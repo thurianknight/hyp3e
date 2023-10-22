@@ -1,0 +1,227 @@
+{
+  "Actor": {
+    "types": ["character", "npc"],
+    "templates": {
+      "base": {
+        "hd": "1d8",
+        "hp": {
+          "value": 10,
+          "min": -10,
+          "max": 10
+        },
+        "ac": {
+          "value": 9,
+          "dr": 0
+        },
+        "atkRate": "1/1",
+        "fa": {
+          "value": 0,
+          "temp": 0
+        },
+        "ca": {
+          "value": 0,
+          "temp": 0
+        },
+        "ta": {
+          "value": 0,
+          "temp": 0
+        },
+        "saves": {
+          "death": {
+            "value": 0
+          },
+          "device": {
+            "value": 0
+          },
+          "transformation": {
+            "value": 0
+          },
+          "avoidance": {
+            "value": 0
+          },
+          "sorcery": {
+            "value": 0
+          }
+        },
+        "movement": {
+          "base": {
+            "value": 40
+          },
+          "exploration": {
+            "value": 120
+          },
+          "travel": {
+            "value": 24
+          }
+        },
+        "otherMv": {
+          "value": ""
+        },
+        "alignment": "",
+        "biography": "",
+        "knownLanguages": ""
+      }
+    },
+    "character": {
+      "templates": ["base"],
+      "details": {
+        "notes": "",
+        "class": "",
+        "level": {
+          "value": 1
+        },
+        "xp": {
+          "value": 0,
+          "toNextLvl": 0,
+          "bonus": 0
+        },
+        "race": "",
+        "gender": "",
+        "age": "",
+        "religion": "",
+        "height": "",
+        "weight": "",
+        "hair": "",
+        "eyes": "",
+        "physicalFeatures": ""
+      },
+      "unskilled": 0,
+      "proficiencies": "",
+      "attributes": {
+        "str": {
+          "value": 10,
+          "atkMod": 0,
+          "dmgMod": 0,
+          "test": 0,
+          "feat": 0
+        },
+        "dex": {
+          "value": 10,
+          "atkMod": 0,
+          "defMod": 0,
+          "test": 0,
+          "feat": 0
+        },
+        "con": {
+          "value": 10,
+          "hpMod": 0,
+          "poisRadMod": 0,
+          "traumaSurvive": 0,
+          "test": 0,
+          "feat": 0
+        },
+        "int": {
+          "value": 10,
+          "languages": 0,
+          "bonusSpells": "",
+          "learnSpell": 0
+        },
+        "wis": {
+          "value": 10,
+          "willMod": 0,
+          "bonusSpells": "",
+          "learnSpell": 0
+        },
+        "cha": {
+          "value": 10,
+          "reaction": 0,
+          "maxHenchmen": 0,
+          "turnUndead": 0
+        }
+      },
+      "explorationSkills": {
+        "listen": {
+          "value": 1
+        },
+        "pickLock": {
+          "value": 1
+        },
+        "secretDoor": {
+          "value": 2
+        },
+        "findTrap": {
+          "value": 1
+        }
+      }
+    },
+    "npc": {
+      "templates": ["base"],
+      "xp": 0,
+      "treasure": ""
+    }
+  },
+  "Item": {
+    "types": ["armor", "container", "feature", "item", "spell", "weapon"],
+    "templates": {
+      "base": {
+        "description": ""
+      },
+      "equippable": {
+        "equipped": false
+      },
+      "physical": {
+        "quantity": {
+          "value": 1,
+          "max": 0
+        },
+        "location": "",
+        "weight": 0,
+        "cost": 0,
+        "containerId": ""
+      },
+      "rollable": {
+        "save": ""
+      }
+    },
+    "armor": {
+      "templates": ["base", "physical", "equippable"],
+      "types": ["unarmored", "light", "medium", "heavy", "shield"],
+      "type": "unarmored",
+      "ac": 9,
+      "dr": 0,
+      "mv": 40
+    },
+    "container": {
+      "templates": ["base", "physical"],
+      "itemIds": []
+    },
+    "feature": {
+      "templates": ["base", "rollable"],
+      "class": "",
+      "level": "",
+      "roll": "d6",
+      "target": "<=3",
+      "blindRoll": false
+    },
+    "item": {
+      "templates": ["base", "physical"],
+      "isContainer": false,
+      "isConsumable": false
+    },
+    "spell": {
+      "templates": ["base", "rollable"],
+      "memorized": 0,
+      "saves": ["death", "transformation", "device", "avoidance", "sorcery"],
+      "spellLevel": 1,
+      "range": "",
+      "duration": "",
+      "classList": ""
+    },
+    "weapon": {
+      "templates": ["base", "physical", "equippable", "rollable"],
+      "types": ["melee", "missile"],
+      "type": "melee",
+      "wc": 0,
+      "range": {
+        "short": 10,
+        "medium": 20,
+        "long": 30
+      },
+      "rof": "1/1",
+      "atkMod": 0,
+      "dmgMod": 0,
+      "damage": "1d6",
+      "annotations": []
+    }
+  }
+}

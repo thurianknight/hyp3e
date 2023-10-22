@@ -1,0 +1,158 @@
+{
+  "HYP3E": {
+    "settings": {
+      "languages": "Languages",
+      "languagesHint": "Known/available languages in Hyperborea.",
+      "characterClasses": "Character Classes",
+      "characterClassesHint": "Character classes available to PCs and some NPCs."
+    },
+    "attributes": {
+      "str": {
+        "name": "Srength",
+        "abbrev": "ST",
+        "atkMod": "Melee Mod",
+        "dmgMod": "Dmg Mod",
+        "test": "Test of ST",
+        "feat": "Feat of ST"
+      },
+      "dex": {
+        "name": "Dexterity",
+        "abbrev": "DX",
+        "atkMod": "Missile Mod",
+        "defMod": "Def Mod",
+        "test": "Test of DX",
+        "feat": "Feat of DX"
+      },
+      "con": {
+        "name": "Constitution",
+        "abbrev": "CN",
+        "hpMod": "HP Mod",
+        "poisRadMod": "Pois/Rad Mod",
+        "traumaSurvive": "Trauma",
+        "test": "Test of CN",
+        "feat": "Feat of CN"
+      },
+      "int": {
+        "name": "Intelligence",
+        "abbrev": "IN",
+        "languages": "Languages",
+        "bonusSpells": "Bonus Spells",
+        "learnSpell": "Learn Spell"
+      },
+      "wis": {
+        "name": "Wisdom",
+        "abbrev": "WS",
+        "willMod": "Will Mod",
+        "bonusSpells": "Bonus Spells",
+        "learnSpell": "Learn Spell"
+      },
+      "cha": {
+        "name": "Charisma",
+        "abbrev": "CH",
+        "reaction": "Reaction",
+        "maxHenchmen": "Max Henchmen",
+        "turnUndead": "Turn Mod"
+      }
+    },
+    "saves": {
+      "death": {
+        "name": "Death",
+        "abbrev": "Death"
+      },
+      "transformation": {
+        "name": "Transformation",
+        "abbrev": "Transform"
+      },
+      "device": {
+        "name": "Devices",
+        "abbrev": "Device"
+      },
+      "avoidance": {
+        "name": "Avoidance",
+        "abbrev": "Avoid"
+      },
+      "sorcery": {
+        "name": "Sorcery",
+        "abbrev": "Sorcery"
+      }
+    },
+    "fightingAbility": "Fighting Ability",
+    "castingAbility": "Casting Ability",
+    "turningAbility": "Turning Ability",
+    "explorationSkills": {
+      "listen": {
+        "name": "Listen at Door",
+        "abbrev": "Listen"
+      },
+      "pickLock": {
+        "name": "Pick Lock",
+        "abbrev": "Lock"
+      },
+      "findSecret": {
+        "name": "Find Secret Door",
+        "abbrev": "Secret Door"
+      },
+      "findTrap": {
+        "name": "Find Trap",
+        "abbrev": "Trap"
+      }
+    },
+    "movement": {
+      "base": {
+        "name": "Base Move",
+        "abbrev": "MV"
+      },
+      "exploration": {
+        "name": "Exploration",
+        "abbrev": "Explore"
+      },
+      "travel": {
+        "name": "Travel (miles)",
+        "abbrev": "Travel"
+      }
+    },
+    "otherMv": {
+      "name": "Other Movement",
+      "abbrev": "Other"
+    },
+    "effect": {
+      "add": "Add Effect",
+      "create": "Create Effect",
+      "toggle": "Toogle Effect"
+    },
+    "feature": {
+      "add": "Add Feature"
+    },
+    "item": {
+      "add": "Add Item",
+      "edit": "Edit",
+      "delete": "Delete",
+      "show": "Show"
+    },
+    "spell": {
+      "addLvl": "Add Lvl",
+      "addSpell": "Add Spell"
+    },
+    "weapon": {
+      "add": "Add Weapon",
+      "type": {
+        "melee": "Melee",
+        "missile": "Missile"
+      }
+    },
+    "armor": {
+      "add": "Add Armor",
+      "type": {
+        "unarmored": "Unarmored",
+        "light": "Light",
+        "medium": "Medium",
+        "heavy": "Heavy",
+        "shield": "Shield"
+      }
+    },
+    "rollFormula": "Roll Formula",
+    "rollExample": "1d6+1",
+    "rollMode": "Roll Mode",
+    "sitMod": "Situational Modifier"
+  }
+}

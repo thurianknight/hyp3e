@@ -1,0 +1,34 @@
+{
+  "id": "hyp3e",
+  "title": "Hyperborea 3rd Edition",
+  "description": "The Hyperborea 3rd Edition system for FoundryVTT!",
+  "version": "0.1",
+  "compatibility": {
+    "minimum": 10,
+    "verified": "11.308",
+    "maximum": 11
+  },
+  "authors": [{
+    "name": "ThurianKnight"
+  }],
+  "esmodules": ["module/hyp3e.mjs"],
+  "styles": ["css/hyp3e.css"],
+  "scripts": [],
+  "packs": [],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "gridDistance": 5,
+  "gridUnits": "ft",
+  "primaryTokenAttribute": "hp",
+  "secondaryTokenAttribute": "None",
+  "url": "",
+  "manifest": "",
+  "download": "",
+  "license": "LICENSE.txt",
+  "changelog": "CHANGELOG.md"
+}

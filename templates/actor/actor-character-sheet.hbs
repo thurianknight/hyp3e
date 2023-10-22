@@ -1,0 +1,106 @@
+<form class="{{cssClass}} {{actor.type}} flexcol" autocomplete="off">
+
+  {{!-- Sheet Header --}}
+  <header class="sheet-header">
+    <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+    <div class="header-block">
+      <div class="character-header-block flexrow">
+        <div class="character-header-block flexcol">
+          <h1 class="charname">
+            <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+          </h1>
+          <div class="flexrow flex-group-center">
+            <label class="header-label align-left">Class</label>
+            <select name="system.details.class">
+              {{#select system.details.class}}
+              <option value=""></option>
+              {{#each characterClasses as |class c|}}
+              <option value="{{class}}">{{class}}</option>
+              {{log 'c='c 'Class='class}}
+              {{/each}}
+              {{/select}}
+            </select>
+            <span></span>
+          </div>
+          <div class="flexrow flex-group-center">
+            <label class="header-label align-left">Alignment</label>
+            <input type="text" name="system.details.alignment" value="{{system.details.alignment}}" data-dtype="String" />
+            <span></span>
+          </div>
+        </div>
+        <div class="character-header-block flexcol">
+          <div class="flexrow flex-group-center">
+            <label class="header-label align-left">Level</label>
+            <input type="text" name="system.details.level.value" value="{{system.details.level.value}}" data-dtype="Number" />
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="flexrow flex-group-center">
+            <label class="header-label align-left">XP</label>
+            <input type="text" name="system.details.xp.value" value="{{system.details.xp.value}}" data-dtype="Number" />
+            <span></span>
+            <label class="header-label flexlarge align-left">To Next Level</label>
+            <input type="text" name="system.details.xp.toNextLvl" value="{{system.details.xp.toNextLvl}}" data-dtype="Number" />
+          </div>
+          <div class="flexrow flex-group-center">
+            <label class="header-label align-left">Bonus</label>
+            <input type="text" name="system.details.xp.bonus" value="{{system.details.xp.bonus}}" data-dtype="Number" /> %
+            <span></span>
+            <label class="header-label flexlarge align-left">Primary Attr</label>
+            <input type="text" name="system.details.xp.primeAttr" value="{{system.details.xp.primeAttr}}" data-dtype="String" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  {{!-- Sheet Tab Navigation --}}
+  <nav class="sheet-tabs tabs" data-group="primary">
+    {{!-- Default tab is specified in actor-sheet.mjs --}}
+    <a class="item" data-tab="abilities">Abilities</a>
+    <a class="item" data-tab="combat">Combat</a>
+    <a class="item" data-tab="spells">Spells</a>
+    <a class="item" data-tab="effects">Effects</a>
+    <a class="item" data-tab="items">Items</a>
+    <a class="item" data-tab="description">Description</a>
+  </nav>
+
+  {{!-- Sheet Body --}}
+  <section class="sheet-body">
+
+    {{!-- Owned Abilities Tab --}}
+    <div class="tab abilities" data-group="primary" data-tab="abilities">
+      {{!-- This is a Handlebars partial. They're stored in the `/parts` folder next to this sheet, and defined in module/helpers/templates.mjs --}}
+      {{> "systems/hyp3e/templates/actor/parts/actor-abilities.hbs"}}
+    </div>
+
+    {{!-- Combat Tab --}}
+    <div class="tab combat" data-group="primary" data-tab="combat">
+       {{> "systems/hyp3e/templates/actor/parts/actor-combat.hbs"}}
+    </div>
+
+    {{!-- Owned Spells Tab --}}
+    <div class="tab spells" data-group="primary" data-tab="spells">
+      {{> "systems/hyp3e/templates/actor/parts/actor-spells.hbs"}}
+    </div>
+
+    {{!-- Active Effects Tab --}}
+    <div class="tab effects flexcol" data-group="primary" data-tab="effects">
+      {{> "systems/hyp3e/templates/actor/parts/actor-effects.hbs"}}
+    </div>
+
+    {{!-- Owned Items Tab --}}
+    <div class="tab items" data-group="primary" data-tab="items">
+       {{> "systems/hyp3e/templates/actor/parts/actor-items.hbs"}}
+    </div>
+
+    {{!-- Biography Tab --}}
+    <div class="tab biography" data-group="primary" data-tab="description">
+      {{> "systems/hyp3e/templates/actor/parts/actor-description.hbs"}}
+    </div>
+
+  </section>
+</form>
+
