@@ -33,7 +33,7 @@ https://github.com/thurianknight/hyp3e/releases/latest/download/system.json
 
 ### Open Game Content Compendium
 
-The Hyperborea Content Compendium is a Foundry VTT module separate from the system. Find it within Foundry VTT's _module_ browser with the search term `hyperborea`.
+The Hyperborea 3rd Edition Content Compendium is a Foundry VTT module separate from the system. Find it within Foundry VTT's _module_ browser with the search term `hyperborea`.
 
 You may also copy the manifest link below and paste it into the manifest link input box.
 
@@ -52,14 +52,13 @@ If you use this system and want to show your appreciation, here's a couple free 
 
 Here's a couple paid things you can do.
 
-- If you'd like to support the original maintainer of this system, U\~man, buy them a coffee on [Ko-Fi](https://ko-fi.com/u_man). It is largely because of U\~man's generosity that we are able to continue providing a free and open source system for Foundry VTT users.
+- If you'd like to support the original maintainer of this system, ThurianKnight, buy him a coffee on [Ko-Fi](https://ko-fi.com/thurianknight).
 
 ## Troubleshooting and Requesting User Support
 
 It's always appreciated when users [submit an issue](https://github.com/thurianknight/hyp3e/issues/new) for all kinds of user questions, comments, and concerns. For those who prefer support via public chat, we recommend asking in:
 
-- The **#dnd-other** channel in the [official Foundry VTT Discord server](https://discord.gg/foundryvtt)
-- The **#hyperborea-virtual-tabletop** channel in the [official Hyperborea Discord server](https://discord.gg/XXXXXXX)
+- The **#hyperborea-virtual-tabletop** channel in the [official North Wind Adventures Discord server](https://discord.gg/YQj5a4z)
 - The [/r/FoundryVTT community on Reddit](https://reddit.com/r/FoundryVTT) may also have answers to your Foundry VTT questions, but it is another general Foundry VTT user community that may not have many users with specific knowledge about HYPERBOREA. Be sure to write `[HYPERBOREA]` in your post subject and select `FVTT Question` from the "Flair" menu.
 
 **We do not offer user support via email. Sorry for the inconvenience.**
@@ -70,7 +69,7 @@ Any feedback is deeply appreciated. Please browse the [open issues](https://gith
 
 If you're a developer, look for our [CONTRIBUTING.md](/CONTRIBUTING.md) file.
 
-If you speak a non-English language, [Join the hyperborea project on Crowdin](https://crowdin.com/project/hyp3e).
+<!-- If you speak a non-English language, [Join the hyperborea project on Crowdin](https://crowdin.com/project/hyp3e). -->
 
 ## Open Game Content Used Under License
 
@@ -85,12 +84,6 @@ This third party product is not affiliated with or approved by North Wind Advent
 Hyperborea is a trademark of North Wind Adventures. The trademark and Hyperborea logo are used with permission of North Wind Adventures, under license. <!-- ADDITIONAL TEXT REQUESTED BY North Wind Adventures --> Permission to use Hyperborea in the ruleset title granted by North Wind Adventures. <!-- END ADDITIONAL TEXT -->
 
 <!-- END TEXT REQUIRED BY LICENSE -->
-
-See [LICENSE.OTHER.HYPERBOREA_THIRD_PARTY_V1_5](/LICENSE.OTHER.HYPERBOREATHIRDPARTY.V1_5) file.
-
-## Code Used Under License
-
-See [LICENSE.GPL](/LICENSE.GPL) file.
 
 ## Licensing Inquiries
 
