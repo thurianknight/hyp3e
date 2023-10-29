@@ -16,7 +16,7 @@ export class Hyp3eItemSheet extends ItemSheet {
 
   /** @override */
   get template() {
-    const path = "systems/hyp3e/templates/item";
+    const path = `${CONFIG.HYP3E.templatePath}/item`;
     // Use the following return statement to get a unique item sheet by type, 
     // like `item-weapon-sheet.hbs`.
     return `${path}/item-${this.item.type}-sheet.hbs`;

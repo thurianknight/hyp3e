@@ -1,6 +1,6 @@
 export const HYP3E = {
   get systemRoot() {
-    return `/systems/${game.system.id}`
+    return `systems/${game.system.id}`
   },
   get assetsPath() {
     return `${this.systemRoot}/assets`

@@ -53,8 +53,12 @@ export class Hyp3eItem extends Item {
       // Retrieve roll data.
       const rollData = this.getRollData();
 
+      console.log("Roll data:", rollData)
+
+      const rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
+      console.log("Roll formula:", rollFormula)
       // Invoke the roll and submit it to chat.
-      const roll = new Roll(rollData.item.formula, rollData);
+      const roll = new Roll(rollFormula, rollData);
       // If you need to store the value first, uncomment the next line.
       // let result = await roll.roll({async: true});
       roll.toMessage({
