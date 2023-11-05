@@ -52,9 +52,7 @@ export class Hyp3eItem extends Item {
     else {
       // Retrieve roll data.
       const rollData = this.getRollData();
-
-      console.log("Roll data:", rollData)
-
+      console.log("Item roll data:", rollData)
       const rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
       console.log("Roll formula:", rollFormula)
       // Invoke the roll and submit it to chat.
@@ -63,8 +61,9 @@ export class Hyp3eItem extends Item {
       // let result = await roll.roll({async: true});
       roll.toMessage({
         speaker: speaker,
-        rollMode: rollMode,
-        flavor: label,
+        flavor: label
+      },{
+        rollMode: rollData.item.rollMode
       });
       return roll;
     }

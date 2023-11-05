@@ -340,9 +340,6 @@ textarea {
 .hyp3e .attribute-block {
   min-width: 575px;
 }
-.hyp3e .exploration-block {
-  min-width: 200px;
-}
 .hyp3e .attribute-row {
   padding-bottom: 5px;
   /* background-color: lightcoral; */
@@ -366,6 +363,9 @@ textarea {
 .hyp3e .mod-label {
   font-size: x-small;
 }
+.hyp3e .exploration-block {
+  min-width: 200px;
+}
 .hyp3e .exploration-label {
   font-weight: bold;
   padding: 5px 5px;
@@ -379,7 +379,7 @@ textarea {
 }
 .hyp3e .combat-block input {
   min-width: 20px;
-  max-width: 50px;
+  max-width: 80px;
 }
 .hyp3e .combat-header {
   font-weight: bold;
@@ -434,6 +434,12 @@ textarea {
 }
 .hyp3e .description-field input {
   min-width: 100px;
+}
+
+/* Custom dialog styles */
+.hyp3e .dialog-label {
+  font-weight: bold;
+  padding: 5px 5px;
 }
 
 /* General resource-field styles -- I am phasing these out, 

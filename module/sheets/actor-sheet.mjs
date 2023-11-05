@@ -95,6 +95,10 @@ export class Hyp3eActorSheet extends ActorSheet {
     context.languages = CONFIG.HYP3E.languages
     console.log("Actor sheet languages:", context.languages)
 
+    // System-defined roll modes
+    context.rollModes = CONFIG.Dice.rollModes
+    console.log("Dice-roll modes:", context.rollModes)
+
   }
 
   /**
@@ -284,9 +288,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     console.log("Element dataset: ", dataset)
 
     try {
-      // const rollResponse = await Hyp3eDice.GetDialogOutput(dataset)
-      // console.log("Dialog response:", rollResponse)  
-
       // Handle item rolls
       if (dataset.rollType) {
         if (dataset.rollType == 'item') {
@@ -294,10 +295,12 @@ export class Hyp3eActorSheet extends ActorSheet {
           const item = this.actor.items.get(itemId);
           dataset.roll = item.system.formula
           console.log("Item:", item)
-          const rollResponse = await Hyp3eDice.GetDialogOutput(dataset)
+          const rollResponse = await Hyp3eDice.ExecRollDialog(dataset)
           console.log("Dialog response:", rollResponse)
           // Add situational modifier from the dice dialog
           item.system.sitMod = rollResponse.sitMod
+          // Add roll mode from the dice dialog
+          item.system.rollMode = rollResponse.rollMode
           if (item) return item.roll();
         }
       }
@@ -305,17 +308,41 @@ export class Hyp3eActorSheet extends ActorSheet {
       // Handle rolls that supply the formula directly
       if (dataset.roll) {
         console.log("Non-item roll")
-        const rollResponse = await Hyp3eDice.GetDialogOutput(dataset)
+        if (dataset.rollType == "save") {
+          // Get the actor's daving throw modifiers
+          console.log("Avoidance mod:", this.actor.system.attributes.dex.defMod*-1)
+          dataset.avoidMod = this.actor.system.attributes.dex.defMod*-1
+          console.log("Poison mod:", this.actor.system.attributes.con.poisRadMod)
+          dataset.poisonMod = this.actor.system.attributes.con.poisRadMod
+          console.log("Will mod:", this.actor.system.attributes.wis.willMod)
+          dataset.willMod = this.actor.system.attributes.wis.willMod
+        }
+        // Log the dataset before the dialog renders
+        console.log("Dataset:", dataset)
+        const rollResponse = await Hyp3eDice.ExecRollDialog(dataset)
+        // Log the dialog response
         console.log("Dialog response:", rollResponse)
+        // Add saving throw modifer, if applicable
+        let saveMod = 0
+        if (rollResponse.avoidMod) {
+          saveMod = rollResponse.avoidMod
+        }
+        if (rollResponse.poisonMod) {
+          saveMod = rollResponse.poisonMod
+        }
+        if (rollResponse.willMod) {
+          saveMod = rollResponse.willMod
+        }
         // Add situational modifier from the dice dialog
-        dataset.roll += ` + ${rollResponse.sitMod}`
-        console.log("Dataset:", dataset.roll)
+        let rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
+        console.log("Roll formula: ", rollFormula)
         let label = dataset.label ? `Rolling ${dataset.label}...` : '';
-        let roll = new Roll(dataset.roll, this.actor.getRollData());
+        let roll = new Roll(rollFormula, this.actor.getRollData());
         roll.toMessage({
           speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-          flavor: label,
-          rollMode: game.settings.get('core', 'rollMode'),
+          flavor: label
+        },{
+          rollMode: rollResponse.rollMode
         });
         return roll;
       }
@@ -323,67 +350,5 @@ export class Hyp3eActorSheet extends ActorSheet {
     } catch {
       // Do nothing
     }
-
   }
-
-  // /**
-  //  * Handle roll dialogs
-  //  * @param dataset
-  //  */
-  // getDialogOutput(dataset) {
-  //   return new Promise((resolve, reject) => {
-
-  //     const dialogHtml = `
-  //       <form>
-  //       <div class='flexrow form-group'>
-  //         <label class='resource-label'>Formula: </label>
-  //         <input type='text' name='data-roll' value=${dataset.roll} disabled />
-  //       </div>
-  //       <div class='flexrow form-group'>
-  //         <label class='resource-label'>Situational Modifier: </label>
-  //         <input type='text' name='sitMod' value="0" />
-  //       </div>
-  //       <div class='flexrow form-group'>
-  //         <label class='resource-label'>Roll Mode: </label>
-  //         <input type='text' name='rollMode' value=${dataset.rollMode} />
-  //       </div>
-  //       </form>
-  //     `
-
-  //     const rollDialog = new Dialog({
-  //       title: `${dataset.label}`,
-  //       content: dialogHtml,
-  //       buttons: {
-  //         roll: {
-  //           icon: '<i class="fas fa-dice-d20"></i>',
-  //           label: "Roll",
-  //           callback: (html) => {
-  //             const formElement = html[0].querySelector('form');
-  //             const formData = new FormDataExtended(formElement);
-  //             const formDataObj = formData.toObject();
-  //             // const formDataObj2 = formData.object();
-  //             console.log('Form data object:', formDataObj);
-  //             console.log("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-  //             ui.notifications.info("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-  //             resolve(html)
-  //           }
-  //         },
-  //         cancel: {
-  //           icon: '<i class="fas fa-times"></i>',
-  //           label: "Cancel",
-  //           callback: (html) => {
-  //             console.log("Roll canceled!"); 
-  //             ui.notifications.info("Roll canceled!")
-  //             reject()
-  //           }
-  //         }
-  //       },
-  //       default: "roll",
-  //       render: html => console.log("Register interactivity in the rendered dialog"),
-  //       close: html => console.log("Dialog closed")
-  //     });
-  //     rollDialog.render(true);
-  //   })
-  // }
-
 }
