@@ -309,13 +309,15 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (dataset.roll) {
         console.log("Non-item roll")
         if (dataset.rollType == "save") {
-          // Get the actor's daving throw modifiers
-          console.log("Avoidance mod:", this.actor.system.attributes.dex.defMod*-1)
-          dataset.avoidMod = this.actor.system.attributes.dex.defMod*-1
-          console.log("Poison mod:", this.actor.system.attributes.con.poisRadMod)
-          dataset.poisonMod = this.actor.system.attributes.con.poisRadMod
-          console.log("Will mod:", this.actor.system.attributes.wis.willMod)
-          dataset.willMod = this.actor.system.attributes.wis.willMod
+          if (this.actor.type == "character") {
+            // Get the character's saving throw modifiers
+            console.log("Avoidance mod:", this.actor.system.attributes.dex.defMod*-1)
+            dataset.avoidMod = this.actor.system.attributes.dex.defMod*-1
+            console.log("Poison mod:", this.actor.system.attributes.con.poisRadMod)
+            dataset.poisonMod = this.actor.system.attributes.con.poisRadMod
+            console.log("Will mod:", this.actor.system.attributes.wis.willMod)
+            dataset.willMod = this.actor.system.attributes.wis.willMod
+          }
         }
         // Log the dataset before the dialog renders
         console.log("Dataset:", dataset)
