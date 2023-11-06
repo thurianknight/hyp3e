@@ -146,6 +146,10 @@
     },
     "npc": {
       "templates": ["base"],
+      "size": "",
+      "noEnc": 0,
+      "noLair": 0,
+      "morale": 1,
       "xp": 0,
       "treasure": ""
     }

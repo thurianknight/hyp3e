@@ -375,9 +375,11 @@ textarea {
 .hyp3e .combat-block {
   padding: 0 2px;
   margin-right: 5px;
+  margin-bottom: 3px;
   /* background-color: aqua; */
 }
 .hyp3e .combat-block input {
+  text-align: center;
   min-width: 20px;
   max-width: 80px;
 }
@@ -398,6 +400,7 @@ textarea {
   /* background-color: aqua; */
 }
 .hyp3e .saves-block input {
+  text-align: center;
   min-width: 20px;
   max-width: 50px;
 }
@@ -417,6 +420,7 @@ textarea {
   /* background-color: darkcyan; */
 }
 .hyp3e .spells input {
+  text-align: center;
   max-width: 50px;
 }
 
@@ -424,7 +428,6 @@ textarea {
 .hyp3e .description-block {
   padding: 0 2px;
   margin-right: 5px;
-  /* background-color: aqua; */
 }
 .hyp3e .description-label {
   font-weight: bold;
@@ -434,6 +437,35 @@ textarea {
 }
 .hyp3e .description-field input {
   min-width: 100px;
+}
+
+/* NPC sheet styles */
+.hyp3e .npc-field {
+  margin-left: 2px;
+  margin-right: 2px;
+  min-width: 75px;
+  /* text-align: center; */
+}
+.hyp3e .small-label {
+  font-size: small;
+  font-weight: bold;
+}
+.hyp3e .npc-stat-block {
+  padding: 0 2px;
+  margin-right: 5px;
+  margin-bottom: 3px;
+  min-width: 180px;
+}
+.hyp3e .npc-stat-block input {
+  text-align: center;
+  min-width: 50px;
+  max-width: 75px;
+}
+.hyp3e .npc-description-block {
+  padding: 0 2px;
+  margin-right: 5px;
+  margin-left: 5px;
+  min-width: 575px;
 }
 
 /* Custom dialog styles */

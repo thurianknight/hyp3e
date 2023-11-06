@@ -61,7 +61,7 @@
       },
       "transformation": {
         "name": "Transformation",
-        "abbrev": "Transform"
+        "abbrev": "Xform"
       },
       "device": {
         "name": "Devices",
@@ -115,6 +115,13 @@
       "name": "Other Movement",
       "abbrev": "Other"
     },
+    "alignment": "Alignment",
+    "size": "Size",
+    "noEnc": "# Enc.",
+    "noLair": "# in Lair",
+    "morale": "Morale",
+    "xp": "XP Value",
+    "treasure": "Treasure Class",
     "effect": {
       "add": "Add Effect",
       "create": "Create Effect",
