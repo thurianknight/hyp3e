@@ -147,11 +147,12 @@
     "npc": {
       "templates": ["base"],
       "size": "",
-      "noEnc": 0,
-      "noLair": 0,
+      "encWild": 0,
+      "encLair": 0,
       "morale": 1,
       "xp": 0,
-      "treasure": ""
+      "treasure": "",
+      "dx": 11
     }
   },
   "Item": {

@@ -295,7 +295,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           const item = this.actor.items.get(itemId);
           dataset.roll = item.system.formula
           console.log("Item:", item)
-          const rollResponse = await Hyp3eDice.ExecRollDialog(dataset)
+          const rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
           console.log("Dialog response:", rollResponse)
           // Add situational modifier from the dice dialog
           item.system.sitMod = rollResponse.sitMod
@@ -307,6 +307,7 @@ export class Hyp3eActorSheet extends ActorSheet {
 
       // Handle rolls that supply the formula directly
       if (dataset.roll) {
+        let rollResponse
         console.log("Non-item roll")
         if (dataset.rollType == "save") {
           if (this.actor.type == "character") {
@@ -317,11 +318,19 @@ export class Hyp3eActorSheet extends ActorSheet {
             dataset.poisonMod = this.actor.system.attributes.con.poisRadMod
             console.log("Will mod:", this.actor.system.attributes.wis.willMod)
             dataset.willMod = this.actor.system.attributes.wis.willMod
+            // Log the dataset before the dialog renders
+            console.log("Dataset:", dataset)
+            rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset)
+          } else {
+            // Log the dataset before the dialog renders
+            console.log("Dataset:", dataset)
+            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
           }
+        } else {
+          // Log the dataset before the dialog renders
+          console.log("Dataset:", dataset)
+          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
         }
-        // Log the dataset before the dialog renders
-        console.log("Dataset:", dataset)
-        const rollResponse = await Hyp3eDice.ExecRollDialog(dataset)
         // Log the dialog response
         console.log("Dialog response:", rollResponse)
         // Add saving throw modifer, if applicable
@@ -348,9 +357,9 @@ export class Hyp3eActorSheet extends ActorSheet {
         });
         return roll;
       }
-
-    } catch {
-      // Do nothing
+    } catch(err) {
+      // Log the error
+      console.log(err)
     }
   }
 }

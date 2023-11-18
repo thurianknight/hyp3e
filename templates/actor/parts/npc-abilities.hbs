@@ -1,6 +1,6 @@
 {{!-- Fighting skills and combat-related abilities --}}
 <div class="resource-content flexrow">
-  <div class="npc-stat-block flexcol">
+  <div class="npc-stat-block">
     {{!-- Basic combat stats here --}}
     <h3>Combat Stats</h3>
     <div class="attribute-row flexrow">
@@ -17,8 +17,12 @@
       <input type="text" name="system.hd" value="{{system.hd}}" data-dtype="String"/>
     </div>
     <div class="attribute-row flexrow">
-      <label for="system.fa.value" class="combat-label">Fighting Ability</label>
+      <label for="system.fa.value" class="combat-label">Fighting Ab</label>
       <input type="text" name="system.fa.value" value="{{system.fa.value}}" data-dtype="Number" />
+    </div>
+    <div class="attribute-row flexrow">
+      <label for="system.dx" class="combat-label">DX</label>
+      <input type="text" name="system.dx" value="{{system.dx}}" data-dtype="Number" />
     </div>
     <div class="attribute-row flexrow">
       <label for="system.ac.value" class="combat-label">Armor Class</label>
@@ -27,6 +31,10 @@
     <div class="attribute-row flexrow">
       <label for="system.ac.dr" class="combat-label">DR</label>
       <input type="text" name="system.ac.dr" value="{{system.ac.dr}}" data-dtype="Number" />
+    </div>
+    <div class="attribute-row flexrow">
+      <label for="system.ca.value" class="combat-label">Casting Ab</label>
+      <input type="text" name="system.ca.value" value="{{system.ca.value}}" data-dtype="Number" />
     </div>
     <div class="attribute-row flexrow">
       <label for="system.movement.base.value" class="combat-label">{{localize "HYP3E.movement.base.abbrev"}}</label>
@@ -81,8 +89,7 @@
         <input type="text" name="system.saves.sorcery.value" value="{{system.saves.sorcery.value}}"/>
       </div>
     </div>
-    {{!-- Natural abilities, weapons and other items here --}}
-    <h3>Abilities & Items</h3>
+    {{!-- Natural abilities, weapons, spells, and other items here --}}
     {{> "systems/hyp3e/templates/actor/parts/actor-all-items.hbs"}}
   </div>
 </div>

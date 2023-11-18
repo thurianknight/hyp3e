@@ -146,7 +146,14 @@ export class Hyp3eActor extends Actor {
   _getNpcRollData(data) {
     if (this.type !== 'npc') return;
 
-    // Process additional NPC data here.
+    // Get fighting ability (FA) and casting ability (CA) -- or fall back to 0
+    if (data.fa) {
+      data.bab = data.fa.value ?? 0;
+    }
+    if (data.ca) {
+      data.bcb = data.ca.value ?? 0;
+    }
+
   }
 
 }
