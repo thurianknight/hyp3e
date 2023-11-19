@@ -14,7 +14,7 @@
     "systems/hyp3e/templates/actor/parts/actor-spells.hbs",
     "systems/hyp3e/templates/actor/parts/actor-effects.hbs",
     "systems/hyp3e/templates/actor/parts/actor-description.hbs",
-    "systems/hyp3e/templates/actor/parts/actor-all-items.hbs",
+    "systems/hyp3e/templates/actor/parts/npc-all-items.hbs",
     "systems/hyp3e/templates/actor/parts/npc-abilities.hbs",
   ]);
 };

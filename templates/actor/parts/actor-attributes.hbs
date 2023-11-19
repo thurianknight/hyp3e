@@ -10,11 +10,11 @@
       <input type="text" name="system.attributes.str.value" value="{{system.attributes.str.value}}" data-dtype="Number"/>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.str.atkMod" value="{{system.attributes.str.atkMod}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.str.atkMod" value="{{numberFormat system.attributes.str.atkMod decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="rollable mod-label" data-roll="1d20 + @str.atkMod + @bab" data-label="Basic ST Attack">{{localize 'HYP3E.attributes.str.atkMod'}} <i class="fas fa-dice-d20"></i></span>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.str.dmgMod" value="{{system.attributes.str.dmgMod}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.str.dmgMod" value="{{numberFormat system.attributes.str.dmgMod decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="mod-label">{{localize 'HYP3E.attributes.str.dmgMod'}}</span>
     </div>
     <div class="attribute-mod">
@@ -39,11 +39,11 @@
       <input type="text" name="system.attributes.dex.value" value="{{system.attributes.dex.value}}" data-dtype="Number"/>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.dex.atkMod" value="{{system.attributes.dex.atkMod}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.dex.atkMod" value="{{numberFormat system.attributes.dex.atkMod decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="rollable mod-label" data-roll="1d20 + @dex.atkMod + @bab" data-label="Basic DX Attack">{{localize 'HYP3E.attributes.dex.atkMod'}} <i class="fas fa-dice-d20"></i></span>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.dex.defMod" value="{{system.attributes.dex.defMod}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.dex.defMod" value="{{numberFormat system.attributes.dex.defMod decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="mod-label">{{localize 'HYP3E.attributes.dex.defMod'}}</span>
     </div>
     <div class="attribute-mod">
@@ -68,11 +68,11 @@
       <input type="text" name="system.attributes.con.value" value="{{system.attributes.con.value}}" data-dtype="Number"/>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.con.hpMod" value="{{system.attributes.con.hpMod}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.con.hpMod" value="{{numberFormat system.attributes.con.hpMod decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="mod-label">{{localize 'HYP3E.attributes.con.hpMod'}}</span>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.con.poisRadMod" value="{{system.attributes.con.poisRadMod}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.con.poisRadMod" value="{{numberFormat system.attributes.con.poisRadMod decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="mod-label">{{localize 'HYP3E.attributes.con.poisRadMod'}}</span>
     </div>
     <div class="attribute-mod">
@@ -98,7 +98,7 @@
       <input type="text" name="system.attributes.int.value" value="{{system.attributes.int.value}}" data-dtype="Number"/>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.int.languages" value="{{system.attributes.int.languages}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.int.languages" value="{{numberFormat system.attributes.int.languages decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="mod-label">{{localize 'HYP3E.attributes.int.languages'}}</span>
     </div>
     <div class="attribute-mod">
@@ -126,7 +126,7 @@
       <input type="text" name="system.attributes.wis.value" value="{{system.attributes.wis.value}}" data-dtype="Number"/>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.wis.willMod" value="{{system.attributes.wis.willMod}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.wis.willMod" value="{{numberFormat system.attributes.wis.willMod decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="mod-label">{{localize 'HYP3E.attributes.wis.willMod'}}</span>
     </div>
     <div class="attribute-mod">
@@ -154,7 +154,7 @@
       <input type="text" name="system.attributes.cha.value" value="{{system.attributes.cha.value}}" data-dtype="Number"/>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.cha.reaction" value="{{system.attributes.cha.reaction}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.cha.reaction" value="{{numberFormat system.attributes.cha.reaction decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="mod-label">{{localize 'HYP3E.attributes.cha.reaction'}}</span>
     </div>
     <div class="attribute-mod">
@@ -162,7 +162,7 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.cha.maxHenchmen'}}</span>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.cha.turnUndead" value="{{system.attributes.cha.turnUndead}}" data-dtype="Number"/>
+      <input type="text" name="system.attributes.cha.turnUndead" value="{{numberFormat system.attributes.cha.turnUndead decimals=0 sign=true}}" data-dtype="Number"/>
       <span class="mod-label">{{localize 'HYP3E.attributes.cha.turnUndead'}}</span>
     </div>
     <div class="attribute-mod">

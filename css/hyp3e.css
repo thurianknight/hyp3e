@@ -479,7 +479,7 @@ textarea {
 .hyp3e .resource {
   padding: 0 2px;
   margin-right: 5px;
-  background-color: aqua;
+  /* background-color: aqua; */
 }
 .hyp3e .resource-header {
   font-weight: bold;
@@ -490,7 +490,7 @@ textarea {
 .hyp3e .resource-label {
   font-weight: bold;
   padding: 5px 5px;
-  background-color: darkcyan;
+  /* background-color: darkcyan; */
 }
 
 /* Character "Items" includes the Class Abilities list, Weapons & Armor lists, 

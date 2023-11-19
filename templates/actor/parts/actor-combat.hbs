@@ -128,8 +128,8 @@
         {{else}}
           <div class="item-prop">{{item.system.wc}}</div>
         {{/if}}
-        <div class="item-prop">{{item.system.atkMod}}</div>
-        <div class="item-prop">{{item.system.dmgMod}}</div>
+        <div class="item-prop">{{numberFormat item.system.atkMod decimals=0 sign=true}}</div>
+        <div class="item-prop">{{numberFormat item.system.dmgMod decimals=0 sign=true}}</div>
         <div class="item-prop">{{item.system.damage}}</div>
         <div class="item-prop"><input name="system.equipped" type="checkbox" {{checked system.equipped}} disabled></div>
         <div class="item-controls">
@@ -167,7 +167,7 @@
       <div class="item-header flexrow">
         <div class="item-name">
           <div class="item-image">
-            <a class="rollable" data-roll-type="item"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+            <a><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
           </div>
           <h4>{{item.name}}</h4>
         </div>

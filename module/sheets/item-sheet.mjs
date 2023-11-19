@@ -1,3 +1,5 @@
+import {Hyp3eDice} from "../dice.mjs";
+
 /**
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
@@ -94,13 +96,26 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Roll handlers, click handlers, etc. would go here.
 
-    // Clicking these links toggles a weapon between melee & missile
-    html.find("a.melee-toggle").click(() => {
-      this.object.update({ 'system.type.melee': !this.object.system.type.melee });
-    });
-    html.find("a.missile-toggle").click(() => {
-      this.object.update({ 'system.type.missile': !this.object.system.type.missile })
-    });
+    // Rollable abilities.
+    html.find('.rollable').click(this._onRoll.bind(this));
+
 
   }
+
+    /**
+   * Handle clickable rolls.
+   * @param {Event} event   The originating click event
+   * @private
+   */
+    async _onRoll(event) {
+      event.preventDefault();
+      const element = event.currentTarget;
+      const dataset = element.dataset;
+  
+      // Log the element
+      console.log("Clicked element: ", element)
+      // Log the element dataset
+      console.log("Element dataset: ", dataset)
+      
+    }
 }

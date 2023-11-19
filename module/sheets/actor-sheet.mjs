@@ -287,6 +287,27 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Log the element dataset
     console.log("Element dataset: ", dataset)
 
+    // How many different roll types do we have?
+    //  Tests of an Attribute: d6 roll-under target
+    //    Formula can be built into character sheet
+    //  Feats of an Attribute: d100 roll-under target
+    //    Formula can be built into character sheet
+    //  Exploration skill checks: d6 roll-under target
+    //    Formula can be built into character sheet
+    //  Class ability checks, esp. thief skills: varies
+    //    Formula can be built into ability
+    //  Turning undead (subset of class abilities): d12 roll-under target
+    //    Formula can be built into turning ability
+    //  Hit dice: dX and sum total
+    //    Formula can be built into character sheet
+    //  Saving throws: d20 roll-over target
+    //    Formula can be built into character sheet
+    //  Attack rolls: d20 roll-over target
+    //    Formula can be built into weapon
+    //  Damage rolls: dX and sum total
+    //    Formula can be built into weapon
+    //  Spell duration, number affected, etc.: varies
+    //    Formulas can be built into spell
     try {
       // Handle item rolls
       if (dataset.rollType) {
@@ -307,6 +328,7 @@ export class Hyp3eActorSheet extends ActorSheet {
 
       // Handle rolls that supply the formula directly
       if (dataset.roll) {
+        let rollFormula
         let rollResponse
         console.log("Non-item roll")
         if (dataset.rollType == "save") {
@@ -321,10 +343,26 @@ export class Hyp3eActorSheet extends ActorSheet {
             // Log the dataset before the dialog renders
             console.log("Dataset:", dataset)
             rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset)
+            // Get saving throw modifer if one was selected
+            let saveMod = 0
+            if (rollResponse.avoidMod) {
+              saveMod = rollResponse.avoidMod
+            }
+            if (rollResponse.poisonMod) {
+              saveMod = rollResponse.poisonMod
+            }
+            if (rollResponse.willMod) {
+              saveMod = rollResponse.willMod
+            }
+            // Add save mod and situational modifier from the dice dialog
+            rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
           } else {
+            // NPC/monster save, no mods
             // Log the dataset before the dialog renders
             console.log("Dataset:", dataset)
             rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+            // Add situational modifier from the dice dialog
+            rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
           }
         } else {
           // Log the dataset before the dialog renders
@@ -333,19 +371,6 @@ export class Hyp3eActorSheet extends ActorSheet {
         }
         // Log the dialog response
         console.log("Dialog response:", rollResponse)
-        // Add saving throw modifer, if applicable
-        let saveMod = 0
-        if (rollResponse.avoidMod) {
-          saveMod = rollResponse.avoidMod
-        }
-        if (rollResponse.poisonMod) {
-          saveMod = rollResponse.poisonMod
-        }
-        if (rollResponse.willMod) {
-          saveMod = rollResponse.willMod
-        }
-        // Add situational modifier from the dice dialog
-        let rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
         console.log("Roll formula: ", rollFormula)
         let label = dataset.label ? `Rolling ${dataset.label}...` : '';
         let roll = new Roll(rollFormula, this.actor.getRollData());
