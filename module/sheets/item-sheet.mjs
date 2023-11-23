@@ -66,6 +66,16 @@ export class Hyp3eItemSheet extends ItemSheet {
         console.log(v, game.i18n.localize(CONFIG.HYP3E.weaponTypes[v]))
         // v.label = game.i18n.localize(CONFIG.HYP3E.weaponTypes[v]) ?? v;
       }
+      // Set melee & missile flags
+      if (context.item.system.type == "melee") {
+        context.item.system.melee = true
+        context.item.system.missile = false
+      } else {
+        context.item.system.melee = false
+        context.item.system.missile = true
+      }
+      console.log("Melee:", context.item.system.melee)
+      console.log("Missile:", context.item.system.missile)
     }
     // Handle armor types
     if (context.item.type == 'armor') {
@@ -116,6 +126,14 @@ export class Hyp3eItemSheet extends ItemSheet {
       console.log("Clicked element: ", element)
       // Log the element dataset
       console.log("Element dataset: ", dataset)
-      
+
+      // Now do some useful stuff!
+      try {
+
+      } catch(err) {
+        // Log the error
+        console.log(err)
+      }
+
     }
 }

@@ -15,7 +15,7 @@
       <div class="item-header flexrow">
         <div class="item-name">
           <div class="item-image">
-            <a class="rollable" data-roll-type="item"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+            <a {{#if item.system.roll}}class="rollable" data-roll-type="item"{{/if}}><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
           </div>
           <h4>{{item.name}}</h4>
         </div>

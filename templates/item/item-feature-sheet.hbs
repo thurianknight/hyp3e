@@ -25,12 +25,11 @@
           <input type="text" name="system.class" value="{{system.class}}" data-dtype="String"/>
           <label class="resource-label">Level</label>
           <input type="text" name="system.level" value="{{system.level}}" data-dtype="String"/>
-          <label class="resource-label">Roll</label>
-          <input type="text" name="system.roll" value="{{system.roll}}" data-dtype="String"/>
+          <label class="rollable resource-label">Check Roll</label>
+          <input type="text" name="system.check" value="{{system.check}}" data-dtype="String"/>
           <label class="resource-label">Target</label>
           <input type="text" name="system.target" value="{{system.target}}" data-dtype="String"/>
           <label class="resource-label">Blind Roll</label>
-          {{!-- <input type="text" name="system.blindRoll" value="{{system.blindRoll}}"/> --}}
           <select name="system.blindRoll">
             {{#select system.blindRoll}}
             <option value=""></option>
@@ -38,6 +37,18 @@
             <option value="false">False</option>
             {{/select}}
           </select>
+          <label class="resource-label">Save</label>
+          <div class="form-fields">
+            <select name="system.save">
+              {{#select system.save}}
+              <option value=""></option>
+              {{#each system.saves as |save t|}}
+              <option value="{{save}}">{{save}}</option>
+              {{log 't='t 'save='save}}
+              {{/each}}
+              {{/select}}
+            </select>
+          </div>
         </div>
 
         {{!-- Description --}}
@@ -52,8 +63,22 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
-        <label class="resource-label">Roll Formula</label>
+        <label class="resource-label">System Roll Formula</label>
         <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
+        <label class="resource-label">Attack Roll Formula</label>
+        <input type="text" name="system.attack" value="{{system.attack}}" data-dtype="String"/>
+        <label class="resource-label">Damage Roll Formula</label>
+        <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String"/>
+        {{!-- <label class="resource-label">Check Roll Formula</label>
+        <input type="text" name="system.check" value="{{system.check}}" data-dtype="String"/> --}}
+        {{!-- <label class="resource-label">Save Roll Formula</label>
+        <input type="text" name="system.save" value="{{system.save}}" data-dtype="String"/> --}}
+        <label class="resource-label">Duration Formula</label>
+        <input type="text" name="system.duration" value="{{system.duration}}" data-dtype="String"/>
+        <label class="resource-label">Number Affected Formula</label>
+        <input type="text" name="system.affected" value="{{system.affected}}" data-dtype="String"/>
+        {{!-- <label class="resource-label">Target Number Formula</label>
+        <input type="text" name="system.target" value="{{system.target}}" data-dtype="String"/> --}}
         <label class="resource-label">Item ID</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
       </div>

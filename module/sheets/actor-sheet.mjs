@@ -289,25 +289,26 @@ export class Hyp3eActorSheet extends ActorSheet {
 
     // How many different roll types do we have?
     //  Tests of an Attribute: d6 roll-under target
-    //    Formula can be built into character sheet
+    //    Formula built into character sheet
     //  Feats of an Attribute: d100 roll-under target
-    //    Formula can be built into character sheet
+    //    Formula built into character sheet
     //  Exploration skill checks: d6 roll-under target
-    //    Formula can be built into character sheet
-    //  Class ability checks, esp. thief skills: varies
-    //    Formula can be built into ability
-    //  Turning undead (subset of class abilities): d12 roll-under target
-    //    Formula can be built into turning ability
+    //    Formula built into character sheet
     //  Hit dice: dX and sum total
-    //    Formula can be built into character sheet
+    //    Formula built into character sheet
     //  Saving throws: d20 roll-over target
-    //    Formula can be built into character sheet
+    //    Formula built into character sheet
+
+    //  Class ability checks, esp. thief skills: varies, but usually d6 or d12 roll-under target
+    //    Formula can be built into ability => item sheet of type "feature"
+    //  Turning undead (subset of class abilities): d12 roll-under target
+    //    Formula can be built into turning ability => item sheet of type "feature"
     //  Attack rolls: d20 roll-over target
-    //    Formula can be built into weapon
+    //    Formula can be built into weapon => item sheet of type "weapon"
     //  Damage rolls: dX and sum total
-    //    Formula can be built into weapon
+    //    Formula can be built into weapon => item sheet of type "weapon"
     //  Spell duration, number affected, etc.: varies
-    //    Formulas can be built into spell
+    //    Formulas can be built into spell => item sheet of type "spell"
     try {
       // Handle item rolls
       if (dataset.rollType) {

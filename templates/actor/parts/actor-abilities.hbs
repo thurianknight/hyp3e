@@ -40,7 +40,7 @@
   <li class="item flexrow items-header">
     <div class="item-name">Class Abilities</div>
     <div class="item-prop">Level</div>
-    <div class="item-prop">Roll</div>
+    <div class="item-prop">Check Roll</div>
     <div class="item-prop">Target</div>
     <div class="item-controls">
       <a class="item-control item-create" title="Create item" data-type="feature">
@@ -53,12 +53,12 @@
       <div class="item-header flexrow">
         <div class="item-name">
           <div class="item-image">
-            <a {{#if item.system.roll}}class="rollable" data-roll-type="item"{{/if}}><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+            <a {{#if item.system.check}}class="rollable" data-roll-type="item"{{/if}}><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
           </div>
           <h4>{{item.name}}</h4>
         </div>
         <div class="item-prop">{{item.system.level}}</div>
-        <div class="item-prop">{{item.system.roll}}</div>
+        <div class="item-prop">{{item.system.check}}</div>
         <div class="item-prop">{{item.system.target}}</div>
         <div class="item-controls">
           <a class="item-control item-show" title='{{localize "HYP3E.item.show"}}'><i class="fas fa-eye"></i></a>

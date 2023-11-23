@@ -175,7 +175,14 @@
         "containerId": ""
       },
       "rollable": {
-        "save": ""
+        "saves": ["death", "transformation", "device", "avoidance", "sorcery"],
+        "attack": "",
+        "damage": "",
+        "check": "",
+        "save": "",
+        "duration": "",
+        "affected": "",
+        "target": ""
       }
     },
     "armor": {
@@ -194,8 +201,6 @@
       "templates": ["base", "rollable"],
       "class": "",
       "level": "",
-      "roll": "d6",
-      "target": "<=3",
       "blindRoll": false
     },
     "item": {
@@ -206,10 +211,8 @@
     "spell": {
       "templates": ["base", "rollable"],
       "memorized": 0,
-      "saves": ["death", "transformation", "device", "avoidance", "sorcery"],
       "spellLevel": 1,
       "range": "",
-      "duration": "",
       "classList": ""
     },
     "weapon": {
@@ -225,7 +228,6 @@
       "rof": "1/1",
       "atkMod": 0,
       "dmgMod": 0,
-      "damage": "1d6",
       "annotations": []
     }
   }
