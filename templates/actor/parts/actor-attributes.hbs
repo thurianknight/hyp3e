@@ -2,7 +2,7 @@
 <div class="abilities flexcol">
   <!-- Strength -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="rollable flex" data-roll="3d6" data-label="Basic ST check">
+    <span class="rollable flex" data-roll="3d6" data-roll-type="check" data-roll-target="{{system.attributes.str.value}}" data-label="Basic ST check">
       <label for="system.attributes.str.value" class="attribute-label">{{localize 'HYP3E.attributes.str.abbrev'}}</label>
       <i class="fas fa-dice"></i>
     </span>
@@ -11,7 +11,7 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.str.atkMod" value="{{numberFormat system.attributes.str.atkMod decimals=0 sign=true}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d20 + @str.atkMod + @bab" data-label="Basic ST Attack">{{localize 'HYP3E.attributes.str.atkMod'}} <i class="fas fa-dice-d20"></i></span>
+      <span class="rollable mod-label" data-roll="1d20 + @str.atkMod + @bab" data-roll-type="attack" data-roll-target="" data-label="Basic ST Attack">{{localize 'HYP3E.attributes.str.atkMod'}} <i class="fas fa-dice-d20"></i></span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.str.dmgMod" value="{{numberFormat system.attributes.str.dmgMod decimals=0 sign=true}}" data-dtype="Number"/>
@@ -19,11 +19,11 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.str.test" value="{{system.attributes.str.test}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d6" data-label="{{localize 'HYP3E.attributes.str.test'}}">{{localize 'HYP3E.attributes.str.test'}} <i class="fas fa-dice-d6"></i></span>
+      <span class="rollable mod-label" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.str.test}}" data-label="{{localize 'HYP3E.attributes.str.test'}}">{{localize 'HYP3E.attributes.str.test'}} <i class="fas fa-dice-d6"></i></span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.str.feat" value="{{system.attributes.str.feat}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-label="{{localize 'HYP3E.attributes.str.feat'}}">{{localize 'HYP3E.attributes.str.feat'}} <i class="fas fa-dice-d10"></i></span>
+      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.str.feat}}" data-label="{{localize 'HYP3E.attributes.str.feat'}}">{{localize 'HYP3E.attributes.str.feat'}} <i class="fas fa-dice-d10"></i></span>
     </div>
     <div class="attribute-mod">
       <span></span>
@@ -31,7 +31,7 @@
   </div>
   <!-- Dexterity -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="rollable flex" data-roll="3d6" data-label="Basic DX check">
+    <span class="rollable flex" data-roll="3d6" data-roll-type="check" data-roll-target="{{system.attributes.dex.value}}" data-label="Basic DX check">
       <label for="system.attributes.dex.value" class="attribute-label">{{localize 'HYP3E.attributes.dex.abbrev'}}</label>
       <i class="fas fa-dice"></i>
     </span>
@@ -40,7 +40,7 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.dex.atkMod" value="{{numberFormat system.attributes.dex.atkMod decimals=0 sign=true}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d20 + @dex.atkMod + @bab" data-label="Basic DX Attack">{{localize 'HYP3E.attributes.dex.atkMod'}} <i class="fas fa-dice-d20"></i></span>
+      <span class="rollable mod-label" data-roll="1d20 + @dex.atkMod + @bab" data-roll-type="attack" data-roll-target="" data-label="Basic DX Attack">{{localize 'HYP3E.attributes.dex.atkMod'}} <i class="fas fa-dice-d20"></i></span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.dex.defMod" value="{{numberFormat system.attributes.dex.defMod decimals=0 sign=true}}" data-dtype="Number"/>
@@ -48,11 +48,11 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.dex.test" value="{{system.attributes.dex.test}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d6" data-label="{{localize 'HYP3E.attributes.dex.test'}}">{{localize 'HYP3E.attributes.dex.test'}} <i class="fas fa-dice-d6"></i></span>
+      <span class="rollable mod-label" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.dex.test}}" data-label="{{localize 'HYP3E.attributes.dex.test'}}">{{localize 'HYP3E.attributes.dex.test'}} <i class="fas fa-dice-d6"></i></span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.dex.feat" value="{{system.attributes.dex.feat}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-label="{{localize 'HYP3E.attributes.dex.feat'}}">{{localize 'HYP3E.attributes.dex.feat'}} <i class="fas fa-dice-d10"></i></span>
+      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.dex.feat}}" data-label="{{localize 'HYP3E.attributes.dex.feat'}}">{{localize 'HYP3E.attributes.dex.feat'}} <i class="fas fa-dice-d10"></i></span>
     </div>
     <div class="attribute-mod">
       <span></span>
@@ -60,7 +60,7 @@
   </div>
   <!-- Constitution -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="rollable flex" data-roll="3d6" data-label="Basic CN check">
+    <span class="rollable flex" data-roll="3d6" data-roll-type="check" data-roll-target="{{system.attributes.con.value}}" data-label="Basic CN check">
       <label for="system.attributes.con.value" class="attribute-label">{{localize 'HYP3E.attributes.con.abbrev'}}</label>
       <i class="fas fa-dice"></i>
     </span>
@@ -77,20 +77,20 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.con.traumaSurvive" value="{{system.attributes.con.traumaSurvive}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-label="{{localize 'HYP3E.attributes.con.traumaSurvive'}}">{{localize 'HYP3E.attributes.con.traumaSurvive'}} <i class="fas fa-dice-d10"></i></span>
+      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.con.traumaSurvive}}" data-label="{{localize 'HYP3E.attributes.con.traumaSurvive'}}">{{localize 'HYP3E.attributes.con.traumaSurvive'}} <i class="fas fa-dice-d10"></i></span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.con.test" value="{{system.attributes.con.test}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d6" data-label="{{localize 'HYP3E.attributes.con.test'}}">{{localize 'HYP3E.attributes.con.test'}} <i class="fas fa-dice-d6"></i></span>
+      <span class="rollable mod-label" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.con.test}}" data-label="{{localize 'HYP3E.attributes.con.test'}}">{{localize 'HYP3E.attributes.con.test'}} <i class="fas fa-dice-d6"></i></span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.con.feat" value="{{system.attributes.con.feat}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-label="{{localize 'HYP3E.attributes.con.feat'}}">{{localize 'HYP3E.attributes.con.feat'}} <i class="fas fa-dice-d10"></i></span>
+      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.con.feat}}" data-label="{{localize 'HYP3E.attributes.con.feat'}}">{{localize 'HYP3E.attributes.con.feat'}} <i class="fas fa-dice-d10"></i></span>
     </div>
   </div>
   <!-- Intelligence -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="rollable flex" data-roll="3d6" data-label="Basic IN check">
+    <span class="rollable flex" data-roll="3d6" data-roll-type="check" data-roll-target="{{system.attributes.int.value}}" data-label="Basic IN check">
       <label for="system.attributes.int.value" class="attribute-label">{{localize 'HYP3E.attributes.int.abbrev'}}</label>
       <i class="fas fa-dice"></i>
     </span>
@@ -107,7 +107,7 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.int.learnSpell" value="{{system.attributes.int.learnSpell}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-label="{{localize 'HYP3E.attributes.int.learnSpell'}}">{{localize 'HYP3E.attributes.int.learnSpell'}} <i class="fas fa-dice-d10"></i></span>
+      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.int.learnSpell}}" data-label="{{localize 'HYP3E.attributes.int.learnSpell'}}">{{localize 'HYP3E.attributes.int.learnSpell'}} <i class="fas fa-dice-d10"></i></span>
     </div>
     <div class="attribute-mod">
       <span></span>
@@ -118,7 +118,7 @@
   </div>
   <!-- Wisdom -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="rollable flex" data-roll="3d6" data-label="Basic WS check">
+    <span class="rollable flex" data-roll="3d6" data-roll-type="check" data-roll-target="{{system.attributes.wis.value}}" data-label="Basic WS check">
       <label for="system.attributes.wis.value" class="attribute-label">{{localize 'HYP3E.attributes.wis.abbrev'}}</label>
       <i class="fas fa-dice"></i>
     </span>
@@ -135,7 +135,7 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.wis.learnSpell" value="{{system.attributes.wis.learnSpell}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-label="{{localize 'HYP3E.attributes.wis.learnSpell'}}">{{localize 'HYP3E.attributes.wis.learnSpell'}} <i class="fas fa-dice-d10"></i></span>
+      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.wis.learnSpell}}" data-label="{{localize 'HYP3E.attributes.wis.learnSpell'}}">{{localize 'HYP3E.attributes.wis.learnSpell'}} <i class="fas fa-dice-d10"></i></span>
     </div>
     <div class="attribute-mod">
       <span></span>
@@ -146,7 +146,7 @@
   </div>
   <!-- Charisma -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="rollable flex" data-roll="3d6" data-label="Basic CH check">
+    <span class="rollable flex" data-roll="3d6" data-roll-type="check" data-roll-target="{{system.attributes.cha.value}}" data-label="Basic CH check">
       <label for="system.attributes.cha.value" class="attribute-label">{{localize 'HYP3E.attributes.cha.abbrev'}}</label>
       <i class="fas fa-dice"></i>
     </span>

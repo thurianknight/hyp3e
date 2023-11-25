@@ -35,6 +35,18 @@
         <div class="flexcol flexshrink flex-group-center item-attributes">
           <label class="resource-label">Location</label>
           <input type="text" name="system.location" value="{{system.location}}" data-dtype="String" />
+          <label class="resource-label">Check Roll</label>
+          <input type="text" name="system.check" value="{{system.check}}" data-dtype="String"/>
+          <label class="resource-label">Target</label>
+          <input type="text" name="system.target" value="{{system.target}}" data-dtype="String"/>
+          <label class="resource-label">Blind Roll</label>
+          <select name="system.blindRoll">
+            {{#select system.blindRoll}}
+            <option value=""></option>
+            <option value="true">True</option>
+            <option value="false">False</option>
+            {{/select}}
+          </select>
         </div>
 
         {{!-- Description Tab --}}

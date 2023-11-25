@@ -36,9 +36,13 @@
         <div class="item-header flexrow">
           <div class="item-name">
             <div class="item-image">
-              <a {{#if item.system.roll}}class="rollable" data-roll-type="item" data-label="Attack with {{item.name}}"{{/if}}><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+              {{#if item.system.attack}}
+              <a class="rollable" data-roll-type="item" data-label="Attack with {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+              {{else}}
+              <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+              {{/if}}
             </div>
-            <h4>{{item.name}}</h4>
+            <a><h4 class="item-drop">{{item.name}}</h4></a>
           </div>
           <div class="item-prop">{{item.system.memorized}}</div>
           <div class="item-prop">{{item.system.range}}</div>

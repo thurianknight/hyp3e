@@ -11,7 +11,7 @@
     <div class="abilities flexcol">
       {{#each system.explorationSkills as |skill key|}}
       <div class="ability flexrow flex-group-center">
-        <span class="rollable flex-xlarge align-left" data-roll="d6" data-label="{{skill.label}}">
+        <span class="rollable flex-xlarge align-left" data-roll="d6" data-roll-target="{{skill.value}}" data-roll-type="check" data-label="{{skill.label}}">
           <label for="system.explorationSkills.{{key}}.value" class="exploration-label">{{skill.label}}</label>
           <i class="fas fa-dice-d6"></i>
         </span>
@@ -53,9 +53,13 @@
       <div class="item-header flexrow">
         <div class="item-name">
           <div class="item-image">
-            <a {{#if item.system.check}}class="rollable" data-roll-type="item"{{/if}}><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+            {{#if item.system.check}}
+            <a class="rollable" data-roll-type="item"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+            {{else}}
+            <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+            {{/if}}
           </div>
-          <h4>{{item.name}}</h4>
+          <a><h4 class="item-drop">{{item.name}}</h4></a>
         </div>
         <div class="item-prop">{{item.system.level}}</div>
         <div class="item-prop">{{item.system.check}}</div>

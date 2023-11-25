@@ -25,9 +25,9 @@
           <input type="text" name="system.spellLevel" value="{{system.spellLevel}}" data-dtype="String" />
           <label class="resource-label"># Mem</label>
           <input type="text" name="system.memorized" value="{{system.memorized}}" data-dtype="Number" />
-          <label class="rollable resource-label">Range</label>
+          <label class="resource-label">Range</label>
           <input type="text" name="system.range" value="{{system.range}}" data-dtype="String" />
-          <label class="rollable resource-label">Duration</label>
+          <label class="resource-label">Duration</label>
           <input type="text" name="system.duration" value="{{system.duration}}" data-dtype="String" />
           <label class="resource-label">Save</label>
           <div class="form-fields">
@@ -41,10 +41,7 @@
               {{/select}}
             </select>
           </div>
-          <span class="rollable flex" data-roll="{{system.damage}}" data-label="Damage">
-            <label for="system.damage" class="resource-label">Damage</label>
-            <i class="fas fa-dice"></i>
-          </span>
+          <label for="system.damage" class="resource-label">Damage</label>
           <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String"/>
         </div>
 

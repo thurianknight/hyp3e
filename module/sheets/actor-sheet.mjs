@@ -174,7 +174,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       item.sheet.render(true);
     });
 
-    html.find(".item-name").click((event) => {
+    html.find(".item-drop").click((event) => {
       this._toggleItemSummary(event);
     });
 
@@ -310,71 +310,183 @@ export class Hyp3eActorSheet extends ActorSheet {
     //  Spell duration, number affected, etc.: varies
     //    Formulas can be built into spell => item sheet of type "spell"
     try {
-      // Handle item rolls
-      if (dataset.rollType) {
-        if (dataset.rollType == 'item') {
+      // What is our roll type?
+      console.log("Roll Type:", dataset.rollType)
+      let rollFormula
+      let rollResponse
+
+      switch (dataset.rollType) {
+        case "item":
+          console.log("Rolling item...");
           const itemId = element.closest('.item').dataset.itemId;
           const item = this.actor.items.get(itemId);
-          dataset.roll = item.system.formula
-          console.log("Item:", item)
-          const rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
-          console.log("Dialog response:", rollResponse)
+          if (item.type == "weapon" || item.type == "spell") {
+            dataset.roll = item.system.attack;
+          } else {
+            // This is the default for features & gear
+            dataset.roll = item.system.check;
+          }
+          console.log("Item:", item);
+          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          // Log the dialog response
+          console.log("Dialog response:", rollResponse);
           // Add situational modifier from the dice dialog
-          item.system.sitMod = rollResponse.sitMod
+          item.system.sitMod = rollResponse.sitMod;
           // Add roll mode from the dice dialog
-          item.system.rollMode = rollResponse.rollMode
+          item.system.rollMode = rollResponse.rollMode;
           if (item) return item.roll();
-        }
-      }
+          break;
+  
+        case "check":
+          console.log("Rolling check...");
+          // Log the dataset before the dialog renders
+          console.log("Dataset:", dataset);
+          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          // Add situational modifier from the dice dialog
+          rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
+          break;
 
-      // Handle rolls that supply the formula directly
-      if (dataset.roll) {
-        let rollFormula
-        let rollResponse
-        console.log("Non-item roll")
-        if (dataset.rollType == "save") {
+        case "attack":
+          console.log("Rolling attack...");
+          // Log the dataset before the dialog renders
+          console.log("Dataset:", dataset);
+          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          // Add situational modifier from the dice dialog
+          rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
+          break;
+
+        case "damage":
+          console.log("Rolling damage...");
+          // Log the dataset before the dialog renders
+          console.log("Dataset:", dataset);
+          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          // Add situational modifier from the dice dialog
+          rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
+          break;
+
+        case "save":
+          console.log("Rolling save...");
           if (this.actor.type == "character") {
             // Get the character's saving throw modifiers
-            console.log("Avoidance mod:", this.actor.system.attributes.dex.defMod*-1)
-            dataset.avoidMod = this.actor.system.attributes.dex.defMod*-1
-            console.log("Poison mod:", this.actor.system.attributes.con.poisRadMod)
-            dataset.poisonMod = this.actor.system.attributes.con.poisRadMod
-            console.log("Will mod:", this.actor.system.attributes.wis.willMod)
-            dataset.willMod = this.actor.system.attributes.wis.willMod
+            console.log("Avoidance mod:", this.actor.system.attributes.dex.defMod*-1);
+            dataset.avoidMod = this.actor.system.attributes.dex.defMod*-1;
+            console.log("Poison mod:", this.actor.system.attributes.con.poisRadMod);
+            dataset.poisonMod = this.actor.system.attributes.con.poisRadMod;
+            console.log("Will mod:", this.actor.system.attributes.wis.willMod);
+            dataset.willMod = this.actor.system.attributes.wis.willMod;
             // Log the dataset before the dialog renders
-            console.log("Dataset:", dataset)
-            rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset)
+            console.log("Dataset:", dataset);
+            rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset);
+            console.log("Dialog response:", rollResponse);
             // Get saving throw modifer if one was selected
-            let saveMod = 0
+            let saveMod = 0;
             if (rollResponse.avoidMod) {
-              saveMod = rollResponse.avoidMod
+              saveMod = rollResponse.avoidMod;
             }
             if (rollResponse.poisonMod) {
-              saveMod = rollResponse.poisonMod
+              saveMod = rollResponse.poisonMod;
             }
             if (rollResponse.willMod) {
-              saveMod = rollResponse.willMod
+              saveMod = rollResponse.willMod;
             }
             // Add save mod and situational modifier from the dice dialog
-            rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
+            rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`;
           } else {
             // NPC/monster save, no mods
             // Log the dataset before the dialog renders
-            console.log("Dataset:", dataset)
-            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+            console.log("Dataset:", dataset);
+            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
             // Add situational modifier from the dice dialog
-            rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
+            rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
           }
-        } else {
+          break;
+
+        case "basic":
+          console.log("Rolling basic...");
           // Log the dataset before the dialog renders
-          console.log("Dataset:", dataset)
-          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
-        }
+          console.log("Dataset:", dataset);
+          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          // Add situational modifier from the dice dialog
+          rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
+          break;
+
+        default:
+          console.log("Rolling default...");
+          // Log the dataset before the dialog renders
+          console.log("Dataset:", dataset);
+          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          // Add situational modifier from the dice dialog
+          rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
+
+      }
+      
+      // Handle non-item rolls that supply the formula directly
+      if (dataset.rollType != "item") {
         // Log the dialog response
         console.log("Dialog response:", rollResponse)
         console.log("Roll formula: ", rollFormula)
-        let label = dataset.label ? `Rolling ${dataset.label}...` : '';
-        let roll = new Roll(rollFormula, this.actor.getRollData());
+        let label = dataset.label ? `Rolling ${dataset.label}...` : ''
+        let roll = new Roll(rollFormula, this.actor.getRollData())
+        // Resolve the roll
+        let result = await roll.evaluate()
+        console.log("Roll result: ", roll)
+
+        // Determine success or failure if we have a target number
+        if (dataset.rollTarget != '' && dataset.rollTarget != 'undefined') {
+          // Attribute, skill and other checks are roll-under for success
+          if (dataset.rollType == "check" || dataset.rollType == "basic") {
+            if(roll.total <= dataset.rollTarget) {
+              console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!")
+              label += "<b>Success</b>!"
+            } else {
+              console.log(roll.total + " is greater than " + dataset.rollTarget + "!")
+              label += "<i>Fail</i>."
+            }
+          // Saves are roll-over for success
+          } else if (dataset.rollType == "save") {
+            if(roll.total >= dataset.rollTarget) {
+              console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!")
+              label += "<b>Success</b>!"
+            } else {
+              console.log(roll.total + " is less than " + dataset.rollTarget + "!")
+              label += "<i>Fail</i>."
+            }
+          // Attacks will never trigger here, until we get targeting functionality added
+          } else if (dataset.rollType == "attack") {
+            let naturalRoll = roll.dice[0].total
+            if(roll.total >= dataset.rollTarget) {
+              console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!")
+              if (naturalRoll == 20) {
+                label += "<span style='color:#2ECC71'><b>critically hits!</b></span>"
+              } else {
+                label += "<b>hits!</b>"
+              }
+            } else {
+              console.log(roll.total + " is less than " + dataset.rollTarget + "!")
+              if (naturalRoll == 1) {
+                label += "<span style='color:#E90000'><i>critically misses!</i></span>"
+              } else {
+                label += "<i>misses.</i>"
+              }
+            }  
+          }
+        } else {
+          // No target number supplied, as is common with attacks
+          if (dataset.rollType == "attack") {
+            console.log(roll.total)
+            console.log(roll.total + " hits AC 19 - " + roll.total + " = " + eval(19 - roll.total))
+            let naturalRoll = roll.dice[0].total
+            if (naturalRoll == 20) {
+              label += "<span style='color:#2ECC71'>critically hits <b>AC " + eval(19 - roll.total) + "!</b></span>"
+            } else if (naturalRoll == 1) {
+              label += "<span style='color:#E90000'><i>critically misses!</i></span>"
+            } else {
+              label += "hits <b>AC " + eval(19 - roll.total) + ".</b>"
+            }
+          }
+        }
+
+        // Output roll result to a chat message
         roll.toMessage({
           speaker: ChatMessage.getSpeaker({ actor: this.actor }),
           flavor: label

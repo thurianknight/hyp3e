@@ -54,35 +54,35 @@
     </div>
     <div class="saves-block flexrow flex-between">
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-label="Death Save">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.death.value}}" data-label="Death Save">
           <label for="system.saves.death.value" class="combat-label">{{localize "HYP3E.saves.death.abbrev"}}</label>
           <i class="fas fa-dice-d20"></i>
           </span>
         <input type="text" name="system.saves.death.value" value="{{system.saves.death.value}}"/>
       </div>
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-label="Device Save">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.device.value}}" data-label="Device Save">
           <label for="system.saves.device.value" class="combat-label">{{localize "HYP3E.saves.device.abbrev"}}</label>
           <i class="fas fa-dice-d20"></i>
         </span>
         <input type="text" name="system.saves.device.value" value="{{system.saves.device.value}}"/>
       </div>
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-label="Transformation Save">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.transformation.value}}" data-label="Transformation Save">
           <label for="system.saves.transformation.value" class="combat-label">{{localize "HYP3E.saves.transformation.abbrev"}}</label>
           <i class="fas fa-dice-d20"></i>
         </span>
         <input type="text" name="system.saves.transformation.value" value="{{system.saves.transformation.value}}"/>
       </div>
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-label="Avoidance Save">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.avoidance.value}}" data-label="Avoidance Save">
           <label for="system.saves.avoidance.value" class="combat-label">{{localize "HYP3E.saves.avoidance.abbrev"}}</label>
           <i class="fas fa-dice-d20"></i>
         </span>
         <input type="text" name="system.saves.avoidance.value" value="{{system.saves.avoidance.value}}"/>
       </div>
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-label="Sorcery Save">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.sorcery.value}}" data-label="Sorcery Save">
           <label for="system.saves.sorcery.value" class="combat-label">{{localize "HYP3E.saves.sorcery.abbrev"}}</label>
           <i class="fas fa-dice-d20"></i>
         </span>
