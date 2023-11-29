@@ -1,4 +1,4 @@
-import {Hyp3eDice} from "../dice.mjs";
+// import {Hyp3eDice} from "../dice.mjs";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -62,10 +62,10 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Handle weapon types
     if (context.item.type == 'weapon') {
-      for (let [k, v] of Object.entries(context.item.system.types)) {
-        console.log(v, game.i18n.localize(CONFIG.HYP3E.weaponTypes[v]))
-        // v.label = game.i18n.localize(CONFIG.HYP3E.weaponTypes[v]) ?? v;
-      }
+      // for (let [k, v] of Object.entries(context.item.system.types)) {
+      //   console.log(v, game.i18n.localize(CONFIG.HYP3E.weaponTypes[v]))
+      //   // v.label = game.i18n.localize(CONFIG.HYP3E.weaponTypes[v]) ?? v;
+      // }
       // Set melee & missile flags
       if (context.item.system.type == "melee") {
         context.item.system.melee = true
@@ -74,23 +74,23 @@ export class Hyp3eItemSheet extends ItemSheet {
         context.item.system.melee = false
         context.item.system.missile = true
       }
-      console.log("Melee:", context.item.system.melee)
-      console.log("Missile:", context.item.system.missile)
+      // console.log("Melee:", context.item.system.melee)
+      // console.log("Missile:", context.item.system.missile)
     }
     // Handle armor types
     if (context.item.type == 'armor') {
-      for (let [k, v] of Object.entries(context.item.system.types)) {
-        console.log("Armor Types:", v, game.i18n.localize(CONFIG.HYP3E.armorTypes[v]))
-        // v.label = game.i18n.localize(CONFIG.HYP3E.armorTypes[v]) ?? v;
-      }
+      // for (let [k, v] of Object.entries(context.item.system.types)) {
+      //   console.log("Armor Types:", v, game.i18n.localize(CONFIG.HYP3E.armorTypes[v]))
+      //   // v.label = game.i18n.localize(CONFIG.HYP3E.armorTypes[v]) ?? v;
+      // }
     }
 
     // Handle saving throws for spells
     if (context.item.type == 'spell') {
-      for (let [k, v] of Object.entries(context.item.system.saves)) {
-        console.log(v, game.i18n.localize(CONFIG.HYP3E.saves[v]))
-        // v.label = game.i18n.localize(CONFIG.HYP3E.saves[v]) ?? v;
-      }
+      // for (let [k, v] of Object.entries(context.item.system.saves)) {
+      //   console.log(v, game.i18n.localize(CONFIG.HYP3E.saves[v]))
+      //   // v.label = game.i18n.localize(CONFIG.HYP3E.saves[v]) ?? v;
+      // }
     }
     
   }
@@ -106,13 +106,12 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Roll handlers, click handlers, etc. would go here.
 
-    // Rollable abilities.
+    // Rollable elements
     html.find('.rollable').click(this._onRoll.bind(this));
-
 
   }
 
-    /**
+   /**
    * Handle clickable rolls.
    * @param {Event} event   The originating click event
    * @private

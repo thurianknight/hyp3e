@@ -16,5 +16,8 @@
     "systems/hyp3e/templates/actor/parts/actor-description.hbs",
     "systems/hyp3e/templates/actor/parts/npc-all-items.hbs",
     "systems/hyp3e/templates/actor/parts/npc-abilities.hbs",
+
+    // chat templates
+    "systems/hyp3e/templates/chat/roll-attack.hbs",
   ]);
 };

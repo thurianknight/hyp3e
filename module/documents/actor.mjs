@@ -1,5 +1,3 @@
-// import { Hyp3eDice } from "../dice.mjs";
-
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
  * @extends {Actor}
@@ -132,10 +130,10 @@ export class Hyp3eActor extends Actor {
       data.lvl = data.details.level.value ?? 0;
     }
     if (data.fa) {
-      data.bab = data.fa.value ?? 0;
+      data.bfa = data.fa.value ?? 0;
     }
     if (data.ca) {
-      data.bcb = data.ca.value ?? 0;
+      data.bca = data.ca.value ?? 0;
     }
 
   }
@@ -148,10 +146,10 @@ export class Hyp3eActor extends Actor {
 
     // Get fighting ability (FA) and casting ability (CA) -- or fall back to 0
     if (data.fa) {
-      data.bab = data.fa.value ?? 0;
+      data.bfa = data.fa.value ?? 0;
     }
     if (data.ca) {
-      data.bcb = data.ca.value ?? 0;
+      data.bca = data.ca.value ?? 0;
     }
 
   }

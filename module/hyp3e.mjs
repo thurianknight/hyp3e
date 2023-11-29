@@ -114,14 +114,14 @@ Hooks.once("ready", async function() {
     const langArray = languages.split(",");
     langArray.forEach((l, i) => (langArray[i] = l.trim()));
     CONFIG.HYP3E.languages = langArray;
-    console.log("CONFIG Languages:", CONFIG.HYP3E.languages)
+    // console.log("CONFIG Languages:", CONFIG.HYP3E.languages)
   }
   const characterClasses = game.settings.get(game.system.id, "characterClasses");
   if (characterClasses != "") {
     const classArray = characterClasses.split(",");
     classArray.forEach((l, i) => (classArray[i] = l.trim()));
     CONFIG.HYP3E.characterClasses = classArray;
-    console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses)
+    // console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses)
   }
 
 });

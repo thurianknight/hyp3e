@@ -247,6 +247,13 @@ textarea {
   resize: none;
 }
 
+/* Chat message damage text */
+.dice-damage {
+  font-style: italic;
+  font-weight: bold;
+  color: #e90000;
+}
+
 /* Styles limited to hyp3e sheets */
 .hyp3e {
   /* Example style for Hyp3e (can be removed if not needed) */

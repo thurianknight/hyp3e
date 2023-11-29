@@ -64,9 +64,9 @@
           </div>
           {{/if}}
           <label class="resource-label">Atk Mod</label>
-          <input type="text" name="system.atkMod" value="{{system.atkMod}}" data-dtype="Number" />
+          <input type="text" name="system.atkMod" value="{{numberFormat system.atkMod decimals=0 sign=true}}" data-dtype="Number" />
           <label class="resource-label">Dmg Mod</label>
-          <input type="text" name="system.dmgMod" value="{{system.dmgMod}}" data-dtype="Number" />
+          <input type="text" name="system.dmgMod" value="{{numberFormat system.dmgMod decimals=0 sign=true}}" data-dtype="Number" />
           <label for="system.damage" class="resource-label">Damage</label>
           <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String" />
         </div>
