@@ -23,19 +23,28 @@ export class Hyp3eItem extends Item {
       // Set melee & missile flags and attack formulas
       if (itemData.system.type == "melee") {
         itemData.system.melee = true
-        itemData.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
         itemData.system.missile = false
+        // Set attack formula if it doesn't already exist, else leave it alone
+        if (!itemData.system.attack) {
+          itemData.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
+        }
       } else if (itemData.system.type == "missile") {
         itemData.system.melee = false
         itemData.system.missile = true
-        itemData.system.attack = '1d20 + @fa + @dex.atkMod + @item.atkMod'
+        // Set attack formula if it doesn't already exist, else leave it alone
+        if (!itemData.system.attack) {
+          itemData.system.attack = '1d20 + @fa + @dex.atkMod + @item.atkMod'
+        }
       } else {
         // This should never happen, unless an item is imported with missing data
         console.log("ITEM ERROR: Weapon has neither melee nor missile property set! Setting to melee...")
         itemData.system.type = "melee"
         itemData.system.melee = true
-        itemData.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
         itemData.system.missile = false
+        // Set attack formula if it doesn't already exist, else leave it alone
+        if (!itemData.system.attack) {
+          itemData.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
+        }
       }
     }
 
@@ -155,9 +164,9 @@ export class Hyp3eItem extends Item {
       // Since this is an attack, we roll damage automatically and include it in the chat message
       if (rollData.item.damage) {
         if (rollData.item.melee) {
-          dmgFormula = `${rollData.item.damage} + ${rollData.str.dmgMod} + ${rollData.item.dmgMod}`
+          dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod`
         } else if (rollData.item.missile) {
-          dmgFormula = `${rollData.item.damage} + ${rollData.item.dmgMod}`
+          dmgFormula = `${rollData.item.damage} + @item.dmgMod`
         } else {
           dmgFormula = `${rollData.item.damage}`
         }
