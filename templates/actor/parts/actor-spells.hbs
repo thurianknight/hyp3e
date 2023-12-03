@@ -1,19 +1,12 @@
 {{!-- Casting ability --}}
 <div class="spells-block flexrow flex-group-left">
   <div class="casting-ability flexrow flex-group-center">
-    <span class="rollable" data-roll="1d20 + @bca" data-roll-type="basic" data-label="Casting Ability check">
-      <label for="system.ca.value" class="spells-label">{{localize "HYP3E.castingAbility"}}</label> 
+    <span class="rollable" data-roll="1d20 + @ca" data-roll-type="basic" data-label="Casting Ability check">
+      <label for="system.ca" class="spells-label">{{localize "HYP3E.castingAbility"}}</label> 
       <i class="fas fa-dice-d20"></i>
     </span>
-    <input type="text" class="spells" name="system.ca.value" value="{{system.ca.value}}" data-dtype="Number"/>
+    <input type="text" class="spells" name="system.ca" value="{{system.ca}}" data-dtype="Number"/>
   </div>
-  <!-- <div class="resource-content flexrow flex-group-center">
-    <span class="rollable" data-roll="1d12 - @cha.turnUndead" data-label="Turn Undead">
-      <label for="system.ta.value" class="spells-label">{{localize "HYP3E.turningAbility"}}</label> 
-      <i class="fas fa-dice-d12"></i>
-    </span>
-    <input type="text" name="system.ta.value" value="{{system.ta.value}}" data-dtype="Number"/>
-  </div> -->
 </div>
 
 {{!-- Spells appear here --}}
@@ -36,7 +29,7 @@
         <div class="item-header flexrow">
           <div class="item-name">
             <div class="item-image">
-              {{#if item.system.attack}}
+              {{#if item.system.atkRoll}}
               <a class="rollable" data-roll-type="item" data-label="Attack with {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
               {{else}}
               <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>

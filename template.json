@@ -14,18 +14,9 @@
           "dr": 0
         },
         "atkRate": "1/1",
-        "fa": {
-          "value": 0,
-          "temp": 0
-        },
-        "ca": {
-          "value": 0,
-          "temp": 0
-        },
-        "ta": {
-          "value": 0,
-          "temp": 0
-        },
+        "fa": 0,
+        "ca": 0,
+        "ta": 0,
         "saves": {
           "death": {
             "value": 0
@@ -176,6 +167,7 @@
       },
       "rollable": {
         "saves": ["death", "transformation", "device", "avoidance", "sorcery"],
+        "atkRoll": false,
         "attack": "",
         "damage": "",
         "check": "",
@@ -219,11 +211,13 @@
       "templates": ["base", "physical", "equippable", "rollable"],
       "types": ["melee", "missile"],
       "type": "melee",
+      "melee": true,
+      "missile": false,
       "wc": 0,
       "range": {
-        "short": 10,
-        "medium": 20,
-        "long": 30
+        "short": 0,
+        "medium": 0,
+        "long": 0
       },
       "rof": "1/1",
       "atkMod": 0,

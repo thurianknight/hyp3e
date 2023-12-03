@@ -12,7 +12,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     return mergeObject(super.defaultOptions, {
       classes: ["hyp3e", "sheet", "actor"],
       width: 800,
-      height: 650,
+      height: 700,
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "abilities" }]
     });
   }
@@ -193,6 +193,17 @@ export class Hyp3eActorSheet extends ActorSheet {
       li.slideUp(200, () => this.render(false));
     });
 
+    // Toggle equip/unequip
+    html.find(".item-equip").click(async (event) => {
+      const li = $(event.currentTarget).closest(".item-entry")
+      const item = this.actor.items.get(li.data("itemId"))
+      await item.update({
+        data: {
+          equipped: !item.system.equipped,
+        },
+      })
+    });
+
     // Active Effect management
     html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.actor));
 
@@ -266,22 +277,30 @@ export class Hyp3eActorSheet extends ActorSheet {
     const label = `<h3>${item.name} [${item.type}]</h3>`
     console.log("Item clicked:", item)
     let content = item.system.description
-    // Setup clickable buttons for item rolls
-    if ((item.system.damage).match(/.*d[1-9].*/)) {
-      // Add a damage roll macro
-      content += "<p>Damage: [[/r " + item.system.damage + "]]</p>"
+    // Setup clickable buttons for item rolls, if they are populated
+    if (item.system.damage) {
+      if ((item.system.damage).match(/.*d[1-9].*/)) {
+        // Add a damage roll macro
+        content += "<p>Damage: [[/r " + item.system.damage + "]]</p>"
+      }
     }
-    if ((item.system.check).match(/.*d[1-9].*/)) {
-      // Add a check roll macro
-      content += "<p>Check: [[/r " + item.system.check + "]]</p>"
+    if (item.system.check) {
+      if ((item.system.check).match(/.*d[1-9].*/)) {
+        // Add a check roll macro
+        content += "<p>Check: [[/r " + item.system.check + "]]</p>"
+      }  
     }
-    if ((item.system.duration).match(/.*d[1-9].*/)) {
-      // Add a duration roll macro
-      content += "<p>Duration: [[/r " + item.system.duration + "]]</p>"
+    if (item.system.duration) {
+      if ((item.system.duration).match(/.*d[1-9].*/)) {
+        // Add a duration roll macro
+        content += "<p>Duration: [[/r " + item.system.duration + "]]</p>"
+      }
     }
-    if ((item.system.affected).match(/.*d[1-9].*/)) {
-      // Add a number affected roll macro
-      content += "<p># Affected: [[/r " + item.system.affected + "]]</p>"
+    if (item.system.affected) {
+      if ((item.system.affected).match(/.*d[1-9].*/)) {
+        // Add a number affected roll macro
+        content += "<p># Affected: [[/r " + item.system.affected + "]]</p>"
+      }
     }
     ChatMessage.create({
       speaker: speaker,
@@ -305,6 +324,8 @@ export class Hyp3eActorSheet extends ActorSheet {
     console.log("Clicked element: ", element)
     // Log the element dataset
     console.log("Element dataset: ", dataset)
+    // Log the actor
+    console.log("Current Actor:", this.actor)
 
     // How many different roll types do we have?
     //  Tests of an Attribute: d6 roll-under target
@@ -345,16 +366,19 @@ export class Hyp3eActorSheet extends ActorSheet {
               // Does the item have an overriding attack formula?
               dataset.roll = item.system.attack
             } else {
-              // Use default attack formulas
+              // These errors should never happen, unless someone manually deleted the formula
               if (item.system.melee) {
-                item.system.attack = '1d20 + @bfa + @str.atkMod + @item.atkMod'
-                dataset.roll = '1d20 + @bfa + @str.atkMod + @item.atkMod'
+                console.log("ITEM ERROR: Weapon has no attack formula! Setting to melee default...")
+                item.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
+                dataset.roll = '1d20 + @fa + @str.atkMod + @item.atkMod'
               } else if (item.system.missile) {
-                item.system.attack = '1d20 + @bfa + @dex.atkMod + @item.atkMod'
-                dataset.roll = '1d20 + @bfa + @dex.atkMod + @item.atkMod'
+                console.log("ITEM ERROR: Weapon has no attack formula! Setting to missile default...")
+                item.system.attack = '1d20 + @fa + @dex.atkMod + @item.atkMod'
+                dataset.roll = '1d20 + @fa + @dex.atkMod + @item.atkMod'
               } else if (item.type == "spell") {
-                item.system.attack = '1d20 + @bfa + @dex.atkMod'
-                dataset.roll = '1d20 + @bfa + @dex.atkMod'
+                console.log("ITEM ERROR: Spell has no attack formula! Setting to spell default...")
+                item.system.attack = '1d20 + @fa'
+                dataset.roll = '1d20 + @fa'
               }
             }
             label = `Attack with ${item.name}...`
@@ -368,7 +392,7 @@ export class Hyp3eActorSheet extends ActorSheet {
             if (item) {
               return item.rollAttack()
             }
-  
+
           } else {
             // The default for features & gear is a check
             dataset.roll = item.system.check;
@@ -385,16 +409,6 @@ export class Hyp3eActorSheet extends ActorSheet {
             }
   
           }
-          // rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
-          // // Log the dialog response
-          // // console.log("Dialog response:", rollResponse);
-          // // Add situational modifier from the dice dialog
-          // item.system.sitMod = rollResponse.sitMod;
-          // // Add roll mode from the dice dialog
-          // item.system.rollMode = rollResponse.rollMode;
-          // if (item) {
-          //   return item.roll()
-          // }
           break;
   
         case "check":

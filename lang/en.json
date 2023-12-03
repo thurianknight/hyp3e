@@ -134,7 +134,8 @@
       "add": "Add Item",
       "edit": "Edit",
       "delete": "Delete",
-      "show": "Show"
+      "show": "Show",
+      "equip": "Toggle Equip"
     },
     "spell": {
       "addLvl": "Add Lvl",
@@ -158,7 +159,7 @@
       }
     },
     "rollFormula": "Roll Formula",
-    "rollExample": "1d6+1",
+    "rollExample": "e.g. 1d6+1",
     "rollMode": "Roll Mode",
     "sitMod": "Situational Modifier"
   }

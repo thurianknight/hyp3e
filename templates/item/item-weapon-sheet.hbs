@@ -43,7 +43,6 @@
           <div class="form-fields">
             <select name="system.type">
               {{#select system.type}}
-              <option value=""></option>
               {{#each system.types as |type t|}}
               <option value="{{type}}">{{type}}</option>
               {{log 't='t 'type='type}}
@@ -88,18 +87,6 @@
         <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
         <label class="resource-label">Attack Roll Formula</label>
         <input type="text" name="system.attack" value="{{system.attack}}" data-dtype="String"/>
-        {{!-- <label class="resource-label">Damage Roll Formula</label>
-        <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String"/> --}}
-        <label class="resource-label">Check Roll Formula</label>
-        <input type="text" name="system.check" value="{{system.check}}" data-dtype="String"/>
-        <label class="resource-label">Save Roll Formula</label>
-        <input type="text" name="system.save" value="{{system.save}}" data-dtype="String"/>
-        <label class="resource-label">Duration Formula</label>
-        <input type="text" name="system.duration" value="{{system.duration}}" data-dtype="String"/>
-        <label class="resource-label">Number Affected Formula</label>
-        <input type="text" name="system.affected" value="{{system.affected}}" data-dtype="String"/>
-        <label class="resource-label">Target Number Formula</label>
-        <input type="text" name="system.target" value="{{system.target}}" data-dtype="String"/>
         <label class="resource-label">Item ID</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
         <label class="resource-label">Container ID</label>

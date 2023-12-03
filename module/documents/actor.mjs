@@ -125,15 +125,9 @@ export class Hyp3eActor extends Actor {
         data[k] = foundry.utils.deepClone(v);
       }
     }
-    // Add level, fighting ability (FA), and casting ability (CA) -- or fall back to 0.
+    // Add character's level to top level of data
     if (data.details.level) {
       data.lvl = data.details.level.value ?? 0;
-    }
-    if (data.fa) {
-      data.bfa = data.fa.value ?? 0;
-    }
-    if (data.ca) {
-      data.bca = data.ca.value ?? 0;
     }
 
   }
@@ -144,14 +138,8 @@ export class Hyp3eActor extends Actor {
   _getNpcRollData(data) {
     if (this.type !== 'npc') return;
 
-    // Get fighting ability (FA) and casting ability (CA) -- or fall back to 0
-    if (data.fa) {
-      data.bfa = data.fa.value ?? 0;
-    }
-    if (data.ca) {
-      data.bca = data.ca.value ?? 0;
-    }
-
+    // Anything to load?
+    
   }
 
 }

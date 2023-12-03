@@ -1,5 +1,3 @@
-// import { HYP3E } from "./helpers/config.mjs";
-
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -17,7 +15,45 @@ export class Hyp3eItem extends Item {
     const itemData = this;
     const actorData = this.actor ? this.actor : {};
     const data = itemData;
-    
+
+    // Handle weapon attack info
+    if (itemData.type == "weapon") {
+      // For all weapons, atkRoll is obviously true
+      itemData.system.atkRoll = true
+      // Set melee & missile flags and attack formulas
+      if (itemData.system.type == "melee") {
+        itemData.system.melee = true
+        itemData.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
+        itemData.system.missile = false
+      } else if (itemData.system.type == "missile") {
+        itemData.system.melee = false
+        itemData.system.missile = true
+        itemData.system.attack = '1d20 + @fa + @dex.atkMod + @item.atkMod'
+      } else {
+        // This should never happen, unless an item is imported with missing data
+        console.log("ITEM ERROR: Weapon has neither melee nor missile property set! Setting to melee...")
+        itemData.system.type = "melee"
+        itemData.system.melee = true
+        itemData.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
+        itemData.system.missile = false
+      }
+    }
+
+    // Handle spell, item, or feature attack info
+    if ((itemData.type == "spell" || itemData.type == "item" || itemData.type == "feature") && itemData.system.atkRoll) {
+      // Only set the attack formula if it isn't already set.
+      //  This way, a GM or player can override the basic formula, for example to add @dex.atkMod
+      if (itemData.system.attack == '') {
+        itemData.system.attack = '1d20 + @fa'
+      }
+    } else if (!itemData.system.atkRoll) {
+      // Reset the attack formula on any item if atkRoll is false
+      itemData.system.attack = ""
+    }
+
+    // Log the item data
+    //console.log("Item Data:", itemData)
+
   }
 
   /**
@@ -76,27 +112,27 @@ export class Hyp3eItem extends Item {
 
       console.log("Roll formula:", rollFormula)
       // Invoke the roll
-      const roll = new Roll(rollFormula, rollData);
+      const atkRoll = new Roll(rollFormula, rollData);
       // Resolve the roll
-      let result = await roll.roll({async: true});
-      console.log("Roll result: ", roll)
-      // Get the resulting values from the roll object
-      naturalRoll = roll.dice[0].total
-      dieType = "d" + roll.dice[0].faces
-      rollTotal = roll.total
+      let result = await atkRoll.roll({async: true});
+      console.log("Roll result: ", result)
+      // Get the resulting values from the die roll
+      naturalRoll = atkRoll.dice[0].total
+      dieType = "d" + atkRoll.dice[0].faces
+      rollTotal = atkRoll.total
 
       // Determine success or failure if we have a target number
       if (rollData.item.target != '' && rollData.item.target != 'undefined') {
         // Attacks will never trigger here, until we get targeting functionality added
-        if(roll.total >= rollData.item.target) {
-          console.log(roll.total + " is greater than or equal to " + rollData.item.target + "!")
+        if(atkRoll.total >= rollData.item.target) {
+          console.log(atkRoll.total + " is greater than or equal to " + rollData.item.target + "!")
           if (naturalRoll == 20) {
             label += "<span style='color:#2ECC71'><b>critically hits!</b></span>"
           } else {
             label += "<b>hits!</b>"
           }
         } else {
-          console.log(roll.total + " is less than " + rollData.item.target + "!")
+          console.log(atkRoll.total + " is less than " + rollData.item.target + "!")
           if (naturalRoll == 1) {
             label += "<span style='color:#E90000'><i>critically misses!</i></span>"
           } else {
@@ -105,21 +141,21 @@ export class Hyp3eItem extends Item {
         }
       } else {
         // No target number supplied, as is common with attacks
-        console.log(roll.total)
-        console.log(roll.total + " hits AC 19 - " + roll.total + " = " + eval(19 - roll.total))
+        console.log(atkRoll.total)
+        console.log(atkRoll.total + " hits AC 19 - " + atkRoll.total + " = " + eval(19 - atkRoll.total))
         if (naturalRoll == 20) {
-          label += "<span style='color:#2ECC71'>critically hits <b>AC " + eval(19 - roll.total) + "!</b></span>"
+          label += "<span style='color:#2ECC71'>critically hits <b>AC " + eval(19 - atkRoll.total) + "!</b></span>"
         } else if (naturalRoll == 1) {
           label += "<span style='color:#E90000'><i>critically misses!</i></span>"
         } else {
-          label += "hits <b>AC " + eval(19 - roll.total) + ".</b>"
+          label += "hits <b>AC " + eval(19 - atkRoll.total) + ".</b>"
         }
       }
 
       // Since this is an attack, we roll damage automatically and include it in the chat message
       if (rollData.item.damage) {
         if (rollData.item.melee) {
-          dmgFormula = `${rollData.item.damage} + ${rollData.item.dmgMod} + ${rollData.str.dmgMod}`
+          dmgFormula = `${rollData.item.damage} + ${rollData.str.dmgMod} + ${rollData.item.dmgMod}`
         } else if (rollData.item.missile) {
           dmgFormula = `${rollData.item.damage} + ${rollData.item.dmgMod}`
         } else {
@@ -127,18 +163,18 @@ export class Hyp3eItem extends Item {
         }
         console.log("Damage formula:", dmgFormula)
 
-        // Invoke the roll
-        const roll = new Roll(rollFormula, rollData);
+        // Invoke the damage roll
+        const dmgRoll = new Roll(dmgFormula, rollData);
         // Resolve the roll
-        let result = await roll.roll({async: true});
-        console.log("Damage result: ", roll)
+        let result = await dmgRoll.roll({async: true});
+        console.log("Damage result: ", dmgRoll)
         // Get the resulting values from the roll object
-        dmgTotal = roll.total
+        dmgTotal = dmgRoll.total
         if (naturalRoll != 1) {
           damageRoll = `
           <div class="dice-roll">
             <div class="dice-result">
-              <h4 class="dice-formula"><span class="dice-damage">${dmgTotal} HP damage to target</span></h4>
+              <h4 class="dice-formula"><span class="dice-damage">${dmgTotal} HP damage!</span></h4>
             </div>
           </div>
           `  
@@ -147,12 +183,12 @@ export class Hyp3eItem extends Item {
 
       // Render the chat message template
       let msgContent = ``
-      let templateData = {
-        formula: roll.formula,
-        naturalRoll: naturalRoll,
-        dieType: dieType,
-        rollTotal: rollTotal
-      };
+      // let templateData = {
+      //   formula: roll.formula,
+      //   naturalRoll: naturalRoll,
+      //   dieType: dieType,
+      //   rollTotal: rollTotal
+      // };
       // const template = `${HYP3E.systemRoot}/templates/chat/roll-attack.hbs`
       // let rendered = await renderTemplate(template, templateData)
       // msgContent += rendered;
@@ -160,7 +196,7 @@ export class Hyp3eItem extends Item {
       <div class="message-content">
         <div class="dice-roll">
           <div class="dice-result">
-            <div class="dice-formula">${roll.formula}</div>
+            <div class="dice-formula">${atkRoll.formula}</div>
             <div class="dice-tooltip">
               <section class="tooltip-part">
                 <div class="dice">
@@ -183,19 +219,20 @@ export class Hyp3eItem extends Item {
       
       // Prettify label
       label = "<h3>" + label + "</h3>"
-      // Output roll result to a chat message
-      let chatMsg = await roll.toMessage({
+
+      // Output attack roll result to a chat message
+      let chatMsg = await atkRoll.toMessage({
         speaker: speaker,
         flavor: label
       },{
         rollMode: rollData.item.rollMode,
         create: false
       })
-      // chatMsg.content += "<p>This is a test.</p>"
+
       chatMsg.content = msgContent
-      console.log("Chat test:", chatMsg)
+      // console.log("Chat test:", chatMsg)
       ChatMessage.create(chatMsg)
-      return roll
+      return atkRoll
     }
   }
 

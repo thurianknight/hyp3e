@@ -6,11 +6,16 @@ export class Hyp3eDice {
    * @param dataset
    */
   static async ShowBasicRollDialog(dataset) {
+    // Get rollMode, if it was set to something other than default
+    let rollMode = game.settings.get("core", "rollMode")
+    if (dataset.rollMode) {
+      rollMode = dataset.rollMode
+    }
     let dialogData = {
       roll: dataset.roll,
       dataset: dataset,
       rollModes: CONFIG.Dice.rollModes,
-      rollMode: game.settings.get("core", "rollMode")  
+      rollMode: rollMode
     }
     console.log("Roll-dialog Dataset: ", dataset)
     const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`;

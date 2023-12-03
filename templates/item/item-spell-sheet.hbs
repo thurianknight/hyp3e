@@ -3,6 +3,18 @@
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
     <div class="header-block">
       <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+      <div class="flexrow">
+        <div class="resource flexrow flex-group-center">
+          <label class="resource-label">Classes</label>
+          <input type="text" name="system.classList" value="{{system.classList}}" />
+        </div>
+        <div class="resource flexrow flex-group-center">
+          <label class="resource-label">Level</label>
+          <input type="text" name="system.spellLevel" value="{{system.spellLevel}}" />
+          <label class="resource-label"># Mem</label>
+          <input type="text" name="system.memorized" value="{{system.memorized}}" />
+        </div>
+      </div>
     </div>
   </header>
 
@@ -21,14 +33,10 @@
 
         {{!-- Spell Attributes --}}
         <div class="flexcol flex-group-center box">
-          <label class="resource-label">Level</label>
-          <input type="text" name="system.spellLevel" value="{{system.spellLevel}}" data-dtype="String" />
-          <label class="resource-label"># Mem</label>
-          <input type="text" name="system.memorized" value="{{system.memorized}}" data-dtype="Number" />
           <label class="resource-label">Range</label>
-          <input type="text" name="system.range" value="{{system.range}}" data-dtype="String" />
+          <input type="text" name="system.range" value="{{system.range}}" />
           <label class="resource-label">Duration</label>
-          <input type="text" name="system.duration" value="{{system.duration}}" data-dtype="String" />
+          <input type="text" name="system.duration" value="{{system.duration}}" />
           <label class="resource-label">Save</label>
           <div class="form-fields">
             <select name="system.save">
@@ -41,8 +49,10 @@
               {{/select}}
             </select>
           </div>
+          <label class="resource-label">Attack Roll</label>
+          <input name="system.atkRoll" type="checkbox" {{checked system.atkRoll}}>
           <label for="system.damage" class="resource-label">Damage</label>
-          <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String"/>
+          <input type="text" name="system.damage" value="{{system.damage}}" />
         </div>
 
         {{!-- Description --}}
@@ -58,21 +68,15 @@
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
         <label class="resource-label">System Roll Formula</label>
-        <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
+        <input type="text" name="system.formula" value="{{system.formula}}" />
         <label class="resource-label">Attack Roll Formula</label>
-        <input type="text" name="system.attack" value="{{system.attack}}" data-dtype="String"/>
-        {{!-- <label class="resource-label">Damage Roll Formula</label>
-        <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String"/> --}}
+        <input type="text" name="system.attack" value="{{system.attack}}" />
         <label class="resource-label">Check Roll Formula</label>
-        <input type="text" name="system.check" value="{{system.check}}" data-dtype="String"/>
-        {{!-- <label class="resource-label">Save Roll Formula</label>
-        <input type="text" name="system.save" value="{{system.save}}" data-dtype="String"/>
-        <label class="resource-label">Duration Formula</label>
-        <input type="text" name="system.duration" value="{{system.duration}}" data-dtype="String"/> --}}
+        <input type="text" name="system.check" value="{{system.check}}" />
         <label class="resource-label">Number Affected Formula</label>
-        <input type="text" name="system.affected" value="{{system.affected}}" data-dtype="String"/>
+        <input type="text" name="system.affected" value="{{system.affected}}" />
         <label class="resource-label">Target Number Formula</label>
-        <input type="text" name="system.target" value="{{system.target}}" data-dtype="String"/>
+        <input type="text" name="system.target" value="{{system.target}}" />
         <label class="resource-label">Item ID</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
       </div>

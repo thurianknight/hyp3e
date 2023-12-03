@@ -10,6 +10,16 @@
   cursor: pointer;
 }
 
+/* .rollable {
+  &:hover .item-image {
+    background-image: url("/icons/svg/d20-grey.svg") !important;
+    cursor: pointer;
+  }
+  .item-image:hover {
+    background-image: url("/icons/svg/d20-black.svg") !important;
+  }
+} */
+
 .grid,
 .grid-2col {
   display: grid;
@@ -251,7 +261,7 @@ textarea {
 .dice-damage {
   font-style: italic;
   font-weight: bold;
-  color: #e90000;
+  /* color: #e90000; */
 }
 
 /* Styles limited to hyp3e sheets */
@@ -568,6 +578,9 @@ textarea {
   -webkit-box-pack: end;
   -ms-flex-pack: end;
   justify-content: flex-end;
+  .item-unequipped {
+    color: rgba(0, 0, 0, 0.2);
+  }
 }
 .hyp3e .items-list .item-controls a {
   font-size: 12px;
@@ -587,6 +600,11 @@ textarea {
 .hyp3e .items-list .item .item-name {
   color: #191813;
 }
+
+/* .item-image:hover .rollable {
+  background-image: url("/icons/svg/d20-black.svg") !important;
+} */
+
 .hyp3e .items-list .item .item-name .item-image {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 30px;
