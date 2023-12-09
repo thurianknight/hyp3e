@@ -17,10 +17,10 @@
 
     {{!-- Description Tab --}}
     <div class="tab" data-group="primary" data-tab="description">
-      <div class="grid grid-4col">
+      <div class="flexrow">
 
         {{!-- Class Feature Attributes --}}
-        <div class="flexcol flex-group-center box">
+        <div class="flexcol flexshrink flex-group-center item-attributes">
           <label class="resource-label">Class</label>
           <input type="text" name="system.class" value="{{system.class}}" data-dtype="String"/>
           <label class="resource-label">Level</label>
@@ -52,7 +52,7 @@
         </div>
 
         {{!-- Description --}}
-        <div class="flexcol grid-span-3">
+        <div class="flex item-description">
           {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
           {{editor system.description target="system.description" rollData=rollData button=true owner=owner editable=editable}}
         </div>
