@@ -168,13 +168,11 @@
       "rollable": {
         "saves": ["death", "transformation", "device", "avoidance", "sorcery"],
         "atkRoll": false,
-        "attack": "",
-        "damage": "",
-        "check": "",
+        "tn": "",
         "save": "",
+        "damage": "",
         "duration": "",
-        "affected": "",
-        "target": ""
+        "affected": ""
       }
     },
     "armor": {

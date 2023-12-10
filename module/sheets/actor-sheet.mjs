@@ -284,12 +284,6 @@ export class Hyp3eActorSheet extends ActorSheet {
         content += "<p>Damage: [[/r " + item.system.damage + "]]</p>"
       }
     }
-    if (item.system.check) {
-      if ((item.system.check).match(/.*d[1-9].*/)) {
-        // Add a check roll macro
-        content += "<p>Check: [[/r " + item.system.check + "]]</p>"
-      }  
-    }
     if (item.system.duration) {
       if ((item.system.duration).match(/.*d[1-9].*/)) {
         // Add a duration roll macro
@@ -362,22 +356,22 @@ export class Hyp3eActorSheet extends ActorSheet {
           console.log(`Rolling Item ${item.name}:`, item)
           // The default for weapons & spells is an attack
           if (item.type == "weapon" || item.type == "spell") {
-            if (item.system.attack != '') {
+            if (item.system.formula != '') {
               // Does the item have an overriding attack formula?
-              dataset.roll = item.system.attack
+              dataset.roll = item.system.formula
             } else {
               // These errors should never happen, unless someone manually deleted the formula
               if (item.system.melee) {
                 console.log("ITEM ERROR: Weapon has no attack formula! Setting to melee default...")
-                item.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
+                item.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
                 dataset.roll = '1d20 + @fa + @str.atkMod + @item.atkMod'
               } else if (item.system.missile) {
                 console.log("ITEM ERROR: Weapon has no attack formula! Setting to missile default...")
-                item.system.attack = '1d20 + @fa + @dex.atkMod + @item.atkMod'
+                item.system.formula = '1d20 + @fa + @dex.atkMod + @item.atkMod'
                 dataset.roll = '1d20 + @fa + @dex.atkMod + @item.atkMod'
               } else if (item.type == "spell") {
                 console.log("ITEM ERROR: Spell has no attack formula! Setting to spell default...")
-                item.system.attack = '1d20 + @fa'
+                item.system.formula = '1d20 + @fa'
                 dataset.roll = '1d20 + @fa'
               }
             }
@@ -394,8 +388,8 @@ export class Hyp3eActorSheet extends ActorSheet {
             }
 
           } else {
-            // The default for features & gear is a check
-            dataset.roll = item.system.check;
+            // The default for features & items is a check
+            dataset.roll = item.system.formula;
             label = `${item.name} check...`
             rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
             // Log the dialog response

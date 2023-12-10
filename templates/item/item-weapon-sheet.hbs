@@ -85,10 +85,10 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
-        <label class="resource-label">System Roll Formula</label>
+        {{#if rollData.isGM}}
+        <label class="resource-label">System Roll (Attack) Formula</label>
         <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
-        <label class="resource-label">Attack Roll Formula</label>
-        <input type="text" name="system.attack" value="{{system.attack}}" data-dtype="String"/>
+        {{/if}}
         <label class="resource-label">Item ID</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
         <label class="resource-label">Container ID</label>

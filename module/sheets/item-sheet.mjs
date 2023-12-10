@@ -32,16 +32,20 @@ export class Hyp3eItemSheet extends ItemSheet {
     // Use a safe clone of the item data for further operations.
     const itemData = context.item;
 
-    // Retrieve the roll data for TinyMCE editors.
+    // Retrieve the actor's roll data for TinyMCE editors.
     context.rollData = {};
     let actor = this.object?.parent ?? null;
     if (actor) {
-      context.rollData = actor.getRollData();
+      context.rollData = actor.getRollData()
+      context.rollData.isGM = game.user.isGM
     }
 
-    // Add the actor's data to context.data for easier access, as well as flags.
+    // Add the item's data to context.data for easier access, as well as flags.
     context.system = itemData.system;
     context.flags = itemData.flags;
+
+    // Log full context data
+    // console.log("Context Data:", context)
 
     // Prepare item data.
     this._prepareItemData(context);

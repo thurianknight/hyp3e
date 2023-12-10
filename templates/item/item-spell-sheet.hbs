@@ -37,6 +37,8 @@
           <input type="text" name="system.range" value="{{system.range}}" />
           <label class="resource-label">Duration</label>
           <input type="text" name="system.duration" value="{{system.duration}}" />
+          <label class="resource-label"># Affected</label>
+          <input type="text" name="system.affected" value="{{system.affected}}" />
           <label class="resource-label">Save</label>
           <div class="form-fields">
             <select name="system.save">
@@ -67,16 +69,10 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
-        <label class="resource-label">System Roll Formula</label>
+        {{#if rollData.isGM}}
+        <label class="resource-label">System Roll (Attack) Formula</label>
         <input type="text" name="system.formula" value="{{system.formula}}" />
-        <label class="resource-label">Attack Roll Formula</label>
-        <input type="text" name="system.attack" value="{{system.attack}}" />
-        <label class="resource-label">Check Roll Formula</label>
-        <input type="text" name="system.check" value="{{system.check}}" />
-        <label class="resource-label">Number Affected Formula</label>
-        <input type="text" name="system.affected" value="{{system.affected}}" />
-        <label class="resource-label">Target Number Formula</label>
-        <input type="text" name="system.target" value="{{system.target}}" />
+        {{/if}}
         <label class="resource-label">Item ID</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
       </div>

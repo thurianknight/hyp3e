@@ -38,9 +38,9 @@
           <label class="resource-label">Location</label>
           <input type="text" name="system.location" value="{{system.location}}" data-dtype="String" />
           <label class="resource-label">Check Roll</label>
-          <input type="text" name="system.check" value="{{system.check}}" data-dtype="String"/>
+          <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
           <label class="resource-label">Target</label>
-          <input type="text" name="system.target" value="{{system.target}}" data-dtype="String"/>
+          <input type="text" name="system.tn" value="{{system.tn}}" data-dtype="String"/>
           <label class="resource-label">Blind Roll</label>
           <select name="system.blindRoll">
             {{#select system.blindRoll}}
@@ -64,8 +64,10 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
-        <label class="resource-label">System Roll Formula</label>
-        <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
+        {{#if rollData.isGM}}
+        {{!-- <label class="resource-label">System Roll Formula</label>
+        <input type="text" name="system.formula" value="{{system.formula}}" disabled/> --}}
+        {{/if}}
         <label class="resource-label">Item ID</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
         <label class="resource-label">Container ID</label>
