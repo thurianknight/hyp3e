@@ -18,8 +18,8 @@ export class Hyp3eDice {
       rollMode: rollMode
     }
     console.log("Roll-dialog Dataset: ", dataset)
-    const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`;
-    const dialogHtml = await renderTemplate(template, dialogData);
+    const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`
+    const dialogHtml = await renderTemplate(template, dialogData)
     // console.log("Dialog HTML:", dialogHtml)
 
     // Roll dialog for everything except saving throws (for now at least)

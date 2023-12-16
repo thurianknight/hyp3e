@@ -353,57 +353,33 @@ export class Hyp3eActorSheet extends ActorSheet {
         case "item":
           const itemId = element.closest('.item').dataset.itemId
           const item = this.actor.items.get(itemId)
-          console.log(`Rolling Item ${item.name}:`, item)
+          let itemName = ""
+          if (item.system.friendlyName != "") {
+            itemName = item.system.friendlyName
+          } else {
+            itemName = item.name
+          }
+          console.log(`Rolling Item ${itemName}:`, item)
           // The default for weapons & spells is an attack
           if (item.type == "weapon" || item.type == "spell") {
-            if (item.system.formula != '') {
-              // Does the item have an overriding attack formula?
-              dataset.roll = item.system.formula
-            } else {
-              // These errors should never happen, unless someone manually deleted the formula
-              if (item.system.melee) {
-                console.log("ITEM ERROR: Weapon has no attack formula! Setting to melee default...")
-                item.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
-                dataset.roll = '1d20 + @fa + @str.atkMod + @item.atkMod'
-              } else if (item.system.missile) {
-                console.log("ITEM ERROR: Weapon has no attack formula! Setting to missile default...")
-                item.system.formula = '1d20 + @fa + @dex.atkMod + @item.atkMod'
-                dataset.roll = '1d20 + @fa + @dex.atkMod + @item.atkMod'
-              } else if (item.type == "spell") {
-                console.log("ITEM ERROR: Spell has no attack formula! Setting to spell default...")
-                item.system.formula = '1d20 + @fa'
-                dataset.roll = '1d20 + @fa'
-              }
-            }
-            label = `Attack with ${item.name}...`
-            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
-            // Log the dialog response
-            // console.log("Dialog response:", rollResponse);
-            // Add situational modifier from the dice dialog
-            item.system.sitMod = rollResponse.sitMod;
-            // Add roll mode from the dice dialog
-            item.system.rollMode = rollResponse.rollMode;
-            if (item) {
-              return item.rollAttack()
-            }
-
-          } else {
-            // The default for features & items is a check
-            dataset.roll = item.system.formula;
-            label = `${item.name} check...`
-            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
-            // Log the dialog response
-            // console.log("Dialog response:", rollResponse);
-            // Add situational modifier from the dice dialog
-            item.system.sitMod = rollResponse.sitMod;
-            // Add roll mode from the dice dialog
-            item.system.rollMode = rollResponse.rollMode;
-            if (item) {
-              return item.rollCheck()
-            }
-  
+            dataset.label = `Attack with ${itemName}...`
+          } else {  // ==> Neither a weapon nor a spell
+            // The default for other item types is a check
+            dataset.label = `${itemName} check...`
           }
-          break;
+          dataset.roll = item.system.formula
+          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          // Log the dialog response
+          // console.log("Dialog response:", rollResponse);
+          // Add situational modifier from the dice dialog
+          item.system.sitMod = rollResponse.sitMod;
+          // Add roll mode from the dice dialog
+          item.system.rollMode = rollResponse.rollMode;
+          if (item) {
+            // return item.rollCheck()
+            return item.roll()
+          }
+          break
   
         case "check":
           // console.log("Rolling check...");
@@ -504,51 +480,51 @@ export class Hyp3eActorSheet extends ActorSheet {
           if (dataset.rollType == "check" || dataset.rollType == "basic") {
             if(roll.total <= dataset.rollTarget) {
               console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!")
-              label += "<b>Success</b>!"
+              label += "<br /><b>Success</b>!"
             } else {
               console.log(roll.total + " is greater than " + dataset.rollTarget + "!")
-              label += "<i>Fail</i>."
+              label += "<br /><i>Fail</i>."
             }
           // Saves are roll-over for success
           } else if (dataset.rollType == "save") {
             if(roll.total >= dataset.rollTarget) {
               console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!")
-              label += "<b>Success</b>!"
+              label += "<br /><b>Success</b>!"
             } else {
               console.log(roll.total + " is less than " + dataset.rollTarget + "!")
-              label += "<i>Fail</i>."
+              label += "<br /><i>Fail</i>."
             }
-          // Attacks will never trigger here, until we get targeting functionality added
+          // Attacks trigger here if there is a target token selected
           } else if (dataset.rollType == "attack") {
             let naturalRoll = roll.dice[0].total
             if(roll.total >= dataset.rollTarget) {
               console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!")
               if (naturalRoll == 20) {
-                label += "<span style='color:#2ECC71'><b>critically hits!</b></span>"
+                label += "<br /><span style='color:#2ECC71'><b>critically hits!</b></span>"
               } else {
-                label += "<b>hits!</b>"
+                label += "<br /><b>hits!</b>"
               }
             } else {
               console.log(roll.total + " is less than " + dataset.rollTarget + "!")
               if (naturalRoll == 1) {
-                label += "<span style='color:#E90000'><i>critically misses!</i></span>"
+                label += "<br /><span style='color:#E90000'><i>critically misses!</i></span>"
               } else {
-                label += "<i>misses.</i>"
+                label += "<br /><i>misses.</i>"
               }
             }
           }
         } else {
-          // No target number supplied, as is common with attacks
+          // No target number supplied with an untargeted attack
           if (dataset.rollType == "attack") {
-            console.log(roll.total + " hits AC 19 - " + roll.total + " = " + eval(19 - roll.total))
+            console.log(roll.total + " hits AC 20 - " + roll.total + " = " + eval(20 - roll.total))
             let naturalRoll = roll.dice[0].total
             console.log("Natural die roll:", naturalRoll)
             if (naturalRoll == 20) {
-              label += "<span style='color:#2ECC71'>critically hits <b>AC " + eval(19 - roll.total) + "!</b></span>"
+              label += "<br /><span style='color:#2ECC71'>critically hits <b>AC " + eval(20 - roll.total) + "!</b></span>"
             } else if (naturalRoll == 1) {
-              label += "<span style='color:#E90000'><i>critically misses!</i></span>"
+              label += " <span style='color:#E90000'><i>critically misses!</i></span>"
             } else {
-              label += "hits <b>AC " + eval(19 - roll.total) + ".</b>"
+              label += "<br />hits <b>AC " + eval(20 - roll.total) + "!</b>"
             }
           }
         }

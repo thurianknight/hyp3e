@@ -150,6 +150,7 @@
     "types": ["armor", "container", "feature", "item", "spell", "weapon"],
     "templates": {
       "base": {
+        "friendlyName": "",
         "description": ""
       },
       "equippable": {

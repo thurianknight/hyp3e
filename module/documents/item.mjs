@@ -44,7 +44,7 @@ export class Hyp3eItem extends Item {
         itemData.system.melee = true
         itemData.system.missile = false
         // Set attack formula if it doesn't already exist, else leave it alone
-        if (!itemData.system.formula || itemData.system.formula == '') {
+        if (itemData.system.formula == '') {
           // itemData.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
           itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
         }
@@ -73,9 +73,10 @@ export class Hyp3eItem extends Item {
    * Prepare a data object which is passed to any Roll formulas which are created related to this Item
    * @private
    */
-   getRollData() {
+  getRollData() {
     // If present, return the actor's roll data.
-    if ( !this.actor ) return null;
+    if ( !this.actor ) return null
+  
     const rollData = this.actor.getRollData();
     // Grab the item's system data as well.
     rollData.item = foundry.utils.deepClone(this.system);
@@ -89,7 +90,12 @@ export class Hyp3eItem extends Item {
   async roll() {
     const item = this;
     // An item roll is either an attack or a check of some kind
-    console.log("Item roll!")
+    // Weapons & spells default to attack, other items default to check
+    if (item.type == 'weapon' || item.type == 'spell') {
+      this.rollAttack()
+    } else {
+      this.rollCheck()
+    }
   }
 
   /**
@@ -102,10 +108,16 @@ export class Hyp3eItem extends Item {
     const speaker = ChatMessage.getSpeaker({ actor: this.actor })
     const rollMode = game.settings.get('core', 'rollMode')
     let label = ""
+    let itemName = ""
+    if (item.system.friendlyName != "") {
+      itemName = item.system.friendlyName
+    } else {
+      itemName = item.name
+    }
 
     if (!this.system.formula) {
     // If there's no roll formula, send a chat message (this should never actually happen)
-      label = `<h3>${item.name} [${item.type}]</h3>`
+      label = `<h3>${itemName} [${item.type}]</h3>`
       ChatMessage.create({
         speaker: speaker,
         rollMode: rollMode,
@@ -135,13 +147,13 @@ export class Hyp3eItem extends Item {
     let userTargets = Array.from(game.user.targets)
     console.log("Target Actor Data:", userTargets)
     if (userTargets.length > 0) {
-      let primaryTargetData = userTargets[0].actor.system
-      targetAc = primaryTargetData.ac.value
+      let primaryTargetData = userTargets[0].actor
+      targetAc = primaryTargetData.system.ac.value
       targetName = primaryTargetData.name
     }
 
     // This is an attack roll
-    label = `Attack with ${item.name}...`
+    label = `Attack ${targetName} with ${itemName}...`
     rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
 
     console.log("Roll formula:", rollFormula)
@@ -156,20 +168,20 @@ export class Hyp3eItem extends Item {
     rollTotal = atkRoll.total
 
     // Determine hit or miss based on target AC
-    let tn = 19 - targetAc
-    console.log(`Attack roll ${atkRoll.total} hits AC [19 - ${atkRoll.total} => ] ${eval(19 - atkRoll.total)}`)
+    let tn = 20 - targetAc
+    console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`)
     if (naturalRoll == 20) {
       console.log("Natural 20 always crit hits!")
-      label += `<span style='color:#2ECC71'>critically hits <b>AC ${targetAc}!</b></span>`
+      label += `<br /><span style='color:#2ECC71'>critically hits <b>AC ${targetAc}!</b></span>`
     } else if (naturalRoll == 1) {
       console.log("Natural 1 always crit misses!")
-      label += "<span style='color:#E90000'><i>critically misses!</i></span>"
+      label += "<br /><span style='color:#E90000'><i>critically misses!</i></span>"
     } else if (atkRoll.total >= tn) {
-      console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [19 - ${targetAc} => ] ${tn}.`)
-      label += `hits <b>AC ${targetAc}.</b>`
+      console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`)
+      label += `<br />hits <b>AC ${targetAc}!</b>`
     } else {
-      console.log(`Miss! Attack roll ${atkRoll.total} is less than [19 - ${targetAc} => ] ${tn}.`)
-      label += `<i>misses <b>AC ${targetAc}.</i>`
+      console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`)
+      label += `<br /><i>misses <b>AC ${targetAc}.</i>`
     }
 
     // Since this is an attack, we roll damage automatically and include it in the chat message
@@ -266,11 +278,17 @@ export class Hyp3eItem extends Item {
     const speaker = ChatMessage.getSpeaker({ actor: this.actor })
     const rollMode = game.settings.get('core', 'rollMode')
     let label = ""
+    let itemName = ""
+    if (item.system.friendlyName != "") {
+      itemName = item.system.friendlyName
+    } else {
+      itemName = item.name
+    }
 
     // If there's no roll formula, send a chat message.
     if (!this.system.formula && !this.system.formula) {
       // Vanilla label
-      label = `<h3>${item.name} [${item.type}]</h3>`
+      label = `<h3>${itemName} [${item.type}]</h3>`
       ChatMessage.create({
         speaker: speaker,
         rollMode: rollMode,
@@ -287,14 +305,10 @@ export class Hyp3eItem extends Item {
     // Declare vars
     let rollFormula
     
-    // Prioritize checks > formula
-    if (rollData.item.formula) {
-      label = `${item.name} check...`
-      rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
-    } else {
-      label = `${item.name} roll...`
-      rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
-    }
+    // Setup roll formula
+    label = `${itemName} roll...`
+    rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
+
     console.log("Roll formula:", rollFormula)
     // Invoke the roll and submit it to chat.
     const roll = new Roll(rollFormula, rollData);
@@ -307,10 +321,10 @@ export class Hyp3eItem extends Item {
       // Item checks are roll-under for success
       if(roll.total <= rollData.item.tn) {
         console.log(roll.total + " is less than or equal to " + rollData.item.tn + "!")
-        label += "<b>Success</b>!"
+        label += "<br /><b>Success</b>!"
       } else {
         console.log(roll.total + " is greater than " + rollData.item.tn + "!")
-        label += "<i>Fail</i>."
+        label += "<br /><i>Fail</i>."
       }
     } else {
       // No target number supplied
