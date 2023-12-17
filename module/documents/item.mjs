@@ -116,7 +116,7 @@ export class Hyp3eItem extends Item {
     }
 
     if (!this.system.formula) {
-    // If there's no roll formula, send a chat message (this should never actually happen)
+    // If there's no roll formula, send a chat message (this should never happen)
       label = `<h3>${itemName} [${item.type}]</h3>`
       ChatMessage.create({
         speaker: speaker,
@@ -152,8 +152,13 @@ export class Hyp3eItem extends Item {
       targetName = primaryTargetData.name
     }
 
-    // This is an attack roll
-    label = `Attack ${targetName} with ${itemName}...`
+    // Setup chat card label based on whether we have a target
+    if (targetName != "") {
+      label = `Attack with ${itemName} vs. ${targetName}...`
+    } else {
+      label = `Attack with ${itemName}...`
+    }
+
     rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
 
     console.log("Roll formula:", rollFormula)

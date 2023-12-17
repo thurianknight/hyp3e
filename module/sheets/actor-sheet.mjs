@@ -322,19 +322,19 @@ export class Hyp3eActorSheet extends ActorSheet {
     console.log("Current Actor:", this.actor)
 
     // How many different roll types do we have?
-    //  Tests of an Attribute: d6 roll-under target
-    //    Formula & TN built into character sheet
-    //  Feats of an Attribute: d100 roll-under target
-    //    Formula & TN built into character sheet
-    //  Exploration skill checks: d6 roll-under target
-    //    Formula built into character sheet, GM sets TN
+    //  Test of Attribute: d6 roll-under target
+    //    Formula & TN built into character sheet, GM may adjust TN by setting a sit mod
+    //  Feat of Attribute: d100 roll-under target
+    //    Formula & TN built into character sheet, GM may adjust
+    //  Exploration skill check: d6 roll-under target
+    //    Formula & TN built into character sheet, GM may adjust
     //  Hit dice: dX and sum total
     //    Formula built into character sheet, no TN needed
     //  Saving throws: d20 roll-over target
-    //    Formula & TN built into character sheet
+    //    Formula & TN built into character sheet, GM may adjust
 
     //  Class ability checks, esp. thief skills: varies, but usually d6 or d12 roll-under target
-    //    Formula can be built into ability => item sheet of type "feature"
+    //    Formula & TN can be built into ability => item sheet of type "feature"
     //  Turning undead (subset of class abilities): d12 roll-under target
     //    Formula can be built into turning ability => item sheet of type "feature"
     //  Attack rolls: d20 roll-over target
@@ -393,7 +393,7 @@ export class Hyp3eActorSheet extends ActorSheet {
 
         case "attack":
           // console.log("Rolling attack...");
-          label = `${dataset.label}...`
+          label = `${dataset.label}`
           // Log the dataset before the dialog renders
           // console.log("Dataset:", dataset);
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
@@ -466,9 +466,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       
       // Handle non-item rolls that supply the formula directly
       if (dataset.rollType != "item") {
-        // Log the dialog response
-        // console.log("Dialog response:", rollResponse)
-        // console.log("Roll formula: ", rollFormula)
+        // Roll the dice!
         let roll = new Roll(rollFormula, this.actor.getRollData())
         // Resolve the roll
         let result = await roll.evaluate()
@@ -495,38 +493,82 @@ export class Hyp3eActorSheet extends ActorSheet {
               label += "<br /><i>Fail</i>."
             }
           // Attacks trigger here if there is a target token selected
-          } else if (dataset.rollType == "attack") {
-            let naturalRoll = roll.dice[0].total
-            if(roll.total >= dataset.rollTarget) {
-              console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!")
-              if (naturalRoll == 20) {
-                label += "<br /><span style='color:#2ECC71'><b>critically hits!</b></span>"
-              } else {
-                label += "<br /><b>hits!</b>"
-              }
-            } else {
-              console.log(roll.total + " is less than " + dataset.rollTarget + "!")
-              if (naturalRoll == 1) {
-                label += "<br /><span style='color:#E90000'><i>critically misses!</i></span>"
-              } else {
-                label += "<br /><i>misses.</i>"
-              }
-            }
+          // } else if (dataset.rollType == "attack") {
+          //   let naturalRoll = roll.dice[0].total
+          //   if(roll.total >= dataset.rollTarget) {
+          //     console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!")
+          //     if (naturalRoll == 20) {
+          //       label += "<br /><span style='color:#2ECC71'><b>critically hits!</b></span>"
+          //     } else {
+          //       label += "<br /><b>hits!</b>"
+          //     }
+          //   } else {
+          //     console.log(roll.total + " is less than " + dataset.rollTarget + "!")
+          //     if (naturalRoll == 1) {
+          //       label += "<br /><span style='color:#E90000'><i>critically misses!</i></span>"
+          //     } else {
+          //       label += "<br /><i>misses.</i>"
+          //     }
+          //   }
+          } else {
+            // Target number was supplied but the roll type is invalid or unspecified!
+            console.log(`Error in roll setup! dataset.rollTarget is ${dataset.rollTarget}, but dataset.rollType is ${dataset.rollType}`)
+            ui.notifications.info(`Error in roll setup! dataset.rollTarget is ${dataset.rollTarget}, but dataset.rollType is ${dataset.rollType}`)
+            return
           }
         } else {
-          // No target number supplied with an untargeted attack
+          // The character sheet has an attack roll, but do we have a target token?
           if (dataset.rollType == "attack") {
-            console.log(roll.total + " hits AC 20 - " + roll.total + " = " + eval(20 - roll.total))
+            // Get roll results
             let naturalRoll = roll.dice[0].total
-            console.log("Natural die roll:", naturalRoll)
-            if (naturalRoll == 20) {
-              label += "<br /><span style='color:#2ECC71'>critically hits <b>AC " + eval(20 - roll.total) + "!</b></span>"
-            } else if (naturalRoll == 1) {
-              label += "<br /><span style='color:#E90000'><i>critically misses!</i></span>"
-            } else if (eval(20 - roll.total) <= 9) {
-              label += "<br />hits <b>AC " + eval(20 - roll.total) + "!</b>"
+            let dieType = ""
+            let rollFormula = ""
+            let rollTotal = 0
+            let targetAc = 9
+            let targetName = ""
+
+            // Has the user targeted a token? If so, get it's AC and name
+            let userTargets = Array.from(game.user.targets)
+            console.log("Target Actor Data:", userTargets)
+            if (userTargets.length > 0) {
+              let primaryTargetData = userTargets[0].actor
+              targetAc = primaryTargetData.system.ac.value
+              targetName = primaryTargetData.name
+            }
+            
+            // Setup chat card label based on whether we have a target
+            if (targetName != "") {
+              label += ` vs. ${targetName}...`
             } else {
-              label += "<br /><i>misses</i> (AC 9 or worse)."
+              label += "..."
+            }
+
+            // Determine hit or miss based on target AC
+            let hit = false
+            let tn = 20 - targetAc
+            console.log(`Attack roll ${roll.total} hits AC [20 - ${roll.total} => ] ${eval(20 - roll.total)}`)
+            if (naturalRoll == 20) {
+              console.log("Natural 20 always crit hits!")
+              label += `<br /><span style='color:#2ECC71'><b>critical hit!</b></span>`
+              hit = true
+            } else if (naturalRoll == 1) {
+              console.log("Natural 1 always crit misses!")
+              label += "<br /><span style='color:#E90000'><i>critical miss!</i></span>"
+            } else if (roll.total >= tn) {
+              console.log(`Hit! Attack roll ${roll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`)
+              if (targetName != "") {
+                label += `<br /><b>hit!</b>`
+              } else {
+                label += `<br />hits <b>AC ${eval(20 - roll.total)}</b>`
+              }
+              hit = true
+            } else {
+              console.log(`Miss! Attack roll ${roll.total} is less than [20 - ${targetAc} => ] ${tn}.`)
+              if (targetName != "") {
+                label += `<br /><i>miss.</i>`
+              } else {
+                label += `<br /><i>misses AC 9.</i>`
+              }
             }
           }
         }
