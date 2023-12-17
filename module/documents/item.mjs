@@ -90,7 +90,7 @@ export class Hyp3eItem extends Item {
   async roll() {
     const item = this;
     // An item roll is either an attack or a check of some kind
-    // Weapons & spells default to attack, other items default to check
+    // Weapons & spells default to attack, other items default to a check
     if (item.type == 'weapon' || item.type == 'spell') {
       this.rollAttack()
     } else {
@@ -134,16 +134,16 @@ export class Hyp3eItem extends Item {
     console.log("Item roll data:", rollData)
     // Declare vars
     let naturalRoll = 0
-    let dieType
-    let rollFormula
-    let rollTotal
-    let dmgFormula
-    let dmgTotal
-    let damageRoll = ''
+    let dieType = ""
+    let rollFormula = ""
+    let rollTotal = 0
+    let dmgFormula = ""
+    let dmgTotal = 0
+    let damageRoll = ""
     let targetAc = 9
     let targetName = ""
 
-    // Has the user targeted a token? If so, get it's AC
+    // Has the user targeted a token? If so, get it's AC and name
     let userTargets = Array.from(game.user.targets)
     console.log("Target Actor Data:", userTargets)
     if (userTargets.length > 0) {
@@ -168,24 +168,35 @@ export class Hyp3eItem extends Item {
     rollTotal = atkRoll.total
 
     // Determine hit or miss based on target AC
+    let hit = false
     let tn = 20 - targetAc
     console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`)
     if (naturalRoll == 20) {
       console.log("Natural 20 always crit hits!")
-      label += `<br /><span style='color:#2ECC71'>critically hits <b>AC ${targetAc}!</b></span>`
+      label += `<br /><span style='color:#2ECC71'><b>critical hit!</b></span>`
+      hit = true
     } else if (naturalRoll == 1) {
       console.log("Natural 1 always crit misses!")
-      label += "<br /><span style='color:#E90000'><i>critically misses!</i></span>"
+      label += "<br /><span style='color:#E90000'><i>critical miss!</i></span>"
     } else if (atkRoll.total >= tn) {
       console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`)
-      label += `<br />hits <b>AC ${targetAc}!</b>`
+      if (targetName != "") {
+        label += `<br /><b>hit!</b>`
+      } else {
+        label += `<br />hits <b>AC ${eval(20 - atkRoll.total)}</b>`
+      }
+      hit = true
     } else {
       console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`)
-      label += `<br /><i>misses <b>AC ${targetAc}.</i>`
+      if (targetName != "") {
+        label += `<br /><i>miss.</i>`
+      } else {
+        label += `<br /><i>misses AC 9.</i>`
+      }
     }
 
-    // Since this is an attack, we roll damage automatically and include it in the chat message
-    if (rollData.item.damage) {
+    // If the attack hit, we roll damage automatically and include it in the chat message
+    if (hit && rollData.item.damage) {
       if (rollData.item.melee) {
         dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod`
       } else if (rollData.item.missile) {
@@ -200,17 +211,46 @@ export class Hyp3eItem extends Item {
       // Resolve the roll
       let result = await dmgRoll.roll({async: true});
       console.log("Damage result: ", dmgRoll)
+      
       // Get the resulting values from the roll object
       dmgTotal = dmgRoll.total
-      if (naturalRoll != 1) {
-        damageRoll = `
-        <div class="dice-roll">
-          <div class="dice-result">
-            <h4 class="dice-formula"><span class="dice-damage">${dmgTotal} HP damage!</span></h4>
+      const dmgDie = dmgRoll.dice[0].faces
+
+      // Render the damage roll chat card
+      damageRoll = `
+      <h4 class="dice-damage">Rolling damage...</h4>
+      <div class="dice-roll">
+        <div class="dice-result">
+          <div class="dice-formula">${dmgRoll.formula}</div>
+          <div class="dice-tooltip">
+            <section class="tooltip-part">
+              <div class="dice">
+                <header class="part-header flexrow">
+                  <span class="part-formula">${dmgRoll.dice[0].number}d${dmgDie}</span>                
+                  <span class="part-total">${dmgRoll.dice[0].total}</span>
+                </header>
+                <ol class="dice-rolls">
+      `
+      // Render damage dice
+      dmgRoll.dice[0].values.forEach(val => {
+        if (val == 1) {
+          damageRoll += `<li class="roll die d${dmgDie} min">${val}</li>`
+        } else if (val == dmgDie) {
+          damageRoll += `<li class="roll die d${dmgDie} max">${val}</li>`
+        } else {
+          damageRoll += `<li class="roll die d${dmgDie}">${val}</li>`
+        }
+      })
+      // Finish the damage roll chat card
+      damageRoll += `
+                </ol>
+              </div>
+            </section>
           </div>
+          <h4 class="dice-formula"><span class="dice-damage">${dmgTotal} HP damage!</span></h4>
         </div>
-        `  
-      }
+      </div>
+      `
     }
 
     // Render the chat message template

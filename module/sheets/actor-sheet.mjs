@@ -522,9 +522,11 @@ export class Hyp3eActorSheet extends ActorSheet {
             if (naturalRoll == 20) {
               label += "<br /><span style='color:#2ECC71'>critically hits <b>AC " + eval(20 - roll.total) + "!</b></span>"
             } else if (naturalRoll == 1) {
-              label += " <span style='color:#E90000'><i>critically misses!</i></span>"
-            } else {
+              label += "<br /><span style='color:#E90000'><i>critically misses!</i></span>"
+            } else if (eval(20 - roll.total) <= 9) {
               label += "<br />hits <b>AC " + eval(20 - roll.total) + "!</b>"
+            } else {
+              label += "<br /><i>misses</i> (AC 9 or worse)."
             }
           }
         }

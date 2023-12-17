@@ -11,7 +11,8 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.str.atkMod" value="{{numberFormat system.attributes.str.atkMod decimals=0 sign=true}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d20 + @str.atkMod + @fa" data-roll-type="attack" data-roll-target="" data-label="Basic melee attack">{{localize 'HYP3E.attributes.str.atkMod'}} <i class="fas fa-dice-d20"></i></span>
+      {{!-- <span class="rollable mod-label" data-roll="1d20 + @str.atkMod + @fa" data-roll-type="attack" data-roll-target="" data-label="Basic melee attack">{{localize 'HYP3E.attributes.str.atkMod'}} <i class="fas fa-dice-d20"></i></span> --}}
+      <span class="mod-label">{{localize 'HYP3E.attributes.str.atkMod'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.str.dmgMod" value="{{numberFormat system.attributes.str.dmgMod decimals=0 sign=true}}" data-dtype="Number"/>
@@ -40,7 +41,8 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.dex.atkMod" value="{{numberFormat system.attributes.dex.atkMod decimals=0 sign=true}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d20 + @dex.atkMod + @fa" data-roll-type="attack" data-roll-target="" data-label="Basic missile attack">{{localize 'HYP3E.attributes.dex.atkMod'}} <i class="fas fa-dice-d20"></i></span>
+      {{!-- <span class="rollable mod-label" data-roll="1d20 + @dex.atkMod + @fa" data-roll-type="attack" data-roll-target="" data-label="Basic missile attack">{{localize 'HYP3E.attributes.dex.atkMod'}} <i class="fas fa-dice-d20"></i></span> --}}
+      <span class="mod-label">{{localize 'HYP3E.attributes.dex.atkMod'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.dex.defMod" value="{{numberFormat system.attributes.dex.defMod decimals=0 sign=true}}" data-dtype="Number"/>
