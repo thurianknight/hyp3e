@@ -11,7 +11,7 @@
 </p>
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <!--
@@ -31,7 +31,7 @@ You may also copy the manifest link below and paste it into the manifest link in
 https://github.com/thurianknight/hyp3e/releases/latest/download/system.json
 ```
 
-### Open Game Content Compendium
+<!-- ### Open Game Content Compendium
 
 The Hyperborea 3rd Edition Content Compendium is a Foundry VTT module separate from the system. Find it within Foundry VTT's _module_ browser with the search term `hyperborea`.
 
@@ -39,7 +39,7 @@ You may also copy the manifest link below and paste it into the manifest link in
 
 ```console
 https://github.com/thurianknight/hyp3e-compendium/releases/latest/download/module.json
-```
+``` -->
 
 ## Your Support
 
@@ -69,7 +69,7 @@ Any feedback is deeply appreciated. Please browse the [open issues](https://gith
 
 If you're a developer, look for our [CONTRIBUTING.md](/CONTRIBUTING.md) file.
 
-If you speak a non-English language, [Join the hyperborea project on Crowdin](https://crowdin.com/project/hyp3e).
+<!-- If you speak a non-English language, [Join the hyperborea project on Crowdin](https://crowdin.com/project/hyp3e). -->
 
 ## Open Game Content Used Under License
 
