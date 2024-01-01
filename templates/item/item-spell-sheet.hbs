@@ -32,7 +32,7 @@
       <div class="flexrow">
 
         {{!-- Spell Attributes --}}
-        <div class="flexcol flexshrink flex-group-center item-attributes">
+        <div class="flexshrink flex-group-center item-attributes">
           <label class="resource-label">Range</label>
           <input type="text" name="system.range" value="{{system.range}}" />
           <label class="resource-label">Duration</label>
@@ -52,7 +52,7 @@
             </select>
           </div>
           <label class="resource-label">Attack Roll</label>
-          <input name="system.atkRoll" type="checkbox" {{checked system.atkRoll}}>
+          <input name="system.atkRoll" type="checkbox" {{checked system.atkRoll}}><br />
           <label for="system.damage" class="resource-label">Damage</label>
           <input type="text" name="system.damage" value="{{system.damage}}" />
         </div>

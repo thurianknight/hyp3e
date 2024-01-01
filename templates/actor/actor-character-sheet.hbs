@@ -10,44 +10,43 @@
             <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
           </h1>
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">Class</label>
+            <label class="header-label align-left">{{localize "HYP3E.details.class"}}</label>
             <select name="system.details.class">
               {{#select system.details.class}}
               <option value=""></option>
               {{#each characterClasses as |class c|}}
               <option value="{{class}}">{{class}}</option>
-              {{!-- {{log 'c='c 'Class='class}} --}}
               {{/each}}
               {{/select}}
             </select>
             <span></span>
           </div>
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">Alignment</label>
+            <label class="header-label align-left">{{localize "HYP3E.details.alignment"}}</label>
             <input type="text" name="system.details.alignment" value="{{system.details.alignment}}" data-dtype="String" />
             <span></span>
           </div>
         </div>
         <div class="character-header-block flexcol">
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">Level</label>
+            <label class="header-label align-left">{{localize "HYP3E.details.level"}}</label>
             <input type="text" name="system.details.level.value" value="{{system.details.level.value}}" data-dtype="Number" />
             <span></span>
             <span></span>
             <span></span>
           </div>
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">XP</label>
+            <label class="header-label align-left">{{localize "HYP3E.details.xp"}}</label>
             <input type="text" name="system.details.xp.value" value="{{system.details.xp.value}}" data-dtype="Number" />
             <span></span>
-            <label class="header-label flexlarge align-left">To Next Level</label>
+            <label class="header-label flexlarge align-left">{{localize "HYP3E.details.toNextLvl"}}</label>
             <input type="text" name="system.details.xp.toNextLvl" value="{{system.details.xp.toNextLvl}}" data-dtype="Number" />
           </div>
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">Bonus</label>
+            <label class="header-label align-left">{{localize "HYP3E.bonus"}}</label>
             <input type="text" name="system.details.xp.bonus" value="{{system.details.xp.bonus}}" data-dtype="Number" /> %
             <span></span>
-            <label class="header-label flexlarge align-left">Primary Attr</label>
+            <label class="header-label flexlarge align-left">{{localize "HYP3E.details.primeAttr"}}</label>
             <input type="text" name="system.details.xp.primeAttr" value="{{system.details.xp.primeAttr}}" data-dtype="String" />
           </div>
         </div>
@@ -59,12 +58,12 @@
   {{!-- Sheet Tab Navigation --}}
   <nav class="sheet-tabs tabs" data-group="primary">
     {{!-- Default tab is specified in actor-sheet.mjs --}}
-    <a class="item" data-tab="abilities">Abilities</a>
-    <a class="item" data-tab="combat">Combat</a>
-    <a class="item" data-tab="spells">Spells</a>
-    <a class="item" data-tab="effects">Effects</a>
-    <a class="item" data-tab="items">Items</a>
-    <a class="item" data-tab="description">Description</a>
+    <a class="item" data-tab="abilities">{{localize "HYP3E.tabs.abilities"}}</a>
+    <a class="item" data-tab="combat">{{localize "HYP3E.tabs.combat"}}</a>
+    <a class="item" data-tab="spells">{{localize "HYP3E.tabs.spells"}}</a>
+    <a class="item" data-tab="effects">{{localize "HYP3E.tabs.effects"}}</a>
+    <a class="item" data-tab="items">{{localize "HYP3E.tabs.items"}}</a>
+    <a class="item" data-tab="description">{{localize "HYP3E.tabs.description"}}</a>
   </nav>
 
   {{!-- Sheet Body --}}

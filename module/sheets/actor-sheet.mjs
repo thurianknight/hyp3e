@@ -521,9 +521,6 @@ export class Hyp3eActorSheet extends ActorSheet {
           if (dataset.rollType == "attack") {
             // Get roll results
             let naturalRoll = roll.dice[0].total
-            let dieType = ""
-            let rollFormula = ""
-            let rollTotal = 0
             let targetAc = 9
             let targetName = ""
 

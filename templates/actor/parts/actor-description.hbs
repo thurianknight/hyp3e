@@ -2,58 +2,58 @@
   <div class="description-block flexrow">
     <div class="description-block flexcol">
       <div class="description-block flexrow description-field">
-        <label for="system.details.race" class="description-label">Race</label>
+        <label for="system.details.race" class="description-label">{{localize 'HYP3E.details.race'}}</label>
         <input type="text" name="system.details.race" value="{{system.details.race}}"/>
       </div>
       <div class="description-block flexrow description-field">
-        <label for="system.details.gender" class="description-label">Gender</label>
+        <label for="system.details.gender" class="description-label">{{localize 'HYP3E.details.gender'}}</label>
         <input type="text" name="system.details.gender" value="{{system.details.gender}}"/>        
       </div>
       <div class="description-block flexrow description-field">
-        <label for="system.details.age" class="description-label">Age</label>
+        <label for="system.details.age" class="description-label">{{localize 'HYP3E.details.age'}}</label>
         <input type="text" name="system.details.age" value="{{system.details.age}}"/>
       </div>
       <div class="description-block flexrow description-field">
-        <label for="system.details.religion" class="description-label">Religion</label>
+        <label for="system.details.religion" class="description-label">{{localize 'HYP3E.details.religion'}}</label>
         <input type="text" name="system.details.religion" value="{{system.details.religion}}"/>         
       </div>
     </div>
     <div class="description-block flexcol">
       <div class="description-block flexrow description-field">
-        <label for="system.details.height" class="description-label">Height</label>
+        <label for="system.details.height" class="description-label">{{localize 'HYP3E.details.height'}}</label>
         <input type="text" name="system.details.height" value="{{system.details.height}}"/>
       </div>
       <div class="description-block flexrow description-field">
-        <label for="system.details.weight" class="description-label">Weight</label>
+        <label for="system.details.weight" class="description-label">{{localize 'HYP3E.details.weight'}}</label>
         <input type="text" name="system.details.weight" value="{{system.details.weight}}"/>
       </div>
       <div class="description-block flexrow description-field">
-        <label for="system.details.hair" class="description-label">Hair</label>
+        <label for="system.details.hair" class="description-label">{{localize 'HYP3E.details.hair'}}</label>
         <input type="text" name="system.details.hair" value="{{system.details.hair}}"/>
       </div>
       <div class="description-block flexrow description-field">
-        <label for="system.details.eyes" class="description-label">Eyes</label>
+        <label for="system.details.eyes" class="description-label">{{localize 'HYP3E.details.eyes'}}</label>
         <input type="text" name="system.details.eyes" value="{{system.details.eyes}}"/>
       </div>
     </div>  
   </div>
   <div class="description-block flexcol">
     <div class="description-block flexrow description-field">
-      <label for="system.details.secondarySkills" class="description-label">Secondary Skills</label>
+      <label for="system.details.secondarySkills" class="description-label">{{localize 'HYP3E.details.secSkills'}}</label>
       <input type="text" name="system.details.secondarySkills" value="{{system.details.secondarySkills}}"/>
     </div>
     <div class="description-block flexrow description-field">
-      <label for="system.knownLanguages" class="description-label">Languages Known</label>
+      <label for="system.knownLanguages" class="description-label">{{localize 'HYP3E.details.languages'}}</label>
       <input type="text" name="system.knownLanguages" value="{{system.knownLanguages}}"/>
     </div>
     <div class="description-block">
-      <label for="system.details.physicalFeatures" class="description-label">Physical Features</label>
+      <label for="system.details.physicalFeatures" class="description-label">{{localize 'HYP3E.details.physFeatures'}}</label>
       <textarea name="system.details.physicalFeatures">{{system.details.physicalFeatures}}</textarea>
     </div>
   </div>
 </div>
 <div class="description-block">
-  <h2>Biography</h2>
+  <h2>{{localize "HYP3E.headers.biography"}}</h2>
   {{!-- If you want TinyMCE editors to output inline rolls when rendered, you need to pass the actor's roll data to the rollData property. --}}
   {{editor system.biography target="system.biography" rollData=rollData button=true owner=owner editable=editable}}  
 </div>

@@ -6,14 +6,65 @@
       "characterClasses": "Character Classes",
       "characterClassesHint": "Character classes available to PCs and some NPCs."
     },
+    "tabs": {
+      "abilities": "Abilities",
+      "combat": "Combat",
+      "spells": "Spells",
+      "effects": "Effects",
+      "items": "Items",
+      "description": "Description",
+      "details": "Details",
+      "attributes": "Attributes"
+    },
+    "headers": {
+      "name": "Name",
+      "attributes": "Attributes",
+      "exploration": "Exploration",
+      "classAbilities": "Class Abilities",
+      "fightingSkills": "Fighting Skills",
+      "combatStats": "Combat Statistics",
+      "savingThrows": "Saving Throws",
+      "atkRate": "Atk Rate",
+      "rof": "RoF",
+      "classRange": "Class/Range",
+      "atkMod": "Atk Mod",
+      "dmgMod": "Dmg Mod",
+      "damage": "Damage",
+      "type": "Type",
+      "biography": "Biography"
+    },
+    "details": {
+      "class": "Class",
+      "alignment": "Alignment",
+      "level": "Level",
+      "hitDie": "Hit Die",
+      "hitDice": "Hit Dice",
+      "xp": "XP",
+      "toNextLvl": "To Next Level",
+      "primeAttr": "Primary Attr",
+      "hitPoints": "Hit Points",
+      "hp": "HP",
+      "race": "Race",
+      "gender": "Gender",
+      "age": "Age",
+      "religion": "Religion",
+      "height": "Height",
+      "weight": "Weight",
+      "hair": "Hair",
+      "eyes": "Eyes",
+      "secSkills": "Secondary Skills",
+      "languages": "Languages Known",
+      "physFeatures": "Physical Features"
+    },
     "attributes": {
       "str": {
-        "name": "Srength",
+        "name": "Strength",
         "abbrev": "ST",
         "atkMod": "Melee Mod",
         "dmgMod": "Dmg Mod",
         "test": "Test of ST",
-        "feat": "Feat of ST"
+        "feat": "Feat of ST",
+        "check": "Basic ST check"
       },
       "dex": {
         "name": "Dexterity",
@@ -21,7 +72,8 @@
         "atkMod": "Missile Mod",
         "defMod": "Def Mod",
         "test": "Test of DX",
-        "feat": "Feat of DX"
+        "feat": "Feat of DX",
+        "check": "Basic DX check"
       },
       "con": {
         "name": "Constitution",
@@ -30,28 +82,32 @@
         "poisRadMod": "Pois/Rad Mod",
         "traumaSurvive": "Trauma",
         "test": "Test of CN",
-        "feat": "Feat of CN"
+        "feat": "Feat of CN",
+        "check": "Basic CN check"
       },
       "int": {
         "name": "Intelligence",
         "abbrev": "IN",
         "languages": "Languages",
         "bonusSpells": "Bonus Spells",
-        "learnSpell": "Learn Spell"
+        "learnSpell": "Learn Spell",
+        "check": "Basic IN check"
       },
       "wis": {
         "name": "Wisdom",
         "abbrev": "WS",
         "willMod": "Will Mod",
         "bonusSpells": "Bonus Spells",
-        "learnSpell": "Learn Spell"
+        "learnSpell": "Learn Spell",
+        "check": "Basic WS check"
       },
       "cha": {
         "name": "Charisma",
         "abbrev": "CH",
         "reaction": "Reaction",
         "maxHenchmen": "Max Henchmen",
-        "turnUndead": "Turn Mod"
+        "turnUndead": "Turn Mod",
+        "check": "Basic CH check"
       }
     },
     "saves": {
@@ -77,6 +133,8 @@
       }
     },
     "fightingAbility": "Fighting Ability",
+    "unskilled": "Unskilled",
+    "wpnSkills": "Weapon Skills & Masteries",
     "castingAbility": "Casting Ability",
     "turningAbility": "Turning Ability",
     "explorationSkills": {
@@ -125,7 +183,8 @@
     "effect": {
       "add": "Add Effect",
       "create": "Create Effect",
-      "toggle": "Toogle Effect"
+      "toggle": "Toogle Effect",
+      "source": "Source"
     },
     "feature": {
       "add": "Add Feature"
@@ -135,18 +194,25 @@
       "edit": "Edit",
       "delete": "Delete",
       "show": "Show",
-      "equip": "Toggle Equip"
+      "equip": "Toggle Equip",
+      "qty": "Qty",
+      "weight": "Weight",
+      "location": "Location"
     },
     "spell": {
       "addLvl": "Add Lvl",
-      "addSpell": "Add Spell"
+      "addSpell": "Add Spell",
+      "numMem": "# Mem",
+      "duration": "Duration",
+      "save": "Save"
     },
     "weapon": {
       "add": "Add Weapon",
       "type": {
         "melee": "Melee",
         "missile": "Missile"
-      }
+      },
+      "range": "Range"
     },
     "armor": {
       "add": "Add Armor",
@@ -156,11 +222,34 @@
         "medium": "Medium",
         "heavy": "Heavy",
         "shield": "Shield"
-      }
+      },
+      "armorClass": "Armor Class",
+      "ac": "AC",
+      "dr": "DR",
+      "dmgResist": "Damage Resistance",
+      "unarmored": "Unarmored"
     },
+    "roll": "Roll",
     "rollFormula": "Roll Formula",
     "rollExample": "e.g. 1d6+1",
+    "checkRoll": "Check Roll",
+    "target": "Target",
     "rollMode": "Roll Mode",
-    "sitMod": "Situational Modifier"
+    "sitMod": "Situational Modifier",
+    "bonus": "Bonus",
+    "dataLabel": {
+      "basicMeleeAtk": "Basic melee attack",
+      "attackWith": "Attack with",
+      "hitDieRoll": "Hit Die + CN mod",
+      "deathSave": "Save vs. Death/Poison/Radiation",
+      "deviceSave": "Save vs. Device",
+      "xformSave": "Save vs. Transformation",
+      "avoidanceSave": "Avoidance Save",
+      "sorcerySave": "Save vs. Sorcery",
+      "check": "check",
+      "caCheck": "Casting Ability check",
+      "taCheck": "Turn Undead check",
+      "spells": "Spells"
+    }
   }
 }

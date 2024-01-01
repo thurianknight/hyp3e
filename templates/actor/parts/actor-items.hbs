@@ -1,9 +1,9 @@
 <ol class="items-list">
   <li class="item flexrow items-header">
-    <div class="item-name">Name</div>
-    <div class="item-prop">Qty</div>
-    <div class="item-prop">Weight</div>
-    <div class="item-prop">Location</div>
+    <div class="item-name">{{localize "HYP3E.headers.name"}}</div>
+    <div class="item-prop">{{localize "HYP3E.item.qty"}}</div>
+    <div class="item-prop">{{localize "HYP3E.item.weight"}}</div>
+    <div class="item-prop">{{localize "HYP3E.item.location"}}</div>
     <div class="item-controls">
       <a class="item-control item-create" title="Create item" data-type="item">
         <i class="fas fa-plus"></i> {{localize "HYP3E.item.add"}}
@@ -16,7 +16,7 @@
         <div class="item-name">
           <div class="item-image">
             {{#if item.system.formula}}
-            <a class="rollable" data-roll-type="item" data-label="{{item.name}} check"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+            <a class="rollable" data-roll-type="item" data-label="{{item.name}} {{localize 'HYP3E.dataLabel.check'}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
             {{else}}
             <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
             {{/if}}
@@ -25,7 +25,7 @@
         </div>
         <div class="item-prop">{{item.system.quantity.value}}
           {{#if item.system.quantity.max}}
-            / item.system.quantity.max
+            / {{item.system.quantity.max}}
           {{/if}}</div>
         <div class="item-prop">{{item.system.weight}}</div>
         <div class="item-prop">{{item.system.location}}</div>

@@ -138,7 +138,6 @@ export class Hyp3eItem extends Item {
     let rollFormula = ""
     let rollTotal = 0
     let dmgFormula = ""
-    let dmgTotal = 0
     let damageRoll = ""
     let targetAc = 9
     let targetName = ""
@@ -162,12 +161,13 @@ export class Hyp3eItem extends Item {
     rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
 
     console.log("Roll formula:", rollFormula)
-    // Invoke the roll
+    // Invoke the attack roll
     const atkRoll = new Roll(rollFormula, rollData);
     // Resolve the roll
     let result = await atkRoll.roll({async: true});
     console.log("Roll result: ", result)
-    // Get the resulting values from the die roll
+
+    // Get the resulting values from the attack roll
     naturalRoll = atkRoll.dice[0].total
     dieType = "d20"
     rollTotal = atkRoll.total
@@ -216,59 +216,50 @@ export class Hyp3eItem extends Item {
       // Resolve the roll
       let result = await dmgRoll.roll({async: true});
       console.log("Damage result: ", dmgRoll)
-      
-      // Get the resulting values from the roll object
-      dmgTotal = dmgRoll.total
-      const dmgDie = dmgRoll.dice[0].faces
 
-      // Render the damage roll chat card
+      // Render the damage-roll chat card
       damageRoll = `
-      <h4 class="dice-damage">Rolling damage...</h4>
-      <div class="dice-roll">
-        <div class="dice-result">
-          <div class="dice-formula">${dmgRoll.formula}</div>
-          <div class="dice-tooltip">
-            <section class="tooltip-part">
-              <div class="dice">
-                <header class="part-header flexrow">
-                  <span class="part-formula">${dmgRoll.dice[0].number}d${dmgDie}</span>                
-                  <span class="part-total">${dmgRoll.dice[0].total}</span>
-                </header>
-                <ol class="dice-rolls">
-      `
-      // Render damage dice
-      dmgRoll.dice[0].values.forEach(val => {
-        if (val == 1) {
-          damageRoll += `<li class="roll die d${dmgDie} min">${val}</li>`
-        } else if (val == dmgDie) {
-          damageRoll += `<li class="roll die d${dmgDie} max">${val}</li>`
-        } else {
-          damageRoll += `<li class="roll die d${dmgDie}">${val}</li>`
-        }
+        <h4 class="dice-damage">Rolling damage...</h4>
+        <div class="dice-roll">
+          <div class="dice-result">
+            <div class="dice-formula">${dmgRoll.formula}</div>
+            <div class="dice-tooltip">
+              <section class="tooltip-part">
+                <div class="dice">`
+      // Add dice-roll summaries to the chat card
+      dmgRoll.dice.forEach(dice => {
+        damageRoll += `
+                  <header class="part-header flexrow">
+                    <span class="part-formula">${dice.number}d${dice.faces}</span>
+                    <span><ol class="dice-rolls">`
+        dice.values.forEach(val => {
+          if (val == 1) {
+            damageRoll += `<li class="roll die d${dice.faces} min">${val}</li>`
+          } else if (val == dice.faces) {
+            damageRoll += `<li class="roll die d${dice.faces} max">${val}</li>`
+          } else {
+            damageRoll += `<li class="roll die d${dice.faces}">${val}</li>`
+          }
+        })  
+        damageRoll += `
+                      </ol></span>
+                    <span class="part-total">${dice.total}</span>
+                  </header>`
       })
-      // Finish the damage roll chat card
+      // Finish the damage-roll chat card
       damageRoll += `
-                </ol>
-              </div>
-            </section>
+                  <!-- </ol> -->
+                </div>
+              </section>
+            </div>
+            <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span></h4>
           </div>
-          <h4 class="dice-formula"><span class="dice-damage">${dmgTotal} HP damage!</span></h4>
         </div>
-      </div>
-      `
+        `
     }
 
-    // Render the chat message template
+    // Render the full attack-roll chat card, with damage if any
     let msgContent = ``
-    // let templateData = {
-    //   formula: roll.formula,
-    //   naturalRoll: naturalRoll,
-    //   dieType: dieType,
-    //   rollTotal: rollTotal
-    // };
-    // const template = `${HYP3E.systemRoot}/templates/chat/roll-attack.hbs`
-    // let rendered = await renderTemplate(template, templateData)
-    // msgContent += rendered;
     msgContent = `
     <div class="message-content">
       <div class="dice-roll">
@@ -278,12 +269,14 @@ export class Hyp3eItem extends Item {
             <section class="tooltip-part">
               <div class="dice">
                 <header class="part-header flexrow">
-                  <span class="part-formula">${dieType}</span>                
+                  <span class="part-formula">${dieType}</span>
+                  <span>
+                    <ol class="dice-rolls">
+                      <li class="roll die ${dieType}">${naturalRoll}</li>
+                    </ol>
+                  </span>
                   <span class="part-total">${naturalRoll}</span>
                 </header>
-                <ol class="dice-rolls">
-                  <li class="roll die ${dieType}">${naturalRoll}</li>
-                </ol>
               </div>
             </section>
           </div>

@@ -647,6 +647,7 @@ textarea {
   -ms-flex: 0 0 200px;
   flex: 0 0 200px;
   padding: 0 8px;
+  vertical-align: top;
 }
 .hyp3e .item-attributes {
   min-width: 125px;

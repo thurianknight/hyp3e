@@ -2,19 +2,19 @@
 <div class="combat-block flexrow">
   <div class="combat-block flexcol">
     <div class="resource-content flexrow flex-group-center">
-      <h3>Fighting Skills</h3>
+      <h3>{{localize "HYP3E.headers.fightingSkills"}}</h3>
     </div>
     <div class="resource-content flexrow flex-group-center">
-      <span class="rollable flexlarge" data-roll="1d20 + @fa + @str.atkMod" data-roll-type="attack" data-roll-target="" data-label="Basic melee attack">
+      <span class="rollable flexlarge" data-roll="1d20 + @fa + @str.atkMod" data-roll-type="attack" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.basicMeleeAtk'}}">
         <label for="system.fa" class="combat-label">{{localize "HYP3E.fightingAbility"}}</label>
         <i class="fas fa-dice-d20"></i>
       </span>
       <input type="text" name="system.fa" value="{{system.fa}}" data-dtype="Number"/>
-      <label for="system.unskilled" class="combat-label">Unskilled</label>
+      <label for="system.unskilled" class="combat-label">{{localize "HYP3E.unskilled"}}</label>
       <input type="text" name="system.unskilled" value="{{system.unskilled}}" data-dtype="Number"/>
     </div>
     <div class="resource-content flexrow flex-group-center">
-      <label for="system.proficiencies" class="combat-label">Weapon Skills & Masteries</label>
+      <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.wpnSkills"}}</label>
     </div>
     <div class="resource-content flexrow flex-group-center">
       <textarea name="system.proficiencies">{{system.proficiencies}}</textarea>
@@ -22,24 +22,24 @@
   </div>
   <div class="combat-block flexcol">
     <div class="resource-content flexrow flex-group-center">
-      <h3>Combat Statistics</h3>
+      <h3>{{localize "HYP3E.headers.combatStats"}}</h3>
     </div>
     <div class="resource-content flexrow flex-group-center">
-      <label for="system.hp.value" class="combat-label">Hit Points</label>
+      <label for="system.hp.value" class="combat-label">{{localize "HYP3E.details.hitPoints"}}</label>
       <input type="text" name="system.hp.value" value="{{system.hp.value}}" data-dtype="Number"/>
       /
       <input type="text" name="system.hp.max" value="{{system.hp.max}}" data-dtype="Number"/>
-      <span class="combat-label rollable" data-roll="{{system.hd}}+{{system.attributes.con.hpMod}}" data-roll-type="basic" data-roll-target="" data-label="Hit Die + CN mod">
-        <label for="system.hd">Hit Die</label> <i class="fas fa-dice-d6"></i>
+      <span class="combat-label rollable" data-roll="{{system.hd}}+{{system.attributes.con.hpMod}}" data-roll-type="basic" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.hitDieRoll'}}">
+        <label for="system.hd">{{localize "HYP3E.details.hitDie"}}</label> <i class="fas fa-dice-d6"></i>
       </span>
       <input type="text" name="system.hd" value="{{system.hd}}" data-dtype="String"/>
     </div>
     <div class="resource-content flexrow flex-group-center">
-      <label for="system.ac.value" class="combat-label">Armor Class</label>
+      <label for="system.ac.value" class="combat-label">{{localize "HYP3E.armor.armorClass"}}</label>
       <input type="text" name="system.ac.value" value="{{system.ac.value}}" data-dtype="Number" disabled/>
-      <label for="system.ac.dr" class="combat-label">DR</label>
+      <label for="system.ac.dr" class="combat-label">{{localize "HYP3E.armor.dr"}}</label>
       <input type="text" name="system.ac.dr" value="{{system.ac.dr}}" data-dtype="Number" disabled/>
-      <label for="system.unarmoredAc" class="combat-label">Unarmored</label>
+      <label for="system.unarmoredAc" class="combat-label">{{localize "HYP3E.armor.unarmored"}}</label>
       <input type="text" name="system.unarmoredAc" value="{{system.unarmoredAc}}" disabled/>
     </div>
     <div class="resource-content flexrow flex-group-center">
@@ -55,40 +55,40 @@
 {{!-- Saving throws here --}}
 <div class="combat-block flexrow">
   <div class="resource-content flexrow flex-group-center">
-    <h3>Saving Throws</h3>
+    <h3>{{localize "HYP3E.headers.savingThrows"}}</h3>
   </div>  
 </div>
 <div class="saves-block flexrow flex-between">
   <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.death.value}}" data-label="Death Save">
+    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.death.value}}" data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
       <label for="system.saves.death.value" class="combat-label">{{localize "HYP3E.saves.death.abbrev"}}</label>
       <i class="fas fa-dice-d20"></i>
       </span>
     <input type="text" name="system.saves.death.value" value="{{system.saves.death.value}}"/>
   </div>
   <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.device.value}}" data-label="Device Save">
+    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.device.value}}" data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
       <label for="system.saves.device.value" class="combat-label">{{localize "HYP3E.saves.device.abbrev"}}</label>
       <i class="fas fa-dice-d20"></i>
     </span>
     <input type="text" name="system.saves.device.value" value="{{system.saves.device.value}}"/>
   </div>
   <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.transformation.value}}" data-label="Transformation Save">
+    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.transformation.value}}" data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
       <label for="system.saves.transformation.value" class="combat-label">{{localize "HYP3E.saves.transformation.abbrev"}}</label>
       <i class="fas fa-dice-d20"></i>
     </span>
     <input type="text" name="system.saves.transformation.value" value="{{system.saves.transformation.value}}"/>
   </div>
   <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.avoidance.value}}" data-label="Avoidance Save">
+    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.avoidance.value}}" data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
       <label for="system.saves.avoidance.value" class="combat-label">{{localize "HYP3E.saves.avoidance.abbrev"}}</label>
       <i class="fas fa-dice-d20"></i>
     </span>
     <input type="text" name="system.saves.avoidance.value" value="{{system.saves.avoidance.value}}"/>
   </div>
   <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.sorcery.value}}" data-label="Sorcery Save">
+    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.sorcery.value}}" data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
       <label for="system.saves.sorcery.value" class="combat-label">{{localize "HYP3E.saves.sorcery.abbrev"}}</label>
       <i class="fas fa-dice-d20"></i>
     </span>
@@ -99,12 +99,12 @@
 {{!-- Weapons appear here --}}
 <ol class="items-list">
   <li class="item flexrow items-header">
-    <div class="item-name">Name</div>
-    <div class="item-prop">Atk Rate</div>
-    <div class="item-prop">Class/Range</div>
-    <div class="item-prop">Atk Mod</div>
-    <div class="item-prop">Dmg Mod</div>
-    <div class="item-prop">Damage</div>
+    <div class="item-name">{{localize "HYP3E.headers.name"}}</div>
+    <div class="item-prop">{{localize "HYP3E.headers.atkRate"}}</div>
+    <div class="item-prop">{{localize "HYP3E.headers.classRange"}}</div>
+    <div class="item-prop">{{localize "HYP3E.headers.atkMod"}}</div>
+    <div class="item-prop">{{localize "HYP3E.headers.dmgMod"}}</div>
+    <div class="item-prop">{{localize "HYP3E.headers.damage"}}</div>
     <div class="item-controls">
       <a class="item-control item-create" title="Create weapon" data-type="weapon">
         <i class="fas fa-plus"></i> {{localize "HYP3E.weapon.add"}}
@@ -116,7 +116,7 @@
       <div class="item-header flexrow">
         <div class="item-name">
           <div class="item-image">
-            <a class="rollable" data-roll-type="item" data-label="Attack with {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+            <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.attackWith'}} {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
           </div>
           <a><h4 class="item-drop">{{item.name}}</h4></a>
         </div>
@@ -149,11 +149,11 @@
 {{!-- Armors appear here --}}
 <ol class="items-list">
   <li class="item flexrow items-header">
-    <div class="item-name">Name</div>
-    <div class="item-prop">Type</div>
-    <div class="item-prop">AC</div>
-    <div class="item-prop">DR</div>
-    <div class="item-prop">MV</div>
+    <div class="item-name">{{localize "HYP3E.headers.name"}}</div>
+    <div class="item-prop">{{localize "HYP3E.headers.type"}}</div>
+    <div class="item-prop">{{localize "HYP3E.armor.ac"}}</div>
+    <div class="item-prop">{{localize "HYP3E.armor.dr"}}</div>
+    <div class="item-prop">{{localize "HYP3E.movement.base.abbrev"}}</div>
     <div class="item-controls">
       <a class="item-control item-create" title="Create armor" data-type="armor">
         <i class="fas fa-plus"></i> {{localize "HYP3E.armor.add"}}

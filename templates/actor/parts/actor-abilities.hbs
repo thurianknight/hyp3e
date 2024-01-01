@@ -7,7 +7,7 @@
 
   {{!-- Exploration skills --}}
   <section class="abilities exploration-block">
-    <h2>Exploration</h2>
+    <h2>{{localize "HYP3E.headers.exploration"}}</h2>
     <div class="abilities flexcol">
       {{#each system.explorationSkills as |skill key|}}
       <div class="ability flexrow flex-group-center">
@@ -20,13 +20,13 @@
       {{/each}}
       {{!-- Movement fields --}}
       <div class="ability flexrow flex-group-center">
-        <span class="flex-xlarge align-left" data-label="exploration">
+        <span class="flex-xlarge align-left">
           <label for="system.movement.exploration.name" class="exploration-label">{{localize "HYP3E.movement.exploration.name"}}</label>
         </span>
         <input type="text" name="system.movement.exploration.value" value="{{system.movement.exploration.value}}" data-dtype="Number" disabled/>
       </div>
       <div class="ability flexrow flex-group-center">
-        <span class="flex-xlarge align-left" data-label="{{type.label}}">
+        <span class="flex-xlarge align-left">
           <label for="system.movement.travel.name" class="exploration-label">{{localize "HYP3E.movement.travel.name"}}</label>
         </span>
         <input type="text" name="system.movement.travel.value" value="{{system.movement.travel.value}}" data-dtype="Number" disabled/>
@@ -38,10 +38,10 @@
 {{!-- For the class features list, span the full width of the sheet --}}
 <ol class="items-list">
   <li class="item flexrow items-header">
-    <div class="item-name">Class Abilities</div>
-    <div class="item-prop">Level</div>
-    <div class="item-prop">Check Roll</div>
-    <div class="item-prop">Target</div>
+    <div class="item-name">{{localize "HYP3E.headers.classAbilities"}}</div>
+    <div class="item-prop">{{localize "HYP3E.details.level"}}</div>
+    <div class="item-prop">{{localize "HYP3E.checkRoll"}}</div>
+    <div class="item-prop">{{localize "HYP3E.target"}}</div>
     <div class="item-controls">
       <a class="item-control item-create" title="Create item" data-type="feature">
         <i class="fas fa-plus"></i> {{localize "HYP3E.feature.add"}}
@@ -54,7 +54,7 @@
         <div class="item-name">
           <div class="item-image">
             {{#if item.system.formula}}
-            <a class="rollable" data-roll-type="item" data-label="{{item.name}} check"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+            <a class="rollable" data-roll-type="item" data-label="{{item.name}} {{localize 'HYP3E.dataLabel.check'}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
             {{else}}
             <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
             {{/if}}

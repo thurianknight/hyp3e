@@ -1,7 +1,7 @@
 {{!-- Casting ability --}}
 <div class="spells-block flexrow flex-group-left">
   <div class="casting-ability flexrow flex-group-center">
-    <span class="rollable" data-roll="1d20 + @ca" data-roll-type="basic" data-label="Casting Ability check">
+    <span class="rollable" data-roll="1d20 + @ca" data-roll-type="basic" data-label="{{localize 'HYP3E.dataLabel.caCheck'}}">
       <label for="system.ca" class="spells-label">{{localize "HYP3E.castingAbility"}}</label> 
       <i class="fas fa-dice-d20"></i>
     </span>
@@ -13,11 +13,11 @@
 <ol class="items-list">
   {{#each spells as |spells spellLevel|}}
     <li class="item flexrow items-header">
-      <div class="item-name">Level {{spellLevel}} Spells</div>
-      <div class="item-prop"># Mem</div>
-      <div class="item-prop">Range</div>
-      <div class="item-prop">Duration</div>
-      <div class="item-prop">Save</div>
+      <div class="item-name">{{localize 'HYP3E.details.level'}} {{spellLevel}} {{localize 'HYP3E.dataLabel.spells'}}</div>
+      <div class="item-prop">{{localize 'HYP3E.spell.numMem'}}</div>
+      <div class="item-prop">{{localize 'HYP3E.weapon.range'}}</div>
+      <div class="item-prop">{{localize 'HYP3E.spell.duration'}}</div>
+      <div class="item-prop">{{localize 'HYP3E.spell.save'}}</div>
       <div class="item-controls">
         <a class="item-control item-create" title="Create item" data-type="spell" data-spell-level="{{spellLevel}}">
           <i class="fas fa-plus"></i> {{localize "HYP3E.spell.addLvl"}} {{spellLevel}}
@@ -30,7 +30,7 @@
           <div class="item-name">
             <div class="item-image">
               {{#if item.system.atkRoll}}
-              <a class="rollable" data-roll-type="item" data-label="Attack with {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+              <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.attackWith'}} {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
               {{else}}
               <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
               {{/if}}
