@@ -82,17 +82,26 @@
 
     {{!-- Owned Spells Tab --}}
     <div class="tab spells" data-group="primary" data-tab="spells">
-      {{> "systems/hyp3e/templates/actor/parts/actor-spells.hbs"}}
+      <div class="description-block">
+        <h2>{{localize 'HYP3E.tabs.spells'}}</h2>
+        {{> "systems/hyp3e/templates/actor/parts/actor-spells.hbs"}}
+      </div>
     </div>
 
     {{!-- Active Effects Tab --}}
     <div class="tab effects flexcol" data-group="primary" data-tab="effects">
-      {{> "systems/hyp3e/templates/actor/parts/actor-effects.hbs"}}
+      <div class="description-block">
+        <h2>{{localize 'HYP3E.headers.effectsCond'}}</h2>
+        {{> "systems/hyp3e/templates/actor/parts/actor-effects.hbs"}}
+      </div>
     </div>
 
     {{!-- Owned Items Tab --}}
     <div class="tab items" data-group="primary" data-tab="items">
-       {{> "systems/hyp3e/templates/actor/parts/actor-items.hbs"}}
+      <div class="description-block">
+        <h2>{{localize 'HYP3E.headers.equipmentItems'}}</h2>
+        {{> "systems/hyp3e/templates/actor/parts/actor-items.hbs"}}
+      </div>
     </div>
 
     {{!-- Biography Tab --}}

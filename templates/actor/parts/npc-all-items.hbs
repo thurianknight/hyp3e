@@ -1,10 +1,10 @@
 {{!-- Abilities, weapons, armor, and gear appear here --}}
-<h3>Abilities & Items</h3>
+<h3>{{localize 'HYP3E.headers.abilitiesItems'}}</h3>
 <ol class="items-list">
   <li class="item flexrow items-header">
-    <div class="item-name">Abilities</div>
-    <div class="item-prop">Check Roll</div>
-    <div class="item-prop">Target</div>
+    <div class="item-name">{{localize 'HYP3E.headers.ability'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.checkRoll'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.target'}}</div>
     <div class="item-controls">
       <a class="item-control item-create" title="Create item" data-type="feature">
         <i class="fas fa-plus"></i> {{localize "HYP3E.feature.add"}}
@@ -42,10 +42,10 @@
 </ol>
 <ol class="items-list">
   <li class="item flexrow items-header">
-    <div class="item-name">Items</div>
-    <div class="item-prop">Qty</div>
-    <div class="item-prop">Weight</div>
-    <div class="item-prop">Location</div>
+    <div class="item-name">{{localize 'HYP3E.headers.attacksItems'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.item.qty'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.item.weight'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.item.location'}}</div>
     <div class="item-controls">
       <a class="item-control item-create" title="Create item" data-type="item">
         <i class="fas fa-plus"></i> {{localize "HYP3E.item.add"}}
@@ -63,7 +63,7 @@
         </div>
         <div class="item-prop">{{item.system.quantity.value}}
           {{#if item.system.quantity.max}}
-            / item.system.quantity.max
+            / {{item.system.quantity.max}}
           {{/if}}</div>
         <div class="item-prop">{{item.system.weight}}</div>
         <div class="item-prop">{{item.system.location}}</div>
@@ -91,7 +91,7 @@
         </div>
         <div class="item-prop">{{item.system.quantity.value}}
           {{#if item.system.quantity.max}}
-            / item.system.quantity.max
+            / {{item.system.quantity.max}}
           {{/if}}</div>
         <div class="item-prop">{{item.system.weight}}</div>
         <div class="item-prop">{{item.system.location}}</div>
@@ -123,7 +123,7 @@
         </div>
         <div class="item-prop">{{item.system.quantity.value}}
           {{#if item.system.quantity.max}}
-            / item.system.quantity.max
+            / {{item.system.quantity.max}}
           {{/if}}</div>
         <div class="item-prop">{{item.system.weight}}</div>
         <div class="item-prop">{{item.system.location}}</div>
@@ -144,15 +144,15 @@
 
 {{!-- Spells appear here --}}
 {{#if system.ca}}
-<h3>Spells</h3>
+<h3>{{localize 'HYP3E.dataLabel.spells'}}</h3>
 <ol class="items-list">
   {{#each spells as |spells spellLevel|}}
     <li class="item flexrow items-header">
-      <div class="item-name">Level {{spellLevel}} Spells</div>
-      <div class="item-prop"># Mem</div>
-      <div class="item-prop">Range</div>
-      <div class="item-prop">Duration</div>
-      <div class="item-prop">Save</div>
+      <div class="item-name">{{localize 'HYP3E.details.level'}} {{spellLevel}} {{localize 'HYP3E.dataLabel.spells'}}</div>
+      <div class="item-prop">{{localize 'HYP3E.spell.numMem'}}</div>
+      <div class="item-prop">{{localize 'HYP3E.weapon.range'}}</div>
+      <div class="item-prop">{{localize 'HYP3E.spell.duration'}}</div>
+      <div class="item-prop">{{localize 'HYP3E.spell.save'}}</div>
       <div class="item-controls">
         <a class="item-control item-create" title="Create item" data-type="spell" data-spell-level="{{spellLevel}}">
           <i class="fas fa-plus"></i> {{localize "HYP3E.spell.addLvl"}} {{spellLevel}}

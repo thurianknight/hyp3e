@@ -24,6 +24,12 @@
       "fightingSkills": "Fighting Skills",
       "combatStats": "Combat Statistics",
       "savingThrows": "Saving Throws",
+      "equipmentItems": "Equipment & Items",
+      "abilitiesItems": "Abilities & Items",
+      "weapons": "Weapons",
+      "armor": "Armor",
+      "items": "Items",
+      "ability": "Ability",
       "atkRate": "Atk Rate",
       "rof": "RoF",
       "classRange": "Class/Range",
@@ -31,7 +37,10 @@
       "dmgMod": "Dmg Mod",
       "damage": "Damage",
       "type": "Type",
-      "biography": "Biography"
+      "biography": "Biography",
+      "descNotes": "Description & Notes",
+      "effectsCond": "Effects & Conditions",
+      "attacksItems": "Attacks & Items"
     },
     "details": {
       "class": "Class",
@@ -39,6 +48,7 @@
       "level": "Level",
       "hitDie": "Hit Die",
       "hitDice": "Hit Dice",
+      "hd": "HD",
       "xp": "XP",
       "toNextLvl": "To Next Level",
       "primeAttr": "Primary Attr",
@@ -133,10 +143,13 @@
       }
     },
     "fightingAbility": "Fighting Ability",
+    "fa": "FA",
     "unskilled": "Unskilled",
     "wpnSkills": "Weapon Skills & Masteries",
     "castingAbility": "Casting Ability",
+    "ca": "CA",
     "turningAbility": "Turning Ability",
+    "ta": "TA",
     "explorationSkills": {
       "listen": {
         "name": "Listen at Door",

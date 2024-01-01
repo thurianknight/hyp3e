@@ -43,9 +43,9 @@
   {{!-- Sheet Tab Navigation --}}
   <nav class="sheet-tabs tabs" data-group="primary">
     {{!-- Default tab is specified in actor-sheet.mjs --}}
-    <a class="item" data-tab="abilities">Abilities</a>
-    <a class="item" data-tab="description">Description</a>
-    <a class="item" data-tab="effects">Effects</a>
+    <a class="item" data-tab="abilities">{{localize 'HYP3E.tabs.abilities'}}</a>
+    <a class="item" data-tab="description">{{localize 'HYP3E.tabs.description'}}</a>
+    <a class="item" data-tab="effects">{{localize 'HYP3E.tabs.effects'}}</a>
   </nav>
 
   {{!-- Sheet Body --}}
@@ -59,7 +59,7 @@
     {{!-- Owned Items Tab --}}
     <div class="tab description" data-group="primary" data-tab="description">
       <div class="npc-description-block">
-        <h2>Description & Notes</h2>
+        <h2>{{localize 'HYP3E.headers.descNotes'}}</h2>
         {{!-- If you want TinyMCE editors to output inline rolls when rendered, you need to pass the actor's roll data to the rollData property. --}}
         {{editor system.biography target="system.biography" rollData=rollData button=true owner=owner editable=editable}}
       </div>
@@ -68,7 +68,7 @@
     {{!-- Active Effects Tab --}}
     <div class="tab effects" data-group="primary" data-tab="effects">
       <div class="npc-description-block">
-        <h2>Effects & Conditions</h2>
+        <h2>{{localize 'HYP3E.headers.effectsCond'}}</h2>
         {{> "systems/hyp3e/templates/actor/parts/actor-effects.hbs"}}
       </div>
     </div>
