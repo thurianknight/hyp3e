@@ -5,15 +5,15 @@
       <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
       <div class="grid grid-3col">
         <div class="resource flexrow flex-group-center">
-          <label class="resource-label flexlarge">Qty</label>
+          <label class="resource-label flexlarge">{{localize 'HYP3E.item.qty'}}</label>
           <input type="text" name="system.quantity.value" value="{{system.quantity.value}}" data-dtype="Number"/>
         </div>
         <div class="resource flexrow flex-group-center">
-          <label class="resource-label flexlarge">Cost</label>
+          <label class="resource-label flexlarge">{{localize 'HYP3E.item.cost'}}</label>
           <input type="text" name="system.cost" value="{{system.cost}}" data-dtype="Number"/>
         </div>
         <div class="resource flexrow flex-group-center">
-          <label class="resource-label flexlarge">Weight</label>
+          <label class="resource-label flexlarge">{{localize 'HYP3E.item.weight'}}</label>
           <input type="text" name="system.weight" value="{{system.weight}}" data-dtype="Number"/>
         </div>
       </div>
@@ -22,8 +22,8 @@
 
   {{!-- Sheet Tab Navigation --}}
   <nav class="sheet-tabs tabs" data-group="primary">
-    <a class="item" data-tab="description">Details</a>
-    <a class="item" data-tab="attributes">Attributes</a>
+    <a class="item" data-tab="description">{{localize 'HYP3E.tabs.details'}}</a>
+    <a class="item" data-tab="attributes">{{localize 'HYP3E.tabs.attributes'}}</a>
   </nav>
 
   {{!-- Sheet Body --}}
@@ -35,25 +35,25 @@
 
         {{!-- Item Attributes --}}
         <div class="flexshrink flex-group-center item-attributes">
-          <label class="resource-label">Location</label>
+          <label class="resource-label">{{localize 'HYP3E.item.location'}}</label>
           <input type="text" name="system.location" value="{{system.location}}" data-dtype="String" />
-          <label class="resource-label">Check Roll</label>
+          <label class="resource-label">{{localize 'HYP3E.checkRoll'}}</label>
           <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
-          <label class="resource-label">Target</label>
+          <label class="resource-label">{{localize 'HYP3E.target'}}</label>
           <input type="text" name="system.tn" value="{{system.tn}}" data-dtype="String"/>
-          <label class="resource-label">Blind Roll</label>
+          <label class="resource-label">{{localize 'HYP3E.blindRoll'}}</label>
           <select name="system.blindRoll">
             {{#select system.blindRoll}}
             <option value=""></option>
-            <option value="true">True</option>
-            <option value="false">False</option>
+            <option value="true">{{localize 'HYP3E.true'}}</option>
+            <option value="false">{{localize 'HYP3E.false'}}</option>
             {{/select}}
           </select>
         </div>
 
         {{!-- Description Tab --}}
         <div class="flex item-description">
-          <h3>Description</h3>
+          <h3>{{localize 'HYP3E.tabs.description'}}</h3>
           {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
           {{editor system.description target="system.description" rollData=rollData button=true owner=owner editable=editable}}
         </div>
@@ -68,11 +68,11 @@
         {{!-- <label class="resource-label">System Roll Formula</label>
         <input type="text" name="system.formula" value="{{system.formula}}" disabled/> --}}
         {{/if}}
-        <label class="resource-label">Chatbox Name</label>
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.friendlyName'}}</label>
         <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
-        <label class="resource-label">Item ID</label>
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.itemId'}}</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
-        <label class="resource-label">Contained Item IDs</label>
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.containedItemIds'}}</label>
         <input type="text" name="system.itemIds" value="{{system.itemIds}}"/>
       </div>
     </div>

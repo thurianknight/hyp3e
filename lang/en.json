@@ -33,6 +33,7 @@
       "atkRate": "Atk Rate",
       "rof": "RoF",
       "classRange": "Class/Range",
+      "wpnClass": "Wpn Class",
       "atkMod": "Atk Mod",
       "dmgMod": "Dmg Mod",
       "damage": "Damage",
@@ -208,6 +209,8 @@
       "delete": "Delete",
       "show": "Show",
       "equip": "Toggle Equip",
+      "equipped": "Equipped",
+      "cost": "Cost",
       "qty": "Qty",
       "weight": "Weight",
       "location": "Location"
@@ -215,8 +218,10 @@
     "spell": {
       "addLvl": "Add Lvl",
       "addSpell": "Add Spell",
+      "classes": "Classes",
       "numMem": "# Mem",
       "duration": "Duration",
+      "numAffected": "# Affected",
       "save": "Save"
     },
     "weapon": {
@@ -225,7 +230,8 @@
         "melee": "Melee",
         "missile": "Missile"
       },
-      "range": "Range"
+      "range": "Range",
+      "atkType": "Atk Type"
     },
     "armor": {
       "add": "Add Armor",
@@ -236,20 +242,25 @@
         "heavy": "Heavy",
         "shield": "Shield"
       },
+      "wtClass": "Wt Class",
       "armorClass": "Armor Class",
       "ac": "AC",
       "dr": "DR",
-      "dmgResist": "Damage Resistance",
+      "dmgResist": "Dmg Resist",
       "unarmored": "Unarmored"
     },
     "roll": "Roll",
     "rollFormula": "Roll Formula",
     "rollExample": "e.g. 1d6+1",
+    "attackRoll": "Attack Roll",
     "checkRoll": "Check Roll",
     "target": "Target",
     "rollMode": "Roll Mode",
+    "blindRoll": "Blind Roll",
     "sitMod": "Situational Modifier",
     "bonus": "Bonus",
+    "true": "True",
+    "false": "False",
     "dataLabel": {
       "basicMeleeAtk": "Basic melee attack",
       "attackWith": "Attack with",
@@ -262,7 +273,11 @@
       "check": "check",
       "caCheck": "Casting Ability check",
       "taCheck": "Turn Undead check",
-      "spells": "Spells"
+      "spells": "Spells",
+      "friendlyName": "Friendly Name",
+      "itemId": "Item ID",
+      "containerId": "Container ID",
+      "containedItemIds": "Contained Item IDs"
     }
   }
 }

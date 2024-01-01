@@ -5,13 +5,13 @@
       <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
       <div class="flexrow">
         <div class="resource flexrow flex-group-center">
-          <label class="resource-label">Classes</label>
+          <label class="resource-label">{{localize 'HYP3E.spell.classes'}}</label>
           <input type="text" name="system.classList" value="{{system.classList}}" />
         </div>
         <div class="resource flexrow flex-group-center">
-          <label class="resource-label">Level</label>
+          <label class="resource-label">{{localize 'HYP3E.details.level'}}</label>
           <input type="text" name="system.spellLevel" value="{{system.spellLevel}}" />
-          <label class="resource-label"># Mem</label>
+          <label class="resource-label">{{localize 'HYP3E.spell.numMem'}}</label>
           <input type="text" name="system.memorized" value="{{system.memorized}}" />
         </div>
       </div>
@@ -20,8 +20,8 @@
 
   {{!-- Sheet Tab Navigation --}}
   <nav class="sheet-tabs tabs" data-group="primary">
-    <a class="item" data-tab="description">Description</a>
-    <a class="item" data-tab="attributes">Attributes</a>
+    <a class="item" data-tab="description">{{localize 'HYP3E.tabs.details'}}</a>
+    <a class="item" data-tab="attributes">{{localize 'HYP3E.tabs.attributes'}}</a>
   </nav>
 
   {{!-- Sheet Body --}}
@@ -33,13 +33,13 @@
 
         {{!-- Spell Attributes --}}
         <div class="flexshrink flex-group-center item-attributes">
-          <label class="resource-label">Range</label>
+          <label class="resource-label">{{localize 'HYP3E.weapon.range'}}</label>
           <input type="text" name="system.range" value="{{system.range}}" />
-          <label class="resource-label">Duration</label>
+          <label class="resource-label">{{localize 'HYP3E.spell.duration'}}</label>
           <input type="text" name="system.duration" value="{{system.duration}}" />
-          <label class="resource-label"># Affected</label>
+          <label class="resource-label">{{localize 'HYP3E.spell.numAffected'}}</label>
           <input type="text" name="system.affected" value="{{system.affected}}" />
-          <label class="resource-label">Save</label>
+          <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
           <div class="form-fields">
             <select name="system.save">
               {{#select system.save}}
@@ -51,14 +51,15 @@
               {{/select}}
             </select>
           </div>
-          <label class="resource-label">Attack Roll</label>
+          <label class="resource-label">{{localize 'HYP3E.attackRoll'}}</label>
           <input name="system.atkRoll" type="checkbox" {{checked system.atkRoll}}><br />
-          <label for="system.damage" class="resource-label">Damage</label>
+          <label for="system.damage" class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
           <input type="text" name="system.damage" value="{{system.damage}}" />
         </div>
 
         {{!-- Description --}}
         <div class="flex item-description">
+          <h3>{{localize 'HYP3E.tabs.description'}}</h3>
           {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
           {{editor system.description target="system.description" rollData=rollData button=true owner=owner editable=editable}}
         </div>
@@ -70,12 +71,12 @@
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
         {{#if rollData.isGM}}
-        <label class="resource-label">System Roll (Attack) Formula</label>
+        <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
         <input type="text" name="system.formula" value="{{system.formula}}" />
         {{/if}}
-        <label class="resource-label">Chatbox Name</label>
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.friendlyName'}}</label>
         <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
-        <label class="resource-label">Item ID</label>
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.itemId'}}</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
       </div>
     </div>
