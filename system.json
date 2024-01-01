@@ -2,10 +2,10 @@
   "id": "hyp3e",
   "title": "Hyperborea 3rd Edition",
   "description": "The Hyperborea 3rd Edition system for FoundryVTT!",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "compatibility": {
     "minimum": 10,
-    "verified": "11.308",
+    "verified": "11.315",
     "maximum": 11
   },
   "authors": [{

@@ -490,8 +490,12 @@ textarea {
   padding: 0 2px;
   margin-right: 5px;
   margin-left: 5px;
-  min-width: 575px;
+  height: 100%;
 }
+.hyp3e .npc-description-block .editor {
+  height: 100%;
+}
+
 
 /* Custom dialog styles */
 .hyp3e .dialog-label {
