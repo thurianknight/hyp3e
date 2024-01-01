@@ -455,6 +455,14 @@ textarea {
 .hyp3e .description-field input {
   min-width: 100px;
 }
+.hyp3e .biography-block {
+  padding: 0 2px;
+  margin-right: 5px;
+  height: 100%;
+}
+.hyp3e .biography-block .editor {
+  height: 100%;
+}
 
 /* NPC sheet styles */
 .hyp3e .npc-field {
