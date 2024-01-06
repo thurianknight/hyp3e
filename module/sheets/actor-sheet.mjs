@@ -303,6 +303,51 @@ export class Hyp3eActorSheet extends ActorSheet {
     })
   }
 
+  _onSortItem(event, itemData) {
+    // console.log("Item Event:", event)
+    // console.log("Item Data:", itemData)
+    
+    const source = this.actor.items.get(itemData._id);
+    // console.log("Source:", source)
+    
+    const siblings = this.actor.items.filter((i) => {
+      return i._id !== source._id;
+    });
+    console.log("Siblings:", siblings)
+    
+    const dropTarget = event.target.closest("[data-item-id]");
+    console.log("Drop Target:", dropTarget)
+    
+    const targetId = dropTarget ? dropTarget.dataset.itemId : null;
+    const target = siblings.find((s) => s._id === targetId);
+    console.log("Target:", target)
+
+    if (!target) throw new Error("Couldn't drop near " + event.target);
+    const targetData = target?.system;
+
+    // Dragging an item into a container sets its containerId and location
+    if ( (target?.type === "container") && targetData.containerId === "" ) {
+      this.actor.updateEmbeddedDocuments("Item", [
+        { _id: source.id, "system.containerId": target.id },
+      ]);
+      this.actor.updateEmbeddedDocuments("Item", [
+        { _id: source.id, "system.location": target.name },
+      ]);
+      return;
+    }
+    // Dragging an item out of a container resets its containerId and location to blank
+    if (source?.system.containerId !== "") {
+      this.actor.updateEmbeddedDocuments("Item", [
+        { _id: source.id, "system.containerId": "" },
+      ]);
+      this.actor.updateEmbeddedDocuments("Item", [
+        { _id: source.id, "system.location": "" },
+      ]);
+    }
+
+    super._onSortItem(event, itemData);
+  }
+
   /**
    * Handle clickable rolls.
    * @param {Event} event   The originating click event
