@@ -321,7 +321,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     })
   }
 
-  //****
   _onSortItem(event, itemData) {
     console.log("Sort Item Event:", event)
     console.log("Sort Item Data:", itemData)
@@ -367,12 +366,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Now call the Foundry core _onSortItem event so we don't break anything
     super._onSortItem(event, itemData);
   }
-  //****/
 
-  _onDragStart(event) {
-    console.log("Drag Start event:", event)
-    super._onDragStart(event)
-  }
   // _onDragStart(event) {
   //   const li = event.currentTarget;
   //   if (event.target.classList.contains("content-link")) return;
@@ -421,11 +415,6 @@ export class Hyp3eActorSheet extends ActorSheet {
   //   );
   // }
 
-  async _onDropItem(event, data){
-      console.log("Drop Item event:", event)
-      console.log("Drop Item data:", data)
-      super._onDropItem(event, data)
-  }
   // async _onDropItem(event, data){
   //   const item = await Item.implementation.fromDropData(data);
   //   const itemData = item.toObject();
