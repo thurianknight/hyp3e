@@ -59,6 +59,9 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Prepare active effects
     context.effects = prepareActiveEffectCategories(this.actor.effects);
 
+    // Log the actor's data
+    console.log("Actor:", context)
+
     return context;
   }
 
@@ -109,7 +112,8 @@ export class Hyp3eActorSheet extends ActorSheet {
    * @return {undefined}
    */
   _prepareItems(context) {
-    // Initialize containers.
+    // Initialize item types.
+    const containers = [];
     const gear = [];
     const features = [];
     const weapons = [];
@@ -126,9 +130,16 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Iterate through items, allocating to tab-groups
     for (let i of context.items) {
       i.img = i.img || DEFAULT_TOKEN;
+      // Append to containers.
+      if (i.type === 'container') {
+        i.contents = this.getContents(i._id, context)
+        containers.push(i);
+        console.log("Container:", i)
+      }
       // Append to gear.
-      if (i.type === 'item' || i.type === 'container') {
+      if (i.type === 'item' && i.system.containerId == '') {
         gear.push(i);
+        console.log("Gear:", i)
       }
       // Append to features.
       else if (i.type === 'feature') {
@@ -152,10 +163,17 @@ export class Hyp3eActorSheet extends ActorSheet {
 
     // Assign and return
     context.gear = gear;
+    context.containers = containers;
     context.features = features;
     context.weapons = weapons;
     context.armor = armor;
     context.spells = spells;
+  }
+
+  getContents(id, context) {	
+		return context.items.filter(
+			({system: {containerId}}) => id === containerId
+		);
   }
 
   /* -------------------------------------------- */
@@ -303,50 +321,156 @@ export class Hyp3eActorSheet extends ActorSheet {
     })
   }
 
+  //****
   _onSortItem(event, itemData) {
-    // console.log("Item Event:", event)
-    // console.log("Item Data:", itemData)
-    
-    const source = this.actor.items.get(itemData._id);
-    // console.log("Source:", source)
-    
-    const siblings = this.actor.items.filter((i) => {
-      return i._id !== source._id;
-    });
-    console.log("Siblings:", siblings)
-    
+    console.log("Sort Item Event:", event)
+    console.log("Sort Item Data:", itemData)
+
+    // Get the drag source and drop target
+    const items = this.actor.items;
+    const source = items.get(itemData._id);
+    console.log("Sort Item Source:", source)
+
     const dropTarget = event.target.closest("[data-item-id]");
-    console.log("Drop Target:", dropTarget)
-    
-    const targetId = dropTarget ? dropTarget.dataset.itemId : null;
-    const target = siblings.find((s) => s._id === targetId);
-    console.log("Target:", target)
+    if ( !dropTarget ) return;
+    // console.log("Drop Target:", dropTarget)
 
-    if (!target) throw new Error("Couldn't drop near " + event.target);
-    const targetData = target?.system;
+    const target = items.get(dropTarget.dataset.itemId);
+    console.log("Sort Item Target:", target)
 
-    // Dragging an item into a container sets its containerId and location
-    if ( (target?.type === "container") && targetData.containerId === "" ) {
+    // Don't sort on yourself
+    if ( source.id === target.id ) return;
+
+    // if (!target) throw new Error("Couldn't drop near " + event.target);
+    // const targetData = target?.system;
+
+    // Dragging an item into a container sets its containerId and location to the container
+    if ( (target?.type === "container") ) {
+      // One container cannot hold another container
+      if (source.type == 'container') { 
+        console.log(`Cannot move container (${source.name}) into another container (${target.name})!`)
+        return 
+      }
+
+      // Update the container info on the item
       this.actor.updateEmbeddedDocuments("Item", [
-        { _id: source.id, "system.containerId": target.id },
-      ]);
-      this.actor.updateEmbeddedDocuments("Item", [
-        { _id: source.id, "system.location": target.name },
+        { _id: source.id, "system.containerId": target.id, "system.location": target.name },
       ]);
       return;
     }
     // Dragging an item out of a container resets its containerId and location to blank
     if (source?.system.containerId !== "") {
       this.actor.updateEmbeddedDocuments("Item", [
-        { _id: source.id, "system.containerId": "" },
-      ]);
-      this.actor.updateEmbeddedDocuments("Item", [
-        { _id: source.id, "system.location": "" },
+        { _id: source.id, "system.containerId": "", "system.location": "" },
       ]);
     }
-
+    // Now call the Foundry core _onSortItem event so we don't break anything
     super._onSortItem(event, itemData);
   }
+  //****/
+
+  _onDragStart(event) {
+    console.log("Drag Start event:", event)
+    super._onDragStart(event)
+  }
+  // _onDragStart(event) {
+  //   const li = event.currentTarget;
+  //   if (event.target.classList.contains("content-link")) return;
+  //   console.log("Drag Start event:", event)
+  //   console.log("Drag Start list item:", li)
+
+  //   let dragData;
+  //   let itemIdsArray = [];
+
+  //   // Owned Items
+  //   if (li.dataset.itemId) {
+  //     const item = this.actor.items.get(li.dataset.itemId);
+  //     dragData = item.toDragData();
+  //     dragData.item = item;
+  //     dragData.type = "Item"; 
+  //     if (item.type === "container" && item.system.itemIds.length) {
+  //       //otherwise JSON.stringify will quadruple stringify for some reason
+  //       itemIdsArray = item.system.itemIds;
+  //     }
+  //   }
+
+  //   // Create drag data
+  //   dragData.actorId = this.actor.id;
+  //   dragData.sceneId = this.actor.isToken ? canvas.scene?.id : null;
+  //   dragData.tokenId = this.actor.isToken ? this.actor.token.id : null;
+  //   dragData.pack = this.actor.pack;
+
+  //   // Active Effect
+  //   if (li.dataset.effectId) {
+  //     const effect = this.actor.effects.get(li.dataset.effectId);
+  //     dragData.type = "ActiveEffect";
+  //     dragData.data = effect.data;
+  //   }
+
+  //   // Set data transfer
+  //   event.dataTransfer.setData(
+  //     "text/plain",
+  //     JSON.stringify(dragData, (key, value) => {
+  //       if (key === "itemIds") {
+  //         //something about how this Array is created makes its elements not real Array elements
+  //         //we go through this hoop to trick stringify into creating our string
+  //         return JSON.stringify(itemIdsArray);
+  //       }
+  //       return value;
+  //     })
+  //   );
+  // }
+
+  async _onDropItem(event, data){
+      console.log("Drop Item event:", event)
+      console.log("Drop Item data:", data)
+      super._onDropItem(event, data)
+  }
+  // async _onDropItem(event, data){
+  //   const item = await Item.implementation.fromDropData(data);
+  //   const itemData = item.toObject();
+
+  //   const exists = !!this.actor.items.get(item.id);
+    
+  //   if (!exists)
+  //     return this._onDropItemCreate([itemData]);
+    
+  //   const isContainer = this.actor.items.get(item.system.containerId);
+    
+  //   if (isContainer)
+  //     return this._onContainerItemRemove(item, isContainer);
+    
+  //   const {itemId: targetId} = event.target.closest('.item').dataset;
+  //   const targetItem = this.actor.items.get(targetId)
+  //   const targetIsContainer = targetItem?.type === 'container'
+
+  //   if (targetIsContainer)
+  //     return this._onContainerItemAdd(item, targetItem);
+
+  // }
+
+  // async _onContainerItemRemove(item, container) {
+  //   const newList = container.system.itemIds.filter((s) => s != item.id);
+  //   const itemObj = this.object.items.get(item.id);
+  //   await container.update({ system: { itemIds: newList } });
+  //   await itemObj.update({ system: { containerId: "" } });
+  // }
+
+  // async _onContainerItemAdd(item, target) {
+  //   const itemData = item.toObject();
+  //   console.log("Container Item Add item data:", itemData)
+  //   const container = this.object.items.get(target.id);
+  //   console.log("Container Item Add container:", container)
+
+  //   const containerId = container.id;
+  //   const itemObj = this.object.items.get(item.id);
+  //   const alreadyExists = container.system.itemIds.find((i) => i.id == item.id);
+  //   if (!alreadyExists) {
+  //     const newList = [...container.system.itemIds, item.id];
+  //     await container.update({ system: { itemIds: newList } });
+  //     await itemObj.update({ system: { containerId: container.id } });
+  //   }
+  // }
 
   /**
    * Handle clickable rolls.

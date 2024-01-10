@@ -613,7 +613,9 @@ textarea {
 .hyp3e .items-list .item .item-name {
   color: #191813;
 }
-
+.hyp3e .contained-items {
+  padding-left: 15px;
+}
 /* .item-image:hover .rollable {
   background-image: url("/icons/svg/d20-black.svg") !important;
 } */
