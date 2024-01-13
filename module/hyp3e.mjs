@@ -42,6 +42,16 @@ Hooks.once('init', async function() {
     config: true,
   });
 
+  // If we ever need migration scripts, use this version number for comparison
+  // game.settings.register(game.system.id, "systemMigrationVersion", {
+  //   config:false,
+  //   scope: "world",
+  //   type: String,
+  //   default: game.system.version
+  // });
+
+  console.log("System info:", game.system)
+
   // Add custom constants for configuration.
   CONFIG.HYP3E = HYP3E;
 
@@ -124,7 +134,132 @@ Hooks.once("ready", async function() {
     // console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses)
   }
 
+  // If we need to do a system migration,  do it after the other settings are loaded
+  if (game.user.isGM) {
+    const currentVersion = game.system.version
+    console.log(`System version ${currentVersion}`)
+    // No need to migrate if system version is 0.9.5 or higher
+    const NEEDS_MIGRATION_TO_VERSION = "0.9.5"
+    const needsMigration = !currentVersion || isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
+    if (needsMigration) {
+      migrateWorld()
+    }
+  }
+
 });
+
+/* -------------------------------------------- */
+/*  Migrate system/world functions              */
+/* -------------------------------------------- */
+async function migrateWorld() {
+  console.log(`Migrating world ${game.system.version}...`)
+
+  // Migrate Actor directory
+  for (let actor of game.actors.contents) {
+    const updateData = migrateActorData(actor)
+    if (!foundry.utils.isEmpty(updateData)) {
+      // Update the actor
+      console.log("Migrated actor:", updateData)
+      await actor.update(updateData)
+    }
+
+    // Next we migrate the actor's items
+    if (actor.items) {
+      let updateItem = {}
+      for (let item of actor.items) {
+        console.log(`Migrating item ${item.name}...`)
+        updateItem = migrateActorItem(item)
+        if (!foundry.utils.isEmpty(updateItem)) {
+          console.log("Updated item:", updateItem)
+          await item.update(updateItem)
+        }
+      }
+    }
+  }
+
+  // Migrate Actor compendia
+  for (let pack of game.packs) {
+    console.log(`Compendium pack ${pack.metadata.label}:`, pack)
+
+    const packType = pack.metadata.type
+    // Skip anything that's not an Actor compendium pack
+    if (packType != "Actor") {
+      continue
+    }
+
+    // Get the compendium's locked property, then unlock it
+    const wasLocked = pack.locked
+    await pack.configure({ locked: false })
+
+    console.log(`Migrating compendium pack ${pack.metadata.label}...`)
+    await pack.migrate()
+
+    const documents = await pack.getDocuments()
+    for (let doc of documents) {
+      console.log("Compendium document:", doc)
+      let updateData = {}
+
+      switch(packType) {
+        case "Actor":
+          updateData = migrateActorData(document)
+          break
+        default:
+          break
+      }
+      if (!foundry.utils.isEmpty(updateData)) {
+        console.log("Updated document:", updateData)
+        await doc.update(updateData)
+      }
+      // Next we migrate the actor document's items
+      if (doc.items) {
+        let updateItem = {}
+        for (let item of doc.items) {
+          console.log(`Migrating item ${item.name}...`)
+          updateItem = migrateActorItem(item)
+          if (!foundry.utils.isEmpty(updateItem)) {
+            console.log("Updated item:", updateItem)
+            await item.update(updateItem)
+          }
+        }
+      }
+
+    }
+    // Re-lock the compendium if it was locked before
+    await pack.configure({ locked: wasLocked })
+
+  }
+
+}
+
+async function migrateActorData(actor) {
+  let updateData = {}
+
+  // Update characters
+  if (actor.type == "character") {
+    console.log(`Migrating character ${actor.name}...`)
+    // Nothing to do yet
+  }
+
+  // Update monsters & NPCs
+  if (actor.type == "npc") {
+    console.log(`Migrating monster/npc ${actor.name}...`)
+    // Nothing to do yet
+  }
+  
+  // Return the updated actor data
+  return updateData
+}
+
+function migrateActorItem(item) {
+  let updateData = {}
+
+  if (item.type == "weapon" && (!item.system.formula || item.system.formula == "" || item.system.formula == "1d20 + @fa")) {
+    console.log("Updating weapon attack formula...")
+    updateData["system.formula"] = "1d20 + @fa + @str.atkMod + @item.atkMod"
+  }
+
+  return updateData
+}
 
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */
