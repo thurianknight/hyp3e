@@ -47,7 +47,7 @@
               {{#select system.type}}
               {{#each system.types as |type t|}}
               <option value="{{type}}">{{type}}</option>
-              {{log 't='t 'type='type}}
+              {{!-- {{log 't='t 'type='type}} --}}
               {{/each}}
               {{/select}}
             </select>
@@ -85,7 +85,9 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
-        {{#if rollData.isGM}}
+        {{log 'User is GM? 'isGM}}
+        {{#if isGM}}
+        {{!-- {{#if rollData.isGM}} --}}
         <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
         <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
         {{/if}}

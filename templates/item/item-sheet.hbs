@@ -25,9 +25,11 @@
     {{!-- Attributes Tab --}}
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
-      {{#if rollData.isGM}}
-      <label class="resource-label">System Roll Formula</label>
-      <input type="text" name="system.formula" value="{{system.formula}}" disabled/>
+      {{log 'User is GM? 'isGM}}
+      {{#if isGM}}
+      {{!-- {{#if rollData.isGM}} --}}
+      {{!-- <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
+      <input type="text" name="system.formula" value="{{system.formula}}" disabled/> --}}
       {{/if}}
       <label class="resource-label">Chatbox Name</label>
       <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />

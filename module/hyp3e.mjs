@@ -43,13 +43,6 @@ Hooks.once('init', async function() {
   });
 
   // If we ever need migration scripts, use this version number for comparison
-  // game.settings.register(game.system.id, "systemMigrationVersion", {
-  //   config:false,
-  //   scope: "world",
-  //   type: String,
-  //   default: game.system.version
-  // });
-
   console.log("System info:", game.system)
 
   // Add custom constants for configuration.
