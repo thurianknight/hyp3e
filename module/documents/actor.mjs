@@ -58,7 +58,7 @@ export class Hyp3eActor extends Actor {
 
     // Calculated fields can go here, I think...?
     systemData.unarmoredAc = 9 + systemData.attributes.dex.defMod
-    console.log("Unarmored AC: ", systemData.unarmoredAc)
+    // console.log("Unarmored AC: ", systemData.unarmoredAc)
 
     // Calculate current AC & DR based on equipped armor, shield, and DX defense mod
     // Start by resetting base AC and DR
@@ -84,7 +84,7 @@ export class Hyp3eActor extends Actor {
         }
       }
     }
-    console.log("Equipped AC: ", systemData.ac.value)
+    // console.log("Equipped AC: ", systemData.ac.value)
 
   }
 

@@ -3,10 +3,16 @@
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
     <div class="header-block">
       <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
-      <div class="grid grid-3col">
+      <div class="flexrow">
+        <div class="resource flexrow flex-group-center">
+          <label class="resource-label">{{localize 'HYP3E.item.ammunition'}}</label>
+          <input name="system.isAmmunition" type="checkbox" {{checked system.isAmmunition}}>
+        </div>
         <div class="resource flexrow flex-group-center">
           <label class="resource-label flexlarge">{{localize 'HYP3E.item.qty'}}</label>
           <input type="text" name="system.quantity.value" value="{{system.quantity.value}}" data-dtype="Number"/>
+          /
+          <input type="text" name="system.quantity.max" value="{{system.quantity.max}}" data-dtype="Number"/>
         </div>
         <div class="resource flexrow flex-group-center">
           <label class="resource-label flexlarge">{{localize 'HYP3E.item.cost'}}</label>
@@ -49,6 +55,17 @@
             <option value="false">{{localize 'HYP3E.false'}}</option>
             {{/select}}
           </select>
+          <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
+          <div class="form-fields">
+            <select name="system.save">
+              {{#select system.save}}
+              <option value=""></option>
+              {{#each system.saves as |save t|}}
+              <option value="{{save}}">{{save}}</option>
+              {{/each}}
+              {{/select}}
+            </select>
+          </div>
         </div>
 
         {{!-- Description Tab --}}

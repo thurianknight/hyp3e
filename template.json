@@ -195,9 +195,10 @@
       "blindRoll": false
     },
     "item": {
-      "templates": ["base", "physical"],
+      "templates": ["base", "physical", "rollable"],
       "isContainer": false,
-      "isConsumable": false
+      "isConsumable": false,
+      "isAmmunition": false
     },
     "spell": {
       "templates": ["base", "rollable"],

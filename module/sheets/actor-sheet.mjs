@@ -60,7 +60,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     context.effects = prepareActiveEffectCategories(this.actor.effects);
 
     // Log the actor's data
-    console.log("Actor:", context)
+    // console.log("Actor:", context)
 
     return context;
   }
@@ -134,12 +134,10 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (i.type === 'container') {
         i.contents = this.getContents(i._id, context)
         containers.push(i);
-        console.log("Container:", i)
       }
       // Append to gear.
       if (i.type === 'item' && i.system.containerId == '') {
         gear.push(i);
-        console.log("Gear:", i)
       }
       // Append to features.
       else if (i.type === 'feature') {
@@ -200,6 +198,14 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
 
+    // Decrement or increment consumable item qty
+    html.find('.item-qty-sub').click(ev => {
+      this._decrementItemQty(event);
+    });
+    html.find('.item-qty-add').click(ev => {
+      this._incrementItemQty(event);
+    });
+
     // Add Inventory Item
     html.find('.item-create').click(this._onItemCreate.bind(this));
 
@@ -237,6 +243,59 @@ export class Hyp3eActorSheet extends ActorSheet {
         li.addEventListener("dragstart", handler, false);
       });
     }
+  }
+
+  /**
+   * Handle decrementing a consumable item's qty
+   * @param {Event} event The originating click event
+   * @private
+   */
+  async _decrementItemQty(event) {
+    // console.log("Decrement item:", event)
+    const li = $(event.currentTarget).closest(".item-entry")
+    const item = this.actor.items.get(li.data("itemId"))
+    if (item.system.quantity.value > 0) {
+      console.log("Decrement item:", item)
+      // Update the item object
+      await item.update({
+        system: {
+          quantity: {
+            value: item.system.quantity.value--,  
+          }
+        }
+      })
+      // Update the embedded item document
+      this.actor.updateEmbeddedDocuments("Item", [
+        { _id: item.id, "system.quantity.value": item.system.quantity.value-- },
+      ]);
+    }
+  }
+
+  /**
+   * Handle incrementing a consumable item's qty
+   * @param {Event} event The originating click event
+   * @private
+   */
+  async _incrementItemQty(event) {
+    // console.log("Increment item:", event)
+    const li = $(event.currentTarget).closest(".item-entry")
+    const item = this.actor.items.get(li.data("itemId"))
+    if (item.system.quantity.value < item.system.quantity.max) {
+      console.log("Increment item:", item)
+      // Update the item object
+      await item.update({
+        system: {
+          quantity: {
+            value: item.system.quantity.value++,
+          }
+        }
+      })
+      // Update the embedded item document
+      this.actor.updateEmbeddedDocuments("Item", [
+        { _id: item.id, "system.quantity.value": item.system.quantity.value++ },
+      ]);
+    }
+
   }
 
   /**
@@ -293,7 +352,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     const item = this.actor.items.get(li.data("itemId"))
     const speaker = ChatMessage.getSpeaker()
     const label = `<h3>${item.name} [${item.type}]</h3>`
-    console.log("Item clicked:", item)
+    // console.log("Item clicked:", item)
     let content = item.system.description
     // Setup clickable buttons for item rolls, if they are populated
     if (item.system.damage) {

@@ -131,7 +131,7 @@ Hooks.once("ready", async function() {
   if (game.user.isGM) {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
-    // No need to migrate if system version is 0.9.5 or higher
+    // No need to migrate if system version is x.x.x or higher
     const NEEDS_MIGRATION_TO_VERSION = "0.9.5"
     const needsMigration = !currentVersion || isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {

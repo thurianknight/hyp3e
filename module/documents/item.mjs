@@ -6,6 +6,38 @@ export class Hyp3eItem extends Item {
   /**
    * Augment the basic Item data model with additional dynamic data.
    */
+
+  // This is not working correctly... yet
+  async _preCreate(data, options, user) {
+    // await super._preCreate(data, options, user);
+    console.log("Creating item data", data)
+    // Replace default image for various item types
+    switch(data.type) {
+      case "spell":
+        data.img = `icons/svg/book.svg`
+        break
+      case "feature":
+        data.img = `icons/svg/target.svg`
+        break
+      case "armor":
+        data.img = `icons/svg/shield.svg`
+        break
+      case "weapon":
+        data.img = `icons/svg/combat.svg`
+        break
+      case "item":
+        data.img = `icons/svg/item-bag.svg`
+        break
+      case "container":
+        data.img = `icons/svg/item-bag.svg`
+        break
+      default:
+        data.img = `icons/svg/item-bag.svg`
+    }
+    await super._preCreate(data, options, user);
+    // return this.update({ img:"foo" })
+  }
+
   prepareData() {
     // As with the actor class, items are documents that can have their data
     // preparation methods overridden (such as prepareBaseData()).
@@ -13,8 +45,9 @@ export class Hyp3eItem extends Item {
 
     // Get the Item's data
     const itemData = this;
-    const actorData = this.actor ? this.actor : {};
-    const data = itemData;
+    // const actorData = this.actor ? this.actor : {};
+    // const data = itemData;
+    // console.log("Item data:", itemData)
 
     // Handle weapon attack roll formula
     if (itemData.type == "weapon") {
@@ -26,7 +59,6 @@ export class Hyp3eItem extends Item {
         itemData.system.missile = false
         // Set attack formula if it doesn't already exist, else leave it alone
         if (!itemData.system.formula || itemData.system.formula == '') {
-          // itemData.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
           itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
         }
       } else if (itemData.system.type == "missile") {
@@ -34,7 +66,6 @@ export class Hyp3eItem extends Item {
         itemData.system.missile = true
         // Set attack formula if it doesn't already exist, else leave it alone
         if (!itemData.system.formula || itemData.system.formula == '') {
-          // itemData.system.attack = '1d20 + @fa + @dex.atkMod + @item.atkMod'
           itemData.system.formula = '1d20 + @fa + @dex.atkMod + @item.atkMod'
         }
       } else {
@@ -45,7 +76,6 @@ export class Hyp3eItem extends Item {
         itemData.system.missile = false
         // Set attack formula if it doesn't already exist, else leave it alone
         if (itemData.system.formula == '') {
-          // itemData.system.attack = '1d20 + @fa + @str.atkMod + @item.atkMod'
           itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
         }
       }
@@ -63,7 +93,6 @@ export class Hyp3eItem extends Item {
         }
       }
     }
-    
     // Log the item data
     //console.log("Item Data:", itemData)
 

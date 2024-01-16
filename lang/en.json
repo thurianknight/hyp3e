@@ -210,10 +210,13 @@
       "show": "Show",
       "equip": "Toggle Equip",
       "equipped": "Equipped",
+      "ammunition": "Ammo",
       "cost": "Cost",
       "qty": "Qty",
       "weight": "Weight",
-      "location": "Location"
+      "location": "Location",
+      "incr": "Add",
+      "decr": "Subtract"
     },
     "spell": {
       "addLvl": "Add Lvl",
@@ -248,6 +251,9 @@
       "dr": "DR",
       "dmgResist": "Dmg Resist",
       "unarmored": "Unarmored"
+    },
+    "attack": {
+      "add": "Add Attack"
     },
     "roll": "Roll",
     "rollFormula": "Roll Formula",

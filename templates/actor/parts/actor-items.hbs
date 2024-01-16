@@ -57,10 +57,16 @@
                 </div>
                 <a><h4 class="item-drop">{{item.name}}</h4></a>
               </div>
-              <div class="item-prop">{{item.system.quantity.value}}
+              <div class="item-prop">
+                {{#if item.system.quantity.max}}
+                  <a class="item-control item-qty-sub" title='{{localize "HYP3E.item.decr"}}'><i class="fa fa-minus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                  <a class="item-control item-qty-add" title='{{localize "HYP3E.item.incr"}}'><i class="fa fa-plus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                {{/if}}
+                {{item.system.quantity.value}}
                 {{#if item.system.quantity.max}}
                   / {{item.system.quantity.max}}
-                {{/if}}</div>
+                {{/if}}
+              </div>
               <div class="item-prop">{{item.system.weight}}</div>
               <div class="item-prop">{{item.system.location}}</div>
               <div class="item-controls">
@@ -93,10 +99,16 @@
           </div>
           <a><h4 class="item-drop">{{item.name}}</h4></a>
         </div>
-        <div class="item-prop">{{item.system.quantity.value}}
+        <div class="item-prop">
+          {{#if item.system.quantity.max}}
+            <a class="item-control item-qty-sub" title='{{localize "HYP3E.item.decr"}}'><i class="fa fa-minus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
+            <a class="item-control item-qty-add" title='{{localize "HYP3E.item.incr"}}'><i class="fa fa-plus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
+          {{/if}}
+          {{item.system.quantity.value}}
           {{#if item.system.quantity.max}}
             / {{item.system.quantity.max}}
-          {{/if}}</div>
+          {{/if}}
+        </div>
         <div class="item-prop">{{item.system.weight}}</div>
         <div class="item-prop">{{item.system.location}}</div>
         <div class="item-controls">

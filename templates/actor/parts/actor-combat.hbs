@@ -145,7 +145,48 @@
     </li>
   {{/each}}
 </ol>
-
+{{!-- Ammo appears here --}}
+<ol class="items-list">
+  <li class="item flexrow items-header">
+    <div class="item-name">{{localize "HYP3E.item.ammunition"}}</div>
+    <div class="item-prop">{{localize "HYP3E.item.qty"}}</div>
+    <div></div>
+    <div></div>
+    <div></div>
+  </li>
+  {{#each items as |item id|}}
+    {{#if item.system.isAmmunition}}
+      <li class="item-entry item" data-item-id="{{item._id}}">
+        <div class="item-header flexrow">
+          <div class="item-name">
+            <div class="item-image">
+              <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+            </div>
+            <a><h4 class="item-drop">{{item.name}}</h4></a>
+          </div>
+          <div class="item-prop">
+            {{#if item.system.quantity.max}}
+              <a class="item-control item-qty-sub" title='{{localize "HYP3E.item.decr"}}'><i class="fa fa-minus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
+              <a class="item-control item-qty-add" title='{{localize "HYP3E.item.incr"}}'><i class="fa fa-plus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
+            {{/if}}
+            {{item.system.quantity.value}}
+            {{#if item.system.quantity.max}}
+              / {{item.system.quantity.max}}
+            {{/if}}
+          </div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="item-summary">
+          <div class="item-description">
+            <div class="contained-items">{{{item.system.description}}}</div>
+          </div>
+        </div>
+      </li>
+    {{/if}}
+  {{/each}}
+</ol>
 {{!-- Armors appear here --}}
 <ol class="items-list">
   <li class="item flexrow items-header">
