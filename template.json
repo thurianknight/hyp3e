@@ -78,6 +78,24 @@
       },
       "unskilled": 0,
       "proficiencies": "",
+      "money" : {
+        "cp": {
+          "value": 0
+        },
+        "sp": {
+          "value": 0
+        },
+        "ep": {
+          "value": 0
+        },
+        "gp": {
+          "value": 0
+        },
+        "pp": {
+          "value": 0
+        }
+      },
+      "treasure": "",
       "attributes": {
         "str": {
           "value": 10,

@@ -441,6 +441,25 @@ textarea {
   max-width: 50px;
 }
 
+/* Character Items-tab styles */
+.hyp3e .money-block {
+  padding: 0 2px;
+  margin-right: 5px;
+  margin-bottom: 3px;
+  /* background-color: aqua; */
+}
+.hyp3e .money-block input {
+  text-align: center;
+  min-width: 20px;
+  max-width: 80px;
+}
+.hyp3e .money-block .editor {
+  min-width: 500px;
+}
+.hyp3e .money-block .treasure-box {
+  border: 2px groove #eeede0;
+}
+
 /* Character Description-tab styles */
 .hyp3e .description-block {
   padding: 0 2px;

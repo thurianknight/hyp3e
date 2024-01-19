@@ -41,7 +41,9 @@
       "biography": "Biography",
       "descNotes": "Description & Notes",
       "effectsCond": "Effects & Conditions",
-      "attacksItems": "Attacks & Items"
+      "attacksItems": "Attacks & Items",
+      "money": "Money",
+      "treasure": "Treasure"
     },
     "details": {
       "class": "Class",
@@ -226,6 +228,13 @@
       "duration": "Duration",
       "numAffected": "# Affected",
       "save": "Save"
+    },
+    "money": {
+      "cp": "CP",
+      "sp": "SP",
+      "ep": "EP",
+      "gp": "GP",
+      "pp": "PP"
     },
     "weapon": {
       "add": "Add Weapon",

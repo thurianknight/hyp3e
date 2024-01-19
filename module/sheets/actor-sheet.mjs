@@ -92,6 +92,12 @@ export class Hyp3eActorSheet extends ActorSheet {
       // console.log("Movement Types:", k, v, v.label)
     }
 
+    // Handle money types
+    for (let [k, v] of Object.entries(context.system.money)) {
+      v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
+      // console.log("Money Types:", k, v, v.label)
+    }
+
     // Character classes and languages are global system settings
     context.characterClasses = CONFIG.HYP3E.characterClasses
     // console.log("Actor sheet class list:", context.characterClasses)

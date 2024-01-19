@@ -77,6 +77,18 @@ HYP3E.explorationAbbreviations = {
 };
 
 /**
+ * The five standard money/coinage types
+ * @type {Object}
+ */
+HYP3E.money = {
+  "cp": "HYP3E.money.cp",
+  "sp": "HYP3E.money.sp",
+  "ep": "HYP3E.money.ep",
+  "gp": "HYP3E.money.gp",
+  "pp": "HYP3E.money.pp"
+};
+
+/**
  * The three standard movement types
  * @type {Object}
  */
