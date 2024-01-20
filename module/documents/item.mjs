@@ -398,6 +398,9 @@ export class Hyp3eItem extends Item {
       console.log("No target number for " + roll.total)
     }
 
+    // Prettify label
+    label = "<h3>" + label + "</h3>"
+
     // Output roll result to a chat message
     let chatMsg = await roll.toMessage({
       speaker: speaker,
