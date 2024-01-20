@@ -57,12 +57,12 @@ export class Hyp3eActor extends Actor {
     }
 
     // Calculated fields can go here, I think...?
-    systemData.unarmoredAc = 9 + systemData.attributes.dex.defMod
+    systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
     // console.log("Unarmored AC: ", systemData.unarmoredAc)
 
     // Calculate current AC & DR based on equipped armor, shield, and DX defense mod
     // Start by resetting base AC and DR
-    systemData.ac.value = 9 + systemData.attributes.dex.defMod
+    systemData.ac.value = 9 - systemData.attributes.dex.defMod
     systemData.ac.dr = 0
     // Loop through all inventory item types to find armor
     for (let itmType of Object.entries(actorData.itemTypes)) {
@@ -74,8 +74,8 @@ export class Hyp3eActor extends Actor {
             // DR can be updated by armor or shield (not in core rules, but...)
             systemData.ac.dr = systemData.ac.dr + obj.system.dr
             if(obj.system.type != "shield") {
-              // Armor AC is a base number that overrides the unarmored AC of 9 + DX mod
-              systemData.ac.value = obj.system.ac + systemData.attributes.dex.defMod
+              // Armor AC is a base number that overrides the unarmored AC of 9 - DX mod
+              systemData.ac.value = obj.system.ac - systemData.attributes.dex.defMod
             } else {
               // Shield AC is a modifier subtracted from current AC
               systemData.ac.value = systemData.ac.value - obj.system.ac
