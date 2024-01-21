@@ -221,9 +221,14 @@
     "spell": {
       "templates": ["base", "rollable"],
       "memorized": 0,
+      "quantity": {
+        "value": 0,
+        "max": 9
+      },
       "spellLevel": 1,
       "range": "",
-      "classList": ""
+      "classList": "",
+      "isConsumable": true
     },
     "weapon": {
       "templates": ["base", "physical", "equippable", "rollable"],

@@ -206,10 +206,10 @@ export class Hyp3eActorSheet extends ActorSheet {
 
     // Decrement or increment consumable item qty
     html.find('.item-qty-sub').click(ev => {
-      this._decrementItemQty(event);
+      this._decrementItemQty(ev);
     });
     html.find('.item-qty-add').click(ev => {
-      this._incrementItemQty(event);
+      this._incrementItemQty(ev);
     });
 
     // Add Inventory Item
@@ -257,7 +257,6 @@ export class Hyp3eActorSheet extends ActorSheet {
    * @private
    */
   async _decrementItemQty(event) {
-    // console.log("Decrement item:", event)
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
     if (item.system.quantity.value > 0) {
@@ -283,7 +282,6 @@ export class Hyp3eActorSheet extends ActorSheet {
    * @private
    */
   async _incrementItemQty(event) {
-    // console.log("Increment item:", event)
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
     if (item.system.quantity.value < item.system.quantity.max) {
@@ -301,7 +299,6 @@ export class Hyp3eActorSheet extends ActorSheet {
         { _id: item.id, "system.quantity.value": item.system.quantity.value++ },
       ]);
     }
-
   }
 
   /**
