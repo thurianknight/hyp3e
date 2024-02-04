@@ -122,13 +122,21 @@
         "int": {
           "value": 10,
           "languages": 0,
-          "bonusSpells": "",
+          "bonusSpells": {
+            "lvl1": false,
+            "lvl2": false,
+            "lvl3": false
+          },
           "learnSpell": 0
         },
         "wis": {
           "value": 10,
           "willMod": 0,
-          "bonusSpells": "",
+          "bonusSpells": {
+            "lvl1": false,
+            "lvl2": false,
+            "lvl3": false
+          },
           "learnSpell": 0
         },
         "cha": {

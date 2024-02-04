@@ -102,7 +102,11 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.int.languages'}}</span>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.int.bonusSpells" value="{{system.attributes.int.bonusSpells}}" data-dtype="String"/>
+      <div class="flexrow">
+        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl1}}no-bonus{{/unless}}" data-spell-lvl="intLvl1" title='{{localize "HYP3E.dataLabel.bonusLvl1"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl2}}no-bonus{{/unless}}" data-spell-lvl="intLvl2" title='{{localize "HYP3E.dataLabel.bonusLvl2"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl3}}no-bonus{{/unless}}" data-spell-lvl="intLvl3" title='{{localize "HYP3E.dataLabel.bonusLvl3"}}'><i class="fas fa-scroll"></i></a>
+      </div>
       <span class="mod-label">{{localize 'HYP3E.attributes.int.bonusSpells'}}</span>
     </div>
     <div class="attribute-mod">
@@ -130,7 +134,11 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.wis.willMod'}}</span>
     </div>
     <div class="attribute-mod">
-      <input type="text" name="system.attributes.wis.bonusSpells" value="{{system.attributes.wis.bonusSpells}}" data-dtype="String"/>
+      <div class="flexrow">
+        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl1}}no-bonus{{/unless}}" data-spell-lvl="wisLvl1" title='{{localize "HYP3E.dataLabel.bonusLvl1"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl2}}no-bonus{{/unless}}" data-spell-lvl="wisLvl2" title='{{localize "HYP3E.dataLabel.bonusLvl2"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl3}}no-bonus{{/unless}}" data-spell-lvl="wisLvl3" title='{{localize "HYP3E.dataLabel.bonusLvl3"}}'><i class="fas fa-scroll"></i></a>
+      </div>
       <span class="mod-label">{{localize 'HYP3E.attributes.wis.bonusSpells'}}</span>
     </div>
     <div class="attribute-mod">

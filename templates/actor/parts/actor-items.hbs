@@ -123,19 +123,22 @@
   {{/each}}
 </ol>
 <div class="money-block flexrow">
-  <div class="resource-content flexrow flex-group-center">
+  <div class="resource-content flex-group-center">
+    <h3>{{localize "HYP3E.headers.encumbrance"}}</h3>
+  </div>
+  <div class="resource-content flex-group-center">
     <h3>{{localize "HYP3E.headers.money"}}</h3>
   </div>
-  <div class="resource-content flexrow flex-group-center">
+  <div class="resource-content flex-xlarge flex-group-center">
     <h3>{{localize "HYP3E.headers.treasure"}}</h3>
-  </div>
-  <div class="resource-content flexrow flex-group-center">
-    <h3>&nbsp;</h3>
   </div>
 </div>
 <div class="money-block flexrow">
-  <div></div>
-  <div class="resource-content flex-group-center">
+  <div class="money-block flex-group-center">
+    <label for="system.encumbrance" class="exploration-label">Total Weight Carried:</label>
+    {{encumbrance}} pounds
+  </div>
+  <div class="money-block flex-group-center">
     {{#each system.money as |coin key|}}
       <div class="ability flexrow flex-group-center">
         <label for="system.money.{{key}}.value" class="exploration-label">{{coin.label}}</label>
@@ -143,8 +146,7 @@
       </div>
     {{/each}}
   </div>
-  <div></div>
-  <div class="treasure-box">
+  <div class="treasure-box flex-xlarge">
     {{!-- <textarea name="system.treasure" rows="10">{{system.treasure}}</textarea> --}}
     {{editor system.treasure target="system.treasure" rollData=rollData button=true owner=owner editable=editable}}
   </div>

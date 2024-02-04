@@ -42,6 +42,7 @@
       "descNotes": "Description & Notes",
       "effectsCond": "Effects & Conditions",
       "attacksItems": "Attacks & Items",
+      "encumbrance": "Encumbrance",
       "money": "Money",
       "treasure": "Treasure"
     },
@@ -53,7 +54,7 @@
       "hitDice": "Hit Dice",
       "hd": "HD",
       "xp": "XP",
-      "toNextLvl": "To Next Level",
+      "toNextLvl": "Next Level",
       "primeAttr": "Primary Attr",
       "hitPoints": "Hit Points",
       "hp": "HP",
@@ -293,7 +294,10 @@
       "friendlyName": "Friendly Name",
       "itemId": "Item ID",
       "containerId": "Container ID",
-      "containedItemIds": "Contained Item IDs"
+      "containedItemIds": "Contained Item IDs",
+      "bonusLvl1": "Level 1",
+      "bonusLvl2": "Level 2",
+      "bonusLvl3": "Level 3"
     }
   }
 }

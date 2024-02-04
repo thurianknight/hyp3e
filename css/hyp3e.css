@@ -387,6 +387,9 @@ textarea {
   font-weight: bold;
   padding: 5px 5px;
 }
+.no-bonus {
+  color: rgba(0, 0, 0, 0.2);
+}
 
 /* Character Combat-tab styles */
 .hyp3e .combat-block {
@@ -454,7 +457,7 @@ textarea {
   max-width: 80px;
 }
 .hyp3e .money-block .editor {
-  min-width: 500px;
+  min-width: 400px;
 }
 .hyp3e .money-block .treasure-box {
   border: 2px groove #eeede0;
@@ -534,7 +537,7 @@ textarea {
   font-weight: bold;
   font-size: large;
   padding: 5px 5px;
-  background-color: blueviolet
+  /* background-color: blueviolet */
 }
 .hyp3e .resource-label {
   font-weight: bold;

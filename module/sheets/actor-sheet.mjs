@@ -60,7 +60,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     context.effects = prepareActiveEffectCategories(this.actor.effects);
 
     // Log the actor's data
-    // console.log("Actor:", context)
+    console.log("Actor:", context)
 
     return context;
   }
@@ -133,9 +133,16 @@ export class Hyp3eActorSheet extends ActorSheet {
       6: []
     };
 
+    let encumbrance = 0
     // Iterate through items, allocating to tab-groups
     for (let i of context.items) {
       i.img = i.img || DEFAULT_TOKEN;
+      // Calculate total weight carried by character
+      // console.log("Item carried:", i)
+      if (i.system.weight) {
+        encumbrance += i.system.weight
+      }
+
       // Append to containers.
       if (i.type === 'container') {
         i.contents = this.getContents(i._id, context)
@@ -164,8 +171,10 @@ export class Hyp3eActorSheet extends ActorSheet {
         }
       }
     }
+    console.log(`Total weight carried: ${encumbrance} pounds`)
 
     // Assign and return
+    context.encumbrance = encumbrance;
     context.gear = gear;
     context.containers = containers;
     context.features = features;
@@ -203,6 +212,12 @@ export class Hyp3eActorSheet extends ActorSheet {
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
+
+    // Toggle bonus spells true/false
+    html.find(".bonus-spell").click(async (event) => {
+      const spellLvl = $(event.currentTarget).data("spellLvl")
+      this._updateBonusSpells(spellLvl)
+    });
 
     // Decrement or increment consumable item qty
     html.find('.item-qty-sub').click(ev => {
@@ -249,6 +264,96 @@ export class Hyp3eActorSheet extends ActorSheet {
         li.addEventListener("dragstart", handler, false);
       });
     }
+  }
+
+  /**
+   * Handle addding and removing bonus spells
+   * @param {String} spellLvl The bonus spell level to be updated
+   * @private
+   */
+  async _updateBonusSpells(spellLvl) {
+    let result
+    switch (spellLvl) {
+      case "intLvl1":
+        result = await this.actor.update({
+          system: {
+            attributes: {
+              int: {
+                bonusSpells: {
+                  lvl1: !this.actor.system.attributes.int.bonusSpells.lvl1,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "intLvl2":
+        result = await this.actor.update({
+          system: {
+            attributes: {
+              int: {
+                bonusSpells: {
+                  lvl2: !this.actor.system.attributes.int.bonusSpells.lvl2,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "intLvl3":
+        result = await this.actor.update({
+          system: {
+            attributes: {
+              int: {
+                bonusSpells: {
+                  lvl3: !this.actor.system.attributes.int.bonusSpells.lvl3,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "wisLvl1":
+        result = await this.actor.update({
+          system: {
+            attributes: {
+              wis: {
+                bonusSpells: {
+                  lvl1: !this.actor.system.attributes.wis.bonusSpells.lvl1,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "wisLvl2":
+        result = await this.actor.update({
+          system: {
+            attributes: {
+              wis: {
+                bonusSpells: {
+                  lvl2: !this.actor.system.attributes.wis.bonusSpells.lvl2,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "wisLvl3":
+        result = await this.actor.update({
+          system: {
+            attributes: {
+              wis: {
+                bonusSpells: {
+                  lvl3: !this.actor.system.attributes.wis.bonusSpells.lvl3,
+                }
+              }
+            }
+          }
+        })
+        break
+    }
+    // console.log("Actor after update:", result)
   }
 
   /**
@@ -509,100 +614,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Now call the Foundry core _onSortItem event so we don't break anything
     super._onSortItem(event, itemData);
   }
-
-  // _onDragStart(event) {
-  //   const li = event.currentTarget;
-  //   if (event.target.classList.contains("content-link")) return;
-  //   console.log("Drag Start event:", event)
-  //   console.log("Drag Start list item:", li)
-
-  //   let dragData;
-  //   let itemIdsArray = [];
-
-  //   // Owned Items
-  //   if (li.dataset.itemId) {
-  //     const item = this.actor.items.get(li.dataset.itemId);
-  //     dragData = item.toDragData();
-  //     dragData.item = item;
-  //     dragData.type = "Item"; 
-  //     if (item.type === "container" && item.system.itemIds.length) {
-  //       //otherwise JSON.stringify will quadruple stringify for some reason
-  //       itemIdsArray = item.system.itemIds;
-  //     }
-  //   }
-
-  //   // Create drag data
-  //   dragData.actorId = this.actor.id;
-  //   dragData.sceneId = this.actor.isToken ? canvas.scene?.id : null;
-  //   dragData.tokenId = this.actor.isToken ? this.actor.token.id : null;
-  //   dragData.pack = this.actor.pack;
-
-  //   // Active Effect
-  //   if (li.dataset.effectId) {
-  //     const effect = this.actor.effects.get(li.dataset.effectId);
-  //     dragData.type = "ActiveEffect";
-  //     dragData.data = effect.data;
-  //   }
-
-  //   // Set data transfer
-  //   event.dataTransfer.setData(
-  //     "text/plain",
-  //     JSON.stringify(dragData, (key, value) => {
-  //       if (key === "itemIds") {
-  //         //something about how this Array is created makes its elements not real Array elements
-  //         //we go through this hoop to trick stringify into creating our string
-  //         return JSON.stringify(itemIdsArray);
-  //       }
-  //       return value;
-  //     })
-  //   );
-  // }
-
-  // async _onDropItem(event, data){
-  //   const item = await Item.implementation.fromDropData(data);
-  //   const itemData = item.toObject();
-
-  //   const exists = !!this.actor.items.get(item.id);
-    
-  //   if (!exists)
-  //     return this._onDropItemCreate([itemData]);
-    
-  //   const isContainer = this.actor.items.get(item.system.containerId);
-    
-  //   if (isContainer)
-  //     return this._onContainerItemRemove(item, isContainer);
-    
-  //   const {itemId: targetId} = event.target.closest('.item').dataset;
-  //   const targetItem = this.actor.items.get(targetId)
-  //   const targetIsContainer = targetItem?.type === 'container'
-
-  //   if (targetIsContainer)
-  //     return this._onContainerItemAdd(item, targetItem);
-
-  // }
-
-  // async _onContainerItemRemove(item, container) {
-  //   const newList = container.system.itemIds.filter((s) => s != item.id);
-  //   const itemObj = this.object.items.get(item.id);
-  //   await container.update({ system: { itemIds: newList } });
-  //   await itemObj.update({ system: { containerId: "" } });
-  // }
-
-  // async _onContainerItemAdd(item, target) {
-  //   const itemData = item.toObject();
-  //   console.log("Container Item Add item data:", itemData)
-  //   const container = this.object.items.get(target.id);
-  //   console.log("Container Item Add container:", container)
-
-  //   const containerId = container.id;
-  //   const itemObj = this.object.items.get(item.id);
-  //   const alreadyExists = container.system.itemIds.find((i) => i.id == item.id);
-  //   if (!alreadyExists) {
-  //     const newList = [...container.system.itemIds, item.id];
-  //     await container.update({ system: { itemIds: newList } });
-  //     await itemObj.update({ system: { containerId: container.id } });
-  //   }
-  // }
 
   /**
    * Handle clickable rolls.
