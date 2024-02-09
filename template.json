@@ -77,7 +77,12 @@
         "physicalFeatures": ""
       },
       "unskilled": 0,
-      "proficiencies": "",
+      "proficiencies": {
+        "class": "",
+        "lvl4": "",
+        "lvl8": "",
+        "lvl12": ""
+      },
       "money" : {
         "cp": {
           "value": 0
