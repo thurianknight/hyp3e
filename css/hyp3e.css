@@ -240,12 +240,16 @@
 /* Default style for input text fields */
 input[type=text] {
   border: none;
-  border-bottom: 1px solid black;
-  background-color: transparent;
+  /* border-bottom: 1px solid black; */
+  background-color:#bdbdbd7f;
+  /* background-color: transparent; */
+  /* background-image: url("../assets/blood-swipe-small.png"); */
+  /* background-blend-mode: lighten; */
+  margin-bottom: 2px;
 }
 input[type=text]:disabled {
   border: none;
-  background-color:#bdbdbd7f;
+  background-color: transparent;
 }
 
 /* Default style for textarea boxes */
@@ -310,6 +314,10 @@ textarea {
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
+  /* background-image: url("../assets/hyperborea-logo.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat; */
 }
 .hyp3e .sheet-header h1.charname {
   height: 50px;
@@ -321,6 +329,10 @@ textarea {
   width: 100%;
   height: 100%;
   margin: 0;
+}
+.hyp3e .hyp3e-metal img {
+  border: none;
+  max-width: 200px;
 }
 .hyp3e .header-label {
   font-weight: bold;
@@ -353,9 +365,25 @@ textarea {
   /* background-color: aqua; */
 }
 
+/* Left gutter image */
+.hyp3e .left-gutter {
+  max-width: 50px;
+  border: none;
+}
+.hyp3e .left-gutter img {
+  border: 0;
+}
+
+/* Main content block */
+.hyp3e .main-content {
+  /* background-image: url("../assets/blood-swipe2.png"); */
+  background-position: center;
+  background-size: cover;
+}
+
 /* Character Abilities-tab styles */
 .hyp3e .attribute-block {
-  min-width: 575px;
+  min-width: 500px;
 }
 .hyp3e .attribute-row {
   padding-bottom: 5px;
@@ -369,12 +397,15 @@ textarea {
   font-weight: bold;
   min-width: 30px;
   max-width: 50px;
+  /* background-image: url("../assets/blood-swipe-small.png"); */
   /* background-color: orange; */
 }
+
 .hyp3e .attribute-mod {
   margin-left: 2px;
   margin-right: 2px;
-  min-width: 90px;
+  min-width: 75px;
+  /* max-width: 80px; */
   /* background-color: chartreuse; */
 }
 .hyp3e .mod-label {
@@ -402,6 +433,20 @@ textarea {
   text-align: center;
   min-width: 20px;
   max-width: 80px;
+  margin-bottom: 2px;
+}
+/* .hyp3e .combat-block .class-weapons {
+} */
+.hyp3e .combat-block .class-weapons input {
+  min-width: 220px;
+  margin-bottom: 2px;
+}
+.hyp3e .combat-block .weapon-field {
+  padding-left: 15px;
+}
+.hyp3e .combat-block .weapon-field input {
+  min-width: 200px;
+  margin-bottom: 2px;
 }
 .hyp3e .combat-header {
   font-weight: bold;
@@ -442,6 +487,7 @@ textarea {
 .hyp3e .spells input {
   text-align: center;
   max-width: 50px;
+  margin-bottom: 2px;
 }
 
 /* Character Items-tab styles */
@@ -455,6 +501,7 @@ textarea {
   text-align: center;
   min-width: 20px;
   max-width: 80px;
+  margin-bottom: 2px;
 }
 .hyp3e .money-block .editor {
   min-width: 400px;
@@ -476,6 +523,7 @@ textarea {
 }
 .hyp3e .description-field input {
   min-width: 100px;
+  margin-bottom: 2px;
 }
 .hyp3e .biography-block {
   padding: 0 2px;
@@ -507,6 +555,7 @@ textarea {
   text-align: center;
   min-width: 50px;
   max-width: 75px;
+  margin-bottom: 2px;
 }
 .hyp3e .npc-description-block {
   padding: 0 2px;

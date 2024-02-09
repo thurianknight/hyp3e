@@ -1,232 +1,258 @@
-{{!-- Fighting skills and combat statistics --}}
-<div class="combat-block flexrow">
-  <div class="combat-block flexcol">
-    <div class="resource-content flexrow flex-group-center">
-      <h3>{{localize "HYP3E.headers.fightingSkills"}}</h3>
-    </div>
-    <div class="resource-content flexrow flex-group-center">
-      <span class="rollable flexlarge" data-roll="1d20 + @fa + @str.atkMod" data-roll-type="attack" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.basicMeleeAtk'}}">
-        <label for="system.fa" class="combat-label">{{localize "HYP3E.fightingAbility"}}</label>
-        <i class="fas fa-dice-d20"></i>
-      </span>
-      <input type="text" name="system.fa" value="{{system.fa}}" data-dtype="Number"/>
-      <label for="system.unskilled" class="combat-label">{{localize "HYP3E.unskilled"}}</label>
-      <input type="text" name="system.unskilled" value="{{system.unskilled}}" data-dtype="Number"/>
-    </div>
-    <div class="resource-content flexrow flex-group-center">
-      <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.wpnSkills"}}</label>
-    </div>
-    <div class="resource-content flexrow flex-group-center">
-      <textarea name="system.proficiencies">{{system.proficiencies}}</textarea>
-    </div>
-  </div>
-  <div class="combat-block flexcol">
-    <div class="resource-content flexrow flex-group-center">
-      <h3>{{localize "HYP3E.headers.combatStats"}}</h3>
-    </div>
-    <div class="resource-content flexrow flex-group-center">
-      <label for="system.hp.value" class="combat-label">{{localize "HYP3E.details.hitPoints"}}</label>
-      <input type="text" name="system.hp.value" value="{{system.hp.value}}" data-dtype="Number"/>
-      /
-      <input type="text" name="system.hp.max" value="{{system.hp.max}}" data-dtype="Number"/>
-      <span class="combat-label rollable" data-roll="{{system.hd}}+{{system.attributes.con.hpMod}}" data-roll-type="basic" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.hitDieRoll'}}">
-        <label for="system.hd">{{localize "HYP3E.details.hitDie"}}</label> <i class="fas fa-dice-d6"></i>
-      </span>
-      <input type="text" name="system.hd" value="{{system.hd}}" data-dtype="String"/>
-    </div>
-    <div class="resource-content flexrow flex-group-center">
-      <label for="system.ac.value" class="combat-label">{{localize "HYP3E.armor.armorClass"}}</label>
-      <input type="text" name="system.ac.value" value="{{system.ac.value}}" data-dtype="Number" disabled/>
-      <label for="system.ac.dr" class="combat-label">{{localize "HYP3E.armor.dr"}}</label>
-      <input type="text" name="system.ac.dr" value="{{system.ac.dr}}" data-dtype="Number" disabled/>
-      <label for="system.unarmoredAc" class="combat-label">{{localize "HYP3E.armor.unarmored"}}</label>
-      <input type="text" name="system.unarmoredAc" value="{{system.unarmoredAc}}" disabled/>
-    </div>
-    <div class="resource-content flexrow flex-group-center">
-      <span></span><span></span>
-      <label for="system.movement.base.value" class="combat-label">{{localize "HYP3E.movement.base.abbrev"}}</label>
-      <input type="text" name="system.movement.base.value" value="{{system.movement.base.value}}" data-dtype="Number"/>
-      <label for="system.otherMv.value" class="combat-label">{{localize "HYP3E.otherMv.abbrev"}}</label>
-      <input type="text" name="system.otherMv.value" value="{{system.otherMv.value}}" data-dtype="String"/>
-    </div>
-  </div>
-</div>
-
-{{!-- Saving throws here --}}
-<div class="combat-block flexrow">
-  <div class="resource-content flexrow flex-group-center">
-    <h3>{{localize "HYP3E.headers.savingThrows"}}</h3>
-  </div>  
-</div>
-<div class="saves-block flexrow flex-between">
-  <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.death.value}}" data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
-      <label for="system.saves.death.value" class="combat-label">{{localize "HYP3E.saves.death.abbrev"}}</label>
-      <i class="fas fa-dice-d20"></i>
-      </span>
-    <input type="text" name="system.saves.death.value" value="{{system.saves.death.value}}"/>
-  </div>
-  <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.device.value}}" data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
-      <label for="system.saves.device.value" class="combat-label">{{localize "HYP3E.saves.device.abbrev"}}</label>
-      <i class="fas fa-dice-d20"></i>
-    </span>
-    <input type="text" name="system.saves.device.value" value="{{system.saves.device.value}}"/>
-  </div>
-  <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.transformation.value}}" data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
-      <label for="system.saves.transformation.value" class="combat-label">{{localize "HYP3E.saves.transformation.abbrev"}}</label>
-      <i class="fas fa-dice-d20"></i>
-    </span>
-    <input type="text" name="system.saves.transformation.value" value="{{system.saves.transformation.value}}"/>
-  </div>
-  <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.avoidance.value}}" data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
-      <label for="system.saves.avoidance.value" class="combat-label">{{localize "HYP3E.saves.avoidance.abbrev"}}</label>
-      <i class="fas fa-dice-d20"></i>
-    </span>
-    <input type="text" name="system.saves.avoidance.value" value="{{system.saves.avoidance.value}}"/>
-  </div>
-  <div class="combat-block flexrow flex-group-center">
-    <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.sorcery.value}}" data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
-      <label for="system.saves.sorcery.value" class="combat-label">{{localize "HYP3E.saves.sorcery.abbrev"}}</label>
-      <i class="fas fa-dice-d20"></i>
-    </span>
-    <input type="text" name="system.saves.sorcery.value" value="{{system.saves.sorcery.value}}"/>
-  </div>
-</div>
-
-{{!-- Weapons appear here --}}
-<ol class="items-list">
-  <li class="item flexrow items-header">
-    <div class="item-name">{{localize "HYP3E.headers.weapons"}}</div>
-    <div class="item-prop">{{localize "HYP3E.headers.atkRate"}}</div>
-    <div class="item-prop">{{localize "HYP3E.headers.classRange"}}</div>
-    <div class="item-prop">{{localize "HYP3E.headers.atkMod"}}</div>
-    <div class="item-prop">{{localize "HYP3E.headers.dmgMod"}}</div>
-    <div class="item-prop">{{localize "HYP3E.headers.damage"}}</div>
-    <div class="item-controls">
-      <a class="item-control item-create" title="Create weapon" data-type="weapon">
-        <i class="fas fa-plus"></i> {{localize "HYP3E.weapon.add"}}
-      </a>
-    </div>
-  </li>
-  {{#each weapons as |item id|}}
-    <li class="item-entry item" data-item-id="{{item._id}}">
-      <div class="item-header flexrow">
-        <div class="item-name">
-          <div class="item-image">
-            <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.attackWith'}} {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
-          </div>
-          <a><h4 class="item-drop">{{item.name}}</h4></a>
+<section class="all-content flexrow">
+  <section class="left-gutter">
+    <img src="systems/hyp3e/assets/serpent-spear.png">
+  </section>
+  <section class="main-content">
+    {{!-- Fighting skills and combat statistics --}}
+    <div class="combat-block flexrow">
+      <div class="combat-block flexcol">
+        <div class="resource-content flexrow flex-group-center">
+          <h3>{{localize "HYP3E.headers.fightingSkills"}}</h3>
         </div>
-        <div class="item-prop">{{item.system.rof}}</div>
-        {{#if item.system.melee}}
-          <div class="item-prop">{{item.system.wc}}</div>
-        {{else}}
-          <div class="item-prop">{{item.system.range.short}}/{{item.system.range.medium}}/{{item.system.range.long}}</div>
-        {{/if}}
-        <div class="item-prop">{{numberFormat item.system.atkMod decimals=0 sign=true}}</div>
-        <div class="item-prop">{{numberFormat item.system.dmgMod decimals=0 sign=true}}</div>
-        <div class="item-prop">{{item.system.damage}}</div>
-        {{!-- <div></div> --}}
+        <div class="resource-content flexrow flex-group-center">
+          <span class="rollable flexlarge" data-roll="1d20 + @fa + @str.atkMod" data-roll-type="attack" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.basicMeleeAtk'}}">
+            <label for="system.fa" class="combat-label">{{localize "HYP3E.fightingAbility"}}</label>
+            <i class="fas fa-dice-d20"></i>
+          </span>
+          <input type="text" name="system.fa" value="{{system.fa}}" data-dtype="Number"/>
+          <label for="system.unskilled" class="combat-label">{{localize "HYP3E.unskilled"}}</label>
+          <input type="text" name="system.unskilled" value="{{system.unskilled}}" data-dtype="Number"/>
+        </div>
+        <div class="resource-content class-weapons flexrow">
+          <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.wpnSkills"}}:</label>
+          <input type="text" name="system.proficiencies.class" value="{{system.proficiencies.class}}"/>
+        </div>
+        <div class="resource-content weapon-field flexrow">
+          <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.level4"}}:</label>
+          <input type="text" name="system.proficiencies.lvl4" value="{{system.proficiencies.lvl4}}"/>
+        </div>
+        <div class="resource-content weapon-field flexrow">
+          <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.level8"}}:</label>
+          <input type="text" name="system.proficiencies.lvl8" value="{{system.proficiencies.lvl8}}"/>
+        </div>
+        <div class="resource-content weapon-field flexrow">
+          <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.level12"}}:</label>
+          <input type="text" name="system.proficiencies.lvl12" value="{{system.proficiencies.lvl12}}"/>
+        </div>
+        {{!-- <div class="resource-content flexrow flex-group-center">
+          <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.wpnSkills"}}</label>
+        </div>
+        <div class="resource-content flexrow flex-group-center">
+          <textarea name="system.proficiencies">{{system.proficiencies}}</textarea>
+        </div> --}}
+      </div>
+      <div class="combat-block flexcol">
+        <div class="resource-content flexrow flex-group-center">
+          <h3>{{localize "HYP3E.headers.combatStats"}}</h3>
+        </div>
+        <div class="resource-content flexrow flex-group-center">
+          <label for="system.hp.value" class="combat-label">{{localize "HYP3E.details.hitPoints"}}</label>
+          <input type="text" name="system.hp.value" value="{{system.hp.value}}" data-dtype="Number"/>
+          /
+          <input type="text" name="system.hp.max" value="{{system.hp.max}}" data-dtype="Number"/>
+          <span class="combat-label rollable" data-roll="{{system.hd}}+{{system.attributes.con.hpMod}}" data-roll-type="basic" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.hitDieRoll'}}">
+            <label for="system.hd">{{localize "HYP3E.details.hitDie"}}</label> <i class="fas fa-dice-d6"></i>
+          </span>
+          <input type="text" name="system.hd" value="{{system.hd}}" data-dtype="String"/>
+        </div>
+        <div class="resource-content flexrow flex-group-center">
+          <label for="system.ac.value" class="combat-label">{{localize "HYP3E.armor.armorClass"}}</label>
+          <input type="text" name="system.ac.value" value="{{system.ac.value}}" data-dtype="Number" disabled/>
+          <label for="system.ac.dr" class="combat-label">{{localize "HYP3E.armor.dr"}}</label>
+          <input type="text" name="system.ac.dr" value="{{system.ac.dr}}" data-dtype="Number" disabled/>
+          <label for="system.unarmoredAc" class="combat-label">{{localize "HYP3E.armor.unarmored"}}</label>
+          <input type="text" name="system.unarmoredAc" value="{{system.unarmoredAc}}" disabled/>
+        </div>
+        <div class="resource-content flexrow flex-group-center">
+          <span></span><span></span>
+          <label for="system.movement.base.value" class="combat-label">{{localize "HYP3E.movement.base.abbrev"}}</label>
+          <input type="text" name="system.movement.base.value" value="{{system.movement.base.value}}" data-dtype="Number"/>
+          <label for="system.otherMv.value" class="combat-label">{{localize "HYP3E.otherMv.abbrev"}}</label>
+          <input type="text" name="system.otherMv.value" value="{{system.otherMv.value}}" data-dtype="String"/>
+        </div>
+        <div class="resource-content flexrow flex-group-center">
+          {{!-- This is a cheat row, to shift the upper rows higher. --}}
+        </div>
+      </div>
+    </div>
+
+    {{!-- Saving throws here --}}
+    <div class="combat-block flexrow">
+      <div class="resource-content flexrow flex-group-center">
+        <h3>{{localize "HYP3E.headers.savingThrows"}}</h3>
+      </div>  
+    </div>
+    <div class="saves-block flexrow flex-between">
+      <div class="combat-block flexrow flex-group-center">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.death.value}}" data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
+          <label for="system.saves.death.value" class="combat-label">{{localize "HYP3E.saves.death.abbrev"}}</label>
+          <i class="fas fa-dice-d20"></i>
+          </span>
+        <input type="text" name="system.saves.death.value" value="{{system.saves.death.value}}"/>
+      </div>
+      <div class="combat-block flexrow flex-group-center">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.device.value}}" data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
+          <label for="system.saves.device.value" class="combat-label">{{localize "HYP3E.saves.device.abbrev"}}</label>
+          <i class="fas fa-dice-d20"></i>
+        </span>
+        <input type="text" name="system.saves.device.value" value="{{system.saves.device.value}}"/>
+      </div>
+      <div class="combat-block flexrow flex-group-center">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.transformation.value}}" data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
+          <label for="system.saves.transformation.value" class="combat-label">{{localize "HYP3E.saves.transformation.abbrev"}}</label>
+          <i class="fas fa-dice-d20"></i>
+        </span>
+        <input type="text" name="system.saves.transformation.value" value="{{system.saves.transformation.value}}"/>
+      </div>
+      <div class="combat-block flexrow flex-group-center">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.avoidance.value}}" data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
+          <label for="system.saves.avoidance.value" class="combat-label">{{localize "HYP3E.saves.avoidance.abbrev"}}</label>
+          <i class="fas fa-dice-d20"></i>
+        </span>
+        <input type="text" name="system.saves.avoidance.value" value="{{system.saves.avoidance.value}}"/>
+      </div>
+      <div class="combat-block flexrow flex-group-center">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.sorcery.value}}" data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
+          <label for="system.saves.sorcery.value" class="combat-label">{{localize "HYP3E.saves.sorcery.abbrev"}}</label>
+          <i class="fas fa-dice-d20"></i>
+        </span>
+        <input type="text" name="system.saves.sorcery.value" value="{{system.saves.sorcery.value}}"/>
+      </div>
+    </div>
+
+    {{!-- Weapons appear here --}}
+    <ol class="items-list">
+      <li class="item flexrow items-header">
+        <div class="item-name">{{localize "HYP3E.headers.weapons"}}</div>
+        <div class="item-prop">{{localize "HYP3E.headers.atkRate"}}</div>
+        <div class="item-prop">{{localize "HYP3E.headers.classRange"}}</div>
+        <div class="item-prop">{{localize "HYP3E.headers.atkMod"}}</div>
+        <div class="item-prop">{{localize "HYP3E.headers.dmgMod"}}</div>
+        <div class="item-prop">{{localize "HYP3E.headers.damage"}}</div>
         <div class="item-controls">
-          <a class="item-control item-equip {{#unless item.system.equipped}}item-unequipped{{/unless}}" title='{{localize "HYP3E.item.equip"}}'><i class="fas fa-shirt"></i></a>
-          <a class="item-control item-show" title='{{localize "HYP3E.item.show"}}'><i class="fas fa-eye"></i></a>
-          <a class="item-control item-edit" title="{{localize 'HYP3E.item.edit'}}"><i class="fas fa-edit"></i></a>
-          <a class="item-control item-delete" title="{{localize 'HYP3E.item.delete'}}"><i class="fas fa-trash"></i></a>
-        </div>
-      </div>
-      <div class="item-summary">
-        <div class="item-description">
-          <div>{{{item.system.description}}}</div>
-        </div>
-      </div>
-    </li>
-  {{/each}}
-</ol>
-{{!-- Ammo appears here --}}
-<ol class="items-list">
-  <li class="item flexrow items-header">
-    <div class="item-name">{{localize "HYP3E.item.ammunition"}}</div>
-    <div class="item-prop">{{localize "HYP3E.item.qty"}}</div>
-    <div></div>
-    <div></div>
-    <div></div>
-  </li>
-  {{#each items as |item id|}}
-    {{#if item.system.isAmmunition}}
-      <li class="item-entry item" data-item-id="{{item._id}}">
-        <div class="item-header flexrow">
-          <div class="item-name">
-            <div class="item-image">
-              <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-            </div>
-            <a><h4 class="item-drop">{{item.name}}</h4></a>
-          </div>
-          <div class="item-prop">
-            {{#if item.system.isConsumable}}
-              <a class="item-control item-qty-sub" title='{{localize "HYP3E.item.decr"}}'><i class="fa fa-minus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
-              <a class="item-control item-qty-add" title='{{localize "HYP3E.item.incr"}}'><i class="fa fa-plus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
-            {{/if}}
-            {{item.system.quantity.value}}
-            {{#if item.system.isConsumable}}
-              / {{item.system.quantity.max}}
-            {{/if}}
-          </div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div class="item-summary">
-          <div class="item-description">
-            <div class="contained-items">{{{item.system.description}}}</div>
-          </div>
+          <a class="item-control item-create" title="Create weapon" data-type="weapon">
+            <i class="fas fa-plus"></i> {{localize "HYP3E.weapon.add"}}
+          </a>
         </div>
       </li>
-    {{/if}}
-  {{/each}}
-</ol>
-{{!-- Armors appear here --}}
-<ol class="items-list">
-  <li class="item flexrow items-header">
-    <div class="item-name">{{localize "HYP3E.headers.armor"}}</div>
-    <div class="item-prop">{{localize "HYP3E.headers.type"}}</div>
-    <div class="item-prop">{{localize "HYP3E.armor.ac"}}</div>
-    <div class="item-prop">{{localize "HYP3E.armor.dr"}}</div>
-    <div class="item-prop">{{localize "HYP3E.movement.base.abbrev"}}</div>
-    <div class="item-controls">
-      <a class="item-control item-create" title="Create armor" data-type="armor">
-        <i class="fas fa-plus"></i> {{localize "HYP3E.armor.add"}}
-      </a>
-    </div>
-  </li>
-  {{#each armor as |item id|}}
-    <li class="item-entry item" data-item-id="{{item._id}}">
-      <div class="item-header flexrow">
-        <div class="item-name">
-          <div class="item-image">
-            <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+      {{#each weapons as |item id|}}
+        <li class="item-entry item" data-item-id="{{item._id}}">
+          <div class="item-header flexrow">
+            <div class="item-name">
+              <div class="item-image">
+                <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.attackWith'}} {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+              </div>
+              <a><h4 class="item-drop">{{item.name}}</h4></a>
+            </div>
+            <div class="item-prop">{{item.system.rof}}</div>
+            {{#if item.system.melee}}
+              <div class="item-prop">{{item.system.wc}}</div>
+            {{else}}
+              <div class="item-prop">{{item.system.range.short}}/{{item.system.range.medium}}/{{item.system.range.long}}</div>
+            {{/if}}
+            <div class="item-prop">{{numberFormat item.system.atkMod decimals=0 sign=true}}</div>
+            <div class="item-prop">{{numberFormat item.system.dmgMod decimals=0 sign=true}}</div>
+            <div class="item-prop">{{item.system.damage}}</div>
+            {{!-- <div></div> --}}
+            <div class="item-controls">
+              <a class="item-control item-equip {{#unless item.system.equipped}}item-unequipped{{/unless}}" title='{{localize "HYP3E.item.equip"}}'><i class="fas fa-shirt"></i></a>
+              <a class="item-control item-show" title='{{localize "HYP3E.item.show"}}'><i class="fas fa-eye"></i></a>
+              <a class="item-control item-edit" title="{{localize 'HYP3E.item.edit'}}"><i class="fas fa-edit"></i></a>
+              <a class="item-control item-delete" title="{{localize 'HYP3E.item.delete'}}"><i class="fas fa-trash"></i></a>
+            </div>
           </div>
-          <a><h4 class="item-drop">{{item.name}}</h4></a>
-        </div>
-        <div class="item-prop">{{item.system.type}}</div>
-        <div class="item-prop">{{item.system.ac}}</div>
-        <div class="item-prop">{{item.system.dr}}</div>
-        <div class="item-prop">{{item.system.mv}}</div>
-        {{!-- <div></div> --}}
+          <div class="item-summary">
+            <div class="item-description">
+              <div>{{{item.system.description}}}</div>
+            </div>
+          </div>
+        </li>
+      {{/each}}
+    </ol>
+    {{!-- Ammo appears here --}}
+    <ol class="items-list">
+      <li class="item flexrow items-header">
+        <div class="item-name">{{localize "HYP3E.item.ammunition"}}</div>
+        <div class="item-prop">{{localize "HYP3E.item.qty"}}</div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </li>
+      {{#each items as |item id|}}
+        {{#if item.system.isAmmunition}}
+          <li class="item-entry item" data-item-id="{{item._id}}">
+            <div class="item-header flexrow">
+              <div class="item-name">
+                <div class="item-image">
+                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                </div>
+                <a><h4 class="item-drop">{{item.name}}</h4></a>
+              </div>
+              <div class="item-prop">
+                {{#if item.system.isConsumable}}
+                  <a class="item-control item-qty-sub" title='{{localize "HYP3E.item.decr"}}'><i class="fa fa-minus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                  <a class="item-control item-qty-add" title='{{localize "HYP3E.item.incr"}}'><i class="fa fa-plus-circle" aria-hidden="true"></i></a>&nbsp;&nbsp;
+                {{/if}}
+                {{item.system.quantity.value}}
+                {{#if item.system.isConsumable}}
+                  / {{item.system.quantity.max}}
+                {{/if}}
+              </div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+            <div class="item-summary">
+              <div class="item-description">
+                <div class="contained-items">{{{item.system.description}}}</div>
+              </div>
+            </div>
+          </li>
+        {{/if}}
+      {{/each}}
+    </ol>
+    {{!-- Armors appear here --}}
+    <ol class="items-list">
+      <li class="item flexrow items-header">
+        <div class="item-name">{{localize "HYP3E.headers.armor"}}</div>
+        <div class="item-prop">{{localize "HYP3E.headers.type"}}</div>
+        <div class="item-prop">{{localize "HYP3E.armor.ac"}}</div>
+        <div class="item-prop">{{localize "HYP3E.armor.dr"}}</div>
+        <div class="item-prop">{{localize "HYP3E.movement.base.abbrev"}}</div>
         <div class="item-controls">
-          <a class="item-control item-equip {{#unless item.system.equipped}}item-unequipped{{/unless}}" title='{{localize "HYP3E.item.equip"}}'><i class="fas fa-shirt"></i></a>
-          <a class="item-control item-show" title='{{localize "HYP3E.item.show"}}'><i class="fas fa-eye"></i></a>
-          <a class="item-control item-edit" title="{{localize 'HYP3E.item.edit'}}"><i class="fas fa-edit"></i></a>
-          <a class="item-control item-delete" title="{{localize 'HYP3E.item.delete'}}"><i class="fas fa-trash"></i></a>
+          <a class="item-control item-create" title="Create armor" data-type="armor">
+            <i class="fas fa-plus"></i> {{localize "HYP3E.armor.add"}}
+          </a>
         </div>
-      </div>
-      <div class="item-summary">
-        <div class="item-description">
-          <div>{{{item.system.description}}}</div>
-        </div>
-      </div>
-    </li>
-  {{/each}}
-</ol>
+      </li>
+      {{#each armor as |item id|}}
+        <li class="item-entry item" data-item-id="{{item._id}}">
+          <div class="item-header flexrow">
+            <div class="item-name">
+              <div class="item-image">
+                <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+              </div>
+              <a><h4 class="item-drop">{{item.name}}</h4></a>
+            </div>
+            <div class="item-prop">{{item.system.type}}</div>
+            <div class="item-prop">{{item.system.ac}}</div>
+            <div class="item-prop">{{item.system.dr}}</div>
+            <div class="item-prop">{{item.system.mv}}</div>
+            {{!-- <div></div> --}}
+            <div class="item-controls">
+              <a class="item-control item-equip {{#unless item.system.equipped}}item-unequipped{{/unless}}" title='{{localize "HYP3E.item.equip"}}'><i class="fas fa-shirt"></i></a>
+              <a class="item-control item-show" title='{{localize "HYP3E.item.show"}}'><i class="fas fa-eye"></i></a>
+              <a class="item-control item-edit" title="{{localize 'HYP3E.item.edit'}}"><i class="fas fa-edit"></i></a>
+              <a class="item-control item-delete" title="{{localize 'HYP3E.item.delete'}}"><i class="fas fa-trash"></i></a>
+            </div>
+          </div>
+          <div class="item-summary">
+            <div class="item-description">
+              <div>{{{item.system.description}}}</div>
+            </div>
+          </div>
+        </li>
+      {{/each}}
+    </ol>
+  </section>
+</section>
