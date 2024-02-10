@@ -3,38 +3,42 @@
   {{!-- Sheet Header --}}
   <header class="sheet-header">
     <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
-    <div class="character-header-block">
-      <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Name"/></h1>
-      <div class="character-header-block flexrow">
-        <div class="npc-field align-center">
-          <input type="text" name="system.size" value="{{system.size}}" />
-          <span class="small-label">{{localize 'HYP3E.size'}}</span>
+    <div class="header-block">
+      <div class="character-header-block flexcol">
+        <h1 class="charname">
+          <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+        </h1>
+        <div class="character-header-block flexrow">
+          <div class="npc-field align-center">
+            <input type="text" name="system.size" value="{{system.size}}" />
+            <span class="small-label">{{localize 'HYP3E.size'}}</span>
+          </div>
+          <div class="npc-field align-center">
+            <input type="text" name="system.alignment" value="{{system.alignment}}" />
+            <span class="small-label">{{localize 'HYP3E.alignment'}}</span>
+          </div>
+          <div class="npc-field align-center">
+            <input type="text" name="system.encWild" value="{{system.encWild}}" />
+            <span class="small-label">{{localize 'HYP3E.encWild'}}</span>
+          </div>
+          <div class="npc-field align-center">
+            <input type="text" name="system.encLair" value="{{system.encLair}}" />
+            <span class="small-label">{{localize 'HYP3E.encLair'}}</span>
+          </div>
         </div>
-        <div class="npc-field align-center">
-          <input type="text" name="system.alignment" value="{{system.alignment}}" />
-          <span class="small-label">{{localize 'HYP3E.alignment'}}</span>
-        </div>
-        <div class="npc-field align-center">
-          <input type="text" name="system.encWild" value="{{system.encWild}}" />
-          <span class="small-label">{{localize 'HYP3E.encWild'}}</span>
-        </div>
-        <div class="npc-field align-center">
-          <input type="text" name="system.encLair" value="{{system.encLair}}" />
-          <span class="small-label">{{localize 'HYP3E.encLair'}}</span>
-        </div>
-      </div>
-      <div class="character-header-block flexrow">
-        <div class="npc-field align-center">
-          <input type="text" name="system.morale" value="{{system.morale}}" />
-          <span class="small-label">{{localize 'HYP3E.morale'}}</span>
-        </div>
-        <div class="npc-field align-center">
-          <input type="text" name="system.xp" value="{{system.xp}}" />
-          <span class="small-label">{{localize 'HYP3E.xp'}}</span>
-        </div>
-        <div class="npc-field align-center">
-          <input type="text" name="system.treasure" value="{{system.treasure}}" />
-          <span class="small-label">{{localize 'HYP3E.treasure'}}</span>
+        <div class="character-header-block flexrow">
+          <div class="npc-field align-center">
+            <input type="text" name="system.morale" value="{{system.morale}}" />
+            <span class="small-label">{{localize 'HYP3E.morale'}}</span>
+          </div>
+          <div class="npc-field align-center">
+            <input type="text" name="system.xp" value="{{system.xp}}" />
+            <span class="small-label">{{localize 'HYP3E.xp'}}</span>
+          </div>
+          <div class="npc-field align-center">
+            <input type="text" name="system.treasure" value="{{system.treasure}}" />
+            <span class="small-label">{{localize 'HYP3E.treasure'}}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -59,16 +63,22 @@
     {{!-- Description Tab --}}
     <div class="tab description" data-group="primary" data-tab="description">
       <div class="npc-description-block">
-        <h2>{{localize 'HYP3E.headers.descNotes'}}</h2>
-        {{!-- If you want TinyMCE editors to output inline rolls when rendered, you need to pass the actor's roll data to the rollData property. --}}
-        {{editor system.biography target="system.biography" rollData=rollData button=true owner=owner editable=editable}}
+        <section class="all-content flexrow">
+          <section class="left-gutter">
+            <img src="systems/hyp3e/assets/serpent-spear.png">
+          </section>
+          <section class="main-content">
+            <h2>{{localize 'HYP3E.headers.descNotes'}}</h2>
+            {{!-- If you want TinyMCE editors to output inline rolls when rendered, you need to pass the actor's roll data to the rollData property. --}}
+            {{editor system.biography target="system.biography" rollData=rollData button=true owner=owner editable=editable}}
+          </section>
+        </section>
       </div>
     </div>
 
     {{!-- Active Effects Tab --}}
     <div class="tab effects" data-group="primary" data-tab="effects">
       <div class="flex npc-description-block">
-        <h2>{{localize 'HYP3E.headers.effectsCond'}}</h2>
         {{> "systems/hyp3e/templates/actor/parts/actor-effects.hbs"}}
       </div>
     </div>
