@@ -672,15 +672,32 @@ export class Hyp3eActorSheet extends ActorSheet {
             itemName = item.name
           }
           console.log(`Rolling Item ${itemName}:`, item)
+          // dataset.details = `${item.system.description}`
           // The default for weapons & spells is an attack
-          if (item.type == "weapon" || item.type == "spell") {
+          if (item.type == "weapon") {
             dataset.label = `Attack with ${itemName}...`
+            dataset.roll = item.system.formula
+            // dataset.enableRoll = true
+            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          } else if (item.type == "spell") {
+            dataset.label = `Cast spell ${itemName}...`
+            if (item.system.formula > "") {
+              dataset.roll = item.system.formula
+              // dataset.enableRoll = true
+            } else {
+              dataset.details = `No attack roll required to cast ${itemName}.`
+              // dataset.enableRoll = false
+            }
+            rollResponse = await Hyp3eDice.ShowSpellcastingDialog(dataset);
           } else {  // ==> Neither a weapon nor a spell
             // The default for other item types is a check
             dataset.label = `${itemName} check...`
+            dataset.roll = item.system.formula
+            // dataset.enableRoll = true
+            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           }
-          dataset.roll = item.system.formula
-          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          // dataset.roll = item.system.formula
+          // rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           // Log the dialog response
           // console.log("Dialog response:", rollResponse);
           // Add situational modifier from the dice dialog
@@ -696,6 +713,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         case "check":
           // console.log("Rolling check...");
           label = `${dataset.label}...`
+          // dataset.enableRoll = true
           // Log the dataset before the dialog renders
           // console.log("Dataset:", dataset);
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
@@ -706,6 +724,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         case "attack":
           // console.log("Rolling attack...");
           label = `${dataset.label}`
+          // dataset.enableRoll = true
           // Log the dataset before the dialog renders
           // console.log("Dataset:", dataset);
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
@@ -716,10 +735,11 @@ export class Hyp3eActorSheet extends ActorSheet {
         case "save":
           // console.log("Rolling save...");
           label = `${dataset.label}...`
+          // dataset.enableRoll = true
           if (this.actor.type == "character") {
             // Get the character's saving throw modifiers
             // console.log("Avoidance mod:", this.actor.system.attributes.dex.defMod*-1);
-            dataset.avoidMod = this.actor.system.attributes.dex.defMod*-1;
+            dataset.avoidMod = this.actor.system.attributes.dex.defMod;
             // console.log("Poison mod:", this.actor.system.attributes.con.poisRadMod);
             dataset.poisonMod = this.actor.system.attributes.con.poisRadMod;
             // console.log("Will mod:", this.actor.system.attributes.wis.willMod);
@@ -757,6 +777,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         case "basic":
           // console.log("Rolling basic...");
           label = `${dataset.label}...`
+          // dataset.enableRoll = true
           // Log the dataset before the dialog renders
           // console.log("Dataset:", dataset);
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
@@ -768,6 +789,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           // This should never happen, pretty sure all rolls have a roll-type
           console.log("Rolling default, this should never happen...");
           label = `${dataset.label}...`
+          // dataset.enableRoll = true
           // Log the dataset before the dialog renders
           // console.log("Dataset:", dataset);
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);

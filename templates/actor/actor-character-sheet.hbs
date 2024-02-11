@@ -60,9 +60,9 @@
     <a class="item" data-tab="abilities">{{localize "HYP3E.tabs.abilities"}}</a>
     <a class="item" data-tab="combat">{{localize "HYP3E.tabs.combat"}}</a>
     <a class="item" data-tab="spells">{{localize "HYP3E.tabs.spells"}}</a>
-    <a class="item" data-tab="effects">{{localize "HYP3E.tabs.effects"}}</a>
     <a class="item" data-tab="items">{{localize "HYP3E.tabs.items"}}</a>
     <a class="item" data-tab="description">{{localize "HYP3E.tabs.description"}}</a>
+    <a class="item" data-tab="effects">{{localize "HYP3E.tabs.effects"}}</a>
   </nav>
 
   {{!-- Sheet Body --}}
@@ -86,13 +86,6 @@
       </div>
     </div>
 
-    {{!-- Active Effects Tab --}}
-    <div class="tab effects flexcol" data-group="primary" data-tab="effects">
-      <div class="description-block">
-        {{> "systems/hyp3e/templates/actor/parts/actor-effects.hbs"}}
-      </div>
-    </div>
-
     {{!-- Owned Items Tab --}}
     <div class="tab items" data-group="primary" data-tab="items">
       <div class="description-block">
@@ -105,6 +98,12 @@
       {{> "systems/hyp3e/templates/actor/parts/actor-description.hbs"}}
     </div>
 
+    {{!-- Active Effects Tab --}}
+    <div class="tab effects flexcol" data-group="primary" data-tab="effects">
+      <div class="description-block">
+        {{> "systems/hyp3e/templates/actor/parts/actor-effects.hbs"}}
+      </div>
+    </div>
+
   </section>
 </form>
-

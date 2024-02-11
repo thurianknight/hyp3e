@@ -284,6 +284,7 @@
     "dataLabel": {
       "basicMeleeAtk": "Basic melee attack",
       "attackWith": "Attack with",
+      "castSpell": "Cast spell",
       "hitDieRoll": "Hit Die + CN mod",
       "deathSave": "Save vs. Death/Poison/Radiation",
       "deviceSave": "Save vs. Device",

@@ -1,27 +1,29 @@
 <form>
   <div class="hyp3e roll-dialog">
-    {{#if dataset.rollData.details}}
+    {{#if dataset.details}}
       <div class="roll-details">
-        {{dataset.rollData.details}}
+        {{dataset.details}}
       </div>
     {{/if}}
-    <div class="flexrow form-group">
-      <label class="dialog-label">{{localize "HYP3E.rollFormula"}}</label>
-      <input type="text" name="baseRollFormula" value="{{roll}}" disabled />
-    </div>
-    <div class="flexrow form-group">
-      <label class="dialog-label">{{localize "HYP3E.sitMod"}}</label>
-      <input type="text" name="sitMod" value="" placeholder="{{localize 'HYP3E.rollExample'}}" />
-    </div>
-    <div class="flexrow form-group">
-      <label class="dialog-label">{{localize "HYP3E.rollMode"}}</label>
-      <select name="rollMode">
-        {{#select rollMode}}
-        {{#each rollModes as |label mode|}}
-        <option value="{{mode}}">{{localize label}}</option>
-        {{/each}}
-        {{/select}}
-      </select>
-    </div>
+    {{!-- {{#if dataset.enableRoll}} --}}
+      <div class="flexrow form-group">
+        <label class="dialog-label">{{localize "HYP3E.rollFormula"}}</label>
+        <input type="text" name="baseRollFormula" value="{{roll}}" disabled />
+      </div>
+      <div class="flexrow form-group">
+        <label class="dialog-label">{{localize "HYP3E.sitMod"}}</label>
+        <input type="text" name="sitMod" value="" placeholder="{{localize 'HYP3E.rollExample'}}" />
+      </div>
+      <div class="flexrow form-group">
+        <label class="dialog-label">{{localize "HYP3E.rollMode"}}</label>
+        <select name="rollMode">
+          {{#select rollMode}}
+          {{#each rollModes as |label mode|}}
+          <option value="{{mode}}">{{localize label}}</option>
+          {{/each}}
+          {{/select}}
+        </select>
+      </div>
+    {{!-- {{/if}} --}}
   </div>
 </form>

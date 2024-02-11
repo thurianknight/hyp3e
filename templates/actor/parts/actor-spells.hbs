@@ -17,6 +17,9 @@
         <input type="text" class="spells" name="system.ca" value="{{system.ca}}" data-dtype="Number"/>
       </div>
       <div class="spells-block">
+        <span class="spells-label">{{localize 'HYP3E.dataLabel.spellsPerDay'}}:</span>
+      </div>
+      <div class="spells-block">
         <span class="spells-label">{{localize 'HYP3E.dataLabel.lvl1'}}</span>
         <input type="text" class="spells" name="system.spells.l1" value="{{system.spells.l1}}"/>
       </div>
@@ -62,11 +65,11 @@
             <div class="item-header flexrow">
               <div class="item-name">
                 <div class="item-image">
-                  {{#if item.system.atkRoll}}
-                  <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.attackWith'}} {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
-                  {{else}}
+                  {{!-- {{#if item.system.atkRoll}} --}}
+                  <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.castSpell'}} {{item.name}}"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></a>
+                  {{!-- {{else}}
                   <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-                  {{/if}}
+                  {{/if}} --}}
                 </div>
                 <a><h4 class="item-drop">{{item.name}}</h4></a>
               </div>

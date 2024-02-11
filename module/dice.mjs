@@ -2,7 +2,7 @@ import { HYP3E } from "./helpers/config.mjs";
 
 export class Hyp3eDice {
   /**
-   * Handle roll dialogs
+   * Handle attack and check dialogs
    * @param dataset
    */
   static async ShowBasicRollDialog(dataset) {
@@ -22,7 +22,7 @@ export class Hyp3eDice {
     const dialogHtml = await renderTemplate(template, dialogData)
     // console.log("Dialog HTML:", dialogHtml)
 
-    // Roll dialog for everything except saving throws (for now at least)
+    // Roll dialog for attacks and item or ability checks
     return new Promise((resolve, reject) => {
       const rollDialog = new Dialog({
         title: `${dataset.label}`,
@@ -35,7 +35,6 @@ export class Hyp3eDice {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
               const formDataObj = formData.toObject();
-              // const formDataObj2 = formData.object();
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
               console.log('Form data object:', formDataObj);
@@ -61,8 +60,70 @@ export class Hyp3eDice {
       rollDialog.render(true);
     })
   }
+
   /**
-   * Handle roll dialogs
+   * Handle spellcasting dialog
+   * @param dataset
+   */
+  static async ShowSpellcastingDialog(dataset) {
+    // Get rollMode, if it was set to something other than default
+    let rollMode = game.settings.get("core", "rollMode")
+    if (dataset.rollMode) {
+      rollMode = dataset.rollMode
+    }
+    let dialogData = {
+      roll: dataset.roll,
+      enableRoll: dataset.enableRoll,
+      dataset: dataset,
+      rollModes: CONFIG.Dice.rollModes,
+      rollMode: rollMode
+    }
+    console.log("Roll-dialog Dataset: ", dataset)
+    const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`
+    const dialogHtml = await renderTemplate(template, dialogData)
+    // console.log("Dialog HTML:", dialogHtml)
+
+    // Roll dialog for casting spells
+    return new Promise((resolve, reject) => {
+      const rollDialog = new Dialog({
+        title: `${dataset.label}`,
+        content: dialogHtml,
+        buttons: {
+          roll: {
+            icon: '<i class="fas fa-scroll"></i>',
+            label: "Cast",
+            callback: (html) => {
+              const formElement = html[0].querySelector('form');
+              const formData = new FormDataExtended(formElement);
+              const formDataObj = formData.toObject();
+              // No situational modifier? Set it to 0
+              if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
+              console.log('Form data object:', formDataObj);
+              console.log("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
+              // ui.notifications.info("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
+              resolve(formDataObj)
+            }
+          },
+          cancel: {
+            icon: '<i class="fas fa-times"></i>',
+            label: "Cancel",
+            callback: (html) => {
+              // console.log("Roll canceled!"); 
+              ui.notifications.info("Roll canceled!")
+              reject()
+            }
+          }
+        },
+        default: "roll",
+        render: html => console.log("Register interactivity in the rendered dialog"),
+        close: html => console.log("Dialog closed")
+      });
+      rollDialog.render(true);
+    })
+  }
+  
+  /**
+   * Handle saving throw dialog
    * @param dataset
    */
   static async ShowSaveRollDialog(dataset) {
@@ -90,7 +151,6 @@ export class Hyp3eDice {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
               const formDataObj = formData.toObject();
-              // const formDataObj2 = formData.object();
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
               console.log('Form data object:', formDataObj);
@@ -106,7 +166,6 @@ export class Hyp3eDice {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
               const formDataObj = formData.toObject();
-              // const formDataObj2 = formData.object();
               formDataObj.avoidMod = dataset.avoidMod
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
@@ -123,7 +182,6 @@ export class Hyp3eDice {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
               const formDataObj = formData.toObject();
-              // const formDataObj2 = formData.object();
               formDataObj.poisonMod = dataset.poisonMod
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
@@ -140,7 +198,6 @@ export class Hyp3eDice {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
               const formDataObj = formData.toObject();
-              // const formDataObj2 = formData.object();
               formDataObj.willMod = dataset.willMod
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
