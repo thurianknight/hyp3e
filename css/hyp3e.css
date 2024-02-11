@@ -315,6 +315,7 @@ textarea {
   top: 0px;
   height: 100px;
   margin-right: 10px;
+  border: none;
 }
 .hyp3e .sheet-header .header-block {
   -webkit-box-flex: 1;
