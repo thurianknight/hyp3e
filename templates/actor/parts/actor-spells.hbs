@@ -5,13 +5,40 @@
   <section class="main-content">
     {{!-- Casting ability --}}
     <h2>{{localize 'HYP3E.tabs.spells'}}</h2>
-    <div class="spells-block flexrow flex-group-left">
-      <div class="casting-ability flexrow flex-group-center">
+    {{!-- <div class="spells-block flexrow flex-group-left"> --}}
+    {{!-- <div class="spells-block flexrow"> --}}
+    <div class="flexrow">
+      {{!-- <div class="casting-ability flexrow flex-group-center"> --}}
+      <div class="casting-ability">
         <span class="rollable" data-roll="1d20 + @ca" data-roll-type="basic" data-label="{{localize 'HYP3E.dataLabel.caCheck'}}">
           <label for="system.ca" class="spells-label">{{localize "HYP3E.castingAbility"}}</label> 
           <i class="fas fa-dice-d20"></i>
         </span>
         <input type="text" class="spells" name="system.ca" value="{{system.ca}}" data-dtype="Number"/>
+      </div>
+      <div class="spells-block">
+        <span class="spells-label">{{localize 'HYP3E.dataLabel.lvl1'}}</span>
+        <input type="text" class="spells" name="system.spells.l1" value="{{system.spells.l1}}"/>
+      </div>
+      <div class="spells-block">
+        <span class="spells-label">{{localize 'HYP3E.dataLabel.lvl2'}}</span>
+        <input type="text" class="spells" name="system.spells.l2" value="{{system.spells.l2}}"/>
+      </div>
+      <div class="spells-block">
+        <span class="spells-label">{{localize 'HYP3E.dataLabel.lvl3'}}</span>
+        <input type="text" class="spells" name="system.spells.l3" value="{{system.spells.l3}}"/>
+      </div>
+      <div class="spells-block">
+        <span class="spells-label">{{localize 'HYP3E.dataLabel.lvl4'}}</span>
+        <input type="text" class="spells" name="system.spells.l4" value="{{system.spells.l4}}"/>
+      </div>
+      <div class="spells-block">
+        <span class="spells-label">{{localize 'HYP3E.dataLabel.lvl5'}}</span>
+        <input type="text" class="spells" name="system.spells.l5" value="{{system.spells.l5}}"/>
+      </div>
+      <div class="spells-block">
+        <span class="spells-label">{{localize 'HYP3E.dataLabel.lvl6'}}</span>
+        <input type="text" class="spells" name="system.spells.l6" value="{{system.spells.l6}}"/>
       </div>
     </div>
 

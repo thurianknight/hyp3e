@@ -51,6 +51,20 @@
         "alignment": "",
         "biography": "",
         "knownLanguages": ""
+      },
+      "spellcaster": {
+        "ca": {
+          "value": 0,
+          "temp": 0
+        },
+        "spells": {
+          "l1": "",
+          "l2": "",
+          "l3": "",
+          "l4": "",
+          "l5": "",
+          "l6": ""
+        }
       }
     },
     "character": {
