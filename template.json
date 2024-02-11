@@ -68,7 +68,7 @@
       }
     },
     "character": {
-      "templates": ["base"],
+      "templates": ["base", "spellcaster"],
       "details": {
         "notes": "",
         "class": "",
