@@ -1,4 +1,11 @@
-<h2>{{localize "HYP3E.headers.attributes"}}</h2>
+<div class="abilities flexrow">
+  <h2>
+    {{localize "HYP3E.headers.attributes"}} 
+    <span class="rollable flex" data-roll="" data-roll-type="setAttr" title="Set Attribute Modifiers">
+      <i class="fas fa-book"></i>
+    </span>
+  </h2>
+</div>
 <div class="abilities flexcol">
   <!-- Strength -->
   <div class="attribute-row flexrow flex-group-center">
@@ -106,6 +113,7 @@
         <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl1}}no-bonus{{/unless}}" data-spell-lvl="intLvl1" title='{{localize "HYP3E.dataLabel.bonusLvl1"}}'><i class="fas fa-scroll"></i></a>
         <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl2}}no-bonus{{/unless}}" data-spell-lvl="intLvl2" title='{{localize "HYP3E.dataLabel.bonusLvl2"}}'><i class="fas fa-scroll"></i></a>
         <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl3}}no-bonus{{/unless}}" data-spell-lvl="intLvl3" title='{{localize "HYP3E.dataLabel.bonusLvl3"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl4}}no-bonus{{/unless}}" data-spell-lvl="intLvl4" title='{{localize "HYP3E.dataLabel.bonusLvl4"}}'><i class="fas fa-scroll"></i></a>
       </div>
       <span class="mod-label">{{localize 'HYP3E.attributes.int.bonusSpells'}}</span>
     </div>
@@ -138,6 +146,7 @@
         <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl1}}no-bonus{{/unless}}" data-spell-lvl="wisLvl1" title='{{localize "HYP3E.dataLabel.bonusLvl1"}}'><i class="fas fa-scroll"></i></a>
         <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl2}}no-bonus{{/unless}}" data-spell-lvl="wisLvl2" title='{{localize "HYP3E.dataLabel.bonusLvl2"}}'><i class="fas fa-scroll"></i></a>
         <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl3}}no-bonus{{/unless}}" data-spell-lvl="wisLvl3" title='{{localize "HYP3E.dataLabel.bonusLvl3"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl4}}no-bonus{{/unless}}" data-spell-lvl="wisLvl4" title='{{localize "HYP3E.dataLabel.bonusLvl4"}}'><i class="fas fa-scroll"></i></a>
       </div>
       <span class="mod-label">{{localize 'HYP3E.attributes.wis.bonusSpells'}}</span>
     </div>

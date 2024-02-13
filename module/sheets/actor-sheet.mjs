@@ -313,7 +313,20 @@ export class Hyp3eActorSheet extends ActorSheet {
           }
         })
         break
-      case "wisLvl1":
+        case "intLvl4":
+          result = await this.actor.update({
+            system: {
+              attributes: {
+                int: {
+                  bonusSpells: {
+                    lvl4: !this.actor.system.attributes.int.bonusSpells.lvl4,
+                  }
+                }
+              }
+            }
+          })
+          break
+        case "wisLvl1":
         result = await this.actor.update({
           system: {
             attributes: {
@@ -352,7 +365,20 @@ export class Hyp3eActorSheet extends ActorSheet {
           }
         })
         break
-    }
+        case "wisLvl4":
+          result = await this.actor.update({
+            system: {
+              attributes: {
+                wis: {
+                  bonusSpells: {
+                    lvl4: !this.actor.system.attributes.wis.bonusSpells.lvl4,
+                  }
+                }
+              }
+            }
+          })
+          break
+      }
     // console.log("Actor after update:", result)
   }
 
@@ -785,6 +811,31 @@ export class Hyp3eActorSheet extends ActorSheet {
           rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
           break;
 
+        case "setAttr":
+          // Take the attribute scores and lookup/calculate all modifiers
+          // console.log("Set attribute modifiers...")
+          new Dialog({
+            title: "Confirm set/reset attribute modifiers",
+            content: "Set attribute modifiers? This will replace any values already in place!",
+            buttons: {
+              confirm: {
+                label: "Confirm",
+                icon: `<i class="fas fa-check"></i>`,
+                callback: () => {
+                  ui.notifications.info("Attribute modifiers set!")
+                  // Set/reset all attribute modifiers
+                  this.actor.SetAttributeMods()
+                }
+              },
+              cancel: {
+                label: "Cancel",
+                icon: `<i class="fas fa-times"></i>`,
+                callback: () => {ui.notifications.info("Set attribute modifiers - canceled!")}
+              }
+            }
+          }).render(true);
+          break;
+
         default:
           // This should never happen, pretty sure all rolls have a roll-type
           console.log("Rolling default, this should never happen...");
@@ -799,7 +850,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       }
       
       // Handle non-item rolls that supply the formula directly
-      if (dataset.rollType != "item") {
+      if (dataset.rollType != "item" && dataset.rollType != "setAttr") {
         // Roll the dice!
         let roll = new Roll(rollFormula, this.actor.getRollData())
         // Resolve the roll

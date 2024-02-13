@@ -142,4 +142,334 @@ export class Hyp3eActor extends Actor {
     
   }
 
+  /**
+   * Str attack mods, from -2 to +2.
+   * 
+   * Applied to:
+   * - `str.atkMod`
+   */
+  strAtkMod = {
+    0: -2,
+    3: -2,
+    4: -1,
+    7: 0,
+    15: 1,
+    18: 2,
+  };
+  /**
+   * Str damage mods, from -2 to +3.
+   * 
+   * Applied to:
+   * - `str.dmgMod`
+   */
+  strDmgMod = {
+    0: -2,
+    3: -2,
+    4: -1,
+    9: 0,
+    13: 1,
+    17: 2,
+    18: 3,
+  };
+  /**
+   * Dex attack mods, from -2 to +3.
+   * 
+   * Applied to:
+   * - `dex.atkMod`
+   */
+  dexAtkMod = {
+    0: -2,
+    3: -2,
+    4: -1,
+    9: 0,
+    13: 1,
+    17: 2,
+    18: 3,
+  };
+  /**
+   * Dex defense mods, from -2 to +2.
+   * 
+   * Applied to:
+   * - `dex.defMod`
+   */
+  dexDefMod = {
+    0: -2,
+    3: -2,
+    4: -1,
+    7: 0,
+    15: 1,
+    18: 2,
+  };
+  /**
+   * Con HP mods, from -1 to +3.
+   * 
+   * Applied to:
+   * - `con.hpMod`
+   */
+  conHpMod = {
+    0: -1,
+    3: -1,
+    7: 0,
+    13: 1,
+    17: 2,
+    18: 3,
+  };
+  /**
+   * Con poison mods, from -2 to +2.
+   * 
+   * Applied to:
+   * - `con.poisonMod`
+   */
+  conPoisonMod = {
+    0: -2,
+    3: -2,
+    4: -1,
+    7: 0,
+    15: 1,
+    18: 2,
+  };
+  /**
+   * Con trauma mods, from 0 to 95.
+   * 
+   * Applied to:
+   * - `con.traumaSurvive`
+   */
+  conTraumaSurvive = {
+    0: 0,
+    3: 45,
+    4: 55,
+    7: 65,
+    9: 75,
+    13: 80,
+    15: 85,
+    17: 90,
+    18: 95,
+  };
+  /**
+   * Modifier table for the Test of Attribute (Str, Dex, Con), from 0 to 5.
+   * Applied to:
+   * - `str.test`
+   * - `dex.test`
+   * - `con.test`
+   */
+  testOfAttr = {
+    0: 0,
+    3: 1,
+    7: 2,
+    13: 3,
+    17: 4,
+    18: 5,
+  };
+  /**
+   * Modifier table for the Feat of Attribute (Str, Dex, Con), from 0 to 32.
+   * Applied to:
+   * - `str.fs`
+   * - `dex.fd`
+   * - `con.fc`
+   */
+  featOfAttr = {
+    0: 0,
+    3: 0,
+    4: 1,
+    7: 2,
+    9: 4,
+    13: 8,
+    15: 16,
+    17: 24,
+    18: 32,
+  };
+  /**
+   * Mapping tables for character's spoken languages.
+   * Applied to:
+   * - `int.spoken`
+   */
+  intLanguages = {
+    0: 0,
+    7: 0,
+    13: 1,
+    17: 2,
+    18: 3,
+  };
+  /**
+   * Magician bonus spells per day.
+   * Applied to:
+   * - `int.bonusSpell1`
+  **/
+  bonusSpell1 = {
+    0: false,
+    3: false,
+    13: true,
+  };
+  bonusSpell2 = {
+    0: false,
+    3: false,
+    15: true,
+  };
+  bonusSpell3 = {
+    0: false,
+    3: false,
+    17: true,
+  };
+  bonusSpell4 = {
+    0: false,
+    3: false,
+    18: true,
+  };
+  /**
+   * Magician or Cleric chance to learn new spell.
+   * Applied to:
+   * - `int.learnSpell` and `wis.learnSpell`
+  **/
+  learnSpell = {
+    0: "",
+    3: "",
+    9: 50,
+    13: 65,
+    15: 75,
+    17: 85,
+    18: 95,
+  };
+  /**
+   * Wis willpower mods, from -2 to +2.
+   * 
+   * Applied to:
+   * - `wis.willMod`
+   */
+  wisWillMod = {
+    0: -2,
+    3: -2,
+    4: -1,
+    7: 0,
+    15: 1,
+    18: 2,
+  };
+  /**
+ * Cha reaction mod, from -2 to 2.
+ * 
+ * Applied to:
+ * - `cha.reaction`
+ */
+  chaReactionMod = {
+    0: -3,
+    3: -3,
+    4: -2,
+    7: -1,
+    9: 0,
+    13: 1,
+    17: 2,
+    18: 3,
+  };
+  /**
+   * Cha number of retainers, from 1 to 12.
+   * 
+   * Applied to:
+   * - `cha.retainers`
+   */
+  chaRetainers = {
+    0: 1,
+    3: 1,
+    4: 2,
+    7: 3,
+    9: 4,
+    13: 6,
+    15: 8,
+    17: 10,
+    18: 12,
+  };
+
+  /**
+   * Cha adjustment to turn undead, from -1 to +1.
+   * 
+   * Applied to:
+   * - `cha.turnUndead`
+   */
+  chaTurnUndead = {
+    0: -1,
+    3: -1,
+    7: 0,
+    15: 1,
+  };
+
+  _valueFromTable(table, val) {
+    let output;
+    // console.log("Table:", table, "Value:", val)
+    for (let i = 0; i <= val; i++) {
+      // console.log("Lookup:", table[i])
+      if (table[i] != undefined) {
+        output = table[i];
+      }
+    }
+    return output;
+  }
+
+  /**
+   * Set or reset all attribute modifiers
+   */
+  async SetAttributeMods() {
+    console.log("Setting attribute modifiers...")
+    const data = super.getRollData();
+    // console.log("Actor:", data)
+    if (data.attributes) {
+      for (let [k, v] of Object.entries(data.attributes)) {
+        // data[k] = foundry.utils.deepClone(v);
+        // console.log(`Getting ${k} modifiers...`)
+        switch (k) {
+          case "str":
+            // console.log(`Setting ${k} modifiers...`)
+            data.attributes.str.atkMod = this._valueFromTable(this.strAtkMod, data.attributes.str.value)
+            data.attributes.str.dmgMod = this._valueFromTable(this.strDmgMod, data.attributes.str.value)
+            data.attributes.str.test = this._valueFromTable(this.testOfAttr, data.attributes.str.value)
+            data.attributes.str.feat = this._valueFromTable(this.featOfAttr, data.attributes.str.value)
+            break
+
+          case "dex":
+            // console.log(`Setting ${k} modifiers...`)
+            data.attributes.dex.atkMod = this._valueFromTable(this.dexAtkMod, data.attributes.dex.value)
+            data.attributes.dex.defMod = this._valueFromTable(this.dexDefMod, data.attributes.dex.value)
+            data.attributes.dex.test = this._valueFromTable(this.testOfAttr, data.attributes.dex.value)
+            data.attributes.dex.feat = this._valueFromTable(this.featOfAttr, data.attributes.dex.value)
+            break
+
+          case "con":
+            // console.log(`Setting ${k} modifiers...`)
+            data.attributes.con.hpMod = this._valueFromTable(this.conHpMod, data.attributes.con.value)
+            data.attributes.con.poisRadMod = this._valueFromTable(this.conPoisonMod, data.attributes.con.value)
+            data.attributes.con.traumaSurvive = this._valueFromTable(this.conTraumaSurvive, data.attributes.con.value)
+            data.attributes.con.test = this._valueFromTable(this.testOfAttr, data.attributes.con.value)
+            data.attributes.con.feat = this._valueFromTable(this.featOfAttr, data.attributes.con.value)
+            break
+
+          case "int":
+            // console.log(`Setting ${k} modifiers...`)
+            data.attributes.int.languages = this._valueFromTable(this.intLanguages, data.attributes.int.value)
+            data.attributes.int.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
+            data.attributes.int.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
+            data.attributes.int.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.int.value)
+            data.attributes.int.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.int.value)
+            data.attributes.int.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.int.value)
+            break
+
+          case "wis":
+            // console.log(`Setting ${k} modifiers...`)
+            data.attributes.wis.willMod = this._valueFromTable(this.wisWillMod, data.attributes.wis.value)
+            data.attributes.wis.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
+            data.attributes.wis.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
+            data.attributes.wis.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.wis.value)
+            data.attributes.wis.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.wis.value)
+            data.attributes.wis.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.wis.value)
+            break
+
+          case "cha":
+            // console.log(`Setting ${k} modifiers...`)
+            data.attributes.cha.reaction = this._valueFromTable(this.chaReactionMod, data.attributes.cha.value)
+            data.attributes.cha.maxHenchmen = this._valueFromTable(this.chaRetainers, data.attributes.cha.value)
+            data.attributes.cha.turnUndead = this._valueFromTable(this.chaTurnUndead, data.attributes.cha.value)
+            break
+        }
+        // Apply updates to the actor
+        await this.update({data})
+      }
+    }
+  }
+
 }
