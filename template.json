@@ -144,7 +144,8 @@
           "bonusSpells": {
             "lvl1": false,
             "lvl2": false,
-            "lvl3": false
+            "lvl3": false,
+            "lvl4": false
           },
           "learnSpell": 0
         },
