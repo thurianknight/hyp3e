@@ -40,13 +40,13 @@
     </li>
   {{/each}}
 </ol>
-{{!-- Weapons, armor, and items appear here --}}
+
+{{!-- Natural attacks and weapons appear here --}}
 <ol class="items-list">
   <li class="item flexrow items-header">
-    <div class="item-name">{{localize 'HYP3E.headers.attacksItems'}}</div>
-    <div class="item-prop">{{localize 'HYP3E.item.qty'}}</div>
-    <div class="item-prop">{{localize 'HYP3E.item.weight'}}</div>
-    <div class="item-prop">{{localize 'HYP3E.item.location'}}</div>
+    <div class="item-name">{{localize 'HYP3E.headers.attacksWeapons'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.headers.atkRate'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.headers.damage'}}</div>
     <div class="item-controls">
       <a class="item-control item-create" title="Create item" data-type="weapon">
         <i class="fas fa-plus"></i> {{localize "HYP3E.attack.add"}}
@@ -62,12 +62,8 @@
           </div>
           <a><h4 class="item-drop">{{item.name}}</h4></a>
         </div>
-        <div class="item-prop">{{item.system.quantity.value}}
-          {{#if item.system.quantity.max}}
-            / {{item.system.quantity.max}}
-          {{/if}}</div>
-        <div class="item-prop">{{item.system.weight}}</div>
-        <div class="item-prop">{{item.system.location}}</div>
+        <div class="item-prop">{{item.system.rof}}</div>
+        <div class="item-prop">{{item.system.damage}}</div>
         <div class="item-controls">
           <a class="item-control item-show" title='{{localize "HYP3E.item.show"}}'><i class="fas fa-eye"></i></a>
           <a class="item-control item-edit" title="{{localize 'HYP3E.item.edit'}}"><i class="fas fa-edit"></i></a>
@@ -81,6 +77,21 @@
       </div>
     </li>
   {{/each}}
+</ol>
+
+{{!-- Armor and items appear here --}}
+{{!-- <ol class="items-list">
+  <li class="item flexrow items-header">
+    <div class="item-name">{{localize 'HYP3E.headers.items'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.item.qty'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.item.weight'}}</div>
+    <div class="item-prop">{{localize 'HYP3E.item.location'}}</div>
+    <div class="item-controls">
+      <a class="item-control item-create" title="Create item" data-type="item">
+        <i class="fas fa-plus"></i> {{localize "HYP3E.item.add"}}
+      </a>
+    </div>
+  </li>
   {{#each armor as |item id|}}
       <li class="item-entry item" data-item-id="{{item._id}}">
       <div class="item-header flexrow">
@@ -141,7 +152,7 @@
       </div>
     </li>
   {{/each}}
-</ol>
+</ol> --}}
 
 {{!-- Spells appear here --}}
 {{#if system.ca}}
