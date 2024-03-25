@@ -711,10 +711,6 @@ textarea {
 .hyp3e .contained-items {
   padding-left: 15px;
 }
-/* .item-image:hover .rollable {
-  background-image: url("/icons/svg/d20-black.svg") !important;
-} */
-
 .hyp3e .items-list .item .item-name .item-image {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 30px;
@@ -725,6 +721,9 @@ textarea {
   margin-right: 5px;
   img {
     border: none;
+  }
+  .rollable img:hover {
+    content: url("/icons/svg/d20-black.svg");
   }
 }
 .hyp3e .items-list .item-prop {
