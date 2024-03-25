@@ -225,11 +225,11 @@ export class Hyp3eItem extends Item {
     console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`)
     if (naturalRoll == 20) {
       console.log("Natural 20 always crit hits!")
-      label += `<br /><span style='color:#2ECC71'><b>critical hit!</b></span>`
+      label += `<br /><span style='color:#00b34c'><b>critical hit!</b></span>`
       hit = true
     } else if (naturalRoll == 1) {
       console.log("Natural 1 always crit misses!")
-      label += "<br /><span style='color:#E90000'><i>critical miss!</i></span>"
+      label += "<br /><span style='color:#e90000'><i>critical miss!</i></span>"
     } else if (atkRoll.total >= tn) {
       console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`)
       if (targetName != "") {
