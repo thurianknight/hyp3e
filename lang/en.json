@@ -1,6 +1,8 @@
 {
   "HYP3E": {
     "settings": {
+      "debugMessages": "Debug Messages",
+      "debugMessagesHint": "Enable additional debug logging and messages.",
       "languages": "Languages",
       "languagesHint": "Known/available languages in Hyperborea.",
       "characterClasses": "Character Classes",
@@ -37,6 +39,7 @@
       "atkMod": "Atk Mod",
       "dmgMod": "Dmg Mod",
       "damage": "Damage",
+      "weaponMastery": "Weapon Mastery",
       "type": "Type",
       "biography": "Biography",
       "descNotes": "Description & Notes",
@@ -249,7 +252,9 @@
         "missile": "Missile"
       },
       "range": "Range",
-      "atkType": "Atk Type"
+      "atkType": "Atk Type",
+      "master": "Master",
+      "grandMaster": "Grandmaster"
     },
     "armor": {
       "add": "Add Armor",

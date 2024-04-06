@@ -23,6 +23,15 @@ Hooks.once('init', async function() {
   };
 
   // Register system settings
+  // Debug logging & messages
+  game.settings.register(game.system.id, "debugMessages", {
+    name: game.i18n.localize("HYP3E.settings.debugMessages"),
+    hint: game.i18n.localize("HYP3E.settings.debugMessagesHint"),
+    default: false,
+    scope: "world",
+    type: Boolean,
+    config: true,
+  });
   // Languages
   game.settings.register(game.system.id, "languages", {
     name: game.i18n.localize("HYP3E.settings.languages"),
@@ -112,6 +121,9 @@ Hooks.once("ready", async function() {
   /**
    * Load system settings
    */
+  const debugMessages = game.settings.get(game.system.id, "debugMessages");
+  CONFIG.HYP3E.debugMessages = debugMessages;
+
   const languages = game.settings.get(game.system.id, "languages");
   if (languages != "") {
     const langArray = languages.split(",");

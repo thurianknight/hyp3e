@@ -79,6 +79,7 @@ export class Hyp3eItem extends Item {
           itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
         }
       }
+
     } else { // ==> Anything NOT a weapon...
       // For non-weapons, is the Attack Roll checkbox selected?
       if (itemData.system.atkRoll) {
@@ -188,6 +189,10 @@ export class Hyp3eItem extends Item {
     let damageRoll = ""
     let targetAc = 9
     let targetName = ""
+    let mastery = "Attack"
+    let masterMod = "0"
+    let debugAtkRollFormula = ""
+    let debugDmgRollFormula = ""
 
     // Has the user targeted a token? If so, get it's AC and name
     let userTargets = Array.from(game.user.targets)
@@ -198,14 +203,24 @@ export class Hyp3eItem extends Item {
       targetName = primaryTargetData.name
     }
 
-    // Setup chat card label based on whether we have a target
-    if (targetName != "") {
-      label = `Attack with ${itemName} vs. ${targetName}...`
-    } else {
-      label = `Attack with ${itemName}...`
+    // Check if the item has Master or Grandmaster flags set
+    if (item.system.wpnGrandmaster) {
+      mastery = "Grandmaster attack"
+      masterMod = "2"
+    } else if (item.system.wpnMaster) {
+      mastery = "Master attack"
+      masterMod = "1"
     }
 
-    rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
+    // Setup chat card label based on whether we have a target
+    if (targetName != "") {
+      label = `${mastery} with ${itemName} vs. ${targetName}...`
+    } else {
+      label = `${mastery} with ${itemName}...`
+    }
+
+    if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${rollData.item.formula} + masteryMod + sitMod` }
+    rollFormula = `${rollData.item.formula} + ${masterMod} + ${rollData.item.sitMod}`
 
     console.log("Roll formula:", rollFormula)
     // Invoke the attack roll
@@ -250,11 +265,15 @@ export class Hyp3eItem extends Item {
     // If the attack hit, we roll damage automatically and include it in the chat message
     if (hit && rollData.item.damage) {
       if (rollData.item.melee) {
-        dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod`
+        dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod + ${masterMod}`
+        if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @str.dmgMod + @item.dmgMod + masteryMod` }
       } else if (rollData.item.missile) {
-        dmgFormula = `${rollData.item.damage} + @item.dmgMod`
+        dmgFormula = `${rollData.item.damage} + @item.dmgMod + ${masterMod}`
+        if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @item.dmgMod + masteryMod` }
       } else {
-        dmgFormula = `${rollData.item.damage}`
+        // This should never happen
+        dmgFormula = `${rollData.item.damage} + ${masterMod}`
+        if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + masteryMod` }
       }
       console.log("Damage formula:", dmgFormula)
 
@@ -271,6 +290,7 @@ export class Hyp3eItem extends Item {
           <div class="dice-result">
             <div class="dice-formula">${dmgRoll.formula}</div>
             <div class="dice-tooltip">
+              ${debugDmgRollFormula}
               <section class="tooltip-part">
                 <div class="dice">`
       // Add dice-roll summaries to the chat card
@@ -314,6 +334,7 @@ export class Hyp3eItem extends Item {
           <div class="dice-formula">${atkRoll.formula}</div>
           <div class="dice-tooltip">
             <section class="tooltip-part">
+              ${debugAtkRollFormula}
               <div class="dice">
                 <header class="part-header flexrow">
                   <span class="part-formula">${dieType}</span>

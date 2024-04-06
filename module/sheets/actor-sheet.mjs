@@ -701,7 +701,13 @@ export class Hyp3eActorSheet extends ActorSheet {
           // dataset.details = `${item.system.description}`
           // The default for weapons & spells is an attack
           if (item.type == "weapon") {
-            dataset.label = `Attack with ${itemName}...`
+            let mastery = "Attack"
+            if (item.system.wpnGrandmaster) {
+              mastery = "Grandmaster attack"
+            } else if (item.system.wpnMaster) {
+              mastery = "Master attack"
+            }
+            dataset.label = `${mastery} with ${itemName}...`
             dataset.roll = item.system.formula
             // dataset.enableRoll = true
             rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
