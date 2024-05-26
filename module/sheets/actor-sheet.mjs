@@ -171,6 +171,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         }
       }
     }
+    encumbrance = Math.round(encumbrance * 10)/10
     console.log(`Total weight carried: ${encumbrance} pounds`)
 
     // Assign and return
