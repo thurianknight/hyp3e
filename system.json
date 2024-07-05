@@ -2,7 +2,7 @@
   "id": "hyp3e",
   "title": "Hyperborea 3rd Edition",
   "description": "The Hyperborea 3rd Edition system for FoundryVTT!",
-  "version": "0.9.21",
+  "version": "0.9.22",
   "compatibility": {
     "minimum": 11,
     "verified": "11.315",
@@ -22,8 +22,6 @@
       "path": "lang/en.json"
     }
   ],
-  "gridDistance": 5,
-  "gridUnits": "ft",
   "grid": {
     "distance": 5,
     "units": "ft"

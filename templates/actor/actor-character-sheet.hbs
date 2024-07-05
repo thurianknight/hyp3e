@@ -12,12 +12,8 @@
           <div class="flexrow flex-group-center">
             <label class="header-label align-left">{{localize "HYP3E.details.class"}}</label>
             <select name="system.details.class">
-              {{#select system.details.class}}
-              <option value=""></option>
-              {{#each characterClasses as |class c|}}
-              <option value="{{class}}">{{class}}</option>
-              {{/each}}
-              {{/select}}
+              {{!-- <option value=""></option> --}}
+              {{selectOptions characterClasses selected=system.details.class localize=false}}
             </select>
             <span></span>
           </div>

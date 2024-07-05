@@ -226,7 +226,7 @@ export class Hyp3eItem extends Item {
     // Invoke the attack roll
     const atkRoll = new Roll(rollFormula, rollData);
     // Resolve the roll
-    let result = await atkRoll.roll({async: true});
+    let result = await atkRoll.roll();
     console.log("Roll result: ", result)
 
     // Get the resulting values from the attack roll
@@ -280,7 +280,7 @@ export class Hyp3eItem extends Item {
       // Invoke the damage roll
       const dmgRoll = new Roll(dmgFormula, rollData);
       // Resolve the roll
-      let result = await dmgRoll.roll({async: true});
+      let result = await dmgRoll.roll();
       console.log("Damage result: ", dmgRoll)
 
       // Render the damage-roll chat card
@@ -419,7 +419,7 @@ export class Hyp3eItem extends Item {
     // Invoke the roll and submit it to chat.
     const roll = new Roll(rollFormula, rollData);
     // Resolve the roll
-    let result = await roll.roll({async: true});
+    let result = await roll.roll();
     console.log("Roll result: ", roll)
 
     // Determine success or failure if we have a target number

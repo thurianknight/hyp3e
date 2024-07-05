@@ -6,7 +6,7 @@ export class Hyp3eItemSheet extends ItemSheet {
 
   /** @override */
   static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["hyp3e", "sheet", "item"],
       width: 520,
       height: 500,

@@ -9,7 +9,7 @@ export class Hyp3eActorSheet extends ActorSheet {
 
   /** @override */
   static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["hyp3e", "sheet", "actor"],
       width: 800,
       height: 700,
@@ -99,14 +99,14 @@ export class Hyp3eActorSheet extends ActorSheet {
     }
 
     // Character classes and languages are global system settings
-    context.characterClasses = CONFIG.HYP3E.characterClasses
-    // console.log("Actor sheet class list:", context.characterClasses)
-    context.languages = CONFIG.HYP3E.languages
+    context.characterClasses = {...CONFIG.HYP3E.characterClasses}
+    console.log("Actor sheet class list:", context.characterClasses)
+    context.languages = {...CONFIG.HYP3E.languages}
     // console.log("Actor sheet languages:", context.languages)
 
     // System-defined roll modes
     context.rollModes = CONFIG.Dice.rollModes
-    // console.log("Dice-roll modes:", context.rollModes)
+    console.log("Dice-roll modes:", context.rollModes)
 
   }
 
@@ -861,7 +861,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         // Roll the dice!
         let roll = new Roll(rollFormula, this.actor.getRollData())
         // Resolve the roll
-        let result = await roll.evaluate()
+        let result = await roll.roll()
         console.log("Roll result: ", result)
 
         // Determine success or failure if we have a target number

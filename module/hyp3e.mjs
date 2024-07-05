@@ -145,7 +145,7 @@ Hooks.once("ready", async function() {
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
     const NEEDS_MIGRATION_TO_VERSION = "0.9.5"
-    const needsMigration = !currentVersion || isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
+    const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
       migrateWorld()
     }
