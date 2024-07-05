@@ -34,12 +34,12 @@ export class Hyp3eDice {
             callback: (html) => {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
-              const formDataObj = formData.toObject();
+              const formDataObj = formData.object;
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
               console.log('Form data object:', formDataObj);
               console.log("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-              // ui.notifications.info("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
+              // // ui.notifications.info("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
               resolve(formDataObj)
             }
           },
@@ -95,7 +95,7 @@ export class Hyp3eDice {
             callback: (html) => {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
-              const formDataObj = formData.toObject();
+              const formDataObj = formData.object;
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
               console.log('Form data object:', formDataObj);
@@ -150,7 +150,7 @@ export class Hyp3eDice {
             callback: (html) => {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
-              const formDataObj = formData.toObject();
+              const formDataObj = formData.object;
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
               console.log('Form data object:', formDataObj);
@@ -165,7 +165,7 @@ export class Hyp3eDice {
             callback: (html) => {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
-              const formDataObj = formData.toObject();
+              const formDataObj = formData.object;
               formDataObj.avoidMod = dataset.avoidMod
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
@@ -181,7 +181,7 @@ export class Hyp3eDice {
             callback: (html) => {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
-              const formDataObj = formData.toObject();
+              const formDataObj = formData.object;
               formDataObj.poisonMod = dataset.poisonMod
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
@@ -197,7 +197,7 @@ export class Hyp3eDice {
             callback: (html) => {
               const formElement = html[0].querySelector('form');
               const formData = new FormDataExtended(formElement);
-              const formDataObj = formData.toObject();
+              const formDataObj = formData.object;
               formDataObj.willMod = dataset.willMod
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
