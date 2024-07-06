@@ -60,7 +60,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     context.effects = prepareActiveEffectCategories(this.actor.effects);
 
     // Log the actor's data
-    console.log("Actor:", context)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor:", context) }
 
     return context;
   }
@@ -77,36 +77,37 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Handle attribute scores
     for (let [k, v] of Object.entries(context.system.attributes)) {
       v.label = game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[k]) ?? k;
-      // console.log("Attributes:", k, v, v.label)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
     }
 
     // Handle exploration skills
     for (let [k, v] of Object.entries(context.system.explorationSkills)) {
       v.label = game.i18n.localize(CONFIG.HYP3E.explorationSkills[k]) ?? k;
-      // console.log("Exploration Skills:", k, v, v.label)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Exploration Skills:", k, v, v.label) }
     }
 
     // Handle movement types
     for (let [k, v] of Object.entries(context.system.movement)) {
       v.label = game.i18n.localize(CONFIG.HYP3E.movement[k]) ?? k;
-      // console.log("Movement Types:", k, v, v.label)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Movement Types:", k, v, v.label) }
     }
 
     // Handle money types
     for (let [k, v] of Object.entries(context.system.money)) {
       v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
-      // console.log("Money Types:", k, v, v.label)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Money Types:", k, v, v.label) }
     }
 
     // Character classes and languages are global system settings
-    context.characterClasses = {...CONFIG.HYP3E.characterClasses}
-    console.log("Actor sheet class list:", context.characterClasses)
-    context.languages = {...CONFIG.HYP3E.languages}
-    // console.log("Actor sheet languages:", context.languages)
+    context.characterClasses = CONFIG.HYP3E.characterClasses
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet class list:", context.characterClasses) }
+
+    context.languages = CONFIG.HYP3E.languages
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet languages:", context.languages) }
 
     // System-defined roll modes
     context.rollModes = CONFIG.Dice.rollModes
-    console.log("Dice-roll modes:", context.rollModes)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Dice-roll modes:", context.rollModes) }
 
   }
 
@@ -138,7 +139,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     for (let i of context.items) {
       i.img = i.img || DEFAULT_TOKEN;
       // Calculate total weight carried by character
-      // console.log("Item carried:", i)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
       if (i.system.weight) {
         encumbrance += i.system.weight
       }
@@ -172,7 +173,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       }
     }
     encumbrance = Math.round(encumbrance * 10)/10
-    console.log(`Total weight carried: ${encumbrance} pounds`)
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Total weight carried: ${encumbrance} pounds`) }
 
     // Assign and return
     context.encumbrance = encumbrance;
@@ -380,7 +381,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           })
           break
       }
-    // console.log("Actor after update:", result)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", result) }
   }
 
   /**
@@ -392,7 +393,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
     if (item.system.quantity.value > 0) {
-      console.log("Decrement item:", item)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Decrement item:", item) }
       // Update the item object
       await item.update({
         system: {
@@ -417,7 +418,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
     if (item.system.quantity.value < item.system.quantity.max) {
-      console.log("Increment item:", item)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Increment item:", item) }
       // Update the item object
       await item.update({
         system: {
@@ -505,7 +506,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Chat message header text
     const label = `<h3>${typeLabel}: ${itemName}</h3>`
     
-    // console.log("Item clicked:", item)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Item clicked:", item) }
     let content = item.system.description
 
     // Setup clickable buttons for item properties if they have a roll macro,
@@ -597,20 +598,20 @@ export class Hyp3eActorSheet extends ActorSheet {
   }
 
   _onSortItem(event, itemData) {
-    console.log("Sort Item Event:", event)
-    console.log("Sort Item Data:", itemData)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Event:", event) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Data:", itemData) }
 
     // Get the drag source and drop target
     const items = this.actor.items;
     const source = items.get(itemData._id);
-    console.log("Sort Item Source:", source)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Source:", source) }
 
     const dropTarget = event.target.closest("[data-item-id]");
     if ( !dropTarget ) return;
-    // console.log("Drop Target:", dropTarget)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Drop Target:", dropTarget) }
 
     const target = items.get(dropTarget.dataset.itemId);
-    console.log("Sort Item Target:", target)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Target:", target) }
 
     // Don't sort on yourself
     if ( source.id === target.id ) return;
@@ -622,7 +623,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     if ( (target?.type === "container") ) {
       // One container cannot hold another container
       if (source.type == 'container') { 
-        console.log(`Cannot move container (${source.name}) into another container (${target.name})!`)
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot move container (${source.name}) into another container (${target.name})!`) }
         return 
       }
 
@@ -654,11 +655,11 @@ export class Hyp3eActorSheet extends ActorSheet {
     let label = ""
 
     // Log the element
-    console.log("Clicked element: ", element)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Clicked element: ", element) }
     // Log the element dataset
-    console.log("Element dataset: ", dataset)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Element dataset: ", dataset) }
     // Log the actor
-    console.log("Current Actor:", this.actor)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Current Actor:", this.actor) }
 
     // How many different roll types do we have?
     //  Test of Attribute: d6 roll-under target
@@ -684,7 +685,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     //    Formulas can be built into spell => item sheet of type "spell"
     try {
       // What is our roll type?
-      console.log("Roll Type:", dataset.rollType)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Roll Type:", dataset.rollType) }
       let rollFormula
       let rollResponse
 
@@ -698,7 +699,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           } else {
             itemName = item.name
           }
-          console.log(`Rolling Item ${itemName}:`, item)
+          if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling Item ${itemName}:`, item) }
           // dataset.details = `${item.system.description}`
           // The default for weapons & spells is an attack
           if (item.type == "weapon") {
@@ -744,29 +745,29 @@ export class Hyp3eActorSheet extends ActorSheet {
           break
   
         case "check":
-          // console.log("Rolling check...");
+          if (CONFIG.HYP3E.debugMessages) { console.log("Rolling check...") }
           label = `${dataset.label}...`
           // dataset.enableRoll = true
           // Log the dataset before the dialog renders
-          // console.log("Dataset:", dataset);
+          if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           // Add situational modifier from the dice dialog
           rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
           break;
 
         case "attack":
-          // console.log("Rolling attack...");
+          if (CONFIG.HYP3E.debugMessages) { console.log("Rolling attack...") }
           label = `${dataset.label}`
           // dataset.enableRoll = true
           // Log the dataset before the dialog renders
-          // console.log("Dataset:", dataset);
+          if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           // Add situational modifier from the dice dialog
           rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
           break;
 
         case "save":
-          // console.log("Rolling save...");
+          if (CONFIG.HYP3E.debugMessages) { console.log("Rolling save...") }
           label = `${dataset.label}...`
           // dataset.enableRoll = true
           if (this.actor.type == "character") {
@@ -778,7 +779,7 @@ export class Hyp3eActorSheet extends ActorSheet {
             // console.log("Will mod:", this.actor.system.attributes.wis.willMod);
             dataset.willMod = this.actor.system.attributes.wis.willMod;
             // Log the dataset before the dialog renders
-            // console.log("Dataset:", dataset);
+            if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
             rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset);
             // console.log("Dialog response:", rollResponse);
             // Get saving throw modifer if one was selected
@@ -800,7 +801,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           } else {
             // NPC/monster save, no mods
             // Log the dataset before the dialog renders
-            // console.log("Dataset:", dataset);
+            if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
             rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
             // Add situational modifier from the dice dialog
             rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
@@ -808,11 +809,11 @@ export class Hyp3eActorSheet extends ActorSheet {
           break;
 
         case "basic":
-          // console.log("Rolling basic...");
+          if (CONFIG.HYP3E.debugMessages) { console.log("Rolling basic...") }
           label = `${dataset.label}...`
           // dataset.enableRoll = true
           // Log the dataset before the dialog renders
-          // console.log("Dataset:", dataset);
+          if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           // Add situational modifier from the dice dialog
           rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
@@ -849,7 +850,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           label = `${dataset.label}...`
           // dataset.enableRoll = true
           // Log the dataset before the dialog renders
-          // console.log("Dataset:", dataset);
+          console.log("Dataset:", dataset);
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           // Add situational modifier from the dice dialog
           rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
@@ -862,26 +863,26 @@ export class Hyp3eActorSheet extends ActorSheet {
         let roll = new Roll(rollFormula, this.actor.getRollData())
         // Resolve the roll
         let result = await roll.roll()
-        console.log("Roll result: ", result)
+        if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
 
         // Determine success or failure if we have a target number
         if (dataset.rollTarget != '' && dataset.rollTarget != undefined) {
           // Attribute, skill and other checks are roll-under for success
           if (dataset.rollType == "check" || dataset.rollType == "basic") {
             if(roll.total <= dataset.rollTarget) {
-              console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!")
+              if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
               label += "<br /><b>Success</b>!"
             } else {
-              console.log(roll.total + " is greater than " + dataset.rollTarget + "!")
+              if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + dataset.rollTarget + "!") }
               label += "<br /><i>Fail</i>."
             }
           // Saves are roll-over for success
           } else if (dataset.rollType == "save") {
             if(roll.total >= dataset.rollTarget) {
-              console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!")
+              if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!") }
               label += "<br /><b>Success</b>!"
             } else {
-              console.log(roll.total + " is less than " + dataset.rollTarget + "!")
+              if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than " + dataset.rollTarget + "!") }
               label += "<br /><i>Fail</i>."
             }
           // Attacks trigger here if there is a target token selected
@@ -918,7 +919,7 @@ export class Hyp3eActorSheet extends ActorSheet {
 
             // Has the user targeted a token? If so, get it's AC and name
             let userTargets = Array.from(game.user.targets)
-            console.log("Target Actor Data:", userTargets)
+            if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
             if (userTargets.length > 0) {
               let primaryTargetData = userTargets[0].actor
               targetAc = primaryTargetData.system.ac.value
@@ -935,16 +936,16 @@ export class Hyp3eActorSheet extends ActorSheet {
             // Determine hit or miss based on target AC
             let hit = false
             let tn = 20 - targetAc
-            console.log(`Attack roll ${roll.total} hits AC [20 - ${roll.total} => ] ${eval(20 - roll.total)}`)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${roll.total} hits AC [20 - ${roll.total} => ] ${eval(20 - roll.total)}`) }
             if (naturalRoll == 20) {
-              console.log("Natural 20 always crit hits!")
+              if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
               label += `<br /><span style='color:#00b34c'><b>critical hit!</b></span>`
               hit = true
             } else if (naturalRoll == 1) {
-              console.log("Natural 1 always crit misses!")
+              if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
               label += "<br /><span style='color:#e90000'><i>critical miss!</i></span>"
             } else if (roll.total >= tn) {
-              console.log(`Hit! Attack roll ${roll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`)
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${roll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
               if (targetName != "") {
                 label += `<br /><b>hit!</b>`
               } else {
@@ -952,7 +953,7 @@ export class Hyp3eActorSheet extends ActorSheet {
               }
               hit = true
             } else {
-              console.log(`Miss! Attack roll ${roll.total} is less than [20 - ${targetAc} => ] ${tn}.`)
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${roll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
               if (targetName != "") {
                 label += `<br /><i>miss.</i>`
               } else {

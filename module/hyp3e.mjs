@@ -126,17 +126,17 @@ Hooks.once("ready", async function() {
 
   const languages = game.settings.get(game.system.id, "languages");
   if (languages != "") {
+    CONFIG.HYP3E.languages = {}
     const langArray = languages.split(",");
-    langArray.forEach((l, i) => (langArray[i] = l.trim()));
-    CONFIG.HYP3E.languages = langArray;
-    // console.log("CONFIG Languages:", CONFIG.HYP3E.languages)
+    langArray.forEach((l, i) => (CONFIG.HYP3E.languages[l.trim()] = l.trim()));
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Languages:", CONFIG.HYP3E.languages) }
   }
   const characterClasses = game.settings.get(game.system.id, "characterClasses");
   if (characterClasses != "") {
+    CONFIG.HYP3E.characterClasses = {}
     const classArray = characterClasses.split(",");
-    classArray.forEach((l, i) => (classArray[i] = l.trim()));
-    CONFIG.HYP3E.characterClasses = classArray;
-    // console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses)
+    classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
   }
 
   // If we need to do a system migration,  do it after the other settings are loaded
