@@ -67,26 +67,27 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Handle weapon types
     if (context.item.type == 'weapon') {
+      context.weaponTypes = CONFIG.HYP3E.weaponTypes
+      if (CONFIG.HYP3E.debugMessages) { console.log("Item sheet weapon types:", context.weaponTypes) }
       // for (let [k, v] of Object.entries(context.item.system.types)) {
       //   console.log(v, game.i18n.localize(CONFIG.HYP3E.weaponTypes[v]))
       //   // v.label = game.i18n.localize(CONFIG.HYP3E.weaponTypes[v]) ?? v;
       // }
     }
+
     // Handle armor types
     if (context.item.type == 'armor') {
+      context.armorTypes = CONFIG.HYP3E.armorTypes
+      if (CONFIG.HYP3E.debugMessages) { console.log("Item sheet armor types:", context.armorTypes) }
       // for (let [k, v] of Object.entries(context.item.system.types)) {
       //   console.log("Armor Types:", v, game.i18n.localize(CONFIG.HYP3E.armorTypes[v]))
       //   // v.label = game.i18n.localize(CONFIG.HYP3E.armorTypes[v]) ?? v;
       // }
     }
 
-    // Handle saving throws for spells
-    if (context.item.type == 'spell') {
-      // for (let [k, v] of Object.entries(context.item.system.saves)) {
-      //   console.log(v, game.i18n.localize(CONFIG.HYP3E.saves[v]))
-      //   // v.label = game.i18n.localize(CONFIG.HYP3E.saves[v]) ?? v;
-      // }
-    }
+    // Handle saving throws for any item types
+    context.saveThrows = CONFIG.HYP3E.saves
+    if (CONFIG.HYP3E.debugMessages) { console.log("Item sheet saves:", context.saveThrows) }
     
   }
   

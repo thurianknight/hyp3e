@@ -169,16 +169,20 @@
       },
       "explorationSkills": {
         "listen": {
-          "value": 1
+          "value": 1,
+          "rollMode": "blindroll"
         },
         "pickLock": {
-          "value": 1
+          "value": 1,
+          "rollMode": "publicroll"
         },
         "secretDoor": {
-          "value": 2
+          "value": 2,
+          "rollMode": "blindroll"
         },
         "findTrap": {
-          "value": 1
+          "value": 1,
+          "rollMode": "blindroll"
         }
       }
     },
@@ -214,7 +218,6 @@
         "containerId": ""
       },
       "rollable": {
-        "saves": ["death", "transformation", "device", "avoidance", "sorcery"],
         "atkRoll": false,
         "tn": "",
         "save": "",
@@ -225,7 +228,6 @@
     },
     "armor": {
       "templates": ["base", "physical", "equippable"],
-      "types": ["unarmored", "light", "medium", "heavy", "shield"],
       "type": "unarmored",
       "ac": 9,
       "dr": 0,
@@ -261,7 +263,6 @@
     },
     "weapon": {
       "templates": ["base", "physical", "equippable", "rollable"],
-      "types": ["melee", "missile"],
       "type": "melee",
       "melee": true,
       "missile": false,

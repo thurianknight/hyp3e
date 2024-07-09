@@ -39,7 +39,7 @@ export class Hyp3eDice {
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
               console.log('Form data object:', formDataObj);
               console.log("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-              // // ui.notifications.info("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
+              // ui.notifications.info("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
               resolve(formDataObj)
             }
           },
@@ -47,8 +47,8 @@ export class Hyp3eDice {
             icon: '<i class="fas fa-times"></i>',
             label: "Cancel",
             callback: (html) => {
-              // console.log("Roll canceled!"); 
-              ui.notifications.info("Roll canceled!")
+              console.log("Roll canceled!"); 
+              // ui.notifications.info("Roll canceled!")
               reject()
             }
           }
@@ -108,8 +108,8 @@ export class Hyp3eDice {
             icon: '<i class="fas fa-times"></i>',
             label: "Cancel",
             callback: (html) => {
-              // console.log("Roll canceled!"); 
-              ui.notifications.info("Roll canceled!")
+              console.log("Roll canceled!"); 
+              // ui.notifications.info("Roll canceled!")
               reject()
             }
           }

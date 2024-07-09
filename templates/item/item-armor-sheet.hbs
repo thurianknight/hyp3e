@@ -42,12 +42,13 @@
           <label class="resource-label">{{localize 'HYP3E.armor.wtClass'}}</label>
           <div class="form-fields">
             <select name="system.type">
-              {{#select system.type}}
+              {{!-- {{#select system.type}} --}}
               <option value=""></option>
-              {{#each system.types as |armor a|}}
+              {{selectOptions armorTypes selected=system.type localize=true}}
+              {{!-- {{#each system.types as |armor a|}}
               <option value="{{armor}}">{{localize armor}}</option>
               {{/each}}
-              {{/select}}
+              {{/select}} --}}
             </select>
           </div>
           <label class="resource-label">{{localize 'HYP3E.armor.armorClass'}}</label>

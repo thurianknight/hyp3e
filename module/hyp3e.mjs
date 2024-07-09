@@ -124,6 +124,7 @@ Hooks.once("ready", async function() {
   const debugMessages = game.settings.get(game.system.id, "debugMessages");
   CONFIG.HYP3E.debugMessages = debugMessages;
 
+  // Load language list
   const languages = game.settings.get(game.system.id, "languages");
   if (languages != "") {
     CONFIG.HYP3E.languages = {}
@@ -131,12 +132,38 @@ Hooks.once("ready", async function() {
     langArray.forEach((l, i) => (CONFIG.HYP3E.languages[l.trim()] = l.trim()));
     if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Languages:", CONFIG.HYP3E.languages) }
   }
+
+  // Load class list
   const characterClasses = game.settings.get(game.system.id, "characterClasses");
   if (characterClasses != "") {
     CONFIG.HYP3E.characterClasses = {}
     const classArray = characterClasses.split(",");
     classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
     if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
+  }
+
+  // Load saving throws
+  if (CONFIG.HYP3E.saves) {
+    for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {
+      CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
+    }
+    console.log("CONFIG Saves:", CONFIG.HYP3E.saves)
+  }
+
+  // Load weapon types
+  if (CONFIG.HYP3E.weaponTypes) { 
+    for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponTypes)) {
+      CONFIG.HYP3E.weaponTypes[k] = game.i18n.localize(CONFIG.HYP3E.weaponTypes[k])
+    }
+    console.log("CONFIG Weapon Types:", CONFIG.HYP3E.weaponTypes)
+  }
+  
+  // Load armor types
+  if (CONFIG.HYP3E.armorTypes) { 
+    for (let [k, v] of Object.entries(CONFIG.HYP3E.armorTypes)) {
+      CONFIG.HYP3E.armorTypes[k] = game.i18n.localize(CONFIG.HYP3E.armorTypes[k])
+    }
+    console.log("CONFIG Armor Types:", CONFIG.HYP3E.armorTypes)
   }
 
   // If we need to do a system migration,  do it after the other settings are loaded
