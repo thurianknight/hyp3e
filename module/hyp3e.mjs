@@ -142,6 +142,14 @@ Hooks.once("ready", async function() {
     if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
   }
 
+  // Load blind roll options
+  if (CONFIG.HYP3E.blindRollOpts) {
+    for (let [k, v] of Object.entries(CONFIG.HYP3E.blindRollOpts)) {
+      CONFIG.HYP3E.blindRollOpts[k] = game.i18n.localize(CONFIG.HYP3E.blindRollOpts[k])
+    }
+    console.log("CONFIG Blind Roll options:", CONFIG.HYP3E.blindRollOpts)
+  }
+  
   // Load saving throws
   if (CONFIG.HYP3E.saves) {
     for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {

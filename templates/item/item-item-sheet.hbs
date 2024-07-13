@@ -45,11 +45,12 @@
           <input type="text" name="system.tn" value="{{system.tn}}" data-dtype="String"/>
           <label class="resource-label">{{localize 'HYP3E.blindRoll'}}</label>
           <select name="system.blindRoll">
-            {{#select system.blindRoll}}
+            {{!-- {{#select system.blindRoll}} --}}
             <option value=""></option>
-            <option value="true">{{localize 'HYP3E.true'}}</option>
+            {{selectOptions blindRollOpts selected=system.blindRoll localize=true}}
+            {{!-- <option value="true">{{localize 'HYP3E.true'}}</option>
             <option value="false">{{localize 'HYP3E.false'}}</option>
-            {{/select}}
+            {{/select}} --}}
           </select>
           <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
           <div class="form-fields">

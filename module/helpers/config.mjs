@@ -40,6 +40,15 @@ HYP3E.attributeAbbreviations = {
 };
 
 /**
+ * True/False options for blind rolls
+ * @type {Object} 
+ */
+HYP3E.blindRollOpts = {
+  "true": "HYP3E.true",
+  "false": "HYP3E.false"
+};
+
+/**
  * The five types of saving throws
  * @type {Object}
  */
