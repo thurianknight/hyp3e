@@ -58,33 +58,59 @@ export class Hyp3eActor extends Actor {
 
     // Calculated fields can go here, I think...?
     systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
-    // console.log("Unarmored AC: ", systemData.unarmoredAc)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Unarmored AC: ", systemData.unarmoredAc) }
 
     // Calculate current AC & DR based on equipped armor, shield, and DX defense mod
     // Start by resetting base AC and DR
     systemData.ac.value = 9 - systemData.attributes.dex.defMod
     systemData.ac.dr = 0
+    let tempAC = 9
+    let shieldMod = 0
+    let tempDR = 0
     // Loop through all inventory item types to find armor
     for (let itmType of Object.entries(actorData.itemTypes)) {
-      if(itmType[0] == "armor") {
-        // Armor can include both armor and shields
+      if (itmType[0] == "armor") {
+        // Armor can include armor, shields, and some protective magic items
         for (let [key, obj] of Object.entries(itmType[1])) {
-          // Only count if it is equipped
-          if(obj.system.equipped) {
+          if (CONFIG.HYP3E.debugMessages) { console.log("Armor data: ", obj) }
+          // Only count an item if it is equipped... but also note that only 1 suit of armor and
+          //   1 shield will ever be counted -- no stacking of items.
+          // The logic here should use the best AC if multiple armor types are equipped, as in 
+          //   the case where someone is wearing both armor and a ring of protection.
+          // HOWEVER, this logic is partially broken. Need to map out all possibilities for magical
+          //   protection items, what stacks & when, then we can fix this logic.
+          if (obj.system.equipped) {
             // DR can be updated by armor or shield (not in core rules, but...)
-            systemData.ac.dr = systemData.ac.dr + obj.system.dr
-            if(obj.system.type != "shield") {
-              // Armor AC is a base number that overrides the unarmored AC of 9 - DX mod
-              systemData.ac.value = obj.system.ac - systemData.attributes.dex.defMod
-            } else {
-              // Shield AC is a modifier subtracted from current AC
-              systemData.ac.value = systemData.ac.value - obj.system.ac
+            if (obj.system.dr > tempDR) {
+              tempDR = obj.system.dr
             }
+            if (obj.system.type != "shield") {
+              // Armor AC overrides the unarmored AC of 9 (DX mod subtracted later)
+              if (obj.system.ac < tempAC) {
+                tempAC = obj.system.ac
+              }
+              if (CONFIG.HYP3E.debugMessages) { 
+                console.log("Armor equipped: ", obj.name, ", Temp AC: ", tempAC, ", Temp DR: ", tempDR)
+              }
+            } else {
+              // Shield AC is a modifier subtracted from base AC
+              if (obj.system.ac > shieldMod) {
+                shieldMod = obj.system.ac
+              }
+              if (CONFIG.HYP3E.debugMessages) {
+                console.log("Shield equipped: ", obj.name, ", Shield Mod: ", shieldMod)
+              }
+            }
+          } else {
+            if (CONFIG.HYP3E.debugMessages) { console.log("Armor not equipped: ", obj.name) }
           }
         }
       }
     }
-    // console.log("Equipped AC: ", systemData.ac.value)
+    // Now set the final values
+    systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
+    systemData.ac.dr = tempDR
+    if (CONFIG.HYP3E.debugMessages) { console.log("Equipped AC: ", systemData.ac.value) }
 
   }
 
