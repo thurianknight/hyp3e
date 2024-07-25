@@ -53,7 +53,6 @@ export class Hyp3eActor extends Actor {
       // Example of how to calculate the modifier using d20 rules.
       //attribute.mod = Math.floor((attribute.value - 10) / 2);
       // NOTHING TO DO HERE...
-      // console.log(key, attribute)
     }
 
     // Calculated fields can go here, I think...?
@@ -70,7 +69,7 @@ export class Hyp3eActor extends Actor {
     // Loop through all inventory item types to find armor
     for (let itmType of Object.entries(actorData.itemTypes)) {
       if (itmType[0] == "armor") {
-        // Armor can include armor, shields, and some protective magic items
+        // Armor as an item type can include armor, shields, and some protective magic items
         for (let [key, obj] of Object.entries(itmType[1])) {
           if (CONFIG.HYP3E.debugMessages) { console.log("Armor data: ", obj) }
           // Only count an item if it is equipped... but also note that only 1 suit of armor and
@@ -82,11 +81,13 @@ export class Hyp3eActor extends Actor {
           if (obj.system.equipped) {
             // DR can be updated by armor or shield (not in core rules, but...)
             if (obj.system.dr > tempDR) {
+              // Only update DR if this equipped item is superior to the current DR
               tempDR = obj.system.dr
             }
             if (obj.system.type != "shield") {
               // Armor AC overrides the unarmored AC of 9 (DX mod subtracted later)
               if (obj.system.ac < tempAC) {
+                // Only update AC if this equipped item is superior to the current AC
                 tempAC = obj.system.ac
               }
               if (CONFIG.HYP3E.debugMessages) { 
@@ -95,6 +96,7 @@ export class Hyp3eActor extends Actor {
             } else {
               // Shield AC is a modifier subtracted from base AC
               if (obj.system.ac > shieldMod) {
+                // Only update shield mod if this equipped item is superior to the current shield
                 shieldMod = obj.system.ac
               }
               if (CONFIG.HYP3E.debugMessages) {
@@ -107,7 +109,7 @@ export class Hyp3eActor extends Actor {
         }
       }
     }
-    // Now set the final values
+    // Now calculate & set the final values
     systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
     systemData.ac.dr = tempDR
     if (CONFIG.HYP3E.debugMessages) { console.log("Equipped AC: ", systemData.ac.value) }

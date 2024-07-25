@@ -244,8 +244,9 @@ export class Hyp3eActorSheet extends ActorSheet {
     html.find(".item-equip").click(async (event) => {
       const li = $(event.currentTarget).closest(".item-entry")
       const item = this.actor.items.get(li.data("itemId"))
+      if (CONFIG.HYP3E.debugMessages) { console.log("Actor item-equip toggle:", item) }
       await item.update({
-        data: {
+        system: {
           equipped: !item.system.equipped,
         },
       })
