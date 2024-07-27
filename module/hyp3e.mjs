@@ -32,6 +32,15 @@ Hooks.once('init', async function() {
     type: Boolean,
     config: true,
   });
+  // Human races
+  game.settings.register(game.system.id, "races", {
+    name: game.i18n.localize("HYP3E.settings.races"),
+    hint: game.i18n.localize("HYP3E.settings.racesHint"),
+    default: "Common (Mixed), Amazon, Atlantean, Esquimaux, Hyperborean, Ixian, Kelt, Kimmerian, Kimmeri-Kelt, Pict, Pict (Half-Blood), Viking, Anglo-Saxon, Carolingian Frank, Esquimaux-Ixian, Greek, Lapp, Lemurian, Moor, Mu, Oon, Roman, Tlingit, Yakut",
+    scope: "world",
+    type: String,
+    config: true,
+  });
   // Languages
   game.settings.register(game.system.id, "languages", {
     name: game.i18n.localize("HYP3E.settings.languages"),
@@ -123,6 +132,15 @@ Hooks.once("ready", async function() {
    */
   const debugMessages = game.settings.get(game.system.id, "debugMessages");
   CONFIG.HYP3E.debugMessages = debugMessages;
+
+  // Load races list
+  const races = game.settings.get(game.system.id, "races");
+  if (races != "") {
+    CONFIG.HYP3E.races = {}
+    const racesArray = races.split(",");
+    racesArray.forEach((l, i) => (CONFIG.HYP3E.races[l.trim()] = l.trim()));
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Races:", CONFIG.HYP3E.races) }
+  }
 
   // Load language list
   const languages = game.settings.get(game.system.id, "languages");

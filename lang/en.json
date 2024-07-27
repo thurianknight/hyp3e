@@ -3,6 +3,8 @@
     "settings": {
       "debugMessages": "Debug Messages",
       "debugMessagesHint": "Enable additional debug logging and messages.",
+      "races": "Races",
+      "racesHint": "Human races in Hyperborea.",
       "languages": "Languages",
       "languagesHint": "Known/available languages in Hyperborea.",
       "characterClasses": "Character Classes",
@@ -59,7 +61,7 @@
       "hd": "HD",
       "xp": "XP",
       "toNextLvl": "Next Level",
-      "primeAttr": "Primary Attr",
+      "primeAttr": "Prime Attr",
       "hitPoints": "Hit Points",
       "hp": "HP",
       "race": "Race",
@@ -71,7 +73,7 @@
       "hair": "Hair",
       "eyes": "Eyes",
       "secSkills": "Secondary Skills",
-      "languages": "Languages Known",
+      "languages": "Languages",
       "physFeatures": "Physical Features"
     },
     "attributes": {

@@ -98,9 +98,12 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Money Types:", k, v, v.label) }
     }
 
-    // Character classes and languages are global system settings
+    // Character classes, races, and languages are global system settings
     context.characterClasses = CONFIG.HYP3E.characterClasses
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet class list:", context.characterClasses) }
+
+    context.races = CONFIG.HYP3E.races
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet races list:", context.races) }
 
     context.languages = CONFIG.HYP3E.languages
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet languages:", context.languages) }

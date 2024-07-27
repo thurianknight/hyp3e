@@ -7,10 +7,13 @@
     <div class="description-block flexrow">
       <div class="description-block flexrow">
         <div class="description-block flexcol">
-          <div class="description-block flexrow description-field">
+          {{!-- <div class="description-block flexrow description-field">
             <label for="system.details.race" class="description-label">{{localize 'HYP3E.details.race'}}</label>
-            <input type="text" name="system.details.race" value="{{system.details.race}}"/>
-          </div>
+            <select name="system.details.race">
+              <option value=""></option>
+              {{selectOptions races selected=system.details.race localize=false}}
+            </select>
+          </div> --}}
           <div class="description-block flexrow description-field">
             <label for="system.details.gender" class="description-label">{{localize 'HYP3E.details.gender'}}</label>
             <input type="text" name="system.details.gender" value="{{system.details.gender}}"/>        
@@ -48,10 +51,10 @@
           <label for="system.details.secondarySkills" class="description-label">{{localize 'HYP3E.details.secSkills'}}</label>
           <input type="text" name="system.details.secondarySkills" value="{{system.details.secondarySkills}}"/>
         </div>
-        <div class="description-block flexrow description-field">
+        {{!-- <div class="description-block flexrow description-field">
           <label for="system.knownLanguages" class="description-label">{{localize 'HYP3E.details.languages'}}</label>
           <input type="text" name="system.knownLanguages" value="{{system.knownLanguages}}"/>
-        </div>
+        </div> --}}
         <div class="description-block">
           <label for="system.details.physicalFeatures" class="description-label">{{localize 'HYP3E.details.physFeatures'}}</label>
           <textarea name="system.details.physicalFeatures">{{system.details.physicalFeatures}}</textarea>

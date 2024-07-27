@@ -10,7 +10,7 @@
             <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
           </h1>
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">{{localize "HYP3E.details.class"}}</label>
+            <label for="system.details.class" class="header-label align-left">{{localize "HYP3E.details.class"}}</label>
             <select name="system.details.class">
               <option value=""></option>
               {{selectOptions characterClasses selected=system.details.class localize=false}}
@@ -18,8 +18,16 @@
             <span></span>
           </div>
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">{{localize "HYP3E.details.alignment"}}</label>
+            <label for="system.details.alignment" class="header-label align-left">{{localize "HYP3E.details.alignment"}}</label>
             <input type="text" name="system.details.alignment" value="{{system.details.alignment}}" data-dtype="String" />
+            <span></span>
+          </div>
+          <div class="flexrow flex-group-center">
+            <label for="system.details.race" class="header-label align-left">{{localize 'HYP3E.details.race'}}</label>
+            <select name="system.details.race">
+              <option value=""></option>
+              {{selectOptions races selected=system.details.race localize=false}}
+            </select>
             <span></span>
           </div>
         </div>
@@ -32,18 +40,22 @@
             <span></span>
           </div>
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">{{localize "HYP3E.details.xp"}}</label>
+            <label for="system.details.xp.value" class="header-label align-left">{{localize "HYP3E.details.xp"}}</label>
             <input type="text" name="system.details.xp.value" value="{{system.details.xp.value}}" data-dtype="Number" />
             <span></span>
-            <label class="header-label flexlarge align-left">{{localize "HYP3E.details.toNextLvl"}}</label>
+            <label for="system.details.xp.toNextLvl" class="header-label flexlarge align-left">{{localize "HYP3E.details.toNextLvl"}}</label>
             <input type="text" name="system.details.xp.toNextLvl" value="{{system.details.xp.toNextLvl}}" data-dtype="Number" />
           </div>
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">{{localize "HYP3E.bonus"}}</label>
+            <label for="system.details.xp.bonus" class="header-label align-left">{{localize "HYP3E.bonus"}}</label>
             <input type="text" name="system.details.xp.bonus" value="{{system.details.xp.bonus}}" data-dtype="Number" /> %
             <span></span>
-            <label class="header-label flexlarge align-left">{{localize "HYP3E.details.primeAttr"}}</label>
+            <label for="system.details.xp.primeAttr" class="header-label flexlarge align-left">{{localize "HYP3E.details.primeAttr"}}</label>
             <input type="text" name="system.details.xp.primeAttr" value="{{system.details.xp.primeAttr}}" data-dtype="String" />
+          </div>
+          <div class="flexrow flex-group-center">
+            <label for="system.knownLanguages" class="header-label align-left">{{localize 'HYP3E.details.languages'}}</label>
+            <input class="flex-xlarge" type="text" name="system.knownLanguages" value="{{system.knownLanguages}}"/>
           </div>
         </div>
       </div>
