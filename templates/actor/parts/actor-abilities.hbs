@@ -62,7 +62,7 @@
             <div class="item-name">
               <div class="item-image">
                 {{#if item.system.formula}}
-                <a class="rollable" data-roll-type="item" data-label="{{item.name}} {{localize 'HYP3E.dataLabel.check'}}">
+                <a class="rollable" data-roll-type="item" data-roll-mode="{{item.system.rollMode}}" data-label="{{item.name}} {{localize 'HYP3E.dataLabel.check'}}">
                   <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                 </a>
                 {{else}}

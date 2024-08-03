@@ -241,7 +241,8 @@
       "templates": ["base", "rollable"],
       "class": "",
       "level": "",
-      "blindRoll": false
+      "blindRoll": null,
+      "rollMode": ""
     },
     "item": {
       "templates": ["base", "physical", "rollable"],

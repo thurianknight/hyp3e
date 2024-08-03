@@ -398,17 +398,9 @@ export class Hyp3eActorSheet extends ActorSheet {
     const item = this.actor.items.get(li.data("itemId"))
     if (item.system.quantity.value > 0) {
       if (CONFIG.HYP3E.debugMessages) { console.log("Decrement item:", item) }
-      // Update the item object
-      await item.update({
-        system: {
-          quantity: {
-            value: item.system.quantity.value--,  
-          }
-        }
-      })
       // Update the embedded item document
       this.actor.updateEmbeddedDocuments("Item", [
-        { _id: item.id, "system.quantity.value": item.system.quantity.value-- },
+        { _id: item.id, "system.quantity.value": item.system.quantity.value-1 },
       ]);
     }
   }
@@ -423,17 +415,9 @@ export class Hyp3eActorSheet extends ActorSheet {
     const item = this.actor.items.get(li.data("itemId"))
     if (item.system.quantity.value < item.system.quantity.max) {
       if (CONFIG.HYP3E.debugMessages) { console.log("Increment item:", item) }
-      // Update the item object
-      await item.update({
-        system: {
-          quantity: {
-            value: item.system.quantity.value++,
-          }
-        }
-      })
       // Update the embedded item document
       this.actor.updateEmbeddedDocuments("Item", [
-        { _id: item.id, "system.quantity.value": item.system.quantity.value++ },
+        { _id: item.id, "system.quantity.value": item.system.quantity.value+1 },
       ]);
     }
   }

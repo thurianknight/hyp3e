@@ -29,25 +29,23 @@
           <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
           <label class="resource-label">{{localize 'HYP3E.target'}}</label>
           <input type="text" name="system.tn" value="{{system.tn}}" data-dtype="String"/>
-          <label class="resource-label">{{localize 'HYP3E.blindRoll'}}</label>
-          <select name="system.blindRoll">
-            {{!-- {{#select system.blindRoll}} --}}
+          {{!-- <label class="resource-label">{{localize 'HYP3E.blindRoll'}}</label>
+          <input type="text" name="system.blindRoll" value="{{system.blindRoll}}" data-dtype="String" disabled/> --}}
+          {{!-- <select name="system.blindRoll">
             <option value=""></option>
             {{selectOptions blindRollOpts selected=system.blindRoll localize=true}}
-            {{!-- <option value="true">{{localize 'HYP3E.true'}}</option>
-            <option value="false">{{localize 'HYP3E.false'}}</option>
-            {{/select}} --}}
+          </select> --}}
+          <label class="resource-label">{{localize "HYP3E.rollMode"}}</label>
+          <select name="system.rollMode">
+            <option value=""></option>
+            {{selectOptions rollModes selected=system.rollMode localize=true}}
           </select>
+
           <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
           <div class="form-fields">
             <select name="system.save">
-              {{!-- {{#select system.save}} --}}
               <option value=""></option>
               {{selectOptions saveThrows selected=system.save localize=true}}
-              {{!-- {{#each system.saves as |save t|}}
-              <option value="{{save}}">{{save}}</option>
-              {{/each}}
-              {{/select}} --}}
             </select>
           </div>
         </div>
