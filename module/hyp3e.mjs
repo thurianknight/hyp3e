@@ -257,9 +257,16 @@ async function migrateWorld() {
   // Update the Class Abilities & Features compendium for blindRoll and rollMode fields
   const collection = game.packs.get("hyperborea-3e-compendium.class-abilities-and-features")
   console.log("Compendium collection: ", collection)
+  // Get the compendium's locked property, then unlock it
+  const wasLocked = collection.locked
+  await collection.configure({ locked: false })
+  // Batch update items based on applied filters
   await collection.updateAll(updateEmpty, filterEmpty)
   await collection.updateAll(updatePublic, filterPublic)
   await collection.updateAll(updateBlind, filterBlind)
+  // Re-lock the compendium if it was locked before
+  await collection.configure({ locked: wasLocked })
+  console.log(`Migrated all documents from Compendium ${collection.collection}`);
 
   // Migrate Actor compendia, one document at a time (time-consuming!)
   for (let pack of game.packs) {
