@@ -8,7 +8,9 @@
       "languages": "Languages",
       "languagesHint": "Known/available languages in Hyperborea.",
       "characterClasses": "Character Classes",
-      "characterClassesHint": "Character classes available to PCs and some NPCs."
+      "characterClassesHint": "Character classes available to PCs and some NPCs.",
+      "autoCalcAc": "Auto-calculate Armor Class",
+      "autoCalcAcHint": "Use 'equipped' status of armor and shields to calculate AC. Note: This function may not work correctly with certain magic items, depending on whether or not they should stack with other protective items."
     },
     "tabs": {
       "abilities": "Abilities",

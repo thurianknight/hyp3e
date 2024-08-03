@@ -59,6 +59,15 @@ Hooks.once('init', async function() {
     type: String,
     config: true,
   });
+  // Automatic Armor Class calculation
+  game.settings.register(game.system.id, "autoCalcAc", {
+    name: game.i18n.localize("HYP3E.settings.autoCalcAc"),
+    hint: game.i18n.localize("HYP3E.settings.autoCalcAcHint"),
+    default: true,
+    scope: "world",
+    type: Boolean,
+    config: true,
+  });
 
   // If we ever need migration scripts, use this version number for comparison
   console.log("System info:", game.system)
@@ -160,6 +169,11 @@ Hooks.once("ready", async function() {
     if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
   }
 
+  // Automatically calculate AC
+  const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");
+  CONFIG.HYP3E.autoCalcAc = autoCalcAc;
+  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc) }
+
   // Load blind roll options
   if (CONFIG.HYP3E.blindRollOpts) {
     for (let [k, v] of Object.entries(CONFIG.HYP3E.blindRollOpts)) {
@@ -197,7 +211,7 @@ Hooks.once("ready", async function() {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "0.9.30"
+    const NEEDS_MIGRATION_TO_VERSION = "0.9.31"
     const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
       migrateWorld()

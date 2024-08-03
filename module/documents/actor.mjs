@@ -55,63 +55,64 @@ export class Hyp3eActor extends Actor {
       // NOTHING TO DO HERE...
     }
 
-    // Calculated fields can go here, I think...?
-    systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
-    if (CONFIG.HYP3E.debugMessages) { console.log("Unarmored AC: ", systemData.unarmoredAc) }
+    // Calculated fields go here
+    if (CONFIG.HYP3E.autoCalcAc) {
+      systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
+      if (CONFIG.HYP3E.debugMessages) { console.log("Unarmored AC: ", systemData.unarmoredAc) }
 
-    // Calculate current AC & DR based on equipped armor, shield, and DX defense mod
-    // Start by resetting base AC and DR
-    systemData.ac.value = 9 - systemData.attributes.dex.defMod
-    systemData.ac.dr = 0
-    let tempAC = 9
-    let shieldMod = 0
-    let tempDR = 0
-    // Loop through all inventory item types to find armor
-    for (let itmType of Object.entries(actorData.itemTypes)) {
-      if (itmType[0] == "armor") {
-        // Armor as an item type can include armor, shields, and some protective magic items
-        for (let [key, obj] of Object.entries(itmType[1])) {
-          if (CONFIG.HYP3E.debugMessages) { console.log("Armor data: ", obj) }
-          // Only count an item if it is equipped... but also note that only 1 suit of armor and
-          //   1 shield will ever be counted -- no stacking of items.
-          // The logic here should use the best AC if multiple armor types are equipped, as in 
-          //   the case where someone is wearing both armor and a ring of protection.
-          // HOWEVER, this logic is partially broken. Need to map out all possibilities for magical
-          //   protection items, what stacks & when, then we can fix this logic.
-          if (obj.system.equipped) {
-            // DR can be updated by armor or shield (not in core rules, but...)
-            if (obj.system.dr > tempDR) {
-              // Only update DR if this equipped item is superior to the current DR
-              tempDR = obj.system.dr
-            }
-            if (obj.system.type != "shield") {
-              // Armor AC overrides the unarmored AC of 9 (DX mod subtracted later)
-              if (obj.system.ac < tempAC) {
-                // Only update AC if this equipped item is superior to the current AC
-                tempAC = obj.system.ac
+      // Calculate current AC & DR based on equipped armor, shield, and DX defense mod
+      // Start by resetting base AC and DR
+      systemData.ac.value = 9 - systemData.attributes.dex.defMod
+      systemData.ac.dr = 0
+      let tempAC = 9
+      let shieldMod = 0
+      let tempDR = 0
+      // Loop through all inventory item types to find armor
+      for (let itmType of Object.entries(actorData.itemTypes)) {
+        if (itmType[0] == "armor") {
+          // Armor as an item type can include armor, shields, and some protective magic items
+          for (let [key, obj] of Object.entries(itmType[1])) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("Armor data: ", obj) }
+            // Only count an item if it is equipped... but also note that only 1 suit of armor and
+            //   1 shield will ever be counted -- no stacking of items.
+            // The logic here should use the best AC if multiple armor types are equipped, as in 
+            //   the case where someone is wearing both armor and a ring of protection.
+            // HOWEVER, this logic is partially broken. Need to map out all possibilities for magical
+            //   protection items, what stacks & when, then we can fix this logic.
+            if (obj.system.equipped) {
+              // DR can be updated by armor or shield (not in core rules, but...)
+              if (obj.system.dr > tempDR) {
+                // Only update DR if this equipped item is superior to the current DR
+                tempDR = obj.system.dr
               }
-              if (CONFIG.HYP3E.debugMessages) { 
-                console.log("Armor equipped: ", obj.name, ", Temp AC: ", tempAC, ", Temp DR: ", tempDR)
+              if (obj.system.type != "shield") {
+                // Armor AC overrides the unarmored AC of 9 (DX mod subtracted later)
+                if (obj.system.ac < tempAC) {
+                  // Only update AC if this equipped item is superior to the current AC
+                  tempAC = obj.system.ac
+                }
+                if (CONFIG.HYP3E.debugMessages) { 
+                  console.log("Armor equipped: ", obj.name, ", Temp AC: ", tempAC, ", Temp DR: ", tempDR)
+                }
+              } else {
+                // Shield AC is a modifier subtracted from base AC.
+                // We allow shield modifiers to stack because many protective magic items give an AC bonus
+                //  similar to shields, and they should stack.
+                shieldMod += obj.system.ac
+                if (CONFIG.HYP3E.debugMessages) {
+                  console.log("Shield equipped: ", obj.name, ", Shield Mod: ", shieldMod)
+                }
               }
             } else {
-              // Shield AC is a modifier subtracted from base AC
-              if (obj.system.ac > shieldMod) {
-                // Only update shield mod if this equipped item is superior to the current shield
-                shieldMod = obj.system.ac
-              }
-              if (CONFIG.HYP3E.debugMessages) {
-                console.log("Shield equipped: ", obj.name, ", Shield Mod: ", shieldMod)
-              }
+              if (CONFIG.HYP3E.debugMessages) { console.log("Armor not equipped: ", obj.name) }
             }
-          } else {
-            if (CONFIG.HYP3E.debugMessages) { console.log("Armor not equipped: ", obj.name) }
           }
         }
       }
+      // Now calculate & set the final values
+      systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
+      systemData.ac.dr = tempDR
     }
-    // Now calculate & set the final values
-    systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
-    systemData.ac.dr = tempDR
     if (CONFIG.HYP3E.debugMessages) { console.log("Equipped AC: ", systemData.ac.value) }
 
   }
