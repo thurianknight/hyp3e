@@ -1,4 +1,4 @@
-<p align="center">
+<p align="center" background="#FFF">
   <a href="https://foundryvtt.com/packages/hyp3e/">
     <img alt="Official HYPERBOREA 3rd Edition on Foundry VTT logo" src="https://github.com/thurianknight/hyp3e/blob/main/assets/hyp3e-metal.png" width="256" />
   </a>
