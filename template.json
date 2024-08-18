@@ -5,9 +5,9 @@
       "base": {
         "hd": "1d8",
         "hp": {
-          "value": 10,
+          "value": 0,
           "min": -10,
-          "max": 10
+          "max": 0
         },
         "ac": {
           "value": 9,

@@ -183,11 +183,20 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.cha.turnUndead'}}</span>
     </div>
     <div class="attribute-mod">
-      <span></span>
+      {{!-- <span></span> --}}
+      <label for="system.fa" class="combat-label">{{localize "HYP3E.turningAbility"}}</label>
     </div>
     <div class="attribute-mod">
-      <span></span>
+      {{!-- <span></span> --}}
+      <input type="text" name="system.ta" value="{{system.ta}}" data-dtype="Number"/>
     </div>
   </div>
-
+  {{!-- <div class="attribute-row flexrow flex-group-center">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <label for="system.fa" class="combat-label">{{localize "HYP3E.turningAbility"}}</label>
+    <input type="text" name="system.ta" value="{{system.ta}}" data-dtype="Number"/>
+  </div> --}}
 </div>
