@@ -436,8 +436,8 @@ export class Hyp3eActor extends Actor {
    */
   async SetAttributeMods() {
     console.log("Setting attribute modifiers...")
-    const data = super.getRollData();
-    // console.log("Actor:", data)
+    let data = super.getRollData();
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor:", data) }
     if (data.attributes) {
       for (let [k, v] of Object.entries(data.attributes)) {
         // data[k] = foundry.utils.deepClone(v);

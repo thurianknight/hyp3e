@@ -179,7 +179,7 @@ Hooks.once("ready", async function() {
     for (let [k, v] of Object.entries(CONFIG.HYP3E.blindRollOpts)) {
       CONFIG.HYP3E.blindRollOpts[k] = game.i18n.localize(CONFIG.HYP3E.blindRollOpts[k])
     }
-    console.log("CONFIG Blind Roll options:", CONFIG.HYP3E.blindRollOpts)
+    // console.log("CONFIG Blind Roll options:", CONFIG.HYP3E.blindRollOpts)
   }
   
   // Load saving throws

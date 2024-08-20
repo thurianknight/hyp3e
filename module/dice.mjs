@@ -6,8 +6,8 @@ export class Hyp3eDice {
    * @param dataset
    */
   static async ShowBasicRollDialog(dataset) {
-    // Get rollMode, if it was set to something other than default
-    let rollMode = game.settings.get("core", "rollMode")
+    // Default rollMode to pulic roll, the user can change it in the roll dialog
+    let rollMode = "publicroll"
     if (dataset.rollMode) {
       rollMode = dataset.rollMode
     }
@@ -22,7 +22,7 @@ export class Hyp3eDice {
     const dialogHtml = await renderTemplate(template, dialogData)
     // console.log("Dialog HTML:", dialogHtml)
 
-    // Roll dialog for attacks and item or ability checks
+    // Roll dialog for attacks, item and ability checks
     return new Promise((resolve, reject) => {
       const rollDialog = new Dialog({
         title: `${dataset.label}`,
@@ -66,11 +66,11 @@ export class Hyp3eDice {
    * @param dataset
    */
   static async ShowSpellcastingDialog(dataset) {
-    // Get rollMode, if it was set to something other than default
-    let rollMode = game.settings.get("core", "rollMode")
-    if (dataset.rollMode) {
-      rollMode = dataset.rollMode
-    }
+    // Default rollMode to pulic roll, the user can change it in the roll dialog
+    let rollMode = "publicroll"
+    // if (dataset.rollMode) {
+    //   rollMode = dataset.rollMode
+    // }
     let dialogData = {
       roll: dataset.roll,
       enableRoll: dataset.enableRoll,
@@ -127,11 +127,16 @@ export class Hyp3eDice {
    * @param dataset
    */
   static async ShowSaveRollDialog(dataset) {
+    // Default rollMode to pulic roll, the user can change it in the roll dialog
+    let rollMode = "publicroll"
+    // if (dataset.rollMode) {
+    //   rollMode = dataset.rollMode
+    // }
     let dialogData = {
       roll: dataset.roll,
       dataset: dataset,
       rollModes: CONFIG.Dice.rollModes,
-      rollMode: game.settings.get("core", "rollMode")  
+      rollMode: rollMode
     }
     console.log("Roll-dialog Dataset: ", dataset)
     const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`;
