@@ -385,6 +385,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           })
           break
       }
+      this.render(false)
       if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", result) }
   }
 
@@ -718,16 +719,13 @@ export class Hyp3eActorSheet extends ActorSheet {
             // dataset.enableRoll = true
             rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           }
-          // dataset.roll = item.system.formula
-          // rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           // Log the dialog response
-          // console.log("Dialog response:", rollResponse);
+          if (CONFIG.HYP3E.debugMessages) { console.log("Dialog response:", rollResponse) }
           // Add situational modifier from the dice dialog
           item.system.sitMod = rollResponse.sitMod;
           // Add roll mode from the dice dialog
           item.system.rollMode = rollResponse.rollMode;
           if (item) {
-            // return item.rollCheck()
             return item.roll()
           }
           break
@@ -818,9 +816,9 @@ export class Hyp3eActorSheet extends ActorSheet {
                 label: "Confirm",
                 icon: `<i class="fas fa-check"></i>`,
                 callback: () => {
-                  ui.notifications.info("Attribute modifiers set!")
                   // Set/reset all attribute modifiers
                   this.actor.SetAttributeMods()
+                  ui.notifications.info("Attribute modifiers set!")
                 }
               },
               cancel: {

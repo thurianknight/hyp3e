@@ -1,6 +1,6 @@
-<p align="center">
+<p align="center" background="#FFF">
   <a href="https://foundryvtt.com/packages/hyp3e/">
-    <img alt="Unofficial HYPERBOREA 3rd Edition on Foundry VTT logo" src="https://raw.githubusercontent.com/thurianknight/hyp3e/main/docs/images/unofficial-hyp3e-fvtt-logo.png" width="256" />
+    <img alt="Official HYPERBOREA 3rd Edition on Foundry VTT logo" src="https://github.com/thurianknight/hyp3e/blob/main/assets/hyp3e-metal.png" width="256" />
   </a>
 </p>
 <h1 align="center">
@@ -45,7 +45,7 @@ The Hyperborea 3rd Edition Content Compendium is a Foundry VTT premium module se
 
 It's always appreciated when users [submit an issue](https://github.com/thurianknight/hyp3e/issues/new) for all kinds of user questions, comments, and concerns. For those who prefer support via public chat, we recommend asking in:
 
-- The **#hyperborea-foundry-vtt** channel in the [official North Wind Adventures Discord server](https://discord.gg/YQj5a4z)
+- The **#hyperborea-vtt** channel in the [official North Wind Adventures Discord server](https://discord.com/channels/688093166208811100/1274767991371857970)
 - The [/r/FoundryVTT community on Reddit](https://reddit.com/r/FoundryVTT) may also have answers to your Foundry VTT questions, but it is a general Foundry VTT user community that may not have many users with specific knowledge about HYPERBOREA. Be sure to write `[HYPERBOREA]` in your post subject and select `FVTT Question` from the "Flair" menu.
 
 **We do not offer user support via email. Sorry for the inconvenience.**
@@ -63,8 +63,8 @@ If you're a developer, look for our [CONTRIBUTING.md](/CONTRIBUTING.md) file.
 If you use this system and want to show your appreciation, here are some free things you can do.
 
 - If you're a GitHub user, please give us a GitHub star.
-- If you're a Foundry Hub user, please [endorse us or write a comment](https://www.foundryvtt-hub.com/package/hyp3e/) (happy feedback and constructive feedback appreciated).
-- If you speak a non-English language fluently, please contribute some of your time on an open source translation. [Join the hyperborea project on Crowdin](https://crowdin.com/project/hyp3e).
+<!-- - If you're a Foundry Hub user, please [endorse us or write a comment](https://www.foundryvtt-hub.com/package/hyp3e/) (happy feedback and constructive feedback appreciated). -->
+<!-- - If you speak a non-English language fluently, please contribute some of your time on an open source translation. [Join the hyperborea project on Crowdin](https://crowdin.com/project/hyp3e). -->
 - If you speak JavaScript, please consider [contributing code](/CONTRIBUTING.md).
 
 Here's a paid thing you can do.
@@ -79,9 +79,9 @@ See [LICENSE.OGL](/LICENSE.OGL) file.
 
 <!-- BEGIN TEXT REQUIRED BY LICENSE -->
 
-This third party product is not affiliated with or approved by North Wind Adventures.
+<!-- This third party product is not affiliated with or approved by North Wind Adventures. -->
 
-Hyperborea is a trademark of North Wind Adventures. The trademark and Hyperborea logo are used with permission of North Wind Adventures, under license. <!-- ADDITIONAL TEXT REQUESTED BY North Wind Adventures --> Permission to use Hyperborea in the ruleset title granted by North Wind Adventures. <!-- END ADDITIONAL TEXT -->
+Hyperborea is a trademark of North Wind Adventures. The trademark and Hyperborea logo are used with permission of North Wind Adventures. <!-- ADDITIONAL TEXT REQUESTED BY North Wind Adventures --> Permission to use Hyperborea in the ruleset title granted by North Wind Adventures. <!-- END ADDITIONAL TEXT -->
 
 <!-- END TEXT REQUIRED BY LICENSE -->
 

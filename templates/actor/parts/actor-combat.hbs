@@ -10,7 +10,7 @@
           <h3>{{localize "HYP3E.headers.fightingSkills"}}</h3>
         </div>
         <div class="resource-content flexrow flex-group-center">
-          <span class="rollable flexlarge" data-roll="1d20 + @fa + @str.atkMod" data-roll-type="attack" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.basicMeleeAtk'}}">
+          <span class="rollable flexlarge" data-roll="1d20 + @fa + @str.atkMod" data-roll-type="attack" data-roll-mode="publicroll" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.basicMeleeAtk'}}">
             <label for="system.fa" class="combat-label">{{localize "HYP3E.fightingAbility"}}</label>
             <i class="fas fa-dice-d20"></i>
           </span>
@@ -84,7 +84,7 @@
     </div>
     <div class="saves-block flexrow flex-between">
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.death.value}}" data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.death.value}}" data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
           {{!-- I thought it would be cool to have little saving throw icons for each type... --}}
           {{!-- <img src="systems/hyp3e/assets/crossing_bones_skull.jpg" width="50"> --}}
           <label for="system.saves.death.value" class="combat-label">{{localize "HYP3E.saves.death.abbrev"}}</label><br />
@@ -93,28 +93,28 @@
         <input type="text" name="system.saves.death.value" value="{{system.saves.death.value}}"/>
       </div>
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.device.value}}" data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.device.value}}" data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
           <label for="system.saves.device.value" class="combat-label">{{localize "HYP3E.saves.device.abbrev"}}</label><br />
           <i class="fas fa-dice-d20"></i>
         </span>
         <input type="text" name="system.saves.device.value" value="{{system.saves.device.value}}"/>
       </div>
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.transformation.value}}" data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.transformation.value}}" data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
           <label for="system.saves.transformation.value" class="combat-label">{{localize "HYP3E.saves.transformation.abbrev"}}</label><br />
           <i class="fas fa-dice-d20"></i>
         </span>
         <input type="text" name="system.saves.transformation.value" value="{{system.saves.transformation.value}}"/>
       </div>
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.avoidance.value}}" data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.avoidance.value}}" data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
           <label for="system.saves.avoidance.value" class="combat-label">{{localize "HYP3E.saves.avoidance.abbrev"}}</label><br />
           <i class="fas fa-dice-d20"></i>
         </span>
         <input type="text" name="system.saves.avoidance.value" value="{{system.saves.avoidance.value}}"/>
       </div>
       <div class="combat-block flexrow flex-group-center">
-        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-target="{{system.saves.sorcery.value}}" data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
+        <span class="rollable" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.sorcery.value}}" data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
           <label for="system.saves.sorcery.value" class="combat-label">{{localize "HYP3E.saves.sorcery.abbrev"}}</label><br />
           <i class="fas fa-dice-d20"></i>
         </span>
@@ -142,7 +142,7 @@
           <div class="item-header flexrow">
             <div class="item-name">
               <div class="item-image">
-                <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.attackWith'}} {{item.name}}">
+                <a class="rollable" data-roll-type="item" data-roll-mode="publicroll" data-label="{{localize 'HYP3E.dataLabel.attackWith'}} {{item.name}}">
                   <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                 </a>
               </div>
