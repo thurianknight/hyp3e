@@ -136,7 +136,8 @@ export class Hyp3eItem extends Item {
 
     // Initialize chat data.
     const speaker = ChatMessage.getSpeaker({ actor: this.actor })
-    const rollMode = game.settings.get('core', 'rollMode')
+    // const rollMode = game.settings.get('core', 'rollMode')
+    // console.log(`System roll mode: ${rollMode}`)
     let label = ""
     let itemName = ""
     if (item.system.friendlyName != "") {
@@ -147,7 +148,7 @@ export class Hyp3eItem extends Item {
 
     // If this is a spell, decrement the number memorized
     if (item.type == "spell" && item.system.quantity.value > 0) {
-      console.log("Decrement item:", item)
+      console.log("Cast memorized spell:", item)
       // Update the item object
       await item.update({
         system: {
@@ -179,11 +180,11 @@ export class Hyp3eItem extends Item {
 
     // Retrieve roll data from the item
     const rollData = this.getRollData();
-    console.log("Item roll data:", rollData)
+    console.log("Attack/spell roll data:", rollData)
     // Declare vars
+    let rollFormula = ""
     let naturalRoll = 0
     let dieType = ""
-    let rollFormula = ""
     let rollTotal = 0
     let dmgFormula = ""
     let damageRoll = ""
@@ -361,15 +362,12 @@ export class Hyp3eItem extends Item {
     // Output attack roll result to a chat message
     let chatMsg = await atkRoll.toMessage({
       speaker: speaker,
-      flavor: label
+      flavor: label,
+      content: msgContent
     },{
-      rollMode: rollData.item.rollMode,
-      create: false
+      rollMode: rollData.item.rollMode
     })
-
-    chatMsg.content = msgContent
-    // console.log("Chat test:", chatMsg)
-    ChatMessage.create(chatMsg)
+    console.log("Chat html:", chatMsg)
     return atkRoll
 
   }
@@ -382,7 +380,8 @@ export class Hyp3eItem extends Item {
 
     // Initialize chat data.
     const speaker = ChatMessage.getSpeaker({ actor: this.actor })
-    const rollMode = game.settings.get('core', 'rollMode')
+    // const rollMode = game.settings.get('core', 'rollMode')
+    // console.log(`System roll mode: ${rollMode}`)
     let label = ""
     let itemName = ""
     if (item.system.friendlyName != "") {
@@ -397,7 +396,7 @@ export class Hyp3eItem extends Item {
       label = `<h3>${itemName} [${item.type}]</h3>`
       ChatMessage.create({
         speaker: speaker,
-        rollMode: rollMode,
+        rollMode: 'publicroll',
         flavor: label,
         content: item.system.description ?? ''
       });
@@ -447,8 +446,9 @@ export class Hyp3eItem extends Item {
     },{
       rollMode: rollData.item.rollMode
     })
-    console.log(chatMsg)
+    console.log("Chat html:", chatMsg)
     return roll
+
   }
 
   /**

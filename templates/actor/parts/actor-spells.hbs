@@ -10,7 +10,7 @@
     <div class="flexrow">
       {{!-- <div class="casting-ability flexrow flex-group-center"> --}}
       <div class="casting-ability">
-        <span class="rollable" data-roll="1d20 + @ca" data-roll-type="basic" data-label="{{localize 'HYP3E.dataLabel.caCheck'}}">
+        <span class="rollable" data-roll="1d20 + @ca" data-roll-type="basic" data-roll-mode="publicroll" data-label="{{localize 'HYP3E.dataLabel.caCheck'}}">
           <label for="system.ca" class="spells-label">{{localize "HYP3E.castingAbility"}}</label> 
           <i class="fas fa-dice-d20"></i>
         </span>
@@ -66,7 +66,7 @@
               <div class="item-name">
                 <div class="item-image">
                   {{!-- {{#if item.system.atkRoll}} --}}
-                  <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.castSpell'}} {{item.name}}">
+                  <a class="rollable" data-roll-type="item" data-roll-mode="publicroll" data-label="{{localize 'HYP3E.dataLabel.castSpell'}} {{item.name}}">
                     <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                   </a>
                   {{!-- {{else}}

@@ -79,7 +79,7 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Handle blind roll true/false for any item types
     context.blindRollOpts = CONFIG.HYP3E.blindRollOpts
-    if (CONFIG.HYP3E.debugMessages) { console.log("Item blind roll options:", context.blindRollOpts) }
+    // if (CONFIG.HYP3E.debugMessages) { console.log("Item blind roll options:", context.blindRollOpts) }
 
     // Handle system roll modes
     context.rollModes = CONFIG.Dice.rollModes
