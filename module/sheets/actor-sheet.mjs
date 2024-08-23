@@ -29,6 +29,8 @@ export class Hyp3eActorSheet extends ActorSheet {
 
   /** @override */
   getData() {
+    if (CONFIG.HYP3E.debugMessages) { console.log("Getting actor sheet data...") }
+
     // Retrieve the data structure from the base sheet. You can inspect or log
     // the context variable to see the structure, but some key properties for
     // sheets are the actor object, the data object, whether or not it's
@@ -60,7 +62,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     context.effects = prepareActiveEffectCategories(this.actor.effects);
 
     // Log the actor's data
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor:", context) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet data complete:", context) }
 
     return context;
   }
@@ -385,7 +387,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           })
           break
       }
-      this.render(false)
+      this.render(true)
       if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", result) }
   }
 
@@ -818,6 +820,7 @@ export class Hyp3eActorSheet extends ActorSheet {
                 callback: () => {
                   // Set/reset all attribute modifiers
                   this.actor.SetAttributeMods()
+                  this.render(true)
                   ui.notifications.info("Attribute modifiers set!")
                 }
               },
@@ -965,4 +968,5 @@ export class Hyp3eActorSheet extends ActorSheet {
       console.log(err)
     }
   }
+
 }
