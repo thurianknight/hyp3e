@@ -33,6 +33,8 @@ export class Hyp3eActor extends Actor {
     const systemData = actorData.system;
     const flags = actorData.flags.hyp3e || {};
 
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Preparing actor ${actorData.name} derived data...`) }
+  
     // Make separate methods for each Actor type (character, npc, etc.) to keep
     // things organized.
     this._prepareCharacterData(actorData);
@@ -436,15 +438,16 @@ export class Hyp3eActor extends Actor {
    */
   async SetAttributeMods() {
     console.log("Setting attribute modifiers...")
-    let data = super.getRollData();
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor:", data) }
+    // let data = super.getRollData();
+    let data = this.system
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", data) }
     if (data.attributes) {
       for (let [k, v] of Object.entries(data.attributes)) {
         // data[k] = foundry.utils.deepClone(v);
         // console.log(`Getting ${k} modifiers...`)
         switch (k) {
           case "str":
-            // console.log(`Setting ${k} modifiers...`)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
             data.attributes.str.atkMod = this._valueFromTable(this.strAtkMod, data.attributes.str.value)
             data.attributes.str.dmgMod = this._valueFromTable(this.strDmgMod, data.attributes.str.value)
             data.attributes.str.test = this._valueFromTable(this.testOfAttr, data.attributes.str.value)
@@ -452,7 +455,7 @@ export class Hyp3eActor extends Actor {
             break
 
           case "dex":
-            // console.log(`Setting ${k} modifiers...`)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
             data.attributes.dex.atkMod = this._valueFromTable(this.dexAtkMod, data.attributes.dex.value)
             data.attributes.dex.defMod = this._valueFromTable(this.dexDefMod, data.attributes.dex.value)
             data.attributes.dex.test = this._valueFromTable(this.testOfAttr, data.attributes.dex.value)
@@ -460,7 +463,7 @@ export class Hyp3eActor extends Actor {
             break
 
           case "con":
-            // console.log(`Setting ${k} modifiers...`)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
             data.attributes.con.hpMod = this._valueFromTable(this.conHpMod, data.attributes.con.value)
             data.attributes.con.poisRadMod = this._valueFromTable(this.conPoisonMod, data.attributes.con.value)
             data.attributes.con.traumaSurvive = this._valueFromTable(this.conTraumaSurvive, data.attributes.con.value)
@@ -469,7 +472,7 @@ export class Hyp3eActor extends Actor {
             break
 
           case "int":
-            // console.log(`Setting ${k} modifiers...`)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
             data.attributes.int.languages = this._valueFromTable(this.intLanguages, data.attributes.int.value)
             data.attributes.int.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
             data.attributes.int.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
@@ -479,7 +482,7 @@ export class Hyp3eActor extends Actor {
             break
 
           case "wis":
-            // console.log(`Setting ${k} modifiers...`)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
             data.attributes.wis.willMod = this._valueFromTable(this.wisWillMod, data.attributes.wis.value)
             data.attributes.wis.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
             data.attributes.wis.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
@@ -489,15 +492,16 @@ export class Hyp3eActor extends Actor {
             break
 
           case "cha":
-            // console.log(`Setting ${k} modifiers...`)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
             data.attributes.cha.reaction = this._valueFromTable(this.chaReactionMod, data.attributes.cha.value)
             data.attributes.cha.maxHenchmen = this._valueFromTable(this.chaRetainers, data.attributes.cha.value)
             data.attributes.cha.turnUndead = this._valueFromTable(this.chaTurnUndead, data.attributes.cha.value)
             break
         }
-        // Apply updates to the actor
-        await this.update({data})
       }
+      // Apply updates to the actor
+      if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', data) }
+      await this.update({data})
     }
   }
 
