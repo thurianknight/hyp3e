@@ -102,7 +102,7 @@ export class Hyp3eActorSheet extends ActorSheet {
 
     // The following are global system settings
     context.enableAttrChecks = CONFIG.HYP3E.enableAttrChecks
-    if (CONFIG.HYP3E.debugMessages) { console.log("Enable attributes checks:", context.enableAttrChecks) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("Enable attribute checks:", context.enableAttrChecks) }
 
     context.characterClasses = CONFIG.HYP3E.characterClasses
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet class list:", context.characterClasses) }

@@ -47,7 +47,7 @@ Hooks.once('init', async function() {
   game.settings.register(game.system.id, "enableAttrChecks", {
     name: game.i18n.localize("HYP3E.settings.enableAttrChecks"),
     hint: game.i18n.localize("HYP3E.settings.enableAttrChecksHint"),
-    default: false,
+    default: "",
     scope: "world",
     type: String,
     choices: {
