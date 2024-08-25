@@ -409,10 +409,17 @@ export class Hyp3eItem extends Item {
     console.log("Item roll data:", rollData)
     // Declare vars
     let rollFormula
-    
+    let debugCheckRollFormula = ""
+
     // Setup roll formula
     label = `${itemName} roll...`
-    rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
+    if (CONFIG.HYP3E.flipRollUnderMods) {
+      if (CONFIG.HYP3E.debugMessages) { debugCheckRollFormula = `Check Formula: ${rollData.item.formula} - sitMod` }
+      rollFormula = `${rollData.item.formula} - ${rollData.item.sitMod}`
+    } else {
+      if (CONFIG.HYP3E.debugMessages) { debugCheckRollFormula = `Check Formula: ${rollData.item.formula} + sitMod` }
+      rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
+    }
 
     console.log("Roll formula:", rollFormula)
     // Invoke the roll and submit it to chat.

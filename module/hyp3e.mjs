@@ -31,33 +31,7 @@ Hooks.once('init', async function() {
     scope: "world",
     type: Boolean,
     config: true,
-  });
-  // Human races
-  game.settings.register(game.system.id, "races", {
-    name: game.i18n.localize("HYP3E.settings.races"),
-    hint: game.i18n.localize("HYP3E.settings.racesHint"),
-    default: "Common (Mixed), Amazon, Atlantean, Esquimaux, Hyperborean, Ixian, Kelt, Kimmerian, Kimmeri-Kelt, Pict, Pict (Half-Blood), Viking, Anglo-Saxon, Carolingian Frank, Carthaginian, Esquimaux-Ixian, Greek, Lapp, Lemurian, Moor, Mu, Oon, Roman, Tlingit, Yakut",
-    scope: "world",
-    type: String,
-    config: true,
-  });
-  // Languages
-  game.settings.register(game.system.id, "languages", {
-    name: game.i18n.localize("HYP3E.settings.languages"),
-    hint: game.i18n.localize("HYP3E.settings.languagesHint"),
-    default: "Common, Berber, Esquimaux (Coastal), Esquimaux (Tundra), Esquimaux-Ixian (pidgin), Hellenic (Amazon), Hellenic (Atlantean), Hellenic (Greek), Hellenic (Hyperborean), Hellenic (Kimmerian), Keltic (Goidelic), Keltic (Pictish), Latin, Lemurian, Muat, Old Norse (Anglo-Saxon), Old Norse (Viking), Oonat, Thracian (Ixian), Thracian (Kimmerian), Tlingit, Uralic (Lapp), Uralic (Yakut)",
-    scope: "world",
-    type: String,
-    config: true,
-  });
-  // Classes
-  game.settings.register(game.system.id, "characterClasses", {
-    name: game.i18n.localize("HYP3E.settings.characterClasses"),
-    hint: game.i18n.localize("HYP3E.settings.characterClassesHint"),
-    default: "Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch",
-    scope: "world",
-    type: String,
-    config: true,
+    requiresReload: true,
   });
   // Automatic Armor Class calculation
   game.settings.register(game.system.id, "autoCalcAc", {
@@ -67,6 +41,62 @@ Hooks.once('init', async function() {
     scope: "world",
     type: Boolean,
     config: true,
+    requiresReload: true,
+  });
+  // Enable basic attribute checks
+  game.settings.register(game.system.id, "enableAttrChecks", {
+    name: game.i18n.localize("HYP3E.settings.enableAttrChecks"),
+    hint: game.i18n.localize("HYP3E.settings.enableAttrChecksHint"),
+    default: false,
+    scope: "world",
+    type: String,
+    choices: {
+      "": "Disabled",
+      "3d6": "3d6 roll-under",
+      "d20": "d20 roll-under"
+    },
+    config: true,
+    requiresReload: true,
+  });
+  // Reverse situational modifiers on roll-under checks
+  game.settings.register(game.system.id, "flipRollUnderMods", {
+    name: game.i18n.localize("HYP3E.settings.flipRollUnderMods"),
+    hint: game.i18n.localize("HYP3E.settings.flipRollUnderModsHint"),
+    default: true,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+  // Human races
+  game.settings.register(game.system.id, "races", {
+    name: game.i18n.localize("HYP3E.settings.races"),
+    hint: game.i18n.localize("HYP3E.settings.racesHint"),
+    default: "Common (Mixed), Amazon, Atlantean, Esquimaux, Hyperborean, Ixian, Kelt, Kimmerian, Kimmeri-Kelt, Pict, Pict (Half-Blood), Viking, Anglo-Saxon, Carolingian Frank, Carthaginian, Esquimaux-Ixian, Greek, Lapp, Lemurian, Moor, Mu, Oon, Roman, Tlingit, Yakut",
+    scope: "world",
+    type: String,
+    config: true,
+    requiresReload: true,
+  });
+  // Languages
+  game.settings.register(game.system.id, "languages", {
+    name: game.i18n.localize("HYP3E.settings.languages"),
+    hint: game.i18n.localize("HYP3E.settings.languagesHint"),
+    default: "Common, Berber, Esquimaux (Coastal), Esquimaux (Tundra), Esquimaux-Ixian (pidgin), Hellenic (Amazon), Hellenic (Atlantean), Hellenic (Greek), Hellenic (Hyperborean), Hellenic (Kimmerian), Keltic (Goidelic), Keltic (Pictish), Latin, Lemurian, Muat, Old Norse (Anglo-Saxon), Old Norse (Viking), Oonat, Thracian (Ixian), Thracian (Kimmerian), Tlingit, Uralic (Lapp), Uralic (Yakut)",
+    scope: "world",
+    type: String,
+    config: true,
+    requiresReload: true,
+  });
+  // Classes
+  game.settings.register(game.system.id, "characterClasses", {
+    name: game.i18n.localize("HYP3E.settings.characterClasses"),
+    hint: game.i18n.localize("HYP3E.settings.characterClassesHint"),
+    default: "Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch",
+    scope: "world",
+    type: String,
+    config: true,
+    requiresReload: true,
   });
 
   // If we ever need migration scripts, use this version number for comparison
@@ -142,6 +172,21 @@ Hooks.once("ready", async function() {
   const debugMessages = game.settings.get(game.system.id, "debugMessages");
   CONFIG.HYP3E.debugMessages = debugMessages;
 
+  // Automatically calculate AC
+  const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");
+  CONFIG.HYP3E.autoCalcAc = autoCalcAc;
+  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc) }
+
+  // Enable basic attribute checks
+  const enableAttrChecks = game.settings.get(game.system.id, "enableAttrChecks");
+  CONFIG.HYP3E.enableAttrChecks = enableAttrChecks;
+  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Enable basic attribute checks:", CONFIG.HYP3E.enableAttrChecks) }
+
+  // Reverse situational modifiers on roll-under checks
+  const flipRollUnderMods = game.settings.get(game.system.id, "flipRollUnderMods");
+  CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
+  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods) }
+
   // Load races list
   const races = game.settings.get(game.system.id, "races");
   if (races != "") {
@@ -168,11 +213,6 @@ Hooks.once("ready", async function() {
     classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
     if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
   }
-
-  // Automatically calculate AC
-  const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");
-  CONFIG.HYP3E.autoCalcAc = autoCalcAc;
-  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc) }
 
   // Load blind roll options
   if (CONFIG.HYP3E.blindRollOpts) {
