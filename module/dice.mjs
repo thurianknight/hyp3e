@@ -37,8 +37,12 @@ export class Hyp3eDice {
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
               if (CONFIG.HYP3E.debugMessages) { 
-                console.log('Form data object:', formDataObj) 
-                console.log("Rolling " + dataset.roll + " - " + formDataObj.sitMod + " ...")
+                console.log('Form data object:', formDataObj)
+                if (CONFIG.HYP3E.flipRollUnderMods) {
+                  console.log("Rolling " + dataset.roll + " - " + formDataObj.sitMod + " ...")
+                } else {
+                  console.log("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
+                }
               }
               resolve(formDataObj)
             }
