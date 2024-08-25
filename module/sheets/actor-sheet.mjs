@@ -100,7 +100,10 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Money Types:", k, v, v.label) }
     }
 
-    // Character classes, races, and languages are global system settings
+    // The following are global system settings
+    context.enableAttrChecks = CONFIG.HYP3E.enableAttrChecks
+    if (CONFIG.HYP3E.debugMessages) { console.log("Enable attributes checks:", context.enableAttrChecks) }
+
     context.characterClasses = CONFIG.HYP3E.characterClasses
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet class list:", context.characterClasses) }
 
@@ -703,7 +706,7 @@ export class Hyp3eActorSheet extends ActorSheet {
             dataset.label = `${mastery} with ${itemName}...`
             dataset.roll = item.system.formula
             // dataset.enableRoll = true
-            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+            rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset);
           } else if (item.type == "spell") {
             dataset.label = `Cast spell ${itemName}...`
             if (item.system.formula > "") {
@@ -740,7 +743,12 @@ export class Hyp3eActorSheet extends ActorSheet {
           if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
           rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           // Add situational modifier from the dice dialog
-          rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
+          if (CONFIG.HYP3E.flipRollUnderMods) {
+            rollFormula = `${dataset.roll} - ${rollResponse.sitMod}`
+          } else {
+            rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
+          }
+          
           break;
 
         case "attack":
@@ -749,7 +757,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           // dataset.enableRoll = true
           // Log the dataset before the dialog renders
           if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
-          rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+          rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset);
           // Add situational modifier from the dice dialog
           rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
           break;
