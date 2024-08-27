@@ -76,9 +76,9 @@
           "value": 1
         },
         "xp": {
-          "value": 0,
-          "toNextLvl": 0,
-          "bonus": 0
+          "value": "0",
+          "toNextLvl": "0",
+          "bonus": "0"
         },
         "race": "",
         "gender": "",
@@ -192,7 +192,7 @@
       "encWild": 0,
       "encLair": 0,
       "morale": 1,
-      "xp": 0,
+      "xp": "0",
       "treasure": "",
       "dx": 11
     }
