@@ -10,7 +10,7 @@ export class Hyp3eItem extends Item {
   // This is not working correctly... yet
   async _preCreate(data, options, user) {
     // await super._preCreate(data, options, user);
-    console.log("Creating item data", data)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Creating item data", data) }
     // Replace default image for various item types
     switch(data.type) {
       case "spell":
@@ -148,7 +148,7 @@ export class Hyp3eItem extends Item {
 
     // If this is a spell, decrement the number memorized
     if (item.type == "spell" && item.system.quantity.value > 0) {
-      console.log("Cast memorized spell:", item)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Cast memorized spell:", item) }
       // Update the item object
       await item.update({
         system: {
@@ -180,7 +180,7 @@ export class Hyp3eItem extends Item {
 
     // Retrieve roll data from the item
     const rollData = this.getRollData();
-    console.log("Attack/spell roll data:", rollData)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Attack/spell roll data:", rollData) }
     // Declare vars
     let rollFormula = ""
     let naturalRoll = 0
@@ -197,7 +197,7 @@ export class Hyp3eItem extends Item {
 
     // Has the user targeted a token? If so, get it's AC and name
     let userTargets = Array.from(game.user.targets)
-    console.log("Target Actor Data:", userTargets)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
     if (userTargets.length > 0) {
       let primaryTargetData = userTargets[0].actor
       targetAc = primaryTargetData.system.ac.value
@@ -223,12 +223,12 @@ export class Hyp3eItem extends Item {
     if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${rollData.item.formula} + masteryMod + sitMod` }
     rollFormula = `${rollData.item.formula} + ${masterMod} + ${rollData.item.sitMod}`
 
-    console.log("Roll formula:", rollFormula)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Roll formula:", rollFormula) }
     // Invoke the attack roll
     const atkRoll = new Roll(rollFormula, rollData);
     // Resolve the roll
     let result = await atkRoll.roll();
-    console.log("Roll result: ", result)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
 
     // Get the resulting values from the attack roll
     naturalRoll = atkRoll.dice[0].total
@@ -238,28 +238,28 @@ export class Hyp3eItem extends Item {
     // Determine hit or miss based on target AC
     let hit = false
     let tn = 20 - targetAc
-    console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`)
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
     if (naturalRoll == 20) {
-      console.log("Natural 20 always crit hits!")
-      label += `<br /><span style='color:#00b34c'><b>critical hit!</b></span>`
+      if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
+      label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
       hit = true
     } else if (naturalRoll == 1) {
-      console.log("Natural 1 always crit misses!")
-      label += "<br /><span style='color:#e90000'><i>critical miss!</i></span>"
+      if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
+      label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
     } else if (atkRoll.total >= tn) {
-      console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`)
+      if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
       if (targetName != "") {
-        label += `<br /><b>hit!</b>`
+        label += `<br /><b>Hit!</b>`
       } else {
-        label += `<br />hits <b>AC ${eval(20 - atkRoll.total)}</b>`
+        label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}.</b>`
       }
       hit = true
     } else {
-      console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`)
+      if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
       if (targetName != "") {
-        label += `<br /><i>miss.</i>`
+        label += `<br /><b>Miss.</b>`
       } else {
-        label += `<br /><i>misses AC 9.</i>`
+        label += `<br /><b>Misses AC 9.</b>`
       }
     }
 
@@ -276,13 +276,13 @@ export class Hyp3eItem extends Item {
         dmgFormula = `${rollData.item.damage} + ${masterMod}`
         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + masteryMod` }
       }
-      console.log("Damage formula:", dmgFormula)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
 
       // Invoke the damage roll
       const dmgRoll = new Roll(dmgFormula, rollData);
       // Resolve the roll
       let result = await dmgRoll.roll();
-      console.log("Damage result: ", dmgRoll)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
 
       // Render the damage-roll chat card
       damageRoll = `
@@ -367,7 +367,7 @@ export class Hyp3eItem extends Item {
     },{
       rollMode: rollData.item.rollMode
     })
-    console.log("Chat html:", chatMsg)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Chat html:", chatMsg) }
     return atkRoll
 
   }
@@ -406,7 +406,7 @@ export class Hyp3eItem extends Item {
     // Create a roll and send a chat message from it.
     // Retrieve roll data from the item
     const rollData = this.getRollData();
-    console.log("Item roll data:", rollData)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Item roll data:", rollData) }
     // Declare vars
     let rollFormula
     let debugCheckRollFormula = ""
@@ -421,26 +421,26 @@ export class Hyp3eItem extends Item {
       rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
     }
 
-    console.log("Roll formula:", rollFormula)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Roll formula:", rollFormula) }
     // Invoke the roll and submit it to chat.
     const roll = new Roll(rollFormula, rollData);
     // Resolve the roll
     let result = await roll.roll();
-    console.log("Roll result: ", roll)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", roll) }
 
     // Determine success or failure if we have a target number
     if (rollData.item.tn != '' && rollData.item.tn != 'undefined') {
       // Item checks are roll-under for success
       if(roll.total <= rollData.item.tn) {
-        console.log(roll.total + " is less than or equal to " + rollData.item.tn + "!")
-        label += "<br /><b>Success</b>!"
+        if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + rollData.item.tn + "!") }
+        label += "<br /><b>Success!</b>"
       } else {
-        console.log(roll.total + " is greater than " + rollData.item.tn + "!")
-        label += "<br /><i>Fail</i>."
+        if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + rollData.item.tn + "!") }
+        label += "<br /><b>Fail.</b>"
       }
     } else {
       // No target number supplied
-      console.log("No target number for " + roll.total)
+      if (CONFIG.HYP3E.debugMessages) { console.log("No target number for " + roll.total) }
     }
 
     // Prettify label
@@ -453,7 +453,7 @@ export class Hyp3eItem extends Item {
     },{
       rollMode: rollData.item.rollMode
     })
-    console.log("Chat html:", chatMsg)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Chat html:", chatMsg) }
     return roll
 
   }
@@ -512,13 +512,14 @@ export class Hyp3eItem extends Item {
         content += `<p>Wpn Class: ${item.system.wc}</p>`
       }
       if (item.system.damage) {
-        if ((item.system.damage).match(/.*d[1-9].*/)) {
-          // Add a damage roll macro
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
-        } else {
-          // If damage is not variable, simply display the value
-          content += `<p>Damage: ${item.system.damage}</p>`
-        }
+        content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        // if ((item.system.damage).match(/.*d[1-9].*/)) {
+        //   // Add a damage roll macro
+        //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        // } else {
+        //   // If damage is not variable, simply display the value
+        //   content += `<p>Damage: ${item.system.damage}</p>`
+        // }
       }
     }
 
@@ -549,13 +550,14 @@ export class Hyp3eItem extends Item {
         content += `<p> Save: ${item.system.save}</p>`
       }
       if (item.system.damage) {
-        if ((item.system.damage).match(/.*d[1-9].*/)) {
-          // Add a damage roll macro
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
-        } else {
-          // If damage is not variable, simply display the value
-          content += `<p>Damage: ${item.system.damage}</p>`
-        }
+        content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        // if ((item.system.damage).match(/.*d[1-9].*/)) {
+        //   // Add a damage roll macro
+        //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        // } else {
+        //   // If damage is not variable, simply display the value
+        //   content += `<p>Damage: ${item.system.damage}</p>`
+        // }
       }      
     }
 

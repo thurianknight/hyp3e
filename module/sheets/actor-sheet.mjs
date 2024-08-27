@@ -528,13 +528,14 @@ export class Hyp3eActorSheet extends ActorSheet {
         content += `<p>Wpn Class: ${item.system.wc}</p>`
       }
       if (item.system.damage) {
-        if ((item.system.damage).match(/.*d[1-9].*/)) {
-          // Add a damage roll macro
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
-        } else {
-          // If damage is not variable, simply display the value
-          content += `<p>Damage: ${item.system.damage}</p>`
-        }
+        content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        // if ((item.system.damage).match(/.*d[1-9].*/)) {
+        //   // Add a damage roll macro
+        //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        // } else {
+        //   // If damage is not variable, simply display the value
+        //   content += `<p>Damage: ${item.system.damage}</p>`
+        // }
       }
     }
 
@@ -565,13 +566,14 @@ export class Hyp3eActorSheet extends ActorSheet {
         content += `<p> Save: ${item.system.save}</p>`
       }
       if (item.system.damage) {
-        if ((item.system.damage).match(/.*d[1-9].*/)) {
-          // Add a damage roll macro
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
-        } else {
-          // If damage is not variable, simply display the value
-          content += `<p>Damage: ${item.system.damage}</p>`
-        }
+        content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        // if ((item.system.damage).match(/.*d[1-9].*/)) {
+        //   // Add a damage roll macro
+        //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        // } else {
+        //   // If damage is not variable, simply display the value
+        //   content += `<p>Damage: ${item.system.damage}</p>`
+        // }
       }      
     }
 
@@ -868,19 +870,19 @@ export class Hyp3eActorSheet extends ActorSheet {
           if (dataset.rollType == "check" || dataset.rollType == "basic") {
             if(roll.total <= dataset.rollTarget) {
               if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
-              label += "<br /><b>Success</b>!"
+              label += "<br /><b>Success!</b>"
             } else {
               if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + dataset.rollTarget + "!") }
-              label += "<br /><i>Fail</i>."
+              label += "<br /><b>Fail.</b>"
             }
           // Saves are roll-over for success
           } else if (dataset.rollType == "save") {
             if(roll.total >= dataset.rollTarget) {
               if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!") }
-              label += "<br /><b>Success</b>!"
+              label += "<br /><b>Success!</b>"
             } else {
               if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than " + dataset.rollTarget + "!") }
-              label += "<br /><i>Fail</i>."
+              label += "<br /><b>Fail.</b>"
             }
           // Attacks trigger here if there is a target token selected
           // } else if (dataset.rollType == "attack") {
@@ -888,16 +890,16 @@ export class Hyp3eActorSheet extends ActorSheet {
           //   if(roll.total >= dataset.rollTarget) {
           //     console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!")
           //     if (naturalRoll == 20) {
-          //       label += "<br /><span style='color:#2ECC71'><b>critically hits!</b></span>"
+          //       label += "<br /><span style='color:#2ECC71'><b>Critically Hits!</b></span>"
           //     } else {
-          //       label += "<br /><b>hits!</b>"
+          //       label += "<br /><b>Hits!</b>"
           //     }
           //   } else {
           //     console.log(roll.total + " is less than " + dataset.rollTarget + "!")
           //     if (naturalRoll == 1) {
-          //       label += "<br /><span style='color:#E90000'><i>critically misses!</i></span>"
+          //       label += "<br /><span style='color:#E90000'><b>Critically Misses!</b></span>"
           //     } else {
-          //       label += "<br /><i>misses.</i>"
+          //       label += "<br /><bb>Miss.</b>"
           //     }
           //   }
           } else {
@@ -936,25 +938,25 @@ export class Hyp3eActorSheet extends ActorSheet {
             if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${roll.total} hits AC [20 - ${roll.total} => ] ${eval(20 - roll.total)}`) }
             if (naturalRoll == 20) {
               if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
-              label += `<br /><span style='color:#00b34c'><b>critical hit!</b></span>`
+              label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
               hit = true
             } else if (naturalRoll == 1) {
               if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
-              label += "<br /><span style='color:#e90000'><i>critical miss!</i></span>"
+              label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
             } else if (roll.total >= tn) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${roll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
               if (targetName != "") {
-                label += `<br /><b>hit!</b>`
+                label += `<br /><b>Hit!</b>`
               } else {
-                label += `<br />hits <b>AC ${eval(20 - roll.total)}</b>`
+                label += `<br /><b>Hits AC ${eval(20 - roll.total)}.</b>`
               }
               hit = true
             } else {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${roll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
               if (targetName != "") {
-                label += `<br /><i>miss.</i>`
+                label += `<br /><b>Miss.</b>`
               } else {
-                label += `<br /><i>misses AC 9.</i>`
+                label += `<br /><b>Misses AC 9.</b>`
               }
             }
           }
