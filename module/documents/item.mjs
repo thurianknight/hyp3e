@@ -250,6 +250,7 @@ export class Hyp3eItem extends Item {
       if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
       if (targetName != "") {
         label += `<br /><b>Hit!</b>`
+        if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}.</b>` }
       } else {
         label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}.</b>`
       }
@@ -258,6 +259,13 @@ export class Hyp3eItem extends Item {
       if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
       if (targetName != "") {
         label += `<br /><b>Miss.</b>`
+        if (CONFIG.HYP3E.debugMessages) {
+          if ( eval(20 - atkRoll.total) <= 9 ) {
+            debugAtkRollFormula += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
+          } else {
+            debugAtkRollFormula += `<br /><b>Misses AC 9.</b>`  
+          }
+        }
       } else {
         label += `<br /><b>Misses AC 9.</b>`
       }
