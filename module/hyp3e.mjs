@@ -52,8 +52,7 @@ Hooks.once('init', async function() {
     type: String,
     choices: {
       "": "Disabled",
-      "3d6": "3d6 roll-under",
-      "d20": "d20 roll-under"
+      "3d6": "3d6 roll-under"
     },
     config: true,
     requiresReload: true,
