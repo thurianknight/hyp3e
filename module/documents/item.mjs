@@ -221,8 +221,13 @@ export class Hyp3eItem extends Item {
       label = `${mastery} with ${itemName}...`
     }
 
-    if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${rollData.item.formula} + masteryMod + sitMod` }
-    rollFormula = `${rollData.item.formula} + ${masterMod} + ${rollData.item.sitMod}`
+    if (masterMod == "0") {
+      if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${rollData.item.formula} + sitMod` }
+      rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`  
+    } else {
+      if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${rollData.item.formula} + masteryMod + sitMod` }
+      rollFormula = `${rollData.item.formula} + ${masterMod} + ${rollData.item.sitMod}`  
+    }
 
     if (CONFIG.HYP3E.debugMessages) { console.log("Roll formula:", rollFormula) }
     // Invoke the attack roll
@@ -276,11 +281,21 @@ export class Hyp3eItem extends Item {
     if (hit && rollData.item.damage) {
       if (Roll.validate(rollData.item.damage)) {
         if (rollData.item.melee) {
-          dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod + ${masterMod}`
-          if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @str.dmgMod + @item.dmgMod + masteryMod` }
+          if (masterMod == "0") {
+            dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod`
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @str.dmgMod + @item.dmgMod` }
+          } else {
+            dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod + ${masterMod}`
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @str.dmgMod + @item.dmgMod + masteryMod` }
+          }
         } else if (rollData.item.missile) {
-          dmgFormula = `${rollData.item.damage} + @item.dmgMod + ${masterMod}`
-          if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @item.dmgMod + masteryMod` }
+          if (masterMod == "0") {
+            dmgFormula = `${rollData.item.damage} + @item.dmgMod`
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @item.dmgMod` }  
+          } else {
+            dmgFormula = `${rollData.item.damage} + @item.dmgMod + ${masterMod}`
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @item.dmgMod + masteryMod` }  
+          }
         } else {
           // This should only happen with spells
           dmgFormula = `${rollData.item.damage}`
@@ -421,7 +436,7 @@ export class Hyp3eItem extends Item {
     }
 
     // If there's no roll formula, send a chat message.
-    if (!this.system.formula && !this.system.formula) {
+    if (!this.system.formula) {
       // Vanilla label
       label = `<h3>${itemName} [${item.type}]</h3>`
       ChatMessage.create({
@@ -440,6 +455,7 @@ export class Hyp3eItem extends Item {
     // Declare vars
     let rollFormula
     let debugCheckRollFormula = ""
+    let debugCheckTn = ""
 
     // Setup roll formula
     label = `${itemName} roll...`
@@ -460,12 +476,21 @@ export class Hyp3eItem extends Item {
 
     // Determine success or failure if we have a target number
     if (rollData.item.tn != '' && rollData.item.tn != 'undefined') {
+      let targetRoll = new Roll(rollData.item.tn, rollData)
+      await targetRoll.roll()
+      if (CONFIG.HYP3E.debugMessages) {
+        debugCheckTn = `Check target formula: ${rollData.item.tn} evaluates to ${targetRoll.formula} = ${targetRoll.total}`
+        console.log(debugCheckTn)
+        console.log("Target formula eval: ", targetRoll)
+      }
+      let targetNum = targetRoll.total
+      label += ` (target ${targetNum})`
       // Item checks are roll-under for success
-      if(roll.total <= rollData.item.tn) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + rollData.item.tn + "!") }
+      if(roll.total <= targetNum) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + targetNum + "!") }
         label += "<br /><b>Success!</b>"
       } else {
-        if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + rollData.item.tn + "!") }
+        if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + targetNum + "!") }
         label += "<br /><b>Fail.</b>"
       }
     } else {
