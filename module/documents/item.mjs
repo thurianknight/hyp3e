@@ -339,8 +339,8 @@ export class Hyp3eItem extends Item {
       } else {
         dmgFormula = `${rollData.item.damage}`
         if (CONFIG.HYP3E.debugMessages) {
-          console.log(`Damage formula ${dmgFormula} cannot be parsed for a roll!`)
-          debugDmgRollFormula = `Damage Formula: <b>${dmgFormula}</b> cannot be parsed for a roll!`
+          console.log(`Damage formula ${dmgFormula} is not a valid roll formula!`)
+          debugDmgRollFormula = `Damage Formula: <b>${dmgFormula}</b> is not a valid roll formula!`
           damageRoll = `
             <h4 class="dice-damage">Rolling damage...</h4>
             <div class="dice-roll">
