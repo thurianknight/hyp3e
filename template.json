@@ -78,7 +78,8 @@
         "xp": {
           "value": "0",
           "toNextLvl": "0",
-          "bonus": "0"
+          "bonus": "0",
+          "primeAttr": ""
         },
         "race": "",
         "gender": "",
