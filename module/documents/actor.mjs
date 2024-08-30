@@ -325,7 +325,7 @@ export class Hyp3eActor extends Actor {
    * Magician bonus spells per day.
    * Applied to:
    * - `int.bonusSpell1`
-  **/
+   **/
   bonusSpell1 = {
     0: false,
     3: false,
@@ -350,7 +350,7 @@ export class Hyp3eActor extends Actor {
    * Magician or Cleric chance to learn new spell.
    * Applied to:
    * - `int.learnSpell` and `wis.learnSpell`
-  **/
+   **/
   learnSpell = {
     0: "",
     3: "",
@@ -375,11 +375,11 @@ export class Hyp3eActor extends Actor {
     18: 2,
   };
   /**
- * Cha reaction mod, from -2 to 2.
- * 
- * Applied to:
- * - `cha.reaction`
- */
+   * Cha reaction mod, from -2 to 2.
+   * 
+   * Applied to:
+   * - `cha.reaction`
+   */
   chaReactionMod = {
     0: -3,
     3: -3,
@@ -407,7 +407,6 @@ export class Hyp3eActor extends Actor {
     17: 10,
     18: 12,
   };
-
   /**
    * Cha adjustment to turn undead, from -1 to +1.
    * 
@@ -421,6 +420,392 @@ export class Hyp3eActor extends Actor {
     15: 1,
   };
 
+  /**
+   * Class hit die
+   * Classes:
+   *   Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, 
+   *   Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, 
+   *   Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch
+   * 
+   * Applied to:
+   * - `system.hd`
+   */
+  classHitDie = {
+    "Assassin": "1d6",
+    "Barbarian": "1d12",
+    "Bard": "1d8",
+    "Berserker": "1d12",
+    "Cataphract": "1d10",
+    "Cleric": "1d8",
+    "Cryomancer": "1d4",
+    "Druid": "1d8",
+    "Fighter": "1d10",
+    "Huntsman": "1d10",
+    "Illusionist": "1d4",
+    "Legerdemainist": "1d6",
+    "Magician": "1d4",
+    "Monk": "1d8",
+    "Necromancer": "1d4",
+    "Paladin": "1d10",
+    "Priest": "1d4",
+    "Purloiner": "1d6",
+    "Pyromancer": "1d4",
+    "Ranger": "1d10",
+    "Runegraver": "1d8",
+    "Scout": "1d6",
+    "Shaman": "1d6",
+    "Thief": "1d6",
+    "Warlock": "1d8",
+    "Witch": "1d4",
+  };
+  
+  classData = {
+    "Assassin": {
+      "hitDie": "1d6",
+      "attrReqs": {
+        "ST": 9,
+        "DX": 9,
+        "IN": 9,
+      },
+      "xpBonusReq": {
+        "DX": 16,
+        "IN": 16,
+      },
+      "featBonus": {
+        "attr": ["DX"],
+      },
+    },
+    "Barbarian": {
+      "hitDie": "1d12",
+      "attrReqs": {
+        "ST": 13,
+        "DX": 13,
+        "CN": 13,
+      },
+      "xpBonusReq": {
+        "ST": 16,
+        "DX": 16,
+      },
+      "featBonus": {
+        "attr": ["ST", "DX"],
+      },
+    },
+    "Bard": {
+      "hitDie": "1d8",
+      "attrReqs": {
+        "ST": 9,
+        "DX": 9,
+        "IN": 9,
+        "WS": 9,
+        "CH": 15,
+      },
+      "xpBonusReq": {
+        "DX": 16,
+        "CH": 16,
+      },
+      "featBonus": {
+        "attr": ["DX"],
+      },
+    },
+    "Berserker": {
+      "hitDie": "1d12",
+      "attrReqs": {
+        "ST": 15,
+        "CN": 15,
+      },
+      "xpBonusReq": {
+        "ST": 16,
+        "CN": 16,
+      },
+      "featBonus": {
+        "attr": ["ST", "CN"],
+      },
+    },
+    "Cataphract": {
+      "hitDie": "1d10",
+      "attrReqs": {
+        "ST": 9,
+        "DX": 9,
+        "WS": 9,
+        "CH": 9,
+      },
+      "xpBonusReq": {
+        "ST": 16,
+        "CH": 16,
+      },
+      "featBonus": {
+        "attr": ["ST"],
+      },
+    },
+    "Cleric": {
+      "hitDie": "1d8",
+      "attrReqs": {
+        "WS": 9,
+      },
+      "xpBonusReq": {
+        "WS": 16,
+      },
+    },
+    "Cryomancer": {
+      "hitDie": "1d4",
+      "attrReqs": {
+        "IN": 9,
+        "WS": 9,
+      },
+      "xpBonusReq": {
+        "IN": 16,
+        "WS": 16,
+      },
+    },
+    "Druid": {
+      "hitDie": "1d8",
+      "attrReqs": {
+        "WS": 9,
+        "CH": 12,
+      },
+      "xpBonusReq": {
+        "WS": 16,
+        "CH": 16,
+      },
+    },
+    "Fighter": {
+      "hitDie": "1d10",
+      "attrReqs": {
+        "ST": 9,
+      },
+      "xpBonusReq": {
+        "ST": 16,
+      },
+      "featBonus": {
+        "attr": ["ST"],
+      },
+    },
+    "Huntsman": {
+      "hitDie": "1d10",
+      "attrReqs": {
+        "ST": 9,
+        "DX": 9,
+        "WS": 9,
+        "CH": 12
+      },
+      "xpBonusReq": {
+        "ST": 16,
+        "WS": 16,
+      },
+      "featBonus": {
+        "attr": ["ST"],
+      },
+    },
+    "Illusionist": {
+      "hitDie": "1d4",
+      "attrReqs": {
+        "DX": 9,
+        "IN": 9,
+      },
+      "xpBonusReq": {
+        "DX": 16,
+        "IN": 16,
+      },
+      "featBonus": {
+        "attr": ["DX"],
+      },
+    },
+    "Legerdemainist": {
+      "hitDie": "1d6",
+      "attrReqs": {
+        "DX": 12,
+        "IN": 12,
+      },
+      "xpBonusReq": {
+        "DX": 16,
+        "IN": 16,
+      },
+      "featBonus": {
+        "attr": ["DX"],
+      },
+    },
+    "Magician": {
+      "hitDie": "1d4",
+      "attrReqs": {
+        "IN": 9,
+      },
+      "xpBonusReq": {
+        "IN": 16,
+      },
+    },
+    "Monk": {
+      "hitDie": "1d8",
+      "attrReqs": {
+        "ST": 9,
+        "DX": 9,
+        "WS": 9,
+      },
+      "xpBonusReq": {
+        "DX": 16,
+        "WS": 16,
+      },
+      "featBonus": {
+        "attr": ["DX"],
+      },
+    },
+    "Necromancer": {
+      "hitDie": "1d4",
+      "attrReqs": {
+        "IN": 9,
+        "WS": 9,
+      },
+      "xpBonusReq": {
+        "IN": 16,
+        "WS": 16,
+      },
+    },
+    "Paladin": {
+      "hitDie": "1d10",
+      "attrReqs": {
+        "ST": 9,
+        "DX": 9,
+        "WS": 9,
+        "CH": 15,
+      },
+      "xpBonusReq": {
+        "ST": 16,
+        "CH": 16,
+      },
+      "featBonus": {
+        "attr": ["ST"],
+      },
+    },
+    "Priest": {
+      "hitDie": "1d4",
+      "attrReqs": {
+        "WS": 9,
+        "CH": 9,
+      },
+      "xpBonusReq": {
+        "WS": 16,
+        "CH": 16,
+      },
+    },
+    "Purloiner": {
+      "hitDie": "1d6",
+      "attrReqs": {
+        "DX": 12,
+        "WS": 12,
+      },
+      "xpBonusReq": {
+        "DX": 16,
+        "WS": 16,
+      },
+      "featBonus": {
+        "attr": ["DX"],
+      },
+    },
+    "Pyromancer": {
+      "hitDie": "1d4",
+      "attrReqs": {
+        "IN": 9,
+        "WS": 9,
+      },
+      "xpBonusReq": {
+        "IN": 16,
+        "WS": 16,
+      },
+    },
+    "Ranger": {
+      "hitDie": "1d10",
+      "attrReqs": {
+        "ST": 9,
+        "DX": 9,
+        "IN": 9,
+        "WS": 9,
+      },
+      "xpBonusReq": {
+        "ST": 16,
+        "WS": 16,
+      },
+      "featBonus": {
+        "attr": ["ST"],
+      },
+    },
+    "Runegraver": {
+      "hitDie": "1d8",
+      "attrReqs": {
+        "ST": 9,
+        "WS": 12,
+      },
+      "xpBonusReq": {
+        "ST": 16,
+        "WS": 16,
+      },
+      "featBonus": {
+        "attr": ["ST"],
+      },
+    },
+    "Scout": {
+      "hitDie": "1d6",
+      "attrReqs": {
+        "DX": 9,
+        "IN": 9,
+      },
+      "xpBonusReq": {
+        "DX": 16,
+        "IN": 16,
+      },
+      "featBonus": {
+        "attr": ["DX"],
+      },
+    },
+    "Shaman": {
+      "hitDie": "1d6",
+      "attrReqs": {
+        "IN": 9,
+        "WS": 12
+      },
+      "xpBonusReq": {
+        "IN": 16,
+        "WS": 16,
+      },
+    },
+    "Thief": {
+      "hitDie": "1d6",
+      "attrReqs": {
+        "DX": 9,
+      },
+      "xpBonusReq": {
+        "DX": 16,
+      },
+      "featBonus": {
+        "attr": ["DX"],
+      },
+    },
+    "Warlock": {
+      "hitDie": "1d8",
+      "attrReqs": {
+        "ST": 12,
+        "IN": 12,
+      },
+      "xpBonusReq": {
+        "ST": 16,
+        "IN": 16,
+      },
+      "featBonus": {
+        "attr": ["ST"],
+      },
+    },
+    "Witch": {
+      "hitDie": "1d4",
+      "attrReqs": {
+        "IN": 9,
+        "WS": 9,
+        "CH": 12,
+      },
+      "xpBonusReq": {
+        "IN": 16,
+        "CH": 16,
+      },
+    },
+}
+
   _valueFromTable(table, val) {
     let output;
     // console.log("Table:", table, "Value:", val)
@@ -433,6 +818,12 @@ export class Hyp3eActor extends Actor {
     return output;
   }
 
+  _stringFromTable(table, val) {
+    let output = ""
+    output = table[val]
+    return output
+  }
+
   /**
    * Set or reset all attribute modifiers
    */
@@ -441,6 +832,10 @@ export class Hyp3eActor extends Actor {
     // let data = super.getRollData();
     let data = this.system
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", data) }
+    if (data.details.class) {
+      if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${data.details.class} hit die...`) }
+      data.hd = this._stringFromTable(this.classHitDie, data.details.class)
+    }
     if (data.attributes) {
       for (let [k, v] of Object.entries(data.attributes)) {
         // data[k] = foundry.utils.deepClone(v);

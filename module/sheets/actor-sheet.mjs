@@ -528,7 +528,11 @@ export class Hyp3eActorSheet extends ActorSheet {
         content += `<p>Wpn Class: ${item.system.wc}</p>`
       }
       if (item.system.damage) {
-        content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        if (Roll.validate(item.system.damage)) {
+          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        } else {
+          content += `<p>Damage: ${item.system.damage}</p>`
+        }
         // if ((item.system.damage).match(/.*d[1-9].*/)) {
         //   // Add a damage roll macro
         //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
@@ -566,7 +570,11 @@ export class Hyp3eActorSheet extends ActorSheet {
         content += `<p> Save: ${item.system.save}</p>`
       }
       if (item.system.damage) {
-        content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        if (Roll.validate(item.system.damage)) {
+          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+        } else {
+          content += `<p>Damage: ${item.system.damage}</p>`
+        }
         // if ((item.system.damage).match(/.*d[1-9].*/)) {
         //   // Add a damage roll macro
         //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
@@ -720,7 +728,7 @@ export class Hyp3eActorSheet extends ActorSheet {
             }
             rollResponse = await Hyp3eDice.ShowSpellcastingDialog(dataset);
           } else {  // ==> Neither a weapon nor a spell
-            // The default for other item types is a check
+            // The default for other item types (i.e. class abilities or actual items) is a check
             dataset.label = `${itemName} check...`
             dataset.roll = item.system.formula
             // dataset.enableRoll = true
@@ -750,7 +758,6 @@ export class Hyp3eActorSheet extends ActorSheet {
           } else {
             rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
           }
-          
           break;
 
         case "attack":

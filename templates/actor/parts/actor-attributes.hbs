@@ -9,9 +9,8 @@
 <div class="abilities flexcol">
   <!-- Strength -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="{{#if enableAttrChecks}}rollable{{/if}} flex" data-roll="{{enableAttrChecks}}" data-roll-type="check" data-roll-target="{{system.attributes.str.value}}" data-label="{{localize 'HYP3E.attributes.str.check'}}">
+    <span class="flex">
       <label for="system.attributes.str.value" class="attribute-label">{{localize 'HYP3E.attributes.str.abbrev'}}</label>
-      {{#if enableAttrChecks}}<i class="fas fa-dice"></i>{{/if}}
     </span>
     <div class="attribute-value">
       <input type="text" name="system.attributes.str.value" value="{{system.attributes.str.value}}" data-dtype="Number"/>
@@ -38,9 +37,8 @@
   </div>
   <!-- Dexterity -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="{{#if enableAttrChecks}}rollable{{/if}} flex" data-roll="{{enableAttrChecks}}" data-roll-type="check" data-roll-target="{{system.attributes.dex.value}}" data-label="{{localize 'HYP3E.attributes.dex.check'}}">
+    <span class="flex">
       <label for="system.attributes.dex.value" class="attribute-label">{{localize 'HYP3E.attributes.dex.abbrev'}}</label>
-      {{#if enableAttrChecks}}<i class="fas fa-dice"></i>{{/if}}
     </span>
     <div class="attribute-value">
       <input type="text" name="system.attributes.dex.value" value="{{system.attributes.dex.value}}" data-dtype="Number"/>
@@ -67,9 +65,8 @@
   </div>
   <!-- Constitution -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="{{#if enableAttrChecks}}rollable{{/if}} flex" data-roll="{{enableAttrChecks}}" data-roll-type="check" data-roll-target="{{system.attributes.con.value}}" data-label="{{localize 'HYP3E.attributes.con.check'}}">
+    <span class="flex">
       <label for="system.attributes.con.value" class="attribute-label">{{localize 'HYP3E.attributes.con.abbrev'}}</label>
-      {{#if enableAttrChecks}}<i class="fas fa-dice"></i>{{/if}}
     </span>
     <div class="attribute-value">
       <input type="text" name="system.attributes.con.value" value="{{system.attributes.con.value}}" data-dtype="Number"/>
@@ -163,9 +160,8 @@
   </div>
   <!-- Charisma -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="{{#if enableAttrChecks}}rollable{{/if}} flex" data-roll="{{enableAttrChecks}}" data-roll-type="check" data-roll-target="{{system.attributes.cha.value}}" data-label="{{localize 'HYP3E.attributes.cha.check'}}">
+    <span class="flex">
       <label for="system.attributes.cha.value" class="attribute-label">{{localize 'HYP3E.attributes.cha.abbrev'}}</label>
-      {{#if enableAttrChecks}}<i class="fas fa-dice"></i>{{/if}}
     </span>
     <div class="attribute-value">
       <input type="text" name="system.attributes.cha.value" value="{{system.attributes.cha.value}}" data-dtype="Number"/>

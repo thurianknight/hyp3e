@@ -3,7 +3,7 @@
     "types": ["character", "npc"],
     "templates": {
       "base": {
-        "hd": "1d8",
+        "hd": "",
         "hp": {
           "value": 0,
           "min": -10,
