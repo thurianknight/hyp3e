@@ -882,9 +882,7 @@ export class Hyp3eActor extends Actor {
 
   _valueFromTable(table, val) {
     let output;
-    // console.log("Table:", table, "Value:", val)
     for (let i = 0; i <= val; i++) {
-      // console.log("Lookup:", table[i])
       if (table[i] != undefined) {
         output = table[i];
       }
@@ -906,16 +904,28 @@ export class Hyp3eActor extends Actor {
     let data = this.system
     let thisClass = {}
     let xpBonusPossible = null
+
+    // Setup chat message variables
+    let label = `<h3>Values for character updated...</h3>`
+    let content = `<ul>`
+
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", data) }
     if (data.details.class) {
+      // Override label if character class selected
+      label = `<h3>Values for ${data.details.class} updated...</h3>`
       if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${data.details.class} hit die...`) }
       thisClass = this.classData[data.details.class]
       if (CONFIG.HYP3E.debugMessages) { console.log(`Class Data for ${data.details.class}: `, thisClass) }
       data.hd = thisClass.hitDie
+      content += `<li>Hit Die: ${thisClass.hitDie}</li>`
       data.fa = thisClass.fa
+      content += `<li>Fighting Ability: ${thisClass.fa}</li>`
       data.ca = thisClass.ca
+      content += `<li>Casting Ability: ${thisClass.ca}</li>`
       data.ta = thisClass.ta
+      content += `<li>Turning Ability: ${thisClass.ta}</li>`
       data.unskilled = thisClass.unskilled
+      content += `<li>Unskilled Weapon Penalty: ${thisClass.unskilled}</li>`
       data.details.xp.primeAttr = ""
     }
     if (data.attributes) {
@@ -923,10 +933,15 @@ export class Hyp3eActor extends Actor {
         switch (k) {
           case "str":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>ST Mods:</li><ul>`
             data.attributes.str.atkMod = this._valueFromTable(this.strAtkMod, data.attributes.str.value)
+            content += `<li>Melee Attack Mod: ${data.attributes.str.atkMod}</li>`
             data.attributes.str.dmgMod = this._valueFromTable(this.strDmgMod, data.attributes.str.value)
+            content += `<li>Damage Mod: ${data.attributes.str.dmgMod}</li>`
             data.attributes.str.test = this._valueFromTable(this.testOfAttr, data.attributes.str.value)
+            content += `<li>Test of ST: ${data.attributes.str.test}</li>`
             data.attributes.str.feat = this._valueFromTable(this.featOfAttr, data.attributes.str.value)
+            content += `<li>Feat of ST: ${data.attributes.str.feat}</li>`
             if (data.details.class) {
               if (thisClass.xpBonusReq.str) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high ST...`) }
@@ -944,16 +959,23 @@ export class Hyp3eActor extends Actor {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of ST...`) }
               if (thisClass.featBonus && thisClass.featBonus.str) {
                 data.attributes.str.feat += thisClass.featBonus.str
+                content += `<li>Extraordinary Feat of ST override: ${data.attributes.str.feat}</li>`
               }
             }
+            content += `</ul>`
             break
 
           case "dex":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>DX Mods:</li><ul>`
             data.attributes.dex.atkMod = this._valueFromTable(this.dexAtkMod, data.attributes.dex.value)
+            content += `<li>Missile Attack Mod: ${data.attributes.dex.atkMod}</li>`
             data.attributes.dex.defMod = this._valueFromTable(this.dexDefMod, data.attributes.dex.value)
+            content += `<li>Defence Mod: ${data.attributes.dex.defMod}</li>`
             data.attributes.dex.test = this._valueFromTable(this.testOfAttr, data.attributes.dex.value)
+            content += `<li>Test of DX: ${data.attributes.dex.test}</li>`
             data.attributes.dex.feat = this._valueFromTable(this.featOfAttr, data.attributes.dex.value)
+            content += `<li>Feat of DX: ${data.attributes.dex.feat}</li>`
             if (data.details.class && thisClass.xpBonusReq.dex) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high DX...`) }
               if (data.attributes.dex.value >= thisClass.xpBonusReq.dex && xpBonusPossible != false) {
@@ -969,17 +991,25 @@ export class Hyp3eActor extends Actor {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of DX...`) }
               if (thisClass.featBonus && thisClass.featBonus.dex) {
                 data.attributes.dex.feat += thisClass.featBonus.dex
+                content += `<li>Extraordinary Feat of DX override: ${data.attributes.dex.feat}</li>`
               }
             }
+            content += `</ul>`
             break
 
           case "con":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>CN Mods:</li><ul>`
             data.attributes.con.hpMod = this._valueFromTable(this.conHpMod, data.attributes.con.value)
+            content += `<li>Hit Point Mod: ${data.attributes.con.hpMod}</li>`
             data.attributes.con.poisRadMod = this._valueFromTable(this.conPoisonMod, data.attributes.con.value)
+            content += `<li>Poison/Radiation Mod: ${data.attributes.con.poisRadMod}</li>`
             data.attributes.con.traumaSurvive = this._valueFromTable(this.conTraumaSurvive, data.attributes.con.value)
+            content += `<li>Trauma Survive %: ${data.attributes.con.traumaSurvive}</li>`
             data.attributes.con.test = this._valueFromTable(this.testOfAttr, data.attributes.con.value)
+            content += `<li>Test of CN: ${data.attributes.con.test}</li>`
             data.attributes.con.feat = this._valueFromTable(this.featOfAttr, data.attributes.con.value)
+            content += `<li>Feat of CN: ${data.attributes.con.feat}</li>`
             if (data.details.class && thisClass.xpBonusReq.con) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high CN...`) }
               if (data.attributes.con.value >= thisClass.xpBonusReq.con && xpBonusPossible != false) {
@@ -995,18 +1025,27 @@ export class Hyp3eActor extends Actor {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of CN...`) }
               if (thisClass.featBonus && thisClass.featBonus.con) {
                 data.attributes.con.feat += thisClass.featBonus.con
+                content += `<li>Extraordinary Feat of CN override: ${data.attributes.con.feat}</li>`
               }
             }
+            content += `</ul>`
             break
 
           case "int":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>IN Mods:</li><ul>`
             data.attributes.int.languages = this._valueFromTable(this.intLanguages, data.attributes.int.value)
+            content += `<li>Languages: ${data.attributes.int.languages}</li>`
             data.attributes.int.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
+            content += `<li>Level 1 Bonus Spell: ${data.attributes.int.bonusSpells.lvl1}</li>`
             data.attributes.int.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
+            content += `<li>Level 2 Bonus Spell: ${data.attributes.int.bonusSpells.lvl2}</li>`
             data.attributes.int.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.int.value)
+            content += `<li>Level 3 Bonus Spell: ${data.attributes.int.bonusSpells.lvl3}</li>`
             data.attributes.int.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.int.value)
+            content += `<li>Level 4 Bonus Spell: ${data.attributes.int.bonusSpells.lvl4}</li>`
             data.attributes.int.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.int.value)
+            content += `<li>% Chance to Learn Spell: ${data.attributes.int.learnSpell}</li>`
             if (data.details.class && thisClass.xpBonusReq.int) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high IN...`) }
               if (data.attributes.int.value >= thisClass.xpBonusReq.int && xpBonusPossible != false) {
@@ -1020,16 +1059,24 @@ export class Hyp3eActor extends Actor {
                 data.details.xp.primeAttr += ", IN"
               }
             }
+            content += `</ul>`
             break
 
           case "wis":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>WS Mods:</li><ul>`
             data.attributes.wis.willMod = this._valueFromTable(this.wisWillMod, data.attributes.wis.value)
+            content += `<li>Will Mod: ${data.attributes.wis.willMod}</li>`
             data.attributes.wis.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
+            content += `<li>Level 1 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl1}</li>`
             data.attributes.wis.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
+            content += `<li>Level 2 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl2}</li>`
             data.attributes.wis.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.wis.value)
+            content += `<li>Level 3 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl3}</li>`
             data.attributes.wis.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.wis.value)
+            content += `<li>Level 4 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl4}</li>`
             data.attributes.wis.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.wis.value)
+            content += `<li>% Chance to Learn Spell: ${data.attributes.wis.learnSpell}</li>`
             if (data.details.class && thisClass.xpBonusReq.wis) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high WS...`) }
               if (data.attributes.wis.value >= thisClass.xpBonusReq.wis && xpBonusPossible != false) {
@@ -1043,13 +1090,18 @@ export class Hyp3eActor extends Actor {
                 data.details.xp.primeAttr += ", WS"
               }
             }
+            content += `</ul>`
             break
 
           case "cha":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>CH Mods:</li><ul>`
             data.attributes.cha.reaction = this._valueFromTable(this.chaReactionMod, data.attributes.cha.value)
+            content += `<li>Reaction Mod: ${data.attributes.cha.reaction}</li>`
             data.attributes.cha.maxHenchmen = this._valueFromTable(this.chaRetainers, data.attributes.cha.value)
+            content += `<li>Max Henchmen: ${data.attributes.cha.maxHenchmen}</li>`
             data.attributes.cha.turnUndead = this._valueFromTable(this.chaTurnUndead, data.attributes.cha.value)
+            content += `<li>Turn Undead Mod: ${data.attributes.cha.turnUndead}</li>`
             if (data.details.class && thisClass.xpBonusReq.cha) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high CH...`) }
               if (data.attributes.cha.value >= thisClass.xpBonusReq.cha && xpBonusPossible != false) {
@@ -1063,6 +1115,7 @@ export class Hyp3eActor extends Actor {
                 data.details.xp.primeAttr += ", CH"
               }
             }
+            content += `</ul>`
             break
         }
         if (xpBonusPossible) {
@@ -1071,9 +1124,20 @@ export class Hyp3eActor extends Actor {
           data.details.xp.bonus = 0
         }
       }
+      content += `<li>Prime Attribute(s): ${data.details.xp.primeAttr}</li>`
+      content += `<li>XP Bonus: ${data.details.xp.bonus}</li>`
+      content += `</ul>`
+
       // Apply updates to the actor
       if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', data) }
       await this.update({data})
+
+      // Now we can display the chat message
+      ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        flavor: label,
+        content: content ?? ''
+      })
     }
   }
 
