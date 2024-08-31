@@ -421,47 +421,19 @@ export class Hyp3eActor extends Actor {
   };
 
   /**
-   * Class hit die
+   * Class-specific data
    * Classes:
    *   Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, 
    *   Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, 
    *   Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch
-   * 
-   * Applied to:
-   * - `system.hd`
    */
-  classHitDie = {
-    "Assassin": "1d6",
-    "Barbarian": "1d12",
-    "Bard": "1d8",
-    "Berserker": "1d12",
-    "Cataphract": "1d10",
-    "Cleric": "1d8",
-    "Cryomancer": "1d4",
-    "Druid": "1d8",
-    "Fighter": "1d10",
-    "Huntsman": "1d10",
-    "Illusionist": "1d4",
-    "Legerdemainist": "1d6",
-    "Magician": "1d4",
-    "Monk": "1d8",
-    "Necromancer": "1d4",
-    "Paladin": "1d10",
-    "Priest": "1d4",
-    "Purloiner": "1d6",
-    "Pyromancer": "1d4",
-    "Ranger": "1d10",
-    "Runegraver": "1d8",
-    "Scout": "1d6",
-    "Shaman": "1d6",
-    "Thief": "1d6",
-    "Warlock": "1d8",
-    "Witch": "1d4",
-  };
-  
   classData = {
     "Assassin": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
         "str": 9,
         "dex": 9,
@@ -472,11 +444,15 @@ export class Hyp3eActor extends Actor {
         "int": 16,
       },
       "featBonus": {
-        "attr": ["dex"],
+        "dex": 8,
       },
     },
     "Barbarian": {
       "hitDie": "1d12",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 13,
         "dex": 13,
@@ -487,11 +463,16 @@ export class Hyp3eActor extends Actor {
         "dex": 16,
       },
       "featBonus": {
-        "attr": ["str", "dex"],
+        "str": 8,
+        "dex": 8,
       },
     },
     "Bard": {
       "hitDie": "1d8",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 9,
         "dex": 9,
@@ -504,11 +485,15 @@ export class Hyp3eActor extends Actor {
         "cha": 16,
       },
       "featBonus": {
-        "attr": ["dex"],
+        "dex": 8,
       },
     },
     "Berserker": {
       "hitDie": "1d12",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 15,
         "con": 15,
@@ -518,11 +503,16 @@ export class Hyp3eActor extends Actor {
         "con": 16,
       },
       "featBonus": {
-        "attr": ["str", "con"],
+        "str": 8,
+        "con": 8,
       },
     },
     "Cataphract": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 9,
         "dex": 9,
@@ -534,10 +524,14 @@ export class Hyp3eActor extends Actor {
         "cha": 16,
       },
       "featBonus": {
-        "attr": ["str"],
+        "str": 8,
       },
     },
     "Cleric": {
+      "fa": 1,
+      "ca": 1,
+      "ta": 1,
+      "unskilled": -2,
       "hitDie": "1d8",
       "attrReqs": {
         "wis": 9,
@@ -548,6 +542,10 @@ export class Hyp3eActor extends Actor {
     },
     "Cryomancer": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
         "int": 9,
         "wis": 9,
@@ -559,6 +557,10 @@ export class Hyp3eActor extends Actor {
     },
     "Druid": {
       "hitDie": "1d8",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
         "wis": 9,
         "cha": 12,
@@ -570,6 +572,10 @@ export class Hyp3eActor extends Actor {
     },
     "Fighter": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 9,
       },
@@ -577,11 +583,15 @@ export class Hyp3eActor extends Actor {
         "str": 16,
       },
       "featBonus": {
-        "attr": ["str"],
+        "str": 8,
       },
     },
     "Huntsman": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 9,
         "dex": 9,
@@ -593,11 +603,15 @@ export class Hyp3eActor extends Actor {
         "wis": 16,
       },
       "featBonus": {
-        "attr": ["str"],
+        "str": 8,
       },
     },
     "Illusionist": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
         "dex": 9,
         "int": 9,
@@ -607,11 +621,15 @@ export class Hyp3eActor extends Actor {
         "int": 16,
       },
       "featBonus": {
-        "attr": ["dex"],
+        "dex": 8,
       },
     },
     "Legerdemainist": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
         "dex": 12,
         "int": 12,
@@ -621,11 +639,15 @@ export class Hyp3eActor extends Actor {
         "int": 16,
       },
       "featBonus": {
-        "attr": ["dex"],
+        "dex": 8,
       },
     },
     "Magician": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
         "int": 9,
       },
@@ -635,6 +657,10 @@ export class Hyp3eActor extends Actor {
     },
     "Monk": {
       "hitDie": "1d8",
+      "fa": 0,
+      "ca": null,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
         "str": 9,
         "dex": 9,
@@ -645,11 +671,15 @@ export class Hyp3eActor extends Actor {
         "wis": 16,
       },
       "featBonus": {
-        "attr": ["dex"],
+        "dex": 8,
       },
     },
     "Necromancer": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
         "int": 9,
         "wis": 9,
@@ -661,6 +691,10 @@ export class Hyp3eActor extends Actor {
     },
     "Paladin": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 9,
         "dex": 9,
@@ -672,11 +706,15 @@ export class Hyp3eActor extends Actor {
         "cha": 16,
       },
       "featBonus": {
-        "attr": ["str"],
+        "str": 8,
       },
     },
     "Priest": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": 1,
+      "unskilled": -4,
       "attrReqs": {
         "wis": 9,
         "cha": 9,
@@ -688,6 +726,10 @@ export class Hyp3eActor extends Actor {
     },
     "Purloiner": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
         "dex": 12,
         "wis": 12,
@@ -697,11 +739,15 @@ export class Hyp3eActor extends Actor {
         "wis": 16,
       },
       "featBonus": {
-        "attr": ["dex"],
+        "dex": 8,
       },
     },
     "Pyromancer": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
         "int": 9,
         "wis": 9,
@@ -713,6 +759,10 @@ export class Hyp3eActor extends Actor {
     },
     "Ranger": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 9,
         "dex": 9,
@@ -724,11 +774,15 @@ export class Hyp3eActor extends Actor {
         "wis": 16,
       },
       "featBonus": {
-        "attr": ["str"],
+        "str": 8,
       },
     },
     "Runegraver": {
       "hitDie": "1d8",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 9,
         "wis": 12,
@@ -738,11 +792,15 @@ export class Hyp3eActor extends Actor {
         "wis": 16,
       },
       "featBonus": {
-        "attr": ["str"],
+        "str": 8,
       },
     },
     "Scout": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
         "dex": 9,
         "int": 9,
@@ -752,11 +810,15 @@ export class Hyp3eActor extends Actor {
         "int": 16,
       },
       "featBonus": {
-        "attr": ["dex"],
+        "dex": 8,
       },
     },
     "Shaman": {
       "hitDie": "1d6",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
         "int": 9,
         "wis": 12
@@ -768,6 +830,10 @@ export class Hyp3eActor extends Actor {
     },
     "Thief": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
         "dex": 9,
       },
@@ -775,11 +841,15 @@ export class Hyp3eActor extends Actor {
         "dex": 16,
       },
       "featBonus": {
-        "attr": ["dex"],
+        "dex": 8,
       },
     },
     "Warlock": {
       "hitDie": "1d8",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
         "str": 12,
         "int": 12,
@@ -789,11 +859,15 @@ export class Hyp3eActor extends Actor {
         "int": 16,
       },
       "featBonus": {
-        "attr": ["str"],
+        "str": 8,
       },
     },
     "Witch": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
         "int": 9,
         "wis": 9,
@@ -835,10 +909,13 @@ export class Hyp3eActor extends Actor {
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", data) }
     if (data.details.class) {
       if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${data.details.class} hit die...`) }
-      // data.hd = this._stringFromTable(this.classHitDie, data.details.class)
       thisClass = this.classData[data.details.class]
       if (CONFIG.HYP3E.debugMessages) { console.log(`Class Data for ${data.details.class}: `, thisClass) }
       data.hd = thisClass.hitDie
+      data.fa = thisClass.fa
+      data.ca = thisClass.ca
+      data.ta = thisClass.ta
+      data.unskilled = thisClass.unskilled
       data.details.xp.primeAttr = ""
     }
     if (data.attributes) {
@@ -850,17 +927,23 @@ export class Hyp3eActor extends Actor {
             data.attributes.str.dmgMod = this._valueFromTable(this.strDmgMod, data.attributes.str.value)
             data.attributes.str.test = this._valueFromTable(this.testOfAttr, data.attributes.str.value)
             data.attributes.str.feat = this._valueFromTable(this.featOfAttr, data.attributes.str.value)
-            if (data.details.class && thisClass.xpBonusReq.str) {
-              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high ST...`) }
-              if (data.attributes.str.value >= 16 && xpBonusPossible != false) {
-                xpBonusPossible = true
-              } else {
-                xpBonusPossible = false
+            if (data.details.class) {
+              if (thisClass.xpBonusReq.str) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high ST...`) }
+                if (data.attributes.str.value >= thisClass.xpBonusReq.str && xpBonusPossible != false) {
+                  xpBonusPossible = true
+                } else {
+                  xpBonusPossible = false
+                }
+                if (data.details.xp.primeAttr == "") {
+                  data.details.xp.primeAttr = "ST"
+                } else {
+                  data.details.xp.primeAttr += ", ST"
+                }
               }
-              if (data.details.xp.primeAttr == "") {
-                data.details.xp.primeAttr = "ST"
-              } else {
-                data.details.xp.primeAttr += ", ST"
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of ST...`) }
+              if (thisClass.featBonus && thisClass.featBonus.str) {
+                data.attributes.str.feat += thisClass.featBonus.str
               }
             }
             break
@@ -873,7 +956,7 @@ export class Hyp3eActor extends Actor {
             data.attributes.dex.feat = this._valueFromTable(this.featOfAttr, data.attributes.dex.value)
             if (data.details.class && thisClass.xpBonusReq.dex) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high DX...`) }
-              if (data.attributes.dex.value >= 16 && xpBonusPossible != false) {
+              if (data.attributes.dex.value >= thisClass.xpBonusReq.dex && xpBonusPossible != false) {
                 xpBonusPossible = true
               } else {
                 xpBonusPossible = false
@@ -882,6 +965,10 @@ export class Hyp3eActor extends Actor {
                 data.details.xp.primeAttr = "DX"
               } else {
                 data.details.xp.primeAttr += ", DX"
+              }
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of DX...`) }
+              if (thisClass.featBonus && thisClass.featBonus.dex) {
+                data.attributes.dex.feat += thisClass.featBonus.dex
               }
             }
             break
@@ -895,7 +982,7 @@ export class Hyp3eActor extends Actor {
             data.attributes.con.feat = this._valueFromTable(this.featOfAttr, data.attributes.con.value)
             if (data.details.class && thisClass.xpBonusReq.con) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high CN...`) }
-              if (data.attributes.con.value >= 16 && xpBonusPossible != false) {
+              if (data.attributes.con.value >= thisClass.xpBonusReq.con && xpBonusPossible != false) {
                 xpBonusPossible = true
               } else {
                 xpBonusPossible = false
@@ -904,6 +991,10 @@ export class Hyp3eActor extends Actor {
                 data.details.xp.primeAttr = "CN"
               } else {
                 data.details.xp.primeAttr += ", CN"
+              }
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of CN...`) }
+              if (thisClass.featBonus && thisClass.featBonus.con) {
+                data.attributes.con.feat += thisClass.featBonus.con
               }
             }
             break
@@ -918,7 +1009,7 @@ export class Hyp3eActor extends Actor {
             data.attributes.int.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.int.value)
             if (data.details.class && thisClass.xpBonusReq.int) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high IN...`) }
-              if (data.attributes.int.value >= 16 && xpBonusPossible != false) {
+              if (data.attributes.int.value >= thisClass.xpBonusReq.int && xpBonusPossible != false) {
                 xpBonusPossible = true
               } else {
                 xpBonusPossible = false
@@ -941,7 +1032,7 @@ export class Hyp3eActor extends Actor {
             data.attributes.wis.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.wis.value)
             if (data.details.class && thisClass.xpBonusReq.wis) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high WS...`) }
-              if (data.attributes.wis.value >= 16 && xpBonusPossible != false) {
+              if (data.attributes.wis.value >= thisClass.xpBonusReq.wis && xpBonusPossible != false) {
                 xpBonusPossible = true
               } else {
                 xpBonusPossible = false
@@ -961,7 +1052,7 @@ export class Hyp3eActor extends Actor {
             data.attributes.cha.turnUndead = this._valueFromTable(this.chaTurnUndead, data.attributes.cha.value)
             if (data.details.class && thisClass.xpBonusReq.cha) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high CH...`) }
-              if (data.attributes.cha.value >= 16 && xpBonusPossible != false) {
+              if (data.attributes.cha.value >= thisClass.xpBonusReq.cha && xpBonusPossible != false) {
                 xpBonusPossible = true
               } else {
                 xpBonusPossible = false
