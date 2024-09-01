@@ -7,10 +7,9 @@ export class Hyp3eItem extends Item {
    * Augment the basic Item data model with additional dynamic data.
    */
 
-  // This is not working correctly... yet
+  // Override the base Item _preCreate function
   async _preCreate(data, options, user) {
-    // await super._preCreate(data, options, user);
-    if (CONFIG.HYP3E.debugMessages) { console.log("Creating item data", data) }
+    await super._preCreate(data, options, user);
     // Replace default image for various item types
     switch(data.type) {
       case "spell":
@@ -34,8 +33,8 @@ export class Hyp3eItem extends Item {
       default:
         data.img = `icons/svg/item-bag.svg`
     }
-    await super._preCreate(data, options, user);
-    // return this.update({ img:"foo" })
+    if (CONFIG.HYP3E.debugMessages) { console.log("Pre-created item data", data) }
+    return this.updateSource(data)
   }
 
   prepareData() {
@@ -474,8 +473,9 @@ export class Hyp3eItem extends Item {
     let result = await roll.roll();
     if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", roll) }
 
-    // Determine success or failure if we have a target number
+    // Determine whether we have a valid target number or formula
     if (rollData.item.tn != '' && rollData.item.tn != 'undefined') {
+      // Resolve target formula to a number, if necessary
       let targetRoll = new Roll(rollData.item.tn, rollData)
       await targetRoll.roll()
       if (CONFIG.HYP3E.debugMessages) {
@@ -483,6 +483,32 @@ export class Hyp3eItem extends Item {
         console.log(debugCheckTn)
         console.log("Target formula eval: ", targetRoll)
       }
+
+      /*
+      * SOMEWHERE IN HERE, CAN WE ADD SOME LOGIC TO SPECIALLY HANDLE TURNING UNDEAD?
+      *
+      Logic:
+
+      Cross-reference the cleric (or sub-class) TA and die roll against the Turn Undead table...
+      To determine possible results...
+      And output those to the chat?
+      It may be possible to just use the actor's TA and dynamically calculate the results row 
+        from the table, since the minimum value for success is always a target number of 10, 
+        affecting undead at Type [TA - 1].
+
+      Example: a cleric with TA of 5 can turn undead up to Type 4 with a target number of 10.
+      From there, we know that:
+
+      A target number of 7 will turn undead at their Type == cleric's TA.
+      A TN of 4 affects undead at Type == cleric [TA + 1].
+      And a TN of 1 affects undead at Type == cleric [TA + 2].
+      And with all of this information, we can also calculate the Types of undead that may be 
+        Turned automatically (undead Type == [cleric TA] - 2), or Destroyed (undead Type == 
+        [cleric TA] - 4), or Ultimately Destroyed (undead Type == [cleric TA] - 7).
+
+      */
+
+      // Determine success or failure of the roll
       let targetNum = targetRoll.total
       label += ` (target ${targetNum})`
       // Item checks are roll-under for success
