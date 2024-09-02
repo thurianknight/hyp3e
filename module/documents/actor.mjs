@@ -421,396 +421,468 @@ export class Hyp3eActor extends Actor {
   };
 
   /**
-   * Class hit die
+   * Class-specific data
    * Classes:
    *   Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, 
    *   Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, 
    *   Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch
-   * 
-   * Applied to:
-   * - `system.hd`
    */
-  classHitDie = {
-    "Assassin": "1d6",
-    "Barbarian": "1d12",
-    "Bard": "1d8",
-    "Berserker": "1d12",
-    "Cataphract": "1d10",
-    "Cleric": "1d8",
-    "Cryomancer": "1d4",
-    "Druid": "1d8",
-    "Fighter": "1d10",
-    "Huntsman": "1d10",
-    "Illusionist": "1d4",
-    "Legerdemainist": "1d6",
-    "Magician": "1d4",
-    "Monk": "1d8",
-    "Necromancer": "1d4",
-    "Paladin": "1d10",
-    "Priest": "1d4",
-    "Purloiner": "1d6",
-    "Pyromancer": "1d4",
-    "Ranger": "1d10",
-    "Runegraver": "1d8",
-    "Scout": "1d6",
-    "Shaman": "1d6",
-    "Thief": "1d6",
-    "Warlock": "1d8",
-    "Witch": "1d4",
-  };
-  
   classData = {
     "Assassin": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
-        "ST": 9,
-        "DX": 9,
-        "IN": 9,
+        "str": 9,
+        "dex": 9,
+        "int": 9,
       },
       "xpBonusReq": {
-        "DX": 16,
-        "IN": 16,
+        "dex": 16,
+        "int": 16,
       },
       "featBonus": {
-        "attr": ["DX"],
+        "dex": 8,
       },
     },
     "Barbarian": {
       "hitDie": "1d12",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 13,
-        "DX": 13,
-        "CN": 13,
+        "str": 13,
+        "dex": 13,
+        "con": 13,
       },
       "xpBonusReq": {
-        "ST": 16,
-        "DX": 16,
+        "str": 16,
+        "dex": 16,
       },
       "featBonus": {
-        "attr": ["ST", "DX"],
+        "str": 8,
+        "dex": 8,
       },
     },
     "Bard": {
       "hitDie": "1d8",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 9,
-        "DX": 9,
-        "IN": 9,
-        "WS": 9,
-        "CH": 15,
+        "str": 9,
+        "dex": 9,
+        "int": 9,
+        "wis": 9,
+        "cha": 15,
       },
       "xpBonusReq": {
-        "DX": 16,
-        "CH": 16,
+        "dex": 16,
+        "cha": 16,
       },
       "featBonus": {
-        "attr": ["DX"],
+        "dex": 8,
       },
     },
     "Berserker": {
       "hitDie": "1d12",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 15,
-        "CN": 15,
+        "str": 15,
+        "con": 15,
       },
       "xpBonusReq": {
-        "ST": 16,
-        "CN": 16,
+        "str": 16,
+        "con": 16,
       },
       "featBonus": {
-        "attr": ["ST", "CN"],
+        "str": 8,
+        "con": 8,
       },
     },
     "Cataphract": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 9,
-        "DX": 9,
-        "WS": 9,
-        "CH": 9,
+        "str": 9,
+        "dex": 9,
+        "wis": 9,
+        "cha": 9,
       },
       "xpBonusReq": {
-        "ST": 16,
-        "CH": 16,
+        "str": 16,
+        "cha": 16,
       },
       "featBonus": {
-        "attr": ["ST"],
+        "str": 8,
       },
     },
     "Cleric": {
+      "fa": 1,
+      "ca": 1,
+      "ta": 1,
+      "unskilled": -2,
       "hitDie": "1d8",
       "attrReqs": {
-        "WS": 9,
+        "wis": 9,
       },
       "xpBonusReq": {
-        "WS": 16,
+        "wis": 16,
       },
     },
     "Cryomancer": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
-        "IN": 9,
-        "WS": 9,
+        "int": 9,
+        "wis": 9,
       },
       "xpBonusReq": {
-        "IN": 16,
-        "WS": 16,
+        "int": 16,
+        "wis": 16,
       },
     },
     "Druid": {
       "hitDie": "1d8",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
-        "WS": 9,
-        "CH": 12,
+        "wis": 9,
+        "cha": 12,
       },
       "xpBonusReq": {
-        "WS": 16,
-        "CH": 16,
+        "wis": 16,
+        "cha": 16,
       },
     },
     "Fighter": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 9,
+        "str": 9,
       },
       "xpBonusReq": {
-        "ST": 16,
+        "str": 16,
       },
       "featBonus": {
-        "attr": ["ST"],
+        "str": 8,
       },
     },
     "Huntsman": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 9,
-        "DX": 9,
-        "WS": 9,
-        "CH": 12
+        "str": 9,
+        "dex": 9,
+        "wis": 9,
+        "cha": 12
       },
       "xpBonusReq": {
-        "ST": 16,
-        "WS": 16,
+        "str": 16,
+        "wis": 16,
       },
       "featBonus": {
-        "attr": ["ST"],
+        "str": 8,
       },
     },
     "Illusionist": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
-        "DX": 9,
-        "IN": 9,
+        "dex": 9,
+        "int": 9,
       },
       "xpBonusReq": {
-        "DX": 16,
-        "IN": 16,
+        "dex": 16,
+        "int": 16,
       },
       "featBonus": {
-        "attr": ["DX"],
+        "dex": 8,
       },
     },
     "Legerdemainist": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
-        "DX": 12,
-        "IN": 12,
+        "dex": 12,
+        "int": 12,
       },
       "xpBonusReq": {
-        "DX": 16,
-        "IN": 16,
+        "dex": 16,
+        "int": 16,
       },
       "featBonus": {
-        "attr": ["DX"],
+        "dex": 8,
       },
     },
     "Magician": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
-        "IN": 9,
+        "int": 9,
       },
       "xpBonusReq": {
-        "IN": 16,
+        "int": 16,
       },
     },
     "Monk": {
       "hitDie": "1d8",
+      "fa": 0,
+      "ca": null,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
-        "ST": 9,
-        "DX": 9,
-        "WS": 9,
+        "str": 9,
+        "dex": 9,
+        "wis": 9,
       },
       "xpBonusReq": {
-        "DX": 16,
-        "WS": 16,
+        "dex": 16,
+        "wis": 16,
       },
       "featBonus": {
-        "attr": ["DX"],
+        "dex": 8,
       },
     },
     "Necromancer": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
-        "IN": 9,
-        "WS": 9,
+        "int": 9,
+        "wis": 9,
       },
       "xpBonusReq": {
-        "IN": 16,
-        "WS": 16,
+        "int": 16,
+        "wis": 16,
       },
     },
     "Paladin": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 9,
-        "DX": 9,
-        "WS": 9,
-        "CH": 15,
+        "str": 9,
+        "dex": 9,
+        "wis": 9,
+        "cha": 15,
       },
       "xpBonusReq": {
-        "ST": 16,
-        "CH": 16,
+        "str": 16,
+        "cha": 16,
       },
       "featBonus": {
-        "attr": ["ST"],
+        "str": 8,
       },
     },
     "Priest": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": 1,
+      "unskilled": -4,
       "attrReqs": {
-        "WS": 9,
-        "CH": 9,
+        "wis": 9,
+        "cha": 9,
       },
       "xpBonusReq": {
-        "WS": 16,
-        "CH": 16,
+        "wis": 16,
+        "cha": 16,
       },
     },
     "Purloiner": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
-        "DX": 12,
-        "WS": 12,
+        "dex": 12,
+        "wis": 12,
       },
       "xpBonusReq": {
-        "DX": 16,
-        "WS": 16,
+        "dex": 16,
+        "wis": 16,
       },
       "featBonus": {
-        "attr": ["DX"],
+        "dex": 8,
       },
     },
     "Pyromancer": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
-        "IN": 9,
-        "WS": 9,
+        "int": 9,
+        "wis": 9,
       },
       "xpBonusReq": {
-        "IN": 16,
-        "WS": 16,
+        "int": 16,
+        "wis": 16,
       },
     },
     "Ranger": {
       "hitDie": "1d10",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 9,
-        "DX": 9,
-        "IN": 9,
-        "WS": 9,
+        "str": 9,
+        "dex": 9,
+        "int": 9,
+        "wis": 9,
       },
       "xpBonusReq": {
-        "ST": 16,
-        "WS": 16,
+        "str": 16,
+        "wis": 16,
       },
       "featBonus": {
-        "attr": ["ST"],
+        "str": 8,
       },
     },
     "Runegraver": {
       "hitDie": "1d8",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 9,
-        "WS": 12,
+        "str": 9,
+        "wis": 12,
       },
       "xpBonusReq": {
-        "ST": 16,
-        "WS": 16,
+        "str": 16,
+        "wis": 16,
       },
       "featBonus": {
-        "attr": ["ST"],
+        "str": 8,
       },
     },
     "Scout": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
-        "DX": 9,
-        "IN": 9,
+        "dex": 9,
+        "int": 9,
       },
       "xpBonusReq": {
-        "DX": 16,
-        "IN": 16,
+        "dex": 16,
+        "int": 16,
       },
       "featBonus": {
-        "attr": ["DX"],
+        "dex": 8,
       },
     },
     "Shaman": {
       "hitDie": "1d6",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
-        "IN": 9,
-        "WS": 12
+        "int": 9,
+        "wis": 12
       },
       "xpBonusReq": {
-        "IN": 16,
-        "WS": 16,
+        "int": 16,
+        "wis": 16,
       },
     },
     "Thief": {
       "hitDie": "1d6",
+      "fa": 1,
+      "ca": null,
+      "ta": null,
+      "unskilled": -2,
       "attrReqs": {
-        "DX": 9,
+        "dex": 9,
       },
       "xpBonusReq": {
-        "DX": 16,
+        "dex": 16,
       },
       "featBonus": {
-        "attr": ["DX"],
+        "dex": 8,
       },
     },
     "Warlock": {
       "hitDie": "1d8",
+      "fa": 1,
+      "ca": 1,
+      "ta": null,
+      "unskilled": null,
       "attrReqs": {
-        "ST": 12,
-        "IN": 12,
+        "str": 12,
+        "int": 12,
       },
       "xpBonusReq": {
-        "ST": 16,
-        "IN": 16,
+        "str": 16,
+        "int": 16,
       },
       "featBonus": {
-        "attr": ["ST"],
+        "str": 8,
       },
     },
     "Witch": {
       "hitDie": "1d4",
+      "fa": 0,
+      "ca": 1,
+      "ta": null,
+      "unskilled": -4,
       "attrReqs": {
-        "IN": 9,
-        "WS": 9,
-        "CH": 12,
+        "int": 9,
+        "wis": 9,
+        "cha": 12,
       },
       "xpBonusReq": {
-        "IN": 16,
-        "CH": 16,
+        "int": 16,
+        "cha": 16,
       },
     },
 }
 
   _valueFromTable(table, val) {
     let output;
-    // console.log("Table:", table, "Value:", val)
     for (let i = 0; i <= val; i++) {
-      // console.log("Lookup:", table[i])
       if (table[i] != undefined) {
         output = table[i];
       }
@@ -829,74 +901,243 @@ export class Hyp3eActor extends Actor {
    */
   async SetAttributeMods() {
     console.log("Setting attribute modifiers...")
-    // let data = super.getRollData();
     let data = this.system
+    let thisClass = {}
+    let xpBonusPossible = null
+
+    // Setup chat message variables
+    let label = `<h3>Values for character updated...</h3>`
+    let content = `<ul>`
+
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", data) }
     if (data.details.class) {
+      // Override label if character class selected
+      label = `<h3>Values for ${data.details.class} updated...</h3>`
       if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${data.details.class} hit die...`) }
-      data.hd = this._stringFromTable(this.classHitDie, data.details.class)
+      thisClass = this.classData[data.details.class]
+      if (CONFIG.HYP3E.debugMessages) { console.log(`Class Data for ${data.details.class}: `, thisClass) }
+      data.hd = thisClass.hitDie
+      content += `<li>Hit Die: ${thisClass.hitDie}</li>`
+      data.fa = thisClass.fa
+      content += `<li>Fighting Ability: ${thisClass.fa}</li>`
+      data.ca = thisClass.ca
+      content += `<li>Casting Ability: ${thisClass.ca}</li>`
+      data.ta = thisClass.ta
+      content += `<li>Turning Ability: ${thisClass.ta}</li>`
+      data.unskilled = thisClass.unskilled
+      content += `<li>Unskilled Weapon Penalty: ${thisClass.unskilled}</li>`
+      data.details.xp.primeAttr = ""
     }
     if (data.attributes) {
       for (let [k, v] of Object.entries(data.attributes)) {
-        // data[k] = foundry.utils.deepClone(v);
-        // console.log(`Getting ${k} modifiers...`)
         switch (k) {
           case "str":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>ST Mods:</li><ul>`
             data.attributes.str.atkMod = this._valueFromTable(this.strAtkMod, data.attributes.str.value)
+            content += `<li>Melee Attack Mod: ${data.attributes.str.atkMod}</li>`
             data.attributes.str.dmgMod = this._valueFromTable(this.strDmgMod, data.attributes.str.value)
+            content += `<li>Damage Mod: ${data.attributes.str.dmgMod}</li>`
             data.attributes.str.test = this._valueFromTable(this.testOfAttr, data.attributes.str.value)
+            content += `<li>Test of ST: ${data.attributes.str.test}</li>`
             data.attributes.str.feat = this._valueFromTable(this.featOfAttr, data.attributes.str.value)
+            content += `<li>Feat of ST: ${data.attributes.str.feat}</li>`
+            if (data.details.class) {
+              if (thisClass.xpBonusReq.str) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high ST...`) }
+                if (data.attributes.str.value >= thisClass.xpBonusReq.str && xpBonusPossible != false) {
+                  xpBonusPossible = true
+                } else {
+                  xpBonusPossible = false
+                }
+                if (data.details.xp.primeAttr == "") {
+                  data.details.xp.primeAttr = "ST"
+                } else {
+                  data.details.xp.primeAttr += ", ST"
+                }
+              }
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of ST...`) }
+              if (thisClass.featBonus && thisClass.featBonus.str) {
+                data.attributes.str.feat += thisClass.featBonus.str
+                content += `<li>Extraordinary Feat of ST override: ${data.attributes.str.feat}</li>`
+              }
+            }
+            content += `</ul>`
             break
 
           case "dex":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>DX Mods:</li><ul>`
             data.attributes.dex.atkMod = this._valueFromTable(this.dexAtkMod, data.attributes.dex.value)
+            content += `<li>Missile Attack Mod: ${data.attributes.dex.atkMod}</li>`
             data.attributes.dex.defMod = this._valueFromTable(this.dexDefMod, data.attributes.dex.value)
+            content += `<li>Defence Mod: ${data.attributes.dex.defMod}</li>`
             data.attributes.dex.test = this._valueFromTable(this.testOfAttr, data.attributes.dex.value)
+            content += `<li>Test of DX: ${data.attributes.dex.test}</li>`
             data.attributes.dex.feat = this._valueFromTable(this.featOfAttr, data.attributes.dex.value)
+            content += `<li>Feat of DX: ${data.attributes.dex.feat}</li>`
+            if (data.details.class && thisClass.xpBonusReq.dex) {
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high DX...`) }
+              if (data.attributes.dex.value >= thisClass.xpBonusReq.dex && xpBonusPossible != false) {
+                xpBonusPossible = true
+              } else {
+                xpBonusPossible = false
+              }
+              if (data.details.xp.primeAttr == "") {
+                data.details.xp.primeAttr = "DX"
+              } else {
+                data.details.xp.primeAttr += ", DX"
+              }
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of DX...`) }
+              if (thisClass.featBonus && thisClass.featBonus.dex) {
+                data.attributes.dex.feat += thisClass.featBonus.dex
+                content += `<li>Extraordinary Feat of DX override: ${data.attributes.dex.feat}</li>`
+              }
+            }
+            content += `</ul>`
             break
 
           case "con":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>CN Mods:</li><ul>`
             data.attributes.con.hpMod = this._valueFromTable(this.conHpMod, data.attributes.con.value)
+            content += `<li>Hit Point Mod: ${data.attributes.con.hpMod}</li>`
             data.attributes.con.poisRadMod = this._valueFromTable(this.conPoisonMod, data.attributes.con.value)
+            content += `<li>Poison/Radiation Mod: ${data.attributes.con.poisRadMod}</li>`
             data.attributes.con.traumaSurvive = this._valueFromTable(this.conTraumaSurvive, data.attributes.con.value)
+            content += `<li>Trauma Survive %: ${data.attributes.con.traumaSurvive}</li>`
             data.attributes.con.test = this._valueFromTable(this.testOfAttr, data.attributes.con.value)
+            content += `<li>Test of CN: ${data.attributes.con.test}</li>`
             data.attributes.con.feat = this._valueFromTable(this.featOfAttr, data.attributes.con.value)
+            content += `<li>Feat of CN: ${data.attributes.con.feat}</li>`
+            if (data.details.class && thisClass.xpBonusReq.con) {
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high CN...`) }
+              if (data.attributes.con.value >= thisClass.xpBonusReq.con && xpBonusPossible != false) {
+                xpBonusPossible = true
+              } else {
+                xpBonusPossible = false
+              }
+              if (data.details.xp.primeAttr == "") {
+                data.details.xp.primeAttr = "CN"
+              } else {
+                data.details.xp.primeAttr += ", CN"
+              }
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of CN...`) }
+              if (thisClass.featBonus && thisClass.featBonus.con) {
+                data.attributes.con.feat += thisClass.featBonus.con
+                content += `<li>Extraordinary Feat of CN override: ${data.attributes.con.feat}</li>`
+              }
+            }
+            content += `</ul>`
             break
 
           case "int":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>IN Mods:</li><ul>`
             data.attributes.int.languages = this._valueFromTable(this.intLanguages, data.attributes.int.value)
+            content += `<li>Languages: ${data.attributes.int.languages}</li>`
             data.attributes.int.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
+            content += `<li>Level 1 Bonus Spell: ${data.attributes.int.bonusSpells.lvl1}</li>`
             data.attributes.int.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
+            content += `<li>Level 2 Bonus Spell: ${data.attributes.int.bonusSpells.lvl2}</li>`
             data.attributes.int.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.int.value)
+            content += `<li>Level 3 Bonus Spell: ${data.attributes.int.bonusSpells.lvl3}</li>`
             data.attributes.int.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.int.value)
+            content += `<li>Level 4 Bonus Spell: ${data.attributes.int.bonusSpells.lvl4}</li>`
             data.attributes.int.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.int.value)
+            content += `<li>% Chance to Learn Spell: ${data.attributes.int.learnSpell}</li>`
+            if (data.details.class && thisClass.xpBonusReq.int) {
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high IN...`) }
+              if (data.attributes.int.value >= thisClass.xpBonusReq.int && xpBonusPossible != false) {
+                xpBonusPossible = true
+              } else {
+                xpBonusPossible = false
+              }
+              if (data.details.xp.primeAttr == "") {
+                data.details.xp.primeAttr = "IN"
+              } else {
+                data.details.xp.primeAttr += ", IN"
+              }
+            }
+            content += `</ul>`
             break
 
           case "wis":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>WS Mods:</li><ul>`
             data.attributes.wis.willMod = this._valueFromTable(this.wisWillMod, data.attributes.wis.value)
+            content += `<li>Will Mod: ${data.attributes.wis.willMod}</li>`
             data.attributes.wis.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
+            content += `<li>Level 1 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl1}</li>`
             data.attributes.wis.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
+            content += `<li>Level 2 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl2}</li>`
             data.attributes.wis.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.wis.value)
+            content += `<li>Level 3 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl3}</li>`
             data.attributes.wis.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.wis.value)
+            content += `<li>Level 4 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl4}</li>`
             data.attributes.wis.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.wis.value)
+            content += `<li>% Chance to Learn Spell: ${data.attributes.wis.learnSpell}</li>`
+            if (data.details.class && thisClass.xpBonusReq.wis) {
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high WS...`) }
+              if (data.attributes.wis.value >= thisClass.xpBonusReq.wis && xpBonusPossible != false) {
+                xpBonusPossible = true
+              } else {
+                xpBonusPossible = false
+              }
+              if (data.details.xp.primeAttr == "") {
+                data.details.xp.primeAttr = "WS"
+              } else {
+                data.details.xp.primeAttr += ", WS"
+              }
+            }
+            content += `</ul>`
             break
 
           case "cha":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+            content += `<li>CH Mods:</li><ul>`
             data.attributes.cha.reaction = this._valueFromTable(this.chaReactionMod, data.attributes.cha.value)
+            content += `<li>Reaction Mod: ${data.attributes.cha.reaction}</li>`
             data.attributes.cha.maxHenchmen = this._valueFromTable(this.chaRetainers, data.attributes.cha.value)
+            content += `<li>Max Henchmen: ${data.attributes.cha.maxHenchmen}</li>`
             data.attributes.cha.turnUndead = this._valueFromTable(this.chaTurnUndead, data.attributes.cha.value)
+            content += `<li>Turn Undead Mod: ${data.attributes.cha.turnUndead}</li>`
+            if (data.details.class && thisClass.xpBonusReq.cha) {
+              if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high CH...`) }
+              if (data.attributes.cha.value >= thisClass.xpBonusReq.cha && xpBonusPossible != false) {
+                xpBonusPossible = true
+              } else {
+                xpBonusPossible = false
+              }
+              if (data.details.xp.primeAttr == "") {
+                data.details.xp.primeAttr = "CH"
+              } else {
+                data.details.xp.primeAttr += ", CH"
+              }
+            }
+            content += `</ul>`
             break
         }
+        if (xpBonusPossible) {
+          data.details.xp.bonus = 10
+        } else {
+          data.details.xp.bonus = 0
+        }
       }
+      content += `<li>Prime Attribute(s): ${data.details.xp.primeAttr}</li>`
+      content += `<li>XP Bonus: ${data.details.xp.bonus}</li>`
+      content += `</ul>`
+
       // Apply updates to the actor
       if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', data) }
       await this.update({data})
+
+      // Now we can display the chat message
+      ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        flavor: label,
+        content: content ?? ''
+      })
     }
   }
 

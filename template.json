@@ -15,8 +15,8 @@
         },
         "atkRate": "1/1",
         "fa": 0,
-        "ca": 0,
-        "ta": 0,
+        "ca": null,
+        "ta": null,
         "saves": {
           "death": {
             "value": 0
@@ -78,7 +78,8 @@
         "xp": {
           "value": "0",
           "toNextLvl": "0",
-          "bonus": "0"
+          "bonus": "0",
+          "primeAttr": ""
         },
         "race": "",
         "gender": "",

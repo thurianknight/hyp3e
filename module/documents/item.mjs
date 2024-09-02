@@ -7,10 +7,9 @@ export class Hyp3eItem extends Item {
    * Augment the basic Item data model with additional dynamic data.
    */
 
-  // This is not working correctly... yet
+  // Override the base Item _preCreate function
   async _preCreate(data, options, user) {
-    // await super._preCreate(data, options, user);
-    if (CONFIG.HYP3E.debugMessages) { console.log("Creating item data", data) }
+    await super._preCreate(data, options, user);
     // Replace default image for various item types
     switch(data.type) {
       case "spell":
@@ -34,8 +33,8 @@ export class Hyp3eItem extends Item {
       default:
         data.img = `icons/svg/item-bag.svg`
     }
-    await super._preCreate(data, options, user);
-    // return this.update({ img:"foo" })
+    if (CONFIG.HYP3E.debugMessages) { console.log("Pre-created item data", data) }
+    return this.updateSource(data)
   }
 
   prepareData() {
@@ -428,6 +427,7 @@ export class Hyp3eItem extends Item {
     // const rollMode = game.settings.get('core', 'rollMode')
     // console.log(`System roll mode: ${rollMode}`)
     let label = ""
+    let content = item.system.description
     let itemName = ""
     if (item.system.friendlyName != "") {
       itemName = item.system.friendlyName
@@ -443,7 +443,7 @@ export class Hyp3eItem extends Item {
         speaker: speaker,
         rollMode: 'publicroll',
         flavor: label,
-        content: item.system.description ?? ''
+        content: content ?? ''
       });
       return null
     }
@@ -454,8 +454,13 @@ export class Hyp3eItem extends Item {
     if (CONFIG.HYP3E.debugMessages) { console.log("Item roll data:", rollData) }
     // Declare vars
     let rollFormula
+    let naturalRoll = 0
+    let dieType = ""
+    let rollTotal = 0
     let debugCheckRollFormula = ""
     let debugCheckTn = ""
+    let results = []
+    let description = ""
 
     // Setup roll formula
     label = `${itemName} roll...`
@@ -467,15 +472,21 @@ export class Hyp3eItem extends Item {
       rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`
     }
 
-    if (CONFIG.HYP3E.debugMessages) { console.log("Roll formula:", rollFormula) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("Check formula:", rollFormula) }
     // Invoke the roll and submit it to chat.
     const roll = new Roll(rollFormula, rollData);
     // Resolve the roll
-    let result = await roll.roll();
+    await roll.roll();
     if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", roll) }
 
-    // Determine success or failure if we have a target number
+    // Get the resulting values from the attack roll
+    naturalRoll = roll.dice[0].total
+    dieType = "d12"
+    rollTotal = roll.total
+
+    // Determine whether we have a valid target number or formula
     if (rollData.item.tn != '' && rollData.item.tn != 'undefined') {
+      // Resolve target formula to a number, if necessary
       let targetRoll = new Roll(rollData.item.tn, rollData)
       await targetRoll.roll()
       if (CONFIG.HYP3E.debugMessages) {
@@ -483,12 +494,61 @@ export class Hyp3eItem extends Item {
         console.log(debugCheckTn)
         console.log("Target formula eval: ", targetRoll)
       }
+
+      // Determine success or failure of the roll
       let targetNum = targetRoll.total
       label += ` (target ${targetNum})`
       // Item checks are roll-under for success
       if(roll.total <= targetNum) {
         if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + targetNum + "!") }
         label += "<br /><b>Success!</b>"
+
+        /*
+        SOMEWHERE IN HERE, CAN WE ADD SOME LOGIC TO SPECIALLY HANDLE TURNING UNDEAD?
+
+        Cross-reference the cleric (or sub-class) TA and die roll against the Turn Undead table...
+        To determine possible results... and output those to the chat?
+        It may be possible to just use the actor's TA and dynamically calculate the results row 
+          from the table, since the minimum value for success is always a target number of 10, 
+          affecting undead at Type [TA - 1].
+
+        Example: a cleric with TA of 5 can turn undead up to Type 4 with a target number of 10.
+        From there, we know that:
+
+        A target number of 7 will turn undead at their Type == cleric's TA.
+        A TN of 4 affects undead at Type == cleric [TA + 1].
+        And a TN of 1 affects undead at Type == cleric [TA + 2].
+        And with all of this information, we can also calculate the Types of undead that may be 
+          Turned automatically (undead Type == [cleric TA] - 2), or Destroyed (undead Type == 
+          [cleric TA] - 4), or Ultimately Destroyed (undead Type == [cleric TA] - 7).
+        */
+
+        let itemNameLower = itemName.toLowerCase()
+        if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
+          if (roll.total <= 1) {
+            results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta+2} or less are <b>turned</b>.</li>`)
+          } else if (roll.total <= 4) {
+            results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta+1} or less are <b>turned</b>.</li>`)
+          } else if (roll.total <= 7) {
+            results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta} or less are <b>turned</b>.</li>`)
+          } else { // => roll.total is between 8 and 10, since a success was already determined
+            results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta-1} or less are <b>turned</b>.</li>`)
+          }
+          if (rollData.ta >= 4) {
+            results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta-4} or less are <b>destroyed</b>.</li>`)
+          }
+          if (rollData.ta >= 7) {
+            results.push(`<li>[[/r 1d6+6]] Undead of Type ${rollData.ta-7} or less are <b>utterly destroyed</b>.</li>`)
+          }
+          // Now setup our description output from the results
+          description = `<ul>`
+          for (let i = results.length-1; i >=0; i--) {
+            description += results[i]
+          }
+          description += `</ul>`
+          
+        }
+
       } else {
         if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + targetNum + "!") }
         label += "<br /><b>Fail.</b>"
@@ -498,13 +558,44 @@ export class Hyp3eItem extends Item {
       if (CONFIG.HYP3E.debugMessages) { console.log("No target number for " + roll.total) }
     }
 
+    // Render the full attack-roll chat card, with damage if any
+    let msgContent = ``
+    msgContent = `
+    <div class="message-content">
+      ${description}
+      <div class="dice-roll">
+        <div class="dice-result">
+          <div class="dice-formula">${roll.formula}</div>
+          <div class="dice-tooltip">
+            <section class="tooltip-part">
+              ${debugCheckRollFormula}
+              <div class="dice">
+                <header class="part-header flexrow">
+                  <span class="part-formula">${dieType}</span>
+                  <span>
+                    <ol class="dice-rolls">
+                      <li class="roll die ${dieType}">${naturalRoll}</li>
+                    </ol>
+                  </span>
+                  <span class="part-total">${naturalRoll}</span>
+                </header>
+              </div>
+            </section>
+          </div>
+          <h4 class="dice-total">${rollTotal}</h4>
+        </div>
+      </div>
+    </div>
+    `
+
     // Prettify label
     label = "<h3>" + label + "</h3>"
 
     // Output roll result to a chat message
     let chatMsg = await roll.toMessage({
       speaker: speaker,
-      flavor: label
+      flavor: label,
+      content: msgContent
     },{
       rollMode: rollData.item.rollMode
     })
