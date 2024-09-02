@@ -703,10 +703,9 @@ export class Hyp3eActorSheet extends ActorSheet {
           } else {
             itemName = item.name
           }
-          if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling Item ${itemName}:`, item) }
-          // dataset.details = `${item.system.description}`
-          // The default for weapons & spells is an attack
+          if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
           if (item.type == "weapon") {
+            // The default for weapons is an attack
             let mastery = "Attack"
             if (item.system.wpnGrandmaster) {
               mastery = "Grandmaster attack"
@@ -715,23 +714,20 @@ export class Hyp3eActorSheet extends ActorSheet {
             }
             dataset.label = `${mastery} with ${itemName}...`
             dataset.roll = item.system.formula
-            // dataset.enableRoll = true
             rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset);
           } else if (item.type == "spell") {
+            // The default for spells is to cast
             dataset.label = `Cast spell ${itemName}...`
             if (item.system.formula > "") {
               dataset.roll = item.system.formula
-              // dataset.enableRoll = true
             } else {
               dataset.details = `No attack roll required to cast ${itemName}.`
-              // dataset.enableRoll = false
             }
             rollResponse = await Hyp3eDice.ShowSpellcastingDialog(dataset);
           } else {  // ==> Neither a weapon nor a spell
             // The default for other item types (i.e. class abilities or actual items) is a check
             dataset.label = `${itemName} check...`
             dataset.roll = item.system.formula
-            // dataset.enableRoll = true
             rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
           }
           // Log the dialog response
