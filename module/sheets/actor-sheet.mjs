@@ -88,6 +88,13 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Exploration Skills:", k, v, v.label) }
     }
 
+    // // Handle d6 task resolution
+    // for (let [k, v] of Object.entries(CONFIG.HYP3E.taskResolution)) {
+    //   v.label = game.i18n.localize(CONFIG.HYP3E.taskResolution[k].name) ?? k.name;
+    //   v.hint = game.i18n.localize(CONFIG.HYP3E.taskResolution[k].hint) ?? k.hint;
+    //   if (CONFIG.HYP3E.debugMessages) { console.log("Task Resolution:", k, v, v.label) }
+    // }
+
     // Handle movement types
     for (let [k, v] of Object.entries(context.system.movement)) {
       v.label = game.i18n.localize(CONFIG.HYP3E.movement[k]) ?? k;
@@ -278,7 +285,7 @@ export class Hyp3eActorSheet extends ActorSheet {
   }
 
   /**
-   * Handle addding and removing bonus spells
+   * Handle adding and removing bonus spells
    * @param {String} spellLvl The bonus spell level to be updated
    * @private
    */
@@ -391,7 +398,7 @@ export class Hyp3eActorSheet extends ActorSheet {
           break
       }
       this.render(true)
-      if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", result) }
+      if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", this.actor) }
   }
 
   /**
@@ -448,7 +455,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       type: type,
       system: data
     };
-    // Remove the type from the dataset since it's in the itemData.type prop.
+    // Remove the type from the dataset since it's in the itemData.type property
     delete itemData.system["type"];
 
     // Finally, create the item!
@@ -936,28 +943,24 @@ export class Hyp3eActorSheet extends ActorSheet {
             }
 
             // Determine hit or miss based on target AC
-            let hit = false
+            // let hit = false
             let tn = 20 - targetAc
             if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${roll.total} hits AC [20 - ${roll.total} => ] ${eval(20 - roll.total)}`) }
             if (naturalRoll == 20) {
               if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
               label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
-              hit = true
+              // hit = true
             } else if (naturalRoll == 1) {
               if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
               label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
             } else if (roll.total >= tn) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${roll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
-              if (targetName != "") {
-                label += `<br /><b>Hit!</b>`
-              } else {
-                label += `<br /><b>Hits AC ${eval(20 - roll.total)}.</b>`
-              }
-              hit = true
+              label += `<br /><b>Hits AC ${eval(20 - roll.total)}!</b>`
+              // hit = true
             } else {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${roll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
-              if (targetName != "") {
-                label += `<br /><b>Miss.</b>`
+              if (eval(20 - roll.total) <= 9) {
+                label += `<br /><b>Miss, would have hit AC ${eval(20 - roll.total)}.</b>`
               } else {
                 label += `<br /><b>Misses AC 9.</b>`
               }

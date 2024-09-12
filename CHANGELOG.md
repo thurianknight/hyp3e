@@ -6,4 +6,4 @@
 
 ## 1.2.1
 
-- Forked to create Hyperborea 3rd Edition system
+- Forked to create Hyperborea 3rd Edition system, version 0.1
