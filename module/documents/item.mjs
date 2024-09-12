@@ -197,6 +197,8 @@ export class Hyp3eItem extends Item {
 
     // Has the user targeted a token? If so, get it's AC and name
     let userTargets = Array.from(game.user.targets)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Selected Tokens:", canvas.tokens.controlled) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("Game User Data:", game.user) }
     if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
     if (userTargets.length > 0) {
       let primaryTargetData = userTargets[0].actor
@@ -253,24 +255,12 @@ export class Hyp3eItem extends Item {
       label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
     } else if (atkRoll.total >= tn) {
       if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
-      if (targetName != "") {
-        label += `<br /><b>Hit!</b>`
-        if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}.</b>` }
-      } else {
-        label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}.</b>`
-      }
+      label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
       hit = true
     } else {
       if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
-      if (targetName != "") {
-        label += `<br /><b>Miss.</b>`
-        if (CONFIG.HYP3E.debugMessages) {
-          if ( eval(20 - atkRoll.total) <= 9 ) {
-            debugAtkRollFormula += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
-          } else {
-            debugAtkRollFormula += `<br /><b>Misses AC 9.</b>`  
-          }
-        }
+      if (eval(20 - atkRoll.total) <= 9) {
+        label += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
       } else {
         label += `<br /><b>Misses AC 9.</b>`
       }
@@ -338,16 +328,22 @@ export class Hyp3eItem extends Item {
                         </ol></span>
                       <span class="part-total">${dice.total}</span>
                     </header>`
-          })  
+          })
           // Finish the damage-roll chat card
           damageRoll += `
-                      <!-- </ol> -->
                     </div>
                   </section>
                 </div>
                 <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span></h4>
-              </div>
+              </div>                
             </div>
+            <!--
+            <button type="button" data-action="apply-damage" title="[Click] Apply full damage to selected tokens.
+              [Shift-Click] Adjust value before applying.">
+              <i class="fa-solid fa-heart-broken fa-fw"></i>
+              <span class="label">Apply Damage</span>
+            </button>
+            -->
             `
         }
       } else {
@@ -504,7 +500,7 @@ export class Hyp3eItem extends Item {
         label += "<br /><b>Success!</b>"
 
         /*
-        SOMEWHERE IN HERE, CAN WE ADD SOME LOGIC TO SPECIALLY HANDLE TURNING UNDEAD?
+        We use simple word parsing in the ability name to determine if this is a cleric turning undead.
 
         Cross-reference the cleric (or sub-class) TA and die roll against the Turn Undead table...
         To determine possible results... and output those to the chat?

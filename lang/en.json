@@ -30,6 +30,8 @@
       "name": "Name",
       "attributes": "Attributes",
       "exploration": "Exploration",
+      "taskResolution": "Task Resolution",
+      "movement": "Movement",
       "classAbilities": "Class Abilities",
       "fightingSkills": "Fighting Skills",
       "combatStats": "Combat Stats",
@@ -38,6 +40,7 @@
       "abilitiesItems": "Abilities & Items",
       "weapons": "Weapons",
       "armor": "Armor",
+      "weaponsAndArmor": "Weapons & Armor",
       "items": "Items",
       "ability": "Ability",
       "atkRate": "Atk Rate",
@@ -187,18 +190,45 @@
         "abbrev": "Trap"
       }
     },
+    "taskResolution": {
+      "simple": {
+        "name": "Simple",
+        "abbrev": "Simpl.",
+        "hint": "Examples: Climbing natural/rough surface with light or no armor..."
+      },
+      "moderate": {
+        "name": "Moderate",
+        "abbrev": "Mod.",
+        "hint": "Examples: Climbing natural/rough surface with medium armor..."
+      },
+      "challenging": {
+        "name": "Challenging",
+        "abbrev": "Chall.",
+        "hint": "Examples: Climbing natural/rough surface with heavy armor; hear loud noise..."
+      },
+      "difficult": {
+        "name": "Difficult",
+        "abbrev": "Diff.",
+        "hint": "Examples: Non-thief hear quiet noise; find concealed or secret door..."
+      },
+      "veryDifficult": {
+        "name": "Very Difficult",
+        "abbrev": "V. Diff.",
+        "hint": "Examples: Non-thief pick lock; find trap..."
+      }
+    },
     "movement": {
       "base": {
         "name": "Base Move",
         "abbrev": "MV"
       },
       "exploration": {
-        "name": "Exploration",
+        "name": "Dungeon (ft/turn)",
         "abbrev": "Explore"
       },
       "travel": {
-        "name": "Travel (miles)",
-        "abbrev": "Travel"
+        "name": "Wilderness (mi/day)",
+        "abbrev": "Wilderness"
       }
     },
     "otherMv": {

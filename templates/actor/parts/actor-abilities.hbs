@@ -10,11 +10,11 @@
         {{> "systems/hyp3e/templates/actor/parts/actor-attributes.hbs"}}
       </section>
 
-      {{!-- Exploration skills --}}
+      {{!-- d6 Task Resolution --}}
       <section class="abilities exploration-block">
-        <h2>{{localize "HYP3E.headers.exploration"}}</h2>
+        <h2>{{localize "HYP3E.headers.taskResolution"}}</h2>
         <div class="abilities flexcol">
-          {{#each system.explorationSkills as |skill key|}}
+          {{!-- {{#each system.explorationSkills as |skill key|}}
           <div class="ability flexrow flex-group-center">
             <span class="rollable flex-xlarge align-left" data-roll="d6" data-roll-target="{{skill.value}}" data-roll-type="check" data-roll-mode="{{skill.rollMode}}" data-label="{{skill.label}}">
               <label for="system.explorationSkills.{{key}}.value" class="exploration-label">{{skill.label}}</label>
@@ -22,8 +22,24 @@
             </span>
             <input type="text" name="system.explorationSkills.{{key}}.value" value="{{skill.value}}" data-dtype="Number"/>
           </div>
+          {{/each}} --}}
+          {{#each system.taskResolution as |task key|}}
+          <div class="ability flexrow flex-group-center">
+            <span class="rollable flex-xlarge align-left" 
+                data-roll="d6" 
+                data-roll-target="{{task.tn}}" 
+                data-roll-type="check" 
+                data-roll-mode="publicroll" 
+                data-label="{{task.name}} task">
+              <label for="system.taskResolution.{{key}}.task" class="exploration-label">{{task.name}}</label>
+              <i class="fas fa-dice-d6"></i>
+            </span>
+            <input type="text" name="system.taskResolution.{{key}}.task" value="{{task.tn}}" data-dtype="Number"/>
+          </div>
           {{/each}}
+          <br />
           {{!-- Movement fields --}}
+          <h2>{{localize "HYP3E.headers.movement"}}</h2>
           <div class="ability flexrow flex-group-center">
             <span class="flex-xlarge align-left">
               <label for="system.movement.exploration.name" class="exploration-label">{{localize "HYP3E.movement.exploration.name"}}</label>
@@ -37,9 +53,9 @@
             <input type="text" name="system.movement.travel.value" value="{{system.movement.travel.value}}" data-dtype="Number" disabled/>
           </div>
         </div>
-        <div class="hyp3e-metal">
+        {{!-- <div class="hyp3e-metal">
           <img src="systems/hyp3e/assets/hyp3e-metal.png">
-        </div>
+        </div> --}}
       </section>
     </section>
 
