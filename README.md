@@ -12,6 +12,7 @@ Requires the _Hyperborea 3rd Edition_ role-playing game ruleset.<!-- END TEXT RE
 
 <!-- FOUNDRY-COMPATIBILITY-BADGE:START - Do not remove or modify this section -->
 ![Foundry v11](https://img.shields.io/badge/foundry-v11-green)
+![Foundry v12](https://img.shields.io/badge/foundry-v12-green)
 <!-- FOUNDRY-COMPATIBILITY-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->

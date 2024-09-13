@@ -86,6 +86,38 @@ HYP3E.explorationAbbreviations = {
 };
 
 /**
+ * d6 task resolution difficulty levels
+ * @type {Object}
+ */
+HYP3E.taskResolution = {
+  "simple": {
+    "name": "HYP3E.taskResolution.simple.name",
+    "hint": "HYP3E.taskResolution.simple.hint",
+    "tn": 5
+  },
+  "moderate": {
+    "name": "HYP3E.taskResolution.moderate.name",
+    "hint": "HYP3E.taskResolution.moderate.hint",
+    "tn": 4
+  },
+  "challenging": {
+    "name": "HYP3E.taskResolution.challenging.name",
+    "hint": "HYP3E.taskResolution.challenging.hint",
+    "tn": 3
+  },
+  "difficult": {
+    "name": "HYP3E.taskResolution.difficult.name",
+    "hint": "HYP3E.taskResolution.difficult.hint",
+    "tn": 2
+  },
+  "veryDifficult": {
+    "name": "HYP3E.taskResolution.veryDifficult.name",
+    "hint": "HYP3E.taskResolution.veryDifficult.hint",
+    "tn": 1
+  }
+}
+
+/**
  * The five standard money/coinage types
  * @type {Object}
  */

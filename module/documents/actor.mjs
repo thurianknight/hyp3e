@@ -58,6 +58,8 @@ export class Hyp3eActor extends Actor {
     }
 
     // Calculated fields go here
+
+    // Auto-calculate AC if configuration is enabled
     if (CONFIG.HYP3E.autoCalcAc) {
       systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
       if (CONFIG.HYP3E.debugMessages) { console.log("Unarmored AC: ", systemData.unarmoredAc) }
@@ -159,6 +161,14 @@ export class Hyp3eActor extends Actor {
     // Add character's level to top level of data
     if (data.details.level) {
       data.lvl = data.details.level.value ?? 0;
+    }
+
+    // Add task resolution
+    data.taskResolution = {}
+    for (let [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
+      data.taskResolution[key] = value
+      data.taskResolution[key].name = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].name)
+      data.taskResolution[key].hint = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].hint)
     }
 
   }
@@ -294,9 +304,9 @@ export class Hyp3eActor extends Actor {
   /**
    * Modifier table for the Feat of Attribute (Str, Dex, Con), from 0 to 32.
    * Applied to:
-   * - `str.fs`
-   * - `dex.fd`
-   * - `con.fc`
+   * - `str.feat`
+   * - `dex.feat`
+   * - `con.feat`
    */
   featOfAttr = {
     0: 0,
@@ -322,9 +332,12 @@ export class Hyp3eActor extends Actor {
     18: 3,
   };
   /**
-   * Magician bonus spells per day.
+   * Magician or Cleric bonus spells per day.
    * Applied to:
-   * - `int.bonusSpell1`
+   * - `int.bonusSpell1` or `wis.bonusSpell1`
+   * - `int.bonusSpell2` or `wis.bonusSpell2`
+   * - `int.bonusSpell3` or `wis.bonusSpell3`
+   * - `int.bonusSpell4` or `wis.bonusSpell4`
    **/
   bonusSpell1 = {
     0: false,
@@ -909,7 +922,7 @@ export class Hyp3eActor extends Actor {
     let label = `<h3>Values for character updated...</h3>`
     let content = `<ul>`
 
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", data) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor system data:", data) }
     if (data.details.class) {
       // Override label if character class selected
       label = `<h3>Values for ${data.details.class} updated...</h3>`
@@ -1034,25 +1047,38 @@ export class Hyp3eActor extends Actor {
           case "int":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
             content += `<li>IN Mods:</li><ul>`
+
             data.attributes.int.languages = this._valueFromTable(this.intLanguages, data.attributes.int.value)
             content += `<li>Languages: ${data.attributes.int.languages}</li>`
+
             data.attributes.int.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
+            data.int.bonusSpells.lvl1 = data.attributes.int.bonusSpells.lvl1
             content += `<li>Level 1 Bonus Spell: ${data.attributes.int.bonusSpells.lvl1}</li>`
+
             data.attributes.int.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
+            data.int.bonusSpells.lvl2 = data.attributes.int.bonusSpells.lvl2
             content += `<li>Level 2 Bonus Spell: ${data.attributes.int.bonusSpells.lvl2}</li>`
+
             data.attributes.int.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.int.value)
+            data.int.bonusSpells.lvl3 = data.attributes.int.bonusSpells.lvl3
             content += `<li>Level 3 Bonus Spell: ${data.attributes.int.bonusSpells.lvl3}</li>`
+
             data.attributes.int.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.int.value)
+            data.int.bonusSpells.lvl4 = data.attributes.int.bonusSpells.lvl4
             content += `<li>Level 4 Bonus Spell: ${data.attributes.int.bonusSpells.lvl4}</li>`
+
             data.attributes.int.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.int.value)
             content += `<li>% Chance to Learn Spell: ${data.attributes.int.learnSpell}</li>`
+
             if (data.details.class && thisClass.xpBonusReq.int) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high IN...`) }
+
               if (data.attributes.int.value >= thisClass.xpBonusReq.int && xpBonusPossible != false) {
                 xpBonusPossible = true
               } else {
                 xpBonusPossible = false
               }
+
               if (data.details.xp.primeAttr == "") {
                 data.details.xp.primeAttr = "IN"
               } else {
@@ -1065,25 +1091,34 @@ export class Hyp3eActor extends Actor {
           case "wis":
             if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
             content += `<li>WS Mods:</li><ul>`
+
             data.attributes.wis.willMod = this._valueFromTable(this.wisWillMod, data.attributes.wis.value)
             content += `<li>Will Mod: ${data.attributes.wis.willMod}</li>`
+
             data.attributes.wis.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
             content += `<li>Level 1 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl1}</li>`
+
             data.attributes.wis.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
             content += `<li>Level 2 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl2}</li>`
+
             data.attributes.wis.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.wis.value)
             content += `<li>Level 3 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl3}</li>`
+
             data.attributes.wis.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.wis.value)
             content += `<li>Level 4 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl4}</li>`
+
             data.attributes.wis.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.wis.value)
             content += `<li>% Chance to Learn Spell: ${data.attributes.wis.learnSpell}</li>`
+
             if (data.details.class && thisClass.xpBonusReq.wis) {
               if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high WS...`) }
+
               if (data.attributes.wis.value >= thisClass.xpBonusReq.wis && xpBonusPossible != false) {
                 xpBonusPossible = true
               } else {
                 xpBonusPossible = false
               }
+
               if (data.details.xp.primeAttr == "") {
                 data.details.xp.primeAttr = "WS"
               } else {
@@ -1129,8 +1164,8 @@ export class Hyp3eActor extends Actor {
       content += `</ul>`
 
       // Apply updates to the actor
-      if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', data) }
       await this.update({data})
+      if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', data) }
 
       // Now we can display the chat message
       ChatMessage.create({
