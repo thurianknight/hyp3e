@@ -17,7 +17,7 @@ export class Hyp3eDice {
       rollModes: CONFIG.Dice.rollModes,
       rollMode: rollMode
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log("Check roll dialog dataset: ", dataset) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("Basic/check roll dialog dataset: ", dataset) }
     const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`
     const dialogHtml = await renderTemplate(template, dialogData)
 
