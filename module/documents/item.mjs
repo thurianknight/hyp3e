@@ -116,301 +116,301 @@ export class Hyp3eItem extends Item {
   /**
    * Handle item rolls
    */
-  async roll() {
-    const item = this;
-    // An item roll is either an attack or a check of some kind
-    // Weapons & spells default to attack, other items default to a check
-    if (item.type == 'weapon' || item.type == 'spell') {
-      this.rollAttack()
-    } else {
-      this.rollCheck()
-    }
-  }
+  // async roll() {
+  //   const item = this;
+  //   // An item roll is either an attack or a check of some kind
+  //   // Weapons & spells default to attack, other items default to a check
+  //   if (item.type == 'weapon' || item.type == 'spell') {
+  //     this.rollAttack()
+  //   } else {
+  //     this.rollCheck()
+  //   }
+  // }
 
   /**
    * Handle item attack rolls.
    */
-  async rollAttack() {
-    const item = this;
+  // async rollAttack() {
+  //   const item = this;
 
-    // Initialize chat data.
-    const speaker = ChatMessage.getSpeaker({ actor: this.actor })
-    // const rollMode = game.settings.get('core', 'rollMode')
-    // console.log(`System roll mode: ${rollMode}`)
-    let label = ""
-    let itemName = ""
-    if (item.system.friendlyName != "") {
-      itemName = item.system.friendlyName
-    } else {
-      itemName = item.name
-    }
+  //   // Initialize chat data.
+  //   const speaker = ChatMessage.getSpeaker({ actor: this.actor })
+  //   // const rollMode = game.settings.get('core', 'rollMode')
+  //   // console.log(`System roll mode: ${rollMode}`)
+  //   let label = ""
+  //   let itemName = ""
+  //   if (item.system.friendlyName != "") {
+  //     itemName = item.system.friendlyName
+  //   } else {
+  //     itemName = item.name
+  //   }
 
-    // If this is a spell, decrement the number memorized
-    if (item.type == "spell" && item.system.quantity.value > 0) {
-      if (CONFIG.HYP3E.debugMessages) { console.log("Cast memorized spell:", item) }
-      // Update the item object
-      await item.update({
-        system: {
-          quantity: {
-            value: item.system.quantity.value--,  
-          }
-        }
-      })
-      // Update the embedded item document
-      this.actor.updateEmbeddedDocuments("Item", [
-        { _id: item.id, "system.quantity.value": item.system.quantity.value-- },
-      ]);
-    }
+  //   // If this is a spell, decrement the number memorized
+  //   if (item.type == "spell" && item.system.quantity.value > 0) {
+  //     if (CONFIG.HYP3E.debugMessages) { console.log("Cast memorized spell:", item) }
+  //     // Update the item object
+  //     await item.update({
+  //       system: {
+  //         quantity: {
+  //           value: item.system.quantity.value--,  
+  //         }
+  //       }
+  //     })
+  //     // Update the embedded item document
+  //     this.actor.updateEmbeddedDocuments("Item", [
+  //       { _id: item.id, "system.quantity.value": item.system.quantity.value-- },
+  //     ]);
+  //   }
 
-    if (!this.system.formula) {
-    // If there's no roll formula, send a chat message
-      this._displayItemInChat()
-      // label = `<h3>${itemName} [${item.type}]</h3>`
-      // ChatMessage.create({
-      //   speaker: speaker,
-      //   rollMode: rollMode,
-      //   flavor: label,
-      //   content: item.system.description ?? ''
-      // });
-      return null
-    }
+  //   if (!this.system.formula) {
+  //   // If there's no roll formula, send a chat message
+  //     this._displayItemInChat()
+  //     // label = `<h3>${itemName} [${item.type}]</h3>`
+  //     // ChatMessage.create({
+  //     //   speaker: speaker,
+  //     //   rollMode: rollMode,
+  //     //   flavor: label,
+  //     //   content: item.system.description ?? ''
+  //     // });
+  //     return null
+  //   }
 
-    // Create an attack roll and send a chat message from it
+  //   // Create an attack roll and send a chat message from it
 
-    // Retrieve roll data from the item
-    const rollData = this.getRollData();
-    if (CONFIG.HYP3E.debugMessages) { console.log("Attack/spell roll data:", rollData) }
-    // Declare vars
-    let rollFormula = ""
-    let naturalRoll = 0
-    let dieType = ""
-    let rollTotal = 0
-    let dmgFormula = ""
-    let damageRoll = ""
-    let dmgRoll
-    let targetAc = 9
-    let targetName = ""
-    let mastery = "Attack"
-    let masterMod = "0"
-    let debugAtkRollFormula = ""
-    let debugDmgRollFormula = ""
+  //   // Retrieve roll data from the item
+  //   const rollData = this.getRollData();
+  //   if (CONFIG.HYP3E.debugMessages) { console.log("Attack/spell roll data:", rollData) }
+  //   // Declare vars
+  //   let rollFormula = ""
+  //   let naturalRoll = 0
+  //   let dieType = ""
+  //   let rollTotal = 0
+  //   let dmgFormula = ""
+  //   let damageRoll = ""
+  //   let dmgRoll
+  //   let targetAc = 9
+  //   let targetName = ""
+  //   let mastery = "Attack"
+  //   let masterMod = "0"
+  //   let debugAtkRollFormula = ""
+  //   let debugDmgRollFormula = ""
 
-    // Has the user targeted a token? If so, get it's AC and name
-    let userTargets = Array.from(game.user.targets)
-    if (CONFIG.HYP3E.debugMessages) { console.log("Selected Tokens:", canvas.tokens.controlled) }
-    if (CONFIG.HYP3E.debugMessages) { console.log("Game User Data:", game.user) }
-    if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
-    if (userTargets.length > 0) {
-      let primaryTargetData = userTargets[0].actor
-      targetAc = primaryTargetData.system.ac.value
-      targetName = primaryTargetData.name
-    }
+  //   // Has the user targeted a token? If so, get it's AC and name
+  //   let userTargets = Array.from(game.user.targets)
+  //   if (CONFIG.HYP3E.debugMessages) { console.log("Selected Tokens:", canvas.tokens.controlled) }
+  //   if (CONFIG.HYP3E.debugMessages) { console.log("Game User Data:", game.user) }
+  //   if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
+  //   if (userTargets.length > 0) {
+  //     let primaryTargetData = userTargets[0].actor
+  //     targetAc = primaryTargetData.system.ac.value
+  //     targetName = primaryTargetData.name
+  //   }
 
-    // Check if the item has Master or Grandmaster flags set
-    if (item.system.wpnGrandmaster) {
-      mastery = "Grandmaster attack"
-      masterMod = "2"
-    } else if (item.system.wpnMaster) {
-      mastery = "Master attack"
-      masterMod = "1"
-    }
+  //   // Check if the item has Master or Grandmaster flags set
+  //   if (item.system.wpnGrandmaster) {
+  //     mastery = "Grandmaster attack"
+  //     masterMod = "2"
+  //   } else if (item.system.wpnMaster) {
+  //     mastery = "Master attack"
+  //     masterMod = "1"
+  //   }
 
-    // Setup chat card label based on whether we have a target
-    if (targetName != "") {
-      label = `${mastery} with ${itemName} vs. ${targetName}...`
-    } else {
-      label = `${mastery} with ${itemName}...`
-    }
+  //   // Setup chat card label based on whether we have a target
+  //   if (targetName != "") {
+  //     label = `${mastery} with ${itemName} vs. ${targetName}...`
+  //   } else {
+  //     label = `${mastery} with ${itemName}...`
+  //   }
 
-    if (masterMod == "0") {
-      if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${rollData.item.formula} + sitMod` }
-      rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`  
-    } else {
-      if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${rollData.item.formula} + masteryMod + sitMod` }
-      rollFormula = `${rollData.item.formula} + ${masterMod} + ${rollData.item.sitMod}`  
-    }
+  //   if (masterMod == "0") {
+  //     if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${rollData.item.formula} + sitMod` }
+  //     rollFormula = `${rollData.item.formula} + ${rollData.item.sitMod}`  
+  //   } else {
+  //     if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${rollData.item.formula} + masteryMod + sitMod` }
+  //     rollFormula = `${rollData.item.formula} + ${masterMod} + ${rollData.item.sitMod}`  
+  //   }
 
-    if (CONFIG.HYP3E.debugMessages) { console.log("Roll formula:", rollFormula) }
-    // Invoke the attack roll
-    const atkRoll = new Roll(rollFormula, rollData);
-    // Resolve the roll
-    let result = await atkRoll.roll();
-    if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
+  //   if (CONFIG.HYP3E.debugMessages) { console.log("Roll formula:", rollFormula) }
+  //   // Invoke the attack roll
+  //   const atkRoll = new Roll(rollFormula, rollData);
+  //   // Resolve the roll
+  //   let result = await atkRoll.roll();
+  //   if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
 
-    // Get the resulting values from the attack roll
-    naturalRoll = atkRoll.dice[0].total
-    dieType = "d20"
-    rollTotal = atkRoll.total
+  //   // Get the resulting values from the attack roll
+  //   naturalRoll = atkRoll.dice[0].total
+  //   dieType = "d20"
+  //   rollTotal = atkRoll.total
 
-    // Determine hit or miss based on target AC
-    let hit = false
-    let tn = 20 - targetAc
-    if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
-    if (naturalRoll == 20) {
-      if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
-      label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
-      hit = true
-    } else if (naturalRoll == 1) {
-      if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
-      label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
-    } else if (atkRoll.total >= tn) {
-      if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
-      label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
-      hit = true
-    } else {
-      if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
-      if (eval(20 - atkRoll.total) <= 9) {
-        label += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
-      } else {
-        label += `<br /><b>Misses AC 9.</b>`
-      }
-    }
+  //   // Determine hit or miss based on target AC
+  //   let hit = false
+  //   let tn = 20 - targetAc
+  //   if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
+  //   if (naturalRoll == 20) {
+  //     if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
+  //     label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
+  //     hit = true
+  //   } else if (naturalRoll == 1) {
+  //     if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
+  //     label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
+  //   } else if (atkRoll.total >= tn) {
+  //     if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
+  //     label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
+  //     hit = true
+  //   } else {
+  //     if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
+  //     if (eval(20 - atkRoll.total) <= 9) {
+  //       label += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
+  //     } else {
+  //       label += `<br /><b>Misses AC 9.</b>`
+  //     }
+  //   }
 
-    // If the attack hit, we roll damage automatically and include it in the chat message
-    if (hit && rollData.item.damage) {
-      if (Roll.validate(rollData.item.damage)) {
-        if (rollData.item.melee) {
-          if (masterMod == "0") {
-            dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod`
-            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @str.dmgMod + @item.dmgMod` }
-          } else {
-            dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod + ${masterMod}`
-            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @str.dmgMod + @item.dmgMod + masteryMod` }
-          }
-        } else if (rollData.item.missile) {
-          if (masterMod == "0") {
-            dmgFormula = `${rollData.item.damage} + @item.dmgMod`
-            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @item.dmgMod` }  
-          } else {
-            dmgFormula = `${rollData.item.damage} + @item.dmgMod + ${masterMod}`
-            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @item.dmgMod + masteryMod` }  
-          }
-        } else {
-          // This should only happen with spells
-          dmgFormula = `${rollData.item.damage}`
-          if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage}` }
-        }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
+  //   // If the attack hit, we roll damage automatically and include it in the chat message
+  //   if (hit && rollData.item.damage) {
+  //     if (Roll.validate(rollData.item.damage)) {
+  //       if (rollData.item.melee) {
+  //         if (masterMod == "0") {
+  //           dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod`
+  //           if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @str.dmgMod + @item.dmgMod` }
+  //         } else {
+  //           dmgFormula = `${rollData.item.damage} + @str.dmgMod + @item.dmgMod + ${masterMod}`
+  //           if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @str.dmgMod + @item.dmgMod + masteryMod` }
+  //         }
+  //       } else if (rollData.item.missile) {
+  //         if (masterMod == "0") {
+  //           dmgFormula = `${rollData.item.damage} + @item.dmgMod`
+  //           if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @item.dmgMod` }  
+  //         } else {
+  //           dmgFormula = `${rollData.item.damage} + @item.dmgMod + ${masterMod}`
+  //           if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage} + @item.dmgMod + masteryMod` }  
+  //         }
+  //       } else {
+  //         // This should only happen with spells
+  //         dmgFormula = `${rollData.item.damage}`
+  //         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${rollData.item.damage}` }
+  //       }
+  //       if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
   
-        // Invoke the damage roll
-        dmgRoll = new Roll(dmgFormula, rollData);
-        // Resolve the roll
-        let result = await dmgRoll.roll();
-        if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
+  //       // Invoke the damage roll
+  //       dmgRoll = new Roll(dmgFormula, rollData);
+  //       // Resolve the roll
+  //       let result = await dmgRoll.roll();
+  //       if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
 
-        // Render the damage-roll chat card
-        if (dmgRoll) {
-          damageRoll = `
-            <h4 class="dice-damage">Rolling damage...</h4>
-            <div class="dice-roll">
-              <div class="dice-result">
-                <div class="dice-formula">${dmgRoll.formula}</div>
-                <div class="dice-tooltip">
-                  ${debugDmgRollFormula}
-                  <section class="tooltip-part">
-                    <div class="dice">`
-          // Add dice-roll summaries to the chat card
-          dmgRoll.dice.forEach(dice => {
-          damageRoll += `
-                    <header class="part-header flexrow">
-                      <span class="part-formula">${dice.number}d${dice.faces}</span>
-                      <span><ol class="dice-rolls">`
-          dice.values.forEach(val => {
-            if (val == 1) {
-              damageRoll += `<li class="roll die d${dice.faces} min">${val}</li>`
-            } else if (val == dice.faces) {
-              damageRoll += `<li class="roll die d${dice.faces} max">${val}</li>`
-            } else {
-              damageRoll += `<li class="roll die d${dice.faces}">${val}</li>`
-            }
-          })  
-          damageRoll += `
-                        </ol></span>
-                      <span class="part-total">${dice.total}</span>
-                    </header>`
-          })
-          // Finish the damage-roll chat card
-          damageRoll += `
-                    </div>
-                  </section>
-                </div>
-                <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span></h4>
-              </div>                
-            </div>
-            <!--
-            <button type="button" data-action="apply-damage" title="[Click] Apply full damage to selected tokens.
-              [Shift-Click] Adjust value before applying.">
-              <i class="fa-solid fa-heart-broken fa-fw"></i>
-              <span class="label">Apply Damage</span>
-            </button>
-            -->
-            `
-        }
-      } else {
-        dmgFormula = `${rollData.item.damage}`
-        if (CONFIG.HYP3E.debugMessages) {
-          console.log(`Damage formula ${dmgFormula} is not a valid roll formula!`)
-          debugDmgRollFormula = `Damage Formula: <b>${dmgFormula}</b> is not a valid roll formula!`
-          damageRoll = `
-            <h4 class="dice-damage">Rolling damage...</h4>
-            <div class="dice-roll">
-              <div class="dice-result">
-                <div class="dice-formula">${rollData.item.damage}</div>
-                <div class="dice-tooltip">
-                  ${debugDmgRollFormula}
-                </div>
-              </div>
-            </div>
-            `
-        }
-      }
-   }
+  //       // Render the damage-roll chat card
+  //       if (dmgRoll) {
+  //         damageRoll = `
+  //           <h4 class="dice-damage">Rolling damage...</h4>
+  //           <div class="dice-roll">
+  //             <div class="dice-result">
+  //               <div class="dice-formula">${dmgRoll.formula}</div>
+  //               <div class="dice-tooltip">
+  //                 ${debugDmgRollFormula}
+  //                 <section class="tooltip-part">
+  //                   <div class="dice">`
+  //         // Add dice-roll summaries to the chat card
+  //         dmgRoll.dice.forEach(dice => {
+  //         damageRoll += `
+  //                   <header class="part-header flexrow">
+  //                     <span class="part-formula">${dice.number}d${dice.faces}</span>
+  //                     <span><ol class="dice-rolls">`
+  //         dice.values.forEach(val => {
+  //           if (val == 1) {
+  //             damageRoll += `<li class="roll die d${dice.faces} min">${val}</li>`
+  //           } else if (val == dice.faces) {
+  //             damageRoll += `<li class="roll die d${dice.faces} max">${val}</li>`
+  //           } else {
+  //             damageRoll += `<li class="roll die d${dice.faces}">${val}</li>`
+  //           }
+  //         })  
+  //         damageRoll += `
+  //                       </ol></span>
+  //                     <span class="part-total">${dice.total}</span>
+  //                   </header>`
+  //         })
+  //         // Finish the damage-roll chat card
+  //         damageRoll += `
+  //                   </div>
+  //                 </section>
+  //               </div>
+  //               <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span></h4>
+  //             </div>                
+  //           </div>
+  //           <!--
+  //           <button type="button" data-action="apply-damage" title="[Click] Apply full damage to selected tokens.
+  //             [Shift-Click] Adjust value before applying.">
+  //             <i class="fa-solid fa-heart-broken fa-fw"></i>
+  //             <span class="label">Apply Damage</span>
+  //           </button>
+  //           -->
+  //           `
+  //       }
+  //     } else {
+  //       dmgFormula = `${rollData.item.damage}`
+  //       if (CONFIG.HYP3E.debugMessages) {
+  //         console.log(`Damage formula ${dmgFormula} is not a valid roll formula!`)
+  //         debugDmgRollFormula = `Damage Formula: <b>${dmgFormula}</b> is not a valid roll formula!`
+  //         damageRoll = `
+  //           <h4 class="dice-damage">Rolling damage...</h4>
+  //           <div class="dice-roll">
+  //             <div class="dice-result">
+  //               <div class="dice-formula">${rollData.item.damage}</div>
+  //               <div class="dice-tooltip">
+  //                 ${debugDmgRollFormula}
+  //               </div>
+  //             </div>
+  //           </div>
+  //           `
+  //       }
+  //     }
+  //  }
 
-    // Render the full attack-roll chat card, with damage if any
-    let msgContent = ``
-    msgContent = `
-    <div class="message-content">
-      <div class="dice-roll">
-        <div class="dice-result">
-          <div class="dice-formula">${atkRoll.formula}</div>
-          <div class="dice-tooltip">
-            <section class="tooltip-part">
-              ${debugAtkRollFormula}
-              <div class="dice">
-                <header class="part-header flexrow">
-                  <span class="part-formula">${dieType}</span>
-                  <span>
-                    <ol class="dice-rolls">
-                      <li class="roll die ${dieType}">${naturalRoll}</li>
-                    </ol>
-                  </span>
-                  <span class="part-total">${naturalRoll}</span>
-                </header>
-              </div>
-            </section>
-          </div>
-          <h4 class="dice-total">${rollTotal}</h4>
-        </div>
-      </div>
-      ${damageRoll}
-    </div>
-    `
+  //   // Render the full attack-roll chat card, with damage if any
+  //   let msgContent = ``
+  //   msgContent = `
+  //   <div class="message-content">
+  //     <div class="dice-roll">
+  //       <div class="dice-result">
+  //         <div class="dice-formula">${atkRoll.formula}</div>
+  //         <div class="dice-tooltip">
+  //           <section class="tooltip-part">
+  //             ${debugAtkRollFormula}
+  //             <div class="dice">
+  //               <header class="part-header flexrow">
+  //                 <span class="part-formula">${dieType}</span>
+  //                 <span>
+  //                   <ol class="dice-rolls">
+  //                     <li class="roll die ${dieType}">${naturalRoll}</li>
+  //                   </ol>
+  //                 </span>
+  //                 <span class="part-total">${naturalRoll}</span>
+  //               </header>
+  //             </div>
+  //           </section>
+  //         </div>
+  //         <h4 class="dice-total">${rollTotal}</h4>
+  //       </div>
+  //     </div>
+  //     ${damageRoll}
+  //   </div>
+  //   `
     
-    // Prettify label
-    label = "<h3>" + label + "</h3>"
+  //   // Prettify label
+  //   label = "<h3>" + label + "</h3>"
 
-    // Output attack roll result to a chat message
-    let chatMsg = await atkRoll.toMessage({
-      speaker: speaker,
-      flavor: label,
-      content: msgContent
-    },{
-      rollMode: rollData.item.rollMode
-    })
-    if (CONFIG.HYP3E.debugMessages) { console.log("Chat html:", chatMsg) }
-    return atkRoll
+  //   // Output attack roll result to a chat message
+  //   let chatMsg = await atkRoll.toMessage({
+  //     speaker: speaker,
+  //     flavor: label,
+  //     content: msgContent
+  //   },{
+  //     rollMode: rollData.item.rollMode
+  //   })
+  //   if (CONFIG.HYP3E.debugMessages) { console.log("Chat html:", chatMsg) }
+  //   return atkRoll
 
-  }
+  // }
 
   /**
    * Handle item check rolls.
