@@ -708,7 +708,10 @@ export class Hyp3eActorSheet extends ActorSheet {
           const itemId = element.closest('.item').dataset.itemId
           // Set item ID in roll dataset
           dataset.itemId = itemId
+
+          // Get item object and apply values to dataset
           const item = this.actor.items.get(itemId)
+          dataset.roll = item.system.formula
           let itemName = ""
           if (item.system.friendlyName != "") {
             itemName = item.system.friendlyName
@@ -724,24 +727,20 @@ export class Hyp3eActorSheet extends ActorSheet {
             } else if (item.system.wpnMaster) {
               mastery = "Master attack"
             }
-            dataset.label = `${mastery} with ${itemName}...`
-            dataset.roll = item.system.formula
+            dataset.label = `${mastery} with ${itemName}`
             // rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset);
             this.actor.rollAttackOrSpell(dataset)
           } else if (item.type == "spell") {
             // The default for spells is to cast
-            dataset.label = `Cast spell ${itemName}...`
-            if (item.system.formula > "") {
-              dataset.roll = item.system.formula
-            } else {
+            dataset.label = `Cast spell ${itemName}`
+            if (item.system.formula == "" || item.system.formula == undefined) {
               dataset.details = `No attack roll required to cast ${itemName}.`
             }
             // rollResponse = await Hyp3eDice.ShowSpellcastingDialog(dataset);
             this.actor.rollAttackOrSpell(dataset)
           } else {  // ==> Neither a weapon nor a spell
             // The default for other item types (i.e. class abilities or actual items) is a check
-            dataset.label = `${itemName} check...`
-            dataset.roll = item.system.formula
+            dataset.label = `${itemName} check`
             dataset.rollTarget = item.system.tn
             // rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
             this.actor.rollCheck(dataset)
