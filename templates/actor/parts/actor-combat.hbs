@@ -4,8 +4,8 @@
   </section>
   <section class="main-content">
     {{!-- Fighting skills and combat statistics --}}
-    <div class="combat-block flexrow">
-      <div class="combat-block flexcol">
+    <section class="combat-block flexrow">
+      <section class="combat-block flexcol">
         <div class="resource-content flexrow flex-group-center">
           <h3>{{localize "HYP3E.headers.fightingSkills"}}</h3>
         </div>
@@ -34,8 +34,8 @@
           <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.level12"}}</label>
           <input type="text" name="system.proficiencies.lvl12" value="{{system.proficiencies.lvl12}}"/>
         </div>
-      </div>
-      <div class="combat-block flexcol">
+      </section>
+      <section class="combat-block flexcol">
         <div class="resource-content flexrow flex-group-center">
           <h3>{{localize "HYP3E.headers.combatStats"}}</h3>
         </div>
@@ -67,8 +67,11 @@
         <div class="resource-content flexrow flex-group-center">
           {{!-- This is a cheat row, to shift the upper rows higher. --}}
         </div>
-      </div>
-    </div>
+        <div class="resource-content flexrow flex-group-center">
+          {{!-- This is a cheat row, to shift the upper rows higher. --}}
+        </div>
+      </section>
+    </section>
 
     {{!-- Saving throws here --}}
     <div class="combat-block flexrow">
