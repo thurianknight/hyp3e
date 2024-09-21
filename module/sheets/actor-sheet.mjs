@@ -542,13 +542,6 @@ export class Hyp3eActorSheet extends ActorSheet {
         } else {
           content += `<p>Damage: ${item.system.damage}</p>`
         }
-        // if ((item.system.damage).match(/.*d[1-9].*/)) {
-        //   // Add a damage roll macro
-        //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
-        // } else {
-        //   // If damage is not variable, simply display the value
-        //   content += `<p>Damage: ${item.system.damage}</p>`
-        // }
       }
     }
 
@@ -584,13 +577,6 @@ export class Hyp3eActorSheet extends ActorSheet {
         } else {
           content += `<p>Damage: ${item.system.damage}</p>`
         }
-        // if ((item.system.damage).match(/.*d[1-9].*/)) {
-        //   // Add a damage roll macro
-        //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
-        // } else {
-        //   // If damage is not variable, simply display the value
-        //   content += `<p>Damage: ${item.system.damage}</p>`
-        // }
       }      
     }
 
@@ -676,26 +662,30 @@ export class Hyp3eActorSheet extends ActorSheet {
 
     // How many different roll types do we have?
     //  Test of Attribute: d6 roll-under target
-    //    Formula & TN built into character sheet, GM may adjust TN by setting a sit mod
+    //    Formula & TN built into character sheet, GM may adjust via situational mod
     //  Feat of Attribute: d100 roll-under target
-    //    Formula & TN built into character sheet, GM may adjust
-    //  Exploration skill check: d6 roll-under target
-    //    Formula & TN built into character sheet, GM may adjust
-    //  Hit dice: dX and sum total
+    //    Formula & TN built into character sheet, GM may adjust via situational mod
+    //  Task Resolution check: d6 roll-under target
+    //    Formula & TN built into character sheet, GM may adjust via situational mod
+    //  IN and WS concentration checks (optional): 3d6 roll-under target
+    //    Formula & TN built into character sheet, GM may adjust via situational mod
+    //  Reaction check: 2d6 + CH Reaction mod, and compare to reaction table
+    //    Formula built into character sheet, GM may adjust via situational mod
+    //  Hit dice: dX + CN HP mod, and display the total
     //    Formula built into character sheet, no TN needed
     //  Saving throws: d20 roll-over target
     //    Formula & TN built into character sheet, GM may adjust
-
-    //  Class ability checks, esp. thief skills: varies, but usually d6 or d12 roll-under target
-    //    Formula & TN can be built into ability => item sheet of type "feature"
-    //  Turning undead (subset of class abilities): d12 roll-under target
-    //    Formula can be built into turning ability => item sheet of type "feature"
-    //  Attack rolls: d20 roll-over target
-    //    Formula can be built into weapon => item sheet of type "weapon"
-    //  Damage rolls: dX and sum total
-    //    Formula can be built into weapon => item sheet of type "weapon"
-    //  Spell duration, number affected, etc.: varies
-    //    Formulas can be built into spell => item sheet of type "spell"
+    //  Item-based rolls:
+    //    Class ability checks, esp. thief skills: varies, but usually d6 or d12 roll-under target
+    //      Formula & TN can be built into ability => item sheet of type "feature"
+    //    Turning undead (subset of class abilities): d12 roll-under target
+    //      Formula can be built into turning ability => item sheet of type "feature"
+    //    Attack rolls: d20 roll-over target
+    //      Formula can be built into weapon => item sheet of type "weapon"
+    //    Damage rolls: dX and sum total
+    //      Formula can be built into weapon => item sheet of type "weapon"
+    //    Spell duration, number affected, etc.: varies
+    //      Formulas can be built into spell => item sheet of type "spell"
     try {
       // What is our roll type?
       if (CONFIG.HYP3E.debugMessages) { console.log("Roll Type:", dataset.rollType) }
@@ -867,15 +857,8 @@ export class Hyp3eActorSheet extends ActorSheet {
 
         default:
           // This should never happen, all rolls should have a roll-type
-          ui.notifications.info("Rolling default, this should never happen...")
-          console.log("Rolling default, this should never happen...");
-          // label = `${dataset.label}...`
-          // // dataset.enableRoll = true
-          // // Log the dataset before the dialog renders
-          // console.log("Dataset:", dataset);
-          // rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
-          // // Add situational modifier from the dice dialog
-          // rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
+          ui.notifications.info("No Roll Type provided, this should never happen...")
+          console.log("No Roll Type provided, this should never happen...");
 
       }
       
@@ -976,7 +959,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       }
     } catch(err) {
       // Log the error
-      console.log(err)
+      console.log("Error: ", err)
     }
   }
 

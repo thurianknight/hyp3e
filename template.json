@@ -277,6 +277,8 @@
       "rof": "1/1",
       "atkMod": 0,
       "dmgMod": 0,
+      "wpnMaster": false,
+      "wpnGrandmaster": false,
       "annotations": []
     }
   }
