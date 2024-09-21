@@ -168,7 +168,7 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.cha.reaction" value="{{numberFormat system.attributes.cha.reaction decimals=0 sign=true}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="2d6" data-roll-type="check" data-roll-target="{{system.attributes.cha.reaction}}" data-label="{{localize 'HYP3E.attributes.cha.reaction'}}">{{localize 'HYP3E.attributes.cha.reaction'}} <i class="fas fa-dice"></i></span>
+      <span class="rollable mod-label" data-roll="2d6+{{system.attributes.cha.reaction}}" data-roll-type="basic" data-roll-target="{{system.attributes.cha.reaction}}" data-label="{{localize 'HYP3E.attributes.cha.reaction'}}">{{localize 'HYP3E.attributes.cha.reaction'}} <i class="fas fa-dice"></i></span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.cha.maxHenchmen" value="{{system.attributes.cha.maxHenchmen}}" data-dtype="Number"/>

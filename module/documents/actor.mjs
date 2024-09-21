@@ -429,10 +429,10 @@ export class Hyp3eActor extends Actor {
       
       // Check if the weapon attack has Master or Grandmaster flags set
       if (item.system.wpnGrandmaster) {
-        mastery = "Grandmaster attack"
+        // mastery = "Grandmaster attack"
         masteryMod = "2"
       } else if (item.system.wpnMaster) {
-        mastery = "Master attack"
+        // mastery = "Master attack"
         masteryMod = "1"
       }
     }
@@ -464,11 +464,11 @@ export class Hyp3eActor extends Actor {
       targetName = primaryTargetData.name
     }
     
-    // Setup chat card label based on whether we have a target
+    // Update chat card label based on whether we have a target
     if (targetName != "") {
-      label = `${mastery} with ${itemName} vs. ${targetName}...`
+      label += ` vs. ${targetName}...`
     } else {
-      label = `${mastery} with ${itemName}...`
+      label += `...`
     }
 
     // Determine hit or miss based on target AC
