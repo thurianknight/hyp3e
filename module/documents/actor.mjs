@@ -1,3 +1,5 @@
+import {Hyp3eDice} from "../dice.mjs";
+
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
  * @extends {Actor}
@@ -59,6 +61,14 @@ export class Hyp3eActor extends Actor {
 
     // Calculated fields go here
 
+    // Add task resolution
+    systemData.taskResolution = {}
+    for (let [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
+      systemData.taskResolution[key] = value
+      systemData.taskResolution[key].name = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].name)
+      systemData.taskResolution[key].hint = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].hint)
+    }
+    
     // Auto-calculate AC if configuration is enabled
     if (CONFIG.HYP3E.autoCalcAc) {
       systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
@@ -163,13 +173,13 @@ export class Hyp3eActor extends Actor {
       data.lvl = data.details.level.value ?? 0;
     }
 
-    // Add task resolution
-    data.taskResolution = {}
-    for (let [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
-      data.taskResolution[key] = value
-      data.taskResolution[key].name = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].name)
-      data.taskResolution[key].hint = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].hint)
-    }
+    // // Add task resolution
+    // data.taskResolution = {}
+    // for (let [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
+    //   data.taskResolution[key] = value
+    //   data.taskResolution[key].name = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].name)
+    //   data.taskResolution[key].hint = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].hint)
+    // }
 
   }
 
@@ -182,6 +192,565 @@ export class Hyp3eActor extends Actor {
     // Anything to load?
     
   }
+
+  /**
+   * Handle rolls from the actor sheet
+   */
+  async rollBasic(dataset) {
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
+
+    let label = `${dataset.label}...`
+
+    // Log the dataset before the dialog renders
+    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+
+    const rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+    // Add situational modifier from the dice dialog
+    const rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
+    
+    // Roll the dice!
+    let roll = new Roll(rollFormula, this.getRollData())
+    // Resolve the roll
+    let result = await roll.roll()
+    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
+
+    // Output roll result to a chat message
+    this.sendRollToChat(roll, label, "", rollResponse.rollMode)
+    
+    return roll
+
+  }
+
+  async rollCheck(dataset) {
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
+
+    // Is this an item or ability check?
+    const item = this.items.get(dataset.itemId) ?? null
+
+    // Determine whether we have a valid target number or formula
+    if (dataset.rollTarget == '' || dataset.rollTarget == undefined || dataset.rollTarget <= 0) {
+      console.log("Missing or invalid target number, cannot confirm success of check!")
+      ui.notifications.info("Missing or invalid target number, cannot confirm success of check!")
+      return
+    }
+
+    // Retrieve roll data from the actor
+    const rollData = this.getRollData();
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", rollData) }
+    
+    // Declare vars
+    let itemName = ""
+    let rollFormula = ""
+    let label = `${dataset.label}...`
+
+    if (item) {
+      if (item.system.friendlyName != "") {
+        itemName = item.system.friendlyName
+      } else {
+        itemName = item.name
+      }    
+    }
+
+    // These are needed for Turn Undead checks
+    let results = []
+    let description = ""
+  
+    // Resolve target formula to a number, if necessary
+    const targetRoll = new Roll(dataset.rollTarget, this.getRollData())
+    await targetRoll.roll()
+    if (CONFIG.HYP3E.debugMessages) {
+      console.log(`Check target formula: ${dataset.rollTarget} evaluates to ${targetRoll.formula} = ${targetRoll.total}`)
+      console.log("Target formula eval: ", targetRoll)
+    }
+    // Override rollTarget, even if it has the same value
+    dataset.rollTarget = targetRoll.total
+    label += ` (target ${targetRoll.total})`
+
+    // Log the dataset before the dialog renders
+    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+    const rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+
+    // Add/subtract situational modifier from the dice dialog
+    if (CONFIG.HYP3E.flipRollUnderMods) {
+      rollFormula = `${dataset.roll} - ${rollResponse.sitMod}`
+    } else {
+      rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
+    }
+
+    // Roll the dice!
+    let roll = new Roll(rollFormula, this.getRollData())
+    // Resolve the roll
+    let result = await roll.roll()
+    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
+
+    // Determine success or failure
+    if (roll.total <= dataset.rollTarget) {
+      if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
+      label += "<br /><b>Success!</b>"
+
+      /*
+      We use simple word parsing in the ability name to determine if this is a cleric turning undead.
+
+      Cross-reference the cleric (or sub-class) TA and die roll against the Turn Undead table...
+      To determine possible results... and output those to the chat?
+      It may be possible to just use the actor's TA and dynamically calculate the results row 
+        from the table, since the minimum value for success is always a target number of 10, 
+        affecting undead at Type [TA - 1].
+
+      Example: a cleric with TA of 5 can turn undead up to Type 4 with a target number of 10.
+      From there, we know that:
+
+      A target number of 7 will turn undead at their Type == cleric's TA.
+      A TN of 4 affects undead at Type == cleric [TA + 1].
+      And a TN of 1 affects undead at Type == cleric [TA + 2].
+      And with all of this information, we can also calculate the Types of undead that may be 
+        Turned automatically (undead Type == [cleric TA] - 2), or Destroyed (undead Type == 
+        [cleric TA] - 4), or Ultimately Destroyed (undead Type == [cleric TA] - 7).
+      */
+
+      let itemNameLower = itemName.toLowerCase()
+      if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
+        if (roll.total <= 1) {
+          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta+2} or less are <b>turned</b>.</li>`)
+        } else if (roll.total <= 4) {
+          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta+1} or less are <b>turned</b>.</li>`)
+        } else if (roll.total <= 7) {
+          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta} or less are <b>turned</b>.</li>`)
+        } else { // => roll.total is between 8 and 10, since a success was already determined
+          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta-1} or less are <b>turned</b>.</li>`)
+        }
+        if (rollData.ta >= 4) {
+          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta-4} or less are <b>destroyed</b>.</li>`)
+        }
+        if (rollData.ta >= 7) {
+          results.push(`<li>[[/r 1d6+6]] Undead of Type ${rollData.ta-7} or less are <b>utterly destroyed</b>.</li>`)
+        }
+        // Now setup our description output from the results
+        description = `<ul>`
+        for (let i = results.length-1; i >=0; i--) {
+          description += results[i]
+        }
+        description += `</ul>`
+      }
+    } else {
+      if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + dataset.rollTarget + "!") }
+      label += "<br /><b>Fail.</b>"
+    }
+
+    // Construct a custom chat card for the check
+    const customChat = this.renderCustomChat(roll, "", description, "")
+    // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
+
+    // Output roll result to a chat message
+    this.sendRollToChat(roll, label, customChat, rollResponse.rollMode)
+    
+    return roll
+
+  }
+
+  async rollAttackOrSpell(dataset) {
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
+
+    // Is this an item (weapon or spell) attack?
+    const item = this.items.get(dataset.itemId) ?? null
+
+    // Retrieve roll data from the actor
+    const rollData = this.getRollData();
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", rollData) }
+
+    // Declare vars
+    let rollFormula = ""
+    let rollResponse
+    let naturalRoll = 0
+    let dmgFormula = ""
+    let dmgRollParts = []
+    let damageChat = ""
+    let dmgRoll
+    let targetAc = 9
+    let targetName = ""
+    let mastery = "Attack"
+    let masteryMod = 0
+    let debugAtkRollFormula = ""
+    let debugDmgRollFormula = ""
+
+    let itemName = ""
+    let label = `${dataset.label}`
+
+    // Log the dataset and item (if any) before proceeding
+    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("Item:", item) }
+    
+    if (item) {
+      // Get the item's friendly name if it has one
+      if (item.system.friendlyName != "") {
+        itemName = item.system.friendlyName
+      } else {
+        itemName = item.name
+      }
+    }
+
+    // Show the roll dialog (type and item-dependent)
+    if (!item) {
+      rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset)
+    } else if (item && item.type == "weapon") {
+      rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset)
+    } else if (item && item.type == "spell") {
+      rollResponse = await Hyp3eDice.ShowSpellcastingDialog(dataset)
+      // Decrement the number memorized
+      if (item.type == "spell" && item.system.quantity.value > 0) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Cast memorized spell: ${item.name}`) }
+        // Update the item object
+        await item.update({
+          system: {
+            quantity: {
+              value: item.system.quantity.value--,  
+            }
+          }
+        })
+        // Update the embedded item document
+        this.updateEmbeddedDocuments("Item", [
+          { _id: item.id, "system.quantity.value": item.system.quantity.value-- },
+        ])
+      }
+    }
+    
+    // Log the roll-dialog response
+    if (CONFIG.HYP3E.debugMessages) { console.log("Dialog response:", rollResponse) }
+    // Add situational modifier and roll mode from the dialog
+    dataset.sitMod = rollResponse.sitMod
+    dataset.rollMode = rollResponse.rollMode
+
+    // Item-specific calculations
+    if (item) {
+      // If there's no item roll formula (typically a spell), send a chat message and exit
+      if (!item.system.formula) {
+        item._displayItemInChat()
+        return null
+      }
+      
+      // Check if the weapon attack has Master or Grandmaster flags set
+      if (item.system.wpnGrandmaster) {
+        // mastery = "Grandmaster attack"
+        masteryMod = 2
+      } else if (item.system.wpnMaster) {
+        // mastery = "Master attack"
+        masteryMod = 1
+      }
+    }
+
+    // Add situational modifier from the dice dialog
+    if (masteryMod == 0) {
+      if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + sitMod` }
+      rollFormula = `${dataset.roll} + ${dataset.sitMod}`
+    } else {
+      if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + masteryMod + sitMod` }
+      rollFormula = `${dataset.roll} + ${masteryMod} + ${dataset.sitMod}`  
+    }
+
+    // Roll the dice!
+    let atkRoll = new Roll(rollFormula, this.getRollData())
+    if (CONFIG.HYP3E.debugMessages) { console.log("Attack roll: ", atkRoll) }
+    // Resolve the roll
+    let result = await atkRoll.roll()
+    if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
+    // Get roll result
+    naturalRoll = atkRoll.dice[0].total
+
+    // Has the user targeted a token? If so, get it's AC and name
+    const userTargets = Array.from(game.user.targets)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
+    if (userTargets.length > 0) {
+      let primaryTargetData = userTargets[0].actor
+      targetAc = primaryTargetData.system.ac.value
+      targetName = primaryTargetData.name
+    }
+    
+    // Update chat card label based on whether we have a target
+    if (targetName != "") {
+      label += ` vs. ${targetName}...`
+    } else {
+      label += `...`
+    }
+
+    // Determine hit or miss based on target AC
+    let hit = false
+    let tn = 20 - targetAc
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
+    if (naturalRoll == 20) {
+      if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
+      label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
+      hit = true
+    } else if (naturalRoll == 1) {
+      if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
+      label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
+    } else if (atkRoll.total >= tn) {
+      if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
+      label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
+      hit = true
+    } else {
+      if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
+      if (eval(20 - atkRoll.total) <= 9) {
+        label += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
+      } else {
+        label += `<br /><b>Misses AC 9.</b>`
+      }
+    }
+
+    // If the item attack hit, we roll damage automatically and include it in the chat message
+    if (hit && item) {
+      if (Roll.validate(item.system.damage)) {
+        // All items start with the base damage formula
+        dmgRollParts.push(item.system.damage)
+        if (item.system.melee) {
+          if (this.type == "character") {
+            // Characters apply their ST Damage Mod to all melee damage
+            dmgRollParts.push(rollData.str.dmgMod)
+            // Apply the item damage mod
+            dmgRollParts.push(item.system.dmgMod)
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @str.dmgMod + @item.dmgMod` }
+          } else {
+            // NPCs and monsters don't have a ST damage modifier, but might have an item damage mod
+            dmgRollParts.push(item.system.dmgMod)
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }
+          }
+        } else if (item.system.missile) {
+          // Apply the item damage mod
+          dmgRollParts.push(item.system.dmgMod)
+          if (masteryMod == 0) {
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }  
+          } else {
+            dmgRollParts.push(masteryMod)
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod + masteryMod` }  
+          }
+        } else {
+          // This should only happen with spells
+          if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage}` }
+        }
+        // Add Weapon Mastery mod if applicable
+        if (masteryMod != 0) {
+          dmgRollParts.push(masteryMod)
+          if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + masteryMod` }
+        }
+        // Construct the damage roll formula from parts
+        dmgFormula = dmgRollParts.join(" + ")
+        if (CONFIG.HYP3E.debugMessages) {
+          console.log("Damage roll parts:", dmgRollParts)
+          console.log("Damage formula:", dmgFormula)
+        }
+  
+        // Invoke the damage roll
+        dmgRoll = new Roll(dmgFormula, rollData);
+        // Resolve the roll
+        let result = await dmgRoll.roll();
+        if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
+
+        // Render a damage chat snippet that will be added to the attack chat
+        damageChat = this.renderDamageChat(dmgRoll, debugDmgRollFormula)
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Damage chat: ", damageChat) }
+
+      }
+    }
+    // Construct a custom chat card for the attack & damage
+    const attackChat = this.renderCustomChat(atkRoll, debugAtkRollFormula, "", damageChat)
+    // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
+
+    // Output roll result to a chat message
+    this.sendRollToChat(atkRoll, label, attackChat, rollResponse.rollMode)
+
+    return atkRoll
+
+  }
+
+  async rollSave(dataset) {
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
+    let rollFormula
+    let rollResponse
+    let label = `${dataset.label}...`
+    // dataset.enableRoll = true
+    if (this.type == "character") {
+      // Get the character's saving throw modifiers
+      dataset.avoidMod = this.system.attributes.dex.defMod;
+      dataset.poisonMod = this.system.attributes.con.poisRadMod;
+      dataset.willMod = this.system.attributes.wis.willMod;
+      // Log the dataset before the dialog renders
+      if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+
+      rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset);
+
+      // Default basic save with only sit mod from dice dialog
+      rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
+
+      // Get saving throw modifer if one was selected
+      let saveMod = 0;
+      if (rollResponse.avoidMod) {
+        saveMod = rollResponse.avoidMod
+        // Override roll formula with Avoidance modifier
+        rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
+        label = `${dataset.label} with Avoidance modifier...`
+      }
+      if (rollResponse.poisonMod) {
+        saveMod = rollResponse.poisonMod;
+        // Override roll formula with Poison/Radiation modifier
+        rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
+        label = `${dataset.label} with Poison/Radiation modifier...`
+      }
+      if (rollResponse.willMod) {
+        saveMod = rollResponse.willMod;
+        // Override roll formula with Willpower modifier
+        rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
+        label = `${dataset.label} with Willpower modifier...`
+      }
+    } else {
+      // NPC/monster save, no attribute-based mods
+      // Log the dataset before the dialog renders
+      if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+
+      rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+
+      // Add situational modifier from the dice dialog
+      rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
+    }
+    // Roll the dice!
+    let roll = new Roll(rollFormula, this.getRollData())
+    // Resolve the roll
+    let result = await roll.roll()
+    if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
+    // Determine success or failure
+    if (roll.total >= dataset.rollTarget) {
+      if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!") }
+      label += "<br /><b>Success!</b>"
+    } else {
+      if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than " + dataset.rollTarget + "!") }
+      label += "<br /><b>Fail.</b>"
+    }
+
+    // Output roll result to a chat message
+    this.sendRollToChat(roll, label, "", rollResponse.rollMode)
+
+    return roll
+
+  }
+
+  // Send roll results to the chat window
+  sendRollToChat(roll, label, content, rollMode) {
+    // Prettify label
+    label = "<h3>" + label + "</h3>"
+    // Send to chat
+    roll.toMessage({
+      speaker: ChatMessage.getSpeaker({ actor: this }),
+      flavor: label,
+      content: content
+    },{
+      rollMode: rollMode
+    })
+  }
+  
+  // Render custom html for attacks and turning undead
+  renderCustomChat(roll, debugRollFormula, description, damageChat) {
+
+    // Render the full attack-roll chat card, with damage if any
+    let customChat = `
+    <div class="message-content">
+      ${description}
+      <div class="dice-roll">
+        <div class="dice-result">
+          <div class="dice-formula">${roll.formula}</div>
+          <div class="dice-tooltip">
+            <section class="tooltip-part">
+              ${debugRollFormula}
+              <div class="dice">`
+      // Add dice-roll summaries to the chat card
+      roll.dice.forEach(dice => {
+        customChat += `
+                <header class="part-header flexrow">
+                  <span class="part-formula">${roll.dice[0].expression}</span>
+                  <span>
+                    <ol class="dice-rolls">`
+      dice.values.forEach(val => {
+        if (val == 1) {
+          customChat += `<li class="roll die d${dice.faces} min">${val}</li>`
+        } else if (val == dice.faces) {
+          customChat += `<li class="roll die d${dice.faces} max">${val}</li>`
+        } else {
+          customChat += `<li class="roll die d${dice.faces}">${val}</li>`
+        }
+      })  
+      customChat += `
+                    </ol>
+                  </span>
+                  <span class="part-total">${roll.dice[0].total}</span>
+                </header>`
+      })
+      // Finish the chat card
+      customChat += `
+              </div>
+            </section>
+          </div>
+          <h4 class="dice-total">${roll.total}</h4>
+        </div>
+      </div>
+      ${damageChat}
+    </div>
+    `
+    return customChat    
+  }
+
+  // Render custom html for damage rolls, which is added to the attack chat
+  renderDamageChat(dmgRoll, debugDmgRollFormula) {
+    // Render the damage-roll chat html
+    let damageChat = ""
+
+    if (dmgRoll) {
+      damageChat = `
+        <h4 class="dice-damage">Rolling damage...</h4>
+        <div class="dice-roll">
+          <div class="dice-result">
+            <div class="dice-formula">${dmgRoll.formula}</div>
+            <div class="dice-tooltip">
+              <section class="tooltip-part">
+                ${debugDmgRollFormula}
+                <div class="dice">`
+      // Add dice-roll summaries to the chat card
+      dmgRoll.dice.forEach(dice => {
+        damageChat += `
+                <header class="part-header flexrow">
+                  <span class="part-formula">${dice.number}d${dice.faces}</span>
+                  <span><ol class="dice-rolls">`
+      dice.values.forEach(val => {
+        if (val == 1) {
+          damageChat += `<li class="roll die d${dice.faces} min">${val}</li>`
+        } else if (val == dice.faces) {
+          damageChat += `<li class="roll die d${dice.faces} max">${val}</li>`
+        } else {
+          damageChat += `<li class="roll die d${dice.faces}">${val}</li>`
+        }
+      })  
+      damageChat += `
+                    </ol>
+                  </span>
+                  <span class="part-total">${dice.total}</span>
+                </header>`
+      })
+      // Finish the damage-roll chat card
+      damageChat += `
+                </div>
+              </section>
+            </div>
+            <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span></h4>
+          </div>                
+        </div>
+        <!--
+        <button type="button" data-action="apply-damage" title="[Click] Apply full damage to selected tokens.
+          [Shift-Click] Adjust value before applying.">
+          <i class="fa-solid fa-heart-broken fa-fw"></i>
+          <span class="label">Apply Damage</span>
+        </button>
+        -->
+      `
+    }
+    return damageChat
+  }
+
 
   /**
    * Str attack mods, from -2 to +2.

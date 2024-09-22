@@ -12,7 +12,9 @@
 
       {{!-- d6 Task Resolution --}}
       <section class="abilities exploration-block">
-        <h2>{{localize "HYP3E.headers.taskResolution"}}</h2>
+        <div class="abilities flexrow">
+          <h2>{{localize "HYP3E.headers.taskResolution"}}</h2>
+        </div>
         <div class="abilities flexcol">
           {{!-- {{#each system.explorationSkills as |skill key|}}
           <div class="ability flexrow flex-group-center">
@@ -34,7 +36,7 @@
               <label for="system.taskResolution.{{key}}.task" class="exploration-label">{{task.name}}</label>
               <i class="fas fa-dice-d6"></i>
             </span>
-            <input type="text" name="system.taskResolution.{{key}}.task" value="{{task.tn}}" data-dtype="Number"/>
+            <input type="text" name="system.taskResolution.{{key}}.task" value="{{task.tn}}" data-dtype="Number" disabled/>
           </div>
           {{/each}}
           <br />
@@ -78,7 +80,10 @@
             <div class="item-name">
               <div class="item-image">
                 {{#if item.system.formula}}
-                <a class="rollable" data-roll-type="item" data-roll-mode="{{item.system.rollMode}}" data-label="{{item.name}} {{localize 'HYP3E.dataLabel.check'}}">
+                <a class="rollable" 
+                    data-roll-type="item" 
+                    data-roll-mode="{{item.system.rollMode}}" 
+                    data-label="{{item.name}} {{localize 'HYP3E.dataLabel.check'}}">
                   <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                 </a>
                 {{else}}

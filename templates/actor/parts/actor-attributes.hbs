@@ -2,7 +2,7 @@
   <h2>
     {{localize "HYP3E.headers.attributes"}} 
     <span class="rollable flex" data-roll="" data-roll-type="setAttr" title="Set Attribute Modifiers">
-      <i class="fas fa-book"></i>
+      <i class="fa fa-book" style="font-size: small"></i>
     </span>
   </h2>
 </div>
@@ -168,7 +168,7 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.cha.reaction" value="{{numberFormat system.attributes.cha.reaction decimals=0 sign=true}}" data-dtype="Number"/>
-      <span class="mod-label">{{localize 'HYP3E.attributes.cha.reaction'}}</span>
+      <span class="rollable mod-label" data-roll="2d6+{{system.attributes.cha.reaction}}" data-roll-type="basic" data-roll-target="{{system.attributes.cha.reaction}}" data-label="{{localize 'HYP3E.attributes.cha.reaction'}}">{{localize 'HYP3E.attributes.cha.reaction'}} <i class="fas fa-dice"></i></span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.cha.maxHenchmen" value="{{system.attributes.cha.maxHenchmen}}" data-dtype="Number"/>
@@ -187,12 +187,4 @@
       <input type="text" name="system.ta" value="{{system.ta}}" data-dtype="Number"/>
     </div>
   </div>
-  {{!-- <div class="attribute-row flexrow flex-group-center">
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <label for="system.fa" class="combat-label">{{localize "HYP3E.turningAbility"}}</label>
-    <input type="text" name="system.ta" value="{{system.ta}}" data-dtype="Number"/>
-  </div> --}}
 </div>

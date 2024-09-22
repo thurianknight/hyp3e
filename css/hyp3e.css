@@ -341,6 +341,9 @@ textarea {
 .hyp3e h1, .hyp3e h2, .hyp3e h3 {
   font-family: "Herculanum", sans-serif;
 }
+.hyp3e h2 {
+  font-size: x-large;
+}
 .hyp3e .hyp3e-metal img {
   border: none;
   max-width: 200px;
@@ -440,8 +443,8 @@ textarea {
 
 /* Character Combat-tab styles */
 .hyp3e .combat-block {
-  padding: 0 2px;
-  margin-right: 5px;
+  /* padding: 0 2px; */
+  /* margin-right: 5px; */
   margin-bottom: 3px;
   /* background-color: aqua; */
 }
