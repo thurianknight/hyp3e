@@ -84,11 +84,11 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
     }
 
-    // Handle exploration skills
-    for (let [k, v] of Object.entries(context.system.explorationSkills)) {
-      v.label = game.i18n.localize(CONFIG.HYP3E.explorationSkills[k]) ?? k;
-      if (CONFIG.HYP3E.debugMessages) { console.log("Exploration Skills:", k, v, v.label) }
-    }
+    // // Handle exploration skills
+    // for (let [k, v] of Object.entries(context.system.explorationSkills)) {
+    //   v.label = game.i18n.localize(CONFIG.HYP3E.explorationSkills[k]) ?? k;
+    //   if (CONFIG.HYP3E.debugMessages) { console.log("Exploration Skills:", k, v, v.label) }
+    // }
 
     // // Handle d6 task resolution
     // for (let [k, v] of Object.entries(CONFIG.HYP3E.taskResolution)) {
@@ -295,112 +295,32 @@ export class Hyp3eActorSheet extends ActorSheet {
     let result
     switch (spellLvl) {
       case "intLvl1":
-        result = await this.actor.update({
-          system: {
-            attributes: {
-              int: {
-                bonusSpells: {
-                  lvl1: !this.actor.system.attributes.int.bonusSpells.lvl1,
-                }
-              }
-            }
-          }
-        })
+        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl1)
         break
       case "intLvl2":
-        result = await this.actor.update({
-          system: {
-            attributes: {
-              int: {
-                bonusSpells: {
-                  lvl2: !this.actor.system.attributes.int.bonusSpells.lvl2,
-                }
-              }
-            }
-          }
-        })
+        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl2)
         break
       case "intLvl3":
-        result = await this.actor.update({
-          system: {
-            attributes: {
-              int: {
-                bonusSpells: {
-                  lvl3: !this.actor.system.attributes.int.bonusSpells.lvl3,
-                }
-              }
-            }
-          }
-        })
+        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl3)
         break
-        case "intLvl4":
-          result = await this.actor.update({
-            system: {
-              attributes: {
-                int: {
-                  bonusSpells: {
-                    lvl4: !this.actor.system.attributes.int.bonusSpells.lvl4,
-                  }
-                }
-              }
-            }
-          })
-          break
-        case "wisLvl1":
-        result = await this.actor.update({
-          system: {
-            attributes: {
-              wis: {
-                bonusSpells: {
-                  lvl1: !this.actor.system.attributes.wis.bonusSpells.lvl1,
-                }
-              }
-            }
-          }
-        })
+      case "intLvl4":
+        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl4)
+        break
+      case "wisLvl1":
+        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl1)
         break
       case "wisLvl2":
-        result = await this.actor.update({
-          system: {
-            attributes: {
-              wis: {
-                bonusSpells: {
-                  lvl2: !this.actor.system.attributes.wis.bonusSpells.lvl2,
-                }
-              }
-            }
-          }
-        })
+        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl2)
         break
       case "wisLvl3":
-        result = await this.actor.update({
-          system: {
-            attributes: {
-              wis: {
-                bonusSpells: {
-                  lvl3: !this.actor.system.attributes.wis.bonusSpells.lvl3,
-                }
-              }
-            }
-          }
-        })
+        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl3)
         break
-        case "wisLvl4":
-          result = await this.actor.update({
-            system: {
-              attributes: {
-                wis: {
-                  bonusSpells: {
-                    lvl4: !this.actor.system.attributes.wis.bonusSpells.lvl4,
-                  }
-                }
-              }
-            }
-          })
-          break
-      }
-      this.render(true)
-      if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", this.actor) }
+      case "wisLvl4":
+        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl4)
+        break
+    }
+    this.render(true)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", this.actor) }
   }
 
   /**
@@ -651,7 +571,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     event.preventDefault()
     const element = event.currentTarget
     const dataset = element.dataset
-    let label = ""
 
     // Log the element
     if (CONFIG.HYP3E.debugMessages) { console.log("Clicked element: ", element) }
@@ -686,11 +605,11 @@ export class Hyp3eActorSheet extends ActorSheet {
     //      Formula can be built into weapon => item sheet of type "weapon"
     //    Spell duration, number affected, etc.: varies
     //      Formulas can be built into spell => item sheet of type "spell"
+
     try {
       // What is our roll type?
       if (CONFIG.HYP3E.debugMessages) { console.log("Roll Type:", dataset.rollType) }
-      let rollFormula
-      let rollResponse
+
       dataset.itemId = ""
 
       switch (dataset.rollType) {
@@ -718,7 +637,6 @@ export class Hyp3eActorSheet extends ActorSheet {
               mastery = "Master attack"
             }
             dataset.label = `${mastery} with ${itemName}`
-            // rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset);
             this.actor.rollAttackOrSpell(dataset)
           } else if (item.type == "spell") {
             // The default for spells is to cast
@@ -726,134 +644,39 @@ export class Hyp3eActorSheet extends ActorSheet {
             if (item.system.formula == "" || item.system.formula == undefined) {
               dataset.details = `No attack roll required to cast ${itemName}.`
             }
-            // rollResponse = await Hyp3eDice.ShowSpellcastingDialog(dataset);
             this.actor.rollAttackOrSpell(dataset)
           } else {  // ==> Neither a weapon nor a spell
             // The default for other item types (i.e. class abilities or actual items) is a check
             dataset.label = `${itemName} check`
             dataset.rollTarget = item.system.tn
-            // rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
             this.actor.rollCheck(dataset)
           }
-          // // Log the dialog response
-          // if (CONFIG.HYP3E.debugMessages) { console.log("Dialog response:", rollResponse) }
-          // // Add situational modifier from the dice dialog
-          // item.system.sitMod = rollResponse.sitMod;
-          // // Add roll mode from the dice dialog
-          // item.system.rollMode = rollResponse.rollMode;
-          // if (item) {
-          //   return item.roll()
-          // }
           break
   
         case "check":
           this.actor.rollCheck(dataset)
-          // if (CONFIG.HYP3E.debugMessages) { console.log("Rolling check...") }
-          // label = `${dataset.label}...`
-          // // dataset.enableRoll = true
-          // // Log the dataset before the dialog renders
-          // if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
-          // rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
-          // // Add situational modifier from the dice dialog
-          // if (CONFIG.HYP3E.flipRollUnderMods) {
-          //   rollFormula = `${dataset.roll} - ${rollResponse.sitMod}`
-          // } else {
-          //   rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
-          // }
-          break;
+          break
 
         case "attack":
           this.actor.rollAttackOrSpell(dataset)
-          // if (CONFIG.HYP3E.debugMessages) { console.log("Rolling attack...") }
-          // label = `${dataset.label}`
-          // // dataset.enableRoll = true
-          // // Log the dataset before the dialog renders
-          // if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
-          // rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset);
-          // // Add situational modifier from the dice dialog
-          // rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
-          break;
+          break
 
         case "save":
           this.actor.rollSave(dataset)
-          // if (CONFIG.HYP3E.debugMessages) { console.log("Rolling save...") }
-          // label = `${dataset.label}...`
-          // // dataset.enableRoll = true
-          // if (this.actor.type == "character") {
-          //   // Get the character's saving throw modifiers
-          //   // console.log("Avoidance mod:", this.actor.system.attributes.dex.defMod*-1);
-          //   dataset.avoidMod = this.actor.system.attributes.dex.defMod;
-          //   // console.log("Poison mod:", this.actor.system.attributes.con.poisRadMod);
-          //   dataset.poisonMod = this.actor.system.attributes.con.poisRadMod;
-          //   // console.log("Will mod:", this.actor.system.attributes.wis.willMod);
-          //   dataset.willMod = this.actor.system.attributes.wis.willMod;
-          //   // Log the dataset before the dialog renders
-          //   if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
-          //   rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset);
-          //   // console.log("Dialog response:", rollResponse);
-          //   // Get saving throw modifer if one was selected
-          //   let saveMod = 0;
-          //   if (rollResponse.avoidMod) {
-          //     saveMod = rollResponse.avoidMod;
-          //     label = `${dataset.label} with Avoidance modifier...`
-          //   }
-          //   if (rollResponse.poisonMod) {
-          //     saveMod = rollResponse.poisonMod;
-          //     label = `${dataset.label} with Poison/Radiation modifier...`
-          //   }
-          //   if (rollResponse.willMod) {
-          //     saveMod = rollResponse.willMod;
-          //     label = `${dataset.label} with Willpower modifier...`
-          //   }
-          //   // Add save mod and situational modifier from the dice dialog
-          //   rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`;
-          // } else {
-          //   // NPC/monster save, no mods
-          //   // Log the dataset before the dialog renders
-          //   if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
-          //   rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
-          //   // Add situational modifier from the dice dialog
-          //   rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
-          // }
-          break;
+          break
 
         case "basic":
           this.actor.rollBasic(dataset)
-          // if (CONFIG.HYP3E.debugMessages) { console.log("Rolling basic...") }
-          // label = `${dataset.label}...`
-          // // dataset.enableRoll = true
-          // // Log the dataset before the dialog renders
-          // if (CONFIG.HYP3E.debugMessages) { console.log("Dataset:", dataset) }
-          // rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
-          // // Add situational modifier from the dice dialog
-          // rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
-          break;
+          break
+
+        case "reaction":
+          this.actor.rollReaction(dataset)
+          break
 
         case "setAttr":
-          // Take the attribute scores and lookup/calculate all modifiers
-          // console.log("Set attribute modifiers...")
-          new Dialog({
-            title: "Confirm set/reset attribute modifiers",
-            content: "Set attribute modifiers? This will replace any values already in place!",
-            buttons: {
-              confirm: {
-                label: "Confirm",
-                icon: `<i class="fas fa-check"></i>`,
-                callback: () => {
-                  // Set/reset all attribute modifiers
-                  this.actor.SetAttributeMods()
-                  this.render(true)
-                  // ui.notifications.info("Attribute modifiers set!")
-                }
-              },
-              cancel: {
-                label: "Cancel",
-                icon: `<i class="fas fa-times"></i>`,
-                callback: () => {ui.notifications.info("Set attribute modifiers - canceled!")}
-              }
-            }
-          }).render(true);
-          break;
+          // Take the attribute scores and class, and lookup/calculate modifiers
+          this.actor.SetAttributeMods(dataset)
+          break
 
         default:
           // This should never happen, all rolls should have a roll-type
@@ -862,104 +685,9 @@ export class Hyp3eActorSheet extends ActorSheet {
 
       }
       
-      // Handle non-item rolls that supply the formula directly
-      if (dataset.rollType != "item" && dataset.rollType != "setAttr") {
-        // // Roll the dice!
-        // let roll = new Roll(rollFormula, this.actor.getRollData())
-        // // Resolve the roll
-        // let result = await roll.roll()
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
-
-        // Determine success or failure if we have a target number
-        if (dataset.rollTarget != '' && dataset.rollTarget != undefined) {
-          // Attribute, skill and other checks are roll-under for success
-          if (dataset.rollType == "check" || dataset.rollType == "basic") {
-            // if(roll.total <= dataset.rollTarget) {
-            //   if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
-            //   label += "<br /><b>Success!</b>"
-            // } else {
-            //   if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + dataset.rollTarget + "!") }
-            //   label += "<br /><b>Fail.</b>"
-            // }
-          // Saves are roll-over for success
-          } else if (dataset.rollType == "save") {
-            // if(roll.total >= dataset.rollTarget) {
-            //   if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!") }
-            //   label += "<br /><b>Success!</b>"
-            // } else {
-            //   if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than " + dataset.rollTarget + "!") }
-            //   label += "<br /><b>Fail.</b>"
-            // }
-          } else {
-            // Target number was supplied but the roll type is invalid or unspecified!
-            console.log(`Error in roll setup! dataset.rollTarget is ${dataset.rollTarget}, but dataset.rollType is ${dataset.rollType}`)
-            ui.notifications.info(`Error in roll setup! dataset.rollTarget is ${dataset.rollTarget}, but dataset.rollType is ${dataset.rollType}`)
-            return
-          }
-        } else {
-          // The character sheet has an attack roll, but do we have a target token?
-          if (dataset.rollType == "attack") {
-            // // Get roll results
-            // let naturalRoll = roll.dice[0].total
-            // let targetAc = 9
-            // let targetName = ""
-
-            // // Has the user targeted a token? If so, get it's AC and name
-            // let userTargets = Array.from(game.user.targets)
-            // if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
-            // if (userTargets.length > 0) {
-            //   let primaryTargetData = userTargets[0].actor
-            //   targetAc = primaryTargetData.system.ac.value
-            //   targetName = primaryTargetData.name
-            // }
-            
-            // // Setup chat card label based on whether we have a target
-            // if (targetName != "") {
-            //   label += ` vs. ${targetName}...`
-            // } else {
-            //   label += "..."
-            // }
-
-            // // Determine hit or miss based on target AC
-            // // let hit = false
-            // let tn = 20 - targetAc
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${roll.total} hits AC [20 - ${roll.total} => ] ${eval(20 - roll.total)}`) }
-            // if (naturalRoll == 20) {
-            //   if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
-            //   label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
-            //   // hit = true
-            // } else if (naturalRoll == 1) {
-            //   if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
-            //   label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
-            // } else if (roll.total >= tn) {
-            //   if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${roll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
-            //   label += `<br /><b>Hits AC ${eval(20 - roll.total)}!</b>`
-            //   // hit = true
-            // } else {
-            //   if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${roll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
-            //   if (eval(20 - roll.total) <= 9) {
-            //     label += `<br /><b>Miss, would have hit AC ${eval(20 - roll.total)}.</b>`
-            //   } else {
-            //     label += `<br /><b>Misses AC 9.</b>`
-            //   }
-            // }
-          }
-        }
-
-        // Prettify label
-        // label = "<h3>" + label + "</h3>"
-        // // Output roll result to a chat message
-        // roll.toMessage({
-        //   speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-        //   flavor: label
-        // },{
-        //   rollMode: rollResponse.rollMode
-        // });
-        // return roll;
-      }
     } catch(err) {
       // Log the error
-      console.log("Error: ", err)
+      console.log("_onRoll Error: ", err)
     }
   }
 

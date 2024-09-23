@@ -199,12 +199,17 @@ export class Hyp3eActor extends Actor {
   async rollBasic(dataset) {
     if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
 
+    let rollResponse
     let label = `${dataset.label}...`
 
     // Log the dataset before the dialog renders
     if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+    try {
+      rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+    } catch(err) {
+      return
+    }
 
-    const rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
     // Add situational modifier from the dice dialog
     const rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
     
@@ -213,6 +218,40 @@ export class Hyp3eActor extends Actor {
     // Resolve the roll
     let result = await roll.roll()
     if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
+
+    // Output roll result to a chat message
+    this.sendRollToChat(roll, label, "", rollResponse.rollMode)
+    
+    return roll
+
+  }
+
+  async rollReaction(dataset) {
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
+
+    let rollResponse
+    let label = `${dataset.label}...`
+
+    // Log the dataset before the dialog renders
+    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+    try {
+      rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+    } catch(err) {
+      return
+    }
+
+    // Add situational modifier from the dice dialog
+    const rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
+    
+    // Roll the dice!
+    let roll = new Roll(rollFormula, this.getRollData())
+    // Resolve the roll
+    let result = await roll.roll()
+    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
+
+    let reaction = this._valueFromTable(this.reactionTable, roll.total)
+    if (CONFIG.HYP3E.debugMessages) { console.log(reaction) }
+    label += `<br /><b>${reaction}</b>`
 
     // Output roll result to a chat message
     this.sendRollToChat(roll, label, "", rollResponse.rollMode)
@@ -241,6 +280,7 @@ export class Hyp3eActor extends Actor {
     // Declare vars
     let itemName = ""
     let rollFormula = ""
+    let rollResponse
     let label = `${dataset.label}...`
 
     if (item) {
@@ -268,7 +308,11 @@ export class Hyp3eActor extends Actor {
 
     // Log the dataset before the dialog renders
     if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
-    const rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+    try {
+      rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+    } catch(err) {
+      return
+    }
 
     // Add/subtract situational modifier from the dice dialog
     if (CONFIG.HYP3E.flipRollUnderMods) {
@@ -359,6 +403,7 @@ export class Hyp3eActor extends Actor {
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", rollData) }
 
     // Declare vars
+    let atkRollParts = []
     let rollFormula = ""
     let rollResponse
     let naturalRoll = 0
@@ -368,7 +413,6 @@ export class Hyp3eActor extends Actor {
     let dmgRoll
     let targetAc = 9
     let targetName = ""
-    let mastery = "Attack"
     let masteryMod = 0
     let debugAtkRollFormula = ""
     let debugDmgRollFormula = ""
@@ -391,11 +435,23 @@ export class Hyp3eActor extends Actor {
 
     // Show the roll dialog (type and item-dependent)
     if (!item) {
-      rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset)
+      try {
+        rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset)
+      } catch(err) {
+        return
+      }
     } else if (item && item.type == "weapon") {
-      rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset)
+      try {
+        rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset)
+      } catch(err) {
+        return
+      }
     } else if (item && item.type == "spell") {
-      rollResponse = await Hyp3eDice.ShowSpellcastingDialog(dataset)
+      try {
+        rollResponse = await Hyp3eDice.ShowSpellcastingDialog(dataset)
+      } catch(err) {
+        return
+      }
       // Decrement the number memorized
       if (item.type == "spell" && item.system.quantity.value > 0) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Cast memorized spell: ${item.name}`) }
@@ -430,21 +486,29 @@ export class Hyp3eActor extends Actor {
       
       // Check if the weapon attack has Master or Grandmaster flags set
       if (item.system.wpnGrandmaster) {
-        // mastery = "Grandmaster attack"
         masteryMod = 2
       } else if (item.system.wpnMaster) {
-        // mastery = "Master attack"
         masteryMod = 1
       }
     }
 
-    // Add situational modifier from the dice dialog
+    // Initialize our attack roll parts array with the base roll
+    atkRollParts.push(dataset.roll)
+    // Add weapon mastery, if needed
     if (masteryMod == 0) {
       if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + sitMod` }
-      rollFormula = `${dataset.roll} + ${dataset.sitMod}`
     } else {
       if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + masteryMod + sitMod` }
-      rollFormula = `${dataset.roll} + ${masteryMod} + ${dataset.sitMod}`  
+      atkRollParts.push(masteryMod)  
+    }
+    // Add situational modifier from the dice dialog
+    atkRollParts.push(dataset.sitMod)
+
+    // Construct our attack roll formula
+    rollFormula = atkRollParts.join(" + ")
+    if (CONFIG.HYP3E.debugMessages) {
+      console.log("Attack roll parts:", atkRollParts)
+      console.log("Attack formula:", rollFormula)
     }
 
     // Roll the dice!
@@ -563,53 +627,64 @@ export class Hyp3eActor extends Actor {
 
   async rollSave(dataset) {
     if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
-    let rollFormula
+
+    let saveRollParts = []
+    let rollFormula = ""
     let rollResponse
     let label = `${dataset.label}...`
-    // dataset.enableRoll = true
+
     if (this.type == "character") {
       // Get the character's saving throw modifiers
-      dataset.avoidMod = this.system.attributes.dex.defMod;
-      dataset.poisonMod = this.system.attributes.con.poisRadMod;
-      dataset.willMod = this.system.attributes.wis.willMod;
+      dataset.avoidMod = this.system.attributes.dex.defMod
+      dataset.poisonMod = this.system.attributes.con.poisRadMod
+      dataset.willMod = this.system.attributes.wis.willMod
+
       // Log the dataset before the dialog renders
       if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
-
-      rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset);
+      try {
+        rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset)
+      } catch(err) {
+        return
+      }
 
       // Default basic save with only sit mod from dice dialog
-      rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
+      saveRollParts.push(dataset.roll)
 
       // Get saving throw modifer if one was selected
-      let saveMod = 0;
       if (rollResponse.avoidMod) {
-        saveMod = rollResponse.avoidMod
-        // Override roll formula with Avoidance modifier
-        rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
+        saveRollParts.push(rollResponse.avoidMod)
         label = `${dataset.label} with Avoidance modifier...`
       }
       if (rollResponse.poisonMod) {
-        saveMod = rollResponse.poisonMod;
-        // Override roll formula with Poison/Radiation modifier
-        rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
+        saveRollParts.push(rollResponse.poisonMod)
         label = `${dataset.label} with Poison/Radiation modifier...`
       }
       if (rollResponse.willMod) {
-        saveMod = rollResponse.willMod;
-        // Override roll formula with Willpower modifier
-        rollFormula = `${dataset.roll} + ${saveMod} + ${rollResponse.sitMod}`
+        saveRollParts.push(rollResponse.willMod)
         label = `${dataset.label} with Willpower modifier...`
       }
     } else {
       // NPC/monster save, no attribute-based mods
       // Log the dataset before the dialog renders
       if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+      try {
+        rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+      } catch(err) {
+        return
+      }
 
-      rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
-
-      // Add situational modifier from the dice dialog
-      rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`;
     }
+
+    // Add situational modifier from the dice dialog
+    saveRollParts.push(rollResponse.sitMod)
+
+    // Construct our save roll formula
+    rollFormula = saveRollParts.join(" + ")
+    if (CONFIG.HYP3E.debugMessages) {
+      console.log("Save roll parts:", saveRollParts)
+      console.log("Save formula:", rollFormula)
+    }
+
     // Roll the dice!
     let roll = new Roll(rollFormula, this.getRollData())
     // Resolve the roll
@@ -1001,6 +1076,19 @@ export class Hyp3eActor extends Actor {
     7: 0,
     15: 1,
   };
+
+  /**
+   * Reaction lookup table
+   */
+  reactionTable = {
+    2: "Violent: immediate attack",
+    3: "Hostile: antagonistic; attack likely",
+    4: "Unfriendly: negative inclination",
+    6: "Neutral: disinterested or uncertain (reroll once)",
+    9: "Friendly: considers ideas/proposals",
+    11: "Agreeable: willing and helpful",
+    12: "Affable: extremely accomodating"
+  }
 
   /**
    * Class-specific data
@@ -1479,13 +1567,141 @@ export class Hyp3eActor extends Actor {
   }
 
   /**
+   * Handle adding and removing bonus spells
+   * @param {String} spellLvl The bonus spell level to be updated
+   * @param {Bool} val The true or false value to be assigned
+   */
+  async updateBonusSpells(spellLvl, val) {
+    let result
+    switch (spellLvl) {
+      case "intLvl1":
+        result = await this.update({
+          system: {
+            attributes: {
+              int: {
+                bonusSpells: {
+                  lvl1: val,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "intLvl2":
+        result = await this.update({
+          system: {
+            attributes: {
+              int: {
+                bonusSpells: {
+                  lvl2: val,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "intLvl3":
+        result = await this.update({
+          system: {
+            attributes: {
+              int: {
+                bonusSpells: {
+                  lvl3: val,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "intLvl4":
+        result = await this.update({
+          system: {
+            attributes: {
+              int: {
+                bonusSpells: {
+                  lvl4: val,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "wisLvl1":
+        result = await this.update({
+          system: {
+            attributes: {
+              wis: {
+                bonusSpells: {
+                  lvl1: val,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "wisLvl2":
+        result = await this.update({
+          system: {
+            attributes: {
+              wis: {
+                bonusSpells: {
+                  lvl2: val,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "wisLvl3":
+        result = await this.update({
+          system: {
+            attributes: {
+              wis: {
+                bonusSpells: {
+                  lvl3: val,
+                }
+              }
+            }
+          }
+        })
+        break
+      case "wisLvl4":
+        result = await this.update({
+          system: {
+            attributes: {
+              wis: {
+                bonusSpells: {
+                  lvl4: val,
+                }
+              }
+            }
+          }
+        })
+        break
+      }
+      this.render(true)
+      if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", this) }
+  }
+
+  /**
    * Set or reset all attribute modifiers
    */
-  async SetAttributeMods() {
+  async SetAttributeMods(dataset) {
     console.log("Setting attribute modifiers...")
+    let rollResponse
     let data = this.system
     let thisClass = {}
     let xpBonusPossible = null
+    let getsBonusSpell = false
+
+    // Log the dataset before the dialog renders
+    if (CONFIG.HYP3E.debugMessages) { console.log(`${this.name} dataset: `, dataset) }
+    try {
+      rollResponse = await Hyp3eDice.ShowSetModifiersDialog(dataset)
+    } catch(err) {
+      console.log(`SetAttributeMods dialog error ${err}`)
+      return
+    }
 
     // Setup chat message variables
     let label = `<h3>Values for character updated...</h3>`
@@ -1620,20 +1836,24 @@ export class Hyp3eActor extends Actor {
             data.attributes.int.languages = this._valueFromTable(this.intLanguages, data.attributes.int.value)
             content += `<li>Languages: ${data.attributes.int.languages}</li>`
 
-            data.attributes.int.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
-            data.int.bonusSpells.lvl1 = data.attributes.int.bonusSpells.lvl1
-            content += `<li>Level 1 Bonus Spell: ${data.attributes.int.bonusSpells.lvl1}</li>`
+            getsBonusSpell = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
+            this.updateBonusSpells("intLvl1", getsBonusSpell)
+            // data.attributes.int.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
+            content += `<li>Level 1 Bonus Spell: ${getsBonusSpell}</li>`
 
-            data.attributes.int.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
-            data.int.bonusSpells.lvl2 = data.attributes.int.bonusSpells.lvl2
+            getsBonusSpell = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
+            this.updateBonusSpells("intLvl2", getsBonusSpell)
+            // data.attributes.int.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
             content += `<li>Level 2 Bonus Spell: ${data.attributes.int.bonusSpells.lvl2}</li>`
 
-            data.attributes.int.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.int.value)
-            data.int.bonusSpells.lvl3 = data.attributes.int.bonusSpells.lvl3
+            getsBonusSpell = this._valueFromTable(this.bonusSpell3, data.attributes.int.value)
+            this.updateBonusSpells("intLvl3", getsBonusSpell)
+            // data.attributes.int.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.int.value)
             content += `<li>Level 3 Bonus Spell: ${data.attributes.int.bonusSpells.lvl3}</li>`
 
-            data.attributes.int.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.int.value)
-            data.int.bonusSpells.lvl4 = data.attributes.int.bonusSpells.lvl4
+            getsBonusSpell = this._valueFromTable(this.bonusSpell4, data.attributes.int.value)
+            this.updateBonusSpells("intLvl4", getsBonusSpell)
+            // data.attributes.int.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.int.value)
             content += `<li>Level 4 Bonus Spell: ${data.attributes.int.bonusSpells.lvl4}</li>`
 
             data.attributes.int.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.int.value)
@@ -1664,16 +1884,24 @@ export class Hyp3eActor extends Actor {
             data.attributes.wis.willMod = this._valueFromTable(this.wisWillMod, data.attributes.wis.value)
             content += `<li>Will Mod: ${data.attributes.wis.willMod}</li>`
 
-            data.attributes.wis.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
+            getsBonusSpell = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
+            this.updateBonusSpells("wisLvl1", getsBonusSpell)
+            // data.attributes.wis.bonusSpells.lvl1 = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
             content += `<li>Level 1 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl1}</li>`
 
-            data.attributes.wis.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
+            getsBonusSpell = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
+            this.updateBonusSpells("wisLvl2", getsBonusSpell)
+            // data.attributes.wis.bonusSpells.lvl2 = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
             content += `<li>Level 2 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl2}</li>`
 
-            data.attributes.wis.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.wis.value)
+            getsBonusSpell = this._valueFromTable(this.bonusSpell3, data.attributes.wis.value)
+            this.updateBonusSpells("wisLvl3", getsBonusSpell)
+            // data.attributes.wis.bonusSpells.lvl3 = this._valueFromTable(this.bonusSpell3, data.attributes.wis.value)
             content += `<li>Level 3 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl3}</li>`
 
-            data.attributes.wis.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.wis.value)
+            getsBonusSpell = this._valueFromTable(this.bonusSpell4, data.attributes.wis.value)
+            this.updateBonusSpells("wisLvl4", getsBonusSpell)
+            // data.attributes.wis.bonusSpells.lvl4 = this._valueFromTable(this.bonusSpell4, data.attributes.wis.value)
             content += `<li>Level 4 Bonus Spell: ${data.attributes.wis.bonusSpells.lvl4}</li>`
 
             data.attributes.wis.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.wis.value)
@@ -1733,8 +1961,13 @@ export class Hyp3eActor extends Actor {
       content += `</ul>`
 
       // Apply updates to the actor
-      await this.update({data})
-      if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', data) }
+      try {
+        await this.update({data})
+        this.render(true)
+        if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', data) }  
+      } catch(err) {
+        console.log(`Actor update error: ${err}`)
+      }
 
       // Now we can display the chat message
       ChatMessage.create({

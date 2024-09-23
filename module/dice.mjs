@@ -286,4 +286,40 @@ export class Hyp3eDice {
       rollDialog.render(true)
     })
   }
+
+  /**
+   * Handle Set Attribute Mods confirmation dialog
+   * @param dataset
+   */
+    static async ShowSetModifiersDialog(dataset) {
+      // Dialog to confirm setting modifiers
+      return new Promise((resolve, reject) => {
+        new Dialog({
+          title: "Confirm set/reset attribute modifiers",
+          content: "Set attribute modifiers? This will replace any values already in place!",
+          buttons: {
+            confirm: {
+              label: "Confirm",
+              icon: `<i class="fas fa-check"></i>`,
+              callback: () => {
+                // Set/reset all attribute modifiers
+                resolve()
+              }
+            },
+            cancel: {
+              label: "Cancel",
+              icon: `<i class="fas fa-times"></i>`,
+              callback: () => {
+                ui.notifications.info("Set attribute modifiers - canceled!")
+                reject()
+              }
+            }
+          },
+          default: "cancel",
+          render: html => console.log("Register interactivity in the rendered dialog"),
+          close: html => console.log("Dialog closed")
+        }).render(true);
+      })
+    }
+
 }
