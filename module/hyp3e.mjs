@@ -257,6 +257,13 @@ Hooks.once("ready", async function() {
     }
   }
 
+  // Report on compendium data
+  if (game.user.isGM) {
+    if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
+      reportBestiary()
+    }
+  }
+
 });
 
 /* -------------------------------------------- */
@@ -415,6 +422,34 @@ function filterBlind(doc) {
   return doc.type === "feature" && (doc.system.blindRoll === "true" || doc.system.blindRoll === true)
 }
 
+async function reportBestiary() {
+  // Generate a report on bestiary data
+  // Loop through all compendia to find the bestiary
+  for (let pack of game.packs) {
+
+    // Skip anything that's not an Actor compendium pack
+    if (pack.metadata.type != "Actor") {
+      continue
+    }
+
+    // We only need to do the Bestiary compendium for this specific migration
+    if (pack.metadata.label !== "Bestiary") {
+      continue
+    }
+    
+    // OK, we have the bestiary compendium... generate the report
+
+    // Iterate over compendium entries and report
+    const documents = await pack.getDocuments()
+    for (let doc of documents) {
+      if (doc.name != doc.prototypeToken.name) {
+        console.log(`Compendium Bestiary error: ${doc.name} is not the same as token ${doc.prototypeToken.name}!`)
+      }
+    }
+
+  }
+
+}
 
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */

@@ -173,14 +173,6 @@ export class Hyp3eActor extends Actor {
       data.lvl = data.details.level.value ?? 0;
     }
 
-    // // Add task resolution
-    // data.taskResolution = {}
-    // for (let [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
-    //   data.taskResolution[key] = value
-    //   data.taskResolution[key].name = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].name)
-    //   data.taskResolution[key].hint = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].hint)
-    // }
-
   }
 
   /**
@@ -282,7 +274,7 @@ export class Hyp3eActor extends Actor {
     let rollFormula = ""
     let rollResponse
     let label = `${dataset.label}...`
-
+    // Get the item's friendly name if it has one
     if (item) {
       if (item.system.friendlyName != "") {
         itemName = item.system.friendlyName
@@ -290,13 +282,11 @@ export class Hyp3eActor extends Actor {
         itemName = item.name
       }    
     }
-
-    // These are needed for Turn Undead checks
-    let results = []
+    // This is needed for Turn Undead results
     let description = ""
   
     // Resolve target formula to a number, if necessary
-    const targetRoll = new Roll(dataset.rollTarget, this.getRollData())
+    const targetRoll = new Roll(dataset.rollTarget, rollData)
     await targetRoll.roll()
     if (CONFIG.HYP3E.debugMessages) {
       console.log(`Check target formula: ${dataset.rollTarget} evaluates to ${targetRoll.formula} = ${targetRoll.total}`)
@@ -322,63 +312,32 @@ export class Hyp3eActor extends Actor {
     }
 
     // Roll the dice!
-    let roll = new Roll(rollFormula, this.getRollData())
+    let roll = new Roll(rollFormula, rollData)
     // Resolve the roll
     let result = await roll.roll()
     if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
 
-    // Determine success or failure
-    if (roll.total <= dataset.rollTarget) {
-      if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
-      label += "<br /><b>Success!</b>"
-
-      /*
-      We use simple word parsing in the ability name to determine if this is a cleric turning undead.
-
-      Cross-reference the cleric (or sub-class) TA and die roll against the Turn Undead table...
-      To determine possible results... and output those to the chat?
-      It may be possible to just use the actor's TA and dynamically calculate the results row 
-        from the table, since the minimum value for success is always a target number of 10, 
-        affecting undead at Type [TA - 1].
-
-      Example: a cleric with TA of 5 can turn undead up to Type 4 with a target number of 10.
-      From there, we know that:
-
-      A target number of 7 will turn undead at their Type == cleric's TA.
-      A TN of 4 affects undead at Type == cleric [TA + 1].
-      And a TN of 1 affects undead at Type == cleric [TA + 2].
-      And with all of this information, we can also calculate the Types of undead that may be 
-        Turned automatically (undead Type == [cleric TA] - 2), or Destroyed (undead Type == 
-        [cleric TA] - 4), or Ultimately Destroyed (undead Type == [cleric TA] - 7).
-      */
-
-      let itemNameLower = itemName.toLowerCase()
-      if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
-        if (roll.total <= 1) {
-          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta+2} or less are <b>turned</b>.</li>`)
-        } else if (roll.total <= 4) {
-          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta+1} or less are <b>turned</b>.</li>`)
-        } else if (roll.total <= 7) {
-          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta} or less are <b>turned</b>.</li>`)
-        } else { // => roll.total is between 8 and 10, since a success was already determined
-          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta-1} or less are <b>turned</b>.</li>`)
-        }
-        if (rollData.ta >= 4) {
-          results.push(`<li>[[/r 2d6]] Undead of Type ${rollData.ta-4} or less are <b>destroyed</b>.</li>`)
-        }
-        if (rollData.ta >= 7) {
-          results.push(`<li>[[/r 1d6+6]] Undead of Type ${rollData.ta-7} or less are <b>utterly destroyed</b>.</li>`)
-        }
-        // Now setup our description output from the results
-        description = `<ul>`
-        for (let i = results.length-1; i >=0; i--) {
-          description += results[i]
-        }
-        description += `</ul>`
+    // We use simple word parsing in the ability name to determine if this is a cleric turning undead
+    let turnUndead = false
+    let itemNameLower = itemName.toLowerCase()
+    if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
+      turnUndead = true
+      // If we are turning undead, that resolution is executed separately...
+    }
+    
+    // Determine success or failure on a simple check, not turning undead
+    if (!turnUndead) {
+      if (roll.total <= dataset.rollTarget) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
+        label += "<br /><b>Success!</b>"
+  
+      } else {
+        if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + dataset.rollTarget + "!") }
+        label += "<br /><b>Fail.</b>"
       }
     } else {
-      if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + dataset.rollTarget + "!") }
-      label += "<br /><b>Fail.</b>"
+      // Resolve the results of the attempted turning undead
+      description = this.resolveTurnUndead(roll.total, rollData)
     }
 
     // Construct a custom chat card for the check
@@ -704,6 +663,88 @@ export class Hyp3eActor extends Actor {
 
     return roll
 
+  }
+
+  // Build the chat message for turning undead
+  resolveTurnUndead(rollTotal, rollData) {
+    /*
+    Turning Undead
+    ==============
+    Cross-reference the cleric (or sub-class) TA and die roll against the Turn Undead table to determine possible 
+    results, and output those to the chat.
+    We can just use the actor's TA and dynamically calculate the results row from the Turn Undead table, since the 
+    minimum value for success is always a target number of 10, affecting undead at Type [TA - 1].
+    
+    Logic:
+    - If TA is 1, it is possible to completely fail.
+    - If TA is 2 or higher, we have the chance for an automatic turn of undead.
+    - As long as we have some kind of success, we always roll 2d6 for the number of undead affected (except if 
+    TA >= 7, see below).
+    - If TA >= 2, then it is possible that some undead will be turned automatically without even requiring a roll.
+    - If TA >= 4, it is possible that lower-Type undead may be Destroyed.
+    - If TA >= 7, it is possible that some lower-Type undead may be Utterly Destroyed. All this does is change the 
+    number affected from 2d6 to 1d6+6, thus increasing the average roll.
+
+    Example: a cleric with TA of 5 can turn undead up to Type 3 automatically, turn undead of 
+    type 4 with a target number of 10, type 5 with a target number of 7, type 6 with a target 
+    number of 4, and finally type 7 with a target number of 1.
+    Knowing that all TA numbers calculate the same way, we know that:
+    - A target number of 10 will turn undead of Type [cleric TA - 1].
+    - A target number of 7 will turn undead of Type [cleric TA].
+    - A TN of 4 affects undead of Type [cleric TA + 1].
+    - And a TN of 1 affects undead of Type [cleric TA + 2].
+    And with all of this information, we can also calculate the Types of undead that may be 
+      Turned automatically (undead Type == [cleric TA] - 2), or Destroyed (undead Type == 
+      [cleric TA] - 4), or Ultimately Destroyed (undead Type == [cleric TA] - 7).
+    */
+    let description = ''
+    let orLess = ''
+    let results = []
+    let rollAffected = '2d6'
+  
+    // Was this a complete fail?
+    if (rollData.ta <= 1 && rollTotal > 10) {
+      return 'No undead were turned...'
+    }
+
+    // From here on it's all some level of success
+    if (rollTotal <= 1) {
+      if ((rollData.ta+2) > 0) { orLess = 'or less ' }
+      results.push(`<li>Undead of Type ${rollData.ta+2} ${orLess}are <b>turned</b>.</li>`)
+    } else if (rollTotal <= 4) {
+      if ((rollData.ta+1) > 0) { orLess = 'or less ' }
+      results.push(`<li>Undead of Type ${rollData.ta+1} ${orLess}are <b>turned</b>.</li>`)
+    } else if (rollTotal <= 7) {
+      if ((rollData.ta) > 0) { orLess = 'or less ' }
+      results.push(`<li>Undead of Type ${rollData.ta} ${orLess}are <b>turned</b>.</li>`)
+    } else if (rollTotal <= 10) {
+      if ((rollData.ta-1) > 0) { orLess = 'or less ' }
+      results.push(`<li>Undead of Type ${rollData.ta-1} ${orLess}are <b>turned</b>.</li>`)
+    } else {
+      // Even a roll of 11 or 12 is still successful against weaker undead
+      if ((rollData.ta-2) > 0) { orLess = 'or less ' }
+      results.push(`<li>Undead of Type ${rollData.ta-2} ${orLess}are <b>turned</b>.</li>`)
+    }
+    // Reset orLess
+    orLess = ''
+    // At TA 4+, the cleric can actually destroy undead
+    if (rollData.ta >= 4) {
+      if ((rollData.ta-4) > 0) { orLess = 'or less ' }
+      results.push(`<li>Undead of Type ${rollData.ta-4} ${orLess}are <b>destroyed</b>.</li>`)
+    }
+    // At TA 7+, the cleric is so powerful that his number affected is greatly improved
+    if (rollData.ta >= 7) {
+      rollAffected = '1d6+6'
+    }
+
+    // Now we can setup our description output from the results
+    description = `Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...<ul>`
+    for (let i = results.length-1; i >=0; i--) {
+      description += results[i]
+    }
+    description += `</ul>`
+
+    return description
   }
 
   // Send roll results to the chat window

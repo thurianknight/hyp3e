@@ -167,24 +167,6 @@
           "maxHenchmen": 0,
           "turnUndead": 0
         }
-      },
-      "explorationSkills": {
-        "listen": {
-          "value": 1,
-          "rollMode": "blindroll"
-        },
-        "pickLock": {
-          "value": 1,
-          "rollMode": "publicroll"
-        },
-        "secretDoor": {
-          "value": 2,
-          "rollMode": "blindroll"
-        },
-        "findTrap": {
-          "value": 1,
-          "rollMode": "blindroll"
-        }
       }
     },
     "npc": {

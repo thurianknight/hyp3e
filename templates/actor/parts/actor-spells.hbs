@@ -10,10 +10,11 @@
     <div class="flexrow">
       {{!-- <div class="casting-ability flexrow flex-group-center"> --}}
       <div class="casting-ability">
-        <span class="rollable" data-roll="1d20 + @ca" data-roll-type="basic" data-roll-mode="publicroll" data-label="{{localize 'HYP3E.dataLabel.caCheck'}}">
+        {{!-- <span class="rollable" data-roll="1d20 + @ca" data-roll-type="basic" data-roll-mode="publicroll" data-label="{{localize 'HYP3E.dataLabel.caCheck'}}">
           <label for="system.ca" class="spells-label">{{localize "HYP3E.castingAbility"}}</label> 
           <i class="fas fa-dice-d20"></i>
-        </span>
+        </span> --}}
+        <span class="spells-label">{{localize "HYP3E.castingAbility"}}</span>
         <input type="text" class="spells" name="system.ca" value="{{system.ca}}" data-dtype="Number"/>
       </div>
       <div class="spells-block">
