@@ -19,12 +19,10 @@ Requires the _Hyperborea 3rd Edition_ role-playing game ruleset.<!-- END TEXT RE
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-<!--
 [![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fhyp3e&colorB=4aa94a)](https://forge-vtt.com/bazaar#package=hyp3e)
-[![Foundry Hub Endorsements](https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fhyp3e%2Fshield%2Fendorsements)](https://www.foundryvtt-hub.com/package/hyp3e/)
-[![Foundry Hub Comments](https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fhyp3e%2Fshield%2Fcomments)](https://www.foundryvtt-hub.com/package/hyp3e/)
-[![Crowdin](https://badges.crowdin.net/hyp3e/localized.svg)](https://crowdin.com/project/hyp3e)
--->
+<!-- [![Foundry Hub Endorsements](https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fhyp3e%2Fshield%2Fendorsements)](https://www.foundryvtt-hub.com/package/hyp3e/) -->
+<!-- [![Foundry Hub Comments](https://img.shields.io/endpoint?logoColor=white&url=https%3A%2F%2Fwww.foundryvtt-hub.com%2Fwp-json%2Fhubapi%2Fv1%2Fpackage%2Fhyp3e%2Fshield%2Fcomments)](https://www.foundryvtt-hub.com/package/hyp3e/) -->
+<!-- [![Crowdin](https://badges.crowdin.net/hyp3e/localized.svg)](https://crowdin.com/project/hyp3e) -->
 
 ## Installation
 
@@ -53,7 +51,7 @@ It's always appreciated when users [submit an issue](https://github.com/thuriank
 
 ## Contributions
 
-Any feedback is deeply appreciated. Please browse the [open issues](https://github.com/thurianknight/hyp3e/issues/) and if there's not a matching one already, open a new one.
+Any feedback is appreciated. Please browse the [open issues](https://github.com/thurianknight/hyp3e/issues/) and if there's not a matching one already, open a new one.
 
 If you're a developer, look for our [CONTRIBUTING.md](/CONTRIBUTING.md) file.
 
