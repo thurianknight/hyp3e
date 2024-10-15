@@ -235,7 +235,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Toggle bonus spells true/false
     html.find(".bonus-spell").click(async (event) => {
       const spellLvl = $(event.currentTarget).data("spellLvl")
-      this._updateBonusSpells(spellLvl)
+      this._updateBonusSpell(spellLvl)
     });
 
     // Decrement or increment consumable item qty
@@ -291,36 +291,36 @@ export class Hyp3eActorSheet extends ActorSheet {
    * @param {String} spellLvl The bonus spell level to be updated
    * @private
    */
-  async _updateBonusSpells(spellLvl) {
+  async _updateBonusSpell(spellLvl) {
     let result
     switch (spellLvl) {
       case "intLvl1":
-        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl1)
+        await this.actor.updateBonusSpell(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl1)
         break
       case "intLvl2":
-        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl2)
+        await this.actor.updateBonusSpell(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl2)
         break
       case "intLvl3":
-        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl3)
+        await this.actor.updateBonusSpell(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl3)
         break
       case "intLvl4":
-        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl4)
+        await this.actor.updateBonusSpell(spellLvl, !this.actor.system.attributes.int.bonusSpells.lvl4)
         break
       case "wisLvl1":
-        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl1)
+        await this.actor.updateBonusSpell(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl1)
         break
       case "wisLvl2":
-        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl2)
+        await this.actor.updateBonusSpell(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl2)
         break
       case "wisLvl3":
-        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl3)
+        await this.actor.updateBonusSpell(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl3)
         break
       case "wisLvl4":
-        await this.actor.updateBonusSpells(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl4)
+        await this.actor.updateBonusSpell(spellLvl, !this.actor.system.attributes.wis.bonusSpells.lvl4)
         break
     }
     this.render(true)
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", this.actor) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("Actor after sheet update:", this.actor.system) }
   }
 
   /**
@@ -675,7 +675,12 @@ export class Hyp3eActorSheet extends ActorSheet {
 
         case "setAttr":
           // Take the attribute scores and class, and lookup/calculate modifiers
-          this.actor.SetAttributeMods(dataset)
+          let returnOk = await this.actor.SetAttributeMods(dataset)
+          if (returnOk) {
+            this.render()
+            // await this.actor.updateAllBonusSpells()
+            // this.render()
+          }
           break
 
         default:
