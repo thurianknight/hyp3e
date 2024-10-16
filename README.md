@@ -46,6 +46,7 @@ It's always appreciated when users [submit an issue](https://github.com/thuriank
 
 - The **#hyperborea-vtt** channel in the [official North Wind Adventures Discord server](https://discord.com/channels/688093166208811100/1274767991371857970)
 - The [/r/FoundryVTT community on Reddit](https://reddit.com/r/FoundryVTT) may also have answers to your Foundry VTT questions, but it is a general Foundry VTT user community that may not have many users with specific knowledge about HYPERBOREA. Be sure to write `[HYPERBOREA]` in your post subject and select `FVTT Question` from the "Flair" menu.
+- The [ThurianKnight](https://www.youtube.com/@thurianknight) channel on YouTube has a bunch of videos to help you get up and running quickly!
 
 **We do not offer user support via email. Sorry for the inconvenience.**
 
