@@ -465,6 +465,9 @@ export class Hyp3eActor extends Actor {
 
     // Construct our attack roll formula
     rollFormula = atkRollParts.join(" + ")
+    // Replace '@item.atkMod' with the actual value
+    rollFormula = rollFormula.replace("@item.atkMod", item.system.atkMod)
+
     if (CONFIG.HYP3E.debugMessages) {
       console.log("Attack roll parts:", atkRollParts)
       console.log("Attack formula:", rollFormula)
