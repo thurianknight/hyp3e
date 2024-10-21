@@ -260,6 +260,7 @@
       "equipped": "Equipped",
       "consumable": "Consumable",
       "ammunition": "Ammunition",
+      "container": "Container",
       "cost": "Cost",
       "qty": "Qty",
       "weight": "Weight",

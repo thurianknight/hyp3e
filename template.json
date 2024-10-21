@@ -218,7 +218,10 @@
     },
     "container": {
       "templates": ["base", "physical"],
-      "itemIds": []
+      "isContainer": true,
+      "itemIds": [],
+      "isConsumable": false,
+      "isAmmunition": false
     },
     "feature": {
       "templates": ["base", "rollable"],
@@ -230,6 +233,7 @@
     "item": {
       "templates": ["base", "physical", "rollable"],
       "isContainer": false,
+      "itemIds": [],
       "isConsumable": false,
       "isAmmunition": false
     },

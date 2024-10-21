@@ -162,12 +162,22 @@ export class Hyp3eActorSheet extends ActorSheet {
       }
 
       // Append to containers.
-      if (i.type === 'container') {
+      if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
+        // Get contained items and add to their container
         i.contents = this.getContents(i._id, context)
         containers.push(i);
+        // Migrate 'container' type to 'item' & set isContainer flag
+        if (i.type === 'container') {
+          i.type = 'item'
+          i.system.isContainer = true
+          // Update the embedded item document
+          this.actor.updateEmbeddedDocuments("Item", [
+            { _id: i._id, "type": 'item', "system.isContainer": true },
+          ])
+        }
       }
-      // Append to gear.
-      if (i.type === 'item' && i.system.containerId == '') {
+      // Append to gear that isn't in a container.
+      if (i.type === 'item' && i.system.containerId == '' && !i.system.isContainer) {
         gear.push(i);
       }
       // Append to features.
@@ -215,7 +225,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     super.activateListeners(html);
 
     // Render the item sheet for viewing/editing prior to the editable check.
-    html.find('.item-show').click(ev => {
+    html.find('.item-show').click(event => {
       this._displayItemInChat(event);
     });
     html.find('.item-edit').click(ev => {
@@ -539,9 +549,9 @@ export class Hyp3eActorSheet extends ActorSheet {
     // const targetData = target?.system;
 
     // Dragging an item into a container sets its containerId and location to the container
-    if ( (target?.type === "container") ) {
+    if ( (target?.type === "container" || target?.system.isContainer) ) {
       // One container cannot hold another container
-      if (source.type == 'container') { 
+      if (source.type === 'container' || source.system.isContainer) { 
         if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot move container (${source.name}) into another container (${target.name})!`) }
         return 
       }
@@ -552,7 +562,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       ]);
       return;
     }
-    // Dragging an item out of a container resets its containerId and location to blank
+    // Dragging an item out over a non-container resets its containerId and location to blank
     if (source?.system.containerId !== "") {
       this.actor.updateEmbeddedDocuments("Item", [
         { _id: source.id, "system.containerId": "", "system.location": "" },
