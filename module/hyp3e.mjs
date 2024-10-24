@@ -7,6 +7,7 @@ import { Hyp3eItemSheet } from "./sheets/item-sheet.mjs";
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
+import { addChatMessageButtons } from "./helpers/chat.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -265,6 +266,8 @@ Hooks.once("ready", async function() {
   }
 
 });
+
+Hooks.on("renderChatMessage", addChatMessageButtons);
 
 /* -------------------------------------------- */
 /*  Migrate system/world functions              */
