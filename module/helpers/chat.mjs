@@ -117,7 +117,7 @@ async function applyHealthDrop(total) {
     for (const t of tokens) {
         const actor = t.actor;
         let isDefeated = false;
-        let isUnconsious = false;
+        let isUnconscious = false;
         //Update Health
         const oldHealth = actor.system.hp.value;
         // consider dr
@@ -150,32 +150,32 @@ async function applyHealthDrop(total) {
             if (actor.type == "character") {
                 if (newHealth <= 10) {
                     isDefeated = true;
-                    isUnconsious = false;
+                    isUnconscious = false;
                 } else {
-                    //TODO (wsAI) split defeated and isUnconsious
+                    //TODO (wsAI) split defeated and isUnconscious
                     isDefeated = true;
-                    isUnconsious = true;
+                    isUnconscious = true;
                 }
             } else if (actor.type == "npc") {
                 isDefeated = true;
-                isUnconsious = false;
+                isUnconscious = false;
             }
         } else if (oldHealth <= 0) {
         // token was at <=0 and now is not
             isDefeated = false;
-            isUnconsious = false;
+            isUnconscious = false;
         } else {
         // we can return no status to update
             continue;
         }
-        await t.combatant?.update({ defeated: isDefeated, unconsious: isUnconsious });
+        await t.combatant?.update({ defeated: isDefeated, unconscious: isUnconscious });
         const defeated_status = CONFIG.statusEffects.find(
             (e) => e.id === CONFIG.specialStatusEffects.DEFEATED
         );
-        const unconsious_status = CONFIG.statusEffects.find(
-            (e) => e.id === CONFIG.specialStatusEffects.UNCONSIOUS
+        const unconscious_status = CONFIG.statusEffects.find(
+            (e) => e.id === CONFIG.specialStatusEffects.UNconscious
         );
-        if (!defeated_status && !isUnconsious) continue;
+        if (!defeated_status && !isUnconscious) continue;
         let effect = actor && defeated_status ? defeated_status : CONFIG.controlIcons.defeated;
         if (t.object) {
             await t.object.toggleEffect(effect, {
@@ -189,16 +189,16 @@ async function applyHealthDrop(total) {
             });
         }
         // TODO(wsAI) figure out how to show effect properly
-        // effect = actor && defeated_status ? defeated_status : CONFIG.controlIcons.unconsious;
+        // effect = actor && defeated_status ? defeated_status : CONFIG.controlIcons.unconscious;
         // if (t.object) {
         //     await t.object.toggleEffect(effect, {
         //         overlay: true,
-        //         active: isUnconsious,
+        //         active: isUnconscious,
         //     });
         // } else {
         //     await t.toggleEffect(effect, {
         //         overlay: true,
-        //         active: isUnconsious,
+        //         active: isUnconscious,
         //     });
         // }
     }
