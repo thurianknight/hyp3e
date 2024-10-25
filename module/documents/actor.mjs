@@ -137,9 +137,11 @@ export class Hyp3eActor extends Actor {
   _prepareNpcData(actorData) {
     if (actorData.type !== 'npc') return;
 
-    // Make modifications to data here. For example:
-    const systemData = actorData.system;
-    // systemData.xp = (systemData.cr * systemData.cr) * 100;
+    // Make modifications to data here
+    const systemData = actorData.system
+    // NPCs and monsters don't get the -10 hp benefit that PCs do
+    systemData.hp.min = 0
+
   }
 
   /**
