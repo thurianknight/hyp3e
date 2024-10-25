@@ -274,6 +274,14 @@ textarea {
   /* color: #e90000; */
 }
 
+.chat-button-small {
+  width: 22px;
+  height:22px;
+  font-size:10px;
+  line-height:1px
+}
+
+
 /* Styles limited to hyp3e sheets */
 .hyp3e {
   /* Example style for Hyp3e (can be removed if not needed) */
