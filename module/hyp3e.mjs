@@ -100,7 +100,7 @@ Hooks.once('init', async function() {
   });
 
   // Critical hit 
-  game.settings.register(game.system.id, "critHits", {
+  game.settings.register(game.system.id, "critHit", {
     name: game.i18n.localize("HYP3E.settings.critHits"),
     hint: game.i18n.localize("HYP3E.settings.critHitsHint"),
     default: true,
