@@ -85,7 +85,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 `<button class=""><i class="fas fa-user-slash" title="Click to roll critical miss to selected token(s)."></i>Fighter</button>`
             );
             const critMissButtonMage = $(
-                `<button class=""><i class="fas fa-user-slash" title="Click to roll critical miss to selected token(s)."></i>Mage</button>`
+                `<button class=""><i class="fas fa-user-slash" title="Click to roll critical miss to selected token(s)."></i>Magician</button>`
             );
             const critMissButtonOther = $(
                 `<button class=""><i class="fas fa-user-slash" title="Click to roll critical miss to selected token(s)."></i>Cleric/Thief/Monster</button>`
@@ -258,6 +258,7 @@ async function applyHealthDrop(total) {
 
 async function getFeetAndDirectionCritMiss() {
     let feetRoll = await new Roll("1d6+4").roll();
+    let feet = feetRoll.total;
     let directionRoll = await new Roll("1d6").roll();
     let direction = "forward";
     if (directionRoll.total == 4){
@@ -267,7 +268,7 @@ async function getFeetAndDirectionCritMiss() {
     } else if (directionRoll.total == 6) {
         direction = "backward";
     }
-    return (feetRoll.total, direction);
+    return [feet, direction];
 }
 
 async function getCritMissHitCrit(charType) {
@@ -292,9 +293,9 @@ async function rollCritMiss(charType) {
         if (roll.total <= 6) {
             content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
         } else if (roll.total <= 8) {
-            let feet, direction = getFeetAndDirectionCritMiss();
-            content = game.i18n.localize(
-                "HYP3E.attack.critMiss.droppedWeapon", 
+            const [feet, direction] = await getFeetAndDirectionCritMiss();
+            content = game.i18n.format(
+                "HYP3E.attack.critMiss.dropWeapon", 
                 { feet: feet, direction: direction }
             );
         } else if (roll.total <= 9) {
@@ -302,13 +303,13 @@ async function rollCritMiss(charType) {
         } else if (roll.total <= 10) {
             content = game.i18n.localize("HYP3E.attack.critMiss.tripFall");
         } else if (roll.total <= 11) {
-            if (getCritMissHitCrit(charType)) {
+            if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAllyCrit");
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAlly");
             }            
         } else if (roll.total == 12) {
-            if (getCritMissHitCrit(charType)) {
+            if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelfCrit");
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelf");
@@ -320,9 +321,9 @@ async function rollCritMiss(charType) {
         if (roll.total <= 2) {
             content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
         } else if (roll.total <= 4) {
-            let feet, direction = getFeetAndDirectionCritMiss();
-            content = game.i18n.localize(
-                "HYP3E.attack.critMiss.droppedWeapon", 
+            const [feet, direction] = await getFeetAndDirectionCritMiss();
+            content = game.i18n.format(
+                "HYP3E.attack.critMiss.dropWeapon", 
                 { feet: feet, direction: direction }
             );
         } else if (roll.total <= 6) {
@@ -330,13 +331,13 @@ async function rollCritMiss(charType) {
         } else if (roll.total <= 8) {
             content = game.i18n.localize("HYP3E.attack.critMiss.tripFall");
         } else if (roll.total <= 10) {
-            if (getCritMissHitCrit(charType)) {
+            if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAllyCrit");
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAlly");
             }            
         } else if (roll.total <= 12) {
-            if (getCritMissHitCrit(charType)) {
+            if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelfCrit");
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelf");
@@ -349,9 +350,9 @@ async function rollCritMiss(charType) {
         if (roll.total <= 4) {
             content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
         } else if (roll.total <= 6) {
-            let feet, direction = getFeetAndDirectionCritMiss();
-            content = game.i18n.localize(
-                "HYP3E.attack.critMiss.droppedWeapon", 
+            const [feet, direction] = await getFeetAndDirectionCritMiss();
+            content = game.i18n.format(
+                "HYP3E.attack.critMiss.dropWeapon", 
                 { feet: feet, direction: direction }
             );
         } else if (roll.total <= 8) {
@@ -374,9 +375,20 @@ async function rollCritMiss(charType) {
             content = "Critical Miss -- Error in getting result";
         }
     }
-    let _msg = await roll.toMessage({
+    const templateData = {
+        title: game.i18n.localize(`HYP3E.attack.critMiss.${charType}`),
+        content: content,
+        diceRoll: await roll.render()
+    };
+
+    const template = `${HYP3E.systemRoot}/templates/chat/crit-roll.hbs`;
+    const html = await renderTemplate(template, templateData);
+
+    const chatData = {
         speaker: ChatMessage.getSpeaker(),
-        flavor: `Critical Miss Roll for ${charType}`,
-        content: content
-    });
+        roll: JSON.stringify(roll),
+        content: html,
+        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+      };
+      getDocumentClass("ChatMessage").create(chatData);
 }
