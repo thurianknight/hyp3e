@@ -14,7 +14,11 @@
       "enableAttrChecks": "Enable IN & WS concentration checks",
       "enableAttrChecksHint": "This option allows players to click an attribute name to do a 3d6 concentration (roll-under) check. N.B.: This is an optional rule, and is disabled by default.",
       "flipRollUnderMods": "Reverse situational modifiers on roll-under checks",
-      "flipRollUnderModsHint": "For roll-under checks, reverse the sign on situational modifiers so that a positive number is treated as a bonus (subtracted from the roll) and a negative number is treated as a penalty (added to the roll). Other modifiers applied from attributes or items are automatically handled this way."
+      "flipRollUnderModsHint": "For roll-under checks, reverse the sign on situational modifiers so that a positive number is treated as a bonus (subtracted from the roll) and a negative number is treated as a penalty (added to the roll). Other modifiers applied from attributes or items are automatically handled this way.",
+      "critHits": "Critical Hits",
+      "critHitsHint": "Show 2x and 3x damage buttons on natural 20.",
+      "critMiss": "Critical Misses/ Xathoqqua’s Woe",
+      "critMissHint": "Show failure button on natural 1."
     },
     "tabs": {
       "abilities": "Abilities",
@@ -312,7 +316,18 @@
       "unarmored": "Unarmored"
     },
     "attack": {
-      "add": "Add Attack"
+      "add": "Add Attack",
+      "critMiss": {
+        "name": "Critical Miss",
+        "badMiss": "Bad miss",
+        "dropWeapon" : "Drop weapon: {feet} away to {direction}.",
+        "stumble": "Awkward stumble. One adjacent gets one free attack. No further attacks for rest of round.",
+        "tripFall" : "Trip and fall. Prone: -4 AC/ no DX bonus for remainder of round and until next action.",
+        "hitAlly": "Hit ally: (closest for melee, closest adjacent for ranged. Regular hit.",
+        "hitAllyCrit": "Hit ally: (closest for melee, closest adjacent for ranged. <b>Critical Hit</b>.",
+        "hitSelf": "Hit self: Regular hit.",
+        "hitSelfCrit": "Hit self: <b>Critical Hit</b>."
+      }
     },
     "roll": "Roll",
     "rollFormula": "Roll Formula",

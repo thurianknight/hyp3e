@@ -5,7 +5,7 @@ import { HYP3E } from "./config.mjs"
 export const addChatMessageButtons = async function(_msg, html, _data) {
     let dmg = html.find(".damage-button");
     if (dmg.length > 0) {
-        dmg.each((i, b) => {
+        dmg.each((_i, b) => {
             let total = Number($(b).data('total'));
             const fullDamageButton = $(
                 `<button class="dice-total-fullDamage-btn chat-button-small"><i class="fas fa-user-minus" title="Click to apply full damage to selected token(s)."></i></button>`
@@ -75,6 +75,37 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 }).render(true);
               });
 
+        });
+    }
+
+    let critMiss = html.find(".critical-miss");
+    if (critMiss.length > 0) {
+        critMiss.each((_i, b) => {
+            const critMissFighterButton = $(
+                `<button class=""><i class="fas fa-user-slash" title="Click to roll critical miss to selected token(s)."></i>Fighter</button>`
+            );
+            const critMissButtonMage = $(
+                `<button class=""><i class="fas fa-user-slash" title="Click to roll critical miss to selected token(s)."></i>Mage</button>`
+            );
+            const critMissButtonOther = $(
+                `<button class=""><i class="fas fa-user-slash" title="Click to roll critical miss to selected token(s)."></i>Cleric/Thief/Monster</button>`
+            );
+            critMiss.append(critMissFighterButton);
+            critMiss.append(critMissButtonMage);
+            critMiss.append(critMissButtonOther);
+
+            critMissFighterButton.on("click", (ev) => {
+                ev.stopPropagation();
+                rollCritMiss("fighter");
+            });
+            critMissButtonMage.on("click", (ev) => {
+                ev.stopPropagation();
+                rollCritMiss("mage");
+            });
+            critMissButtonOther.on("click", (ev) => {
+                ev.stopPropagation();
+                rollCritMiss("other");
+            });
         });
     }
 }
@@ -223,4 +254,129 @@ async function applyHealthDrop(total) {
     };
 
     ChatMessage.create(chatData, {});
+}
+
+async function getFeetAndDirectionCritMiss() {
+    let feetRoll = await new Roll("1d6+4").roll();
+    let directionRoll = await new Roll("1d6").roll();
+    let direction = "forward";
+    if (directionRoll.total == 4){
+        direction = "left";
+    } else if (directionRoll.total == 5) {
+        direction = "right";
+    } else if (directionRoll.total == 6) {
+        direction = "backward";
+    }
+    return (feetRoll.total, direction);
+}
+
+async function getCritMissHitCrit(charType) {
+    let roll = await new Roll("1d8").roll();
+    if (charType === "fighter" && roll.total == 1) {
+        return true;
+    } else if (charType === "mage" && roll.total <= 3) {
+        return true;
+    } else if (charType === "other" && roll.total <= 2) {
+        return true;
+    }
+    return false;
+}
+
+
+async function rollCritMiss(charType) {
+    let content = "";
+    let roll = await new Roll("1d12").roll();
+    if (roll.total <= 2) {
+        content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
+    } else if (charType === "fighter") {
+        if (roll.total <= 6) {
+            content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
+        } else if (roll.total <= 8) {
+            let feet, direction = getFeetAndDirectionCritMiss();
+            content = game.i18n.localize(
+                "HYP3E.attack.critMiss.droppedWeapon", 
+                { feet: feet, direction: direction }
+            );
+        } else if (roll.total <= 9) {
+            content = game.i18n.localize("HYP3E.attack.critMiss.stumble");
+        } else if (roll.total <= 10) {
+            content = game.i18n.localize("HYP3E.attack.critMiss.tripFall");
+        } else if (roll.total <= 11) {
+            if (getCritMissHitCrit(charType)) {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitAllyCrit");
+            } else {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitAlly");
+            }            
+        } else if (roll.total == 12) {
+            if (getCritMissHitCrit(charType)) {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitSelfCrit");
+            } else {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitSelf");
+            }
+        }  else {
+            content = "Critical Miss -- Error in getting result";
+        }
+    } else if (charType === "mage") {
+        if (roll.total <= 2) {
+            content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
+        } else if (roll.total <= 4) {
+            let feet, direction = getFeetAndDirectionCritMiss();
+            content = game.i18n.localize(
+                "HYP3E.attack.critMiss.droppedWeapon", 
+                { feet: feet, direction: direction }
+            );
+        } else if (roll.total <= 6) {
+            content = game.i18n.localize("HYP3E.attack.critMiss.stumble");
+        } else if (roll.total <= 8) {
+            content = game.i18n.localize("HYP3E.attack.critMiss.tripFall");
+        } else if (roll.total <= 10) {
+            if (getCritMissHitCrit(charType)) {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitAllyCrit");
+            } else {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitAlly");
+            }            
+        } else if (roll.total <= 12) {
+            if (getCritMissHitCrit(charType)) {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitSelfCrit");
+            } else {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitSelf");
+            }
+        }  else {
+            content = "Critical Miss -- Error in getting result";
+        }
+    } else {
+        // cleric/thief/monster
+        if (roll.total <= 4) {
+            content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
+        } else if (roll.total <= 6) {
+            let feet, direction = getFeetAndDirectionCritMiss();
+            content = game.i18n.localize(
+                "HYP3E.attack.critMiss.droppedWeapon", 
+                { feet: feet, direction: direction }
+            );
+        } else if (roll.total <= 8) {
+            content = game.i18n.localize("HYP3E.attack.critMiss.stumble");
+        } else if (roll.total <= 10) {
+            content = game.i18n.localize("HYP3E.attack.critMiss.tripFall");
+        } else if (roll.total <= 11) {
+            if (getCritMissHitCrit(charType)) {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitAllyCrit");
+            } else {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitAlly");
+            }            
+        } else if (roll.total <= 12) {
+            if (getCritMissHitCrit(charType)) {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitSelfCrit");
+            } else {
+                content = game.i18n.localize("HYP3E.attack.critMiss.hitSelf");
+            }
+        }  else {
+            content = "Critical Miss -- Error in getting result";
+        }
+    }
+    let _msg = await roll.toMessage({
+        speaker: ChatMessage.getSpeaker(),
+        flavor: `Critical Miss Roll for ${charType}`,
+        content: content
+    });
 }
