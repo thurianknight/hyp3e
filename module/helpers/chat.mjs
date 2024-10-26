@@ -54,24 +54,34 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                   buttons: {
                     yes: {
                       icon: "<i class='fas fa-check'></i>",
-                      label: `Apply`,
-                    },
-                  },
-                  default: "yes",
-                  close: (html) => {
-                    const form = html[0].querySelector("form");
-                    const modifier = ((
-                      form.querySelector('[name="inputField"]')
-                    ))?.value;
-                    if (modifier && modifier != "") {
-                      const nModifier = Number(modifier);
-                      if (nModifier) {
-                        applyHealthDrop(total + nModifier);
-                      } else {
-                        ui.notifications?.error(modifier + " is not a number");
+                      label: `Apply Modifier`,
+                      callback: (html) => {
+                        const form = html[0].querySelector("form");
+                        const modifier = ((
+                          form.querySelector('[name="inputField"]')
+                        ))?.value;
+                        if (modifier && modifier != "") {
+                          const nModifier = Number(modifier);
+                          if (nModifier) {
+                            applyHealthDrop(total + nModifier);
+                          } else {
+                            ui.notifications?.error(modifier + " is not a number");
+                          }
+                        }
                       }
+                    },
+                    two: {
+                        icon: "<i class='fas fa-check'></i>",
+                        label: `2x Damage`,
+                        callback: () => applyHealthDrop(total * 2)
+                    },
+                    three: {
+                      icon: "<i class='fas fa-check'></i>",
+                      label: `3x Damage`,
+                      callback: () => applyHealthDrop(total * 3)
                     }
                   },
+                  default: "yes",
                 }).render(true);
               });
 
