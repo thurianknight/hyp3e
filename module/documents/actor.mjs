@@ -573,13 +573,17 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
 
         // Render a damage chat snippet that will be added to the attack chat
-        damageChat = this.renderDamageChat(dmgRoll, debugDmgRollFormula)
+        damageChat = this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalRoll)
         // if (CONFIG.HYP3E.debugMessages) { console.log("Damage chat: ", damageChat) }
 
       }
     }
+
+    let critMissHTML = (game.settings.get(game.system.id, "critMiss") && item && naturalRoll == 1) ? 
+      "<div class='critical-miss'><h4>Xathoqqua’s Woe:</h4></div>" :
+      "";
     // Construct a custom chat card for the attack & damage
-    const attackChat = this.renderCustomChat(atkRoll, debugAtkRollFormula, "", damageChat)
+    const attackChat = this.renderCustomChat(atkRoll, debugAtkRollFormula, "", damageChat, critMissHTML);
     // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
 
     // Output roll result to a chat message
@@ -767,8 +771,7 @@ export class Hyp3eActor extends Actor {
   }
   
   // Render custom html for attacks and turning undead
-  renderCustomChat(roll, debugRollFormula, description, damageChat) {
-
+  renderCustomChat(roll, debugRollFormula, description, damageChat, footerHTML = "") {
     // Render the full attack-roll chat card, with damage if any
     let customChat = `
     <div class="message-content">
@@ -811,13 +814,14 @@ export class Hyp3eActor extends Actor {
         </div>
       </div>
       ${damageChat}
+      ${footerHTML}
     </div>
     `
     return customChat    
   }
 
   // Render custom html for damage rolls, which is added to the attack chat
-  renderDamageChat(dmgRoll, debugDmgRollFormula) {
+  renderDamageChat(dmgRoll, debugDmgRollFormula, naturalRoll) {
     // Render the damage-roll chat html
     let damageChat = ""
 

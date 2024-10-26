@@ -99,6 +99,28 @@ Hooks.once('init', async function() {
     requiresReload: true,
   });
 
+  // Critical hit 
+  game.settings.register(game.system.id, "critHits", {
+    name: game.i18n.localize("HYP3E.settings.critHits"),
+    hint: game.i18n.localize("HYP3E.settings.critHitsHint"),
+    default: true,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+  
+  // Critical Miss 
+  game.settings.register(game.system.id, "critMiss", {
+    name: game.i18n.localize("HYP3E.settings.critMiss"),
+    hint: game.i18n.localize("HYP3E.settings.critMissHint"),
+    default: true,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+    
   // If we ever need migration scripts, use this version number for comparison
   console.log("System info:", game.system)
 
@@ -186,6 +208,9 @@ Hooks.once("ready", async function() {
   const flipRollUnderMods = game.settings.get(game.system.id, "flipRollUnderMods");
   CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
   if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods) }
+
+  // Set crit configs
+  //const critHits = game.settings.get(game.system.id, "critHits");
 
   // Load races list
   const races = game.settings.get(game.system.id, "races");
