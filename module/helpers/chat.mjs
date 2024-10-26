@@ -74,12 +74,12 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     two: {
                         icon: "<i class='fas fa-check'></i>",
                         label: `2x Damage (roll only)`,
-                        callback: () => applyHealthDrop(total * 2 + naturalRoll)
+                        callback: () => applyHealthDrop(total + naturalRoll)
                     },
                     three: {
                       icon: "<i class='fas fa-check'></i>",
                       label: `3x Damage (roll only)`,
-                      callback: () => applyHealthDrop(total * 3 + (naturalRoll * 2))
+                      callback: () => applyHealthDrop(total + (naturalRoll * 2))
                     }
                   },
                   default: "yes",
