@@ -7,6 +7,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     if (dmg.length > 0) {
         dmg.each((_i, b) => {
             let total = Number($(b).data('total'));
+            let naturalRoll = Number($(b).data('natural'));
             const fullDamageButton = $(
                 `<button class="dice-total-fullDamage-btn chat-button-small"><i class="fas fa-user-minus" title="Click to apply full damage to selected token(s)."></i></button>`
             );
@@ -54,7 +55,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                   buttons: {
                     yes: {
                       icon: "<i class='fas fa-check'></i>",
-                      label: `Apply Modifier`,
+                      label: `Apply Modifier Above`,
                       callback: (html) => {
                         const form = html[0].querySelector("form");
                         const modifier = ((
@@ -72,13 +73,13 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     },
                     two: {
                         icon: "<i class='fas fa-check'></i>",
-                        label: `2x Damage`,
-                        callback: () => applyHealthDrop(total * 2)
+                        label: `2x Damage (roll only)`,
+                        callback: () => applyHealthDrop(total * 2 + naturalRoll)
                     },
                     three: {
                       icon: "<i class='fas fa-check'></i>",
-                      label: `3x Damage`,
-                      callback: () => applyHealthDrop(total * 3)
+                      label: `3x Damage (roll only)`,
+                      callback: () => applyHealthDrop(total * 3 + (naturalRoll * 2))
                     }
                   },
                   default: "yes",
@@ -201,9 +202,11 @@ async function applyHealthDrop(total) {
         if (damage_mod == 0) continue;
 
         // find updated health
-        const newHealth = oldHealth - damage_mod;
+        let newHealth = oldHealth - damage_mod;
         if (newHealth <  actor.system.hp.min) {
             newHealth = actor.system.hp.min;
+        } else if (newHealth > actor.system.hp.max) {
+            newHealth = actor.system.hp.max;
         }
         await actor.update({ "system.hp.value": newHealth });
 

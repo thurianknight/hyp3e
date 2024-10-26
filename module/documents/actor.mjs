@@ -869,7 +869,7 @@ export class Hyp3eActor extends Actor {
               </section>
             </div>
             <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span>
-            <span class="damage-button" data-total="${dmgRoll.total}"></span></h4>
+            <span class="damage-button" data-total="${dmgRoll.total}" data-natural="${naturalRoll}"></span></h4>
           </div>                
         </div>
         <!--
