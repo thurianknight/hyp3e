@@ -500,6 +500,9 @@ export class Hyp3eActor extends Actor {
       label += `...`
     }
 
+    // Footer used for adding crit buttons (if enabled)
+    let critFooterHTML = "";
+
     // Determine hit or miss based on target AC
     let hit = false
     let tn = 20 - targetAc
@@ -508,9 +511,16 @@ export class Hyp3eActor extends Actor {
       if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
       label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
       hit = true
+      if (game.settings.get(game.system.id, "critHit") && item) {
+        critFooterHTML = "<div class='critical-hit'><h4>Critical Hit:</h4></div>";
+      }
     } else if (naturalRoll == 1) {
       if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
       label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
+
+      if (game.settings.get(game.system.id, "critMiss") && item) {
+        critFooterHTML = "<div class='critical-miss'><h4>Xathoqqua’s Woe:</h4></div>";
+      }
     } else if (atkRoll.total >= tn) {
       if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
       label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
@@ -579,11 +589,8 @@ export class Hyp3eActor extends Actor {
       }
     }
 
-    let critMissHTML = (game.settings.get(game.system.id, "critMiss") && item && naturalRoll == 1) ? 
-      "<div class='critical-miss'><h4>Xathoqqua’s Woe:</h4></div>" :
-      "";
     // Construct a custom chat card for the attack & damage
-    const attackChat = this.renderCustomChat(atkRoll, debugAtkRollFormula, "", damageChat, critMissHTML);
+    const attackChat = this.renderCustomChat(atkRoll, debugAtkRollFormula, "", damageChat, critFooterHTML);
     // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
 
     // Output roll result to a chat message

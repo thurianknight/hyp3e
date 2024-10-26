@@ -330,7 +330,11 @@
         "mage": "Critical miss roll for magician",
         "fighter": "Critical miss roll for fighter",
         "other": "Critical miss roll for cleric/thief/monster"
-
+      },
+      "critHit": {
+        "mage": "Critical hit roll for magician",
+        "fighter": "Critical hit roll for fighter",
+        "other": "Critical hit roll for cleric/thief/monster"
       }
     },
     "roll": "Roll",
