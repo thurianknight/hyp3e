@@ -16,9 +16,9 @@
       "flipRollUnderMods": "Reverse situational modifiers on roll-under checks",
       "flipRollUnderModsHint": "For roll-under checks, reverse the sign on situational modifiers so that a positive number is treated as a bonus (subtracted from the roll) and a negative number is treated as a penalty (added to the roll). Other modifiers applied from attributes or items are automatically handled this way.",
       "critHits": "Critical Hits",
-      "critHitsHint": "Show 2x and 3x damage buttons on natural 20.",
+      "critHitsHint": "Show buttons to roll critical hits on natural 20.",
       "critMiss": "Critical Misses/ Xathoqqua’s Woe",
-      "critMissHint": "Show failure button on natural 1."
+      "critMissHint": "Show buttons to roll critical miss on natural 1."
     },
     "tabs": {
       "abilities": "Abilities",
