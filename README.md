@@ -97,6 +97,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/thurianknight"><img src="https://avatars.githubusercontent.com/u/50419557?v=4" width="100px;" alt="ThurianKnight"/><br /><sub><b>ThurianKnight</b></sub></a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/wintersleepai"><img src="https://avatars.githubusercontent.com/u/88955427?v=4" width="100px;" alt="wintersleepAI"/><br /><sub><b>wintersleepAI</b></sub></a></td>
     </tr>
   </tbody>
 </table>
