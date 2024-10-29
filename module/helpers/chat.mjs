@@ -75,12 +75,12 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     two: {
                         icon: "<i class='fas fa-check'></i>",
                         label: `2x Damage (roll only)`,
-                        callback: () => applyHealthDrop(total + naturalRoll)
+                        callback: () => applyHealthDrop(total, dieFormula)
                     },
                     three: {
                       icon: "<i class='fas fa-check'></i>",
                       label: `3x Damage (roll only)`,
-                      callback: () => applyHealthDrop(total + (naturalRoll * 2))
+                      callback: () => applyHealthDrop(total, `${dieFormula}+${dieFormula}`)
                     }
                   },
                   default: "yes",
@@ -211,7 +211,18 @@ async function rollSaveButton(saveType) {
 }
 
 // Apply a health drop (positive number is damage) to one or more tokens.
-async function applyHealthDrop(total) {
+async function applyHealthDrop(total, extraRoll = "") {
+    if (extraRoll != "") {
+        const roll = await new Roll(extraRoll).roll();
+        if (total => 0) {
+            total += roll.total;
+        } else {
+            total -= roll.total;
+        }
+        // For showing the roll
+        extraRoll = await roll.render();
+    }
+
     if (total == 0) return; // Skip changes of 0
     const tokens = canvas?.tokens?.controlled;
 
@@ -312,15 +323,22 @@ async function applyHealthDrop(total) {
         //     });
         // }
     }
+    let body = "";
+    if (extraRoll != "") {
+        body += `<p>Extra damage roll: ${extraRoll}</p>`;
+    }
+    body += `<ul><li>${names
+        // .map((t) => t.name)
+        .join("</li><li>")}</li></ul>`;
+
+
     // Log health hit as a chat message
     const title = total > 0
         ? `Applied ${total} damage`
         : `Applied ${total*-1} healing`;
     const templateData = {
         title: title,
-        body: `<ul><li>${names
-            // .map((t) => t.name)
-            .join("</li><li>")}</li></ul>`,
+        body: body,
         // image: image
     };
 
