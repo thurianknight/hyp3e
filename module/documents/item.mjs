@@ -708,7 +708,10 @@ export class Hyp3eItem extends Item {
         //   // If damage is not variable, simply display the value
         //   content += `<p>Damage: ${item.system.damage}</p>`
         // }
-      }      
+      }
+      if (item.system.save && item.system.save !== "") {
+        content += `<div class='save-button' data-save='${item.system.save}'></div>`;
+      }
     }
 
     // Item
