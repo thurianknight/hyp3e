@@ -647,6 +647,8 @@ export class Hyp3eActor extends Actor {
       if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
       try {
         rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+        // Default basic save with only sit mod from dice dialog
+        saveRollParts.push(dataset.roll)
       } catch(err) {
         return
       }
@@ -872,7 +874,7 @@ export class Hyp3eActor extends Actor {
               </section>
             </div>
             <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span>
-            <span class="damage-button" data-total="${dmgRoll.total}" 
+            <span class="damage-button" data-total="${dmgRoll.total}"
               data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}"></span></h4>
           </div>                
         </div>
