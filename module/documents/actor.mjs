@@ -512,14 +512,14 @@ export class Hyp3eActor extends Actor {
       label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
       hit = true
       if (game.settings.get(game.system.id, "critHit") && item) {
-        critFooterHTML = "<div class='critical-hit'><h4>Critical Hit:</h4></div>";
+        critFooterHTML += "<div class='critical-hit'><h4>Critical Hit:</h4></div>";
       }
     } else if (naturalRoll == 1) {
       if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
       label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
 
       if (game.settings.get(game.system.id, "critMiss") && item) {
-        critFooterHTML = "<div class='critical-miss'><h4>Xathoqqua’s Woe:</h4></div>";
+        critFooterHTML += "<div class='critical-miss'><h4>Xathoqqua’s Woe:</h4></div>";
       }
     } else if (atkRoll.total >= tn) {
       if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
@@ -584,9 +584,9 @@ export class Hyp3eActor extends Actor {
 
         // Get the dice roll value of damage for x2/x3 modifier button
         let dmgRollNatural =  dmgRoll.dice[0].total;
-
+        let dmgBaseRoll = item.system.damage;
         // Render a damage chat snippet that will be added to the attack chat
-        damageChat = this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRollNatural)
+        damageChat = this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRollNatural, dmgBaseRoll)
         // if (CONFIG.HYP3E.debugMessages) { console.log("Damage chat: ", damageChat) }
 
       }
@@ -647,6 +647,8 @@ export class Hyp3eActor extends Actor {
       if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
       try {
         rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+        // Default basic save with only sit mod from dice dialog
+        saveRollParts.push(dataset.roll)
       } catch(err) {
         return
       }
@@ -831,7 +833,7 @@ export class Hyp3eActor extends Actor {
   }
 
   // Render custom html for damage rolls, which is added to the attack chat
-  renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll) {
+  renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll) {
     // Render the damage-roll chat html
     let damageChat = ""
 
@@ -872,7 +874,8 @@ export class Hyp3eActor extends Actor {
               </section>
             </div>
             <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span>
-            <span class="damage-button" data-total="${dmgRoll.total}" data-natural="${naturalDmgRoll}"></span></h4>
+            <span class="damage-button" data-total="${dmgRoll.total}"
+              data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}"></span></h4>
           </div>                
         </div>
         <!--

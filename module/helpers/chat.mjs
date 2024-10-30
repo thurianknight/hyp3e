@@ -8,6 +8,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
         dmg.each((_i, b) => {
             let total = Number($(b).data('total'));
             let naturalRoll = Number($(b).data('natural'));
+            let dieFormula =$(b).data('roll');
             const fullDamageButton = $(
                 `<button class="dice-total-fullDamage-btn chat-button-small"><i class="fas fa-user-minus" title="Click to apply full damage to selected token(s)."></i></button>`
             );
@@ -74,12 +75,12 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     two: {
                         icon: "<i class='fas fa-check'></i>",
                         label: `2x Damage (roll only)`,
-                        callback: () => applyHealthDrop(total + naturalRoll)
+                        callback: () => applyHealthDrop(total, dieFormula)
                     },
                     three: {
                       icon: "<i class='fas fa-check'></i>",
                       label: `3x Damage (roll only)`,
-                      callback: () => applyHealthDrop(total + (naturalRoll * 2))
+                      callback: () => applyHealthDrop(total, `${dieFormula}+${dieFormula}`)
                     }
                   },
                   default: "yes",
@@ -146,6 +147,22 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             });
         });
     }
+    let save = html.find(".save-button");
+    if (save.length > 0) {
+        save.each((_i, b) => {
+            let saveType = $(b).data('save');
+            let saveButton = $(
+                `<button class=""><i class="fas fa-dice-d20" title="Click to roll save to selected token(s)."></i>Save: ${saveType}</button>`
+            );
+            save.append(saveButton);
+
+            // Handle button clicks
+            save.on("click", (ev) => {
+                ev.stopPropagation();
+                rollSaveButton(saveType);
+            });
+        });
+    }
 }
 
 // Show a change in value by a token
@@ -171,8 +188,41 @@ export async function showValueChange(t, fillColor,total) {
     );
   }
   
+async function rollSaveButton(saveType) {
+    if (saveType == "") return; // Skip empty save
+    const tokens = canvas?.tokens?.controlled;
+
+    if (!tokens || tokens.length == 0) {
+        ui.notifications?.error("Please select at least one token");
+        return;
+    }
+
+    for (const t of tokens) {
+        const actor = t.actor;
+        let saveTarget = actor.system.saves[saveType].value;
+        const dataset = {
+            label: "Save vs. " + saveType,
+            roll: "1d20",
+            rollMode: "publicroll",
+            rollTarget: saveTarget
+        };
+        await actor.rollSave(dataset);
+    }
+}
+
 // Apply a health drop (positive number is damage) to one or more tokens.
-async function applyHealthDrop(total) {
+async function applyHealthDrop(total, extraRoll = "") {
+    if (extraRoll != "") {
+        const roll = await new Roll(extraRoll).roll();
+        if (total => 0) {
+            total += roll.total;
+        } else {
+            total -= roll.total;
+        }
+        // For showing the roll
+        extraRoll = await roll.render();
+    }
+
     if (total == 0) return; // Skip changes of 0
     const tokens = canvas?.tokens?.controlled;
 
@@ -273,15 +323,22 @@ async function applyHealthDrop(total) {
         //     });
         // }
     }
+    let body = "";
+    if (extraRoll != "") {
+        body += `<p>Extra damage roll: ${extraRoll}</p>`;
+    }
+    body += `<ul><li>${names
+        // .map((t) => t.name)
+        .join("</li><li>")}</li></ul>`;
+
+
     // Log health hit as a chat message
     const title = total > 0
         ? `Applied ${total} damage`
         : `Applied ${total*-1} healing`;
     const templateData = {
         title: title,
-        body: `<ul><li>${names
-            // .map((t) => t.name)
-            .join("</li><li>")}</li></ul>`,
+        body: body,
         // image: image
     };
 
