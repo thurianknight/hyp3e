@@ -9,6 +9,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             let total = Number($(b).data('total'));
             let naturalRoll = Number($(b).data('natural'));
             let dieFormula =$(b).data('roll');
+            let sourceType = $(b).data('sourceType');
             const fullDamageButton = $(
                 `<button class="dice-total-fullDamage-btn chat-button-small"><i class="fas fa-user-minus" title="Click to apply full damage to selected token(s)."></i></button>`
             );
@@ -44,6 +45,39 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
 
             fullDamageModifiedButton.on("click", (ev) => {
                 ev.stopPropagation();
+                let buttons = {
+                    yes: {
+                        icon: "<i class='fas fa-check'></i>",
+                        label: `Apply Modifier Above`,
+                        callback: (html) => {
+                          const form = html[0].querySelector("form");
+                          const modifier = ((
+                            form.querySelector('[name="inputField"]')
+                          ))?.value;
+                          if (modifier && modifier != "") {
+                            const nModifier = Number(modifier);
+                            if (nModifier) {
+                              applyHealthDrop(total + nModifier);
+                            } else {
+                              ui.notifications?.error(modifier + " is not a number");
+                            }
+                          }
+                        }
+                      }
+                };
+                if (sourceType === "weapon") {
+                    if (CONFIG.HYP3E.debugMessages) { console.log("Adding 2x/3x button for weapon") }
+                    buttons["two"] = {
+                        icon: "<i class='fas fa-check'></i>",
+                        label: `2x Damage (roll only)`,
+                        callback: () => applyHealthDrop(total, dieFormula)
+                    };
+                    buttons["three"] = {
+                        icon: "<i class='fas fa-check'></i>",
+                        label: `3x Damage (roll only)`,
+                        callback: () => applyHealthDrop(total, `${dieFormula}+${dieFormula}`)
+                    };
+                }
                 new Dialog({
                   title: "Apply Modifier to Damage",
                   content: `
@@ -53,36 +87,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                           <input type='text' name='inputField'></input>
                         </div>
                       </form>`,
-                  buttons: {
-                    yes: {
-                      icon: "<i class='fas fa-check'></i>",
-                      label: `Apply Modifier Above`,
-                      callback: (html) => {
-                        const form = html[0].querySelector("form");
-                        const modifier = ((
-                          form.querySelector('[name="inputField"]')
-                        ))?.value;
-                        if (modifier && modifier != "") {
-                          const nModifier = Number(modifier);
-                          if (nModifier) {
-                            applyHealthDrop(total + nModifier);
-                          } else {
-                            ui.notifications?.error(modifier + " is not a number");
-                          }
-                        }
-                      }
-                    },
-                    two: {
-                        icon: "<i class='fas fa-check'></i>",
-                        label: `2x Damage (roll only)`,
-                        callback: () => applyHealthDrop(total, dieFormula)
-                    },
-                    three: {
-                      icon: "<i class='fas fa-check'></i>",
-                      label: `3x Damage (roll only)`,
-                      callback: () => applyHealthDrop(total, `${dieFormula}+${dieFormula}`)
-                    }
-                  },
+                  buttons,
                   default: "yes",
                 }).render(true);
               });

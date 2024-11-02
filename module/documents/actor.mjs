@@ -586,7 +586,7 @@ export class Hyp3eActor extends Actor {
         let dmgRollNatural =  dmgRoll.dice[0].total;
         let dmgBaseRoll = item.system.damage;
         // Render a damage chat snippet that will be added to the attack chat
-        damageChat = this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRollNatural, dmgBaseRoll)
+        damageChat = this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRollNatural, dmgBaseRoll, item)
         // if (CONFIG.HYP3E.debugMessages) { console.log("Damage chat: ", damageChat) }
 
       }
@@ -833,7 +833,7 @@ export class Hyp3eActor extends Actor {
   }
 
   // Render custom html for damage rolls, which is added to the attack chat
-  renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll) {
+  renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll, sourceItem = null) {
     // Render the damage-roll chat html
     let damageChat = ""
 
@@ -875,7 +875,7 @@ export class Hyp3eActor extends Actor {
             </div>
             <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span>
             <span class="damage-button" data-total="${dmgRoll.total}"
-              data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}"></span></h4>
+              data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}" data-source-type="${sourceItem.type}"></span></h4>
           </div>                
         </div>
         <!--
