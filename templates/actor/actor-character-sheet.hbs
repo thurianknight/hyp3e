@@ -2,7 +2,24 @@
 
   {{!-- Sheet Header --}}
   <header class="sheet-header">
-    <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+    <div class="profile-img"><!-- Profile Image -->
+      <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+      <div class="health-bar" style="border-bottom:0px;"><!-- The character health bar -->
+        <div style="width:{{system.hp.percentage}}%" class="health-fill"></div>
+          <div class="health-text">
+              <span
+                class='short-field align-right current-value'
+                style='text-align:right;'>
+                {{system.hp.value}}
+              </span> 
+            <p style="margin:0px">/</p>
+              <span class=' short-field'>
+                {{system.hp.max}}
+              </span> 
+          </div>
+      </div> <!-- End Health Bar -->
+    </div><!-- End Profile Image -->
+
     <div class="header-block">
       <div class="character-header-block flexrow">
         <div class="character-header-block flexcol">
