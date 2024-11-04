@@ -327,12 +327,12 @@ textarea {
 }
 
 /* Sets the position of the health-bar and strain-bar and sets it to the propper size. */
-.hyp3e .health-bar{
-  position: relative;
-  bottom: 0px;
+.hyp3e .health-bar {
+  position: absolute;
+  bottom: -5px;
 
   width: 100%;
-  height: 20px;
+  height: 15px;
 
   border: 1px solid rgb(170,170,170);
 
@@ -340,13 +340,13 @@ textarea {
   background-color: whitesmoke;
 }
 
-.hyp3e .health-bar .health-fill{
+.hyp3e .health-bar .health-fill {
   background: linear-gradient(45deg, rgba(48,121,22,1) 0%, rgba(97,190,80,1) 100%);
   height: 100%;
 }
 
 /* Positions the HP text in the center of the healthbar or strainbar */
-.hyp3e .health-text{
+.hyp3e .health-text {
   display: flex;
   position: relative;
   top: -100%;
