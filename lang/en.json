@@ -311,7 +311,7 @@
       "wtClass": "Wt Class",
       "armorClass": "Armor Class",
       "ac": "AC",
-      "dr": "DR",
+      "dr": "Damage Reduction",
       "dmgResist": "Dmg Resist",
       "unarmored": "Unarmored"
     },
