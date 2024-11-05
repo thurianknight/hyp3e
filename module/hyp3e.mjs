@@ -34,6 +34,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+
   // Automatic Armor Class calculation
   game.settings.register(game.system.id, "autoCalcAc", {
     name: game.i18n.localize("HYP3E.settings.autoCalcAc"),
@@ -44,6 +45,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+
   // Enable basic attribute checks
   game.settings.register(game.system.id, "enableAttrChecks", {
     name: game.i18n.localize("HYP3E.settings.enableAttrChecks"),
@@ -58,6 +60,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+
   // Reverse situational modifiers on roll-under checks
   game.settings.register(game.system.id, "flipRollUnderMods", {
     name: game.i18n.localize("HYP3E.settings.flipRollUnderMods"),
@@ -65,36 +68,6 @@ Hooks.once('init', async function() {
     default: true,
     scope: "world",
     type: Boolean,
-    config: true,
-    requiresReload: true,
-  });
-  // Human races
-  game.settings.register(game.system.id, "races", {
-    name: game.i18n.localize("HYP3E.settings.races"),
-    hint: game.i18n.localize("HYP3E.settings.racesHint"),
-    default: "Common (Mixed), Amazon, Atlantean, Esquimaux, Hyperborean, Ixian, Kelt, Kimmerian, Kimmeri-Kelt, Pict, Pict (Half-Blood), Viking, Anglo-Saxon, Carolingian Frank, Carthaginian, Esquimaux-Ixian, Greek, Lapp, Lemurian, Moor, Mu, Oon, Roman, Tlingit, Yakut",
-    scope: "world",
-    type: String,
-    config: true,
-    requiresReload: true,
-  });
-  // Languages
-  game.settings.register(game.system.id, "languages", {
-    name: game.i18n.localize("HYP3E.settings.languages"),
-    hint: game.i18n.localize("HYP3E.settings.languagesHint"),
-    default: "Common, Berber, Esquimaux (Coastal), Esquimaux (Tundra), Esquimaux-Ixian (pidgin), Hellenic (Amazon), Hellenic (Atlantean), Hellenic (Greek), Hellenic (Hyperborean), Hellenic (Kimmerian), Keltic (Goidelic), Keltic (Pictish), Latin, Lemurian, Muat, Old Norse (Anglo-Saxon), Old Norse (Viking), Oonat, Thracian (Ixian), Thracian (Kimmerian), Tlingit, Uralic (Lapp), Uralic (Yakut)",
-    scope: "world",
-    type: String,
-    config: true,
-    requiresReload: true,
-  });
-  // Classes
-  game.settings.register(game.system.id, "characterClasses", {
-    name: game.i18n.localize("HYP3E.settings.characterClasses"),
-    hint: game.i18n.localize("HYP3E.settings.characterClassesHint"),
-    default: "Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch",
-    scope: "world",
-    type: String,
     config: true,
     requiresReload: true,
   });
@@ -117,6 +90,39 @@ Hooks.once('init', async function() {
     default: true,
     scope: "world",
     type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+
+  // Human races
+  game.settings.register(game.system.id, "races", {
+    name: game.i18n.localize("HYP3E.settings.races"),
+    hint: game.i18n.localize("HYP3E.settings.racesHint"),
+    default: "Common (Mixed), Amazon, Atlantean, Esquimaux, Hyperborean, Ixian, Kelt, Kimmerian, Kimmeri-Kelt, Pict, Pict (Half-Blood), Viking, Anglo-Saxon, Carolingian Frank, Carthaginian, Esquimaux-Ixian, Greek, Lapp, Lemurian, Moor, Mu, Oon, Roman, Tlingit, Yakut",
+    scope: "world",
+    type: String,
+    config: true,
+    requiresReload: true,
+  });
+
+  // Languages
+  game.settings.register(game.system.id, "languages", {
+    name: game.i18n.localize("HYP3E.settings.languages"),
+    hint: game.i18n.localize("HYP3E.settings.languagesHint"),
+    default: "Common, Berber, Esquimaux (Coastal), Esquimaux (Tundra), Esquimaux-Ixian (pidgin), Hellenic (Amazon), Hellenic (Atlantean), Hellenic (Greek), Hellenic (Hyperborean), Hellenic (Kimmerian), Keltic (Goidelic), Keltic (Pictish), Latin, Lemurian, Muat, Old Norse (Anglo-Saxon), Old Norse (Viking), Oonat, Thracian (Ixian), Thracian (Kimmerian), Tlingit, Uralic (Lapp), Uralic (Yakut)",
+    scope: "world",
+    type: String,
+    config: true,
+    requiresReload: true,
+  });
+  
+  // Classes
+  game.settings.register(game.system.id, "characterClasses", {
+    name: game.i18n.localize("HYP3E.settings.characterClasses"),
+    hint: game.i18n.localize("HYP3E.settings.characterClassesHint"),
+    default: "Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch",
+    scope: "world",
+    type: String,
     config: true,
     requiresReload: true,
   });
