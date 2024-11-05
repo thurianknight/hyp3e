@@ -158,7 +158,11 @@ export class Hyp3eActorSheet extends ActorSheet {
       // Calculate total weight carried by character
       if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
       if (i.system.weight) {
-        encumbrance += i.system.weight
+        if (i.system.quantity.value) {
+          encumbrance += (i.system.weight * i.system.quantity.value)
+        } else {
+          encumbrance += i.system.weight
+        }
       }
 
       // Append to containers.

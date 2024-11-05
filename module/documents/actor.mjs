@@ -242,8 +242,11 @@ export class Hyp3eActor extends Actor {
     // Resolve the roll
     let result = await roll.roll()
     if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
+    // The roll shouldn't go below zero, even if modifiers would make it so
+    let rollTotal = roll.total
+    if (rollTotal < 0) { rollTotal = 0 }
 
-    let reaction = this._valueFromTable(this.reactionTable, roll.total)
+    let reaction = this._valueFromTable(this.reactionTable, rollTotal)
     if (CONFIG.HYP3E.debugMessages) { console.log(reaction) }
     label += `<br /><b>${reaction}</b>`
 
@@ -1147,6 +1150,7 @@ export class Hyp3eActor extends Actor {
    * Reaction lookup table
    */
   reactionTable = {
+    0: "Violent: immediate attack",
     2: "Violent: immediate attack",
     3: "Hostile: antagonistic; attack likely",
     4: "Unfriendly: negative inclination",
