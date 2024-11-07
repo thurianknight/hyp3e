@@ -1186,6 +1186,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 16
+      },
     },
     "Barbarian": {
       "hitDie": "1d12",
@@ -1205,6 +1212,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
         "dex": 8,
+      },
+      "saves": {
+        "death": 14,
+        "device": 14,
+        "transformation": 14,
+        "avoidance": 14,
+        "sorcery": 14
       },
     },
     "Bard": {
@@ -1227,6 +1241,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 16
+      },
     },
     "Berserker": {
       "hitDie": "1d12",
@@ -1245,6 +1266,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
         "con": 8,
+      },
+      "saves": {
+        "death": 14,
+        "device": 14,
+        "transformation": 14,
+        "avoidance": 14,
+        "sorcery": 14
       },
     },
     "Cataphract": {
@@ -1266,6 +1294,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 16
+      },
     },
     "Cleric": {
       "fa": 1,
@@ -1278,6 +1313,13 @@ export class Hyp3eActor extends Actor {
       },
       "xpBonusReq": {
         "wis": 16,
+      },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
       },
     },
     "Cryomancer": {
@@ -1294,6 +1336,13 @@ export class Hyp3eActor extends Actor {
         "int": 16,
         "wis": 16,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Druid": {
       "hitDie": "1d8",
@@ -1308,6 +1357,13 @@ export class Hyp3eActor extends Actor {
       "xpBonusReq": {
         "wis": 16,
         "cha": 16,
+      },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
       },
     },
     "Fighter": {
@@ -1324,6 +1380,13 @@ export class Hyp3eActor extends Actor {
       },
       "featBonus": {
         "str": 8,
+      },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 16
       },
     },
     "Huntsman": {
@@ -1345,6 +1408,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 16
+      },
     },
     "Illusionist": {
       "hitDie": "1d4",
@@ -1362,6 +1432,13 @@ export class Hyp3eActor extends Actor {
       },
       "featBonus": {
         "dex": 8,
+      },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
       },
     },
     "Legerdemainist": {
@@ -1381,6 +1458,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 14
+      },
     },
     "Magician": {
       "hitDie": "1d4",
@@ -1393,6 +1477,13 @@ export class Hyp3eActor extends Actor {
       },
       "xpBonusReq": {
         "int": 16,
+      },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
       },
     },
     "Monk": {
@@ -1413,6 +1504,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 14,
+        "sorcery": 16
+      },
     },
     "Necromancer": {
       "hitDie": "1d4",
@@ -1427,6 +1525,13 @@ export class Hyp3eActor extends Actor {
       "xpBonusReq": {
         "int": 16,
         "wis": 16,
+      },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
       },
     },
     "Paladin": {
@@ -1448,6 +1553,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 14,
+        "transformation": 14,
+        "avoidance": 14,
+        "sorcery": 14
+      },
     },
     "Priest": {
       "hitDie": "1d4",
@@ -1462,6 +1574,13 @@ export class Hyp3eActor extends Actor {
       "xpBonusReq": {
         "wis": 16,
         "cha": 16,
+      },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
       },
     },
     "Purloiner": {
@@ -1481,6 +1600,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 14
+      },
     },
     "Pyromancer": {
       "hitDie": "1d4",
@@ -1495,6 +1621,13 @@ export class Hyp3eActor extends Actor {
       "xpBonusReq": {
         "int": 16,
         "wis": 16,
+      },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
       },
     },
     "Ranger": {
@@ -1516,6 +1649,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 16
+      },
     },
     "Runegraver": {
       "hitDie": "1d8",
@@ -1533,6 +1673,13 @@ export class Hyp3eActor extends Actor {
       },
       "featBonus": {
         "str": 8,
+      },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 14
       },
     },
     "Scout": {
@@ -1552,6 +1699,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 16
+      },
     },
     "Shaman": {
       "hitDie": "1d6",
@@ -1566,6 +1720,13 @@ export class Hyp3eActor extends Actor {
       "xpBonusReq": {
         "int": 16,
         "wis": 16,
+      },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
       },
     },
     "Thief": {
@@ -1582,6 +1743,13 @@ export class Hyp3eActor extends Actor {
       },
       "featBonus": {
         "dex": 8,
+      },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 16
       },
     },
     "Warlock": {
@@ -1601,6 +1769,13 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Witch": {
       "hitDie": "1d4",
@@ -1617,8 +1792,15 @@ export class Hyp3eActor extends Actor {
         "int": 16,
         "cha": 16,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
-}
+  }
 
   _valueFromTable(table, val) {
     let output;
@@ -1798,6 +1980,18 @@ export class Hyp3eActor extends Actor {
       data.unskilled = thisClass.unskilled
       content += `<li>Unskilled Weapon Penalty: ${thisClass.unskilled}</li>`
       data.details.xp.primeAttr = ""
+      content += `<li>Saving Throws vs:</li><ul>`
+      content += `<li>Death: ${thisClass.saves.death}</li>`
+      data.saves.death.value = thisClass.saves.death
+      content += `<li>Device: ${thisClass.saves.device}</li>`
+      data.saves.device.value = thisClass.saves.device
+      content += `<li>Transformation: ${thisClass.saves.transformation}</li>`
+      data.saves.transformation.value = thisClass.saves.transformation
+      content += `<li>Avoidance: ${thisClass.saves.avoidance}</li>`
+      data.saves.avoidance.value = thisClass.saves.avoidance
+      content += `<li>Sorcery: ${thisClass.saves.sorcery}</li>`
+      data.saves.sorcery.value = thisClass.saves.sorcery
+      content += `</ul>`
     }
     if (data.attributes) {
       for (let [k, v] of Object.entries(data.attributes)) {
@@ -2048,6 +2242,23 @@ export class Hyp3eActor extends Actor {
           fa: data.fa,
           ca: data.ca,
           ta: data.ta,
+          saves: {
+            death: {
+              value: data.saves.death.value
+            },
+            device: {
+              value: data.saves.device.value
+            },
+            transformation: {
+              value: data.saves.transformation.value
+            },
+            avoidance: {
+              value: data.saves.avoidance.value
+            },
+            sorcery: {
+              value: data.saves.sorcery.value
+            }
+          },
           details: {
             xp: {
               bonus: data.details.xp.bonus,
