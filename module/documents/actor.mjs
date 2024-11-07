@@ -71,8 +71,8 @@ export class Hyp3eActor extends Actor {
     
     // Auto-calculate AC if configuration is enabled
     if (CONFIG.HYP3E.autoCalcAc) {
-      systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
-      if (CONFIG.HYP3E.debugMessages) { console.log("Unarmored AC: ", systemData.unarmoredAc) }
+      // systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
+      // if (CONFIG.HYP3E.debugMessages) { console.log("Unarmored AC: ", systemData.unarmoredAc) }
 
       // Calculate current AC & DR based on equipped armor, shield, and DX defense mod
       // Start by resetting base AC and DR
@@ -1637,57 +1637,6 @@ export class Hyp3eActor extends Actor {
   }
 
   /**
-   * Handle updating all bonus spells
-   */
-  async updateAllBonusSpells() {
-    console.log("Updating all bonus spells...")
-
-    let intBonusSpells = []
-    let wisBonusSpells = []
-
-    // Get IN bonus spells
-    if (this._valueFromTable(this.bonusSpell1, this.system.attributes.int.value)) { 
-      console.log("Adding bonus spell intLvl1")
-      intBonusSpells.push("intLvl1")
-    }
-    if (this._valueFromTable(this.bonusSpell2, this.system.attributes.int.value)) { 
-      console.log("Adding bonus spell intLvl2")
-      intBonusSpells.push("intLvl2")
-    }
-    if (this._valueFromTable(this.bonusSpell3, this.system.attributes.int.value)) { 
-      console.log("Adding bonus spell intLvl3")
-      intBonusSpells.push("intLvl3")
-    }
-    if (this._valueFromTable(this.bonusSpell4, this.system.attributes.int.value)) { 
-      console.log("Adding bonus spell intLvl4")
-      intBonusSpells.push("intLvl4")
-    }
-
-    // Get WS bonus spells
-    if (this._valueFromTable(this.bonusSpell1, this.system.attributes.wis.value)) { 
-      console.log("Adding bonus spell wisLvl1")
-      wisBonusSpells.push("wisLvl1")
-    }
-    if (this._valueFromTable(this.bonusSpell2, this.system.attributes.wis.value)) { 
-      console.log("Adding bonus spell wisLvl2")
-      wisBonusSpells.push("wisLvl2")
-    }
-    if (this._valueFromTable(this.bonusSpell3, this.system.attributes.wis.value)) { 
-      console.log("Adding bonus spell wisLvl3")
-      wisBonusSpells.push("wisLvl3")
-    }
-    if (this._valueFromTable(this.bonusSpell4, this.system.attributes.wis.value)) { 
-      console.log("Adding bonus spell wisLvl4")
-      wisBonusSpells.push("wisLvl4")
-    }
-
-    // Run the IN updates
-    intBonusSpells.forEach(elem => this.updateBonusSpell(elem, true))
-    // Run the WS updates
-    wisBonusSpells.forEach(elem => this.updateBonusSpell(elem, true))
-  }
-
-  /**
    * Handle adding and removing a bonus spell
    * @param {String} spellLvl The bonus spell level to be updated
    * @param {Bool} val The true or false value to be assigned
@@ -1799,7 +1748,7 @@ export class Hyp3eActor extends Actor {
         })
         break
       }
-      this.render(true)
+      // this.render(true)
       if (CONFIG.HYP3E.debugMessages) { console.log("Bonus spell update:", this.system) }
   }
 
@@ -1821,7 +1770,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Initialize some vars
-    let data = this.system
+    let data = foundry.utils.deepClone(this.system)
     let thisClass = {}
     let xpBonusPossible = null
     let getsBonusSpell = false
@@ -1830,6 +1779,7 @@ export class Hyp3eActor extends Actor {
     let label = `<h3>Values for character updated...</h3>`
     let content = `<ul>`
 
+    // Here we modify the cloned data object of the actor...
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor system data:", data) }
     if (data.details.class) {
       // Override label if character class selected
@@ -1961,25 +1911,25 @@ export class Hyp3eActor extends Actor {
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
             if (getsBonusSpell) { 
-              // data.attributes.int.bonusSpells.lvl1 = true
+              data.attributes.int.bonusSpells.lvl1 = true
             }
             content += `<li>Level 1 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
             if (getsBonusSpell) { 
-              // data.attributes.int.bonusSpells.lvl2 = true
+              data.attributes.int.bonusSpells.lvl2 = true
             }
             content += `<li>Level 2 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell3, data.attributes.int.value)
             if (getsBonusSpell) { 
-              // data.attributes.int.bonusSpells.lvl3 = true
+              data.attributes.int.bonusSpells.lvl3 = true
             }
             content += `<li>Level 3 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell4, data.attributes.int.value)
             if (getsBonusSpell) { 
-              // data.attributes.int.bonusSpells.lvl4 = true
+              data.attributes.int.bonusSpells.lvl4 = true
             }
             content += `<li>Level 4 Bonus Spell: ${getsBonusSpell}</li>`
 
@@ -2013,25 +1963,25 @@ export class Hyp3eActor extends Actor {
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
             if (getsBonusSpell) { 
-              // data.attributes.wis.bonusSpells.lvl1 = true
+              data.attributes.wis.bonusSpells.lvl1 = true
             }
             content += `<li>Level 1 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
             if (getsBonusSpell) { 
-              // data.attributes.wis.bonusSpells.lvl2 = true
+              data.attributes.wis.bonusSpells.lvl2 = true
             }
             content += `<li>Level 2 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell3, data.attributes.wis.value)
             if (getsBonusSpell) { 
-              // data.attributes.wis.bonusSpells.lvl3 = true
+              data.attributes.wis.bonusSpells.lvl3 = true
             }
             content += `<li>Level 3 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell4, data.attributes.wis.value)
             if (getsBonusSpell) { 
-              // data.attributes.wis.bonusSpells.lvl4 = true
+              data.attributes.wis.bonusSpells.lvl4 = true
             }
             content += `<li>Level 4 Bonus Spell: ${getsBonusSpell}</li>`
 
@@ -2091,14 +2041,79 @@ export class Hyp3eActor extends Actor {
       content += `<li>XP Bonus: ${data.details.xp.bonus}</li>`
       content += `</ul>`
 
+      // Use the modified data clone to create a clean update object for the character
+      let updateData = {
+        system: {
+          hd: data.hd,
+          fa: data.fa,
+          ca: data.ca,
+          ta: data.ta,
+          details: {
+            xp: {
+              bonus: data.details.xp.bonus,
+              primeAttr: data.details.xp.primeAttr
+            }
+          },
+          unskilled: data.unskilled,
+          attributes: {
+            str: {
+              atkMod: data.attributes.str.atkMod,
+              dmgMod: data.attributes.str.dmgMod,
+              test: data.attributes.str.test,
+              feat: data.attributes.str.feat
+            },
+            dex: {
+              atkMod: data.attributes.dex.atkMod,
+              defMod: data.attributes.dex.defMod,
+              test: data.attributes.dex.test,
+              feat: data.attributes.dex.feat
+            },
+            con: {
+              hpMod: data.attributes.con.hpMod,
+              poisRadMod: data.attributes.con.poisRadMod,
+              traumaSurvive: data.attributes.con.traumaSurvive,
+              test: data.attributes.con.test,
+              feat: data.attributes.con.feat
+            },
+            int: {
+              languages: data.attributes.int.languages,
+              bonusSpells: {
+                lvl1: data.attributes.int.bonusSpells.lvl1,
+                lvl2: data.attributes.int.bonusSpells.lvl2,
+                lvl3: data.attributes.int.bonusSpells.lvl3,
+                lvl4: data.attributes.int.bonusSpells.lvl4
+              },
+              learnSpell: data.attributes.int.learnSpell
+            },
+            wis: {
+              willMod: data.attributes.wis.willMod,
+              bonusSpells: {
+                lvl1: data.attributes.wis.bonusSpells.lvl1,
+                lvl2: data.attributes.wis.bonusSpells.lvl2,
+                lvl3: data.attributes.wis.bonusSpells.lvl3,
+                lvl4: data.attributes.wis.bonusSpells.lvl4
+              },
+              learnSpell: data.attributes.wis.learnSpell
+            },
+            cha: {
+              reaction: data.attributes.cha.reaction,
+              maxHenchmen: data.attributes.cha.maxHenchmen,
+              turnUndead: data.attributes.cha.turnUndead
+            }
+          }
+        }
+      }
+
       // Apply updates to the actor
       try {
-        if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', data) }
-        // Update the main actor data
-        await this.update({data})
-        this.render(true)
-        // Log the actor data after updating
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", this.system) }
+        if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', updateData) }
+        if(this.validate(updateData)) {
+          if (CONFIG.HYP3E.debugMessages) { console.log('Validation OK, executing update...') }
+          // Update the main actor data
+          await this.update(updateData)
+          // Log the actor data after updating
+          if (CONFIG.HYP3E.debugMessages) { console.log('Actor after update:', this.system) }
+        }
       } catch(err) {
         console.log(`Actor update error: ${err}`)
       }

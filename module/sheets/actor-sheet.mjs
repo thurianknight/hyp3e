@@ -692,8 +692,6 @@ export class Hyp3eActorSheet extends ActorSheet {
           let returnOk = await this.actor.SetAttributeMods(dataset)
           if (returnOk) {
             this.render()
-            // await this.actor.updateAllBonusSpells()
-            // this.render()
           }
           break
 
