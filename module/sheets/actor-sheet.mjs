@@ -686,7 +686,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         case "reaction":
           this.actor.rollReaction(dataset)
           break
-
+  
         case "setAttr":
           // Take the attribute scores and class, and lookup/calculate modifiers
           let returnOk = await this.actor.SetAttributeMods(dataset)
