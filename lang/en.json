@@ -323,7 +323,7 @@
         "badMiss": "Bad miss",
         "dropWeapon" : "Drop weapon: {feet} feet away to {direction}.",
         "stumble": "Awkward stumble. One adjacent gets one free attack. No further attacks for rest of round.",
-        "tripFall" : "Trip and fall. Prone: -4 AC/ no DX bonus for remainder of round and until next action.",
+        "tripFall" : "Trip and fall. Prone: -4 AC, no DX bonus for remainder of round and until next action.",
         "hitAlly": "Hit ally: closest for melee, closest adjacent for ranged. Regular hit.",
         "hitAllyCrit": "Hit ally: closest for melee, closest adjacent for ranged. <b>Critical Hit</b>.",
         "hitSelf": "Hit self: Regular hit.",

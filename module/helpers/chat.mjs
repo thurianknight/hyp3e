@@ -69,12 +69,12 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     if (CONFIG.HYP3E.debugMessages) { console.log("Adding 2x/3x button for weapon") }
                     buttons["two"] = {
                         icon: "<i class='fas fa-check'></i>",
-                        label: `2x Damage (roll only)`,
+                        label: `2x Dice Dmg (roll only)`,
                         callback: () => applyHealthDrop(total, dieFormula)
                     };
                     buttons["three"] = {
                         icon: "<i class='fas fa-check'></i>",
-                        label: `3x Damage (roll only)`,
+                        label: `3x Dice Dmg (roll only)`,
                         callback: () => applyHealthDrop(total, `${dieFormula}+${dieFormula}`)
                     };
                 }
@@ -339,8 +339,8 @@ async function applyHealthDrop(total, extraRoll = "") {
 
     // Log health hit as a chat message
     const title = total > 0
-        ? `Applied ${total} damage`
-        : `Applied ${total*-1} healing`;
+        ? `Applied ${total} damage to...`
+        : `Applied ${total*-1} healing to...`;
     const templateData = {
         title: title,
         body: body,
@@ -392,34 +392,34 @@ async function rollCritHit(charType) {
     let roll = await new Roll("1d6").roll();
     if (charType === "fighter") {
         if (roll.total <= 2) {
-            content = `+2 ${dmg}`;
+            content = `<h4 class="dice-damage">+2 ${dmg}</h4>`;
         } else if (roll.total <= 4) {
-            content = `x2 ${dmg}`;
+            content = `<h4 class="dice-damage">x2 Dice ${dmg}</h4>`;
         } else if (roll.total <= 6) {
-            content = `x3 ${dmg}`;
+            content = `<h4 class="dice-damage">x3 Dice ${dmg}</h4>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else if (charType === "mage") {
         if (roll.total <= 2) {
-            content = `+1 ${dmg}`;
+            content = `<h4 class="dice-damage">+1 ${dmg}</h4>`;
         } else if (roll.total <= 4) {
-            content = `+2 ${dmg}`;
+            content = `<h4 class="dice-damage">+2 ${dmg}</h4>`;
         } else if (roll.total <= 6) {
-            content = `x2 ${dmg}`;
+            content = `<h4 class="dice-damage">x2 Dice ${dmg}</h4>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else {
         // cleric/thief/monster
         if (roll.total <= 1) {
-            content = `+1 ${dmg}`;
+            content = `<h4 class="dice-damage">+1 ${dmg}</h4>`;
         } else if (roll.total <= 3) {
-            content = `+2 ${dmg}`;
+            content = `<h4 class="dice-damage">+2 ${dmg}</h4>`;
         } else if (roll.total <= 5) {
-            content = `x2 ${dmg}`;
+            content = `<h4 class="dice-damage">x2 Dice ${dmg}</h4>`;
         }  else if (roll.total <= 6) {
-            content = `x3 ${dmg}`;
+            content = `<h4 class="dice-damage">x3 Dice ${dmg}</h4>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
