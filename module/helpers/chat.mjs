@@ -4,12 +4,16 @@ import { HYP3E } from "./config.mjs"
 // done here instead of inline to add listeners in js
 export const addChatMessageButtons = async function(_msg, html, _data) {
     let dmg = html.find(".damage-button");
+    let baseClass = ""
+    let baseClassLabel = ""
+
     if (dmg.length > 0) {
         dmg.each((_i, b) => {
             let total = Number($(b).data('total'));
             let naturalRoll = Number($(b).data('natural'));
             let dieFormula =$(b).data('roll');
             let sourceType = $(b).data('sourceType');
+
             const fullDamageButton = $(
                 `<button class="dice-total-fullDamage-btn chat-button-small"><i class="fas fa-user-minus" title="Click to apply full damage to selected token(s)."></i></button>`
             );
@@ -101,27 +105,39 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let critMiss = html.find(".critical-miss");
     if (critMiss.length > 0) {
         critMiss.each((_i, b) => {
+            baseClass = $(b).data('baseClass');
+            if (baseClass != "npc") {
+                baseClassLabel = baseClass.charAt(0).toUpperCase()+baseClass.substring(1)
+            } else {
+                baseClassLabel = "NPC"
+            }
             const icon = "fa-user-slash";
 
-            const critMissButtonFighter = $(long_button('miss','Fighter', icon));
-            const critMissButtonMage = $(long_button('miss','Magician', icon));
-            const critMissButtonOther = $(long_button('miss','Cleric/Thief/Monster', icon));
+            // const critMissButtonFighter = $(long_button('miss','Fighter', icon));
+            // const critMissButtonMage = $(long_button('miss','Magician', icon));
+            // const critMissButtonOther = $(long_button('miss','Cleric/Thief/Monster', icon));
+            const critMissButton = $(long_button('miss',`Roll Critical Miss for ${baseClassLabel}-type`, icon));
 
-            critMiss.append(critMissButtonFighter);
-            critMiss.append(critMissButtonMage);
-            critMiss.append(critMissButtonOther);
+            // critMiss.append(critMissButtonFighter);
+            // critMiss.append(critMissButtonMage);
+            // critMiss.append(critMissButtonOther);
+            critMiss.append(critMissButton);
 
-            critMissButtonFighter.on("click", (ev) => {
+            // critMissButtonFighter.on("click", (ev) => {
+            //     ev.stopPropagation();
+            //     rollCritMiss("fighter");
+            // });
+            // critMissButtonMage.on("click", (ev) => {
+            //     ev.stopPropagation();
+            //     rollCritMiss("magician");
+            // });
+            // critMissButtonOther.on("click", (ev) => {
+            //     ev.stopPropagation();
+            //     rollCritMiss("other");
+            // });
+            critMissButton.on("click", (ev) => {
                 ev.stopPropagation();
-                rollCritMiss("fighter");
-            });
-            critMissButtonMage.on("click", (ev) => {
-                ev.stopPropagation();
-                rollCritMiss("magician");
-            });
-            critMissButtonOther.on("click", (ev) => {
-                ev.stopPropagation();
-                rollCritMiss("other");
+                rollCritMiss(baseClass);
             });
         });
     }
@@ -129,27 +145,39 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let critHit = html.find(".critical-hit");
     if (critHit.length > 0) {
         critHit.each((_i, b) => {
+            baseClass = $(b).data('baseClass');
+            if (baseClass != "npc") {
+                baseClassLabel = baseClass.charAt(0).toUpperCase()+baseClass.substring(1)
+            } else {
+                baseClassLabel = "NPC"
+            }
             const icon = "fa-user";
 
-            const critHitButtonFighter = $(long_button('hit','Fighter', icon));
-            const critHitButtonMage = $(long_button('hit','Magician', icon));
-            const critHitButtonOther = $(long_button('hit','Cleric/Thief/Monster', icon));
+            // const critHitButtonFighter = $(long_button('hit','Fighter', icon));
+            // const critHitButtonMage = $(long_button('hit','Magician', icon));
+            // const critHitButtonOther = $(long_button('hit','Cleric/Thief/Monster', icon));
+            const critHitButton = $(long_button('hit',`Roll Critical Hit for ${baseClassLabel}-type`, icon));
 
-            critHit.append(critHitButtonFighter);
-            critHit.append(critHitButtonMage);
-            critHit.append(critHitButtonOther);
+            // critHit.append(critHitButtonFighter);
+            // critHit.append(critHitButtonMage);
+            // critHit.append(critHitButtonOther);
+            critHit.append(critHitButton);
 
-            critHitButtonFighter.on("click", (ev) => {
+            // critHitButtonFighter.on("click", (ev) => {
+            //     ev.stopPropagation();
+            //     rollCritHit("fighter");
+            // });
+            // critHitButtonMage.on("click", (ev) => {
+            //     ev.stopPropagation();
+            //     rollCritHit("magician");
+            // });
+            // critHitButtonOther.on("click", (ev) => {
+            //     ev.stopPropagation();
+            //     rollCritHit("other");
+            // });
+            critHitButton.on("click", (ev) => {
                 ev.stopPropagation();
-                rollCritHit("fighter");
-            });
-            critHitButtonMage.on("click", (ev) => {
-                ev.stopPropagation();
-                rollCritHit("magician");
-            });
-            critHitButtonOther.on("click", (ev) => {
-                ev.stopPropagation();
-                rollCritHit("other");
+                rollCritHit(baseClass);
             });
         });
     }
@@ -413,7 +441,7 @@ async function rollCritHit(charType) {
             content = "Critical Hit -- Error in getting result";
         }
     } else {
-        // cleric/thief/monster
+        // cleric/thief/npc-monster
         if (roll.total <= 1) {
             content = `<h4 class="dice-damage">+1 ${dmg}</h4>`;
         } else if (roll.total <= 3) {
@@ -506,7 +534,7 @@ async function rollCritMiss(charType) {
             content = "Critical Miss -- Error in getting result";
         }
     } else {
-        // cleric/thief/monster
+        // cleric/thief/npc-monster
         if (roll.total <= 4) {
             content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
         } else if (roll.total <= 6) {

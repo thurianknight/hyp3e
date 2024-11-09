@@ -527,14 +527,16 @@ export class Hyp3eActor extends Actor {
       label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
       hit = true
       if (game.settings.get(game.system.id, "critHit") && item) {
-        critFooterHTML += "<div class='critical-hit'><h4>Critical Hit:</h4></div>";
+        // critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'><h4>Critical Hit:</h4></div>`;
+        critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'>&nbsp;</div>`;
       }
     } else if (naturalRoll == 1) {
       if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
       label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
 
       if (game.settings.get(game.system.id, "critMiss") && item) {
-        critFooterHTML += "<div class='critical-miss'><h4>Xathoqqua’s Woe:</h4></div>";
+        // critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'><h4>Xathoqqua’s Woe:</h4></div>`;
+        critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'>&nbsp;</div>`;
       }
     } else if (atkRoll.total >= tn) {
       if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
@@ -888,19 +890,13 @@ export class Hyp3eActor extends Actor {
                 </div>
               </section>
             </div>
-            <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span>
-            <span class="damage-button" data-total="${dmgRoll.total}"
-              data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}" data-source-type="${sourceItem.type}"></span></h4>
+            <h4 class="dice-formula">
+                <span class="dice-damage">${dmgRoll.total} HP damage!</span>
+                <span class="damage-button" data-total="${dmgRoll.total}"
+                data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}" data-source-type="${sourceItem.type}">
+                </span></h4>
           </div>                
-        </div>
-        <!--
-        <button type="button" data-action="apply-damage" title="[Click] Apply full damage to selected tokens.
-          [Shift-Click] Adjust value before applying.">
-          <i class="fa-solid fa-heart-broken fa-fw"></i>
-          <span class="label">Apply Damage</span>
-        </button>
-        -->
-      `
+        </div>      `
     }
     return damageChat
   }
