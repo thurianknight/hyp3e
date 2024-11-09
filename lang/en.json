@@ -328,12 +328,12 @@
         "hitAllyCrit": "Hit ally: closest for melee, closest adjacent for ranged. <b>Critical Hit</b>.",
         "hitSelf": "Hit self: Regular hit.",
         "hitSelfCrit": "Hit self: <b>Critical Hit</b>.",
-        "mage": "Critical miss roll for magician",
+        "magician": "Critical miss roll for magician",
         "fighter": "Critical miss roll for fighter",
         "other": "Critical miss roll for cleric/thief/monster"
       },
       "critHit": {
-        "mage": "Critical hit roll for magician",
+        "magician": "Critical hit roll for magician",
         "fighter": "Critical hit roll for fighter",
         "other": "Critical hit roll for cleric/thief/monster"
       }

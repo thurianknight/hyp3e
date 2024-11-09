@@ -1169,6 +1169,7 @@ export class Hyp3eActor extends Actor {
    */
   classData = {
     "Assassin": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": null,
@@ -1195,6 +1196,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Barbarian": {
+      "baseClass": "fighter",
       "hitDie": "1d12",
       "fa": 1,
       "ca": null,
@@ -1222,6 +1224,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Bard": {
+      "baseClass": "thief",
       "hitDie": "1d8",
       "fa": 1,
       "ca": 1,
@@ -1250,6 +1253,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Berserker": {
+      "baseClass": "fighter",
       "hitDie": "1d12",
       "fa": 1,
       "ca": null,
@@ -1276,6 +1280,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Cataphract": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1303,6 +1308,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Cleric": {
+      "baseClass": "cleric",
       "fa": 1,
       "ca": 1,
       "ta": 1,
@@ -1323,6 +1329,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Cryomancer": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1345,6 +1352,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Druid": {
+      "baseClass": "cleric",
       "hitDie": "1d8",
       "fa": 1,
       "ca": 1,
@@ -1367,6 +1375,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Fighter": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1390,6 +1399,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Huntsman": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1417,6 +1427,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Illusionist": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1442,6 +1453,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Legerdemainist": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": 1,
@@ -1467,6 +1479,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Magician": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1487,6 +1500,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Monk": {
+      "baseClass": "cleric",
       "hitDie": "1d8",
       "fa": 0,
       "ca": null,
@@ -1513,6 +1527,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Necromancer": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1535,6 +1550,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Paladin": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1562,6 +1578,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Priest": {
+      "baseClass": "cleric",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1584,6 +1601,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Purloiner": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": 1,
@@ -1609,6 +1627,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Pyromancer": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1631,6 +1650,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Ranger": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1658,6 +1678,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Runegraver": {
+      "baseClass": "cleric",
       "hitDie": "1d8",
       "fa": 1,
       "ca": 1,
@@ -1683,6 +1704,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Scout": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": null,
@@ -1708,6 +1730,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Shaman": {
+      "baseClass": "cleric",
       "hitDie": "1d6",
       "fa": 0,
       "ca": 1,
@@ -1730,6 +1753,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Thief": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": null,
@@ -1753,6 +1777,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Warlock": {
+      "baseClass": "fighter",
       "hitDie": "1d8",
       "fa": 1,
       "ca": 1,
@@ -1778,6 +1803,7 @@ export class Hyp3eActor extends Actor {
       },
     },
     "Witch": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,

@@ -103,21 +103,21 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
         critMiss.each((_i, b) => {
             const icon = "fa-user-slash";
 
-            const critMissFighterButton = $(long_button('miss','Fighter', icon));
+            const critMissButtonFighter = $(long_button('miss','Fighter', icon));
             const critMissButtonMage = $(long_button('miss','Magician', icon));
             const critMissButtonOther = $(long_button('miss','Cleric/Thief/Monster', icon));
 
-            critMiss.append(critMissFighterButton);
+            critMiss.append(critMissButtonFighter);
             critMiss.append(critMissButtonMage);
             critMiss.append(critMissButtonOther);
 
-            critMissFighterButton.on("click", (ev) => {
+            critMissButtonFighter.on("click", (ev) => {
                 ev.stopPropagation();
                 rollCritMiss("fighter");
             });
             critMissButtonMage.on("click", (ev) => {
                 ev.stopPropagation();
-                rollCritMiss("mage");
+                rollCritMiss("magician");
             });
             critMissButtonOther.on("click", (ev) => {
                 ev.stopPropagation();
@@ -130,21 +130,22 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     if (critHit.length > 0) {
         critHit.each((_i, b) => {
             const icon = "fa-user";
-            const critHitFighterButton = $(long_button('hit','Fighter', icon));
+
+            const critHitButtonFighter = $(long_button('hit','Fighter', icon));
             const critHitButtonMage = $(long_button('hit','Magician', icon));
             const critHitButtonOther = $(long_button('hit','Cleric/Thief/Monster', icon));
 
-            critHit.append(critHitFighterButton);
+            critHit.append(critHitButtonFighter);
             critHit.append(critHitButtonMage);
             critHit.append(critHitButtonOther);
 
-            critHitFighterButton.on("click", (ev) => {
+            critHitButtonFighter.on("click", (ev) => {
                 ev.stopPropagation();
                 rollCritHit("fighter");
             });
             critHitButtonMage.on("click", (ev) => {
                 ev.stopPropagation();
-                rollCritHit("mage");
+                rollCritHit("magician");
             });
             critHitButtonOther.on("click", (ev) => {
                 ev.stopPropagation();
@@ -226,6 +227,7 @@ async function applyHealthDrop(total, extraRoll = "") {
         }
         // For showing the roll
         extraRoll = await roll.render();
+        console.log("Extra roll result: ", extraRoll)
     }
 
     if (total == 0) return; // Skip changes of 0
@@ -377,7 +379,7 @@ async function getCritMissHitCrit(charType) {
     let roll = await new Roll("1d8").roll();
     if (charType === "fighter" && roll.total == 1) {
         return true;
-    } else if (charType === "mage" && roll.total <= 3) {
+    } else if (charType === "magician" && roll.total <= 3) {
         return true;
     } else if (charType === "other" && roll.total <= 2) {
         return true;
@@ -400,7 +402,7 @@ async function rollCritHit(charType) {
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
-    } else if (charType === "mage") {
+    } else if (charType === "magician") {
         if (roll.total <= 2) {
             content = `<h4 class="dice-damage">+1 ${dmg}</h4>`;
         } else if (roll.total <= 4) {
@@ -475,7 +477,7 @@ async function rollCritMiss(charType) {
         }  else {
             content = "Critical Miss -- Error in getting result";
         }
-    } else if (charType === "mage") {
+    } else if (charType === "magician") {
         if (roll.total <= 2) {
             content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
         } else if (roll.total <= 4) {
