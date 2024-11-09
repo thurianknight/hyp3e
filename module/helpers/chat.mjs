@@ -409,7 +409,7 @@ async function getCritMissHitCrit(charType) {
         return true;
     } else if (charType === "magician" && roll.total <= 3) {
         return true;
-    } else if (charType === "other" && roll.total <= 2) {
+    } else if ((charType === "cleric" || charType === "thief" || charType === "npc") && roll.total <= 2) {
         return true;
     }
     return false;

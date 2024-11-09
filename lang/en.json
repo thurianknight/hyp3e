@@ -328,20 +328,20 @@
         "hitAllyCrit": "Hit ally: closest for melee, closest adjacent for ranged. <b>Critical Hit</b>.",
         "hitSelf": "Hit self: Regular hit.",
         "hitSelfCrit": "Hit self: <b>Critical Hit</b>.",
-        "cleric": "Critical miss roll for cleric-type",
-        "fighter": "Critical miss roll for fighter-type",
-        "magician": "Critical miss roll for magician-type",
-        "thief": "Critical miss roll for thief-type",
-        "npc": "Critical miss roll for npc/monster",
-        "other": "Critical miss roll for cleric/thief/monster"
+        "cleric": "Critical miss roll for cleric-type...",
+        "fighter": "Critical miss roll for fighter-type...",
+        "magician": "Critical miss roll for magician-type...",
+        "thief": "Critical miss roll for thief-type...",
+        "npc": "Critical miss roll for npc/monster...",
+        "other": "Critical miss roll for cleric/thief/monster..."
       },
       "critHit": {
-        "cleric": "Critical hit roll for cleric-type",
-        "fighter": "Critical hit roll for fighter-type",
-        "magician": "Critical hit roll for magician-type",
-        "thief": "Critical hit roll for thief-type",
-        "npc": "Critical hit roll for npc/monster",
-        "other": "Critical hit roll for cleric/thief/monster"
+        "cleric": "Critical hit roll for cleric-type...",
+        "fighter": "Critical hit roll for fighter-type...",
+        "magician": "Critical hit roll for magician-type...",
+        "thief": "Critical hit roll for thief-type...",
+        "npc": "Critical hit roll for npc/monster...",
+        "other": "Critical hit roll for cleric/thief/monster..."
       }
     },
     "roll": "Roll",
