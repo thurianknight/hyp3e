@@ -625,6 +625,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Roll Type:", dataset.rollType) }
 
       dataset.itemId = ""
+      dataset.baseClass = this.actor.system.baseClass
 
       switch (dataset.rollType) {
         case "item":

@@ -298,6 +298,7 @@ Hooks.once("ready", async function() {
 
 });
 
+// Insert special damage buttons into attack & damage chats
 Hooks.on("renderChatMessage", addChatMessageButtons);
 
 /* -------------------------------------------- */

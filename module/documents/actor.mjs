@@ -59,7 +59,10 @@ export class Hyp3eActor extends Actor {
       // NOTHING TO DO HERE...
     }
 
-    // Calculated fields go here
+    // Calculated fields go here...
+
+    // Add base class, used for crit hit & crit miss tables
+    systemData.baseClass = this.classData[systemData.details.class].baseClass
 
     // Add task resolution
     systemData.taskResolution = {}
@@ -127,7 +130,9 @@ export class Hyp3eActor extends Actor {
       systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
       systemData.ac.dr = tempDR
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log("Equipped AC: ", systemData.ac.value) }
+
+    // Log the prepared data
+    if (CONFIG.HYP3E.debugMessages) { console.log("Prepared Character Data: ", systemData) }
 
   }
 
@@ -141,6 +146,11 @@ export class Hyp3eActor extends Actor {
     const systemData = actorData.system
     // NPCs and monsters don't get the -10 hp benefit that PCs do
     systemData.hp.min = 0
+
+    // Calculated fields go here...
+
+    // Add base class, used for crit hit & crit miss tables
+    systemData.baseClass = "npc"
 
   }
 

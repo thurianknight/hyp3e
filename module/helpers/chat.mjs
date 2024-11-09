@@ -193,7 +193,7 @@ export async function showValueChange(t, fillColor,total) {
         floaterData
     );
   }
-  
+
 async function rollSaveButton(saveType) {
     if (saveType == "") return; // Skip empty save
     const tokens = canvas?.tokens?.controlled;
