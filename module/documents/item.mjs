@@ -11,7 +11,6 @@ export class Hyp3eItem extends Item {
   async _preCreate(data, options, user) {
     await super._preCreate(data, options, user);
     // Replace default image for items, but if an image is defined, leave it be
-    console.log(`Item image: ${data.img}`)
     if (!data.img || data.img == "") {
         switch(data.type) {
             case "spell":
