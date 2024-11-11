@@ -116,7 +116,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // const critMissButtonFighter = $(long_button('miss','Fighter', icon));
             // const critMissButtonMage = $(long_button('miss','Magician', icon));
             // const critMissButtonOther = $(long_button('miss','Cleric/Thief/Monster', icon));
-            const critMissButton = $(long_button('miss',`Roll Critical Miss for ${baseClassLabel}-type`, icon));
+            const critMissButton = $(long_button('miss',`Roll Critical Miss for ${baseClassLabel}-class`, icon));
 
             // critMiss.append(critMissButtonFighter);
             // critMiss.append(critMissButtonMage);
@@ -156,7 +156,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // const critHitButtonFighter = $(long_button('hit','Fighter', icon));
             // const critHitButtonMage = $(long_button('hit','Magician', icon));
             // const critHitButtonOther = $(long_button('hit','Cleric/Thief/Monster', icon));
-            const critHitButton = $(long_button('hit',`Roll Critical Hit for ${baseClassLabel}-type`, icon));
+            const critHitButton = $(long_button('hit',`Roll Critical Hit for ${baseClassLabel}-class`, icon));
 
             // critHit.append(critHitButtonFighter);
             // critHit.append(critHitButtonMage);
