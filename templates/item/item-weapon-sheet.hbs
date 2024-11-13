@@ -5,8 +5,8 @@
       <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
       <div class="flexrow">
         <div class="resource flexrow flex-group-center">
-          <label class="resource-label">{{localize 'HYP3E.item.equipped'}}</label>
-          <input name="system.equipped" type="checkbox" {{checked system.equipped}}>
+          <label class="resource-label">{{localize 'HYP3E.details.xp'}}</label>
+          <input type="text" name="system.xp" value="{{system.xp}}" >
         </div>
         <div class="resource flexrow flex-group-center">
           <label class="resource-label">{{localize 'HYP3E.item.qty'}}</label>
@@ -62,13 +62,15 @@
           <input type="text" name="system.atkMod" value="{{numberFormat system.atkMod decimals=0 sign=true}}" data-dtype="Number" />
           <label class="resource-label">{{localize 'HYP3E.headers.dmgMod'}}</label>
           <input type="text" name="system.dmgMod" value="{{numberFormat system.dmgMod decimals=0 sign=true}}" data-dtype="Number" />
-          <label for="system.damage" class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
+          <label class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
           <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String" />
-          <label for="weaponMastery" class="resource-label">{{localize 'HYP3E.headers.weaponMastery'}}</label>
+          <label class="resource-label">{{localize 'HYP3E.headers.weaponMastery'}}</label>
           <div class="flexrow">
             <a class="weapon-mastery {{#unless system.wpnMaster}}no-bonus{{/unless}}" data-mastery="master" title='{{localize "HYP3E.weapon.master"}}'><i class="fas fa-sword"></i></a>
             <a class="weapon-mastery {{#unless system.wpnGrandmaster}}no-bonus{{/unless}}" data-mastery="grandMaster" title='{{localize "HYP3E.weapon.grandMaster"}}'><i class="fas fa-swords"></i></a>
           </div>
+          <label class="resource-label">{{localize 'HYP3E.item.equipped'}}</label><br />
+          <input name="system.equipped" type="checkbox" {{checked system.equipped}}>
         </div>
 
         {{!-- Description --}}

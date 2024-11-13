@@ -195,6 +195,7 @@
         "location": "",
         "weight": 0,
         "cost": 0,
+        "xp": "",
         "containerId": ""
       },
       "rollable": {
