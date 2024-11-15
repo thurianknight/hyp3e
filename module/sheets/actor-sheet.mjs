@@ -84,12 +84,6 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
     }
 
-    // // Handle exploration skills
-    // for (let [k, v] of Object.entries(context.system.explorationSkills)) {
-    //   v.label = game.i18n.localize(CONFIG.HYP3E.explorationSkills[k]) ?? k;
-    //   if (CONFIG.HYP3E.debugMessages) { console.log("Exploration Skills:", k, v, v.label) }
-    // }
-
     // // Handle d6 task resolution
     // for (let [k, v] of Object.entries(CONFIG.HYP3E.taskResolution)) {
     //   v.label = game.i18n.localize(CONFIG.HYP3E.taskResolution[k].name) ?? k.name;
