@@ -153,8 +153,11 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
       if (i.system.weight) {
         if (i.system.quantity.value) {
+          i.system.carriedWt = (i.system.weight * i.system.quantity.value)
+          i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
           encumbrance += (i.system.weight * i.system.quantity.value)
         } else {
+          i.system.carriedWt = i.system.weight
           encumbrance += i.system.weight
         }
       }
