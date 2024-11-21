@@ -291,8 +291,11 @@ Hooks.once("ready", async function() {
 
   // Report on compendium data
   if (game.user.isGM) {
-    if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
-      reportBestiary()
+    // if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
+    //   reportBestiary()
+    // }
+    if (foundry.utils.isNewerVersion("1.0.8", game.system.version)) {
+        reportItems()
     }
   }
 
@@ -490,9 +493,30 @@ async function reportBestiary() {
         console.log(`Compendium Bestiary error: ${doc.name} is not the same as token ${doc.prototypeToken.name}!`)
       }
     }
-
   }
+}
 
+async function reportItems() {
+    // Generate a report on item data in the compendium.
+    // Report on all items with blank weight and zero weight.
+
+    for (let pack of game.packs) {
+        // Skip anything that's not an Item compendium pack
+        if (pack.metadata.type != "Item") {
+            continue
+        }
+
+        // Skip anything that is not a physical item compendium
+        if (pack.metadata.label == "Armor" || pack.metadata.label == "Weapons" || pack.metadata.label == "Equipment - General" || pack.metadata.label == "Equipment - Provisions" || pack.metadata.label == "Equipment - Religious") {
+            // Iterate over compendium entries and report
+            const documents = await pack.getDocuments()
+            for (let doc of documents) {
+                if (!doc.system.weight || doc.system.weight == "") {
+                    console.log(`Compendium weight: ${doc.name} has weight ${doc.system.weight}!`)
+                }
+            }
+        }
+    }
 }
 
 /* -------------------------------------------- */
