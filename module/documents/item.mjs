@@ -10,28 +10,30 @@ export class Hyp3eItem extends Item {
   // Override the base Item _preCreate function
   async _preCreate(data, options, user) {
     await super._preCreate(data, options, user);
-    // Replace default image for various item types
-    switch(data.type) {
-      case "spell":
-        data.img = `icons/svg/book.svg`
-        break
-      case "feature":
-        data.img = `icons/svg/target.svg`
-        break
-      case "armor":
-        data.img = `icons/svg/shield.svg`
-        break
-      case "weapon":
-        data.img = `icons/svg/combat.svg`
-        break
-      case "item":
-        data.img = `icons/svg/item-bag.svg`
-        break
-      case "container":
-        data.img = `icons/svg/item-bag.svg`
-        break
-      default:
-        data.img = `icons/svg/item-bag.svg`
+    // Replace default image for items, but if an image is defined, leave it be
+    if (!data.img || data.img == "") {
+        switch(data.type) {
+            case "spell":
+              data.img = `icons/svg/book.svg`
+              break
+            case "feature":
+              data.img = `icons/svg/target.svg`
+              break
+            case "armor":
+              data.img = `icons/svg/shield.svg`
+              break
+            case "weapon":
+              data.img = `icons/svg/combat.svg`
+              break
+            case "item":
+              data.img = `icons/svg/item-bag.svg`
+              break
+            case "container":
+              data.img = `icons/svg/item-bag.svg`
+              break
+            default:
+              data.img = `icons/svg/item-bag.svg`
+          }      
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("Pre-created item data", data) }
     return this.updateSource(data)
@@ -708,7 +710,10 @@ export class Hyp3eItem extends Item {
         //   // If damage is not variable, simply display the value
         //   content += `<p>Damage: ${item.system.damage}</p>`
         // }
-      }      
+      }
+      if (item.system.save && item.system.save !== "") {
+        content += `<div class='save-button' data-save='${item.system.save}'></div>`;
+      }
     }
 
     // Item

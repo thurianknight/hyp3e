@@ -29,7 +29,7 @@
         <div class="character-header-block flexrow">
           <div class="npc-field align-center">
             <input type="text" name="system.morale" value="{{system.morale}}" />
-            <span class="small-label">{{localize 'HYP3E.morale'}}</span>
+            <span class="rollable small-label" data-roll="2d6" data-roll-type="check" data-roll-target="{{system.morale}}" data-label="{{localize 'HYP3E.morale'}}">{{localize 'HYP3E.morale'}} <i class="fas fa-dice"></i></span>
           </div>
           <div class="npc-field align-center">
             <input type="text" name="system.xp" value="{{system.xp}}" />

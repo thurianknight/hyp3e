@@ -15,7 +15,6 @@
         },
         "atkRate": "1/1",
         "fa": 0,
-        "ca": null,
         "ta": null,
         "saves": {
           "death": {
@@ -53,10 +52,7 @@
         "knownLanguages": ""
       },
       "spellcaster": {
-        "ca": {
-          "value": 0,
-          "temp": 0
-        },
+        "ca": null,
         "spells": {
           "l1": "",
           "l2": "",
@@ -89,6 +85,7 @@
         "weight": "",
         "hair": "",
         "eyes": "",
+        "complexion": "",
         "physicalFeatures": ""
       },
       "unskilled": 0,
@@ -198,6 +195,7 @@
         "location": "",
         "weight": 0,
         "cost": 0,
+        "xp": "",
         "containerId": ""
       },
       "rollable": {
@@ -218,7 +216,10 @@
     },
     "container": {
       "templates": ["base", "physical"],
-      "itemIds": []
+      "isContainer": true,
+      "itemIds": [],
+      "isConsumable": false,
+      "isAmmunition": false
     },
     "feature": {
       "templates": ["base", "rollable"],
@@ -230,6 +231,7 @@
     "item": {
       "templates": ["base", "physical", "rollable"],
       "isContainer": false,
+      "itemIds": [],
       "isConsumable": false,
       "isAmmunition": false
     },

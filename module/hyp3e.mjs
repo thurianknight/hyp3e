@@ -7,6 +7,7 @@ import { Hyp3eItemSheet } from "./sheets/item-sheet.mjs";
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
+import { addChatMessageButtons } from "./helpers/chat.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -33,6 +34,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+
   // Automatic Armor Class calculation
   game.settings.register(game.system.id, "autoCalcAc", {
     name: game.i18n.localize("HYP3E.settings.autoCalcAc"),
@@ -43,6 +45,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+
   // Enable basic attribute checks
   game.settings.register(game.system.id, "enableAttrChecks", {
     name: game.i18n.localize("HYP3E.settings.enableAttrChecks"),
@@ -57,6 +60,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+
   // Reverse situational modifiers on roll-under checks
   game.settings.register(game.system.id, "flipRollUnderMods", {
     name: game.i18n.localize("HYP3E.settings.flipRollUnderMods"),
@@ -67,6 +71,29 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+
+  // Critical hit 
+  game.settings.register(game.system.id, "critHit", {
+    name: game.i18n.localize("HYP3E.settings.critHits"),
+    hint: game.i18n.localize("HYP3E.settings.critHitsHint"),
+    default: true,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+  
+  // Critical Miss 
+  game.settings.register(game.system.id, "critMiss", {
+    name: game.i18n.localize("HYP3E.settings.critMiss"),
+    hint: game.i18n.localize("HYP3E.settings.critMissHint"),
+    default: true,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+
   // Human races
   game.settings.register(game.system.id, "races", {
     name: game.i18n.localize("HYP3E.settings.races"),
@@ -77,6 +104,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+
   // Languages
   game.settings.register(game.system.id, "languages", {
     name: game.i18n.localize("HYP3E.settings.languages"),
@@ -87,6 +115,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+  
   // Classes
   game.settings.register(game.system.id, "characterClasses", {
     name: game.i18n.localize("HYP3E.settings.characterClasses"),
@@ -97,7 +126,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
-
+    
   // If we ever need migration scripts, use this version number for comparison
   console.log("System info:", game.system)
 
@@ -186,6 +215,9 @@ Hooks.once("ready", async function() {
   CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
   if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods) }
 
+  // Set crit configs
+  //const critHits = game.settings.get(game.system.id, "critHits");
+
   // Load races list
   const races = game.settings.get(game.system.id, "races");
   if (races != "") {
@@ -250,7 +282,7 @@ Hooks.once("ready", async function() {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "0.9.31"
+    const NEEDS_MIGRATION_TO_VERSION = "1.0.4"
     const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
       migrateWorld()
@@ -266,6 +298,9 @@ Hooks.once("ready", async function() {
 
 });
 
+// Insert special damage buttons into attack & damage chats
+Hooks.on("renderChatMessage", addChatMessageButtons);
+
 /* -------------------------------------------- */
 /*  Migrate system/world functions              */
 /* -------------------------------------------- */
@@ -277,57 +312,57 @@ async function migrateWorld() {
     // Update the actor
 
     // Migrate the actor document's items if any exist
-    if (actor.items) {
-      for (let item of actor.items) {
+    // if (actor.items) {
+    //   for (let item of actor.items) {
         // Update the embedded item document
-        if ( item.type === "feature" && (item.system.formula == null || item.system.formula == undefined || item.system.formula == "undefined" || item.system.formula == "") ) {
-        console.log(`Migrating item ${item.name}...`, item)
-        actor.updateEmbeddedDocuments("Item", [
-            { _id: item.id, "system.blindRoll": null, "system.rollMode": "" },
-          ])
-        } else if ( item.type === "feature" && (item.system.blindRoll === "false" || item.system.blindRoll === false) ) {
-          console.log(`Migrating item ${item.name}...`, item)
-          actor.updateEmbeddedDocuments("Item", [
-            { _id: item.id, "system.rollMode": "publicroll" },
-          ])
-        } else if ( item.type === "feature" && (item.system.blindRoll === "true" || item.system.blindRoll === true) ) {
-          console.log(`Migrating item ${item.name}...`, item)
-          actor.updateEmbeddedDocuments("Item", [
-            { _id: item.id, "system.rollMode": "blindroll" },
-          ])
-        }
-      }
-    }
+        // if ( item.type === "feature" && (item.system.formula == null || item.system.formula == undefined || item.system.formula == "undefined" || item.system.formula == "") ) {
+        // console.log(`Migrating item ${item.name}...`, item)
+        // actor.updateEmbeddedDocuments("Item", [
+        //     { _id: item.id, "system.blindRoll": null, "system.rollMode": "" },
+        //   ])
+        // } else if ( item.type === "feature" && (item.system.blindRoll === "false" || item.system.blindRoll === false) ) {
+        //   console.log(`Migrating item ${item.name}...`, item)
+        //   actor.updateEmbeddedDocuments("Item", [
+        //     { _id: item.id, "system.rollMode": "publicroll" },
+        //   ])
+        // } else if ( item.type === "feature" && (item.system.blindRoll === "true" || item.system.blindRoll === true) ) {
+        //   console.log(`Migrating item ${item.name}...`, item)
+        //   actor.updateEmbeddedDocuments("Item", [
+        //     { _id: item.id, "system.rollMode": "blindroll" },
+        //   ])
+        // }
+    //   }
+    // }
   }
 
   // Update the Class Abilities & Features compendium for blindRoll and rollMode fields
-  const collection = game.packs.get("hyperborea-3e-compendium.class-abilities-and-features")
-  console.log("Compendium collection: ", collection)
-  // Get the compendium's locked property, then unlock it
-  const wasLocked = collection.locked
-  await collection.configure({ locked: false })
-  // Batch update items based on applied filters
-  await collection.updateAll(updateEmpty, filterEmpty)
-  await collection.updateAll(updatePublic, filterPublic)
-  await collection.updateAll(updateBlind, filterBlind)
-  // Re-lock the compendium if it was locked before
-  await collection.configure({ locked: wasLocked })
-  console.log(`Migrated all documents from Compendium ${collection.collection}`);
+  // const collection = game.packs.get("hyperborea-3e-compendium.class-abilities-and-features")
+  // console.log("Compendium collection: ", collection)
+  // // Get the compendium's locked property, then unlock it
+  // const wasLocked = collection.locked
+  // await collection.configure({ locked: false })
+  // // Batch update items based on applied filters
+  // await collection.updateAll(updateEmpty, filterEmpty)
+  // await collection.updateAll(updatePublic, filterPublic)
+  // await collection.updateAll(updateBlind, filterBlind)
+  // // Re-lock the compendium if it was locked before
+  // await collection.configure({ locked: wasLocked })
+  // console.log(`Migrated all documents from Compendium ${collection.collection}`);
 
   // Migrate Actor compendia, one document at a time (time-consuming!)
   for (let pack of game.packs) {
 
     const packType = pack.metadata.type
     // Skip anything that's not an Actor compendium pack
-    if (packType != "Actor") {
+    if (packType != "Item") {
       continue
     }
 
     console.log(`Compendium pack ${pack.metadata.label}:`, pack)
     const documentName = pack.documentName;
 
-    // We only need to do the Bestiary compendium for this specific migration
-    if (pack.metadata.label !== "Bestiary") {
+    // We only need to do the General Equipment compendium for this specific migration
+    if (pack.metadata.label !== "Equipment - General") {
       continue
     }
 
@@ -346,32 +381,41 @@ async function migrateWorld() {
         switch(packType) {
           case "Actor":
             // Migrate the actor document's items if any exist
-            if (doc.items) {
-              for (let item of doc.items) {
-                // Update the embedded item document
-                if ( item.type === "feature" && (item.system.formula == null || item.system.formula == undefined || item.system.formula == "undefined" || item.system.formula == "") ) {
-                  console.log(`Migrating item ${item.name}...`, item)
-                  doc.updateEmbeddedDocuments("Item", [
-                    { _id: item.id, "system.blindRoll": null, "system.rollMode": "" },
-                  ])
-                } else if ( item.type === "feature" && (item.system.blindRoll === "false" || item.system.blindRoll === false) ) {
-                  console.log(`Migrating item ${item.name}...`, item)
-                  doc.updateEmbeddedDocuments("Item", [
-                    { _id: item.id, "system.rollMode": "publicroll" },
-                  ])
-                } else if ( item.type === "feature" && (item.system.blindRoll === "true" || item.system.blindRoll === true) ) {
-                  console.log(`Migrating item ${item.name}...`, item)
-                  doc.updateEmbeddedDocuments("Item", [
-                    { _id: item.id, "system.rollMode": "blindroll" },
-                  ])
-                }
-              }
-            }
+            // if (doc.items) {
+            //   for (let item of doc.items) {
+            //     // Update the embedded item document
+            //     if ( item.type === "feature" && (item.system.formula == null || item.system.formula == undefined || item.system.formula == "undefined" || item.system.formula == "") ) {
+            //       console.log(`Migrating item ${item.name}...`, item)
+            //       doc.updateEmbeddedDocuments("Item", [
+            //         { _id: item.id, "system.blindRoll": null, "system.rollMode": "" },
+            //       ])
+            //     } else if ( item.type === "feature" && (item.system.blindRoll === "false" || item.system.blindRoll === false) ) {
+            //       console.log(`Migrating item ${item.name}...`, item)
+            //       doc.updateEmbeddedDocuments("Item", [
+            //         { _id: item.id, "system.rollMode": "publicroll" },
+            //       ])
+            //     } else if ( item.type === "feature" && (item.system.blindRoll === "true" || item.system.blindRoll === true) ) {
+            //       console.log(`Migrating item ${item.name}...`, item)
+            //       doc.updateEmbeddedDocuments("Item", [
+            //         { _id: item.id, "system.rollMode": "blindroll" },
+            //       ])
+            //     }
+            //   }
+            // }
             break
   
           case "Item":
-            // console.log("Compendium item document:", doc)
-            // Items do not have child documents
+            console.log("Compendium item document:", doc)
+            // Migrate items of type 'container' to type 'item', and set isContainer flag
+            if (doc.type === 'container') {
+              // Update the container/item document
+              console.log(`Updating container/item ${doc.name}...`)
+              doc.type = "item"
+              doc.system.isContainer = true
+              await doc.update()
+            }
+    
+
             break
   
           default:

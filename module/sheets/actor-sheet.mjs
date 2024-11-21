@@ -84,12 +84,6 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
     }
 
-    // // Handle exploration skills
-    // for (let [k, v] of Object.entries(context.system.explorationSkills)) {
-    //   v.label = game.i18n.localize(CONFIG.HYP3E.explorationSkills[k]) ?? k;
-    //   if (CONFIG.HYP3E.debugMessages) { console.log("Exploration Skills:", k, v, v.label) }
-    // }
-
     // // Handle d6 task resolution
     // for (let [k, v] of Object.entries(CONFIG.HYP3E.taskResolution)) {
     //   v.label = game.i18n.localize(CONFIG.HYP3E.taskResolution[k].name) ?? k.name;
@@ -158,16 +152,30 @@ export class Hyp3eActorSheet extends ActorSheet {
       // Calculate total weight carried by character
       if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
       if (i.system.weight) {
-        encumbrance += i.system.weight
+        if (i.system.quantity.value) {
+          encumbrance += (i.system.weight * i.system.quantity.value)
+        } else {
+          encumbrance += i.system.weight
+        }
       }
 
       // Append to containers.
-      if (i.type === 'container') {
+      if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
+        // Get contained items and add to their container
         i.contents = this.getContents(i._id, context)
         containers.push(i);
+        // Migrate 'container' type to 'item' & set isContainer flag
+        if (i.type === 'container') {
+          i.type = 'item'
+          i.system.isContainer = true
+          // Update the embedded item document
+          this.actor.updateEmbeddedDocuments("Item", [
+            { _id: i._id, "type": 'item', "system.isContainer": true },
+          ])
+        }
       }
-      // Append to gear.
-      if (i.type === 'item' && i.system.containerId == '') {
+      // Append to gear that isn't in a container.
+      if (i.type === 'item' && i.system.containerId == '' && !i.system.isContainer) {
         gear.push(i);
       }
       // Append to features.
@@ -215,7 +223,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     super.activateListeners(html);
 
     // Render the item sheet for viewing/editing prior to the editable check.
-    html.find('.item-show').click(ev => {
+    html.find('.item-show').click(event => {
       this._displayItemInChat(event);
     });
     html.find('.item-edit').click(ev => {
@@ -539,9 +547,9 @@ export class Hyp3eActorSheet extends ActorSheet {
     // const targetData = target?.system;
 
     // Dragging an item into a container sets its containerId and location to the container
-    if ( (target?.type === "container") ) {
+    if ( (target?.type === "container" || target?.system.isContainer) ) {
       // One container cannot hold another container
-      if (source.type == 'container') { 
+      if (source.type === 'container' || source.system.isContainer) { 
         if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot move container (${source.name}) into another container (${target.name})!`) }
         return 
       }
@@ -552,7 +560,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       ]);
       return;
     }
-    // Dragging an item out of a container resets its containerId and location to blank
+    // Dragging an item out over a non-container resets its containerId and location to blank
     if (source?.system.containerId !== "") {
       this.actor.updateEmbeddedDocuments("Item", [
         { _id: source.id, "system.containerId": "", "system.location": "" },
@@ -611,6 +619,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Roll Type:", dataset.rollType) }
 
       dataset.itemId = ""
+      dataset.baseClass = this.actor.system.baseClass
 
       switch (dataset.rollType) {
         case "item":
@@ -672,14 +681,12 @@ export class Hyp3eActorSheet extends ActorSheet {
         case "reaction":
           this.actor.rollReaction(dataset)
           break
-
+  
         case "setAttr":
           // Take the attribute scores and class, and lookup/calculate modifiers
           let returnOk = await this.actor.SetAttributeMods(dataset)
           if (returnOk) {
             this.render()
-            // await this.actor.updateAllBonusSpells()
-            // this.render()
           }
           break
 
