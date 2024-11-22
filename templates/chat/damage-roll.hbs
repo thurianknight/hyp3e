@@ -1,0 +1,37 @@
+<h4 class="dice-damage">{{title}}</h4>
+<div class="dice-roll">
+    <div class="dice-result">
+    <div class="dice-formula">{{dmgRoll.formula}}</div>
+    <div class="dice-tooltip">
+        <section class="tooltip-part">
+            <div class="dice">
+                <header class="part-header flexrow">
+                    <span class="part-formula">{{dmgRoll.formula}}</span>
+                    <span class="part-total">{{dmgRoll.total}}</span>
+                </header>
+                <ol class="dice-rolls">
+                    {{#each dmgRoll.dice as |die key|}}
+                    <header class="part-header flexrow">
+                        {{!-- <span class="part-formula">{{die.number}}d{{die.faces}}</span> --}}
+                        <span>
+                            <ol class="dice-rolls">
+                            {{#each die.values as |val d|}}
+                                <li class="roll die d{{die.faces}}">{{val}}</li>
+                            {{/each}}
+                            </ol>
+                        </span>
+                        <span class="part-total">{{die.total}}</span>
+                    </header>
+                    {{/each}}
+                </ol>
+            </div>
+        </section>
+    </div>
+    <div class="dice-roll">
+        <h4 class="dice-formula">
+            <span class="dice-damage">{{dmgRoll.total}} HP damage!</span>
+            <span class="damage-button" data-total="{{dmgRoll.total}}" data-natural="{{dmgRoll.total}}" 
+                data-roll="{{dmgRoll.formula}}" data-source-type="{{sourceType}}"></span>
+        </h4>
+    </div>
+</div>

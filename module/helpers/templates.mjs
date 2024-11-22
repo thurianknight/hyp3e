@@ -18,6 +18,8 @@
     "systems/hyp3e/templates/actor/parts/npc-abilities.hbs",
 
     // chat templates
+    "systems/hyp3e/templates/chat/apply-damage.hbs",
+    "systems/hyp3e/templates/chat/crit-roll.hbs",
     "systems/hyp3e/templates/chat/roll-attack.hbs",
   ]);
 };

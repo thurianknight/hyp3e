@@ -84,12 +84,6 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
     }
 
-    // // Handle exploration skills
-    // for (let [k, v] of Object.entries(context.system.explorationSkills)) {
-    //   v.label = game.i18n.localize(CONFIG.HYP3E.explorationSkills[k]) ?? k;
-    //   if (CONFIG.HYP3E.debugMessages) { console.log("Exploration Skills:", k, v, v.label) }
-    // }
-
     // // Handle d6 task resolution
     // for (let [k, v] of Object.entries(CONFIG.HYP3E.taskResolution)) {
     //   v.label = game.i18n.localize(CONFIG.HYP3E.taskResolution[k].name) ?? k.name;
@@ -158,7 +152,14 @@ export class Hyp3eActorSheet extends ActorSheet {
       // Calculate total weight carried by character
       if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
       if (i.system.weight) {
-        encumbrance += i.system.weight
+        if (i.system.quantity.value) {
+          i.system.carriedWt = (i.system.weight * i.system.quantity.value)
+          i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
+          encumbrance += (i.system.weight * i.system.quantity.value)
+        } else {
+          i.system.carriedWt = i.system.weight
+          encumbrance += i.system.weight
+        }
       }
 
       // Append to containers.
@@ -419,8 +420,10 @@ export class Hyp3eActorSheet extends ActorSheet {
   async _displayItemInChat(event) {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
+    const actor = this.actor
+    const actorData = actor.system
     // const speaker = ChatMessage.getSpeaker()
-    
+
     // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
     let typeLabel = ""
     if (item.type == 'feature') {
@@ -468,9 +471,12 @@ export class Hyp3eActorSheet extends ActorSheet {
       }
       if (item.system.damage) {
         if (Roll.validate(item.system.damage)) {
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+            // Resolve damage string & variables to a rollable formula
+            const roll = new Roll(item.system.damage, actorData)
+            if (CONFIG.HYP3E.debugMessages) { console.log("Weapon damage roll: ", roll) }
+            content += `<div class='dmg-roll-button' data-formula='${roll.formula}'></div>`;
         } else {
-          content += `<p>Damage: ${item.system.damage}</p>`
+            content += `<p>Damage: ${item.system.damage}</p>`
         }
       }
     }
@@ -503,9 +509,12 @@ export class Hyp3eActorSheet extends ActorSheet {
       }
       if (item.system.damage) {
         if (Roll.validate(item.system.damage)) {
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+            // Resolve damage string & variables to a rollable formula
+            const roll = new Roll(item.system.damage, actorData)
+            if (CONFIG.HYP3E.debugMessages) { console.log("Spell damage roll: ", roll) }
+            content += `<div class='dmg-roll-button' data-formula='${roll.formula}'></div>`;
         } else {
-          content += `<p>Damage: ${item.system.damage}</p>`
+            content += `<p>Damage: ${item.system.damage}</p>`
         }
       }      
     }
@@ -621,6 +630,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Roll Type:", dataset.rollType) }
 
       dataset.itemId = ""
+      dataset.baseClass = this.actor.system.baseClass
 
       switch (dataset.rollType) {
         case "item":
@@ -682,14 +692,12 @@ export class Hyp3eActorSheet extends ActorSheet {
         case "reaction":
           this.actor.rollReaction(dataset)
           break
-
+  
         case "setAttr":
           // Take the attribute scores and class, and lookup/calculate modifiers
           let returnOk = await this.actor.SetAttributeMods(dataset)
           if (returnOk) {
             this.render()
-            // await this.actor.updateAllBonusSpells()
-            // this.render()
           }
           break
 

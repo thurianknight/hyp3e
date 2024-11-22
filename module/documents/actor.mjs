@@ -34,7 +34,8 @@ export class Hyp3eActor extends Actor {
     const actorData = this;
     const systemData = actorData.system;
     const flags = actorData.flags.hyp3e || {};
-
+    // systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
+    systemData.hp.percentage = Math.min(Math.max((systemData.hp.value * 100) / systemData.hp.max, 0), 100);
     if (CONFIG.HYP3E.debugMessages) { console.log(`Preparing actor ${actorData.name} derived data...`) }
   
     // Make separate methods for each Actor type (character, npc, etc.) to keep
@@ -59,7 +60,15 @@ export class Hyp3eActor extends Actor {
       // NOTHING TO DO HERE...
     }
 
-    // Calculated fields go here
+    // Calculated fields go here...
+
+    // Add base class, used for crit hit & crit miss tables
+    try {
+        systemData.baseClass = this.classData[systemData.details.class].baseClass
+    } catch (err) {
+        // No match found (happens with custom classes), use "npc"
+        systemData.baseClass = "npc"
+    }
 
     // Add task resolution
     systemData.taskResolution = {}
@@ -71,8 +80,8 @@ export class Hyp3eActor extends Actor {
     
     // Auto-calculate AC if configuration is enabled
     if (CONFIG.HYP3E.autoCalcAc) {
-      systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
-      if (CONFIG.HYP3E.debugMessages) { console.log("Unarmored AC: ", systemData.unarmoredAc) }
+      // systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
+      // if (CONFIG.HYP3E.debugMessages) { console.log("Unarmored AC: ", systemData.unarmoredAc) }
 
       // Calculate current AC & DR based on equipped armor, shield, and DX defense mod
       // Start by resetting base AC and DR
@@ -127,7 +136,9 @@ export class Hyp3eActor extends Actor {
       systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
       systemData.ac.dr = tempDR
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log("Equipped AC: ", systemData.ac.value) }
+
+    // Log the prepared data
+    if (CONFIG.HYP3E.debugMessages) { console.log("Prepared Character Data: ", systemData) }
 
   }
 
@@ -141,6 +152,11 @@ export class Hyp3eActor extends Actor {
     const systemData = actorData.system
     // NPCs and monsters don't get the -10 hp benefit that PCs do
     systemData.hp.min = 0
+
+    // Calculated fields go here...
+
+    // Add base class, used for crit hit & crit miss tables
+    systemData.baseClass = "npc"
 
   }
 
@@ -242,8 +258,11 @@ export class Hyp3eActor extends Actor {
     // Resolve the roll
     let result = await roll.roll()
     if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
+    // The roll shouldn't go below zero, even if modifiers would make it so
+    let rollTotal = roll.total
+    if (rollTotal < 0) { rollTotal = 0 }
 
-    let reaction = this._valueFromTable(this.reactionTable, roll.total)
+    let reaction = this._valueFromTable(this.reactionTable, rollTotal)
     if (CONFIG.HYP3E.debugMessages) { console.log(reaction) }
     label += `<br /><b>${reaction}</b>`
 
@@ -467,8 +486,10 @@ export class Hyp3eActor extends Actor {
 
     // Construct our attack roll formula
     rollFormula = atkRollParts.join(" + ")
-    // Replace '@item.atkMod' with the actual value
-    rollFormula = rollFormula.replace("@item.atkMod", item.system.atkMod)
+    if (item) {
+      // Replace '@item.atkMod' with the actual value
+      rollFormula = rollFormula.replace("@item.atkMod", item.system.atkMod)
+    }
 
     if (CONFIG.HYP3E.debugMessages) {
       console.log("Attack roll parts:", atkRollParts)
@@ -512,14 +533,16 @@ export class Hyp3eActor extends Actor {
       label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
       hit = true
       if (game.settings.get(game.system.id, "critHit") && item) {
-        critFooterHTML += "<div class='critical-hit'><h4>Critical Hit:</h4></div>";
+        // critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'><h4>Critical Hit:</h4></div>`;
+        critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'>&nbsp;</div>`;
       }
     } else if (naturalRoll == 1) {
       if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
       label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
 
       if (game.settings.get(game.system.id, "critMiss") && item) {
-        critFooterHTML += "<div class='critical-miss'><h4>Xathoqqua’s Woe:</h4></div>";
+        // critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'><h4>Xathoqqua’s Woe:</h4></div>`;
+        critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'>&nbsp;</div>`;
       }
     } else if (atkRoll.total >= tn) {
       if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
@@ -873,19 +896,13 @@ export class Hyp3eActor extends Actor {
                 </div>
               </section>
             </div>
-            <h4 class="dice-formula"><span class="dice-damage">${dmgRoll.total} HP damage!</span>
-            <span class="damage-button" data-total="${dmgRoll.total}"
-              data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}" data-source-type="${sourceItem.type}"></span></h4>
+            <h4 class="dice-formula">
+                <span class="dice-damage">${dmgRoll.total} HP damage!</span>
+                <span class="damage-button" data-total="${dmgRoll.total}"
+                data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}" data-source-type="${sourceItem.type}">
+                </span></h4>
           </div>                
-        </div>
-        <!--
-        <button type="button" data-action="apply-damage" title="[Click] Apply full damage to selected tokens.
-          [Shift-Click] Adjust value before applying.">
-          <i class="fa-solid fa-heart-broken fa-fw"></i>
-          <span class="label">Apply Damage</span>
-        </button>
-        -->
-      `
+        </div>      `
     }
     return damageChat
   }
@@ -1145,6 +1162,7 @@ export class Hyp3eActor extends Actor {
    * Reaction lookup table
    */
   reactionTable = {
+    0: "Violent: immediate attack",
     2: "Violent: immediate attack",
     3: "Hostile: antagonistic; attack likely",
     4: "Unfriendly: negative inclination",
@@ -1163,6 +1181,7 @@ export class Hyp3eActor extends Actor {
    */
   classData = {
     "Assassin": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": null,
@@ -1180,8 +1199,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 16
+      },
     },
     "Barbarian": {
+      "baseClass": "fighter",
       "hitDie": "1d12",
       "fa": 1,
       "ca": null,
@@ -1200,8 +1227,16 @@ export class Hyp3eActor extends Actor {
         "str": 8,
         "dex": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 14,
+        "transformation": 14,
+        "avoidance": 14,
+        "sorcery": 14
+      },
     },
     "Bard": {
+      "baseClass": "thief",
       "hitDie": "1d8",
       "fa": 1,
       "ca": 1,
@@ -1221,8 +1256,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 16
+      },
     },
     "Berserker": {
+      "baseClass": "fighter",
       "hitDie": "1d12",
       "fa": 1,
       "ca": null,
@@ -1240,8 +1283,16 @@ export class Hyp3eActor extends Actor {
         "str": 8,
         "con": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 14,
+        "transformation": 14,
+        "avoidance": 14,
+        "sorcery": 14
+      },
     },
     "Cataphract": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1260,8 +1311,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 16
+      },
     },
     "Cleric": {
+      "baseClass": "cleric",
       "fa": 1,
       "ca": 1,
       "ta": 1,
@@ -1273,8 +1332,16 @@ export class Hyp3eActor extends Actor {
       "xpBonusReq": {
         "wis": 16,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Cryomancer": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1288,8 +1355,16 @@ export class Hyp3eActor extends Actor {
         "int": 16,
         "wis": 16,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Druid": {
+      "baseClass": "cleric",
       "hitDie": "1d8",
       "fa": 1,
       "ca": 1,
@@ -1303,8 +1378,16 @@ export class Hyp3eActor extends Actor {
         "wis": 16,
         "cha": 16,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Fighter": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1319,8 +1402,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 16
+      },
     },
     "Huntsman": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1339,8 +1430,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 16
+      },
     },
     "Illusionist": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1357,8 +1456,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Legerdemainist": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": 1,
@@ -1375,8 +1482,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 14
+      },
     },
     "Magician": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1388,8 +1503,16 @@ export class Hyp3eActor extends Actor {
       "xpBonusReq": {
         "int": 16,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Monk": {
+      "baseClass": "cleric",
       "hitDie": "1d8",
       "fa": 0,
       "ca": null,
@@ -1407,8 +1530,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 14,
+        "sorcery": 16
+      },
     },
     "Necromancer": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1422,8 +1553,16 @@ export class Hyp3eActor extends Actor {
         "int": 16,
         "wis": 16,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Paladin": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1442,8 +1581,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 14,
+        "transformation": 14,
+        "avoidance": 14,
+        "sorcery": 14
+      },
     },
     "Priest": {
+      "baseClass": "cleric",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1457,8 +1604,16 @@ export class Hyp3eActor extends Actor {
         "wis": 16,
         "cha": 16,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Purloiner": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": 1,
@@ -1475,8 +1630,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 14
+      },
     },
     "Pyromancer": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1490,8 +1653,16 @@ export class Hyp3eActor extends Actor {
         "int": 16,
         "wis": 16,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Ranger": {
+      "baseClass": "fighter",
       "hitDie": "1d10",
       "fa": 1,
       "ca": null,
@@ -1510,8 +1681,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 16
+      },
     },
     "Runegraver": {
+      "baseClass": "cleric",
       "hitDie": "1d8",
       "fa": 1,
       "ca": 1,
@@ -1528,8 +1707,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Scout": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": null,
@@ -1546,8 +1733,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 16
+      },
     },
     "Shaman": {
+      "baseClass": "cleric",
       "hitDie": "1d6",
       "fa": 0,
       "ca": 1,
@@ -1561,8 +1756,16 @@ export class Hyp3eActor extends Actor {
         "int": 16,
         "wis": 16,
       },
+      "saves": {
+        "death": 14,
+        "device": 16,
+        "transformation": 16,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Thief": {
+      "baseClass": "thief",
       "hitDie": "1d6",
       "fa": 1,
       "ca": null,
@@ -1577,8 +1780,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "dex": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 14,
+        "transformation": 16,
+        "avoidance": 14,
+        "sorcery": 16
+      },
     },
     "Warlock": {
+      "baseClass": "fighter",
       "hitDie": "1d8",
       "fa": 1,
       "ca": 1,
@@ -1595,8 +1806,16 @@ export class Hyp3eActor extends Actor {
       "featBonus": {
         "str": 8,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
     "Witch": {
+      "baseClass": "magician",
       "hitDie": "1d4",
       "fa": 0,
       "ca": 1,
@@ -1611,8 +1830,15 @@ export class Hyp3eActor extends Actor {
         "int": 16,
         "cha": 16,
       },
+      "saves": {
+        "death": 16,
+        "device": 16,
+        "transformation": 14,
+        "avoidance": 16,
+        "sorcery": 14
+      },
     },
-}
+  }
 
   _valueFromTable(table, val) {
     let output;
@@ -1628,57 +1854,6 @@ export class Hyp3eActor extends Actor {
     let output = ""
     output = table[val]
     return output
-  }
-
-  /**
-   * Handle updating all bonus spells
-   */
-  async updateAllBonusSpells() {
-    console.log("Updating all bonus spells...")
-
-    let intBonusSpells = []
-    let wisBonusSpells = []
-
-    // Get IN bonus spells
-    if (this._valueFromTable(this.bonusSpell1, this.system.attributes.int.value)) { 
-      console.log("Adding bonus spell intLvl1")
-      intBonusSpells.push("intLvl1")
-    }
-    if (this._valueFromTable(this.bonusSpell2, this.system.attributes.int.value)) { 
-      console.log("Adding bonus spell intLvl2")
-      intBonusSpells.push("intLvl2")
-    }
-    if (this._valueFromTable(this.bonusSpell3, this.system.attributes.int.value)) { 
-      console.log("Adding bonus spell intLvl3")
-      intBonusSpells.push("intLvl3")
-    }
-    if (this._valueFromTable(this.bonusSpell4, this.system.attributes.int.value)) { 
-      console.log("Adding bonus spell intLvl4")
-      intBonusSpells.push("intLvl4")
-    }
-
-    // Get WS bonus spells
-    if (this._valueFromTable(this.bonusSpell1, this.system.attributes.wis.value)) { 
-      console.log("Adding bonus spell wisLvl1")
-      wisBonusSpells.push("wisLvl1")
-    }
-    if (this._valueFromTable(this.bonusSpell2, this.system.attributes.wis.value)) { 
-      console.log("Adding bonus spell wisLvl2")
-      wisBonusSpells.push("wisLvl2")
-    }
-    if (this._valueFromTable(this.bonusSpell3, this.system.attributes.wis.value)) { 
-      console.log("Adding bonus spell wisLvl3")
-      wisBonusSpells.push("wisLvl3")
-    }
-    if (this._valueFromTable(this.bonusSpell4, this.system.attributes.wis.value)) { 
-      console.log("Adding bonus spell wisLvl4")
-      wisBonusSpells.push("wisLvl4")
-    }
-
-    // Run the IN updates
-    intBonusSpells.forEach(elem => this.updateBonusSpell(elem, true))
-    // Run the WS updates
-    wisBonusSpells.forEach(elem => this.updateBonusSpell(elem, true))
   }
 
   /**
@@ -1793,7 +1968,7 @@ export class Hyp3eActor extends Actor {
         })
         break
       }
-      this.render(true)
+      // this.render(true)
       if (CONFIG.HYP3E.debugMessages) { console.log("Bonus spell update:", this.system) }
   }
 
@@ -1815,7 +1990,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Initialize some vars
-    let data = this.system
+    let data = foundry.utils.deepClone(this.system)
     let thisClass = {}
     let xpBonusPossible = null
     let getsBonusSpell = false
@@ -1824,6 +1999,7 @@ export class Hyp3eActor extends Actor {
     let label = `<h3>Values for character updated...</h3>`
     let content = `<ul>`
 
+    // Here we modify the cloned data object of the actor...
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor system data:", data) }
     if (data.details.class) {
       // Override label if character class selected
@@ -1842,6 +2018,18 @@ export class Hyp3eActor extends Actor {
       data.unskilled = thisClass.unskilled
       content += `<li>Unskilled Weapon Penalty: ${thisClass.unskilled}</li>`
       data.details.xp.primeAttr = ""
+      content += `<li>Saving Throws vs:</li><ul>`
+      content += `<li>Death: ${thisClass.saves.death}</li>`
+      data.saves.death.value = thisClass.saves.death
+      content += `<li>Device: ${thisClass.saves.device}</li>`
+      data.saves.device.value = thisClass.saves.device
+      content += `<li>Transformation: ${thisClass.saves.transformation}</li>`
+      data.saves.transformation.value = thisClass.saves.transformation
+      content += `<li>Avoidance: ${thisClass.saves.avoidance}</li>`
+      data.saves.avoidance.value = thisClass.saves.avoidance
+      content += `<li>Sorcery: ${thisClass.saves.sorcery}</li>`
+      data.saves.sorcery.value = thisClass.saves.sorcery
+      content += `</ul>`
     }
     if (data.attributes) {
       for (let [k, v] of Object.entries(data.attributes)) {
@@ -1955,25 +2143,25 @@ export class Hyp3eActor extends Actor {
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell1, data.attributes.int.value)
             if (getsBonusSpell) { 
-              // data.attributes.int.bonusSpells.lvl1 = true
+              data.attributes.int.bonusSpells.lvl1 = true
             }
             content += `<li>Level 1 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell2, data.attributes.int.value)
             if (getsBonusSpell) { 
-              // data.attributes.int.bonusSpells.lvl2 = true
+              data.attributes.int.bonusSpells.lvl2 = true
             }
             content += `<li>Level 2 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell3, data.attributes.int.value)
             if (getsBonusSpell) { 
-              // data.attributes.int.bonusSpells.lvl3 = true
+              data.attributes.int.bonusSpells.lvl3 = true
             }
             content += `<li>Level 3 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell4, data.attributes.int.value)
             if (getsBonusSpell) { 
-              // data.attributes.int.bonusSpells.lvl4 = true
+              data.attributes.int.bonusSpells.lvl4 = true
             }
             content += `<li>Level 4 Bonus Spell: ${getsBonusSpell}</li>`
 
@@ -2007,25 +2195,25 @@ export class Hyp3eActor extends Actor {
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell1, data.attributes.wis.value)
             if (getsBonusSpell) { 
-              // data.attributes.wis.bonusSpells.lvl1 = true
+              data.attributes.wis.bonusSpells.lvl1 = true
             }
             content += `<li>Level 1 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell2, data.attributes.wis.value)
             if (getsBonusSpell) { 
-              // data.attributes.wis.bonusSpells.lvl2 = true
+              data.attributes.wis.bonusSpells.lvl2 = true
             }
             content += `<li>Level 2 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell3, data.attributes.wis.value)
             if (getsBonusSpell) { 
-              // data.attributes.wis.bonusSpells.lvl3 = true
+              data.attributes.wis.bonusSpells.lvl3 = true
             }
             content += `<li>Level 3 Bonus Spell: ${getsBonusSpell}</li>`
 
             getsBonusSpell = this._valueFromTable(this.bonusSpell4, data.attributes.wis.value)
             if (getsBonusSpell) { 
-              // data.attributes.wis.bonusSpells.lvl4 = true
+              data.attributes.wis.bonusSpells.lvl4 = true
             }
             content += `<li>Level 4 Bonus Spell: ${getsBonusSpell}</li>`
 
@@ -2085,14 +2273,96 @@ export class Hyp3eActor extends Actor {
       content += `<li>XP Bonus: ${data.details.xp.bonus}</li>`
       content += `</ul>`
 
+      // Use the modified data clone to create a clean update object for the character
+      let updateData = {
+        system: {
+          hd: data.hd,
+          fa: data.fa,
+          ca: data.ca,
+          ta: data.ta,
+          saves: {
+            death: {
+              value: data.saves.death.value
+            },
+            device: {
+              value: data.saves.device.value
+            },
+            transformation: {
+              value: data.saves.transformation.value
+            },
+            avoidance: {
+              value: data.saves.avoidance.value
+            },
+            sorcery: {
+              value: data.saves.sorcery.value
+            }
+          },
+          details: {
+            xp: {
+              bonus: data.details.xp.bonus,
+              primeAttr: data.details.xp.primeAttr
+            }
+          },
+          unskilled: data.unskilled,
+          attributes: {
+            str: {
+              atkMod: data.attributes.str.atkMod,
+              dmgMod: data.attributes.str.dmgMod,
+              test: data.attributes.str.test,
+              feat: data.attributes.str.feat
+            },
+            dex: {
+              atkMod: data.attributes.dex.atkMod,
+              defMod: data.attributes.dex.defMod,
+              test: data.attributes.dex.test,
+              feat: data.attributes.dex.feat
+            },
+            con: {
+              hpMod: data.attributes.con.hpMod,
+              poisRadMod: data.attributes.con.poisRadMod,
+              traumaSurvive: data.attributes.con.traumaSurvive,
+              test: data.attributes.con.test,
+              feat: data.attributes.con.feat
+            },
+            int: {
+              languages: data.attributes.int.languages,
+              bonusSpells: {
+                lvl1: data.attributes.int.bonusSpells.lvl1,
+                lvl2: data.attributes.int.bonusSpells.lvl2,
+                lvl3: data.attributes.int.bonusSpells.lvl3,
+                lvl4: data.attributes.int.bonusSpells.lvl4
+              },
+              learnSpell: data.attributes.int.learnSpell
+            },
+            wis: {
+              willMod: data.attributes.wis.willMod,
+              bonusSpells: {
+                lvl1: data.attributes.wis.bonusSpells.lvl1,
+                lvl2: data.attributes.wis.bonusSpells.lvl2,
+                lvl3: data.attributes.wis.bonusSpells.lvl3,
+                lvl4: data.attributes.wis.bonusSpells.lvl4
+              },
+              learnSpell: data.attributes.wis.learnSpell
+            },
+            cha: {
+              reaction: data.attributes.cha.reaction,
+              maxHenchmen: data.attributes.cha.maxHenchmen,
+              turnUndead: data.attributes.cha.turnUndead
+            }
+          }
+        }
+      }
+
       // Apply updates to the actor
       try {
-        if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', data) }
-        // Update the main actor data
-        await this.update({data})
-        this.render(true)
-        // Log the actor data after updating
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor after update:", this.system) }
+        if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', updateData) }
+        if(this.validate(updateData)) {
+          if (CONFIG.HYP3E.debugMessages) { console.log('Validation OK, executing update...') }
+          // Update the main actor data
+          await this.update(updateData)
+          // Log the actor data after updating
+          if (CONFIG.HYP3E.debugMessages) { console.log('Actor after update:', this.system) }
+        }
       } catch(err) {
         console.log(`Actor update error: ${err}`)
       }

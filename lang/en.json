@@ -9,15 +9,15 @@
       "languagesHint": "Known/available languages in Hyperborea.",
       "characterClasses": "Character Classes",
       "characterClassesHint": "Character classes available to PCs and some NPCs.",
-      "autoCalcAc": "Auto-calculate Armor Class",
-      "autoCalcAcHint": "Use 'equipped' status of armor and shields to calculate AC. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
+      "autoCalcAc": "Auto-calculate Armour Class",
+      "autoCalcAcHint": "Use 'equipped' status of armour and shields to calculate AC. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
       "enableAttrChecks": "Enable IN & WS concentration checks",
       "enableAttrChecksHint": "This option allows players to click an attribute name to do a 3d6 concentration (roll-under) check. N.B.: This is an optional rule, and is disabled by default.",
       "flipRollUnderMods": "Reverse situational modifiers on roll-under checks",
       "flipRollUnderModsHint": "For roll-under checks, reverse the sign on situational modifiers so that a positive number is treated as a bonus (subtracted from the roll) and a negative number is treated as a penalty (added to the roll). Other modifiers applied from attributes or items are automatically handled this way.",
       "critHits": "Critical Hits",
       "critHitsHint": "Show buttons to roll critical hits on natural 20.",
-      "critMiss": "Critical Misses/ Xathoqqua’s Woe",
+      "critMiss": "Critical Misses / Xathoqqua’s Woe",
       "critMissHint": "Show buttons to roll critical miss on natural 1."
     },
     "tabs": {
@@ -43,8 +43,8 @@
       "equipmentItems": "Equipment & Items",
       "abilitiesItems": "Abilities & Items",
       "weapons": "Weapons",
-      "armor": "Armor",
-      "weaponsAndArmor": "Weapons & Armor",
+      "armor": "Armour",
+      "weaponsAndArmor": "Weapons & Armour",
       "items": "Items",
       "ability": "Ability",
       "atkRate": "Atk Rate",
@@ -85,6 +85,7 @@
       "weight": "Weight",
       "hair": "Hair",
       "eyes": "Eyes",
+      "complexion": "Complexion",
       "secSkills": "Secondary Skills",
       "languages": "Languages",
       "physFeatures": "Physical Features"
@@ -198,17 +199,17 @@
       "simple": {
         "name": "Simple",
         "abbrev": "Simpl.",
-        "hint": "Examples: Climbing natural/rough surface with light or no armor..."
+        "hint": "Examples: Climbing natural/rough surface with light or no armour..."
       },
       "moderate": {
         "name": "Moderate",
         "abbrev": "Mod.",
-        "hint": "Examples: Climbing natural/rough surface with medium armor..."
+        "hint": "Examples: Climbing natural/rough surface with medium armour..."
       },
       "challenging": {
         "name": "Challenging",
         "abbrev": "Chall.",
-        "hint": "Examples: Climbing natural/rough surface with heavy armor; hear loud noise..."
+        "hint": "Examples: Climbing natural/rough surface with heavy armour; hear loud noise..."
       },
       "difficult": {
         "name": "Difficult",
@@ -300,20 +301,20 @@
       "grandMaster": "Grandmaster"
     },
     "armor": {
-      "add": "Add Armor",
+      "add": "Add Armour",
       "type": {
-        "unarmored": "Unarmored",
+        "unarmored": "Unarmoured",
         "light": "Light",
         "medium": "Medium",
         "heavy": "Heavy",
         "shield": "Shield"
       },
       "wtClass": "Wt Class",
-      "armorClass": "Armor Class",
+      "armorClass": "Armour Class",
       "ac": "AC",
       "dr": "DR",
-      "dmgResist": "Dmg Resist",
-      "unarmored": "Unarmored"
+      "dmgReduct": "Dmg Reduction",
+      "unarmored": "Unarmoured"
     },
     "attack": {
       "add": "Add Attack",
@@ -322,19 +323,25 @@
         "badMiss": "Bad miss",
         "dropWeapon" : "Drop weapon: {feet} feet away to {direction}.",
         "stumble": "Awkward stumble. One adjacent gets one free attack. No further attacks for rest of round.",
-        "tripFall" : "Trip and fall. Prone: -4 AC/ no DX bonus for remainder of round and until next action.",
+        "tripFall" : "Trip and fall. Prone: -4 AC, no DX bonus for remainder of round and until next action.",
         "hitAlly": "Hit ally: closest for melee, closest adjacent for ranged. Regular hit.",
         "hitAllyCrit": "Hit ally: closest for melee, closest adjacent for ranged. <b>Critical Hit</b>.",
         "hitSelf": "Hit self: Regular hit.",
         "hitSelfCrit": "Hit self: <b>Critical Hit</b>.",
-        "mage": "Critical miss roll for magician",
-        "fighter": "Critical miss roll for fighter",
-        "other": "Critical miss roll for cleric/thief/monster"
+        "cleric": "Critical miss roll for cleric-class...",
+        "fighter": "Critical miss roll for fighter-class...",
+        "magician": "Critical miss roll for magician-class...",
+        "thief": "Critical miss roll for thief-class...",
+        "npc": "Critical miss roll for npc/monster...",
+        "other": "Critical miss roll for cleric/thief/monster..."
       },
       "critHit": {
-        "mage": "Critical hit roll for magician",
-        "fighter": "Critical hit roll for fighter",
-        "other": "Critical hit roll for cleric/thief/monster"
+        "cleric": "Critical hit roll for cleric-class...",
+        "fighter": "Critical hit roll for fighter-class...",
+        "magician": "Critical hit roll for magician-class...",
+        "thief": "Critical hit roll for thief-class...",
+        "npc": "Critical hit roll for npc/monster...",
+        "other": "Critical hit roll for cleric/thief/monster..."
       }
     },
     "roll": "Roll",
