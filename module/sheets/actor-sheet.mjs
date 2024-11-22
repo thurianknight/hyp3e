@@ -420,8 +420,10 @@ export class Hyp3eActorSheet extends ActorSheet {
   async _displayItemInChat(event) {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
+    const actor = this.actor
+    const actorData = actor.system
     // const speaker = ChatMessage.getSpeaker()
-    
+
     // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
     let typeLabel = ""
     if (item.type == 'feature') {
@@ -469,9 +471,12 @@ export class Hyp3eActorSheet extends ActorSheet {
       }
       if (item.system.damage) {
         if (Roll.validate(item.system.damage)) {
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+            // Resolve damage string & variables to a rollable formula
+            const roll = new Roll(item.system.damage, actorData)
+            if (CONFIG.HYP3E.debugMessages) { console.log("Weapon damage roll: ", roll) }
+            content += `<div class='dmg-roll-button' data-formula='${roll.formula}'></div>`;
         } else {
-          content += `<p>Damage: ${item.system.damage}</p>`
+            content += `<p>Damage: ${item.system.damage}</p>`
         }
       }
     }
@@ -504,9 +509,12 @@ export class Hyp3eActorSheet extends ActorSheet {
       }
       if (item.system.damage) {
         if (Roll.validate(item.system.damage)) {
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+            // Resolve damage string & variables to a rollable formula
+            const roll = new Roll(item.system.damage, actorData)
+            if (CONFIG.HYP3E.debugMessages) { console.log("Spell damage roll: ", roll) }
+            content += `<div class='dmg-roll-button' data-formula='${roll.formula}'></div>`;
         } else {
-          content += `<p>Damage: ${item.system.damage}</p>`
+            content += `<p>Damage: ${item.system.damage}</p>`
         }
       }      
     }

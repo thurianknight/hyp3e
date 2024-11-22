@@ -602,133 +602,126 @@ export class Hyp3eItem extends Item {
 
   // }
 
-  /**
-   * Handle displaying an Item description in the chat.
-   * @private
-   */
-  async _displayItemInChat() {
-    const item = this
-    // const speaker = ChatMessage.getSpeaker()
-    
-    // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
-    let typeLabel = ""
-    if (item.type == 'feature') {
-      typeLabel = 'Ability'
-    } else {
-      typeLabel = (item.type).capitalize()
-    }
-    // Replace names like "Bow, composite, long" with something that looks nicer
-    let itemName = ""
-    if (item.system.friendlyName != "") {
-      itemName = item.system.friendlyName
-    } else {
-      itemName = item.name
-    }
-
-    // Chat message header text
-    const label = `<h3>${typeLabel}: ${itemName}</h3>`
-    
-    // console.log("Item clicked:", item)
-    let content = item.system.description
-
-    // Setup clickable buttons for item properties if they have a roll macro,
-    //  otherwise just display the value.
-
-    // Features/Abilities
-    if (item.type == 'feature') {
-      if (item.system.formula && item.system.tn) {
-        // Display the ability check roll with target number
-        content += `<p>Ability Check: ${item.system.formula} equal or under ${item.system.tn}</p>`
-      }
-    }
-
-    // Weapons
-    if (item.type == 'weapon') {
-      if (item.system.rof) {
-        // Display missile rate of fire or melee attack rate
-        content += `<p>Atk Rate: ${item.system.rof}</p>`
-      }
-      if (item.system.type == 'missile') {
-        // For a missile weapon we display the range increments
-        content += `<p>Range: ${item.system.range.short} / ${item.system.range.medium} / ${item.system.range.long}</p>`
-      } else {
-        // For melee weapons we display the weapon class
-        content += `<p>Wpn Class: ${item.system.wc}</p>`
-      }
-      if (item.system.damage) {
-        if (Roll.validate(item.system.damage)) {
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
+    /**
+     * Handle displaying an Item description in the chat.
+     * @private
+     */
+    async _displayItemInChat() {
+        const item = this
+        const actor = this.actor
+        const actorData = actor.system
+        // const speaker = ChatMessage.getSpeaker()
+        
+        // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
+        let typeLabel = ""
+        if (item.type == 'feature') {
+            typeLabel = 'Ability'
         } else {
-          content += `<p>Damage: ${item.system.damage}</p>`
+            typeLabel = (item.type).capitalize()
         }
-        // if ((item.system.damage).match(/.*d[1-9].*/)) {
-        //   // Add a damage roll macro
-        //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
-        // } else {
-        //   // If damage is not variable, simply display the value
-        //   content += `<p>Damage: ${item.system.damage}</p>`
-        // }
-      }
-    }
-
-    // Spells
-    if (item.type == 'spell') {
-      if (item.system.range) {
-        // Display the range
-        content += `<p>Range: ${item.system.range}</p>`
-      }
-      if (item.system.duration) {
-        if ((item.system.duration).match(/.*d[1-9].*/)) {
-          // Add a duration roll macro
-          content += `<p>Duration: [[/r ${item.system.duration}]]</p>`
+        // Replace names like "Bow, composite, long" with something that looks nicer
+        let itemName = ""
+        if (item.system.friendlyName != "") {
+            itemName = item.system.friendlyName
         } else {
-          // If duration is not variable, simply display the value
-          content += `<p>Duration: ${item.system.duration}</p>`
+            itemName = item.name
         }
-      }
-      if (item.system.affected) {
-        if ((item.system.affected).match(/.*d[1-9].*/)) {
-          // Add a number affected roll macro
-          content += `<p># Affected: [[/r ${item.system.affected}</p>`
-        } else {
-          content += `<p># Affected: ${item.system.affected}</p>`
-        }
-      }
-      if (item.system.save) {
-        content += `<p> Save: ${item.system.save}</p>`
-      }
-      if (item.system.damage) {
-        if (Roll.validate(item.system.damage)) {
-          content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
-        } else {
-          content += `<p>Damage: ${item.system.damage}</p>`
-        }
-        // if ((item.system.damage).match(/.*d[1-9].*/)) {
-        //   // Add a damage roll macro
-        //   content += `<p>Damage: [[/r ${item.system.damage}]]</p>`
-        // } else {
-        //   // If damage is not variable, simply display the value
-        //   content += `<p>Damage: ${item.system.damage}</p>`
-        // }
-      }
-      if (item.system.save && item.system.save !== "") {
-        content += `<div class='save-button' data-save='${item.system.save}'></div>`;
-      }
-    }
 
-    // Item
-    if (item.type == 'item') {
-      if (item.system.formula && item.system.tn) {
-        // Display the item check roll with target number
-        content += `<p>Item Check: ${item.system.formula} equal or under ${item.system.tn}</p>`
-      }
-    }
+        // Chat message header text
+        const label = `<h3>${typeLabel}: ${itemName}</h3>`
+        
+        // console.log("Item clicked:", item)
+        let content = item.system.description
 
-    // Now we can display the chat message
-    ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-      flavor: label,
-      content: content ?? ''
-    })
-  }
+        // Setup clickable buttons for item properties if they have a roll macro,
+        //  otherwise just display the value.
+
+        // Features/Abilities
+        if (item.type == 'feature') {
+            if (item.system.formula && item.system.tn) {
+                // Display the ability check roll with target number
+                content += `<p>Ability Check: ${item.system.formula} equal or under ${item.system.tn}</p>`
+            }
+        }
+
+        // Weapons
+        if (item.type == 'weapon') {
+            if (item.system.rof) {
+                // Display missile rate of fire or melee attack rate
+                content += `<p>Atk Rate: ${item.system.rof}</p>`
+            }
+            if (item.system.type == 'missile') {
+                // For a missile weapon we display the range increments
+                content += `<p>Range: ${item.system.range.short} / ${item.system.range.medium} / ${item.system.range.long}</p>`
+            } else {
+                // For melee weapons we display the weapon class
+                content += `<p>Wpn Class: ${item.system.wc}</p>`
+            }
+            if (item.system.damage) {
+                if (Roll.validate(item.system.damage)) {
+                    // Resolve damage string & variables to a rollable formula
+                    const roll = new Roll(item.system.damage, actorData)
+                    console.log("Spell damage roll: ", roll)
+                    content += `<div class='dmg-roll-button' data-formula='${roll.formula}'></div>`;
+                } else {
+                    content += `<p>Damage: ${item.system.damage}</p>`
+                }
+            }
+        }
+
+        // Spells
+        if (item.type == 'spell') {
+            if (item.system.range) {
+                // Display the range
+                content += `<p>Range: ${item.system.range}</p>`
+            }
+            if (item.system.duration) {
+                if (Roll.validate(item.system.duration)) {
+                    // Add a duration roll macro
+                    content += `<p>Duration: [[/r ${item.system.duration}]]</p>`
+                } else {
+                    // If duration is not variable, simply display the value
+                    content += `<p>Duration: ${item.system.duration}</p>`
+                }
+            }
+            if (item.system.affected) {
+                if (Roll.validate(item.system.affected)) {
+                    // Add a number affected roll macro
+                    content += `<p># Affected: [[/r ${item.system.affected}</p>`
+                } else {
+                    content += `<p># Affected: ${item.system.affected}</p>`
+                }
+            }
+            // if (item.system.save) {
+            //     content += `<p> Save: ${item.system.save}</p>`
+            // }
+            if (item.system.damage) {
+                if (Roll.validate(item.system.damage)) {
+                    // Resolve damage string & variables to a rollable formula
+                    const roll = new Roll(item.system.damage, actorData)
+                    content += `<div class='dmg-roll-button' data-formula='${roll.formula}' data-source-type='${item.type}'></div>`;
+                } else {
+                    content += `<p>Damage: ${item.system.damage}</p>`
+                }
+            }
+            if (item.system.save && item.system.save !== "") {
+                content += `<div class='save-button' data-save='${item.system.save}'></div>`;
+            }
+        }
+
+        // Item
+        if (item.type == 'item') {
+            if (item.system.formula && item.system.tn) {
+                // Display the item check roll with target number
+                content += `<p>Item Check: ${item.system.formula} equal or under ${item.system.tn}</p>`
+            }
+        }
+
+        // Now we can display the chat message
+        ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+            flavor: label,
+            content: content ?? ''
+        })
+    }
 }

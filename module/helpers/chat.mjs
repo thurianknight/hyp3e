@@ -3,6 +3,29 @@ import { HYP3E } from "./config.mjs"
 // hook listener for adding buttons to damage roll
 // done here instead of inline to add listeners in js
 export const addChatMessageButtons = async function(_msg, html, _data) {
+
+    // Damage-roll button
+    let dmgRoll = html.find(".dmg-roll-button");
+    if (dmgRoll.length > 0) {
+        dmgRoll.each((_i, b) => {
+            console.log(`Damage html: `, b)
+            const dmgFormula = $(b).data('formula');
+            const sourceType = $(b).data('sourceType');
+            const actorId = "15oRtA40Umri4k3L"
+            let dmgButton = $(
+                `<button class=""><i class="fas fa-dice" title="Click to roll damage."></i>Damage: ${dmgFormula}</button>`
+            );
+            dmgRoll.append(dmgButton);
+
+            // Handle button clicks
+            dmgRoll.on("click", (ev) => {
+                ev.stopPropagation();
+                rollDmgButton(dmgFormula, actorId, sourceType);
+            });
+        });
+    }
+
+    // Four damage-applying buttons
     let dmg = html.find(".damage-button");
     let baseClass = ""
     let baseClassLabel = ""
@@ -181,6 +204,8 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             });
         });
     }
+
+    // Saving throw button
     let save = html.find(".save-button");
     if (save.length > 0) {
         save.each((_i, b) => {
@@ -220,7 +245,37 @@ export async function showValueChange(t, fillColor,total) {
         `${total * -1}`,
         floaterData
     );
-  }
+}
+
+async function rollDmgButton(formula, actorId, sourceType) {
+    if (formula == "") { return } // Exit on empty formula
+
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll formula: ${formula}`) }
+    // Invoke the damage roll
+    let dmgRoll = new Roll(formula);
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll object: `, dmgRoll) }
+    // Resolve the roll
+    await dmgRoll.roll()
+
+    const title = "Rolling Damage..."
+    const templateData = {
+        title: title,
+        dmgRoll: dmgRoll,
+        sourceType: sourceType
+    };
+
+    const template = `${HYP3E.systemRoot}/templates/chat/damage-roll.hbs`;
+    const html = await renderTemplate(template, templateData);
+
+    const chatData = {
+        user: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actorId }),
+        content: html
+    };
+
+    ChatMessage.create(chatData, {});
+
+}
 
 async function rollSaveButton(saveType) {
     if (saveType == "") return; // Skip empty save
