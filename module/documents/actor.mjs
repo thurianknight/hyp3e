@@ -203,6 +203,15 @@ export class Hyp3eActor extends Actor {
     
   }
 
+  async _preCreate(data, options, user) {
+    await super._preCreate(data, options, user);
+    if (data.type == "character") {
+      this.updateSource({
+        "prototypeToken.actorLink": true,
+      });
+    }
+  }
+
   /**
    * Handle rolls from the actor sheet
    */
