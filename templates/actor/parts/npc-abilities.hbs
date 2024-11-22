@@ -15,11 +15,16 @@
           <input type="text" name="system.hp.max" value="{{system.hp.max}}" data-dtype="Number"/>
         </div>
         <div class="attribute-row flexrow">
-          <span class="combat-label rollable" data-roll="{{system.hd}}" data-roll-type="basic" data-roll-target="" data-label="{{localize 'HYP3E.details.hitDie'}}">
-            <label for="system.hd">{{localize "HYP3E.details.hitDice"}}</label> 
+          <span class="combat-label rollable" data-roll="{{system.hd}}" data-roll-type="basic" data-roll-target="" 
+            data-label="{{localize 'HYP3E.details.hitDie'}}" data-tooltip="{{localize "HYP3E.details.hitDice"}}">
+            <label for="system.hd">{{localize "HYP3E.details.hd"}}</label> 
             <i class="fas fa-dice-d6"></i>
           </span>
           <input type="text" name="system.hd" value="{{system.hd}}" data-dtype="String"/>
+        </div>
+        <div class="attribute-row flexrow" data-tooltip="{{localize "HYP3E.details.rollHDLong"}}">
+          <label for="system.init" class="combat-label-small">{{localize "HYP3E.details.rollHD"}}</label>
+          <input type="checkbox" name="system.rollHD" {{checked system.rollHD}} style="min-width:10px"/>
         </div>
         <div class="attribute-row flexrow">
           <label for="system.fa" class="combat-label">{{localize "HYP3E.fa"}}</label>

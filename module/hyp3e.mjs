@@ -308,6 +308,12 @@ Hooks.once("ready", async function() {
 // Insert special damage buttons into attack & damage chats
 Hooks.on("renderChatMessage", addChatMessageButtons);
 
+Hooks.on("createToken", (document, options, userId) => {
+  if (document.actor?.type == "npc" && document.actor.system.rollHD) {
+    document.actor.rollHD()
+  }
+});
+
 /* -------------------------------------------- */
 /*  Migrate system/world functions              */
 /* -------------------------------------------- */

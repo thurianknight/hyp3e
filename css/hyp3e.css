@@ -520,6 +520,15 @@ textarea {
   padding: 5px 10px;
   /* background-color: dodgerblue; */
 }
+
+.hyp3e .combat-label-small {
+  font-family: "Herculanum", sans-serif;
+  font-weight: bold;
+  font-size: small;
+  padding: 5px 10px;
+  /* background-color: dodgerblue; */
+}
+
 .hyp3e .saves-block {
   padding: 2px 2px;
   margin-bottom: 5px;
