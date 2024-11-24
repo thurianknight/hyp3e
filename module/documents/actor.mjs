@@ -1,4 +1,5 @@
 import {Hyp3eDice} from "../dice.mjs";
+import { HYP3E } from "../helpers/config.mjs"
 
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
@@ -362,7 +363,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Construct a custom chat card for the check
-    const customChat = this.renderCustomChat(roll, "", description, "")
+    const customChat = this.renderCustomChat(roll, label, "", description, "", "", rollResponse.rollMode)
     // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
 
     // Output roll result to a chat message
@@ -557,6 +558,13 @@ export class Hyp3eActor extends Actor {
       }
     }
 
+    // Construct a custom chat card for the attack
+    const attackChat = this.renderCustomChat(atkRoll, label, debugAtkRollFormula, "", "", critFooterHTML, rollResponse.rollMode);
+    // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
+
+    // Output attack roll result to a chat message
+    // this.sendRollToChat(atkRoll, label, attackChat, rollResponse.rollMode)
+
     // If the item attack hit, we roll damage automatically and include it in the chat message
     if (hit && item) {
       if (Roll.validate(item.system.damage)) {
@@ -606,22 +614,32 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
 
         // Get the dice roll value of damage for x2/x3 modifier button
-        let dmgRollNatural =  dmgRoll.dice[0].total;
-        let dmgBaseRoll = item.system.damage;
+        // let dmgRollNatural =  dmgRoll.dice[0].total;
+        // let dmgBaseRoll = item.system.damage;
         // Render a damage chat snippet that will be added to the attack chat
-        damageChat = this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRollNatural, dmgBaseRoll, item)
+        // damageChat = this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRollNatural, dmgBaseRoll, item)
+
+        // Now output the damage chat
+        this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRoll.dice[0].total, item.system.damage, item)
         // if (CONFIG.HYP3E.debugMessages) { console.log("Damage chat: ", damageChat) }
 
       }
     }
+    // if (hit && item) {
+        // Now output the damage chat
+        // this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRoll.dice[0].total, item.system.damage, item)
+    // }
 
-    // Construct a custom chat card for the attack & damage
-    const attackChat = this.renderCustomChat(atkRoll, debugAtkRollFormula, "", damageChat, critFooterHTML);
-    // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
+    // // Construct a custom chat card for the attack
+    // const attackChat = this.renderCustomChat(atkRoll, debugAtkRollFormula, "", "", critFooterHTML);
+    // // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
 
-    // Output roll result to a chat message
-    this.sendRollToChat(atkRoll, label, attackChat, rollResponse.rollMode)
-
+    // // Output roll result to a chat message
+    // this.sendRollToChat(atkRoll, label, attackChat, rollResponse.rollMode)
+    // if (hit && item) {
+    //     // Now output the damage chat
+    //     this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRoll.dice[0].total, item.system.damage, item)
+    // }
     return atkRoll
 
   }
@@ -797,17 +815,17 @@ export class Hyp3eActor extends Actor {
     label = "<h3>" + label + "</h3>"
     // Send to chat
     roll.toMessage({
-      speaker: ChatMessage.getSpeaker({ actor: this }),
-      flavor: label,
-      content: content
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        flavor: label,
+        content: content
     },{
-      rollMode: rollMode
+        rollMode: rollMode
     })
   }
-  
+
   // Render custom html for attacks and turning undead
-  renderCustomChat(roll, debugRollFormula, description, damageChat, footerHTML = "") {
-    // Render the full attack-roll chat card, with damage if any
+  async renderCustomChat(roll, label, debugRollFormula, description, damageChat, footerHTML, rollMode) {
+    // Render the full attack-roll chat card////, with damage if any
     let customChat = `
     <div class="message-content">
       ${description}
@@ -852,60 +870,105 @@ export class Hyp3eActor extends Actor {
       ${footerHTML}
     </div>
     `
-    return customChat    
+    // return customChat
+
+    // Prettify label
+    label = "<h3>" + label + "</h3>"
+
+    const templateData = {
+        roll: roll,
+        debugRollFormula: debugRollFormula,
+        footerHTML: footerHTML,
+    };
+
+    const template = `${HYP3E.systemRoot}/templates/chat/attack-roll.hbs`;
+    customChat = await renderTemplate(template, templateData);
+    // console.log(customChat)
+
+    const chatData = {
+        user: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        flavor: label,
+        content: customChat
+    };
+
+    ChatMessage.create(chatData, {});
+
   }
 
-  // Render custom html for damage rolls, which is added to the attack chat
-  renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll, sourceItem = null) {
+  // Render html template for damage rolls, which is added to the attack chat
+  async renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll, sourceItem = null) {
     // Render the damage-roll chat html
     let damageChat = ""
 
-    if (dmgRoll) {
-      damageChat = `
-        <h4 class="dice-damage">Rolling damage...</h4>
-        <div class="dice-roll">
-          <div class="dice-result">
-            <div class="dice-formula">${dmgRoll.formula}</div>
-            <div class="dice-tooltip">
-              <section class="tooltip-part">
-                ${debugDmgRollFormula}
-                <div class="dice">`
-      // Add dice-roll summaries to the chat card
-      dmgRoll.dice.forEach(dice => {
-        damageChat += `
-                <header class="part-header flexrow">
-                  <span class="part-formula">${dice.number}d${dice.faces}</span>
-                  <span><ol class="dice-rolls">`
-      dice.values.forEach(val => {
-        if (val == 1) {
-          damageChat += `<li class="roll die d${dice.faces} min">${val}</li>`
-        } else if (val == dice.faces) {
-          damageChat += `<li class="roll die d${dice.faces} max">${val}</li>`
-        } else {
-          damageChat += `<li class="roll die d${dice.faces}">${val}</li>`
-        }
-      })  
-      damageChat += `
-                    </ol>
-                  </span>
-                  <span class="part-total">${dice.total}</span>
-                </header>`
-      })
-      // Finish the damage-roll chat card
-      damageChat += `
-                </div>
-              </section>
-            </div>
-            <h4 class="dice-formula">
-                <span class="dice-damage">${dmgRoll.total} HP damage!</span>
-                <span class="damage-button" data-total="${dmgRoll.total}"
-                data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}" data-source-type="${sourceItem.type}">
-                </span></h4>
-          </div>                
-        </div>      `
-    }
-    return damageChat
-  }
+    // if (dmgRoll) {
+    //   damageChat = `
+    //     <h4 class="dice-damage">Rolling damage...</h4>
+    //     <div class="dice-roll">
+    //       <div class="dice-result">
+    //         <div class="dice-formula">${dmgRoll.formula}</div>
+    //         <div class="dice-tooltip">
+    //           <section class="tooltip-part">
+    //             ${debugDmgRollFormula}
+    //             <div class="dice">`
+    //   // Add dice-roll summaries to the chat card
+    //   dmgRoll.dice.forEach(dice => {
+    //     damageChat += `
+    //             <header class="part-header flexrow">
+    //               <span class="part-formula">${dice.number}d${dice.faces}</span>
+    //               <span><ol class="dice-rolls">`
+    //   dice.values.forEach(val => {
+    //     if (val == 1) {
+    //       damageChat += `<li class="roll die d${dice.faces} min">${val}</li>`
+    //     } else if (val == dice.faces) {
+    //       damageChat += `<li class="roll die d${dice.faces} max">${val}</li>`
+    //     } else {
+    //       damageChat += `<li class="roll die d${dice.faces}">${val}</li>`
+    //     }
+    //   })  
+    //   damageChat += `
+    //                 </ol>
+    //               </span>
+    //               <span class="part-total">${dice.total}</span>
+    //             </header>`
+    //   })
+    //   // Finish the damage-roll chat card
+    //   damageChat += `
+    //             </div>
+    //           </section>
+    //         </div>
+    //         <h4 class="dice-formula">
+    //             <span class="dice-damage">${dmgRoll.total} HP damage!</span>
+    //             <span class="damage-button" data-total="${dmgRoll.total}"
+    //             data-natural="${naturalDmgRoll}" data-roll="${dmgBaseRoll}" data-source-type="${sourceItem.type}">
+    //             </span></h4>
+    //       </div>                
+    //     </div>`
+    // }
+
+    const title = "Rolling Damage..."
+    const templateData = {
+        title: title,
+        dmgRoll: dmgRoll,
+        debugDmgRollFormula: debugDmgRollFormula,
+        naturalDmgRoll: naturalDmgRoll,
+        dmgBaseRoll: dmgBaseRoll,
+        sourceType: sourceItem.type
+    };
+
+    const template = `${HYP3E.systemRoot}/templates/chat/damage-roll.hbs`;
+    damageChat = await renderTemplate(template, templateData);
+    // console.log(damageChat)
+
+    const chatData = {
+        user: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        content: damageChat
+    };
+
+    ChatMessage.create(chatData, {});
+
+}
 
 
   /**
