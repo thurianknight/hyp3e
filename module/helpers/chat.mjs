@@ -523,8 +523,8 @@ async function rollCritHit(charType) {
         roll: JSON.stringify(roll),
         content: html,
         type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-      };
-      getDocumentClass("ChatMessage").create(chatData);
+    };
+    getDocumentClass("ChatMessage").create(chatData);
 }
 
 async function rollCritMiss(charType) {
@@ -632,6 +632,6 @@ async function rollCritMiss(charType) {
         roll: JSON.stringify(roll),
         content: html,
         type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-      };
-      getDocumentClass("ChatMessage").create(chatData);
+    };
+    getDocumentClass("ChatMessage").create(chatData);
 }
