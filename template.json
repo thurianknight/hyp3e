@@ -174,7 +174,8 @@
       "morale": 1,
       "xp": "0",
       "treasure": "",
-      "dx": 11
+      "dx": 11,
+      "rollHD": true
     }
   },
   "Item": {

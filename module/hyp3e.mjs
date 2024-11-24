@@ -192,7 +192,11 @@ Handlebars.registerHelper('subtract', function(num1, num2) {
 
 Hooks.once("ready", async function() {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
-  Hooks.on("hotbarDrop", (bar, data, slot) => createItemMacro(data, slot));
+  Hooks.on("hotbarDrop", (bar, data, slot) => {
+    createItemMacro(data, slot);
+    // TODO wsAI -- this use the custom macro
+    //return false;
+  });
 
   /**
    * Load system settings
@@ -303,6 +307,12 @@ Hooks.once("ready", async function() {
 
 // Insert special damage buttons into attack & damage chats
 Hooks.on("renderChatMessage", addChatMessageButtons);
+
+Hooks.on("createToken", (document, options, userId) => {
+  if (document.actor?.type == "npc" && document.actor.system.rollHD) {
+    document.actor.rollHD()
+  }
+});
 
 /* -------------------------------------------- */
 /*  Migrate system/world functions              */

@@ -71,6 +71,8 @@
       "level": "Level",
       "hitDie": "Hit Die",
       "hitDice": "Hit Dice",
+      "rollHD": "Roll HP on create",
+      "rollHDLong": "Roll the NPCs HP when a token is created based on the HD",
       "hd": "HD",
       "xp": "XP",
       "toNextLvl": "Next Level",

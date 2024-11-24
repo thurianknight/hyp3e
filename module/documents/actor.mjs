@@ -204,6 +204,15 @@ export class Hyp3eActor extends Actor {
     
   }
 
+  async _preCreate(data, options, user) {
+    await super._preCreate(data, options, user);
+    if (data.type == "character") {
+      this.updateSource({
+        "prototypeToken.actorLink": true,
+      });
+    }
+  }
+
   /**
    * Handle rolls from the actor sheet
    */
@@ -724,6 +733,31 @@ export class Hyp3eActor extends Actor {
     this.sendRollToChat(roll, label, "", rollResponse.rollMode)
 
     return roll
+
+  }
+
+  async rollHD() {
+    if (this.type !== 'npc') return;
+    if (!this.system.hd){
+      if (CONFIG.HYP3E.debugMessages) { console.log("No HD value to roll!") }
+      return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling HD ${this.system.hd}...`) }
+    const roll = new Roll(this.system.hd);
+    await roll.roll();
+    if (roll != undefined && roll.total != undefined) {
+      const newHealth = roll.total;
+      await this.update({
+        system: {
+          hp: {
+            value: newHealth,
+            max: newHealth
+          }
+        }
+      });
+    } else {
+      if (CONFIG.HYP3E.debugMessages) { console.log("Roll failed, no total value!") }
+    }
 
   }
 
