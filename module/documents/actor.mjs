@@ -372,11 +372,11 @@ export class Hyp3eActor extends Actor {
     }
 
     // Construct a custom chat card for the check
-    const customChat = this.renderCustomChat(roll, label, "", description, "", "", rollResponse.rollMode)
+    const customChat = await this.renderCustomChat(roll, label, "", description, "", "", rollResponse.rollMode)
     // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
 
     // Output roll result to a chat message
-    this.sendRollToChat(roll, label, customChat, rollResponse.rollMode)
+    // this.sendRollToChat(roll, label, customChat, rollResponse.rollMode)
     
     return roll
 
@@ -568,7 +568,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Construct a custom chat card for the attack
-    const attackChat = this.renderCustomChat(atkRoll, label, debugAtkRollFormula, "", "", critFooterHTML, rollResponse.rollMode);
+    const attackChat = await this.renderCustomChat(atkRoll, label, debugAtkRollFormula, "", "", critFooterHTML, rollResponse.rollMode);
     // if (CONFIG.HYP3E.debugMessages) { console.log("Attack chat: ", attackChat) }
 
     // Output attack roll result to a chat message
@@ -840,6 +840,7 @@ export class Hyp3eActor extends Actor {
     }
     description += `</ul>`
 
+    if (CONFIG.HYP3E.debugMessages) { console.log("Turn Undead: ", description) }
     return description
   }
 
@@ -911,6 +912,7 @@ export class Hyp3eActor extends Actor {
 
     const templateData = {
         roll: roll,
+        description: description,
         debugRollFormula: debugRollFormula,
         footerHTML: footerHTML,
     };
@@ -919,16 +921,25 @@ export class Hyp3eActor extends Actor {
     customChat = await renderTemplate(template, templateData);
     // console.log(customChat)
 
-    const chatData = {
+    // const chatData = {
+    //     user: game.user_id,
+    //     speaker: ChatMessage.getSpeaker({ actor: this }),
+    //     flavor: label,
+    //     content: customChat
+    // };
+    // ChatMessage.create(chatData, {});
+
+    // Send to chat
+    roll.toMessage({
         user: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: this }),
         flavor: label,
         content: customChat
-    };
+    },{
+        rollMode: rollMode
+    })
 
-    ChatMessage.create(chatData, {});
-
-  }
+}
 
   // Render html template for damage rolls, which is added to the attack chat
   async renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll, sourceItem = null) {
@@ -994,14 +1005,20 @@ export class Hyp3eActor extends Actor {
     damageChat = await renderTemplate(template, templateData);
     // console.log(damageChat)
 
-    const chatData = {
+    // const chatData = {
+    //     user: game.user_id,
+    //     speaker: ChatMessage.getSpeaker({ actor: this }),
+    //     content: damageChat
+    // };
+    // ChatMessage.create(chatData, {});
+
+    // Send to chat
+    dmgRoll.toMessage({
         user: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: this }),
         content: damageChat
-    };
-
-    ChatMessage.create(chatData, {});
-
+    })
+    
 }
 
 

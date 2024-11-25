@@ -257,23 +257,39 @@ async function rollDmgButton(formula, actorId, sourceType) {
     // Resolve the roll
     await dmgRoll.roll()
 
+    let naturalDmgRoll = 0
+    if (dmgRoll.dice[0]?.total) {
+        naturalDmgRoll = dmgRoll.dice[0]?.total
+    } else {
+        naturalDmgRoll = dmgRoll.total
+    }
+
     const title = "Rolling Damage..."
     const templateData = {
         title: title,
         dmgRoll: dmgRoll,
+        debugDmgRollFormula: formula,
+        naturalDmgRoll: naturalDmgRoll,
+        dmgBaseRoll: formula,
         sourceType: sourceType
     };
 
     const template = `${HYP3E.systemRoot}/templates/chat/damage-roll.hbs`;
     const html = await renderTemplate(template, templateData);
 
-    const chatData = {
+    // const chatData = {
+    //     user: game.user_id,
+    //     speaker: ChatMessage.getSpeaker({ actor: actorId }),
+    //     content: html
+    // };
+    // ChatMessage.create(chatData, {});
+
+    // Send to chat
+    dmgRoll.toMessage({
         user: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: actorId }),
         content: html
-    };
-
-    ChatMessage.create(chatData, {});
+    })
 
 }
 
@@ -470,7 +486,6 @@ async function getCritMissHitCrit(charType) {
     return false;
 }
 
-
 async function rollCritHit(charType) {
     let content = "";
     const dmg = game.i18n.localize("HYP3E.headers.damage");
@@ -518,13 +533,22 @@ async function rollCritHit(charType) {
     const template = `${HYP3E.systemRoot}/templates/chat/crit-roll.hbs`;
     const html = await renderTemplate(template, templateData);
 
-    const chatData = {
+    // const chatData = {
+    //     speaker: ChatMessage.getSpeaker(),
+    //     roll: JSON.stringify(roll),
+    //     content: html,
+    //     type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+    // };
+    // getDocumentClass("ChatMessage").create(chatData);
+
+    // Send to chat
+    roll.toMessage({
+        user: game.user_id,
         speaker: ChatMessage.getSpeaker(),
-        roll: JSON.stringify(roll),
-        content: html,
-        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-    };
-    getDocumentClass("ChatMessage").create(chatData);
+        roll: roll,
+        content: html
+    })
+    
 }
 
 async function rollCritMiss(charType) {
@@ -627,11 +651,20 @@ async function rollCritMiss(charType) {
     const template = `${HYP3E.systemRoot}/templates/chat/crit-roll.hbs`;
     const html = await renderTemplate(template, templateData);
 
-    const chatData = {
+    // const chatData = {
+    //     speaker: ChatMessage.getSpeaker(),
+    //     roll: JSON.stringify(roll),
+    //     content: html,
+    //     type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+    // };
+    // getDocumentClass("ChatMessage").create(chatData);
+
+    // Send to chat
+    roll.toMessage({
+        user: game.user_id,
         speaker: ChatMessage.getSpeaker(),
-        roll: JSON.stringify(roll),
-        content: html,
-        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-    };
-    getDocumentClass("ChatMessage").create(chatData);
+        roll: roll,
+        content: html
+    })
+    
 }
