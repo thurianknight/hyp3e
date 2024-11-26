@@ -431,7 +431,7 @@ async function applyHealthDrop(total, extraRoll = "") {
     }
     let body = "";
     if (extraRoll != "") {
-        body += `<p>Extra damage roll: ${extraRoll}</p>`;
+        extraRoll = `<p>Extra damage roll: ${extraRoll}</p>`;
     }
     body += `<ul><li>${names
         // .map((t) => t.name)
@@ -443,6 +443,7 @@ async function applyHealthDrop(total, extraRoll = "") {
         ? `Applied ${total} damage to...`
         : `Applied ${total*-1} healing to...`;
     const templateData = {
+        extraRoll: extraRoll,
         title: title,
         body: body,
         // image: image
