@@ -1,270 +1,275 @@
 {
-  "Actor": {
-    "types": ["character", "npc"],
-    "templates": {
-      "base": {
-        "hd": "",
-        "hp": {
-          "value": 0,
-          "min": -10,
-          "max": 0
+    "Actor": {
+        "types": ["character", "npc"],
+        "templates": {
+            "base": {
+                "hd": "",
+                "hp": {
+                    "value": 0,
+                    "min": -10,
+                    "max": 0
+                },
+                "ac": {
+                    "value": 9,
+                    "dr": 0
+                },
+                "atkRate": "1/1",
+                "fa": 0,
+                "ta": null,
+                "saves": {
+                    "death": {
+                        "value": 0
+                    },
+                    "device": {
+                        "value": 0
+                    },
+                    "transformation": {
+                        "value": 0
+                    },
+                    "avoidance": {
+                        "value": 0
+                    },
+                    "sorcery": {
+                        "value": 0
+                    }
+                },
+                "movement": {
+                    "base": {
+                        "value": 40
+                    },
+                    "exploration": {
+                        "value": 120
+                    },
+                    "travel": {
+                        "value": 24
+                    }
+                },
+                "otherMv": {
+                    "value": ""
+                },
+                "alignment": "",
+                "biography": "",
+                "knownLanguages": ""
+            },
+            "spellcaster": {
+                "ca": null,
+                "spells": {
+                    "l1": "",
+                    "l2": "",
+                    "l3": "",
+                    "l4": "",
+                    "l5": "",
+                    "l6": ""
+                }
+            }
         },
-        "ac": {
-          "value": 9,
-          "dr": 0
+        "character": {
+            "templates": ["base", "spellcaster"],
+            "details": {
+                "notes": "",
+                "class": "",
+                "level": {
+                    "value": 1
+                },
+                "xp": {
+                    "value": "0",
+                    "toNextLvl": "0",
+                    "bonus": "0",
+                    "primeAttr": ""
+                },
+                "race": "",
+                "gender": "",
+                "age": "",
+                "religion": "",
+                "height": "",
+                "weight": "",
+                "hair": "",
+                "eyes": "",
+                "complexion": "",
+                "physicalFeatures": ""
+            },
+            "unskilled": 0,
+            "proficiencies": {
+            "class": "",
+            "lvl4": "",
+            "lvl8": "",
+            "lvl12": ""
+            },
+            "money" : {
+                "cp": {
+                    "value": 0
+                },
+                "sp": {
+                    "value": 0
+                },
+                "ep": {
+                    "value": 0
+                },
+                "gp": {
+                    "value": 0
+                },
+                "pp": {
+                    "value": 0
+                }
+            },
+            "treasure": "",
+            "attributes": {
+                "str": {
+                    "value": 10,
+                    "atkMod": 0,
+                    "dmgMod": 0,
+                    "test": 0,
+                    "feat": 0
+                },
+                "dex": {
+                    "value": 10,
+                    "atkMod": 0,
+                    "defMod": 0,
+                    "test": 0,
+                    "feat": 0
+                },
+                "con": {
+                    "value": 10,
+                    "hpMod": 0,
+                    "poisRadMod": 0,
+                    "traumaSurvive": 0,
+                    "test": 0,
+                    "feat": 0
+                },
+                "int": {
+                    "value": 10,
+                    "languages": 0,
+                    "bonusSpells": {
+                        "lvl1": false,
+                        "lvl2": false,
+                        "lvl3": false,
+                        "lvl4": false
+                    },
+                    "learnSpell": 0
+                },
+                "wis": {
+                    "value": 10,
+                    "willMod": 0,
+                    "bonusSpells": {
+                        "lvl1": false,
+                        "lvl2": false,
+                        "lvl3": false,
+                        "lvl4": false
+                    },
+                    "learnSpell": 0
+                },
+                "cha": {
+                    "value": 10,
+                    "reaction": 0,
+                    "maxHenchmen": 0,
+                    "turnUndead": 0
+                }
+            }
         },
-        "atkRate": "1/1",
-        "fa": 0,
-        "ta": null,
-        "saves": {
-          "death": {
-            "value": 0
-          },
-          "device": {
-            "value": 0
-          },
-          "transformation": {
-            "value": 0
-          },
-          "avoidance": {
-            "value": 0
-          },
-          "sorcery": {
-            "value": 0
-          }
-        },
-        "movement": {
-          "base": {
-            "value": 40
-          },
-          "exploration": {
-            "value": 120
-          },
-          "travel": {
-            "value": 24
-          }
-        },
-        "otherMv": {
-          "value": ""
-        },
-        "alignment": "",
-        "biography": "",
-        "knownLanguages": ""
-      },
-      "spellcaster": {
-        "ca": null,
-        "spells": {
-          "l1": "",
-          "l2": "",
-          "l3": "",
-          "l4": "",
-          "l5": "",
-          "l6": ""
+        "npc": {
+            "templates": ["base"],
+            "attributes": {
+                "dex": {
+                    "value": 10
+                }
+            },
+            "size": "",
+            "encWild": 0,
+            "encLair": 0,
+            "morale": 1,
+            "xp": "0",
+            "treasure": "",
+            "dx": 11,
+            "rollHD": true
         }
-      }
     },
-    "character": {
-      "templates": ["base", "spellcaster"],
-      "details": {
-        "notes": "",
-        "class": "",
-        "level": {
-          "value": 1
+    "Item": {
+        "types": ["armor", "container", "feature", "item", "spell", "weapon"],
+        "templates": {
+            "base": {
+                "friendlyName": "",
+                "description": ""
+            },
+            "equippable": {
+                "equipped": false
+            },
+            "physical": {
+                "quantity": {
+                    "value": 1,
+                    "max": 0
+                },
+                "location": "",
+                "weight": 0,
+                "cost": 0,
+                "xp": "",
+                "containerId": ""
+            },
+            "rollable": {
+                "atkRoll": false,
+                "tn": "",
+                "save": "",
+                "damage": "",
+                "duration": "",
+                "affected": ""
+            }
         },
-        "xp": {
-          "value": "0",
-          "toNextLvl": "0",
-          "bonus": "0",
-          "primeAttr": ""
+        "armor": {
+            "templates": ["base", "physical", "equippable"],
+            "type": "unarmored",
+            "ac": 9,
+            "dr": 0,
+            "mv": 40
         },
-        "race": "",
-        "gender": "",
-        "age": "",
-        "religion": "",
-        "height": "",
-        "weight": "",
-        "hair": "",
-        "eyes": "",
-        "complexion": "",
-        "physicalFeatures": ""
-      },
-      "unskilled": 0,
-      "proficiencies": {
-        "class": "",
-        "lvl4": "",
-        "lvl8": "",
-        "lvl12": ""
-      },
-      "money" : {
-        "cp": {
-          "value": 0
+        "container": {
+            "templates": ["base", "physical"],
+            "isContainer": true,
+            "itemIds": [],
+            "isConsumable": false,
+            "isAmmunition": false
         },
-        "sp": {
-          "value": 0
+        "feature": {
+            "templates": ["base", "rollable"],
+            "class": "",
+            "level": "",
+            "blindRoll": null,
+            "rollMode": ""
         },
-        "ep": {
-          "value": 0
+        "item": {
+            "templates": ["base", "physical", "rollable"],
+            "isContainer": false,
+            "itemIds": [],
+            "isConsumable": false,
+            "isAmmunition": false
         },
-        "gp": {
-          "value": 0
+        "spell": {
+            "templates": ["base", "rollable"],
+            "memorized": 0,
+            "quantity": {
+                "value": 0,
+                "max": 9
+            },
+            "spellLevel": 1,
+            "range": "",
+            "classList": "",
+            "isConsumable": true
         },
-        "pp": {
-          "value": 0
+        "weapon": {
+            "templates": ["base", "physical", "equippable", "rollable"],
+            "type": "melee",
+            "melee": true,
+            "missile": false,
+            "wc": 0,
+            "range": {
+                "short": 0,
+                "medium": 0,
+                "long": 0
+            },
+            "rof": "1/1",
+            "atkMod": 0,
+            "dmgMod": 0,
+            "wpnMaster": false,
+            "wpnGrandmaster": false,
+            "annotations": []
         }
-      },
-      "treasure": "",
-      "attributes": {
-        "str": {
-          "value": 10,
-          "atkMod": 0,
-          "dmgMod": 0,
-          "test": 0,
-          "feat": 0
-        },
-        "dex": {
-          "value": 10,
-          "atkMod": 0,
-          "defMod": 0,
-          "test": 0,
-          "feat": 0
-        },
-        "con": {
-          "value": 10,
-          "hpMod": 0,
-          "poisRadMod": 0,
-          "traumaSurvive": 0,
-          "test": 0,
-          "feat": 0
-        },
-        "int": {
-          "value": 10,
-          "languages": 0,
-          "bonusSpells": {
-            "lvl1": false,
-            "lvl2": false,
-            "lvl3": false,
-            "lvl4": false
-          },
-          "learnSpell": 0
-        },
-        "wis": {
-          "value": 10,
-          "willMod": 0,
-          "bonusSpells": {
-            "lvl1": false,
-            "lvl2": false,
-            "lvl3": false,
-            "lvl4": false
-          },
-          "learnSpell": 0
-        },
-        "cha": {
-          "value": 10,
-          "reaction": 0,
-          "maxHenchmen": 0,
-          "turnUndead": 0
-        }
-      }
-    },
-    "npc": {
-      "templates": ["base"],
-      "size": "",
-      "encWild": 0,
-      "encLair": 0,
-      "morale": 1,
-      "xp": "0",
-      "treasure": "",
-      "dx": 11,
-      "rollHD": true
     }
-  },
-  "Item": {
-    "types": ["armor", "container", "feature", "item", "spell", "weapon"],
-    "templates": {
-      "base": {
-        "friendlyName": "",
-        "description": ""
-      },
-      "equippable": {
-        "equipped": false
-      },
-      "physical": {
-        "quantity": {
-          "value": 1,
-          "max": 0
-        },
-        "location": "",
-        "weight": 0,
-        "cost": 0,
-        "xp": "",
-        "containerId": ""
-      },
-      "rollable": {
-        "atkRoll": false,
-        "tn": "",
-        "save": "",
-        "damage": "",
-        "duration": "",
-        "affected": ""
-      }
-    },
-    "armor": {
-      "templates": ["base", "physical", "equippable"],
-      "type": "unarmored",
-      "ac": 9,
-      "dr": 0,
-      "mv": 40
-    },
-    "container": {
-      "templates": ["base", "physical"],
-      "isContainer": true,
-      "itemIds": [],
-      "isConsumable": false,
-      "isAmmunition": false
-    },
-    "feature": {
-      "templates": ["base", "rollable"],
-      "class": "",
-      "level": "",
-      "blindRoll": null,
-      "rollMode": ""
-    },
-    "item": {
-      "templates": ["base", "physical", "rollable"],
-      "isContainer": false,
-      "itemIds": [],
-      "isConsumable": false,
-      "isAmmunition": false
-    },
-    "spell": {
-      "templates": ["base", "rollable"],
-      "memorized": 0,
-      "quantity": {
-        "value": 0,
-        "max": 9
-      },
-      "spellLevel": 1,
-      "range": "",
-      "classList": "",
-      "isConsumable": true
-    },
-    "weapon": {
-      "templates": ["base", "physical", "equippable", "rollable"],
-      "type": "melee",
-      "melee": true,
-      "missile": false,
-      "wc": 0,
-      "range": {
-        "short": 0,
-        "medium": 0,
-        "long": 0
-      },
-      "rof": "1/1",
-      "atkMod": 0,
-      "dmgMod": 0,
-      "wpnMaster": false,
-      "wpnGrandmaster": false,
-      "annotations": []
-    }
-  }
 }
