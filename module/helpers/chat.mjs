@@ -274,7 +274,7 @@ async function rollDmgButton(formula, actorId, sourceType) {
         sourceType: sourceType
     };
 
-    const template = `${HYP3E.systemRoot}/templates/chat/damage-roll.hbs`;
+    const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;
     const html = await renderTemplate(template, templateData);
 
     // const chatData = {
@@ -449,7 +449,7 @@ async function applyHealthDrop(total, extraRoll = "") {
         // image: image
     };
 
-    const template = `${HYP3E.systemRoot}/templates/chat/apply-damage.hbs`;
+    const template = `${HYP3E.templatePath}/chat/apply-damage.hbs`;
     const html = await renderTemplate(template, templateData);
 
     const chatData = {
@@ -531,7 +531,7 @@ async function rollCritHit(charType) {
         diceRoll: await roll.render()
     };
 
-    const template = `${HYP3E.systemRoot}/templates/chat/crit-roll.hbs`;
+    const template = `${HYP3E.templatePath}/chat/crit-roll.hbs`;
     const html = await renderTemplate(template, templateData);
 
     // const chatData = {
@@ -649,7 +649,7 @@ async function rollCritMiss(charType) {
         diceRoll: await roll.render()
     };
 
-    const template = `${HYP3E.systemRoot}/templates/chat/crit-roll.hbs`;
+    const template = `${HYP3E.templatePath}/chat/crit-roll.hbs`;
     const html = await renderTemplate(template, templateData);
 
     // const chatData = {

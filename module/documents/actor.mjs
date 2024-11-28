@@ -843,7 +843,7 @@ export class Hyp3eActor extends Actor {
         footerHTML: footerHTML,
     };
 
-    const template = `${HYP3E.systemRoot}/templates/chat/attack-roll.hbs`;
+    const template = `${HYP3E.templatePath}/chat/attack-roll.hbs`;
     let customChat = await renderTemplate(template, templateData);
 
     // Send to chat
@@ -871,7 +871,7 @@ export class Hyp3eActor extends Actor {
         sourceType: sourceItem.type
     };
 
-    const template = `${HYP3E.systemRoot}/templates/chat/damage-roll.hbs`;
+    const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;
     let damageChat = await renderTemplate(template, templateData);
 
     // Send to chat

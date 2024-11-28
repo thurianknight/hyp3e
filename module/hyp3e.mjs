@@ -72,6 +72,17 @@ Hooks.once('init', async function() {
     requiresReload: true,
   });
 
+  // Enable/disable group-based initiative
+  game.settings.register(game.system.id, "isGroupInitiative", {
+    name: game.i18n.localize("HYP3E.settings.isGroupInitiative"),
+    hint: game.i18n.localize("HYP3E.settings.isGroupInitiativeHint"),
+    default: true,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+
   // Critical hit 
   game.settings.register(game.system.id, "critHit", {
     name: game.i18n.localize("HYP3E.settings.critHits"),
@@ -219,6 +230,11 @@ Hooks.once("ready", async function() {
   CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
   if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods) }
 
+  // Enable/disable group-based initiative
+  const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
+  CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
+  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative) }
+
   // Set crit configs
   //const critHits = game.settings.get(game.system.id, "critHits");
 
@@ -298,7 +314,7 @@ Hooks.once("ready", async function() {
     // if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
     //   reportBestiary()
     // }
-    if (foundry.utils.isNewerVersion("1.0.8", game.system.version)) {
+    if (foundry.utils.isNewerVersion("1.0.4", game.system.version)) {
         reportItems()
     }
   }
@@ -322,7 +338,21 @@ async function migrateWorld() {
 
   // Migrate Actor directory
   for (let actor of game.actors.contents) {
-    // Update the actor
+    if (actor.type == "npc") {
+        // Migrate NPC dx to attributes.dex.value
+        console.log(`Migrating actor ${actor.name}...`)
+        const dex = {
+            system: {
+                attributes: {
+                    dex: {
+                        value: actor.system.dx
+                    }
+                }
+            }
+        }
+        console.log(`DX value: ${actor.system.dx}, update object: `, dex)
+        await actor.update(dex)
+    }
 
     // Migrate the actor document's items if any exist
     // if (actor.items) {
@@ -366,18 +396,22 @@ async function migrateWorld() {
   for (let pack of game.packs) {
 
     const packType = pack.metadata.type
-    // Skip anything that's not an Actor compendium pack
-    if (packType != "Item") {
-      continue
-    }
+    // Skip anything that's not an Item compendium pack
+    // if (packType != "Item") {
+    //   continue
+    // }
+    // We only need to do the General Equipment compendium for this specific migration
+    // if (pack.metadata.label !== "Equipment - General") {
+    //   continue
+    // }
 
+    // Skip anything that's not an Actor compendium pack
+    if (packType != "Actor") {
+        continue
+    }
+      
     console.log(`Compendium pack ${pack.metadata.label}:`, pack)
     const documentName = pack.documentName;
-
-    // We only need to do the General Equipment compendium for this specific migration
-    if (pack.metadata.label !== "Equipment - General") {
-      continue
-    }
 
     // Get the compendium's locked property, then unlock it
     const wasLocked = pack.locked
@@ -393,6 +427,23 @@ async function migrateWorld() {
       try {
         switch(packType) {
           case "Actor":
+            // Migrate NPC dx to attributes.dex.value
+            if (doc.type == "npc") {
+                // Migrate NPC dx to attributes.dex.value
+                console.log(`Migrating actor ${doc.name}...`)
+                const dex = {
+                    system: {
+                        attributes: {
+                            dex: {
+                                value: doc.system.dx
+                            }
+                        }
+                    }
+                }
+                console.log(`DX value: ${doc.system.dx}, update object: `, dex)
+                await doc.update(dex)
+            }
+        
             // Migrate the actor document's items if any exist
             // if (doc.items) {
             //   for (let item of doc.items) {
@@ -428,7 +479,6 @@ async function migrateWorld() {
               await doc.update()
             }
     
-
             break
   
           default:

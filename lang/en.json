@@ -15,6 +15,8 @@
       "enableAttrChecksHint": "This option allows players to click an attribute name to do a 3d6 concentration (roll-under) check. N.B.: This is an optional rule, and is disabled by default.",
       "flipRollUnderMods": "Reverse situational modifiers on roll-under checks",
       "flipRollUnderModsHint": "For roll-under checks, reverse the sign on situational modifiers so that a positive number is treated as a bonus (subtracted from the roll) and a negative number is treated as a penalty (added to the roll). Other modifiers applied from attributes or items are automatically handled this way.",
+      "isGroupInitiative": "Use group-based initiative",
+      "isGroupInitiativeHint": "Hyperborea 3rd Edition (as written) uses group-based initiative. Disabling this item reverts the system to Foundry's default behavior of individual initiative.",
       "critHits": "Critical Hits",
       "critHitsHint": "Show buttons to roll critical hits on natural 20.",
       "critMiss": "Critical Misses / Xathoqqua’s Woe",
