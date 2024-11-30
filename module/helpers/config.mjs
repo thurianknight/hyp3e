@@ -1,6 +1,7 @@
 export const HYP3E = {
     systemRoot() {
-        return `systems/${game.system.id}`
+        // return `systems/${game.system.id}`
+        return `systems/hyp3e`
     },
     get assetsPath() {
         return `${this.systemRoot()}/assets`
@@ -14,7 +15,15 @@ export const HYP3E = {
     get templatePath() {
         return `${this.systemRoot()}/templates`;
     },
-
+    colors: {
+        green: "HYP3E.colors.green",
+        red: "HYP3E.colors.red",
+        yellow: "HYP3E.colors.yellow",
+        purple: "HYP3E.colors.purple",
+        blue: "HYP3E.colors.blue",
+        orange: "HYP3E.colors.orange",
+        white: "HYP3E.colors.white",
+    },
 };
 
 /**
