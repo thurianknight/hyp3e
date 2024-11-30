@@ -8,6 +8,12 @@ import { Hyp3eItemSheet } from "./sheets/item-sheet.mjs";
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./helpers/chat.mjs";
+// Import Combat classes
+import { HYP3EGroupCombat } from "./combat/combat-group.mjs";
+import { HYP3EGroupCombatant } from "./combat/combatant-group.mjs";
+import { HYP3ECombat } from "./combat/combat.mjs";
+import { HYP3ECombatant } from "./combat/combatant.mjs";
+import { HYP3ECombatTab } from "./combat/sidebar.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -144,16 +150,27 @@ Hooks.once('init', async function() {
   // Add custom constants for configuration.
   CONFIG.HYP3E = HYP3E;
 
-  /**
-   * Set an initiative formula for the system
-   * @type {String}
-   */
-  CONFIG.Combat.initiative = {
-    // formula: "1d20 + @attributes.dex.mod",
-    // decimals: 2
-    formula: "1d6",
-    decimals: 0
-  };
+    /**
+     * Set an initiative formula for the system
+     * @type {String}
+     */
+    //   CONFIG.Combat.initiative = {
+    //     // formula: "1d20 + @attributes.dex.mod",
+    //     // decimals: 2
+    //     formula: "1d6 + @dex.value",
+    //     decimals: 0
+    //   };
+    const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
+    if (isGroupInitiative) { 
+        CONFIG.Combat.documentClass = HYP3EGroupCombat;
+        CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
+        CONFIG.Combat.initiative = { decimals: 2, formula: HYP3EGroupCombat.FORMULA }
+    } else {
+        CONFIG.Combat.documentClass = HYP3ECombat;
+        CONFIG.Combatant.documentClass = HYP3ECombatant;
+        CONFIG.Combat.initiative = { decimals: 2, formula: HYP3ECombat.FORMULA }
+    }
+    CONFIG.ui.combat = HYP3ECombatTab;
 
   // Define custom Document classes
   CONFIG.Actor.documentClass = Hyp3eActor;
