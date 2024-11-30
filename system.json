@@ -11,7 +11,17 @@
   "authors": [
     {
       "name": "ThurianKnight",
+      "email": "thurianknight@gmail.com",
+      "url": "https://github.com/thurianknight",
       "flags": {}
+    },
+    {
+        "name": "wintersleepAI",
+        "flags": {}
+    },
+    {
+        "name": "Xander-Carroll",
+        "flags": {}
     }
   ],
   "esmodules": [
