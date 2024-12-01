@@ -39,7 +39,7 @@ export class HYP3ECombatTab extends CombatTracker {
             turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
             turn.isOwnedByUser = !!combatant.actor.isOwner;
             turn.group = combatant.group;
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Turn: `, turn) }
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Turn: `, turn) }
             return turn;
         });
 
@@ -51,7 +51,7 @@ export class HYP3ECombatTab extends CombatTracker {
                 return arr;
             }
 
-            console.log("Group Initiative Scores: ", game.combat.groupInitiativeScores)
+            // if (CONFIG.HYP3E.debugMessages) { console.log("Group Initiative Scores: ", game.combat.groupInitiativeScores) }
             const initiative = game.combat.groupInitiativeScores.get(turn.group) ? game.combat.groupInitiativeScores.get(turn.group) : null
 
             return [...arr, {

@@ -65,18 +65,20 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         })
 
         const updates = this.combatants.map(
-            (c) => ({ _id: c.id, initiative: results[c.group].initiative 
-                                            + c.actor?.system?.attributes?.dex?.value 
-                                            + c.moveInit
-                                            + c.meleeInit
-                                            + c.missileInit
-                                            + c.magicInit
+            (c) => ({ _id: c.id, 
+                        initiative: Math.round((results[c.group].initiative 
+                                                + (c.actor?.system?.attributes?.dex?.value/100)
+                                                + c.moveInit
+                                                + c.meleeInit
+                                                + c.missileInit
+                                                + c.magicInit) * 100) / 100
                     })
         )
         if (CONFIG.HYP3E.debugMessages) { console.log("Combatant updates: ", updates) }
         if (CONFIG.HYP3E.debugMessages) { console.log("All Combatants: ", this.combatants) }
 
         await this.updateEmbeddedDocuments("Combatant", updates);
+        
         await this.#rollInitiativeUIFeedback(results);
         await this.activateCombatant(0);
         if (CONFIG.HYP3E.debugMessages) { console.log("THIS Combat: ", this) }
@@ -171,17 +173,6 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         }
         if (CONFIG.HYP3E.debugMessages) { console.log("Get Initiative Map: ", initiativeMap) }
         return initiativeMap;
-    }
-
-    async resetAll() {
-        // Reset group initiatives
-        const initiativeMap = game.combat.groupInitiativeScores
-        if (CONFIG.HYP3E.debugMessages) { console.log("Reset Initiative Map: ", initiativeMap) }
-        for (const group in this.combatantsByGroup) {
-            initiativeMap.set(group, null)
-        }
-        // Now do the main reset
-        await super.resetAll()
     }
 
 }

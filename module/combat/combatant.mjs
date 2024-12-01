@@ -1,11 +1,11 @@
 export class HYP3ECombatant extends Combatant {
     // These are added to the initiative roll + DX of an actor, to position them in order high to low
-    static INITIATIVE_VALUE_MELEE = 120
-    static INITIATIVE_VALUE_MISSILE = 90
-    static INITIATIVE_VALUE_MAGIC = 60
-    static INITIATIVE_VALUE_MOVEMENT = 30
+    static INITIATIVE_VALUE_MELEE = 0.80
+    static INITIATIVE_VALUE_MISSILE = 0.60
+    static INITIATIVE_VALUE_MAGIC = 0.40
+    static INITIATIVE_VALUE_MOVEMENT = 0.20
     // static INITIATIVE_VALUE_SLOWED = -499;
-    static INITIATIVE_VALUE_DEFEATED = -999;
+    static INITIATIVE_VALUE_DEFEATED = -99;
   
     // ===========================================================================
     // BOOLEAN FLAGS
@@ -73,7 +73,7 @@ export class HYP3ECombatant extends Combatant {
     setCombatAction(flag, value) {
         // Always set the specified flag
         this.setFlag(game.system.id, flag, value)
-        // Most combat actions are mutually exclusive, but only when setting one to true
+        // Most combat actions are mutually exclusive, when setting one to true
         switch (flag) {
             case "isMelee":
                 if (value === true) {
@@ -112,16 +112,15 @@ export class HYP3ECombatant extends Combatant {
 
     getInitiativeRoll(formula) {
         let term = formula || CONFIG.Combat.initiative.formula;
-        // @todo : Add DX value to initiative roll formula
 
         // Movement overrides Melee, Missile, or Magic values for initiative
-        if (this.isMovement) {
+        if (this.getFlag(game.system.id, "isMovement")) {
             term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT}`;
         } else {
             // These are mutually exclusive to each other
-            if (this.isMelee) term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MELEE}`;
-            if (this.isMissile) term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MISSILE}`;
-            if (this.isMagic) term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MAGIC}`;    
+            if (this.getFlag(game.system.id, "isMelee")) term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MELEE}`;
+            if (this.getFlag(game.system.id, "isMissile")) term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MISSILE}`;
+            if (this.getFlag(game.system.id, "isMagic")) term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MAGIC}`;    
         }
         // if (this.isSlow) term = `${HYP3ECombatant.INITIATIVE_VALUE_SLOWED}`;
         // If defeated, initiative is set to this static value
@@ -130,15 +129,16 @@ export class HYP3ECombatant extends Combatant {
         return new Roll(term, rollData);
     }
 
-    async getData(options = {}) {
-        const context = await super.getData(options);
-        return foundry.utils.mergeObject(context, {
-            melee: this.isMelee,
-            missile: this.isMissile,
-            magic: this.isMagic,
-            movement: this.isMovement
-        })
-    }
+    // Pretty sure this is not needed...
+    // async getData(options = {}) {
+    //     const context = await super.getData(options);
+    //     return foundry.utils.mergeObject(context, {
+    //         melee: this.isMelee,
+    //         missile: this.isMissile,
+    //         magic: this.isMagic,
+    //         movement: this.isMovement
+    //     })
+    // }
 
 }
   

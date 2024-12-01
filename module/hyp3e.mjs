@@ -89,6 +89,21 @@ Hooks.once('init', async function() {
     requiresReload: true,
   });
 
+  // Re-roll Initiative action
+  game.settings.register(game.system.id, "rerollInitiative", {
+    name: game.i18n.localize("HYP3E.settings.rerollInitiative"),
+    hint: game.i18n.localize("HYP3E.settings.rerollInitiativeHint"),
+    default: "reset",
+    scope: "world",
+    type: String,
+    config: true,
+    choices: {
+      keep: "HYP3E.settings.initiativeKeep",
+      reset: "HYP3E.settings.initiativeReset",
+      reroll: "HYP3E.settings.initiativeReroll",
+    },
+  });
+
   // Critical hit 
   game.settings.register(game.system.id, "critHit", {
     name: game.i18n.localize("HYP3E.settings.critHits"),
@@ -164,11 +179,11 @@ Hooks.once('init', async function() {
     if (isGroupInitiative) { 
         CONFIG.Combat.documentClass = HYP3EGroupCombat;
         CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
-        CONFIG.Combat.initiative = { decimals: 2, formula: HYP3EGroupCombat.FORMULA }
+        CONFIG.Combat.initiative = { decimals: 3, formula: HYP3EGroupCombat.FORMULA }
     } else {
         CONFIG.Combat.documentClass = HYP3ECombat;
         CONFIG.Combatant.documentClass = HYP3ECombatant;
-        CONFIG.Combat.initiative = { decimals: 2, formula: HYP3ECombat.FORMULA }
+        CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
     }
     CONFIG.ui.combat = HYP3ECombatTab;
 
