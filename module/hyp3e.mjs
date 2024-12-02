@@ -442,7 +442,7 @@ async function migrateWorld() {
                                 }
                             }
                             console.log(`DX value: ${doc.system.dx}, update object: `, dex)
-                            await doc.update(dex)
+                            // await doc.update(dex)
                         }
                     }
                 
@@ -488,6 +488,7 @@ function updateEmpty(doc) {
     update.system = {rollMode: "", blindRoll: null}
     return update;
 }
+
 function filterEmpty(doc) {
     return doc.type === "feature" && (doc.system.formula === "undefined" || doc.system.formula === undefined || doc.system.formula === "")
 }
