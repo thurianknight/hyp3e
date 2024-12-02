@@ -58,27 +58,27 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                 c.missileInit = c.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_VALUE_MISSILE : 0;
                 c.magicInit = c.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_VALUE_MAGIC : 0;
             } else {
-                c.meleeInit = 0
-                c.missileInit = 0
-                c.magicInit = 0
+                c.meleeInit = (c.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_VALUE_MELEE : 0)/10;
+                c.missileInit = (c.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_VALUE_MISSILE : 0)/10;
+                c.magicInit = (c.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_VALUE_MAGIC : 0)/10;
             }
         })
 
         const updates = this.combatants.map(
             (c) => ({ _id: c.id, 
                         initiative: Math.round((results[c.group].initiative 
-                                                + (c.actor?.system?.attributes?.dex?.value/100)
+                                                + (c.actor?.system?.attributes?.dex?.value/1000)
                                                 + c.moveInit
                                                 + c.meleeInit
                                                 + c.missileInit
-                                                + c.magicInit) * 100) / 100
+                                                + c.magicInit) * 1000) / 1000
                     })
         )
         if (CONFIG.HYP3E.debugMessages) { console.log("Combatant updates: ", updates) }
         if (CONFIG.HYP3E.debugMessages) { console.log("All Combatants: ", this.combatants) }
 
         await this.updateEmbeddedDocuments("Combatant", updates);
-        
+
         await this.#rollInitiativeUIFeedback(results);
         await this.activateCombatant(0);
         if (CONFIG.HYP3E.debugMessages) { console.log("THIS Combat: ", this) }
