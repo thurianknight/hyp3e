@@ -334,7 +334,7 @@ Hooks.once("ready", async function() {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "1.0.4"
+    const NEEDS_MIGRATION_TO_VERSION = "1.0.8"
     const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
       migrateWorld()
@@ -366,199 +366,150 @@ Hooks.on("createToken", (document, options, userId) => {
 /*  Migrate system/world functions              */
 /* -------------------------------------------- */
 async function migrateWorld() {
-  console.log(`Migrating world ${game.system.version}...`)
+    console.log(`Migrating world ${game.system.version}...`)
 
-  // Migrate Actor directory
-  for (let actor of game.actors.contents) {
-    if (actor.type == "npc") {
-        // Migrate NPC dx to attributes.dex.value
-        console.log(`Migrating actor ${actor.name}...`)
-        const dex = {
-            system: {
-                attributes: {
-                    dex: {
-                        value: actor.system.dx
-                    }
-                }
-            }
-        }
-        console.log(`DX value: ${actor.system.dx}, update object: `, dex)
-        await actor.update(dex)
-    }
-
-    // Migrate the actor document's items if any exist
-    // if (actor.items) {
-    //   for (let item of actor.items) {
-        // Update the embedded item document
-        // if ( item.type === "feature" && (item.system.formula == null || item.system.formula == undefined || item.system.formula == "undefined" || item.system.formula == "") ) {
-        // console.log(`Migrating item ${item.name}...`, item)
-        // actor.updateEmbeddedDocuments("Item", [
-        //     { _id: item.id, "system.blindRoll": null, "system.rollMode": "" },
-        //   ])
-        // } else if ( item.type === "feature" && (item.system.blindRoll === "false" || item.system.blindRoll === false) ) {
-        //   console.log(`Migrating item ${item.name}...`, item)
-        //   actor.updateEmbeddedDocuments("Item", [
-        //     { _id: item.id, "system.rollMode": "publicroll" },
-        //   ])
-        // } else if ( item.type === "feature" && (item.system.blindRoll === "true" || item.system.blindRoll === true) ) {
-        //   console.log(`Migrating item ${item.name}...`, item)
-        //   actor.updateEmbeddedDocuments("Item", [
-        //     { _id: item.id, "system.rollMode": "blindroll" },
-        //   ])
-        // }
-    //   }
-    // }
-  }
-
-  // Update the Class Abilities & Features compendium for blindRoll and rollMode fields
-  // const collection = game.packs.get("hyperborea-3e-compendium.class-abilities-and-features")
-  // console.log("Compendium collection: ", collection)
-  // // Get the compendium's locked property, then unlock it
-  // const wasLocked = collection.locked
-  // await collection.configure({ locked: false })
-  // // Batch update items based on applied filters
-  // await collection.updateAll(updateEmpty, filterEmpty)
-  // await collection.updateAll(updatePublic, filterPublic)
-  // await collection.updateAll(updateBlind, filterBlind)
-  // // Re-lock the compendium if it was locked before
-  // await collection.configure({ locked: wasLocked })
-  // console.log(`Migrated all documents from Compendium ${collection.collection}`);
-
-  // Migrate Actor compendia, one document at a time (time-consuming!)
-  for (let pack of game.packs) {
-
-    const packType = pack.metadata.type
-    // Skip anything that's not an Item compendium pack
-    // if (packType != "Item") {
-    //   continue
-    // }
-    // We only need to do the General Equipment compendium for this specific migration
-    // if (pack.metadata.label !== "Equipment - General") {
-    //   continue
-    // }
-
-    // Skip anything that's not an Actor compendium pack
-    if (packType != "Actor") {
-        continue
-    }
-      
-    console.log(`Compendium pack ${pack.metadata.label}:`, pack)
-    const documentName = pack.documentName;
-
-    // Get the compendium's locked property, then unlock it
-    const wasLocked = pack.locked
-    await pack.configure({ locked: false })
-
-    // Begin by requesting server-side data model migration and get the migrated content
-    console.log(`Migrating compendium pack ${pack.metadata.label}...`)
-    await pack.migrate()
-    const documents = await pack.getDocuments()
-
-    // Iterate over compendium entries and apply migration functions
-    for (let doc of documents) {
-      try {
-        switch(packType) {
-          case "Actor":
-            // Migrate NPC dx to attributes.dex.value
-            if (doc.type == "npc") {
+    // Migrate Actor directory
+    for (let actor of game.actors.contents) {
+        if (actor.type == "npc") {
+            if (actor.system.attributes.dex.value != actor.system.dx) {
                 // Migrate NPC dx to attributes.dex.value
-                console.log(`Migrating actor ${doc.name}...`)
+                console.log(`Migrating actor ${actor.name}...`)
                 const dex = {
                     system: {
                         attributes: {
                             dex: {
-                                value: doc.system.dx
+                                value: actor.system.dx
                             }
                         }
                     }
                 }
-                console.log(`DX value: ${doc.system.dx}, update object: `, dex)
-                await doc.update(dex)
+                console.log(`DX value: ${actor.system.dx}, update object: `, dex)
+                await actor.update(dex)
             }
-        
-            // Migrate the actor document's items if any exist
-            // if (doc.items) {
-            //   for (let item of doc.items) {
-            //     // Update the embedded item document
-            //     if ( item.type === "feature" && (item.system.formula == null || item.system.formula == undefined || item.system.formula == "undefined" || item.system.formula == "") ) {
-            //       console.log(`Migrating item ${item.name}...`, item)
-            //       doc.updateEmbeddedDocuments("Item", [
-            //         { _id: item.id, "system.blindRoll": null, "system.rollMode": "" },
-            //       ])
-            //     } else if ( item.type === "feature" && (item.system.blindRoll === "false" || item.system.blindRoll === false) ) {
-            //       console.log(`Migrating item ${item.name}...`, item)
-            //       doc.updateEmbeddedDocuments("Item", [
-            //         { _id: item.id, "system.rollMode": "publicroll" },
-            //       ])
-            //     } else if ( item.type === "feature" && (item.system.blindRoll === "true" || item.system.blindRoll === true) ) {
-            //       console.log(`Migrating item ${item.name}...`, item)
-            //       doc.updateEmbeddedDocuments("Item", [
-            //         { _id: item.id, "system.rollMode": "blindroll" },
-            //       ])
-            //     }
-            //   }
-            // }
-            break
-  
-          case "Item":
-            console.log("Compendium item document:", doc)
-            // Migrate items of type 'container' to type 'item', and set isContainer flag
-            if (doc.type === 'container') {
-              // Update the container/item document
-              console.log(`Updating container/item ${doc.name}...`)
-              doc.type = "item"
-              doc.system.isContainer = true
-              await doc.update()
-            }
-    
-            break
-  
-          default:
-            break
         }
-  
-      } catch (err) {
-        err.message = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}: ${err.message}`;
-        console.error(err);
-      }
 
+        // Migrate the actor document's items if any exist
+        // if (actor.items) {
+        //   for (let item of actor.items) {
+        //      do stuff
+        //   }
+        // }
     }
 
-    // Re-lock the compendium if it was locked before
-    await pack.configure({ locked: wasLocked })
-    console.log(`Migrated all ${documentName} documents from Compendium ${pack.collection}`);
+    // Migrate Actor compendia, one document at a time (time-consuming!)
+    for (let pack of game.packs) {
 
-  }
+        const packType = pack.metadata.type
+        // Skip anything that's not an Item compendium pack
+        // if (packType != "Item") {
+        //   continue
+        // }
+
+        // Skip anything that's not an Actor compendium pack
+        if (packType != "Actor") {
+            continue
+        }
+        
+        console.log(`Compendium pack ${pack.metadata.label}:`, pack)
+        const documentName = pack.documentName;
+
+        // Get the compendium's locked property, then unlock it
+        const wasLocked = pack.locked
+        await pack.configure({ locked: false })
+
+        // Begin by requesting server-side data model migration and get the migrated content
+        console.log(`Migrating compendium pack ${pack.metadata.label}...`)
+        await pack.migrate()
+        const documents = await pack.getDocuments()
+
+        // Iterate over compendium entries and apply migration functions
+        for (let doc of documents) {
+            try {
+                switch(packType) {
+                case "Actor":
+                    // Migrate NPC dx to attributes.dex.value
+                    if (doc.type == "npc") {
+                        if (doc.system.attributes.dex.value != doc.system.dx) {
+                            // Migrate NPC dx to attributes.dex.value
+                            console.log(`Migrating actor ${doc.name}...`)
+                            const dex = {
+                                system: {
+                                    attributes: {
+                                        dex: {
+                                            value: doc.system.dx
+                                        }
+                                    }
+                                }
+                            }
+                            console.log(`DX value: ${doc.system.dx}, update object: `, dex)
+                            await doc.update(dex)
+                        }
+                    }
+                
+                    // Migrate the actor document's items if any exist
+                    // if (doc.items) {
+                    //   for (let item of doc.items) {
+                    //      do stuff
+                    //   }
+                    // }
+                    break
+        
+                case "Item":
+                    console.log("Compendium item document:", doc)
+                    // Migrate items of type 'container' to type 'item', and set isContainer flag
+                    if (doc.type === 'container') {
+                        // Update the container/item document
+                        console.log(`Updating container/item ${doc.name}...`)
+                        doc.type = "item"
+                        doc.system.isContainer = true
+                        await doc.update()
+                    }
+                    break
+        
+                default:
+                    break
+                }
+            } catch (err) {
+                errMsg = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}: ${err.message}`;
+                console.error(errMsg);
+            }
+        }
+
+        // Re-lock the compendium if it was locked before
+        await pack.configure({ locked: wasLocked })
+        console.log(`Migrated all ${documentName} documents from Compendium ${pack.collection}`);
+
+    }
 }
 
 function updateEmpty(doc) {
-  console.log(doc.name)
-  const update = {system: {}}
-  update.system = {rollMode: "", blindRoll: null}
-  return update;
+    console.log(doc.name)
+    const update = {system: {}}
+    update.system = {rollMode: "", blindRoll: null}
+    return update;
 }
 function filterEmpty(doc) {
-  return doc.type === "feature" && (doc.system.formula === "undefined" || doc.system.formula === undefined || doc.system.formula === "")
+    return doc.type === "feature" && (doc.system.formula === "undefined" || doc.system.formula === undefined || doc.system.formula === "")
 }
 
 function updatePublic(doc) {
-  console.log(doc.name)
-  const update = {system: {}}
-  update.system = {rollMode: "publicroll"}
-  return update;
+    console.log(doc.name)
+    const update = {system: {}}
+    update.system = {rollMode: "publicroll"}
+    return update;
 }
 function filterPublic(doc) {
-  return doc.type === "feature" && (doc.system.blindRoll === "false" || doc.system.blindRoll === false)
+    return doc.type === "feature" && (doc.system.blindRoll === "false" || doc.system.blindRoll === false)
 }
 
 function updateBlind(doc) {
-  console.log(doc.name)
-  const update = {system: {}}
-  update.system = {rollMode: "blindroll"}
-  return update;
+    console.log(doc.name)
+    const update = {system: {}}
+    update.system = {rollMode: "blindroll"}
+    return update;
 }
 function filterBlind(doc) {
-  return doc.type === "feature" && (doc.system.blindRoll === "true" || doc.system.blindRoll === true)
+    return doc.type === "feature" && (doc.system.blindRoll === "true" || doc.system.blindRoll === true)
 }
 
 async function reportBestiary() {

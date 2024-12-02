@@ -37,7 +37,6 @@ export class Hyp3eActor extends Actor {
     const flags = actorData.flags.hyp3e || {};
     // systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
     systemData.hp.percentage = Math.min(Math.max((systemData.hp.value * 100) / systemData.hp.max, 0), 100);
-    if (CONFIG.HYP3E.debugMessages) { console.log(`Preparing actor ${actorData.name} derived data...`) }
   
     // Make separate methods for each Actor type (character, npc, etc.) to keep
     // things organized.
