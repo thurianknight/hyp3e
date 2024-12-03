@@ -1,392 +1,425 @@
 {
-  "HYP3E": {
-    "settings": {
-      "debugMessages": "Debug Messages",
-      "debugMessagesHint": "Enable additional debug logging and messages.",
-      "races": "Races",
-      "racesHint": "Human races in Hyperborea.",
-      "languages": "Languages",
-      "languagesHint": "Known/available languages in Hyperborea.",
-      "characterClasses": "Character Classes",
-      "characterClassesHint": "Character classes available to PCs and some NPCs.",
-      "autoCalcAc": "Auto-calculate Armour Class",
-      "autoCalcAcHint": "Use 'equipped' status of armour and shields to calculate AC. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
-      "enableAttrChecks": "Enable IN & WS concentration checks",
-      "enableAttrChecksHint": "This option allows players to click an attribute name to do a 3d6 concentration (roll-under) check. N.B.: This is an optional rule, and is disabled by default.",
-      "flipRollUnderMods": "Reverse situational modifiers on roll-under checks",
-      "flipRollUnderModsHint": "For roll-under checks, reverse the sign on situational modifiers so that a positive number is treated as a bonus (subtracted from the roll) and a negative number is treated as a penalty (added to the roll). Other modifiers applied from attributes or items are automatically handled this way.",
-      "critHits": "Critical Hits",
-      "critHitsHint": "Show buttons to roll critical hits on natural 20.",
-      "critMiss": "Critical Misses / Xathoqqua’s Woe",
-      "critMissHint": "Show buttons to roll critical miss on natural 1."
-    },
-    "tabs": {
-      "abilities": "Abilities",
-      "combat": "Combat",
-      "spells": "Spells",
-      "effects": "Effects",
-      "items": "Items",
-      "description": "Description",
-      "details": "Details",
-      "attributes": "Attributes"
-    },
-    "headers": {
-      "name": "Name",
-      "attributes": "Attributes",
-      "exploration": "Exploration",
-      "taskResolution": "Task Resolution",
-      "movement": "Movement",
-      "classAbilities": "Class Abilities",
-      "fightingSkills": "Fighting Skills",
-      "combatStats": "Combat Stats",
-      "savingThrows": "Saving Throws",
-      "equipmentItems": "Equipment & Items",
-      "abilitiesItems": "Abilities & Items",
-      "weapons": "Weapons",
-      "armor": "Armour",
-      "weaponsAndArmor": "Weapons & Armour",
-      "items": "Items",
-      "ability": "Ability",
-      "atkRate": "Atk Rate",
-      "rof": "RoF",
-      "classRange": "Class/Range",
-      "wpnClass": "Wpn Class",
-      "atkMod": "Atk Mod",
-      "dmgMod": "Dmg Mod",
-      "damage": "Damage",
-      "weaponMastery": "Weapon Mastery",
-      "type": "Type",
-      "biography": "Biography",
-      "descNotes": "Description & Notes",
-      "effectsCond": "Effects & Conditions",
-      "attacksItems": "Attacks & Items",
-      "attacksWeapons": "Attacks & Weapons",
-      "encumbrance": "Encumbrance",
-      "money": "Money",
-      "treasure": "Treasure"
-    },
-    "details": {
-      "class": "Class",
-      "alignment": "Alignment",
-      "level": "Level",
-      "hitDie": "Hit Die",
-      "hitDice": "Hit Dice",
-      "rollHD": "Roll HP on create",
-      "rollHDLong": "Roll the NPCs HP when a token is created based on the HD",
-      "hd": "HD",
-      "xp": "XP",
-      "toNextLvl": "Next Level",
-      "primeAttr": "Prime Attr",
-      "hitPoints": "Hit Points",
-      "hp": "HP",
-      "race": "Race",
-      "gender": "Gender",
-      "age": "Age",
-      "religion": "Religion",
-      "height": "Height",
-      "weight": "Weight",
-      "hair": "Hair",
-      "eyes": "Eyes",
-      "complexion": "Complexion",
-      "secSkills": "Secondary Skills",
-      "languages": "Languages",
-      "physFeatures": "Physical Features"
-    },
-    "attributes": {
-      "str": {
-        "name": "Strength",
-        "abbrev": "ST",
-        "atkMod": "Melee Mod",
-        "dmgMod": "Dmg Mod",
-        "test": "Test of ST",
-        "feat": "Feat of ST",
-        "check": "Basic ST check"
-      },
-      "dex": {
-        "name": "Dexterity",
-        "abbrev": "DX",
-        "atkMod": "Missile Mod",
-        "defMod": "Def Mod",
-        "test": "Test of DX",
-        "feat": "Feat of DX",
-        "check": "Basic DX check"
-      },
-      "con": {
-        "name": "Constitution",
-        "abbrev": "CN",
-        "hpMod": "HP Mod",
-        "poisRadMod": "Pois/Rad Mod",
-        "traumaSurvive": "Trauma",
-        "test": "Test of CN",
-        "feat": "Feat of CN",
-        "check": "Basic CN check"
-      },
-      "int": {
-        "name": "Intelligence",
-        "abbrev": "IN",
-        "languages": "Languages",
-        "bonusSpells": "Bonus Spells",
-        "learnSpell": "Learn Spell",
-        "check": "IN concentration check"
-      },
-      "wis": {
-        "name": "Wisdom",
-        "abbrev": "WS",
-        "willMod": "Will Mod",
-        "bonusSpells": "Bonus Spells",
-        "learnSpell": "Learn Spell",
-        "check": "WS concentration check"
-      },
-      "cha": {
-        "name": "Charisma",
-        "abbrev": "CH",
-        "reaction": "Reaction",
-        "maxHenchmen": "Max Henchmen",
-        "turnUndead": "Turn Mod",
-        "check": "Basic CH check"
-      }
-    },
-    "saves": {
-      "death": {
-        "name": "Death",
-        "abbrev": "Death"
-      },
-      "transformation": {
-        "name": "Transformation",
-        "abbrev": "Xform"
-      },
-      "device": {
-        "name": "Devices",
-        "abbrev": "Device"
-      },
-      "avoidance": {
-        "name": "Avoidance",
-        "abbrev": "Avoid"
-      },
-      "sorcery": {
-        "name": "Sorcery",
-        "abbrev": "Sorcery"
-      }
-    },
-    "fightingAbility": "Fighting Ability",
-    "fa": "FA",
-    "unskilled": "Unskilled",
-    "wpnSkills": "Favoured Wpns",
-    "level4": "Level 4",
-    "level8": "Level 8",
-    "level12": "Level 12",
-    "castingAbility": "Casting Ability",
-    "ca": "CA",
-    "turningAbility": "Turning Ability",
-    "ta": "TA",
-    "explorationSkills": {
-      "listen": {
-        "name": "Listen at Door",
-        "abbrev": "Listen"
-      },
-      "pickLock": {
-        "name": "Pick Lock",
-        "abbrev": "Lock"
-      },
-      "findSecret": {
-        "name": "Find Secret Door",
-        "abbrev": "Secret Door"
-      },
-      "findTrap": {
-        "name": "Find Trap",
-        "abbrev": "Trap"
-      }
-    },
-    "taskResolution": {
-      "simple": {
-        "name": "Simple",
-        "abbrev": "Simpl.",
-        "hint": "Examples: Climbing natural/rough surface with light or no armour..."
-      },
-      "moderate": {
-        "name": "Moderate",
-        "abbrev": "Mod.",
-        "hint": "Examples: Climbing natural/rough surface with medium armour..."
-      },
-      "challenging": {
-        "name": "Challenging",
-        "abbrev": "Chall.",
-        "hint": "Examples: Climbing natural/rough surface with heavy armour; hear loud noise..."
-      },
-      "difficult": {
-        "name": "Difficult",
-        "abbrev": "Diff.",
-        "hint": "Examples: Non-thief hear quiet noise; find concealed or secret door..."
-      },
-      "veryDifficult": {
-        "name": "Very Difficult",
-        "abbrev": "V. Diff.",
-        "hint": "Examples: Non-thief pick lock; find trap..."
-      }
-    },
-    "movement": {
-      "base": {
-        "name": "Base Move",
-        "abbrev": "MV"
-      },
-      "exploration": {
-        "name": "Dungeon (ft/turn)",
-        "abbrev": "Explore"
-      },
-      "travel": {
-        "name": "Wilderness (mi/day)",
-        "abbrev": "Wilderness"
-      }
-    },
-    "otherMv": {
-      "name": "Other Movement",
-      "abbrev": "Other"
-    },
-    "alignment": "Alignment",
-    "size": "Size",
-    "encWild": "# Enc.",
-    "encLair": "# in Lair",
-    "morale": "Morale",
-    "xp": "XP Value",
-    "treasure": "Treasure Class",
-    "effect": {
-      "add": "Add Effect",
-      "create": "Create Effect",
-      "toggle": "Toogle Effect",
-      "source": "Source"
-    },
-    "feature": {
-      "add": "Add Feature"
-    },
-    "item": {
-      "add": "Add Item",
-      "edit": "Edit",
-      "delete": "Delete",
-      "show": "Show",
-      "equip": "Toggle Equip",
-      "equipped": "Equipped",
-      "consumable": "Consumable",
-      "ammunition": "Ammunition",
-      "container": "Container",
-      "cost": "Cost",
-      "qty": "Qty",
-      "weight": "Weight",
-      "location": "Location",
-      "incr": "Add",
-      "decr": "Subtract"
-    },
-    "spell": {
-      "addLvl": "Add Lvl",
-      "addSpell": "Add Spell",
-      "classes": "Classes",
-      "numMem": "# Mem",
-      "duration": "Duration",
-      "numAffected": "# Affected",
-      "save": "Save"
-    },
-    "money": {
-      "cp": "CP",
-      "sp": "SP",
-      "ep": "EP",
-      "gp": "GP",
-      "pp": "PP"
-    },
-    "weapon": {
-      "add": "Add Weapon",
-      "type": {
-        "melee": "Melee",
-        "missile": "Missile"
-      },
-      "range": "Range",
-      "atkType": "Atk Type",
-      "master": "Master",
-      "grandMaster": "Grandmaster"
-    },
-    "armor": {
-      "add": "Add Armour",
-      "type": {
-        "unarmored": "Unarmoured",
-        "light": "Light",
-        "medium": "Medium",
-        "heavy": "Heavy",
-        "shield": "Shield"
-      },
-      "wtClass": "Wt Class",
-      "armorClass": "Armour Class",
-      "ac": "AC",
-      "dr": "DR",
-      "dmgReduct": "Dmg Reduction",
-      "unarmored": "Unarmoured"
-    },
-    "attack": {
-      "add": "Add Attack",
-      "critMiss": {
-        "name": "Critical Miss",
-        "badMiss": "Bad miss",
-        "dropWeapon" : "Drop weapon: {feet} feet away to {direction}.",
-        "stumble": "Awkward stumble. One adjacent gets one free attack. No further attacks for rest of round.",
-        "tripFall" : "Trip and fall. Prone: -4 AC, no DX bonus for remainder of round and until next action.",
-        "hitAlly": "Hit ally: closest for melee, closest adjacent for ranged. Regular hit.",
-        "hitAllyCrit": "Hit ally: closest for melee, closest adjacent for ranged. <b>Critical Hit</b>.",
-        "hitSelf": "Hit self: Regular hit.",
-        "hitSelfCrit": "Hit self: <b>Critical Hit</b>.",
-        "cleric": "Critical miss roll for cleric-class...",
-        "fighter": "Critical miss roll for fighter-class...",
-        "magician": "Critical miss roll for magician-class...",
-        "thief": "Critical miss roll for thief-class...",
-        "npc": "Critical miss roll for npc/monster...",
-        "other": "Critical miss roll for cleric/thief/monster..."
-      },
-      "critHit": {
-        "cleric": "Critical hit roll for cleric-class...",
-        "fighter": "Critical hit roll for fighter-class...",
-        "magician": "Critical hit roll for magician-class...",
-        "thief": "Critical hit roll for thief-class...",
-        "npc": "Critical hit roll for npc/monster...",
-        "other": "Critical hit roll for cleric/thief/monster..."
-      }
-    },
-    "roll": "Roll",
-    "rollFormula": "Roll Formula",
-    "rollExample": "e.g. 1d6+1",
-    "attackRoll": "Attack Roll",
-    "checkRoll": "Check Roll",
-    "target": "Target",
-    "rollMode": "Roll Mode",
-    "blindRoll": "Blind Roll",
-    "sitMod": "Situational Modifier",
-    "bonus": "Bonus",
-    "true": "True",
-    "false": "False",
-    "dataLabel": {
-      "basicMeleeAtk": "Basic melee attack",
-      "attackWith": "Attack with",
-      "castSpell": "Cast spell",
-      "hitDieRoll": "Hit Die + CN mod",
-      "deathSave": "Save vs. Death/Poison/Radiation",
-      "deviceSave": "Save vs. Device",
-      "xformSave": "Save vs. Transformation",
-      "avoidanceSave": "Avoidance Save",
-      "sorcerySave": "Save vs. Sorcery",
-      "check": "check",
-      "caCheck": "Casting Ability check",
-      "taCheck": "Turn Undead check",
-      "spells": "Spells",
-      "spellsPerDay": "Spells/Day",
-      "friendlyName": "Friendly Name",
-      "itemId": "Item ID",
-      "containerId": "Container ID",
-      "containedItemIds": "Contained Item IDs",
-      "bonusLvl1": "Level 1",
-      "bonusLvl2": "Level 2",
-      "bonusLvl3": "Level 3",
-      "bonusLvl4": "Level 4",
-      "lvl1": "L1",
-      "lvl2": "L2",
-      "lvl3": "L3",
-      "lvl4": "L4",
-      "lvl5": "L5",
-      "lvl6": "L6"
+    "HYP3E": {
+        "settings": {
+            "debugMessages": "Debug Messages",
+            "debugMessagesHint": "Enable additional debug logging and messages.",
+            "races": "Races",
+            "racesHint": "Human races in Hyperborea.",
+            "languages": "Languages",
+            "languagesHint": "Known/available languages in Hyperborea.",
+            "characterClasses": "Character Classes",
+            "characterClassesHint": "Character classes available to PCs and some NPCs.",
+            "autoCalcAc": "Auto-calculate Armour Class",
+            "autoCalcAcHint": "Use 'equipped' status of armour and shields to calculate AC. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
+            "enableAttrChecks": "Enable IN & WS concentration checks",
+            "enableAttrChecksHint": "This option allows players to click an attribute name to do a 3d6 concentration (roll-under) check. N.B.: This is an optional rule, and is disabled by default.",
+            "flipRollUnderMods": "Reverse situational modifiers on roll-under checks",
+            "flipRollUnderModsHint": "For roll-under checks, reverse the sign on situational modifiers so that a positive number is treated as a bonus (subtracted from the roll) and a negative number is treated as a penalty (added to the roll). Other modifiers applied from attributes or items are automatically handled this way.",
+            "isGroupInitiative": "Use group-based initiative",
+            "isGroupInitiativeHint": "Hyperborea 3rd Edition (as written) uses group-based initiative. Disabling this item reverts the system to Foundry's default behavior of individual initiative.",
+            "rerollInitiative": "Initiative persistence",
+            "rerollInitiativeHint": "Keeps, resets or rerolls initiative each round.",
+            "initiativeKeep": "Keep same for each round",
+            "initiativeReset": "Reset to blank each round",
+            "initiativeReroll": "Reroll each round",
+            "critHits": "Critical Hits",
+            "critHitsHint": "Show buttons to roll critical hits on natural 20.",
+            "critMiss": "Critical Misses / Xathoqqua’s Woe",
+            "critMissHint": "Show buttons to roll critical miss on natural 1."
+        },
+        "tabs": {
+            "abilities": "Abilities",
+            "combat": "Combat",
+            "spells": "Spells",
+            "effects": "Effects",
+            "items": "Items",
+            "description": "Description",
+            "details": "Details",
+            "attributes": "Attributes"
+        },
+        "headers": {
+            "name": "Name",
+            "attributes": "Attributes",
+            "exploration": "Exploration",
+            "taskResolution": "Task Resolution",
+            "movement": "Movement",
+            "classAbilities": "Class Abilities",
+            "fightingSkills": "Fighting Skills",
+            "combatStats": "Combat Stats",
+            "savingThrows": "Saving Throws",
+            "equipmentItems": "Equipment & Items",
+            "abilitiesItems": "Abilities & Items",
+            "weapons": "Weapons",
+            "armor": "Armour",
+            "weaponsAndArmor": "Weapons & Armour",
+            "items": "Items",
+            "ability": "Ability",
+            "atkRate": "Atk Rate",
+            "rof": "RoF",
+            "classRange": "Class/Range",
+            "wpnClass": "Wpn Class",
+            "atkMod": "Atk Mod",
+            "dmgMod": "Dmg Mod",
+            "damage": "Damage",
+            "weaponMastery": "Weapon Mastery",
+            "type": "Type",
+            "biography": "Biography",
+            "descNotes": "Description & Notes",
+            "effectsCond": "Effects & Conditions",
+            "attacksItems": "Attacks & Items",
+            "attacksWeapons": "Attacks & Weapons",
+            "encumbrance": "Encumbrance",
+            "money": "Money",
+            "treasure": "Treasure"
+        },
+        "details": {
+            "class": "Class",
+            "alignment": "Alignment",
+            "level": "Level",
+            "hitDie": "Hit Die",
+            "hitDice": "Hit Dice",
+            "rollHD": "Roll HP on create",
+            "rollHDLong": "Roll the NPCs HP when a token is created based on the HD",
+            "hd": "HD",
+            "xp": "XP",
+            "toNextLvl": "Next Level",
+            "primeAttr": "Prime Attr",
+            "hitPoints": "Hit Points",
+            "hp": "HP",
+            "race": "Race",
+            "gender": "Gender",
+            "age": "Age",
+            "religion": "Religion",
+            "height": "Height",
+            "weight": "Weight",
+            "hair": "Hair",
+            "eyes": "Eyes",
+            "complexion": "Complexion",
+            "secSkills": "Secondary Skills",
+            "languages": "Languages",
+            "physFeatures": "Physical Features"
+        },
+        "attributes": {
+            "str": {
+                "name": "Strength",
+                "abbrev": "ST",
+                "atkMod": "Melee Mod",
+                "dmgMod": "Dmg Mod",
+                "test": "Test of ST",
+                "feat": "Feat of ST",
+                "check": "Basic ST check"
+            },
+            "dex": {
+                "name": "Dexterity",
+                "abbrev": "DX",
+                "atkMod": "Missile Mod",
+                "defMod": "Def Mod",
+                "test": "Test of DX",
+                "feat": "Feat of DX",
+                "check": "Basic DX check"
+            },
+            "con": {
+                "name": "Constitution",
+                "abbrev": "CN",
+                "hpMod": "HP Mod",
+                "poisRadMod": "Pois/Rad Mod",
+                "traumaSurvive": "Trauma",
+                "test": "Test of CN",
+                "feat": "Feat of CN",
+                "check": "Basic CN check"
+            },
+            "int": {
+                "name": "Intelligence",
+                "abbrev": "IN",
+                "languages": "Languages",
+                "bonusSpells": "Bonus Spells",
+                "learnSpell": "Learn Spell",
+                "check": "IN concentration check"
+            },
+            "wis": {
+                "name": "Wisdom",
+                "abbrev": "WS",
+                "willMod": "Will Mod",
+                "bonusSpells": "Bonus Spells",
+                "learnSpell": "Learn Spell",
+                "check": "WS concentration check"
+            },
+            "cha": {
+                "name": "Charisma",
+                "abbrev": "CH",
+                "reaction": "Reaction",
+                "maxHenchmen": "Max Henchmen",
+                "turnUndead": "Turn Mod",
+                "check": "Basic CH check"
+            }
+        },
+        "saves": {
+            "death": {
+                "name": "Death",
+                "abbrev": "Death"
+            },
+            "transformation": {
+                "name": "Transformation",
+                "abbrev": "Xform"
+            },
+            "device": {
+                "name": "Devices",
+                "abbrev": "Device"
+            },
+            "avoidance": {
+                "name": "Avoidance",
+                "abbrev": "Avoid"
+            },
+            "sorcery": {
+                "name": "Sorcery",
+                "abbrev": "Sorcery"
+            }
+        },
+        "fightingAbility": "Fighting Ability",
+        "fa": "FA",
+        "unskilled": "Unskilled",
+        "wpnSkills": "Favoured Wpns",
+        "level4": "Level 4",
+        "level8": "Level 8",
+        "level12": "Level 12",
+        "castingAbility": "Casting Ability",
+        "ca": "CA",
+        "turningAbility": "Turning Ability",
+        "ta": "TA",
+        "explorationSkills": {
+            "listen": {
+                "name": "Listen at Door",
+                "abbrev": "Listen"
+            },
+            "pickLock": {
+                "name": "Pick Lock",
+                "abbrev": "Lock"
+            },
+            "findSecret": {
+                "name": "Find Secret Door",
+                "abbrev": "Secret Door"
+            },
+            "findTrap": {
+                "name": "Find Trap",
+                "abbrev": "Trap"
+            }
+        },
+        "taskResolution": {
+            "simple": {
+                "name": "Simple",
+                "abbrev": "Simpl.",
+                "hint": "Examples: Climbing natural/rough surface with light or no armour..."
+            },
+            "moderate": {
+                "name": "Moderate",
+                "abbrev": "Mod.",
+                "hint": "Examples: Climbing natural/rough surface with medium armour..."
+            },
+            "challenging": {
+                "name": "Challenging",
+                "abbrev": "Chall.",
+                "hint": "Examples: Climbing natural/rough surface with heavy armour; hear loud noise..."
+            },
+            "difficult": {
+                "name": "Difficult",
+                "abbrev": "Diff.",
+                "hint": "Examples: Non-thief hear quiet noise; find concealed or secret door..."
+            },
+            "veryDifficult": {
+                "name": "Very Difficult",
+                "abbrev": "V. Diff.",
+                "hint": "Examples: Non-thief pick lock; find trap..."
+            }
+        },
+        "movement": {
+            "base": {
+                "name": "Base Move",
+                "abbrev": "MV"
+            },
+            "exploration": {
+                "name": "Dungeon (ft/turn)",
+                "abbrev": "Explore"
+            },
+            "travel": {
+                "name": "Wilderness (mi/day)",
+                "abbrev": "Wilderness"
+            }
+        },
+        "otherMv": {
+            "name": "Other Movement",
+            "abbrev": "Other"
+        },
+        "alignment": "Alignment",
+        "size": "Size",
+        "encWild": "# Enc.",
+        "encLair": "# in Lair",
+        "morale": "Morale",
+        "xp": "XP Value",
+        "treasure": "Treasure Class",
+        "effect": {
+            "add": "Add Effect",
+            "create": "Create Effect",
+            "toggle": "Toogle Effect",
+            "source": "Source"
+        },
+        "feature": {
+            "add": "Add Feature"
+        },
+        "item": {
+            "add": "Add Item",
+            "edit": "Edit",
+            "delete": "Delete",
+            "show": "Show",
+            "equip": "Toggle Equip",
+            "equipped": "Equipped",
+            "consumable": "Consumable",
+            "ammunition": "Ammunition",
+            "container": "Container",
+            "cost": "Cost",
+            "qty": "Qty",
+            "weight": "Weight",
+            "location": "Location",
+            "incr": "Add",
+            "decr": "Subtract"
+        },
+        "spell": {
+            "addLvl": "Add Lvl",
+            "addSpell": "Add Spell",
+            "classes": "Classes",
+            "numMem": "# Mem",
+            "duration": "Duration",
+            "numAffected": "# Affected",
+            "save": "Save"
+        },
+        "money": {
+            "cp": "CP",
+            "sp": "SP",
+            "ep": "EP",
+            "gp": "GP",
+            "pp": "PP"
+        },
+        "weapon": {
+            "add": "Add Weapon",
+            "type": {
+                "melee": "Melee",
+                "missile": "Missile"
+            },
+            "range": "Range",
+            "atkType": "Atk Type",
+            "master": "Master",
+            "grandMaster": "Grandmaster"
+        },
+        "armor": {
+            "add": "Add Armour",
+            "type": {
+                "unarmored": "Unarmoured",
+                "light": "Light",
+                "medium": "Medium",
+                "heavy": "Heavy",
+                "shield": "Shield"
+            },
+            "wtClass": "Wt Class",
+            "armorClass": "Armour Class",
+            "ac": "AC",
+            "dr": "DR",
+            "dmgReduct": "Dmg Reduction",
+            "unarmored": "Unarmoured"
+        },
+        "attack": {
+            "add": "Add Attack",
+            "critMiss": {
+                "name": "Critical Miss",
+                "badMiss": "Bad miss",
+                "dropWeapon" : "Drop weapon: {feet} feet away to {direction}.",
+                "stumble": "Awkward stumble. One adjacent gets one free attack. No further attacks for rest of round.",
+                "tripFall" : "Trip and fall. Prone: -4 AC, no DX bonus for remainder of round and until next action.",
+                "hitAlly": "Hit ally: closest for melee, closest adjacent for ranged. Regular hit.",
+                "hitAllyCrit": "Hit ally: closest for melee, closest adjacent for ranged. <b>Critical Hit</b>.",
+                "hitSelf": "Hit self: Regular hit.",
+                "hitSelfCrit": "Hit self: <b>Critical Hit</b>.",
+                "cleric": "Critical miss roll for cleric-class...",
+                "fighter": "Critical miss roll for fighter-class...",
+                "magician": "Critical miss roll for magician-class...",
+                "thief": "Critical miss roll for thief-class...",
+                "npc": "Critical miss roll for npc/monster...",
+                "other": "Critical miss roll for cleric/thief/monster..."
+            },
+            "critHit": {
+                "cleric": "Critical hit roll for cleric-class...",
+                "fighter": "Critical hit roll for fighter-class...",
+                "magician": "Critical hit roll for magician-class...",
+                "thief": "Critical hit roll for thief-class...",
+                "npc": "Critical hit roll for npc/monster...",
+                "other": "Critical hit roll for cleric/thief/monster..."
+            }
+        },
+        "roll": "Roll",
+        "reroll": "Reroll",
+        "rollFormula": "Roll Formula",
+        "rollExample": "e.g. 1d6+1",
+        "attackRoll": "Attack Roll",
+        "checkRoll": "Check Roll",
+        "target": "Target",
+        "rollMode": "Roll Mode",
+        "blindRoll": "Blind Roll",
+        "sitMod": "Situational Modifier",
+        "bonus": "Bonus",
+        "true": "True",
+        "false": "False",
+        "dataLabel": {
+            "basicMeleeAtk": "Basic melee attack",
+            "attackWith": "Attack with",
+            "castSpell": "Cast spell",
+            "hitDieRoll": "Hit Die + CN mod",
+            "deathSave": "Save vs. Death/Poison/Radiation",
+            "deviceSave": "Save vs. Device",
+            "xformSave": "Save vs. Transformation",
+            "avoidanceSave": "Avoidance Save",
+            "sorcerySave": "Save vs. Sorcery",
+            "check": "check",
+            "caCheck": "Casting Ability check",
+            "taCheck": "Turn Undead check",
+            "spells": "Spells",
+            "spellsPerDay": "Spells/Day",
+            "friendlyName": "Friendly Name",
+            "itemId": "Item ID",
+            "containerId": "Container ID",
+            "containedItemIds": "Contained Item IDs",
+            "bonusLvl1": "Level 1",
+            "bonusLvl2": "Level 2",
+            "bonusLvl3": "Level 3",
+            "bonusLvl4": "Level 4",
+            "lvl1": "L1",
+            "lvl2": "L2",
+            "lvl3": "L3",
+            "lvl4": "L4",
+            "lvl5": "L5",
+            "lvl6": "L6"
+        },
+        "combat": {
+            "rollInitiative": "Group {group} rolls for Initiative!",
+            "initiative": "Initiative",
+            "setCombatantGroups": "Set Combatant Groups",
+            "setCombatantAsActive": "Set Combatant as Active",
+            "meleeDeclared": "Melee declared",
+            "missileDeclared": "Missile declared",
+            "magicDeclared": "Magic declared",
+            "moveDeclared": "Movement declared"
+        },
+        "actions": {
+            "melee": "Melee",
+            "missile": "Missile",
+            "magic": "Magic",
+            "movement": "Movement"
+        },
+        "colors": {
+            "green": "Green",
+            "red": "Red",
+            "yellow": "Yellow",
+            "purple": "Purple",
+            "blue": "Blue",
+            "orange": "Orange",
+            "white": "White"
+        }
     }
-  }
 }

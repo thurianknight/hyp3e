@@ -2,30 +2,42 @@
   "id": "hyp3e",
   "title": "Hyperborea 3rd Edition",
   "description": "The Hyperborea 3rd Edition system for FoundryVTT!",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "compatibility": {
-    "minimum": 11,
-    "verified": "12.328",
-    "maximum": 12
+    "minimum": "12",
+    "verified": "12.331",
+    "maximum": "12"
   },
-  "authors": [{
-    "name": "ThurianKnight"
-  }],
-  "esmodules": ["module/hyp3e.mjs"],
-  "styles": ["css/hyp3e.css"],
-  "scripts": [],
-  "packs": [],
+  "authors": [
+    {
+      "name": "ThurianKnight",
+      "email": "thurianknight@gmail.com",
+      "url": "https://github.com/thurianknight",
+      "flags": {}
+    },
+    {
+        "name": "wintersleepAI",
+        "flags": {}
+    },
+    {
+        "name": "Xander-Carroll",
+        "flags": {}
+    }
+  ],
+  "esmodules": [
+    "module/hyp3e.mjs"
+  ],
+  "styles": [
+    "css/hyp3e.css"
+  ],
   "languages": [
     {
       "lang": "en",
       "name": "English",
-      "path": "lang/en.json"
+      "path": "lang/en.json",
+      "flags": {}
     }
   ],
-  "grid": {
-    "distance": 5,
-    "units": "ft"
-  },
   "primaryTokenAttribute": "hp",
   "secondaryTokenAttribute": "None",
   "url": "https://github.com/thurianknight/hyp3e",

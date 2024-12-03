@@ -1,20 +1,29 @@
 export const HYP3E = {
-  get systemRoot() {
-    return `systems/${game.system.id}`
-  },
-  get assetsPath() {
-    return `${this.systemRoot}/assets`
-  },
-  get cssPath() {
-    return `${this.systemRoot}/css`;
-  },
-  get modulePath() {
-    return `${this.systemRoot}/module`;
-  },
-  get templatePath() {
-    return `${this.systemRoot}/templates`;
-  },
-
+    systemRoot() {
+        // return `systems/${game.system.id}`
+        return `systems/hyp3e`
+    },
+    get assetsPath() {
+        return `${this.systemRoot()}/assets`
+    },
+    get cssPath() {
+        return `${this.systemRoot()}/css`;
+    },
+    get modulePath() {
+        return `${this.systemRoot()}/module`;
+    },
+    get templatePath() {
+        return `${this.systemRoot()}/templates`;
+    },
+    colors: {
+        green: "HYP3E.colors.green",
+        red: "HYP3E.colors.red",
+        yellow: "HYP3E.colors.yellow",
+        purple: "HYP3E.colors.purple",
+        blue: "HYP3E.colors.blue",
+        orange: "HYP3E.colors.orange",
+        white: "HYP3E.colors.white",
+    },
 };
 
 /**
@@ -165,3 +174,5 @@ HYP3E.armorTypes = {
   "heavy": "HYP3E.armor.type.heavy",
   "shield": "HYP3E.armor.type.shield"
 };
+
+export default HYP3E;

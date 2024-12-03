@@ -18,7 +18,7 @@ export class Hyp3eDice {
       rollMode: rollMode
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("Basic/check roll dialog dataset: ", dataset) }
-    const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`
+    const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
     const dialogHtml = await renderTemplate(template, dialogData)
 
     // Roll dialog for item and ability checks
@@ -78,7 +78,7 @@ export class Hyp3eDice {
       rollMode: rollMode
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("Attack roll dialog dataset: ", dataset) }
-    const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`
+    const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
     const dialogHtml = await renderTemplate(template, dialogData)
 
     // Roll dialog for attacks
@@ -135,7 +135,7 @@ export class Hyp3eDice {
       rollMode: rollMode
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("Spellcasting roll dialog dataset: ", dataset) }
-    const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`
+    const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
     const dialogHtml = await renderTemplate(template, dialogData)
 
     // Roll dialog for casting spells
@@ -194,7 +194,7 @@ export class Hyp3eDice {
       rollMode: rollMode
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("Save roll dialog dataset: ", dataset) }
-    const template = `${HYP3E.systemRoot}/templates/dialog/roll-dialog.hbs`
+    const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
     const dialogHtml = await renderTemplate(template, dialogData)
 
     // Roll dialog for saving throws, with save modifiers
