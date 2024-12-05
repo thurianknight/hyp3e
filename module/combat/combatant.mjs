@@ -112,20 +112,31 @@ export class HYP3ECombatant extends Combatant {
 
     getInitiativeRoll(formula) {
         let term = formula || CONFIG.Combat.initiative.formula;
+        
+        // Get the actor's roll data now, so we can use the DX value
+        const rollData = this.actor?.getRollData() || {};
 
         // Movement overrides Melee, Missile, or Magic values for initiative
-        if (this.getFlag(game.system.id, "isMovement")) {
-            term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT}`;
+        // if (this.getFlag(game.system.id, "isMovement")) {
+            // term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT}`;
+        this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT : 0;
+        if (this.moveInit == 0) {
+            this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_VALUE_MELEE : 0;
+            this.missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_VALUE_MISSILE : 0;
+            this.magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_VALUE_MAGIC : 0;
         } else {
-            // These are mutually exclusive to each other
-            if (this.getFlag(game.system.id, "isMelee")) term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MELEE}`;
-            if (this.getFlag(game.system.id, "isMissile")) term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MISSILE}`;
-            if (this.getFlag(game.system.id, "isMagic")) term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MAGIC}`;    
+            this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_VALUE_MELEE : 0)/10;
+            this.missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_VALUE_MISSILE : 0)/10;
+            this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_VALUE_MAGIC : 0)/10;
         }
+        // Sum all the action values and add to term
+        term += `+ ${this.moveInit + this.meleeInit + this.missileInit + this.magicInit}`
+        // Add the actor's DX value
+        term += `+ ${(rollData.attributes?.dex?.value/1000)}`
         // if (this.isSlow) term = `${HYP3ECombatant.INITIATIVE_VALUE_SLOWED}`;
+
         // If defeated, initiative is set to this static value
         if (this.isDefeated) term += `${HYP3ECombatant.INITIATIVE_VALUE_DEFEATED}`;
-        const rollData = this.actor?.getRollData() || {};
         return new Roll(term, rollData);
     }
 

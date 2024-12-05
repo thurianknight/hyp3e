@@ -384,7 +384,7 @@ async function migrateWorld() {
                     }
                 }
                 console.log(`DX value: ${actor.system.dx}, update object: `, dex)
-                await actor.update(dex)
+                // await actor.update(dex)
             }
         }
 

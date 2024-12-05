@@ -52,7 +52,7 @@ export class HYP3ECombatTab extends CombatTracker {
             }
 
             // if (CONFIG.HYP3E.debugMessages) { console.log("Group Initiative Scores: ", game.combat.groupInitiativeScores) }
-            const initiative = game.combat.groupInitiativeScores.get(turn.group) ? game.combat.groupInitiativeScores.get(turn.group) : null
+            const initiative = game.combat.groupInitiativeScores?.get(turn.group) ? game.combat.groupInitiativeScores.get(turn.group) : null
 
             return [...arr, {
                 group: turn.group,
