@@ -375,7 +375,7 @@ async function applyHealthDrop(total, extraRoll = "") {
         // Change token status 
         if (newHealth <= 0) {
             if (actor.type == "character") {
-                if (newHealth <= 10) {
+                if (newHealth == 0) {
                     isDefeated = true;
                     isUnconscious = false;
                 } else {

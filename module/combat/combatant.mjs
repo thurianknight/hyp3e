@@ -4,22 +4,11 @@ export class HYP3ECombatant extends Combatant {
     static INITIATIVE_VALUE_MISSILE = 0.60
     static INITIATIVE_VALUE_MAGIC = 0.40
     static INITIATIVE_VALUE_MOVEMENT = 0.20
-    // static INITIATIVE_VALUE_SLOWED = -499;
     static INITIATIVE_VALUE_DEFEATED = -99;
   
     // ===========================================================================
     // BOOLEAN FLAGS
     // ===========================================================================
-
-    // get isCasting() {
-    //     return this.getFlag(game.system.id, "prepareSpell");
-    // }
-    // set isCasting(value) {
-    //     this.setFlag(game.system.id, 'prepareSpell', value)
-    // }
-    // get isSlow() {
-    //   return this.actor.system.isSlow;
-    // }
 
     get isMelee() {
         return this.getFlag(game.system.id, "isMelee");
@@ -105,6 +94,8 @@ export class HYP3ECombatant extends Combatant {
         
         // Get the actor's roll data now, so we can use the DX value
         const rollData = this.actor?.getRollData() || {};
+        const name = this.actor?.name || ""
+        if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data for initiative: ", rollData) }
 
         // Movement partially overrides the other combat actions for initiative order
         this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT : 0;
@@ -122,8 +113,9 @@ export class HYP3ECombatant extends Combatant {
         // Add the actor's DX value
         term += `+ ${(rollData.attributes?.dex?.value/1000)}`
 
-        // If defeated, initiative is set to this static value
-        if (this.isDefeated) term += `${HYP3ECombatant.INITIATIVE_VALUE_DEFEATED}`;
+        // If defeated, add this initiative penalty to force actor to the bottom of the list
+        if (this.isDefeated) term += `+ ${HYP3ECombatant.INITIATIVE_VALUE_DEFEATED}`;
+        if (CONFIG.HYP3E.debugMessages) { console.log(`${name} initiative roll terms: `, term) }
         return new Roll(term, rollData);
     }
 

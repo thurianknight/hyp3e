@@ -43,10 +43,10 @@ export class HYP3EGroupCombat extends HYP3ECombat {
             ...prev,
             [curr]: new Roll(HYP3EGroupCombat.FORMULA) 
         }), {});
-        if (CONFIG.HYP3E.debugMessages) { console.log("Roll Per Group: ", rollPerGroup) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Initiative roll per group: ", rollPerGroup) }
 
         const results = await this.#prepareGroupInitiativeDice(rollPerGroup);
-        if (CONFIG.HYP3E.debugMessages) { console.log("Group Initiative roll:", results) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Group initiative roll:", results) }
         
         // Add the combat action value to each combatant for initiative calculation
         this.combatants.forEach(c => {
@@ -62,6 +62,12 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                 c.missileInit = (c.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_VALUE_MISSILE : 0)/10;
                 c.magicInit = (c.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_VALUE_MAGIC : 0)/10;
             }
+            // If defeated, add this initiative penalty to force actor to the bottom of the group
+            if (c.isDefeated) {
+                c.defeatedInit = HYP3ECombatant.INITIATIVE_VALUE_DEFEATED;
+            } else {
+                c.defeatedInit = 0
+            }
         })
 
         const updates = this.combatants.map(
@@ -71,18 +77,18 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                                                 + c.moveInit
                                                 + c.meleeInit
                                                 + c.missileInit
-                                                + c.magicInit) * 1000) / 1000
+                                                + c.magicInit
+                                                + c.defeatedInit) * 1000) / 1000
                     })
         )
-        if (CONFIG.HYP3E.debugMessages) { console.log("Combatant updates: ", updates) }
-        if (CONFIG.HYP3E.debugMessages) { console.log("All Combatants: ", this.combatants) }
-
+        if (CONFIG.HYP3E.debugMessages) { console.log("All initiative updates: ", updates) }
         await this.updateEmbeddedDocuments("Combatant", updates);
 
         await this.#rollInitiativeUIFeedback(results);
         await this.activateCombatant(0);
+        // if (CONFIG.HYP3E.debugMessages) { console.log("All combatants: ", this.combatants) }
         if (CONFIG.HYP3E.debugMessages) { console.log("THIS Combat: ", this) }
-        if (CONFIG.HYP3E.debugMessages) { console.log("THIS Combat Turns: ", this.turns) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("THIS Combat Turns: ", this.turns) }
         return this;
     }
 
