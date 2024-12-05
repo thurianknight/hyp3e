@@ -212,6 +212,25 @@ export class Hyp3eActor extends Actor {
     }
   }
 
+  async rollMacro(itemUuid = null) {
+    const dropData = {
+      type: 'Item',
+      uuid: itemUuid
+    };
+    // Load the item from the uuid.
+    // wsAI not sure if geting the item this way is good or not.
+    Item.fromDropData(dropData).then(item => {
+      // Determine if the item loaded and if it's an owned item.
+      if (!item || !item.parent) {
+        const itemName = item?.name ?? itemUuid;
+        return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
+      }
+
+      // TODO Trigger the item roll
+      ui.notifications.info(`Hello World from ${this.name} for ${item.name}!`);
+    });
+}
+
   /**
    * Handle rolls from the actor sheet
    */
