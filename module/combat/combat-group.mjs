@@ -51,7 +51,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         // Add the combat action value to each combatant for initiative calculation
         this.combatants.forEach(c => {
             c.initRoll = results[c.group].initiative
-            // Movement overrides the other combat actions for initiative order
+            // Movement partially overrides the other combat actions for initiative order
             c.moveInit = c.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT : 0;
             if (c.moveInit == 0) {
                 c.meleeInit = c.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_VALUE_MELEE : 0;

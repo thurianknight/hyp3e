@@ -22,42 +22,32 @@ export class HYP3ECombatant extends Combatant {
     // }
 
     get isMelee() {
-        // return this.actor.system.isMelee;
         return this.getFlag(game.system.id, "isMelee");
     }
-    set isMelee(value) {
-        this.setFlag(game.system.id, 'isMelee', value)
-        // this.setFlag(game.system.id, 'isMissile', !value)
-        // this.setFlag(game.system.id, 'isMagic', !value)
-    }
+    // set isMelee(value) {
+    //     this.setFlag(game.system.id, 'isMelee', value)
+    // }
 
     get isMissile() {
-        // return this.actor.system.isMissile;
         return this.getFlag(game.system.id, "isMissile");
     }
-    set isMissile(value) {
-        this.setFlag(game.system.id, 'isMissile', value)
-        // this.setFlag(game.system.id, 'isMelee', !value)
-        // this.setFlag(game.system.id, 'isMagic', !value)
-    }
+    // set isMissile(value) {
+    //     this.setFlag(game.system.id, 'isMissile', value)
+    // }
 
     get isMagic() {
-        // return this.actor.system.isMagic;
         return this.getFlag(game.system.id, "isMagic");
     }
-    set isMagic(value) {
-        this.setFlag(game.system.id, 'isMagic', value)
-        // this.setFlag(game.system.id, 'isMelee', !value)
-        // this.setFlag(game.system.id, 'isMissile', !value)
-    }
+    // set isMagic(value) {
+    //     this.setFlag(game.system.id, 'isMagic', value)
+    // }
 
     get isMovement() {
-        // return this.actor.system.isMovement;
         return this.getFlag(game.system.id, "isMovement");
     }
-    set isMovement(value) {
-        this.setFlag(game.system.id, 'isMovement', value)
-    }
+    // set isMovement(value) {
+    //     this.setFlag(game.system.id, 'isMovement', value)
+    // }
 
     // Any actor is defeated if their HP go to zero or negative
     get isDefeated() {
@@ -116,9 +106,7 @@ export class HYP3ECombatant extends Combatant {
         // Get the actor's roll data now, so we can use the DX value
         const rollData = this.actor?.getRollData() || {};
 
-        // Movement overrides Melee, Missile, or Magic values for initiative
-        // if (this.getFlag(game.system.id, "isMovement")) {
-            // term += ` + ${HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT}`;
+        // Movement partially overrides the other combat actions for initiative order
         this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT : 0;
         if (this.moveInit == 0) {
             this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_VALUE_MELEE : 0;
@@ -133,7 +121,6 @@ export class HYP3ECombatant extends Combatant {
         term += `+ ${this.moveInit + this.meleeInit + this.missileInit + this.magicInit}`
         // Add the actor's DX value
         term += `+ ${(rollData.attributes?.dex?.value/1000)}`
-        // if (this.isSlow) term = `${HYP3ECombatant.INITIATIVE_VALUE_SLOWED}`;
 
         // If defeated, initiative is set to this static value
         if (this.isDefeated) term += `${HYP3ECombatant.INITIATIVE_VALUE_DEFEATED}`;
