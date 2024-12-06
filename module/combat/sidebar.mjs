@@ -30,16 +30,14 @@ export class HYP3ECombatTab extends CombatTracker {
         // @ts-expect-error - We don't have type data for the combat tracker turn object
         const turns = context.turns.map((turn) => {
             const combatant = game.combat.combatants.get(turn.id);
-            // turn.isSlowed = turn.initiative === `${HYP3ECombatant.INITIATIVE_VALUE_SLOWED}`
-            // turn.isCasting = !!combatant.getFlag(game.system.id, "prepareSpell");
-            // turn.isRetreating = !!combatant.getFlag(game.system.id, "moveInCombat");
             turn.isMelee = !!combatant.getFlag(game.system.id, "isMelee")
             turn.isMissile = !!combatant.getFlag(game.system.id, "isMissile")
             turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
             turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
             turn.isOwnedByUser = !!combatant.actor.isOwner;
             turn.group = combatant.group;
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Turn: `, turn) }
+            if (!isGroupInitiative) turn.initRoll = Math.floor(combatant.initiative)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Turn: `, turn) }
             return turn;
         });
 
