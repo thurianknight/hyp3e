@@ -16,7 +16,7 @@ Requires the _Hyperborea 3rd Edition_ role-playing game ruleset.<!-- END TEXT RE
 <!-- FOUNDRY-COMPATIBILITY-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fhyp3e&colorB=4aa94a)](https://forge-vtt.com/bazaar#package=hyp3e)
@@ -99,6 +99,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/thurianknight"><img src="https://avatars.githubusercontent.com/u/50419557?v=4" width="100px;" alt="ThurianKnight"/><br /><sub><b>ThurianKnight</b></sub></a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/wintersleepai"><img src="https://avatars.githubusercontent.com/u/88955427?v=4" width="100px;" alt="wintersleepAI"/><br /><sub><b>wintersleepAI</b></sub></a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/xander-carroll"><img src="https://avatars.githubusercontent.com/u/93937517?v=4" width="100px;" alt="Xander-Carroll"/><br /><sub><b>Xander-Carroll</b></sub></a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/vttred/ose"><img src="https://avatars.githubusercontent.com/u/74152737?s=200&v=4" width="100px;" alt="VTT Red & OSE Devs"/><br /><sub><b>VTT Red & OSE Devs</b></sub></a></td>
     </tr>
   </tbody>
 </table>
