@@ -237,8 +237,7 @@ Hooks.once("ready", async function() {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on("hotbarDrop", (bar, data, slot) => {
     createItemMacro(data, slot);
-    // TODO wsAI -- this use the custom macro
-    //return false;
+    return false;
   });
 
   /**
@@ -584,7 +583,7 @@ async function createItemMacro(data, slot) {
   const item = await Item.fromDropData(data);
 
   // Create the macro command using the uuid.
-  const command = `game.hyp3e.rollItemMacro("${data.uuid}");`;
+  const command = `game.hyp3e.rollItemMacro("${data.uuid}","${item.actor.id}");`;
   let macro = game.macros.find(m => (m.name === item.name) && (m.command === command));
   if (!macro) {
     macro = await Macro.create({
@@ -604,21 +603,38 @@ async function createItemMacro(data, slot) {
  * Get an existing item macro if one exists, otherwise create a new one.
  * @param {string} itemUuid
  */
-function rollItemMacro(itemUuid) {
-  // Reconstruct the drop data so that we can load the item.
-  const dropData = {
-    type: 'Item',
-    uuid: itemUuid
-  };
-  // Load the item from the uuid.
-  Item.fromDropData(dropData).then(item => {
-    // Determine if the item loaded and if it's an owned item.
-    if (!item || !item.parent) {
-      const itemName = item?.name ?? itemUuid;
-      return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
-    }
+function rollItemMacro(itemUuid, actorId=null) {
+  // wsAI: looks like actor could be retrieved from itemUuid, not sure cons/risks of that approach.
+  if (actorId == null){
+    // wsAI old way. should likely be removed if rollItemMacro is always created with actorId
+    // Reconstruct the drop data so that we can load the item.
+    const dropData = {
+      type: 'Item',
+      uuid: itemUuid
+    };
+    // Load the item from the uuid.
+    Item.fromDropData(dropData).then(item => {
+      // Determine if the item loaded and if it's an owned item.
+      if (!item || !item.parent) {
+        const itemName = item?.name ?? itemUuid;
+        return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
+      }
 
-    // Trigger the item roll
-    item.roll();
-  });
+      // Trigger the item roll
+      item.roll();
+    });
+  } else {
+    // wsAI note above, might be better to get actor from the Item object.
+    const actor = game.actors.get(actorId);
+    // wsAI: some of the helper logic in the actor.rollMacro function could be moved here and the wrapper removed. 
+
+    // Ensure rollMacro is a function on the actor 
+    if (typeof actor.rollMacro === 'function') {
+      actor.rollMacro(itemUuid);
+    }
+    else {
+      ui.notifications.error("Actor does not have a roll function");
+    }
+  }
+
 }
