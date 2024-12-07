@@ -214,20 +214,67 @@ export class Hyp3eActor extends Actor {
 
   async rollMacro(itemUuid = null) {
     const dropData = {
-      type: 'Item',
-      uuid: itemUuid
+        type: 'Item',
+        uuid: itemUuid
     };
     // Load the item from the uuid.
     // wsAI not sure if geting the item this way is good or not.
     Item.fromDropData(dropData).then(item => {
-      // Determine if the item loaded and if it's an owned item.
-      if (!item || !item.parent) {
-        const itemName = item?.name ?? itemUuid;
-        return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
-      }
+        // Determine if the item loaded and if it's an owned item.
+        if (!item || !item.parent) {
+            const itemName = item?.name ?? itemUuid;
+            return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
+        }
 
-      // TODO Trigger the item roll
-      ui.notifications.info(`Hello World from ${this.name} for ${item.name}!`);
+        // Trigger the item roll
+        // ui.notifications.info(`Hello World from ${this.name} for ${item.name}!`);
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Macro actor: `, this) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Macro item: `, item) }
+
+        // Create dataset object and start populating it
+        let dataset = {}
+        dataset.itemId = item.id
+        dataset.baseClass = this.system.baseClass
+        dataset.roll = item.system.formula
+        dataset.rollType = 'item'
+        // itemName is used in the label string
+        let itemName = ""
+        if (item.system.friendlyName != "") {
+            itemName = item.system.friendlyName
+        } else {
+            itemName = item.name
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling macro for ${item.type} ${itemName}:`, item) }
+
+        if (item.type == "weapon") {
+            // The default for weapons is an attack
+            let mastery = "Attack"
+            if (item.system.wpnGrandmaster) {
+                mastery = "Grandmaster attack"
+            } else if (item.system.wpnMaster) {
+                mastery = "Master attack"
+            }
+            dataset.label = `${mastery} with ${itemName}`
+            // Execute the weapon roll
+            this.rollAttackOrSpell(dataset)
+
+        } else if (item.type == "spell") {
+            // The default for spells is to cast
+            dataset.label = `Cast spell ${itemName}`
+            if (item.system.formula == "" || item.system.formula == undefined) {
+                dataset.details = `No attack roll required to cast ${itemName}.`
+            }
+            // Execute the spell roll
+            this.rollAttackOrSpell(dataset)
+
+        } else {  // ==> Neither a weapon nor a spell
+            // The default for other item types (i.e. class abilities or actual items) is a check
+            dataset.label = `${itemName} check`
+            dataset.rollTarget = item.system.tn
+            // Execute the item check roll
+            this.rollCheck(dataset)
+        }
+
     });
 }
 

@@ -604,37 +604,35 @@ async function createItemMacro(data, slot) {
  * @param {string} itemUuid
  */
 function rollItemMacro(itemUuid, actorId=null) {
-  // wsAI: looks like actor could be retrieved from itemUuid, not sure cons/risks of that approach.
-  if (actorId == null){
-    // wsAI old way. should likely be removed if rollItemMacro is always created with actorId
-    // Reconstruct the drop data so that we can load the item.
-    const dropData = {
-      type: 'Item',
-      uuid: itemUuid
-    };
-    // Load the item from the uuid.
-    Item.fromDropData(dropData).then(item => {
-      // Determine if the item loaded and if it's an owned item.
-      if (!item || !item.parent) {
-        const itemName = item?.name ?? itemUuid;
-        return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
-      }
+    // wsAI: looks like actor could be retrieved from itemUuid, not sure cons/risks of that approach.
+    if (actorId == null){
+        // wsAI old way. should likely be removed if rollItemMacro is always created with actorId
+        // Reconstruct the drop data so that we can load the item.
+        const dropData = {
+            type: 'Item',
+            uuid: itemUuid
+        };
+        // Load the item from the uuid.
+        Item.fromDropData(dropData).then(item => {
+            // Determine if the item loaded and if it's an owned item.
+            if (!item || !item.parent) {
+                const itemName = item?.name ?? itemUuid;
+                return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
+            }
+            // Trigger the item roll
+            item.roll();
+        });
+    } else {
+        // wsAI note above, might be better to get actor from the Item object.
+        const actor = game.actors.get(actorId);
+        // wsAI: some of the helper logic in the actor.rollMacro function could be moved here and the wrapper removed. 
 
-      // Trigger the item roll
-      item.roll();
-    });
-  } else {
-    // wsAI note above, might be better to get actor from the Item object.
-    const actor = game.actors.get(actorId);
-    // wsAI: some of the helper logic in the actor.rollMacro function could be moved here and the wrapper removed. 
-
-    // Ensure rollMacro is a function on the actor 
-    if (typeof actor.rollMacro === 'function') {
-      actor.rollMacro(itemUuid);
+        // Ensure rollMacro is a function on the actor 
+        if (typeof actor.rollMacro === 'function') {
+            actor.rollMacro(itemUuid);
+        } else {
+            ui.notifications.error("Actor does not have a roll function");
+        }
     }
-    else {
-      ui.notifications.error("Actor does not have a roll function");
-    }
-  }
 
 }
