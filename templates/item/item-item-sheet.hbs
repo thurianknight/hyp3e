@@ -71,9 +71,7 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
-        {{log 'User is GM? 'isGM}}
         {{#if isGM}}
-        {{!-- {{#if rollData.isGM}} --}}
         {{!-- <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
         <input type="text" name="system.formula" value="{{system.formula}}" disabled/> --}}
         {{/if}}
@@ -100,8 +98,6 @@
           <input id="system.isContainer" name="system.isContainer" type="checkbox" {{checked system.isContainer}}>
           <div class="flex-xlarge">The Container tag allows this item to contain other non-container items.</div>
         </div>
-        {{!-- <label class="resource-label">{{localize 'HYP3E.dataLabel.containedItemIds'}}</label>
-        <input type="text" name="system.itemIds" value="{{system.itemIds}}"/> --}}
       </div>
     </div>
   </section>

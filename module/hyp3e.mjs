@@ -606,22 +606,23 @@ async function createItemMacro(data, slot) {
 function rollItemMacro(itemUuid, actorId=null) {
     // wsAI: looks like actor could be retrieved from itemUuid, not sure cons/risks of that approach.
     if (actorId == null){
-        // wsAI old way. should likely be removed if rollItemMacro is always created with actorId
-        // Reconstruct the drop data so that we can load the item.
-        const dropData = {
-            type: 'Item',
-            uuid: itemUuid
-        };
-        // Load the item from the uuid.
-        Item.fromDropData(dropData).then(item => {
-            // Determine if the item loaded and if it's an owned item.
-            if (!item || !item.parent) {
-                const itemName = item?.name ?? itemUuid;
-                return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
-            }
-            // Trigger the item roll
-            item.roll();
-        });
+        return ui.notifications.warn(`Could not find actor for item ${itemUuid}. You may need to delete and recreate this macro.`);
+        // // wsAI old way. should likely be removed if rollItemMacro is always created with actorId
+        // // Reconstruct the drop data so that we can load the item.
+        // const dropData = {
+        //     type: 'Item',
+        //     uuid: itemUuid
+        // };
+        // // Load the item from the uuid.
+        // Item.fromDropData(dropData).then(item => {
+        //     // Determine if the item loaded and if it's an owned item.
+        //     if (!item || !item.parent) {
+        //         const itemName = item?.name ?? itemUuid;
+        //         return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
+        //     }
+        //     // Trigger the item roll
+        //     item.roll();
+        // });
     } else {
         // wsAI note above, might be better to get actor from the Item object.
         const actor = game.actors.get(actorId);

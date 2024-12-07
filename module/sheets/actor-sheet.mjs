@@ -637,40 +637,42 @@ export class Hyp3eActorSheet extends ActorSheet {
           const itemId = element.closest('.item').dataset.itemId
           // Set item ID in roll dataset
           dataset.itemId = itemId
+          // Roll the item
+          this.actor.rollItem(dataset)
 
-          // Get item object and apply values to dataset
-          const item = this.actor.items.get(itemId)
-          dataset.roll = item.system.formula
-          let itemName = ""
-          if (item.system.friendlyName != "") {
-            itemName = item.system.friendlyName
-          } else {
-            itemName = item.name
-          }
-          if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
-          if (item.type == "weapon") {
-            // The default for weapons is an attack
-            let mastery = "Attack"
-            if (item.system.wpnGrandmaster) {
-              mastery = "Grandmaster attack"
-            } else if (item.system.wpnMaster) {
-              mastery = "Master attack"
-            }
-            dataset.label = `${mastery} with ${itemName}`
-            this.actor.rollAttackOrSpell(dataset)
-          } else if (item.type == "spell") {
-            // The default for spells is to cast
-            dataset.label = `Cast spell ${itemName}`
-            if (item.system.formula == "" || item.system.formula == undefined) {
-              dataset.details = `No attack roll required to cast ${itemName}.`
-            }
-            this.actor.rollAttackOrSpell(dataset)
-          } else {  // ==> Neither a weapon nor a spell
-            // The default for other item types (i.e. class abilities or actual items) is a check
-            dataset.label = `${itemName} check`
-            dataset.rollTarget = item.system.tn
-            this.actor.rollCheck(dataset)
-          }
+        //   // Get item object and apply values to dataset
+        //   const item = this.actor.items.get(itemId)
+        //   dataset.roll = item.system.formula
+        //   let itemName = ""
+        //   if (item.system.friendlyName != "") {
+        //     itemName = item.system.friendlyName
+        //   } else {
+        //     itemName = item.name
+        //   }
+        //   if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
+        //   if (item.type == "weapon") {
+        //     // The default for weapons is an attack
+        //     let mastery = "Attack"
+        //     if (item.system.wpnGrandmaster) {
+        //       mastery = "Grandmaster attack"
+        //     } else if (item.system.wpnMaster) {
+        //       mastery = "Master attack"
+        //     }
+        //     dataset.label = `${mastery} with ${itemName}`
+        //     this.actor.rollAttackOrSpell(dataset)
+        //   } else if (item.type == "spell") {
+        //     // The default for spells is to cast
+        //     dataset.label = `Cast spell ${itemName}`
+        //     if (item.system.formula == "" || item.system.formula == undefined) {
+        //       dataset.details = `No attack roll required to cast ${itemName}.`
+        //     }
+        //     this.actor.rollAttackOrSpell(dataset)
+        //   } else {  // ==> Neither a weapon nor a spell
+        //     // The default for other item types (i.e. class abilities or actual items) is a check
+        //     dataset.label = `${itemName} check`
+        //     dataset.rollTarget = item.system.tn
+        //     this.actor.rollCheck(dataset)
+        //   }
           break
   
         case "check":

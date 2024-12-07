@@ -212,6 +212,39 @@ export class Hyp3eActor extends Actor {
     }
   }
 
+  async rollItem(dataset) {
+    // Get item info to execute a standard roll
+
+    const item = this.items.get(dataset.itemId)
+    dataset.roll = item.system.formula
+    let itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
+
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
+    if (item.type == "weapon") {
+        // The default for weapons is an attack
+        let mastery = "Attack"
+        if (item.system.wpnGrandmaster) {
+            mastery = "Grandmaster attack"
+        } else if (item.system.wpnMaster) {
+            mastery = "Master attack"
+        }
+        dataset.label = `${mastery} with ${itemName}`
+        this.rollAttackOrSpell(dataset)
+    } else if (item.type == "spell") {
+        // The default for spells is to cast
+        dataset.label = `Cast spell ${itemName}`
+        if (item.system.formula == "" || item.system.formula == undefined) {
+            dataset.details = `No attack roll required to cast ${itemName}.`
+        }
+        this.rollAttackOrSpell(dataset)
+    } else {  // ==> Neither a weapon nor a spell
+        // The default for other item types (i.e. class abilities or actual items) is a check
+        dataset.label = `${itemName} check`
+        dataset.rollTarget = item.system.tn
+        this.rollCheck(dataset)
+    }
+  }
+
   async rollMacro(itemUuid = null) {
     const dropData = {
         type: 'Item',
@@ -227,9 +260,9 @@ export class Hyp3eActor extends Actor {
         }
 
         // Trigger the item roll
-        // ui.notifications.info(`Hello World from ${this.name} for ${item.name}!`);
         if (CONFIG.HYP3E.debugMessages) { console.log(`Macro actor: `, this) }
         if (CONFIG.HYP3E.debugMessages) { console.log(`Macro item: `, item) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling macro for ${item.type} ${item.name}:`, item) }
 
         // Create dataset object and start populating it
         let dataset = {}
@@ -237,43 +270,46 @@ export class Hyp3eActor extends Actor {
         dataset.baseClass = this.system.baseClass
         dataset.roll = item.system.formula
         dataset.rollType = 'item'
+        // Execute the item roll
+        this.rollItem(dataset)
+        
         // itemName is used in the label string
-        let itemName = ""
-        if (item.system.friendlyName != "") {
-            itemName = item.system.friendlyName
-        } else {
-            itemName = item.name
-        }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling macro for ${item.type} ${itemName}:`, item) }
+        // let itemName = ""
+        // if (item.system.friendlyName != "") {
+        //     itemName = item.system.friendlyName
+        // } else {
+        //     itemName = item.name
+        // }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling macro for ${item.type} ${itemName}:`, item) }
 
-        if (item.type == "weapon") {
-            // The default for weapons is an attack
-            let mastery = "Attack"
-            if (item.system.wpnGrandmaster) {
-                mastery = "Grandmaster attack"
-            } else if (item.system.wpnMaster) {
-                mastery = "Master attack"
-            }
-            dataset.label = `${mastery} with ${itemName}`
-            // Execute the weapon roll
-            this.rollAttackOrSpell(dataset)
+        // if (item.type == "weapon") {
+        //     // The default for weapons is an attack
+        //     let mastery = "Attack"
+        //     if (item.system.wpnGrandmaster) {
+        //         mastery = "Grandmaster attack"
+        //     } else if (item.system.wpnMaster) {
+        //         mastery = "Master attack"
+        //     }
+        //     dataset.label = `${mastery} with ${itemName}`
+        //     // Execute the weapon roll
+        //     this.rollAttackOrSpell(dataset)
 
-        } else if (item.type == "spell") {
-            // The default for spells is to cast
-            dataset.label = `Cast spell ${itemName}`
-            if (item.system.formula == "" || item.system.formula == undefined) {
-                dataset.details = `No attack roll required to cast ${itemName}.`
-            }
-            // Execute the spell roll
-            this.rollAttackOrSpell(dataset)
+        // } else if (item.type == "spell") {
+        //     // The default for spells is to cast
+        //     dataset.label = `Cast spell ${itemName}`
+        //     if (item.system.formula == "" || item.system.formula == undefined) {
+        //         dataset.details = `No attack roll required to cast ${itemName}.`
+        //     }
+        //     // Execute the spell roll
+        //     this.rollAttackOrSpell(dataset)
 
-        } else {  // ==> Neither a weapon nor a spell
-            // The default for other item types (i.e. class abilities or actual items) is a check
-            dataset.label = `${itemName} check`
-            dataset.rollTarget = item.system.tn
-            // Execute the item check roll
-            this.rollCheck(dataset)
-        }
+        // } else {  // ==> Neither a weapon nor a spell
+        //     // The default for other item types (i.e. class abilities or actual items) is a check
+        //     dataset.label = `${itemName} check`
+        //     dataset.rollTarget = item.system.tn
+        //     // Execute the item check roll
+        //     this.rollCheck(dataset)
+        // }
 
     });
 }
@@ -372,11 +408,7 @@ export class Hyp3eActor extends Actor {
     let label = `${dataset.label}...`
     // Get the item's friendly name if it has one
     if (item) {
-      if (item.system.friendlyName != "") {
-        itemName = item.system.friendlyName
-      } else {
-        itemName = item.name
-      }    
+        itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
     }
     // This is needed for Turn Undead results
     let turnUndeadHtml = ""
@@ -476,11 +508,7 @@ export class Hyp3eActor extends Actor {
     
     if (item) {
       // Get the item's friendly name if it has one
-      if (item.system.friendlyName != "") {
-        itemName = item.system.friendlyName
-      } else {
-        itemName = item.name
-      }
+      itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
     }
 
     // Show the roll dialog (type and item-dependent)

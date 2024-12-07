@@ -1,3 +1,4 @@
+
 /**
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
@@ -138,15 +139,7 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Now do some useful stuff!
     try {
-      // THIS IS ON HOLD FOR NOW. The plan is to use macros in the Description field if desired, 
-      //  but also to include these macros as buttons in the Chat window when the display function 
-      //  is triggered. Then the user can click whatever bottons are available for Damage, Checks, etc.
-
-      // let item = this.object ?? null;
-      // if (item) {
-      //   console.log(item)
-      //   item.roll()
-      // }
+        // We don't really use rollable buttons or links on the item sheets.
     } catch(err) {
       // Log the error
       console.log(err)

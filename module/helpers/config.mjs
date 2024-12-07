@@ -77,24 +77,6 @@ HYP3E.saveAbbreviations = {
 };
 
 /**
- * The four basic exploration skills for any character class
- * @type {Object}
- */
-// HYP3E.explorationSkills = {
-//   "listen": "HYP3E.explorationSkills.listen.name",
-//   "pickLock": "HYP3E.explorationSkills.pickLock.name",
-//   "secretDoor": "HYP3E.explorationSkills.findSecret.name",
-//   "findTrap": "HYP3E.explorationSkills.findTrap.name"
-// };
-
-// HYP3E.explorationAbbreviations = {
-//   "listen": "HYP3E.explorationSkills.listen.abbrev",
-//   "pickLock": "HYP3E.explorationSkills.pickLock.abbrev",
-//   "secretDoor": "HYP3E.explorationSkills.findSecret.abbrev",
-//   "findTrap": "HYP3E.explorationSkills.findTrap.abbrev"
-// };
-
-/**
  * d6 task resolution difficulty levels
  * @type {Object}
  */
