@@ -1,3 +1,4 @@
+import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -43,6 +44,9 @@ export class Hyp3eItemSheet extends ItemSheet {
       context.rollData = actor.getRollData()
       // context.rollData.isGM = game.user.isGM
     }
+
+    // Prepare active effects
+    context.effects = prepareActiveEffectCategories(this.item.effects);
 
     // Add the item's data to context.data for easier access, as well as flags.
     context.system = itemData.system;
@@ -119,7 +123,10 @@ export class Hyp3eItemSheet extends ItemSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Weapon Mastery click: ", mastery) }
       this._updateWpnMastery(mastery)
     });
-    
+
+    // Active Effect management
+    html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.item));
+
   }
 
   /**

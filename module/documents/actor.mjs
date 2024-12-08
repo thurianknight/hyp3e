@@ -108,7 +108,7 @@ export class Hyp3eActor extends Actor {
                   tempAC = obj.system.ac
                 }
                 if (CONFIG.HYP3E.debugMessages) { 
-                  console.log("Armor equipped: ", obj.name, ", Temp AC: ", tempAC, ", Temp DR: ", tempDR)
+                  console.log("Armor equipped: ", obj.name, ", Base AC: ", tempAC, ", Base DR: ", tempDR)
                 }
               } else {
                 // Shield AC is a modifier subtracted from base AC.
