@@ -1,4 +1,4 @@
-<p align="center" background="#FFF">
+<p align="center" style="background-color: #ffffff">
   <a href="https://foundryvtt.com/packages/hyp3e/">
     <img alt="Official HYPERBOREA 3rd Edition on Foundry VTT logo" src="https://github.com/thurianknight/hyp3e/blob/main/assets/hyp3e-metal.png" width="256" />
   </a>
@@ -11,8 +11,8 @@
 Requires the _Hyperborea 3rd Edition_ role-playing game ruleset.<!-- END TEXT REQUIRED BY LICENSE --> Find the game at the [North Wind Adventures website](https://www.hyperborea.tv/).
 
 <!-- FOUNDRY-COMPATIBILITY-BADGE:START - Do not remove or modify this section -->
-![Foundry v11](https://img.shields.io/badge/foundry-v11-green) up to release 1.0.5, 
-![Foundry v12](https://img.shields.io/badge/foundry-v12-green)
+![Foundry v12](https://img.shields.io/badge/foundry-v12-green)  
+![Foundry v11](https://img.shields.io/badge/foundry-v11-green) (up to release 1.0.5)
 <!-- FOUNDRY-COMPATIBILITY-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
