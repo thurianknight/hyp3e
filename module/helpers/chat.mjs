@@ -135,29 +135,10 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 baseClassLabel = "NPC"
             }
             const icon = "fa-user-slash";
-
-            // const critMissButtonFighter = $(long_button('miss','Fighter', icon));
-            // const critMissButtonMage = $(long_button('miss','Magician', icon));
-            // const critMissButtonOther = $(long_button('miss','Cleric/Thief/Monster', icon));
             const critMissButton = $(long_button('miss',`Roll Critical Miss for ${baseClassLabel}-class`, icon));
-
-            // critMiss.append(critMissButtonFighter);
-            // critMiss.append(critMissButtonMage);
-            // critMiss.append(critMissButtonOther);
             critMiss.append(critMissButton);
 
-            // critMissButtonFighter.on("click", (ev) => {
-            //     ev.stopPropagation();
-            //     rollCritMiss("fighter");
-            // });
-            // critMissButtonMage.on("click", (ev) => {
-            //     ev.stopPropagation();
-            //     rollCritMiss("magician");
-            // });
-            // critMissButtonOther.on("click", (ev) => {
-            //     ev.stopPropagation();
-            //     rollCritMiss("other");
-            // });
+            // Handle button clicks
             critMissButton.on("click", (ev) => {
                 ev.stopPropagation();
                 rollCritMiss(baseClass);
@@ -175,29 +156,10 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 baseClassLabel = "NPC"
             }
             const icon = "fa-user";
-
-            // const critHitButtonFighter = $(long_button('hit','Fighter', icon));
-            // const critHitButtonMage = $(long_button('hit','Magician', icon));
-            // const critHitButtonOther = $(long_button('hit','Cleric/Thief/Monster', icon));
             const critHitButton = $(long_button('hit',`Roll Critical Hit for ${baseClassLabel}-class`, icon));
-
-            // critHit.append(critHitButtonFighter);
-            // critHit.append(critHitButtonMage);
-            // critHit.append(critHitButtonOther);
             critHit.append(critHitButton);
 
-            // critHitButtonFighter.on("click", (ev) => {
-            //     ev.stopPropagation();
-            //     rollCritHit("fighter");
-            // });
-            // critHitButtonMage.on("click", (ev) => {
-            //     ev.stopPropagation();
-            //     rollCritHit("magician");
-            // });
-            // critHitButtonOther.on("click", (ev) => {
-            //     ev.stopPropagation();
-            //     rollCritHit("other");
-            // });
+            // Handle button clicks
             critHitButton.on("click", (ev) => {
                 ev.stopPropagation();
                 rollCritHit(baseClass);

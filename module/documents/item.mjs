@@ -692,9 +692,6 @@ export class Hyp3eItem extends Item {
                     content += `<p># Affected: ${item.system.affected}</p>`
                 }
             }
-            // if (item.system.save) {
-            //     content += `<p> Save: ${item.system.save}</p>`
-            // }
             if (item.system.damage) {
                 if (Roll.validate(item.system.damage)) {
                     // Resolve damage string & variables to a rollable formula
@@ -703,6 +700,8 @@ export class Hyp3eItem extends Item {
                 } else {
                     content += `<p>Damage: ${item.system.damage}</p>`
                 }
+            } else {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll for spell ${item.name}, ${item.system.damage}, is not rollable.`) }
             }
             if (item.system.save && item.system.save !== "") {
                 content += `<div class='save-button' data-save='${item.system.save}'></div>`;
