@@ -53,13 +53,6 @@ export class Hyp3eActor extends Actor {
     // Make modifications to data here. For example:
     const systemData = actorData.system;
 
-    // Loop through attribute scores, and add their modifiers to our sheet output.
-    for (let [key, attribute] of Object.entries(systemData.attributes)) {
-      // Example of how to calculate the modifier using d20 rules.
-      //attribute.mod = Math.floor((attribute.value - 10) / 2);
-      // NOTHING TO DO HERE...
-    }
-
     // Calculated fields go here...
 
     // Add base class, used for crit hit & crit miss tables
@@ -115,7 +108,7 @@ export class Hyp3eActor extends Actor {
                   tempAC = obj.system.ac
                 }
                 if (CONFIG.HYP3E.debugMessages) { 
-                  console.log("Armor equipped: ", obj.name, ", Temp AC: ", tempAC, ", Temp DR: ", tempDR)
+                  console.log("Armor equipped: ", obj.name, ", Base AC: ", tempAC, ", Base DR: ", tempDR)
                 }
               } else {
                 // Shield AC is a modifier subtracted from base AC.
@@ -208,6 +201,8 @@ export class Hyp3eActor extends Actor {
     if (data.type == "character") {
       this.updateSource({
         "prototypeToken.actorLink": true,
+        "prototypeToken.sight.enabled": true,
+        "prototypeToken.disposition": 0
       });
     }
   }

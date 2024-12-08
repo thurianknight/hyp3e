@@ -8,7 +8,7 @@ import HYP3E from "./config.mjs"
 export const preloadHandlebarsTemplates = async function() {
     return loadTemplates([
 
-        // Actor partials.
+        // Actor partials
         `${HYP3E.templatePath}/actor/parts/actor-abilities.hbs`,
         `${HYP3E.templatePath}/actor/parts/actor-attributes.hbs`,
         `${HYP3E.templatePath}/actor/parts/actor-combat.hbs`,
@@ -18,6 +18,9 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/actor/parts/actor-description.hbs`,
         `${HYP3E.templatePath}/actor/parts/npc-all-items.hbs`,
         `${HYP3E.templatePath}/actor/parts/npc-abilities.hbs`,
+
+        // Item partials
+        `${HYP3E.templatePath}/item/parts/item-effects.hbs`,
 
         // chat templates
         `${HYP3E.templatePath}/chat/apply-damage.hbs`,

@@ -10,6 +10,7 @@
   <nav class="sheet-tabs tabs" data-group="primary">
     <a class="item" data-tab="description">{{localize 'HYP3E.tabs.details'}}</a>
     <a class="item" data-tab="attributes">{{localize 'HYP3E.tabs.attributes'}}</a>
+    <a class="item" data-tab="effects">{{localize 'HYP3E.tabs.effects'}}</a>
   </nav>
 
   {{!-- Sheet Body --}}
@@ -29,12 +30,6 @@
           <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
           <label class="resource-label">{{localize 'HYP3E.target'}}</label>
           <input type="text" name="system.tn" value="{{system.tn}}" data-dtype="String"/>
-          {{!-- <label class="resource-label">{{localize 'HYP3E.blindRoll'}}</label>
-          <input type="text" name="system.blindRoll" value="{{system.blindRoll}}" data-dtype="String" disabled/> --}}
-          {{!-- <select name="system.blindRoll">
-            <option value=""></option>
-            {{selectOptions blindRollOpts selected=system.blindRoll localize=true}}
-          </select> --}}
           <label class="resource-label">{{localize "HYP3E.rollMode"}}</label>
           <select name="system.rollMode">
             <option value=""></option>
@@ -63,9 +58,7 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
-        {{log 'User is GM? 'isGM}}
         {{#if isGM}}
-        {{!-- {{#if rollData.isGM}} --}}
         {{!-- <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
         <input type="text" name="system.formula" value="{{system.formula}}" disabled/> --}}
         {{/if}}
@@ -74,7 +67,15 @@
         <label class="resource-label">{{localize 'HYP3E.dataLabel.itemId'}}</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
       </div>
-  </div>
+    </div>
+    
+    {{!-- Effects Tab --}}
+    <div class="tab effects" data-group="primary" data-tab="effects">
+      {{!-- As you add new fields, add them in here! --}}
+      <div class="flex description-block">
+        {{> "systems/hyp3e/templates/item/parts/item-effects.hbs"}}
+      </div>
+    </div>
   </section>
 
 </form>
