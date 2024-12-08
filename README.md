@@ -11,7 +11,7 @@
 Requires the _Hyperborea 3rd Edition_ role-playing game ruleset.<!-- END TEXT REQUIRED BY LICENSE --> Find the game at the [North Wind Adventures website](https://www.hyperborea.tv/).
 
 <!-- FOUNDRY-COMPATIBILITY-BADGE:START - Do not remove or modify this section -->
-![Foundry v11](https://img.shields.io/badge/foundry-v11-green)
+![Foundry v11](https://img.shields.io/badge/foundry-v11-green) up to release 1.0.5, 
 ![Foundry v12](https://img.shields.io/badge/foundry-v12-green)
 <!-- FOUNDRY-COMPATIBILITY-BADGE:END -->
 
@@ -39,6 +39,9 @@ https://github.com/thurianknight/hyp3e/releases/latest/download/system.json
 The Hyperborea 3rd Edition Content Compendium is a Foundry VTT premium module separate from the system. Find it within Foundry VTT's _module_ browser with the search term `hyperborea`.
 
 -->
+
+## System Variables in Formulas and Macros
+The file [VARIABLES.md](/VARIABLES.md) has a list of the most commonly-used variables. Consult this when creating any kind of attack/damage, spell rolls, and other macros. For a more exhaustive list (though undocumented), check the Combat Tracker Settings and read the Tracked Resources drop-down list.
 
 ## Troubleshooting and Requesting User Support
 
