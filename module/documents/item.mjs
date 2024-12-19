@@ -143,7 +143,7 @@ export class Hyp3eItem extends Item {
         // Chat message header text
         const label = `<h3>${typeLabel}: ${itemName}</h3>`
         
-        // console.log("Item clicked:", item)
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item clicked:", item) }
         let content = item.system.description
 
         // Setup clickable buttons for item properties if they have a roll macro,
@@ -216,9 +216,10 @@ export class Hyp3eItem extends Item {
             } else {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll for spell ${item.name}, ${item.system.damage}, is not rollable.`) }
             }
-            if (item.system.save && item.system.save !== "") {
-                content += `<div class='save-button' data-save='${item.system.save}'></div>`;
-            }
+        }
+        // Both spells and weapons might have a Saving Throw
+        if (item.system.save && item.system.save !== "") {
+            content += `<div class='save-button' data-save='${item.system.save}'></div>`;
         }
 
         // Item

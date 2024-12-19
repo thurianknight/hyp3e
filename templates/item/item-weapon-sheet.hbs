@@ -70,6 +70,13 @@
             <a class="weapon-mastery {{#unless system.wpnMaster}}no-bonus{{/unless}}" data-mastery="master" title='{{localize "HYP3E.weapon.master"}}'><i class="fas fa-sword"></i></a>
             <a class="weapon-mastery {{#unless system.wpnGrandmaster}}no-bonus{{/unless}}" data-mastery="grandMaster" title='{{localize "HYP3E.weapon.grandMaster"}}'><i class="fas fa-swords"></i></a>
           </div>
+          <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
+          <div class="form-fields">
+            <select name="system.save">
+              <option value=""></option>
+              {{selectOptions saveThrows selected=system.save localize=true}}
+            </select>
+          </div>
           <label class="resource-label">{{localize 'HYP3E.item.equipped'}}</label><br />
           <input name="system.equipped" type="checkbox" {{checked system.equipped}}>
         </div>

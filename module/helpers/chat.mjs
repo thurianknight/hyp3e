@@ -171,6 +171,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let save = html.find(".save-button");
     if (save.length > 0) {
         save.each((_i, b) => {
+            console.log(`Save html: `, b)
             let saveType = $(b).data('save');
             let saveButton = $(
                 `<button class=""><i class="fas fa-dice-d20" title="Click to roll save to selected token(s)."></i>Save: ${saveType}</button>`
