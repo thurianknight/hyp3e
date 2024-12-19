@@ -917,7 +917,8 @@ export class Hyp3eActor extends Actor {
         debugDmgRollFormula: debugDmgRollFormula,
         naturalDmgRoll: naturalDmgRoll,
         dmgBaseRoll: dmgBaseRoll,
-        sourceType: sourceItem.type
+        sourceType: sourceItem.type,
+        save: sourceItem.system.save
     };
 
     const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;
