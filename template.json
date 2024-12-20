@@ -269,6 +269,8 @@
             "dmgMod": 0,
             "wpnMaster": false,
             "wpnGrandmaster": false,
+            "isGrenade": false,
+            "isAreaEffect": false,
             "annotations": []
         }
     }

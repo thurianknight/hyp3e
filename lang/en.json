@@ -274,13 +274,20 @@
             "equipped": "Equipped",
             "consumable": "Consumable",
             "ammunition": "Ammunition",
+            "grenade": "Grenade/hurled item",
+            "areaEffect": "Area effect attack",
             "container": "Container",
             "cost": "Cost",
             "qty": "Qty",
             "weight": "Weight",
             "location": "Location",
             "incr": "Add",
-            "decr": "Subtract"
+            "decr": "Subtract",
+            "attributes": {
+                "isConsumable": "The Consumable tag gives this item the increment/decrement buttons.",
+                "isAmmunition": "The Ammunition tag causes this item to display on the Combat tab.",
+                "isContainer": "The Container tag allows this item to contain other non-container items."
+            }
         },
         "spell": {
             "addLvl": "Add Lvl",
@@ -289,7 +296,10 @@
             "numMem": "# Mem",
             "duration": "Duration",
             "numAffected": "# Affected",
-            "save": "Save"
+            "save": "Save",
+            "attributes": {
+                "isConsumable": "Note: Leave this item checked unless the spell is being used as an at-will power."
+            }
         },
         "money": {
             "cp": "CP",
@@ -307,7 +317,11 @@
             "range": "Range",
             "atkType": "Atk Type",
             "master": "Master",
-            "grandMaster": "Grandmaster"
+            "grandMaster": "Grandmaster",
+            "attributes": {
+                "isGrenade": "The Grenade tag causes this item to attack as a hurled item, from Table 143 of the Player's Manual.",
+                "isAreaEffect": "The Area Effect tag causes this item ignore making an attack roll, and simply roll damage. Note that this is different from the Grenade tag, above."
+            }
         },
         "armor": {
             "add": "Add Armour",

@@ -905,7 +905,7 @@ export class Hyp3eActor extends Actor {
         rollMode: rollMode
     })
 
-}
+  }
 
   // Render html template for damage rolls
   async renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll, sourceItem = null) {
@@ -930,7 +930,7 @@ export class Hyp3eActor extends Actor {
         speaker: ChatMessage.getSpeaker({ actor: this }),
         content: damageChat
     })
-}
+  }
 
 
   /**
