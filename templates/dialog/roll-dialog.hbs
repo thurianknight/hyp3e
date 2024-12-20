@@ -1,25 +1,31 @@
 <form>
-  <div class="hyp3e roll-dialog">
-    {{#if dataset.details}}
-      <div class="roll-details">
-        {{dataset.details}}
-      </div>
-    {{/if}}
-    {{!-- {{#if dataset.enableRoll}} --}}
-      <div class="flexrow form-group">
-        <label class="dialog-label">{{localize "HYP3E.rollFormula"}}</label>
-        <input type="text" name="baseRollFormula" value="{{roll}}" disabled />
-      </div>
-      <div class="flexrow form-group">
-        <label class="dialog-label">{{localize "HYP3E.sitMod"}}</label>
-        <input type="text" name="sitMod" value="" placeholder="{{localize 'HYP3E.rollExample'}}" />
-      </div>
-      <div class="flexrow form-group">
-        <label class="dialog-label">{{localize "HYP3E.rollMode"}}</label>
-        <select name="rollMode">
-          {{selectOptions rollModes selected=rollMode localize=true}}
-        </select>
-      </div>
-    {{!-- {{/if}} --}}
-  </div>
+    <div class="hyp3e roll-dialog">
+        {{#if dataset.details}}
+        <div class="roll-details">
+            {{dataset.details}}
+        </div>
+        {{/if}}
+        <div class="flexrow form-group">
+            <label class="dialog-label">{{localize "HYP3E.rollFormula"}}</label>
+            <input type="text" name="baseRollFormula" value="{{roll}}" disabled />
+        </div>
+        <div class="flexrow form-group">
+            <label class="dialog-label">{{localize "HYP3E.sitMod"}}</label>
+            <input type="text" name="sitMod" value="" placeholder="{{localize 'HYP3E.rollExample'}}" />
+        </div>
+        {{#if dataset.showRanges}}
+        <div class="flexrow form-group">
+            <label class="dialog-label">{{localize 'HYP3E.weapon.range'}}</label>
+            <div class="form-fields">
+                {{radioBoxes rangeGroup ranges checked=chosen localize=true}}
+            </div>
+        </div>
+        {{/if}}
+        <div class="flexrow form-group">
+            <label class="dialog-label">{{localize "HYP3E.rollMode"}}</label>
+            <select name="rollMode">
+                {{selectOptions rollModes selected=rollMode localize=true}}
+            </select>
+        </div>
+    </div>
 </form>

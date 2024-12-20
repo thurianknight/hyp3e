@@ -3,117 +3,135 @@
  * @extends {Item}
  */
 export class Hyp3eItem extends Item {
-  /**
-   * Augment the basic Item data model with additional dynamic data.
-   */
+    /**
+     * Augment the basic Item data model with additional dynamic data.
+     */
 
-  // Override the base Item _preCreate function
-  async _preCreate(data, options, user) {
-    await super._preCreate(data, options, user);
-    // Replace default image for items, but if an image is defined, leave it be
-    if (!data.img || data.img == "") {
-        switch(data.type) {
-            case "spell":
-              data.img = `icons/svg/book.svg`
-              break
-            case "feature":
-              data.img = `icons/svg/target.svg`
-              break
-            case "armor":
-              data.img = `icons/svg/shield.svg`
-              break
-            case "weapon":
-              data.img = `icons/svg/combat.svg`
-              break
-            case "item":
-              data.img = `icons/svg/item-bag.svg`
-              break
-            case "container":
-              data.img = `icons/svg/item-bag.svg`
-              break
-            default:
-              data.img = `icons/svg/item-bag.svg`
-          }      
+    // Override the base Item _preCreate function
+    async _preCreate(data, options, user) {
+        await super._preCreate(data, options, user);
+        // Replace default image for items, but if an image is defined, leave it be
+        if (!data.img || data.img == "") {
+            switch(data.type) {
+                case "spell":
+                data.img = `icons/svg/book.svg`
+                break
+                case "feature":
+                data.img = `icons/svg/target.svg`
+                break
+                case "armor":
+                data.img = `icons/svg/shield.svg`
+                break
+                case "weapon":
+                data.img = `icons/svg/combat.svg`
+                break
+                case "item":
+                data.img = `icons/svg/item-bag.svg`
+                break
+                case "container":
+                data.img = `icons/svg/item-bag.svg`
+                break
+                default:
+                data.img = `icons/svg/item-bag.svg`
+            }      
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Pre-created item data", data) }
+        return this.updateSource(data)
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log("Pre-created item data", data) }
-    return this.updateSource(data)
-  }
 
-  prepareData() {
-    // As with the actor class, items are documents that can have their data
-    // preparation methods overridden (such as prepareBaseData()).
-    super.prepareData();
+    prepareData() {
+        // As with the actor class, items are documents that can have their data
+        // preparation methods overridden (such as prepareBaseData()).
+        super.prepareData();
 
-    // Get the Item's data
-    const itemData = this;
-    // const actorData = this.actor ? this.actor : {};
-    // const data = itemData;
-    // console.log("Item data:", itemData)
+        // Get the Item's data
+        const itemData = this;
+        // const actorData = this.actor ? this.actor : {};
+        // const data = itemData;
+        // console.log("Item data:", itemData)
 
-    // Handle weapon attack roll formula
-    if (itemData.type == "weapon") {
-      // For all weapons, atkRoll is obviously true
-      itemData.system.atkRoll = true
-      // Set melee & missile flags and attack formulas
-      if (itemData.system.type == "melee") {
-        itemData.system.melee = true
-        itemData.system.missile = false
-        // Set attack formula if it doesn't already exist, else leave it alone
-        if (!itemData.system.formula || itemData.system.formula == '') {
-          itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
+        // Handle weapon attack roll formula
+        if (itemData.type == "weapon") {
+        // For all weapons, atkRoll is obviously true
+        itemData.system.atkRoll = true
+        // Set melee & missile flags and attack formulas
+        if (itemData.system.type == "melee") {
+            itemData.system.melee = true
+            itemData.system.missile = false
+            // Area effects do not require an attack roll, all else does
+            if (!itemData.system.isAreaEffect) {
+                // Set attack formula if it doesn't already exist, else leave it alone
+                if (!itemData.system.formula || itemData.system.formula == '') {
+                    itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
+                }
+            } else {
+                // Clear the attack roll if this is an area effect attack
+                itemData.system.formula = ""
+            }
+        } else if (itemData.system.type == "missile") {
+            itemData.system.melee = false
+            itemData.system.missile = true
+            // Area effects do not require an attack roll, all else does
+            if (!itemData.system.isAreaEffect) {
+                // Set attack formula if it doesn't already exist, else leave it alone
+                if (!itemData.system.formula || itemData.system.formula == '') {
+                    if (!itemData.system.isGrenade) {
+                        // Standard missile weapons
+                        itemData.system.formula = '1d20 + @fa + @dex.atkMod + @item.atkMod'
+                    } else {
+                        // Grenade-like splash-effect items
+                        itemData.system.formula = '1d20 + @dex.atkMod'
+                    }
+                }
+            } else {
+                // Clear the attack roll if this is an area effect attack
+                itemData.system.formula = ""
+            }
+        } else {
+            // This should never happen, unless an item is imported with missing data
+            console.log("ITEM ERROR: Weapon has neither melee nor missile property set! Setting to melee...")
+            itemData.system.type = "melee"
+            itemData.system.melee = true
+            itemData.system.missile = false
+            // Set attack formula if it doesn't already exist, else leave it alone
+            if (itemData.system.formula == '') {
+                itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
+            }
         }
-      } else if (itemData.system.type == "missile") {
-        itemData.system.melee = false
-        itemData.system.missile = true
-        // Set attack formula if it doesn't already exist, else leave it alone
-        if (!itemData.system.formula || itemData.system.formula == '') {
-          itemData.system.formula = '1d20 + @fa + @dex.atkMod + @item.atkMod'
-        }
-      } else {
-        // This should never happen, unless an item is imported with missing data
-        console.log("ITEM ERROR: Weapon has neither melee nor missile property set! Setting to melee...")
-        itemData.system.type = "melee"
-        itemData.system.melee = true
-        itemData.system.missile = false
-        // Set attack formula if it doesn't already exist, else leave it alone
-        if (itemData.system.formula == '') {
-          itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
-        }
-      }
 
-    } else { // ==> Anything NOT a weapon...
-      // For non-weapons, is the Attack Roll checkbox selected?
-      if (itemData.system.atkRoll) {
-        // Set attack formula if it doesn't already exist, else leave it alone
-        if (itemData.system.formula == '') {
-          itemData.system.formula = '1d20 + @fa'
+        } else { // ==> Anything NOT a weapon...
+        // For non-weapons, is the Attack Roll checkbox selected?
+        if (itemData.system.atkRoll) {
+            // Set attack formula if it doesn't already exist, else leave it alone
+            if (itemData.system.formula == '') {
+                itemData.system.formula = '1d20 + @fa'
+            }
+        } else {
+            // Handle item check roll formula
+            if (itemData.system.formula == '' && itemData.system.check != '') {
+                itemData.system.formula = itemData.system.check
+            }
         }
-      } else {
-        // Handle item check roll formula
-        if (itemData.system.formula == '' && itemData.system.check != '') {
-          itemData.system.formula = itemData.system.check
         }
-      }
+        // Log the item data
+        //console.log("Item Data:", itemData)
+
     }
-    // Log the item data
-    //console.log("Item Data:", itemData)
 
-  }
+    /**
+     * Prepare a data object which is passed to any Roll formulas which are created related to this Item
+     * @private
+     */
+    getRollData() {
+        // If present, return the actor's roll data.
+        if ( !this.actor ) return null
+    
+        const rollData = this.actor.getRollData();
+        // Grab the item's system data as well.
+        rollData.item = foundry.utils.deepClone(this.system);
 
-  /**
-   * Prepare a data object which is passed to any Roll formulas which are created related to this Item
-   * @private
-   */
-  getRollData() {
-    // If present, return the actor's roll data.
-    if ( !this.actor ) return null
-  
-    const rollData = this.actor.getRollData();
-    // Grab the item's system data as well.
-    rollData.item = foundry.utils.deepClone(this.system);
-
-    return rollData;
-  }
+        return rollData;
+    }
 
     /**
      * Handle displaying an Item description in the chat.
