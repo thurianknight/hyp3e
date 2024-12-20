@@ -297,12 +297,12 @@ Hooks.once("ready", async function() {
   }
 
   // Load blind roll options
-  if (CONFIG.HYP3E.blindRollOpts) {
-    for (let [k, v] of Object.entries(CONFIG.HYP3E.blindRollOpts)) {
-      CONFIG.HYP3E.blindRollOpts[k] = game.i18n.localize(CONFIG.HYP3E.blindRollOpts[k])
-    }
-    // console.log("CONFIG Blind Roll options:", CONFIG.HYP3E.blindRollOpts)
-  }
+//   if (CONFIG.HYP3E.blindRollOpts) {
+//     for (let [k, v] of Object.entries(CONFIG.HYP3E.blindRollOpts)) {
+//       CONFIG.HYP3E.blindRollOpts[k] = game.i18n.localize(CONFIG.HYP3E.blindRollOpts[k])
+//     }
+//     // console.log("CONFIG Blind Roll options:", CONFIG.HYP3E.blindRollOpts)
+//   }
   
   // Load saving throws
   if (CONFIG.HYP3E.saves) {
@@ -310,6 +310,14 @@ Hooks.once("ready", async function() {
       CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
     }
     console.log("CONFIG Saves:", CONFIG.HYP3E.saves)
+  }
+
+  // Load creature sizes
+  if (CONFIG.HYP3E.creatureSizes) {
+    for (let [k, v] of Object.entries(CONFIG.HYP3E.creatureSizes)) {
+        CONFIG.HYP3E.creatureSizes[k] = game.i18n.localize(CONFIG.HYP3E.creatureSizes[k])
+    }
+    console.log("CONFIG Creature Sizes:", CONFIG.HYP3E.creatureSizes)
   }
 
   // Load weapon types

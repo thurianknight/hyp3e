@@ -251,6 +251,11 @@
         },
         "alignment": "Alignment",
         "size": "Size",
+        "sizes": {
+            "S": "Small",
+            "M": "Medium",
+            "L": "Large"
+        },
         "encWild": "# Enc.",
         "encLair": "# in Lair",
         "morale": "Morale",

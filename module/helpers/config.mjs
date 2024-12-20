@@ -49,6 +49,16 @@ HYP3E.attributeAbbreviations = {
 };
 
 /**
+ * The three standard creature sizes
+ * @type {Object}
+ */
+HYP3E.creatureSizes = {
+    "S": "HYP3E.sizes.S",
+    "M": "HYP3E.sizes.M",
+    "L": "HYP3E.sizes.L"
+}
+
+/**
  * True/False options for blind rolls
  * @type {Object} 
  */
