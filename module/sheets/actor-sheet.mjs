@@ -55,6 +55,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Prepare NPC data and items.
     if (actorData.type == 'npc') {
       this._prepareItems(context);
+      this._prepareNpcData(context);
     }
 
     // Add roll data for TinyMCE editors.
@@ -70,9 +71,9 @@ export class Hyp3eActorSheet extends ActorSheet {
   }
 
   /**
-   * Organize and classify Items for Character sheets.
+   * Organize and classify Data for Character sheets.
    *
-   * @param {Object} actorData The actor to prepare.
+   * @param {Object} context The actor to prepare.
    *
    * @return {undefined}
    */
@@ -115,10 +116,25 @@ export class Hyp3eActorSheet extends ActorSheet {
 
   }
 
+    /**
+   * Organize and classify Data for NPC sheets.
+   *
+   * @param {Object} context The actor to prepare.
+   *
+   * @return {undefined}
+   */
+    _prepareNpcData(context) {
+        
+        // Load creature sizes
+        context.creatureSizes = CONFIG.HYP3E.creatureSizes
+        if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet sizes:", context.creatureSizes) }
+    
+    }
+
   /**
    * Organize and classify Items for Character sheets.
    *
-   * @param {Object} actorData The actor to prepare.
+   * @param {Object} context The actor to prepare.
    *
    * @return {undefined}
    */
