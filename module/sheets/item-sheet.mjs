@@ -80,6 +80,8 @@ export class Hyp3eItemSheet extends ItemSheet {
     if (context.item.type == 'armor') {
       context.armorTypes = CONFIG.HYP3E.armorTypes
       if (CONFIG.HYP3E.debugMessages) { console.log("Item armor types:", context.armorTypes) }
+      context.system.isShield = context.system.type == "shield" ? true : false
+      if (CONFIG.HYP3E.debugMessages) { console.log(`Shield: ${context.system.isShield}`) }
     }
 
     // Handle blind roll true/false for any item types

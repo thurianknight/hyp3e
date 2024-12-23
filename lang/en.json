@@ -279,7 +279,7 @@
             "equipped": "Equipped",
             "consumable": "Consumable",
             "ammunition": "Ammunition",
-            "grenade": "Grenade/hurled item",
+            "grenade": "Grenade-like item",
             "areaEffect": "Area effect attack",
             "container": "Container",
             "cost": "Cost",
@@ -342,7 +342,8 @@
             "ac": "AC",
             "dr": "DR",
             "dmgReduct": "Dmg Reduction",
-            "unarmored": "Unarmoured"
+            "unarmored": "Unarmoured",
+            "acMod": "AC Mod"
         },
         "attack": {
             "add": "Add Attack",
