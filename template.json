@@ -15,6 +15,7 @@
                 },
                 "atkRate": "1/1",
                 "fa": 0,
+                "ca": null,
                 "ta": null,
                 "saves": {
                     "death": {
@@ -52,7 +53,6 @@
                 "knownLanguages": ""
             },
             "spellcaster": {
-                "ca": null,
                 "spells": {
                     "l1": "",
                     "l2": "",

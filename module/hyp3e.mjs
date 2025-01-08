@@ -341,10 +341,11 @@ Hooks.once("ready", async function() {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "1.0.8"
+    const NEEDS_MIGRATION_TO_VERSION = "1.1.3"
     const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
       migrateWorld()
+      reportBestiary()
     }
   }
 
@@ -378,21 +379,7 @@ async function migrateWorld() {
     // Migrate Actor directory
     for (let actor of game.actors.contents) {
         if (actor.type == "npc") {
-            if (actor.system.attributes.dex.value != actor.system.dx) {
-                // Migrate NPC dx to attributes.dex.value
-                console.log(`Migrating actor ${actor.name}...`)
-                const dex = {
-                    system: {
-                        attributes: {
-                            dex: {
-                                value: actor.system.dx
-                            }
-                        }
-                    }
-                }
-                console.log(`DX value: ${actor.system.dx}, update object: `, dex)
-                // await actor.update(dex)
-            }
+            // do stuff
         }
 
         // Migrate the actor document's items if any exist
@@ -436,29 +423,59 @@ async function migrateWorld() {
                 case "Actor":
                     // Migrate NPC dx to attributes.dex.value
                     if (doc.type == "npc") {
-                        if (doc.system.attributes.dex.value != doc.system.dx) {
-                            // Migrate NPC dx to attributes.dex.value
-                            console.log(`Migrating actor ${doc.name}...`)
-                            const dex = {
+                        if (doc.system.hp.value >= 0) {
+                            // Nullify HP if it's populated
+                            console.log(`Nullifying actor ${doc.name} HP...`)
+                            const hp = {
                                 system: {
-                                    attributes: {
-                                        dex: {
-                                            value: doc.system.dx
-                                        }
+                                    hp: {
+                                        value: null,
+                                        min: 0,
+                                        max: null
                                     }
                                 }
                             }
-                            console.log(`DX value: ${doc.system.dx}, update object: `, dex)
-                            // await doc.update(dex)
+                            await doc.update(hp)
+                        }
+                        if (doc.system.ca == 0) {
+                            // Nullify CA if it's 0
+                            console.log(`Nullifying actor ${doc.name} CA...`)
+                            const ca = {
+                                system: {
+                                    ca: null
+                                }
+                            }
+                            await doc.update(ca)
+                        }
+                        if (doc.system.otherMv.value != "") {
+                            // Set otherMv string to lower-case
+                            console.log(`Setting actor ${doc.name} otherMv to lower case...`)
+                            const otherMv = {
+                                system: {
+                                    otherMv: {
+                                        value: doc.system.otherMv.value.toLowerCase(),
+                                    }
+                                }
+                            }
+                            await doc.update(otherMv)
                         }
                     }
-                
+
                     // Migrate the actor document's items if any exist
-                    // if (doc.items) {
-                    //   for (let item of doc.items) {
-                    //      do stuff
-                    //   }
-                    // }
+                    if (doc.items) {
+                      for (let item of doc.items) {
+                        //  Update CA if it was null but the actor actually has spells
+                        if (doc.system.ca == null && item.type == "spell") {
+                            console.log(`Resetting actor ${doc.name} CA...`)
+                            const ca = {
+                                system: {
+                                    ca: doc.system.fa
+                                }
+                            }
+                            await doc.update(ca)
+                        }
+                      }
+                    }
                     break
         
                 case "Item":
