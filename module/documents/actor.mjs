@@ -708,12 +708,7 @@ export class Hyp3eActor extends Actor {
                 } else if (item.system.missile) {
                     // Apply the item damage mod
                     dmgRollParts.push(item.system.dmgMod)
-                    if (masteryMod == 0) {
-                        if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }  
-                    } else {
-                        dmgRollParts.push(masteryMod)
-                        if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod + masteryMod` }  
-                    }
+                    if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }  
                 } else {
                     // This should only happen with spells
                     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage}` }
