@@ -336,12 +336,12 @@ Hooks.once("ready", async function() {
     console.log("CONFIG Armor Types:", CONFIG.HYP3E.armorTypes)
   }
 
-  // If we need to do a system migration,  do it after the other settings are loaded
+  // If we need to do a system migration, do it after the other settings are loaded
   if (game.user.isGM) {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "1.1.3"
+    const NEEDS_MIGRATION_TO_VERSION = "1.1.4"
     const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
       migrateWorld()
@@ -354,7 +354,7 @@ Hooks.once("ready", async function() {
     // if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
     //   reportBestiary()
     // }
-    if (foundry.utils.isNewerVersion("1.0.4", game.system.version)) {
+    if (foundry.utils.isNewerVersion("1.0.3", game.system.version)) {
         reportItems()
     }
   }
@@ -421,63 +421,73 @@ async function migrateWorld() {
             try {
                 switch(packType) {
                 case "Actor":
-                    // Migrate NPC dx to attributes.dex.value
+                    // Migrate NPC data
                     if (doc.type == "npc") {
-                        if (doc.system.hp.value >= 0) {
-                            // Nullify HP if it's populated
-                            console.log(`Nullifying actor ${doc.name} HP...`)
-                            const hp = {
-                                system: {
-                                    hp: {
-                                        value: null,
-                                        min: 0,
-                                        max: null
-                                    }
-                                }
-                            }
-                            await doc.update(hp)
-                        }
-                        if (doc.system.ca == 0) {
-                            // Nullify CA if it's 0
-                            console.log(`Nullifying actor ${doc.name} CA...`)
-                            const ca = {
-                                system: {
-                                    ca: null
-                                }
-                            }
-                            await doc.update(ca)
-                        }
-                        if (doc.system.otherMv.value != "") {
-                            // Set otherMv string to lower-case
-                            console.log(`Setting actor ${doc.name} otherMv to lower case...`)
-                            const otherMv = {
-                                system: {
-                                    otherMv: {
-                                        value: doc.system.otherMv.value.toLowerCase(),
-                                    }
-                                }
-                            }
-                            await doc.update(otherMv)
-                        }
+                        // if (doc.system.hp.value >= 0) {
+                        //     // Nullify HP if it's populated
+                        //     console.log(`Nullifying actor ${doc.name} HP...`)
+                        //     const hp = {
+                        //         system: {
+                        //             hp: {
+                        //                 value: null,
+                        //                 min: 0,
+                        //                 max: null
+                        //             }
+                        //         }
+                        //     }
+                        //     await doc.update(hp)
+                        // }
+                        // if (doc.system.ca == 0) {
+                        //     // Nullify CA if it's 0
+                        //     console.log(`Nullifying actor ${doc.name} CA...`)
+                        //     const ca = {
+                        //         system: {
+                        //             ca: null
+                        //         }
+                        //     }
+                        //     await doc.update(ca)
+                        // }
+                        // if (doc.system.otherMv.value != "") {
+                        //     // Set otherMv string to lower-case
+                        //     console.log(`Setting actor ${doc.name} otherMv to lower case...`)
+                        //     const otherMv = {
+                        //         system: {
+                        //             otherMv: {
+                        //                 value: doc.system.otherMv.value.toLowerCase(),
+                        //             }
+                        //         }
+                        //     }
+                        //     await doc.update(otherMv)
+                        // }
                     }
 
                     // Migrate the actor document's items if any exist
                     if (doc.items) {
                       for (let item of doc.items) {
                         //  Update CA if it was null but the actor actually has spells
-                        if (doc.system.ca == null && item.type == "spell") {
-                            console.log(`Resetting actor ${doc.name} CA...`)
-                            const ca = {
+                        // if (doc.system.ca == null && item.type == "spell") {
+                        //     console.log(`Resetting actor ${doc.name} CA...`)
+                        //     const ca = {
+                        //         system: {
+                        //             ca: doc.system.fa
+                        //         }
+                        //     }
+                        //     await doc.update(ca)
+                        // }
+                        if (item.type == "feature" && item.system.class != null) {
+                            // Update the feature document
+                            console.log(`Updating feature ${item.name}...`)
+                            const c = {
                                 system: {
-                                    ca: doc.system.fa
+                                    class: null
                                 }
                             }
-                            await doc.update(ca)
+                            await item.update(c)
                         }
                       }
                     }
                     break
-        
+
                 case "Item":
                     console.log("Compendium item document:", doc)
                     // Migrate items of type 'container' to type 'item', and set isContainer flag
