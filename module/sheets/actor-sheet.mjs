@@ -206,6 +206,10 @@ export class Hyp3eActorSheet extends ActorSheet {
       else if (i.type === 'spell') {
         if (i.system.spellLevel != undefined && i.system.spellLevel >= 1 && i.system.spellLevel <= 6) {
           spells[i.system.spellLevel].push(i);
+        } else if (i.system.spellLevel != undefined && i.system.spellLevel < 1) {
+            spells[1].push(i);
+        } else if (i.system.spellLevel != undefined && i.system.spellLevel > 6) {
+            spells[6].push(i);
         }
       }
     }
