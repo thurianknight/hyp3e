@@ -729,7 +729,7 @@ export class Hyp3eActor extends Actor {
                     console.log("Damage roll parts:", dmgRollParts)
                     console.log("Damage formula:", dmgFormula)
                 }
-        
+
                 // Invoke the damage roll
                 dmgRoll = new Roll(dmgFormula, rollData);
                 // Resolve the roll
