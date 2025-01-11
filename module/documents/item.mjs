@@ -1,3 +1,5 @@
+import {Hyp3eDice} from "../dice.mjs";
+
 /**
  * Extend the basic Item with some very simple modifications.
  * @extends {Item}
@@ -139,6 +141,7 @@ export class Hyp3eItem extends Item {
      */
     async _displayItemInChat() {
         const item = this
+        const itemData = item.system
         const actor = this.actor
         const actorData = actor.system
         // const speaker = ChatMessage.getSpeaker()
@@ -152,8 +155,8 @@ export class Hyp3eItem extends Item {
         }
         // Replace names like "Bow, composite, long" with something that looks nicer
         let itemName = ""
-        if (item.system.friendlyName != "") {
-            itemName = item.system.friendlyName
+        if (itemData.friendlyName != "") {
+            itemName = itemData.friendlyName
         } else {
             itemName = item.name
         }
@@ -162,89 +165,95 @@ export class Hyp3eItem extends Item {
         const label = `<h3>${typeLabel}: ${itemName}</h3>`
         
         if (CONFIG.HYP3E.debugMessages) { console.log("Item clicked:", item) }
-        let content = item.system.description
+        let content = itemData.description
 
         // Setup clickable buttons for item properties if they have a roll macro,
         //  otherwise just display the value.
 
         // Features/Abilities
         if (item.type == 'feature') {
-            if (item.system.formula && item.system.tn) {
+            if (itemData.formula && itemData.tn) {
                 // Display the ability check roll with target number
-                content += `<p>Ability Check: ${item.system.formula} equal or under ${item.system.tn}</p>`
+                content += `<p>Ability Check: ${itemData.formula} equal or under ${itemData.tn}</p>`
             }
         }
 
         // Weapons
         if (item.type == 'weapon') {
-            if (item.system.rof) {
+            if (itemData.rof) {
                 // Display missile rate of fire or melee attack rate
-                content += `<p>Atk Rate: ${item.system.rof}</p>`
+                content += `<p>Atk Rate: ${itemData.rof}</p>`
             }
-            if (item.system.type == 'missile') {
+            if (itemData.type == 'missile') {
                 // For a missile weapon we display the range increments
-                content += `<p>Range: ${item.system.range.short} / ${item.system.range.medium} / ${item.system.range.long}</p>`
+                content += `<p>Range: ${itemData.range.short} / ${itemData.range.medium} / ${itemData.range.long}</p>`
             } else {
                 // For melee weapons we display the weapon class
-                content += `<p>Wpn Class: ${item.system.wc}</p>`
+                content += `<p>Wpn Class: ${itemData.wc}</p>`
             }
-            if (item.system.damage) {
-                if (Roll.validate(item.system.damage)) {
+            if (itemData.damage) {
+                if (Roll.validate(itemData.damage)) {
+                    // Build our damage roll formula, including actor and weapon mods
+                    const dmgFormula = Hyp3eDice.buildDamageFormula(itemData, actorData, actor.type)
                     // Resolve damage string & variables to a rollable formula
-                    const roll = new Roll(`${item.system.damage} + ${item.system.dmgMod}`, actorData)
+                    // const roll = new Roll(`${itemData.damage} + ${itemData.dmgMod}`, actorData)
+                    const roll = new Roll(dmgFormula, actorData)
                     console.log("Spell damage roll: ", roll)
                     content += `<div class='dmg-roll-button' data-formula='${roll.formula}'></div>`;
                 } else {
-                    content += `<p>Damage: ${item.system.damage}</p>`
+                    content += `<p>Damage: ${itemData.damage}</p>`
                 }
             }
         }
 
         // Spells
         if (item.type == 'spell') {
-            if (item.system.range) {
+            if (itemData.range) {
                 // Display the range
-                content += `<p>Range: ${item.system.range}</p>`
+                content += `<p>Range: ${itemData.range}</p>`
             }
-            if (item.system.duration) {
-                if (Roll.validate(item.system.duration)) {
+            if (itemData.duration) {
+                if (Roll.validate(itemData.duration)) {
                     // Add a duration roll macro
-                    content += `<p>Duration: [[/r ${item.system.duration}]]</p>`
+                    content += `<p>Duration: [[/r ${itemData.duration}]]</p>`
                 } else {
                     // If duration is not variable, simply display the value
-                    content += `<p>Duration: ${item.system.duration}</p>`
+                    content += `<p>Duration: ${itemData.duration}</p>`
                 }
             }
-            if (item.system.affected) {
-                if (Roll.validate(item.system.affected)) {
+            if (itemData.affected) {
+                if (Roll.validate(itemData.affected)) {
                     // Add a number affected roll macro
-                    content += `<p># Affected: [[/r ${item.system.affected}</p>`
+                    content += `<p># Affected: [[/r ${itemData.affected}</p>`
                 } else {
-                    content += `<p># Affected: ${item.system.affected}</p>`
+                    content += `<p># Affected: ${itemData.affected}</p>`
                 }
             }
-            if (item.system.damage) {
-                if (Roll.validate(item.system.damage)) {
+            if (itemData.damage) {
+                if (Roll.validate(itemData.damage)) {
+                    // Build our damage roll formula, including actor and weapon mods
+                    const dmgFormula = Hyp3eDice.buildDamageFormula(itemData, actorData, actor.type)
                     // Resolve damage string & variables to a rollable formula
-                    const roll = new Roll(item.system.damage, actorData)
+                    // const roll = new Roll(itemData.damage, actorData)
+                    const roll = new Roll(dmgFormula, actorData)
                     content += `<div class='dmg-roll-button' data-formula='${roll.formula}' data-source-type='${item.type}'></div>`;
                 } else {
-                    content += `<p>Damage: ${item.system.damage}</p>`
+                    content += `<p>Damage: ${itemData.damage}</p>`
                 }
             } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll for spell ${item.name}, ${item.system.damage}, is not rollable.`) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll for spell ${item.name}, ${itemData.damage}, is not rollable.`) }
             }
         }
         // Both spells and weapons might have a Saving Throw
-        if (item.system.save && item.system.save !== "") {
-            content += `<div class='save-button' data-save='${item.system.save}'></div>`;
+        if (itemData.save && itemData.save !== "") {
+            content += `<div class='save-button' data-save='${itemData.save}'></div>`;
         }
 
         // Item
         if (item.type == 'item') {
-            if (item.system.formula && item.system.tn) {
+            if (itemData.formula && itemData.tn) {
                 // Display the item check roll with target number
-                content += `<p>Item Check: ${item.system.formula} equal or under ${item.system.tn}</p>`
+                content += `<p>Item Check: ${itemData.formula} equal or under ${itemData.tn}</p>`
             }
         }
 

@@ -437,6 +437,7 @@ export class Hyp3eActor extends Actor {
 
         // Is this an item (weapon or spell) attack?
         const item = this.items.get(dataset.itemId) ?? null
+        const itemData = item ? item.system : null
 
         // Retrieve roll data from the actor
         const rollData = this.getRollData();
@@ -692,36 +693,37 @@ export class Hyp3eActor extends Actor {
         if (hit && item) {
             if (Roll.validate(item.system.damage)) {
                 // All items start with the base damage formula
-                dmgRollParts.push(item.system.damage)
-                if (item.system.melee) {
-                    if (this.type == "character") {
-                        // Characters apply their ST Damage Mod to all melee damage
-                        dmgRollParts.push(rollData.str.dmgMod)
-                        // Apply the item damage mod
-                        dmgRollParts.push(item.system.dmgMod)
-                        if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @str.dmgMod + @item.dmgMod` }
-                    } else {
-                        // NPCs and monsters don't have a ST damage modifier, but might have an item damage mod
-                        dmgRollParts.push(item.system.dmgMod)
-                        if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }
-                    }
-                } else if (item.system.missile) {
-                    // Apply the item damage mod
-                    dmgRollParts.push(item.system.dmgMod)
-                    if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }  
-                } else {
-                    // This should only happen with spells
-                    if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage}` }
-                }
-                // Add Weapon Mastery mod if applicable
-                if (masteryMod != 0) {
-                    dmgRollParts.push(masteryMod)
-                    if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + masteryMod` }
-                }
-                // Construct the damage roll formula from parts
-                dmgFormula = dmgRollParts.join(" + ")
+                // dmgRollParts.push(item.system.damage)
+                // if (item.system.melee) {
+                //     if (this.type == "character") {
+                //         // Characters apply their ST Damage Mod to all melee damage
+                //         dmgRollParts.push(rollData.str.dmgMod)
+                //         // Apply the item damage mod
+                //         dmgRollParts.push(item.system.dmgMod)
+                //         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @str.dmgMod + @item.dmgMod` }
+                //     } else {
+                //         // NPCs and monsters don't have a ST damage modifier, but might have an item damage mod
+                //         dmgRollParts.push(item.system.dmgMod)
+                //         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }
+                //     }
+                // } else if (item.system.missile) {
+                //     // Apply the item damage mod
+                //     dmgRollParts.push(item.system.dmgMod)
+                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }  
+                // } else {
+                //     // This should only happen with spells
+                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage}` }
+                // }
+                // // Add Weapon Mastery mod if applicable
+                // if (masteryMod != 0) {
+                //     dmgRollParts.push(masteryMod)
+                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + masteryMod` }
+                // }
+                // // Construct the damage roll formula from parts
+                // dmgFormula = dmgRollParts.join(" + ")
+                dmgFormula = Hyp3eDice.buildDamageFormula(itemData, rollData, this.type)
                 if (CONFIG.HYP3E.debugMessages) {
-                    console.log("Damage roll parts:", dmgRollParts)
+                    // console.log("Damage roll parts:", dmgRollParts)
                     console.log("Damage formula:", dmgFormula)
                 }
 
@@ -731,12 +733,13 @@ export class Hyp3eActor extends Actor {
                 let result = await dmgRoll.roll();
                 if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
 
-                // Get the dice roll value of damage for x2/x3 modifier button
-                // let dmgRollNatural =  dmgRoll.dice[0].total;
+                // Get the dice roll values of damage for x2/x3 modifier button
                 // let dmgBaseRoll = item.system.damage;
-
+                const naturalDmgRoll = dmgRoll.dice[0]?.total ? dmgRoll.dice[0]?.total : dmgRoll.total;
+            
                 // Now output the damage chat
-                this.renderDamageChat(dmgRoll, debugDmgRollFormula, dmgRoll.dice[0].total, item.system.damage, item)
+                debugDmgRollFormula = CONFIG.HYP3E.debugMessages? "Damage Formula: " + dmgFormula : ""
+                this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, item.system.damage, item)
             }
         }
 

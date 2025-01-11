@@ -11,7 +11,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             console.log(`Damage html: `, b)
             const dmgFormula = $(b).data('formula');
             const sourceType = $(b).data('sourceType');
-            const actorId = "15oRtA40Umri4k3L"
+            const actorId = "actorId"; //$(b).data('actorId');
             let dmgButton = $(
                 `<button class=""><i class="fas fa-dice" title="Click to roll damage."></i>Damage: ${dmgFormula}</button>`
             );
@@ -227,11 +227,13 @@ async function rollDmgButton(formula, actorId, sourceType) {
         naturalDmgRoll = dmgRoll.total
     }
 
+    const debugDmgRollFormula = CONFIG.HYP3E.debugMessages? "Damage Formula: " + formula : ""
+
     const title = "Rolling Damage..."
     const templateData = {
         title: title,
         dmgRoll: dmgRoll,
-        debugDmgRollFormula: formula,
+        debugDmgRollFormula: debugDmgRollFormula,
         naturalDmgRoll: naturalDmgRoll,
         dmgBaseRoll: formula,
         sourceType: sourceType

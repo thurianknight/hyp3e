@@ -10,10 +10,11 @@
           <h3>{{localize "HYP3E.headers.fightingSkills"}}</h3>
         </div>
         <div class="resource-content flexrow flex-group-center">
-          <span class="rollable flexlarge" data-roll="1d20 + @fa + @str.atkMod" data-roll-type="attack" data-roll-mode="publicroll" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.basicMeleeAtk'}}">
+          {{!-- <span class="rollable flexlarge" data-roll="1d20 + @fa + @str.atkMod" data-roll-type="attack" data-roll-mode="publicroll" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.basicMeleeAtk'}}">
             <label for="system.fa" class="combat-label">{{localize "HYP3E.fightingAbility"}}</label>
             <i class="fas fa-dice-d20"></i>
-          </span>
+          </span> --}}
+          <label for="system.fa" class="combat-label">{{localize "HYP3E.fightingAbility"}}</label>
           <input type="text" name="system.fa" value="{{system.fa}}" data-dtype="Number"/>
           <label for="system.unskilled" class="combat-label">{{localize "HYP3E.unskilled"}}</label>
           <input type="text" name="system.unskilled" value="{{system.unskilled}}" data-dtype="Number"/>
