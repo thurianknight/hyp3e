@@ -10,6 +10,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
         dmgRoll.each((_i, b) => {
             console.log(`Damage html: `, b)
             const dmgFormula = $(b).data('formula');
+            const debugDmgRollFormula = $(b).data('debugFormula');
             const sourceType = $(b).data('sourceType');
             const actorId = "actorId"; //$(b).data('actorId');
             let dmgButton = $(
@@ -20,7 +21,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, actorId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, sourceType);
             });
         });
     }
@@ -210,7 +211,7 @@ export async function showValueChange(t, fillColor,total) {
     );
 }
 
-async function rollDmgButton(formula, actorId, sourceType) {
+async function rollDmgButton(formula, debugDmgRollFormula, actorId, sourceType) {
     if (formula == "") { return } // Exit on empty formula
 
     if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll formula: ${formula}`) }
@@ -227,7 +228,7 @@ async function rollDmgButton(formula, actorId, sourceType) {
         naturalDmgRoll = dmgRoll.total
     }
 
-    const debugDmgRollFormula = CONFIG.HYP3E.debugMessages? "Damage Formula: " + formula : ""
+    // const debugDmgRollFormula = CONFIG.HYP3E.debugMessages? "Damage Formula: " + formula : ""
 
     const title = "Rolling Damage..."
     const templateData = {

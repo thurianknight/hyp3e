@@ -201,7 +201,7 @@ export class Hyp3eItem extends Item {
                     // const roll = new Roll(`${itemData.damage} + ${itemData.dmgMod}`, actorData)
                     const roll = new Roll(dmgFormula, actorData)
                     console.log("Spell damage roll: ", roll)
-                    content += `<div class='dmg-roll-button' data-formula='${roll.formula}'></div>`;
+                    content += `<div class='dmg-roll-button' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}'></div>`;
                 } else {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
