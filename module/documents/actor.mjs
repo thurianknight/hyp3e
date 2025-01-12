@@ -721,7 +721,9 @@ export class Hyp3eActor extends Actor {
                 // }
                 // // Construct the damage roll formula from parts
                 // dmgFormula = dmgRollParts.join(" + ")
-                dmgFormula = Hyp3eDice.buildDamageFormula(itemData, rollData, this.type)
+                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, rollData, this.type)
+                dmgFormula = dmgObj.formula
+                debugDmgRollFormula = dmgObj.debugFormula
                 if (CONFIG.HYP3E.debugMessages) {
                     // console.log("Damage roll parts:", dmgRollParts)
                     console.log("Damage formula:", dmgFormula)
@@ -738,7 +740,7 @@ export class Hyp3eActor extends Actor {
                 const naturalDmgRoll = dmgRoll.dice[0]?.total ? dmgRoll.dice[0]?.total : dmgRoll.total;
             
                 // Now output the damage chat
-                debugDmgRollFormula = CONFIG.HYP3E.debugMessages? "Damage Formula: " + dmgFormula : ""
+                // debugDmgRollFormula = CONFIG.HYP3E.debugMessages? "Damage Formula: " + dmgFormula : ""
                 this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, item.system.damage, item)
             }
         }

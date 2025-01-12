@@ -51,8 +51,13 @@ export class Hyp3eDice {
             console.log(debugDmgRollFormula)
         }
 
-        // Construct the damage roll formula from parts
-        return dmgRollParts.join(" + ")
+        // Construct the damage roll formula from parts, and return an object with the formula and debug formula
+        const dmgRollFormula = dmgRollParts.join(" + ")
+        const dmgObj = {
+            formula: dmgRollFormula,
+            debugFormula: debugDmgRollFormula
+        }
+        return dmgObj
     }
 
     /**
