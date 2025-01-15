@@ -427,7 +427,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Construct a custom chat card for the check
-        await this.renderCustomChat(roll, label, "", "", turnUndeadHtml, rollResponse.rollMode)
+        await this.renderCustomChat(roll, item.id, label, "", "", turnUndeadHtml, rollResponse.rollMode)
         
         return roll
     }
@@ -687,7 +687,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Construct a custom chat card for the attack
-        await this.renderCustomChat(atkRoll, label, debugAtkRollFormula, "", critFooterHTML, rollResponse.rollMode);
+        await this.renderCustomChat(atkRoll, item.id, label, debugAtkRollFormula, "", critFooterHTML, rollResponse.rollMode);
 
         // If the item attack hit, we roll damage automatically and include it in the chat message
         if (hit && item) {
@@ -952,7 +952,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Render custom html for attacks and turning undead
-    async renderCustomChat(roll, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
+    async renderCustomChat(roll, itemId, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
         // Prettify label
         label = "<h3>" + label + "</h3>"
 
@@ -960,6 +960,7 @@ export class Hyp3eActor extends Actor {
             roll: roll,
             headerHTML: headerHTML,
             debugRollFormula: debugRollFormula,
+            itemId: itemId,
             footerHTML: footerHTML,
         };
 
