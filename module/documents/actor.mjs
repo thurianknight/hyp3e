@@ -986,6 +986,7 @@ export class Hyp3eActor extends Actor {
             debugDmgRollFormula: debugDmgRollFormula,
             naturalDmgRoll: naturalDmgRoll,
             dmgBaseRoll: dmgBaseRoll,
+            itemId: sourceItem.id,
             sourceType: sourceItem.type,
             save: sourceItem.system.save,
             description: sourceItem.system.description

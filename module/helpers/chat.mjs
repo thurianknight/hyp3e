@@ -12,6 +12,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const dmgFormula = $(b).data('formula');
             const debugDmgRollFormula = $(b).data('debugFormula');
             const sourceType = $(b).data('sourceType');
+            const itemId = $(b).data('itemId');
             const actorId = "actorId"; //$(b).data('actorId');
             let dmgButton = $(
                 `<button class=""><i class="fas fa-dice" title="Click to roll damage."></i>Damage: ${dmgFormula}</button>`
@@ -21,7 +22,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, itemId, sourceType);
             });
         });
     }
@@ -211,7 +212,7 @@ export async function showValueChange(t, fillColor,total) {
     );
 }
 
-async function rollDmgButton(formula, debugDmgRollFormula, actorId, sourceType) {
+async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, sourceType) {
     if (formula == "") { return } // Exit on empty formula
 
     if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll formula: ${formula}`) }
@@ -237,6 +238,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, actorId, sourceType) 
         debugDmgRollFormula: debugDmgRollFormula,
         naturalDmgRoll: naturalDmgRoll,
         dmgBaseRoll: formula,
+        itemId: itemId,
         sourceType: sourceType
     };
 

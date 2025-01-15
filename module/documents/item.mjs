@@ -201,7 +201,7 @@ export class Hyp3eItem extends Item {
                     // const roll = new Roll(`${itemData.damage} + ${itemData.dmgMod}`, actorData)
                     const roll = new Roll(dmgFormula, actorData)
                     console.log("Spell damage roll: ", roll)
-                    content += `<div class='dmg-roll-button' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}'></div>`;
+                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}'></div>`;
                 } else {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
@@ -238,7 +238,7 @@ export class Hyp3eItem extends Item {
                     // Resolve damage string & variables to a rollable formula
                     // const roll = new Roll(itemData.damage, actorData)
                     const roll = new Roll(dmgFormula, actorData)
-                    content += `<div class='dmg-roll-button' data-formula='${roll.formula}' data-source-type='${item.type}'></div>`;
+                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-formula='${roll.formula}' data-source-type='${item.type}'></div>`;
                 } else {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
