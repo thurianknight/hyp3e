@@ -201,7 +201,7 @@ export class Hyp3eItem extends Item {
                     // const roll = new Roll(`${itemData.damage} + ${itemData.dmgMod}`, actorData)
                     const roll = new Roll(dmgFormula, actorData)
                     console.log("Spell damage roll: ", roll)
-                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}'></div>`;
+                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}' data-source-type='${item.type}'></div>`;
                 } else {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
@@ -234,11 +234,13 @@ export class Hyp3eItem extends Item {
             if (itemData.damage) {
                 if (Roll.validate(itemData.damage)) {
                     // Build our damage roll formula, including actor and weapon mods
-                    const dmgFormula = Hyp3eDice.buildDamageFormula(itemData, actorData, actor.type)
+                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, actorData, actor.type)
+                    const dmgFormula = dmgObj.formula
+                    const debugDmgRollFormula = dmgObj.debugFormula
                     // Resolve damage string & variables to a rollable formula
                     // const roll = new Roll(itemData.damage, actorData)
                     const roll = new Roll(dmgFormula, actorData)
-                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-formula='${roll.formula}' data-source-type='${item.type}'></div>`;
+                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}' data-source-type='${item.type}'></div>`;
                 } else {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
