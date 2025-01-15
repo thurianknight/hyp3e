@@ -254,7 +254,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, sour
 
     // Send to chat
     dmgRoll.toMessage({
-        user: game.user_id,
+        author: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: actorId }),
         content: html
     })
@@ -421,7 +421,7 @@ async function applyHealthDrop(total, extraRoll = "") {
     const html = await renderTemplate(template, templateData);
 
     const chatData = {
-        user: game.user_id,
+        author: game.user_id,
         content: html
     };
 
@@ -512,7 +512,7 @@ async function rollCritHit(charType) {
 
     // Send to chat
     roll.toMessage({
-        user: game.user_id,
+        author: game.user_id,
         speaker: ChatMessage.getSpeaker(),
         roll: roll,
         content: html
@@ -630,7 +630,7 @@ async function rollCritMiss(charType) {
 
     // Send to chat
     roll.toMessage({
-        user: game.user_id,
+        author: game.user_id,
         speaker: ChatMessage.getSpeaker(),
         roll: roll,
         content: html

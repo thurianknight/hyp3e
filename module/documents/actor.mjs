@@ -942,6 +942,7 @@ export class Hyp3eActor extends Actor {
         label = "<h3>" + label + "</h3>"
         // Send to chat
         roll.toMessage({
+            author: game.user_id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
             flavor: label,
             content: content
@@ -967,7 +968,7 @@ export class Hyp3eActor extends Actor {
 
         // Send to chat
         roll.toMessage({
-            user: game.user_id,
+            author: game.user_id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
             flavor: label,
             content: customChat
@@ -997,7 +998,7 @@ export class Hyp3eActor extends Actor {
 
         // Send to chat
         dmgRoll.toMessage({
-            user: game.user_id,
+            author: game.user_id,
             speaker: ChatMessage.getSpeaker({ actor: this }),
             content: damageChat
         })
