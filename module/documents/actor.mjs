@@ -961,6 +961,7 @@ export class Hyp3eActor extends Actor {
             headerHTML: headerHTML,
             debugRollFormula: debugRollFormula,
             itemId: itemId,
+            actorId: this.id,
             footerHTML: footerHTML,
         };
 

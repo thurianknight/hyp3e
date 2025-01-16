@@ -224,7 +224,7 @@ export class Hyp3eItem extends Item {
                 }
             }
             if (itemData.affected) {
-                if (Roll.validate(itemData.affected)) {
+                if ((itemData.affected).match(/.*d[1-9].*/) && Roll.validate(itemData.affected)) {
                     // Add a number affected roll macro
                     content += `<p># Affected: [[/r ${itemData.affected}</p>`
                 } else {

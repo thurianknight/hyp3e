@@ -1,5 +1,5 @@
 <h4 class="dice-damage">{{title}}</h4>
-<div class="dice-roll">
+<div class="dice-roll" data-item-id="{{itemId}}" data-actor-id="{{actorId}}">
     <div class="dice-result">
         <div class="dice-formula">{{dmgRoll.formula}}</div>
         <div class="dice-tooltip">
@@ -31,8 +31,7 @@
         <div class="dice-roll">
             <h4 class="dice-formula">
                 <span class="dice-damage">{{dmgRoll.total}} HP damage!</span>
-                <span class="damage-button" data-total="{{dmgRoll.total}}" 
-                    data-item-id="{{itemId}}" 
+                <span class="damage-button" data-total="{{dmgRoll.total}}"  
                     data-natural="{{naturalDmgRoll}}" 
                     data-roll="{{dmgBaseRoll}}" 
                     data-source-type="{{sourceType}}">

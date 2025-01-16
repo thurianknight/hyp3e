@@ -1,7 +1,7 @@
 <div style="padding-bottom: 5px">
     {{{headerHTML}}}
 </div>
-<div class="dice-roll">
+<div class="dice-roll" data-item-id="{{itemId}}" data-actor-id="{{actorId}}">
     <div class="dice-result">
         <div class="dice-formula">{{roll.formula}}</div>
         <div class="dice-tooltip" style="display: none;">
@@ -24,7 +24,7 @@
                 </div>
             </section>
         </div>
-        <h4 class="dice-total" data-item-id="{{itemId}}">{{roll.total}}</h4>
+        <h4 class="dice-total">{{roll.total}}</h4>
     </div>
 </div>
 <div style="padding-top: 10px">
