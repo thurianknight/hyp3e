@@ -990,6 +990,7 @@ export class Hyp3eActor extends Actor {
             naturalDmgRoll: naturalDmgRoll,
             dmgBaseRoll: dmgBaseRoll,
             itemId: sourceItem.id,
+            actorId: this.id,
             sourceType: sourceItem.type,
             save: sourceItem.system.save,
             description: sourceItem.system.description

@@ -13,7 +13,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const debugDmgRollFormula = $(b).data('debugFormula');
             const sourceType = $(b).data('sourceType');
             const itemId = $(b).data('itemId');
-            const actorId = "actorId"; //$(b).data('actorId');
+            const actorId = $(b).data('actorId');
             let dmgButton = $(
                 `<button class=""><i class="fas fa-dice" title="Click to roll damage."></i>Damage: ${dmgFormula}</button>`
             );
@@ -238,7 +238,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, sour
         debugDmgRollFormula: debugDmgRollFormula,
         naturalDmgRoll: naturalDmgRoll,
         dmgBaseRoll: formula,
-        itemId: itemId,
+        actorId: actorId,
         sourceType: sourceType
     };
 
