@@ -360,12 +360,14 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", rollData) }
         
         // Declare vars
+        let itemId = ""
         let itemName = ""
         let rollFormula = ""
         let rollResponse
         let label = `${dataset.label}...`
-        // Get the item's friendly name if it has one
+        // Get the item's ID and friendly name if it has one
         if (item) {
+            itemId = item.id
             itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
         }
         // This is needed for Turn Undead results
@@ -427,7 +429,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Construct a custom chat card for the check
-        await this.renderCustomChat(roll, item.id, label, "", "", turnUndeadHtml, rollResponse.rollMode)
+        await this.renderCustomChat(roll, itemId, label, "", "", turnUndeadHtml, rollResponse.rollMode)
         
         return roll
     }
@@ -452,8 +454,8 @@ export class Hyp3eActor extends Actor {
         let rangeGroup = ""
         let chosen = ""
         let dmgFormula = ""
-        let dmgRollParts = []
-        let damageChat = ""
+        // let dmgRollParts = []
+        // let damageChat = ""
         let dmgRoll
         let targetAc = 9
         let targetName = ""
@@ -461,7 +463,7 @@ export class Hyp3eActor extends Actor {
         let masteryMod = 0
         let debugAtkRollFormula = ""
         let debugDmgRollFormula = ""
-
+        let itemId = ""
         let itemName = ""
         let label = `${dataset.label}`
 
@@ -470,7 +472,8 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("Item:", item) }
         
         if (item) {
-            // Get the item's friendly name if it has one
+            // Get the item's ID and friendly name if it has one
+            itemId = item.id
             itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
             // Missile weapons need to show a range selector in the dialog
             if (item.system.missile) {
@@ -487,6 +490,7 @@ export class Hyp3eActor extends Actor {
 
         // Show the roll dialog (type and item-dependent)
         if (!item) {
+            // Since removing the basic attack from Fighting Ability, this may not be needed
             try {
                 rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset)
             } catch(err) {

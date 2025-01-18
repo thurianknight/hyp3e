@@ -14,7 +14,9 @@
                         <span>
                             <ol class="dice-rolls">
                                 {{#each die.values as |val d|}}
-                                <li class="roll die d{{die.faces}}">{{val}}</li>
+                                <li class="roll die d{{die.faces}} 
+                                    {{isMin val}}
+                                    {{isMax val die.faces}}">{{val}}</li>
                                 {{/each}}
                             </ol>
                         </span>

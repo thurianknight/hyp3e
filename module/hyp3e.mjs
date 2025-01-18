@@ -229,6 +229,14 @@ Handlebars.registerHelper('subtract', function(num1, num2) {
   return num1 - num2
 });
 
+Handlebars.registerHelper('isMin', function(val) {
+    return val == 1 ? "min" : ""
+});
+
+Handlebars.registerHelper('isMax', function(val, maxVal) {
+    return val == maxVal ? "max" : ""
+});
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
