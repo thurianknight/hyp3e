@@ -2,9 +2,81 @@ import { HYP3E } from "./helpers/config.mjs"
 
 export class Hyp3eDice {
     /**
-     * Construct damage roll from relevant parts, return roll formula
+     * Construct attack roll from relevant parts, return roll formula
+     * @param {Object} itemData
      * @param {Object} actorData
-     * @param {Object} item
+     * @param {String} actorType
+     */
+    static buildAttackFormula(rollData, itemData, actorData = null, actorType = null) {
+        let atkRollParts = []
+        let masteryMod = 0
+        let debugAtkRollFormula = ""
+
+        // Check if the weapon attack has Master or Grandmaster flags set
+        if (itemData.wpnGrandmaster) {
+            masteryMod = 2
+        } else if (itemData.wpnMaster) {
+            masteryMod = 1
+        }
+    
+        // All items start with the base attack formula.
+        //  For weapons, this includes the FA, ST or DX mod, and item attack mod.
+        //  For spells, it may include different variables based on the type of spell.
+        //  For grenade-like items, it probably only includes the DX mod.
+        atkRollParts.push(rollData.roll)
+        if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${itemData.formula}` }
+        // We might need code like the below if we ever decide that weapon roll formulas 
+        //   should NOT include ST or DX mods
+        if (itemData.melee) {
+            // if (actorData && actorType == "character") {
+            //     // Only characters (not NPCs) apply their ST Attack Mod to melee attacks
+            //     atkRollParts.push(actorData.str.atkMod)
+            // }
+        } else if (itemData.missile) {
+            // if (actorData && actorType == "character") {
+            //     // Only characters (not NPCs) apply their DX Attack Mod to missile attacks
+            //     atkRollParts.push(actorData.dex.atkMod)
+            // }
+        }
+        // Apply the item attack mod
+        // atkRollParts.push(itemData.atkMod)
+
+        // Add Weapon Mastery mod if applicable, and situational modifier after that
+        if (masteryMod > 0) {
+            atkRollParts.push(masteryMod)
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += ` + masteryMod + sitMod` }
+        } else {
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += ` + sitMod` }
+        }
+        // Add situational modifier from the roll dialog
+        atkRollParts.push(rollData.sitMod)
+
+        // Add range modifier from the roll dialog, if needed
+        if (rollData.rangeMod) {
+            atkRollParts.push(rollData.rangeMod)
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += ` + rangeMod` }    
+        }
+
+        // Log the attack roll parts & the constructed formula
+        if (CONFIG.HYP3E.debugMessages) { 
+            console.log("Attack roll parts:", atkRollParts)
+            console.log(debugAtkRollFormula)
+        }
+
+        // Construct the attack roll formula from parts, and return an object with the formula and debug formula
+        const atkRollFormula = atkRollParts.join(" + ")
+        const atkObj = {
+            formula: atkRollFormula,
+            debugFormula: debugAtkRollFormula
+        }
+        return atkObj
+    }
+
+    /**
+     * Construct damage roll from relevant parts, return roll formula
+     * @param {Object} itemData
+     * @param {Object} actorData
+     * @param {String} actorType
      */
     static buildDamageFormula(itemData, actorData = null, actorType = null) {
         let dmgRollParts = []
@@ -40,11 +112,13 @@ export class Hyp3eDice {
             // This should only happen with spells
             if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage}` }
         }
+
         // Add Weapon Mastery mod if applicable
         if (masteryMod > 0) {
             dmgRollParts.push(masteryMod)
             if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + masteryMod` }
         }
+
         // Log the damage roll parts & the constructed formula
         if (CONFIG.HYP3E.debugMessages) { 
             console.log("Damage roll parts:", dmgRollParts)

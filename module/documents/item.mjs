@@ -103,7 +103,7 @@ export class Hyp3eItem extends Item {
             }
 
         } else { // ==> Anything else...
-            // For non-weapons, is the Attack Roll checkbox selected?
+            // For non-weapons (like spells), is the Attack Roll checkbox selected?
             if (itemData.system.atkRoll) {
                 // Set attack formula if it doesn't already exist, else leave it alone
                 if (itemData.system.formula == '') {

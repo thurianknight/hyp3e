@@ -267,6 +267,7 @@ export class Hyp3eActor extends Actor {
             // Create dataset object and start populating it
             let dataset = {}
             dataset.itemId = item.id
+            dataset.actorId = this.id
             dataset.baseClass = this.system.baseClass
             dataset.roll = item.system.formula
             dataset.rollType = 'item'
@@ -447,7 +448,7 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", rollData) }
 
         // Declare vars
-        let atkRollParts = []
+        // let atkRollParts = []
         let rollFormula = ""
         let rollResponse
         let naturalRoll = 0
@@ -461,10 +462,10 @@ export class Hyp3eActor extends Actor {
         let targetAc = 9
         let targetName = ""
         let targetSize = ""
-        let masteryMod = 0
+        // let masteryMod = 0
         let debugAtkRollFormula = ""
         let debugDmgRollFormula = ""
-        let itemId = ""
+        // let itemId = dataset.itemId
         let itemName = ""
         let label = `${dataset.label}`
 
@@ -473,8 +474,7 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("Item:", item) }
         
         if (item) {
-            // Get the item's ID and friendly name if it has one
-            itemId = item.id
+            // Get the item's friendly name if it has one
             itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
             // Missile weapons need to show a range selector in the dialog
             if (item.system.missile) {
@@ -533,7 +533,7 @@ export class Hyp3eActor extends Actor {
         // Add situational modifier and roll mode from the dialog
         dataset.sitMod = rollResponse.sitMod
         dataset.rollMode = rollResponse.rollMode
-        // Is there a range modifier needed?
+        // Did we get a range modifier from the dialog?
         if (rollResponse.rangeGroup != "") {
             switch (rollResponse.rangeGroup) {
                 case "short":
@@ -548,7 +548,7 @@ export class Hyp3eActor extends Actor {
             }
         }
 
-        // Item-specific calculations
+        // Does the item have an attack formula?
         if (item) {
             // If there's no item roll formula (typically a spell), send a chat message and exit
             if (!item.system.formula) {
@@ -557,42 +557,53 @@ export class Hyp3eActor extends Actor {
             }
             
             // Check if the weapon attack has Master or Grandmaster flags set
-            if (item.system.wpnGrandmaster) {
-                masteryMod = 2
-            } else if (item.system.wpnMaster) {
-                masteryMod = 1
-            }
+            // if (item.system.wpnGrandmaster) {
+            //     masteryMod = 2
+            // } else if (item.system.wpnMaster) {
+            //     masteryMod = 1
+            // }
         }
 
-        // Initialize our attack roll parts array with the base roll
-        atkRollParts.push(dataset.roll)
-        // Add weapon mastery, if needed
-        if (masteryMod == 0) {
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + sitMod` }
-        } else {
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + masteryMod + sitMod` }
-            atkRollParts.push(masteryMod)  
-        }
-        // Add situational modifier from the dice dialog
-        atkRollParts.push(dataset.sitMod)
+        // // Initialize our attack roll parts array with the base roll
+        // atkRollParts.push(dataset.roll)
+        // // Add weapon mastery, if needed
+        // if (masteryMod == 0) {
+        //     if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + sitMod` }
+        // } else {
+        //     if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + masteryMod + sitMod` }
+        //     atkRollParts.push(masteryMod)  
+        // }
+        // // Add situational modifier from the dice dialog
+        // atkRollParts.push(dataset.sitMod)
 
-        // Add range modifier from the dice dialog, if needed
-        if (dataset.rangeMod) {
-            atkRollParts.push(dataset.rangeMod)
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += ` + rangeMod` }    
-        }
+        // // Add range modifier from the dice dialog, if needed
+        // if (dataset.rangeMod) {
+        //     atkRollParts.push(dataset.rangeMod)
+        //     if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += ` + rangeMod` }    
+        // }
+
+        // // Construct our attack roll formula
+        // rollFormula = atkRollParts.join(" + ")
+        // if (item) {
+        //     // Replace '@item.atkMod' with the actual value
+        //     rollFormula = rollFormula.replace("@item.atkMod", item.system.atkMod)
+        // }
+
+        // if (CONFIG.HYP3E.debugMessages) {
+        //     console.log("Attack roll parts:", atkRollParts)
+        //     console.log("Attack formula:", rollFormula)
+        // }
 
         // Construct our attack roll formula
-        rollFormula = atkRollParts.join(" + ")
-        if (item) {
-            // Replace '@item.atkMod' with the actual value
-            rollFormula = rollFormula.replace("@item.atkMod", item.system.atkMod)
+        const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, rollData, this.type)
+        rollFormula = atkObj.formula
+        if (itemData) {
+            // Replace '@item.atkMod' with the actual value...
+            //  There must be a better way to do this, but it works for now.
+            rollFormula = rollFormula.replace("@item.atkMod", itemData.atkMod)
         }
-
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log("Attack roll parts:", atkRollParts)
-            console.log("Attack formula:", rollFormula)
-        }
+        debugAtkRollFormula = atkObj.debugFormula
+        if (CONFIG.HYP3E.debugMessages) { console.log("Attack formula:", rollFormula) }
 
         // Roll the dice!
         let atkRoll = new Roll(rollFormula, this.getRollData())
@@ -729,10 +740,7 @@ export class Hyp3eActor extends Actor {
                 const dmgObj = Hyp3eDice.buildDamageFormula(itemData, rollData, this.type)
                 dmgFormula = dmgObj.formula
                 debugDmgRollFormula = dmgObj.debugFormula
-                if (CONFIG.HYP3E.debugMessages) {
-                    // console.log("Damage roll parts:", dmgRollParts)
-                    console.log("Damage formula:", dmgFormula)
-                }
+                if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
 
                 // Invoke the damage roll
                 dmgRoll = new Roll(dmgFormula, rollData);
