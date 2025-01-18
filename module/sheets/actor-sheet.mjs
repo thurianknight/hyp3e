@@ -1,5 +1,5 @@
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
-import {Hyp3eDice} from "../dice.mjs";
+// import {Hyp3eDice} from "../dice.mjs";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications

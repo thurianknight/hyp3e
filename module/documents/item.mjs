@@ -1,4 +1,5 @@
 import {Hyp3eDice} from "../dice.mjs";
+// import {Hyp3eDialog} from "../helpers/dialog.mjs";
 
 /**
  * Extend the basic Item with some very simple modifications.

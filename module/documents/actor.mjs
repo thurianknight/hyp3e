@@ -1,4 +1,5 @@
 import {Hyp3eDice} from "../dice.mjs";
+import {Hyp3eDialog} from "../helpers/dialog.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 
 /**
@@ -286,7 +287,7 @@ export class Hyp3eActor extends Actor {
         // Log the dataset before the dialog renders
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
         try {
-            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+            rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
         } catch(err) {
             return
         }
@@ -315,7 +316,7 @@ export class Hyp3eActor extends Actor {
         // Log the dataset before the dialog renders
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
         try {
-            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+            rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
         } catch(err) {
             return
         }
@@ -387,7 +388,7 @@ export class Hyp3eActor extends Actor {
         // Log the dataset before the dialog renders
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
         try {
-            rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset)
+            rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
         } catch(err) {
             return
         }
@@ -492,20 +493,20 @@ export class Hyp3eActor extends Actor {
         if (!item) {
             // Since removing the basic attack from Fighting Ability, this may not be needed
             try {
-                rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset)
+                rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset)
             } catch(err) {
                 return
             }
         } else if (item && item.type == "weapon") {
             try {
-                rollResponse = await Hyp3eDice.ShowAttackRollDialog(dataset, rangeGroup, ranges, chosen)
+                rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, rangeGroup, ranges, chosen)
             } catch(err) {
                 if (CONFIG.HYP3E.debugMessages) { console.log("ERROR: ", err) }
                 return
             }
         } else if (item && item.type == "spell") {
             try {
-                rollResponse = await Hyp3eDice.ShowSpellcastingDialog(dataset)
+                rollResponse = await Hyp3eDialog.ShowSpellcastingDialog(dataset)
             } catch(err) {
                 return
             }
@@ -769,7 +770,7 @@ export class Hyp3eActor extends Actor {
             // Log the dataset before the dialog renders
             if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
             try {
-                rollResponse = await Hyp3eDice.ShowSaveRollDialog(dataset)
+                rollResponse = await Hyp3eDialog.ShowSaveRollDialog(dataset)
             } catch(err) {
                 return
             }
@@ -795,7 +796,7 @@ export class Hyp3eActor extends Actor {
             // Log the dataset before the dialog renders
             if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
             try {
-                rollResponse = await Hyp3eDice.ShowBasicRollDialog(dataset);
+                rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset);
                 // Default basic save with only sit mod from dice dialog
                 saveRollParts.push(dataset.roll)
             } catch(err) {
@@ -2098,7 +2099,7 @@ export class Hyp3eActor extends Actor {
         
         // Display the confirmation dialog, and exit if the user cancels this action
         try {
-            let rollResponse = await Hyp3eDice.ShowSetModifiersDialog(dataset)
+            let rollResponse = await Hyp3eDialog.ShowSetModifiersDialog(dataset)
         } catch(err) {
             console.log(`SetAttributeMods dialog error ${err}`)
             return false
