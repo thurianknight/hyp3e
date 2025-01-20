@@ -349,23 +349,22 @@ Hooks.once("ready", async function() {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "1.1.3"
+    const NEEDS_MIGRATION_TO_VERSION = "1.1.5"
     const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
-      migrateWorld()
-      reportBestiary()
+        migrateWorld()
     }
   }
 
-  // Report on compendium data
-  if (game.user.isGM) {
-    // if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
-    //   reportBestiary()
-    // }
-    if (foundry.utils.isNewerVersion("1.0.3", game.system.version)) {
-        reportItems()
+    // Report on compendium data, for data-error hunting
+    if (game.user.isGM) {
+        // if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
+        //     reportBestiary()
+        // }
+        if (foundry.utils.isNewerVersion("1.1.5", game.system.version)) {
+            reportItems()
+        }
     }
-  }
 
 });
 
@@ -386,31 +385,35 @@ async function migrateWorld() {
 
     // Migrate Actor directory
     for (let actor of game.actors.contents) {
-        if (actor.type == "npc") {
-            // do stuff
+        if (actor.type == "character") {
+            // do stuff only to characters
         }
-
         // Migrate the actor document's items if any exist
-        // if (actor.items) {
-        //   for (let item of actor.items) {
-        //      do stuff
-        //   }
-        // }
+        if (actor.items) {
+            for (let item of actor.items) {
+                if (item.type === "weapon") {
+                    const atkFormula = updateWeaponFormula(item)
+                    if (atkFormula) {
+                        await item.update(atkFormula)
+                    }
+                }
+            }
+        }
     }
 
     // Migrate Actor compendia, one document at a time (time-consuming!)
     for (let pack of game.packs) {
 
         const packType = pack.metadata.type
-        // Skip anything that's not an Item compendium pack
-        // if (packType != "Item") {
-        //   continue
-        // }
-
-        // Skip anything that's not an Actor compendium pack
-        if (packType != "Actor") {
+        // Skip anything that's not an Item or Actor compendium pack
+        if (packType != "Item" && packType != "Actor") {
             continue
         }
+
+        // Skip anything that's not an Actor compendium pack
+        // if (packType != "Actor") {
+        //     continue
+        // }
         
         console.log(`Compendium pack ${pack.metadata.label}:`, pack)
         const documentName = pack.documentName;
@@ -419,7 +422,7 @@ async function migrateWorld() {
         const wasLocked = pack.locked
         await pack.configure({ locked: false })
 
-        // Begin by requesting server-side data model migration and get the migrated content
+        // Begin by requesting server-side data model migration, and get the pack docs
         console.log(`Migrating compendium pack ${pack.metadata.label}...`)
         await pack.migrate()
         const documents = await pack.getDocuments()
@@ -431,80 +434,29 @@ async function migrateWorld() {
                 case "Actor":
                     // Migrate NPC data
                     if (doc.type == "npc") {
-                        // if (doc.system.hp.value >= 0) {
-                        //     // Nullify HP if it's populated
-                        //     console.log(`Nullifying actor ${doc.name} HP...`)
-                        //     const hp = {
-                        //         system: {
-                        //             hp: {
-                        //                 value: null,
-                        //                 min: 0,
-                        //                 max: null
-                        //             }
-                        //         }
-                        //     }
-                        //     await doc.update(hp)
-                        // }
-                        // if (doc.system.ca == 0) {
-                        //     // Nullify CA if it's 0
-                        //     console.log(`Nullifying actor ${doc.name} CA...`)
-                        //     const ca = {
-                        //         system: {
-                        //             ca: null
-                        //         }
-                        //     }
-                        //     await doc.update(ca)
-                        // }
-                        // if (doc.system.otherMv.value != "") {
-                        //     // Set otherMv string to lower-case
-                        //     console.log(`Setting actor ${doc.name} otherMv to lower case...`)
-                        //     const otherMv = {
-                        //         system: {
-                        //             otherMv: {
-                        //                 value: doc.system.otherMv.value.toLowerCase(),
-                        //             }
-                        //         }
-                        //     }
-                        //     await doc.update(otherMv)
-                        // }
+                        // do stuff to npcs
                     }
-
                     // Migrate the actor document's items if any exist
                     if (doc.items) {
-                      for (let item of doc.items) {
-                        //  Update CA if it was null but the actor actually has spells
-                        // if (doc.system.ca == null && item.type == "spell") {
-                        //     console.log(`Resetting actor ${doc.name} CA...`)
-                        //     const ca = {
-                        //         system: {
-                        //             ca: doc.system.fa
-                        //         }
-                        //     }
-                        //     await doc.update(ca)
-                        // }
-                        if (item.type == "feature" && item.system.class != null) {
-                            // Update the feature document
-                            console.log(`Updating feature ${item.name}...`)
-                            const c = {
-                                system: {
-                                    class: null
+                        for (let item of doc.items) {
+                            if (item.type === "weapon") {
+                                // Update the weapon document
+                                const atkFormula = updateWeaponFormula(item)
+                                if (atkFormula) {
+                                    await item.update(atkFormula)
                                 }
                             }
-                            await item.update(c)
                         }
-                      }
                     }
                     break
 
                 case "Item":
-                    console.log("Compendium item document:", doc)
-                    // Migrate items of type 'container' to type 'item', and set isContainer flag
-                    if (doc.type === 'container') {
-                        // Update the container/item document
-                        console.log(`Updating container/item ${doc.name}...`)
-                        doc.type = "item"
-                        doc.system.isContainer = true
-                        await doc.update()
+                    if (doc.type === "weapon") {
+                        // Update the weapon document
+                        const atkFormula = updateWeaponFormula(doc)
+                        if (atkFormula) {
+                            await doc.update(atkFormula)
+                        }
                     }
                     break
         
@@ -522,6 +474,17 @@ async function migrateWorld() {
         console.log(`Migrated all ${documentName} documents from Compendium ${pack.collection}`);
 
     }
+}
+
+function updateWeaponFormula(doc) {
+    if (doc.system.formula.includes("+ @item.atkMod")) {
+        console.log(`Updating ${doc.name}...`)
+        const newFormula = doc.system.formula.replace("+ @item.atkMod", "")
+        const update = {system: {}}
+        update.system = {formula: newFormula}
+        return update;
+    }
+    return null;
 }
 
 function updateEmpty(doc) {
@@ -598,7 +561,10 @@ async function reportItems() {
             const documents = await pack.getDocuments()
             for (let doc of documents) {
                 if (!doc.system.weight || doc.system.weight == "") {
-                    console.log(`Compendium weight: ${doc.name} has weight ${doc.system.weight}!`)
+                    console.log(`DEBUG: ${doc.name} has weight ${doc.system.weight}!`)
+                }
+                if (doc.system.formula?.includes("item.atkMod")) {
+                    console.log(`DEBUG: ${doc.name} has formula ${doc.system.formula}!`)
                 }
             }
         }

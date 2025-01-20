@@ -10,6 +10,7 @@ export class Hyp3eDice {
     static buildAttackFormula(rollData, itemData, actorData = null, actorType = null) {
         let atkRollParts = []
         let masteryMod = 0
+        let debugAtkRollParts = []
         let debugAtkRollFormula = ""
 
         // Check if the weapon attack has Master or Grandmaster flags set
@@ -18,49 +19,65 @@ export class Hyp3eDice {
         } else if (itemData.wpnMaster) {
             masteryMod = 1
         }
-    
-        // All items start with the base attack formula.
-        //  For weapons, this includes the FA, ST or DX mod, and item attack mod.
-        //  For spells, it may include different variables based on the type of spell.
-        //  For grenade-like items, it probably only includes the DX mod.
-        atkRollParts.push(rollData.roll)
-        if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${itemData.formula}` }
-        // We might need code like the below if we ever decide that weapon roll formulas 
-        //   should NOT include ST or DX mods
-        if (itemData.melee) {
-            // if (actorData && actorType == "character") {
-            //     // Only characters (not NPCs) apply their ST Attack Mod to melee attacks
-            //     atkRollParts.push(actorData.str.atkMod)
-            // }
-        } else if (itemData.missile) {
-            // if (actorData && actorType == "character") {
-            //     // Only characters (not NPCs) apply their DX Attack Mod to missile attacks
-            //     atkRollParts.push(actorData.dex.atkMod)
-            // }
-        }
-        // Apply the item attack mod
-        // atkRollParts.push(itemData.atkMod)
 
-        // Add Weapon Mastery mod if applicable, and situational modifier after that
+        // All items start with the base attack formula.
+        //  For weapons, this includes the item attack mod, FA, and ST or DX mod.
+        //  For spells with attack rolls, it includes FA and possibly ST or DX mod.
+        //  For grenade-like items, it only includes the DX mod.
+        // atkRollParts.push(rollData.roll)
+        let tmpAtkRollParts = rollData.roll.split("+")
+        atkRollParts = tmpAtkRollParts.map(str => str.trim())
+        if (CONFIG.HYP3E.debugMessages) { 
+            console.log("Base attack roll parts:", atkRollParts)
+            debugAtkRollParts = [...atkRollParts]
+            console.log("Debug attack roll parts:", debugAtkRollParts)
+        }
+
+        // Apply the item attack mod if needed
+        if (itemData.atkMod) {
+            // atkRollParts.push(itemData.atkMod)
+            atkRollParts.splice(1, 0, itemData.atkMod)
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(1, 0, 'itemAtkMod') }
+        }
+
+        // TESTING: We need code like the below if we decide that weapon roll formulas 
+        //   should NOT include ST or DX mods, and that those should be added separately.
+        // if (itemData.melee) {
+        //     if (actorData && actorType == "character") {
+        //         // Only characters (not NPCs) apply their ST Attack Mod to melee attacks
+        //         atkRollParts.push(actorData.str.atkMod)
+        //     }
+        // } else if (itemData.missile) {
+        //     if (actorData && actorType == "character") {
+        //         // Only characters (not NPCs) apply their DX Attack Mod to missile attacks
+        //         atkRollParts.push(actorData.dex.atkMod)
+        //     }
+        // }
+
+        // Add Weapon Mastery mod if applicable
         if (masteryMod > 0) {
             atkRollParts.push(masteryMod)
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += ` + masteryMod + sitMod` }
-        } else {
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += ` + sitMod` }
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('masteryMod') }
         }
         // Add situational modifier from the roll dialog
-        atkRollParts.push(rollData.sitMod)
+        if (rollData?.sitMod != 0) {
+            atkRollParts.push(rollData.sitMod)
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('sitMod') }
+        }
+        // atkRollParts.push(rollData.sitMod)
 
         // Add range modifier from the roll dialog, if needed
-        if (rollData.rangeMod) {
+        if (rollData?.rangeMod <= 0) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("Range mod:", rollData?.rangeMod) }
             atkRollParts.push(rollData.rangeMod)
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += ` + rangeMod` }    
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('rangeMod') }    
         }
 
         // Log the attack roll parts & the constructed formula
         if (CONFIG.HYP3E.debugMessages) { 
             console.log("Attack roll parts:", atkRollParts)
-            console.log(debugAtkRollFormula)
+            console.log("Debug attack roll parts:", debugAtkRollParts)
+            debugAtkRollFormula = debugAtkRollParts.join(" + ")
         }
 
         // Construct the attack roll formula from parts, and return an object with the formula and debug formula
@@ -92,25 +109,34 @@ export class Hyp3eDice {
 
         // All items start with the base damage formula
         dmgRollParts.push(itemData.damage)
+        if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage}` }
+
+        // Apply the item damage mod if needed
+        if (itemData.dmgMod) {
+            dmgRollParts.push(itemData.dmgMod)
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + itemDmgMod` }
+        }
+
         if (itemData.melee) {
             if (actorData && actorType == "character") {
+                // Apply the item damage mod first
+                // dmgRollParts.push(itemData.dmgMod)
                 // Characters apply their ST Damage Mod to all melee damage
                 dmgRollParts.push(actorData.str.dmgMod)
-                // Apply the item damage mod
-                dmgRollParts.push(itemData.dmgMod)
-                if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + @str.dmgMod + @item.dmgMod` }
+                // if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + itemDmgMod + @str.dmgMod` }
+                if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + @str.dmgMod` }
             } else {
-                // NPCs and monsters don't have a ST damage modifier, but might have an item damage mod
-                dmgRollParts.push(itemData.dmgMod)
-                if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + @item.dmgMod` }
+                // NPCs/monsters don't have a ST attribute, so it's just the item damage mod
+                // dmgRollParts.push(itemData.dmgMod)
+                // if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + itemDmgMod` }
             }
         } else if (itemData.missile) {
             // Apply the item damage mod
-            dmgRollParts.push(itemData.dmgMod)
-            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + @item.dmgMod` }
+            // dmgRollParts.push(itemData.dmgMod)
+            // if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + itemDmgMod` }
         } else {
             // This should only happen with spells
-            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage}` }
+            // if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage}` }
         }
 
         // Add Weapon Mastery mod if applicable

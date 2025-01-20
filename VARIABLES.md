@@ -2,7 +2,7 @@
 
 When creating roll formulas and macros, it is common to use variables for actor and item properties. Below is a list of the most commonly-used variables. But if you need a more complete listing of possible variables, I recommend installing the Koboldworks Data Inspector module.
 
-## Actor (Character & NPC) Variables
+## Actor (Character) Variables
 - @ac.dr
   - Damage Reduction on actor from equipped armor
 - @ac.value
@@ -45,11 +45,11 @@ When creating roll formulas and macros, it is common to use variables for actor 
   - Turning Ability
 
 ## Item Variables
-- @item.ac
+- @ac
   - Armor Class value
-- @item.atkMod
+- @atkMod
   - Item Attack Modifier
-- @item.dmgMod
+- @dmgMod
   - Item Damage Modifier
-- @item.dr
+- @dr
   - Damage Reduction value

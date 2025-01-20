@@ -48,76 +48,91 @@ export class Hyp3eItem extends Item {
         super.prepareData();
 
         // Get the Item's data
-        const itemData = this;
+        const item = this;
+        const itemData = item.system;
         // const actorData = this.actor ? this.actor : {};
-        // const data = itemData;
-        // console.log("Item data:", itemData)
+        // console.log("Item:", item)
 
         // Handle weapon attack roll formula
-        if (itemData.type == "weapon") {
+        if (item.type == "weapon") {
             // For all weapons, atkRoll is obviously true
-            itemData.system.atkRoll = true
+            itemData.atkRoll = true
             // Set melee & missile flags and attack formulas
-            if (itemData.system.type == "melee") {
-                itemData.system.melee = true
-                itemData.system.missile = false
+            if (itemData.type == "melee") {
+                itemData.melee = true
+                itemData.missile = false
                 // Area effects do not require an attack roll, all else does
-                if (!itemData.system.isAreaEffect) {
+                if (!itemData.isAreaEffect) {
                     // Set attack formula if it doesn't already exist, else leave it alone
-                    if (!itemData.system.formula || itemData.system.formula == '') {
-                        itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
+                    if (!itemData.formula || itemData.formula == '') {
+                        itemData.formula = '1d20 + @fa + @str.atkMod'
                     }
                 } else {
                     // Clear the attack roll if this is an area effect attack
-                    itemData.system.formula = ""
+                    itemData.formula = ""
                 }
-            } else if (itemData.system.type == "missile") {
-                itemData.system.melee = false
-                itemData.system.missile = true
+            } else if (itemData.type == "missile") {
+                itemData.melee = false
+                itemData.missile = true
                 // Area effects do not require an attack roll, all else does
-                if (!itemData.system.isAreaEffect) {
+                if (!itemData.isAreaEffect) {
                     // Set attack formula if it doesn't already exist, else leave it alone
-                    if (!itemData.system.formula || itemData.system.formula == '') {
-                        if (!itemData.system.isGrenade) {
+                    if (!itemData.formula || itemData.formula == '') {
+                        if (!itemData.isGrenade) {
                             // Standard missile weapons
-                            itemData.system.formula = '1d20 + @fa + @dex.atkMod + @item.atkMod'
-                        } else {
-                            // Grenade-like splash-effect items
-                            itemData.system.formula = '1d20 + @dex.atkMod'
+                            itemData.formula = '1d20 + @fa + @dex.atkMod'
+                        // } else {
+                        //     // Grenade-like splash-effect items
+                        //     itemData.formula = '1d20 + @dex.atkMod'
                         }
                     }
                 } else {
                     // Clear the attack roll if this is an area effect attack
-                    itemData.system.formula = ""
+                    itemData.formula = ""
                 }
             } else {
                 // This should never happen, unless an item is imported with missing data
                 console.log("ITEM ERROR: Weapon has neither melee nor missile property set! Setting to melee...")
-                itemData.system.type = "melee"
-                itemData.system.melee = true
-                itemData.system.missile = false
+                itemData.type = "melee"
+                itemData.melee = true
+                itemData.missile = false
+                itemData.isGrenade = false
+                itemData.isAreaEffect = false
                 // Set attack formula if it doesn't already exist, else leave it alone
-                if (itemData.system.formula == '') {
-                    itemData.system.formula = '1d20 + @fa + @str.atkMod + @item.atkMod'
+                if (itemData.formula == '') {
+                    itemData.formula = '1d20 + @fa + @str.atkMod'
                 }
+            }
+            // The grenade and area effect checkboxes override standard attack formulas
+            if (itemData.isGrenade) {
+                itemData.melee = false
+                itemData.missile = true
+                itemData.isAreaEffect = false
+                itemData.formula = '1d20 + @dex.atkMod'
+            }
+            if (itemData.isAreaEffect) {
+                itemData.melee = false
+                itemData.missile = true
+                itemData.isGrenade = false
+                itemData.formula = ''
             }
 
         } else { // ==> Anything else...
             // For non-weapons (like spells), is the Attack Roll checkbox selected?
-            if (itemData.system.atkRoll) {
+            if (itemData.atkRoll) {
                 // Set attack formula if it doesn't already exist, else leave it alone
-                if (itemData.system.formula == '') {
-                    itemData.system.formula = '1d20 + @fa'
+                if (itemData.formula == '') {
+                    itemData.formula = '1d20 + @fa'
                 }
             } else {
                 // Handle item check roll formula
-                if (itemData.system.formula == '' && itemData.system.check != '') {
-                    itemData.system.formula = itemData.system.check
+                if (itemData.formula == '' && itemData.check != '') {
+                    itemData.formula = itemData.check
                 }
             }
         }
         // Log the item data
-        //console.log("Item Data:", itemData)
+        //console.log("Item Data:", item)
 
     }
 

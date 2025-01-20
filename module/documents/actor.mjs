@@ -437,15 +437,19 @@ export class Hyp3eActor extends Actor {
     }
 
     async rollAttackOrSpell(dataset) {
+        // Log the dataset and item (if any) before proceeding
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
-
-        // Is this an item (weapon or spell) attack?
+        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+        
+        // Is this an item-based attack?
         const item = this.items.get(dataset.itemId) ?? null
-        const itemData = item ? item.system : null
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item:", item) }
+        const itemData = item ? {...item.system} : null
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item roll data:", itemData) }
 
         // Retrieve roll data from the actor
-        const rollData = this.getRollData();
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", rollData) }
+        const actorData = this.getRollData();
+        if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", actorData) }
 
         // Declare vars
         // let atkRollParts = []
@@ -465,26 +469,22 @@ export class Hyp3eActor extends Actor {
         // let masteryMod = 0
         let debugAtkRollFormula = ""
         let debugDmgRollFormula = ""
-        // let itemId = dataset.itemId
+        let itemId = dataset.itemId
         let itemName = ""
         let label = `${dataset.label}`
 
-        // Log the dataset and item (if any) before proceeding
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item:", item) }
-        
         if (item) {
             // Get the item's friendly name if it has one
-            itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
+            itemName = itemData.friendlyName != "" ? itemData.friendlyName : item.name
             // Missile weapons need to show a range selector in the dialog
-            if (item.system.missile) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Range increments:`, item.system.range) }
+            if (itemData.missile) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Range increments:`, itemData.range) }
                 dataset.showRanges = true
                 rangeGroup = "rangeGroup"
                 ranges = {
-                    short: `Short (${item.system.range.short})`,
-                    medium: `Medium (${item.system.range.medium})`,
-                    long: `Long (${item.system.range.long})`}
+                    short: `Short (${itemData.range.short})`,
+                    medium: `Medium (${itemData.range.medium})`,
+                    long: `Long (${itemData.range.long})`}
                 chosen = "short"
             }
         }
@@ -511,19 +511,19 @@ export class Hyp3eActor extends Actor {
                 return
             }
             // Decrement the number memorized
-            if (item.type == "spell" && item.system.quantity.value > 0) {
+            if (item.type == "spell" && itemData.quantity.value > 0) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Cast memorized spell: ${item.name}`) }
                 // Update the item object
                 await item.update({
                 system: {
                     quantity: {
-                        value: item.system.quantity.value--,  
+                        value: itemData.quantity.value--,  
                     }
                 }
                 })
                 // Update the embedded item document
                 this.updateEmbeddedDocuments("Item", [
-                    { _id: item.id, "system.quantity.value": item.system.quantity.value-- },
+                    { _id: item.id, "system.quantity.value": itemData.quantity.value-- },
                 ])
             }
         }
@@ -551,20 +551,21 @@ export class Hyp3eActor extends Actor {
         // Does the item have an attack formula?
         if (item) {
             // If there's no item roll formula (typically a spell), send a chat message and exit
-            if (!item.system.formula) {
+            if (!itemData.formula) {
                 item._displayItemInChat()
                 return null
             }
             
-            // Check if the weapon attack has Master or Grandmaster flags set
-            // if (item.system.wpnGrandmaster) {
+            // TESTING: Check if the weapon attack has Master or Grandmaster flags set
+            // if (itemData.wpnGrandmaster) {
             //     masteryMod = 2
-            // } else if (item.system.wpnMaster) {
+            // } else if (itemData.wpnMaster) {
             //     masteryMod = 1
             // }
         }
 
-        // // Initialize our attack roll parts array with the base roll
+        // TESTING: Log the final attack roll formula for comparison
+        // Initialize our attack roll parts array with the base roll
         // atkRollParts.push(dataset.roll)
         // // Add weapon mastery, if needed
         // if (masteryMod == 0) {
@@ -584,29 +585,30 @@ export class Hyp3eActor extends Actor {
 
         // // Construct our attack roll formula
         // rollFormula = atkRollParts.join(" + ")
-        // if (item) {
+        // if (itemData) {
         //     // Replace '@item.atkMod' with the actual value
-        //     rollFormula = rollFormula.replace("@item.atkMod", item.system.atkMod)
+        //     rollFormula = rollFormula.replace("@item.atkMod", itemData.atkMod)
         // }
 
         // if (CONFIG.HYP3E.debugMessages) {
-        //     console.log("Attack roll parts:", atkRollParts)
-        //     console.log("Attack formula:", rollFormula)
+        //     console.log("TESTING: Attack roll parts:", atkRollParts)
+        //     console.log("TESTING: Attack formula variables:", debugAtkRollFormula)
         // }
 
         // Construct our attack roll formula
-        const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, rollData, this.type)
+        const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, actorData, this.type)
         rollFormula = atkObj.formula
-        if (itemData) {
-            // Replace '@item.atkMod' with the actual value...
-            //  There must be a better way to do this, but it works for now.
-            rollFormula = rollFormula.replace("@item.atkMod", itemData.atkMod)
+        if (rollFormula.includes("@item.atkMod")) {
+            // Strip '@item.atkMod' out, since we added it previously anyway...
+            //  Ideally this won't ever happen, but some items might have it in their formula.
+            console.log(`DEBUG: ${itemData.friendlyName} still has @itemData.atkMod in its formula!`)
+            rollFormula = rollFormula.replace("@item.atkMod", "")
         }
         debugAtkRollFormula = atkObj.debugFormula
         if (CONFIG.HYP3E.debugMessages) { console.log("Attack formula:", rollFormula) }
 
         // Roll the dice!
-        let atkRoll = new Roll(rollFormula, this.getRollData())
+        let atkRoll = new Roll(rollFormula, actorData)
         if (CONFIG.HYP3E.debugMessages) { console.log("Attack roll: ", atkRoll) }
         // Resolve the roll
         let result = await atkRoll.roll()
@@ -637,7 +639,7 @@ export class Hyp3eActor extends Actor {
         // Determine hit or miss
         let hit = false
         let tn = 31 // some fake number just to initialize the variable
-        if (!item.system.isGrenade) {
+        if (!itemData.isGrenade) {
             // If this is a normal attack, TN is based on target's AC
             tn = 20 - targetAc
             if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
@@ -707,28 +709,28 @@ export class Hyp3eActor extends Actor {
 
         // If the item attack hit, we roll damage automatically and include it in the chat message
         if (hit && item) {
-            if (Roll.validate(item.system.damage)) {
+            if (Roll.validate(itemData.damage)) {
                 // All items start with the base damage formula
-                // dmgRollParts.push(item.system.damage)
-                // if (item.system.melee) {
+                // dmgRollParts.push(itemData.damage)
+                // if (itemData.melee) {
                 //     if (this.type == "character") {
                 //         // Characters apply their ST Damage Mod to all melee damage
-                //         dmgRollParts.push(rollData.str.dmgMod)
+                //         dmgRollParts.push(actorData.str.dmgMod)
                 //         // Apply the item damage mod
-                //         dmgRollParts.push(item.system.dmgMod)
-                //         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @str.dmgMod + @item.dmgMod` }
+                //         dmgRollParts.push(itemData.dmgMod)
+                //         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + @str.dmgMod + @item.dmgMod` }
                 //     } else {
                 //         // NPCs and monsters don't have a ST damage modifier, but might have an item damage mod
-                //         dmgRollParts.push(item.system.dmgMod)
-                //         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }
+                //         dmgRollParts.push(itemData.dmgMod)
+                //         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + @item.dmgMod` }
                 //     }
-                // } else if (item.system.missile) {
+                // } else if (itemData.missile) {
                 //     // Apply the item damage mod
-                //     dmgRollParts.push(item.system.dmgMod)
-                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage} + @item.dmgMod` }  
+                //     dmgRollParts.push(itemData.dmgMod)
+                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + @item.dmgMod` }  
                 // } else {
                 //     // This should only happen with spells
-                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${item.system.damage}` }
+                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage}` }
                 // }
                 // // Add Weapon Mastery mod if applicable
                 // if (masteryMod != 0) {
@@ -737,24 +739,24 @@ export class Hyp3eActor extends Actor {
                 // }
                 // // Construct the damage roll formula from parts
                 // dmgFormula = dmgRollParts.join(" + ")
-                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, rollData, this.type)
+                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, actorData, this.type)
                 dmgFormula = dmgObj.formula
                 debugDmgRollFormula = dmgObj.debugFormula
                 if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
 
                 // Invoke the damage roll
-                dmgRoll = new Roll(dmgFormula, rollData);
+                dmgRoll = new Roll(dmgFormula, actorData);
                 // Resolve the roll
                 let result = await dmgRoll.roll();
                 if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
 
                 // Get the dice roll values of damage for x2/x3 modifier button
-                // let dmgBaseRoll = item.system.damage;
+                // let dmgBaseRoll = itemData.damage;
                 const naturalDmgRoll = dmgRoll.dice[0]?.total ? dmgRoll.dice[0]?.total : dmgRoll.total;
             
                 // Now output the damage chat
                 // debugDmgRollFormula = CONFIG.HYP3E.debugMessages? "Damage Formula: " + dmgFormula : ""
-                this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, item.system.damage, item)
+                this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, itemData.damage, item)
             }
         }
 
