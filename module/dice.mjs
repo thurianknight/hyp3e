@@ -3,11 +3,11 @@ import { HYP3E } from "./helpers/config.mjs"
 export class Hyp3eDice {
     /**
      * Construct attack roll from relevant parts, return roll formula
+     * @param {Object} rollData 
      * @param {Object} itemData
      * @param {Object} actorData
-     * @param {String} actorType
      */
-    static buildAttackFormula(rollData, itemData, actorData = null, actorType = null) {
+    static buildAttackFormula(rollData, itemData, actorData = null) {
         let atkRollParts = []
         let masteryMod = 0
         let debugAtkRollParts = []
@@ -33,26 +33,95 @@ export class Hyp3eDice {
             console.log("Debug attack roll parts:", debugAtkRollParts)
         }
 
+        // Strip '@item.atkMod' out since we add it automatically anyway...
+        //  Ideally this won't ever happen, but some items might have it in their formula.
+        if (atkRollParts.includes("@item.atkMod")) {
+            console.log(`DEBUG: ${rollData.itemName} still has @itemData.atkMod in its formula!`)
+            atkRollParts = atkRollParts.filter(part => (part != "@item.atkMod"))
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@item.atkMod")) }
+        }
+
         // Apply the item attack mod if needed
         if (itemData.atkMod) {
             // atkRollParts.push(itemData.atkMod)
-            atkRollParts.splice(1, 0, itemData.atkMod)
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(1, 0, 'itemAtkMod') }
+            if (atkRollParts.length > 1) {
+                atkRollParts.splice(1, 0, itemData.atkMod)
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(1, 0, 'itemAtkMod') }
+            } else {
+                atkRollParts.push(itemData.atkMod)
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('itemAtkMod') }
+            }
         }
 
         // TESTING: We need code like the below if we decide that weapon roll formulas 
-        //   should NOT include ST or DX mods, and that those should be added separately.
-        // if (itemData.melee) {
-        //     if (actorData && actorType == "character") {
-        //         // Only characters (not NPCs) apply their ST Attack Mod to melee attacks
-        //         atkRollParts.push(actorData.str.atkMod)
-        //     }
-        // } else if (itemData.missile) {
-        //     if (actorData && actorType == "character") {
-        //         // Only characters (not NPCs) apply their DX Attack Mod to missile attacks
-        //         atkRollParts.push(actorData.dex.atkMod)
-        //     }
-        // }
+        //   should NOT include the standard mods, but only custom variables.
+        //   This would help ensure that the formula is correct without requiring the 
+        //   GM to enter it precisely.
+
+        // For weapons, the formulas are pretty standard.
+        //   Remove @fa, @str.atkMod, and @dex.atkMod from the roll formula
+        if (itemData.itemType == "weapon") {
+            // Remove Fighting Ability, we will re-add it later if needed
+            atkRollParts = atkRollParts.filter(part => (part != "@fa"))
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@fa")) }
+
+            // Grenade-like items only use the character's DX attack mod
+            if (itemData.isGrenade) {
+                if (actorData?.actorType == "character") {
+                    // if @dex.atkMod exists, remove it first
+                    atkRollParts = atkRollParts.filter(part => (part != "@dex.atkMod"))
+                    if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@dex.atkMod")) }
+                    // By removing and re-adding, we ensure the parts are in the order we want
+                    atkRollParts.push(actorData.dex.atkMod)
+                    if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('dex.atkMod') }
+                }
+            } else {
+                // Most weapons fall into this section...
+
+                // Add Fighting Ability, even if it's zero
+                atkRollParts.push(actorData.fa)
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('fa') }
+
+                // Characters add ST or DX mods based on what the formula already has in it.
+                //   We do this because some people may have custom formulas that don't 
+                //   use ST or DX mods, or use them in non-standard ways.
+                //   For example, they might have a Rapier that uses dex.atkMod instead 
+                //   of str.atkMod.
+                if (actorData?.actorType == "character") {
+                    if (atkRollParts.includes("@str.atkMod")) {
+                        // Remove @str.atkMod first
+                        atkRollParts = atkRollParts.filter(part => (part != "@str.atkMod"))
+                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@str.atkMod")) }
+                        // By removing and re-adding, we ensure the parts are in the order we want
+                        atkRollParts.push(actorData.str.atkMod)
+                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('str.atkMod') }
+                    }
+                    if (atkRollParts.includes("@dex.atkMod")) {
+                        // Remove @dex.atkMod first
+                        atkRollParts = atkRollParts.filter(part => (part != "@dex.atkMod"))
+                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@dex.atkMod")) }
+                        // By removing and re-adding, we ensure the parts are in the order we want
+                        atkRollParts.push(actorData.dex.atkMod)
+                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('dex.atkMod') }
+                    }
+                }
+            }
+
+        } else if (itemData.itemType == "spell") {
+            // Spell attack formulas are so bespoke, we need to handle each variable separately
+            if (atkRollParts.includes("@fa")) {
+                atkRollParts[atkRollParts.indexOf("@fa")] = actorData.fa
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@fa")] = 'fa' }
+            }
+            if (atkRollParts.includes("@str.atkMod")) {
+                atkRollParts[atkRollParts.indexOf("@str.atkMod")] = actorData.str.atkMod
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = 'str.atkMod' }
+            }
+            if (atkRollParts.includes("@dex.atkMod")) {
+                atkRollParts[atkRollParts.indexOf("@dex.atkMod")] = actorData.dex.atkMod
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = 'dex.atkMod' }
+            }
+        }
 
         // Add Weapon Mastery mod if applicable
         if (masteryMod > 0) {
@@ -64,7 +133,6 @@ export class Hyp3eDice {
             atkRollParts.push(rollData.sitMod)
             if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('sitMod') }
         }
-        // atkRollParts.push(rollData.sitMod)
 
         // Add range modifier from the roll dialog, if needed
         if (rollData?.rangeMod <= 0) {
@@ -93,9 +161,8 @@ export class Hyp3eDice {
      * Construct damage roll from relevant parts, return roll formula
      * @param {Object} itemData
      * @param {Object} actorData
-     * @param {String} actorType
      */
-    static buildDamageFormula(itemData, actorData = null, actorType = null) {
+    static buildDamageFormula(itemData, actorData = null) {
         let dmgRollParts = []
         let masteryMod = 0
         let debugDmgRollFormula = ""
@@ -118,7 +185,7 @@ export class Hyp3eDice {
         }
 
         if (itemData.melee) {
-            if (actorData && actorType == "character") {
+            if (actorData?.actorType == "character") {
                 // Apply the item damage mod first
                 // dmgRollParts.push(itemData.dmgMod)
                 // Characters apply their ST Damage Mod to all melee damage

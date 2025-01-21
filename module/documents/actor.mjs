@@ -56,8 +56,9 @@ export class Hyp3eActor extends Actor {
 
         // Calculated fields go here...
 
-        // Add base class, used for crit hit & crit miss tables
+        // Add actor type & base class, used for crit hit & crit miss tables
         try {
+            systemData.actorType = actorData.type
             systemData.baseClass = this.classData[systemData.details.class].baseClass
         } catch (err) {
             // No match found (happens with custom classes), use "npc"
@@ -149,7 +150,8 @@ export class Hyp3eActor extends Actor {
 
         // Calculated fields go here...
 
-        // Add base class, used for crit hit & crit miss tables
+        // Add actor type & base class, used for crit hit & crit miss tables
+        systemData.actorType = actorData.type
         systemData.baseClass = "npc"
 
     }
@@ -174,7 +176,7 @@ export class Hyp3eActor extends Actor {
         if (this.type !== 'character') return;
 
         // Copy the attribute scores to the top level, so that rolls can use
-        // formulas like `@str.mod + 4`.
+        //   formulas like `@str.atkMod`.
         if (data.attributes) {
             for (let [k, v] of Object.entries(data.attributes)) {
                 data[k] = foundry.utils.deepClone(v);
@@ -445,10 +447,16 @@ export class Hyp3eActor extends Actor {
         const item = this.items.get(dataset.itemId) ?? null
         if (CONFIG.HYP3E.debugMessages) { console.log("Item:", item) }
         const itemData = item ? {...item.system} : null
+        if (itemData) {
+            itemData.itemType = item.type
+        }
         if (CONFIG.HYP3E.debugMessages) { console.log("Item roll data:", itemData) }
 
         // Retrieve roll data from the actor
-        const actorData = this.getRollData();
+        const actorData = this.getRollData()
+        if (actorData) {
+            actorData.actorType = this.type
+        }
         if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", actorData) }
 
         // Declare vars
@@ -476,6 +484,7 @@ export class Hyp3eActor extends Actor {
         if (item) {
             // Get the item's friendly name if it has one
             itemName = itemData.friendlyName != "" ? itemData.friendlyName : item.name
+            dataset.itemName = itemName
             // Missile weapons need to show a range selector in the dialog
             if (itemData.missile) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Range increments:`, itemData.range) }
@@ -596,15 +605,16 @@ export class Hyp3eActor extends Actor {
         // }
 
         // Construct our attack roll formula
-        const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, actorData, this.type)
+        const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, actorData)
         rollFormula = atkObj.formula
-        if (rollFormula.includes("@item.atkMod")) {
-            // Strip '@item.atkMod' out, since we added it previously anyway...
-            //  Ideally this won't ever happen, but some items might have it in their formula.
-            console.log(`DEBUG: ${itemData.friendlyName} still has @itemData.atkMod in its formula!`)
-            rollFormula = rollFormula.replace("@item.atkMod", "")
-        }
         debugAtkRollFormula = atkObj.debugFormula
+        // if (rollFormula.includes("@item.atkMod")) {
+        //     // Strip '@item.atkMod' out, since we added it previously anyway...
+        //     //  Ideally this won't ever happen, but some items might have it in their formula.
+        //     console.log(`DEBUG: ${itemName} still has @itemData.atkMod in its formula!`)
+        //     rollFormula = rollFormula.replace("@item.atkMod", "")
+        //     debugAtkRollFormula = debugAtkRollFormula.replace("@item.atkMod", "")
+        // }
         if (CONFIG.HYP3E.debugMessages) { console.log("Attack formula:", rollFormula) }
 
         // Roll the dice!
