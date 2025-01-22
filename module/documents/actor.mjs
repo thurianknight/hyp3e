@@ -564,58 +564,13 @@ export class Hyp3eActor extends Actor {
                 item._displayItemInChat()
                 return null
             }
-            
-            // TESTING: Check if the weapon attack has Master or Grandmaster flags set
-            // if (itemData.wpnGrandmaster) {
-            //     masteryMod = 2
-            // } else if (itemData.wpnMaster) {
-            //     masteryMod = 1
-            // }
         }
-
-        // TESTING: Log the final attack roll formula for comparison
-        // Initialize our attack roll parts array with the base roll
-        // atkRollParts.push(dataset.roll)
-        // // Add weapon mastery, if needed
-        // if (masteryMod == 0) {
-        //     if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + sitMod` }
-        // } else {
-        //     if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula = `Attack Formula: ${dataset.roll} + masteryMod + sitMod` }
-        //     atkRollParts.push(masteryMod)  
-        // }
-        // // Add situational modifier from the dice dialog
-        // atkRollParts.push(dataset.sitMod)
-
-        // // Add range modifier from the dice dialog, if needed
-        // if (dataset.rangeMod) {
-        //     atkRollParts.push(dataset.rangeMod)
-        //     if (CONFIG.HYP3E.debugMessages) { debugAtkRollFormula += ` + rangeMod` }    
-        // }
-
-        // // Construct our attack roll formula
-        // rollFormula = atkRollParts.join(" + ")
-        // if (itemData) {
-        //     // Replace '@item.atkMod' with the actual value
-        //     rollFormula = rollFormula.replace("@item.atkMod", itemData.atkMod)
-        // }
-
-        // if (CONFIG.HYP3E.debugMessages) {
-        //     console.log("TESTING: Attack roll parts:", atkRollParts)
-        //     console.log("TESTING: Attack formula variables:", debugAtkRollFormula)
-        // }
 
         // Construct our attack roll formula
         const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, actorData)
         rollFormula = atkObj.formula
         debugAtkRollFormula = atkObj.debugFormula
-        // if (rollFormula.includes("@item.atkMod")) {
-        //     // Strip '@item.atkMod' out, since we added it previously anyway...
-        //     //  Ideally this won't ever happen, but some items might have it in their formula.
-        //     console.log(`DEBUG: ${itemName} still has @itemData.atkMod in its formula!`)
-        //     rollFormula = rollFormula.replace("@item.atkMod", "")
-        //     debugAtkRollFormula = debugAtkRollFormula.replace("@item.atkMod", "")
-        // }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Attack formula:", rollFormula) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Final attack formula:", rollFormula) }
 
         // Roll the dice!
         let atkRoll = new Roll(rollFormula, actorData)

@@ -20,11 +20,10 @@ export class Hyp3eDice {
             masteryMod = 1
         }
 
-        // All items start with the base attack formula.
-        //  For weapons, this includes the item attack mod, FA, and ST or DX mod.
-        //  For spells with attack rolls, it includes FA and possibly ST or DX mod.
-        //  For grenade-like items, it only includes the DX mod.
-        // atkRollParts.push(rollData.roll)
+        // All items start with their basic attack formula.
+        //   For weapons, this includes the item attack mod, FA, and ST or DX mod.
+        //   For spells with attack rolls, it might include FA, and ST or DX mods.
+        //   For grenade-like items, it only includes the DX mod.
         let tmpAtkRollParts = rollData.roll.split("+")
         atkRollParts = tmpAtkRollParts.map(str => str.trim())
         if (CONFIG.HYP3E.debugMessages) { 
@@ -34,7 +33,7 @@ export class Hyp3eDice {
         }
 
         // Strip '@item.atkMod' out since we add it automatically anyway...
-        //  Ideally this won't ever happen, but some items might have it in their formula.
+        //   Ideally this won't ever happen, but some items might have it in their formula.
         if (atkRollParts.includes("@item.atkMod")) {
             console.log(`DEBUG: ${rollData.itemName} still has @itemData.atkMod in its formula!`)
             atkRollParts = atkRollParts.filter(part => (part != "@item.atkMod"))
@@ -53,15 +52,9 @@ export class Hyp3eDice {
             }
         }
 
-        // TESTING: We need code like the below if we decide that weapon roll formulas 
-        //   should NOT include the standard mods, but only custom variables.
-        //   This would help ensure that the formula is correct without requiring the 
-        //   GM to enter it precisely.
-
         // For weapons, the formulas are pretty standard.
-        //   Remove @fa, @str.atkMod, and @dex.atkMod from the roll formula
         if (itemData.itemType == "weapon") {
-            // Remove Fighting Ability, we will re-add it later if needed
+            // Remove Fighting Ability, we will re-add it later if this isn't a grenade
             atkRollParts = atkRollParts.filter(part => (part != "@fa"))
             if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@fa")) }
 
@@ -94,7 +87,7 @@ export class Hyp3eDice {
                         if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@str.atkMod")) }
                         // By removing and re-adding, we ensure the parts are in the order we want
                         atkRollParts.push(actorData.str.atkMod)
-                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('str.atkMod') }
+                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('@str.atkMod') }
                     }
                     if (atkRollParts.includes("@dex.atkMod")) {
                         // Remove @dex.atkMod first
@@ -102,7 +95,7 @@ export class Hyp3eDice {
                         if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@dex.atkMod")) }
                         // By removing and re-adding, we ensure the parts are in the order we want
                         atkRollParts.push(actorData.dex.atkMod)
-                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('dex.atkMod') }
+                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('@dex.atkMod') }
                     }
                 }
             }
@@ -111,15 +104,15 @@ export class Hyp3eDice {
             // Spell attack formulas are so bespoke, we need to handle each variable separately
             if (atkRollParts.includes("@fa")) {
                 atkRollParts[atkRollParts.indexOf("@fa")] = actorData.fa
-                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@fa")] = 'fa' }
+                // if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@fa")] = 'fa' }
             }
             if (atkRollParts.includes("@str.atkMod")) {
                 atkRollParts[atkRollParts.indexOf("@str.atkMod")] = actorData.str.atkMod
-                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = 'str.atkMod' }
+                // if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = 'str.atkMod' }
             }
             if (atkRollParts.includes("@dex.atkMod")) {
                 atkRollParts[atkRollParts.indexOf("@dex.atkMod")] = actorData.dex.atkMod
-                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = 'dex.atkMod' }
+                // if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = 'dex.atkMod' }
             }
         }
 
@@ -128,6 +121,7 @@ export class Hyp3eDice {
             atkRollParts.push(masteryMod)
             if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('masteryMod') }
         }
+
         // Add situational modifier from the roll dialog
         if (rollData?.sitMod != 0) {
             atkRollParts.push(rollData.sitMod)
@@ -226,328 +220,4 @@ export class Hyp3eDice {
         }
         return dmgObj
     }
-
-    // /**
-    //  * Handle item and ability check dialogs
-    //  * @param dataset
-    //  */
-    // static async ShowBasicRollDialog(dataset) {
-    //     // Default rollMode to public roll, the user can change it in the roll dialog
-    //     let rollMode = "publicroll"
-    //     if (dataset.rollMode) {
-    //         rollMode = dataset.rollMode
-    //     }
-    //     let dialogData = {
-    //         roll: dataset.roll,
-    //         dataset: dataset,
-    //         rollModes: CONFIG.Dice.rollModes,
-    //         rollMode: rollMode
-    //     }
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("Basic/check roll dialog dataset: ", dataset) }
-    //     const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
-    //     const dialogHtml = await renderTemplate(template, dialogData)
-
-    //     // Roll dialog for item and ability checks
-    //     return new Promise((resolve, reject) => {
-    //         const rollDialog = new Dialog({
-    //             title: `${dataset.label}`,
-    //             content: dialogHtml,
-    //             buttons: {
-    //                 roll: {
-    //                     icon: '<i class="fas fa-dice-d20"></i>',
-    //                     label: "Roll",
-    //                     callback: (html) => {
-    //                         const formElement = html[0].querySelector('form')
-    //                         const formData = new FormDataExtended(formElement)
-    //                         const formDataObj = formData.object
-    //                         // No situational modifier? Set it to 0
-    //                         if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-    //                         if (CONFIG.HYP3E.debugMessages) { 
-    //                             console.log('Form data object:', formDataObj)
-    //                             if (CONFIG.HYP3E.flipRollUnderMods) {
-    //                                 console.log("Rolling " + dataset.roll + " - " + formDataObj.sitMod + " ...")
-    //                             } else {
-    //                                 console.log("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-    //                             }
-    //                         }
-    //                         resolve(formDataObj)
-    //                     }
-    //                 },
-    //                 cancel: {
-    //                     icon: '<i class="fas fa-times"></i>',
-    //                     label: "Cancel",
-    //                     callback: (html) => {
-    //                         if (CONFIG.HYP3E.debugMessages) { console.log("Roll canceled!") }
-    //                         reject()
-    //                     }
-    //                 }
-    //             },
-    //             default: "roll",
-    //             render: html => console.log("Register interactivity in the rendered dialog"),
-    //             close: html => console.log("Dialog closed")
-    //         })
-    //         rollDialog.render(true)
-    //     })
-    // }
-
-    // /**
-    //  * Handle attack dialogs
-    //  * @param dataset
-    //  */
-    // static async ShowAttackRollDialog(dataset, rangeGroup = null, ranges = null, chosen = null) {
-    //     // Default rollMode to public roll, the user can change it in the roll dialog
-    //     let rollMode = "publicroll"
-    //     let dialogData = {
-    //         roll: dataset.roll,
-    //         dataset: dataset,
-    //         rollModes: CONFIG.Dice.rollModes,
-    //         rollMode: rollMode,
-    //         rangeGroup: rangeGroup,
-    //         ranges: ranges,
-    //         chosen: chosen
-    //     }
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("Attack roll dialog dataset: ", dataset) }
-    //     const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
-    //     const dialogHtml = await renderTemplate(template, dialogData)
-
-    //     // Roll dialog for attacks
-    //     return new Promise((resolve, reject) => {
-    //         const rollDialog = new Dialog({
-    //             title: `${dataset.label}`,
-    //             content: dialogHtml,
-    //             buttons: {
-    //                 roll: {
-    //                     icon: '<i class="fas fa-dice-d20"></i>',
-    //                     label: "Attack",
-    //                     callback: (html) => {
-    //                         const formElement = html[0].querySelector('form')
-    //                         const formData = new FormDataExtended(formElement)
-    //                         const formDataObj = formData.object
-    //                         // No situational modifier? Set it to 0
-    //                         if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-    //                         if (CONFIG.HYP3E.debugMessages) { 
-    //                             console.log('Form data object:', formDataObj) 
-    //                             console.log("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-    //                         }
-    //                         resolve(formDataObj)
-    //                     }
-    //                 },
-    //                 cancel: {
-    //                     icon: '<i class="fas fa-times"></i>',
-    //                     label: "Cancel",
-    //                     callback: (html) => {
-    //                         if (CONFIG.HYP3E.debugMessages) { console.log("Roll canceled!") }
-    //                         reject()
-    //                     }
-    //                 }
-    //             },
-    //             default: "roll",
-    //             render: html => console.log("Register interactivity in the rendered dialog"),
-    //             close: html => console.log("Dialog closed")
-    //         })
-    //         rollDialog.render(true)
-    //     })
-    // }
-
-    // /**
-    //  * Handle spellcasting dialog
-    //  * @param dataset
-    //  */
-    // static async ShowSpellcastingDialog(dataset) {
-    //     // Default rollMode to public roll, the user can change it in the roll dialog
-    //     let rollMode = "publicroll"
-    //     let dialogData = {
-    //         roll: dataset.roll,
-    //         enableRoll: dataset.enableRoll,
-    //         dataset: dataset,
-    //         rollModes: CONFIG.Dice.rollModes,
-    //         rollMode: rollMode
-    //     }
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("Spellcasting roll dialog dataset: ", dataset) }
-    //     const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
-    //     const dialogHtml = await renderTemplate(template, dialogData)
-
-    //     // Roll dialog for casting spells
-    //     return new Promise((resolve, reject) => {
-    //         const rollDialog = new Dialog({
-    //             title: `${dataset.label}`,
-    //             content: dialogHtml,
-    //             buttons: {
-    //                 roll: {
-    //                     icon: '<i class="fas fa-scroll"></i>',
-    //                     label: "Cast",
-    //                     callback: (html) => {
-    //                         const formElement = html[0].querySelector('form')
-    //                         const formData = new FormDataExtended(formElement)
-    //                         const formDataObj = formData.object
-    //                         // No situational modifier? Set it to 0
-    //                         if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-    //                         if (CONFIG.HYP3E.debugMessages) {
-    //                             console.log('Form data object:', formDataObj)
-    //                             console.log("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-    //                         }
-    //                         resolve(formDataObj)
-    //                     }
-    //                 },
-    //                 cancel: {
-    //                     icon: '<i class="fas fa-times"></i>',
-    //                     label: "Cancel",
-    //                     callback: (html) => {
-    //                         console.log("Roll canceled!")
-    //                         reject()
-    //                     }
-    //                 }
-    //             },
-    //             default: "roll",
-    //             render: html => console.log("Register interactivity in the rendered dialog"),
-    //             close: html => console.log("Dialog closed")
-    //         })
-    //         rollDialog.render(true)
-    //     })
-    // }
-  
-    // /**
-    //  * Handle saving throw dialog
-    //  * @param dataset
-    //  */
-    // static async ShowSaveRollDialog(dataset) {
-    //     // Default rollMode to pulic roll, the user can change it in the roll dialog
-    //     let rollMode = "publicroll"
-    //     // if (dataset.rollMode) {
-    //     //   rollMode = dataset.rollMode
-    //     // }
-    //     let dialogData = {
-    //         roll: dataset.roll,
-    //         dataset: dataset,
-    //         rollModes: CONFIG.Dice.rollModes,
-    //         rollMode: rollMode
-    //     }
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("Save roll dialog dataset: ", dataset) }
-    //     const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
-    //     const dialogHtml = await renderTemplate(template, dialogData)
-
-    //     // Roll dialog for saving throws, with save modifiers
-    //     return new Promise((resolve, reject) => {
-    //         const rollDialog = new Dialog({
-    //             title: `${dataset.label}`,
-    //             content: dialogHtml,
-    //             buttons: {
-    //                 roll: {
-    //                     icon: '<i class="fas fa-dice-d20"></i>',
-    //                     label: "Roll",
-    //                     callback: (html) => {
-    //                         const formElement = html[0].querySelector('form')
-    //                         const formData = new FormDataExtended(formElement)
-    //                         const formDataObj = formData.object
-    //                         // No situational modifier? Set it to 0
-    //                         if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-    //                         if (CONFIG.HYP3E.debugMessages) {
-    //                             console.log('Form data object:', formDataObj)
-    //                             console.log("Rolling basic save: " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-    //                         }
-    //                         resolve(formDataObj)
-    //                     }
-    //                 },
-    //                 avoid: {
-    //                     icon: '<i class="fas fa-dice-d20"></i>',
-    //                     label: "Avoidance Mod",
-    //                     callback: (html) => {
-    //                         const formElement = html[0].querySelector('form')
-    //                         const formData = new FormDataExtended(formElement)
-    //                         const formDataObj = formData.object
-    //                         formDataObj.avoidMod = dataset.avoidMod
-    //                         // No situational modifier? Set it to 0
-    //                         if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-    //                         if (CONFIG.HYP3E.debugMessages) {
-    //                             console.log('Form data object:', formDataObj)
-    //                             console.log("Rolling save with Avoidance mod: " + dataset.roll + " + " + formDataObj.avoidMod + " + " + formDataObj.sitMod + " ...")
-    //                         }
-    //                         resolve(formDataObj)
-    //                     }
-    //                 },
-    //                 poison: {
-    //                     icon: '<i class="fas fa-dice-d20"></i>',
-    //                     label: "Poison/Rad Mod",
-    //                     callback: (html) => {
-    //                         const formElement = html[0].querySelector('form')
-    //                         const formData = new FormDataExtended(formElement)
-    //                         const formDataObj = formData.object
-    //                         formDataObj.poisonMod = dataset.poisonMod
-    //                         // No situational modifier? Set it to 0
-    //                         if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-    //                         if (CONFIG.HYP3E.debugMessages) {
-    //                             console.log('Form data object:', formDataObj)
-    //                             console.log("Rolling save with Poison/Radiation mod: " + dataset.roll + " + " + formDataObj.poisonMod + " + " + formDataObj.sitMod + " ...")
-    //                         }
-    //                         resolve(formDataObj)
-    //                     }
-    //                 },
-    //                 willpower: {
-    //                     icon: '<i class="fas fa-dice-d20"></i>',
-    //                     label: "Willpower Mod",
-    //                     callback: (html) => {
-    //                         const formElement = html[0].querySelector('form')
-    //                         const formData = new FormDataExtended(formElement)
-    //                         const formDataObj = formData.object
-    //                         formDataObj.willMod = dataset.willMod
-    //                         // No situational modifier? Set it to 0
-    //                         if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-    //                         if (CONFIG.HYP3E.debugMessages) {
-    //                             console.log('Form data object:', formDataObj)
-    //                             console.log("Rolling save with Willpower mod: " + dataset.roll + " + " + formDataObj.willMod + " + " + formDataObj.sitMod + " ...")
-    //                         }
-    //                         resolve(formDataObj)
-    //                     }
-    //                 },
-    //                 cancel: {
-    //                     icon: '<i class="fas fa-times"></i>',
-    //                     label: "Cancel",
-    //                     callback: (html) => {
-    //                         console.log("Roll canceled!")
-    //                         reject()
-    //                     }
-    //                 }
-    //             },
-    //             default: "roll",
-    //             render: html => console.log("Register interactivity in the rendered dialog"),
-    //             close: html => console.log("Dialog closed")
-    //         })
-    //         rollDialog.render(true)
-    //     })
-    // }
-
-    // /**
-    //  * Handle Set Attribute Mods confirmation dialog
-    //  * @param dataset
-    //  */
-    // static async ShowSetModifiersDialog(dataset) {
-    //     // Dialog to confirm setting modifiers
-    //     return new Promise((resolve, reject) => {
-    //         new Dialog({
-    //             title: "Confirm set/reset attribute modifiers",
-    //             content: "Set attribute modifiers? This will replace any values already in place!",
-    //             buttons: {
-    //                 confirm: {
-    //                     label: "Confirm",
-    //                     icon: `<i class="fas fa-check"></i>`,
-    //                     callback: () => {
-    //                         // Set/reset all attribute modifiers
-    //                         resolve()
-    //                     }
-    //                 },
-    //                 cancel: {
-    //                     label: "Cancel",
-    //                     icon: `<i class="fas fa-times"></i>`,
-    //                     callback: () => {
-    //                         ui.notifications.info("Set attribute modifiers - canceled!")
-    //                         reject()
-    //                     }
-    //                 }
-    //             },
-    //             default: "cancel",
-    //             render: html => console.log("Register interactivity in the rendered dialog"),
-    //             close: html => console.log("Dialog closed")
-    //         }).render(true);
-    //     })
-    // }
 }

@@ -65,7 +65,7 @@ export class Hyp3eItem extends Item {
                 if (!itemData.isAreaEffect) {
                     // Set attack formula if it doesn't already exist, else leave it alone
                     if (!itemData.formula || itemData.formula == '') {
-                        itemData.formula = '1d20 + @fa + @str.atkMod'
+                        itemData.formula = '1d20 + @str.atkMod'
                     }
                 } else {
                     // Clear the attack roll if this is an area effect attack
@@ -80,7 +80,7 @@ export class Hyp3eItem extends Item {
                     if (!itemData.formula || itemData.formula == '') {
                         if (!itemData.isGrenade) {
                             // Standard missile weapons
-                            itemData.formula = '1d20 + @fa + @dex.atkMod'
+                            itemData.formula = '1d20 + @dex.atkMod'
                         // } else {
                         //     // Grenade-like splash-effect items
                         //     itemData.formula = '1d20 + @dex.atkMod'
@@ -100,7 +100,7 @@ export class Hyp3eItem extends Item {
                 itemData.isAreaEffect = false
                 // Set attack formula if it doesn't already exist, else leave it alone
                 if (itemData.formula == '') {
-                    itemData.formula = '1d20 + @fa + @str.atkMod'
+                    itemData.formula = '1d20 + @str.atkMod'
                 }
             }
             // The grenade and area effect checkboxes override standard attack formulas

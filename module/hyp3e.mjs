@@ -477,13 +477,30 @@ async function migrateWorld() {
 }
 
 function updateWeaponFormula(doc) {
-    if (doc.system.formula.includes("+ @item.atkMod")) {
-        console.log(`Updating ${doc.name}...`)
-        const newFormula = doc.system.formula.replace("+ @item.atkMod", "")
+    let newFormula = doc.system.formula
+    if (doc.system.formula.includes("@item.atkMod")) {
+        console.log(`Removing @item.atkMod from ${doc.name} formula...`)
+        // Remove the item atkMod from the formula
+        newFormula = newFormula.replace("+ @item.atkMod", "")
+        newFormula = newFormula.replace("+@item.atkMod", "")
+    }
+    // Only remove @fa from weapons
+    if (doc.type == "weapon" && doc.system.formula.includes("@fa")) {
+        console.log(`Removing @fa from ${doc.name} formula...`)
+        // Also remove fighting ability from the formula
+        newFormula = newFormula.replace("+ @fa", "")
+        newFormula = newFormula.replace("+@fa", "")
+    }
+    // Finally, trim off any extra spaces
+    newFormula = newFormula.trim()
+
+    // Did we make any changes?
+    if (newFormula != doc.system.formula) {
         const update = {system: {}}
         update.system = {formula: newFormula}
         return update;
     }
+    // Else...    
     return null;
 }
 
@@ -563,7 +580,10 @@ async function reportItems() {
                 if (!doc.system.weight || doc.system.weight == "") {
                     console.log(`DEBUG: ${doc.name} has weight ${doc.system.weight}!`)
                 }
-                if (doc.system.formula?.includes("item.atkMod")) {
+                if (doc.system.formula?.includes("@item.atkMod")) {
+                    console.log(`DEBUG: ${doc.name} has formula ${doc.system.formula}!`)
+                }
+                if (doc.system.formula?.includes("@fa")) {
                     console.log(`DEBUG: ${doc.name} has formula ${doc.system.formula}!`)
                 }
             }
