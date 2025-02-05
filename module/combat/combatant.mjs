@@ -116,6 +116,8 @@ export class HYP3ECombatant extends Combatant {
         // If defeated, add this initiative penalty to force actor to the bottom of the list
         if (this.isDefeated) term += `+ ${HYP3ECombatant.INITIATIVE_VALUE_DEFEATED}`;
         if (CONFIG.HYP3E.debugMessages) { console.log(`${name} initiative roll terms: `, term) }
+
+        // Finally, roll initiative and return the result
         const result = new Roll(term, rollData);
         console.log("Init roll result:", result)
         this.initRoll = result.dice[0].total

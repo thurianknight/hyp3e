@@ -136,6 +136,7 @@ export class HYP3ECombatTab extends CombatTracker {
 
   _getEntryContextOptions() {
     const options = super._getEntryContextOptions();
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Context Options: `, options) }
     return [
       {
         name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
