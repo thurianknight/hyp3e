@@ -1,4 +1,4 @@
-import {Hyp3eDice} from "../dice.mjs";
+import {Hyp3eDice} from "../helpers/dice.mjs";
 import {Hyp3eDialog} from "../helpers/dialog.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 
