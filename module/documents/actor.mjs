@@ -434,7 +434,7 @@ export class Hyp3eActor extends Actor {
 
         // Construct a custom chat card for the check
         await this.renderCustomChat(roll, itemId, label, "", "", turnUndeadHtml, rollResponse.rollMode)
-        
+
         return roll
     }
 

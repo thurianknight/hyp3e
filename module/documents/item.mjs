@@ -50,8 +50,6 @@ export class Hyp3eItem extends Item {
         // Get the Item's data
         const item = this;
         const itemData = item.system;
-        // const actorData = this.actor ? this.actor : {};
-        // console.log("Item:", item)
 
         // Handle weapon attack roll formula
         if (item.type == "weapon") {
@@ -79,11 +77,8 @@ export class Hyp3eItem extends Item {
                     // Set attack formula if it doesn't already exist, else leave it alone
                     if (!itemData.formula || itemData.formula == '') {
                         if (!itemData.isGrenade) {
-                            // Standard missile weapons
+                            // Standard missile weapons. We handle grenades further down.
                             itemData.formula = '1d20 + @dex.atkMod'
-                        // } else {
-                        //     // Grenade-like splash-effect items
-                        //     itemData.formula = '1d20 + @dex.atkMod'
                         }
                     }
                 } else {
@@ -231,7 +226,7 @@ export class Hyp3eItem extends Item {
                 content += `<p>Range: ${itemData.range}</p>`
             }
             if (itemData.duration) {
-                if (Roll.validate(itemData.duration)) {
+                if ((itemData.duration).match(/.*d[1-9].*/) && Roll.validate(itemData.duration)) {
                     // Add a duration roll macro
                     content += `<p>Duration: [[/r ${itemData.duration}]]</p>`
                 } else {
