@@ -46,7 +46,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         if (CONFIG.HYP3E.debugMessages) { console.log("Initiative roll per group: ", rollPerGroup) }
 
         const results = await this.#prepareGroupInitiativeDice(rollPerGroup);
-        if (CONFIG.HYP3E.debugMessages) { console.log("Group initiative roll:", results) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Group initiative rolls:", results) }
         
         // Add the combat action value to each combatant for initiative calculation
         this.combatants.forEach(c => {
@@ -54,48 +54,24 @@ export class HYP3EGroupCombat extends HYP3ECombat {
             if (CONFIG.HYP3E.debugMessages) { console.log("Combat Actor: ", c.actor) }
             c.initRoll = results[c.group].initiative
             // Movement partially overrides the other combat actions for initiative order
-            c.moveInit = c.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_MOD_MOVEMENT : 0;
-            if (c.moveInit == 0) {
-                c.meleeInit = c.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_MOD_MELEE : 0;
-                c.missileInit = c.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_MOD_MISSILE : 0;
-                c.magicInit = c.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_MOD_MAGIC : 0;
-            } else {
-                c.meleeInit = (c.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_MOD_MELEE : 0)/10;
-                c.missileInit = (c.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_MOD_MISSILE : 0)/10;
-                c.magicInit = (c.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_MOD_MAGIC : 0)/10;
-            }
+            c.getActionModifiers();
 
             // If deaf or blind, add these initiative penalties
-            c.statusInit = 0;
-            c.isSlowed = false;
-            for ( let e of c.actor.effects ) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${c.actor.name} has effect: `, e) }
-                if (e.name == "Deaf" && !e.disabled) {
-                    c.statusInit += HYP3ECombatant.INITIATIVE_MOD_DEAF;
-                    c.isSlowed = true;
-                }
-                if (e.name == "Blind" && !e.disabled) {
-                    c.statusInit += HYP3ECombatant.INITIATIVE_MOD_BLIND;
-                    c.isSlowed = true;
-                }
-            }
+            c.getSlowingModifiers();
 
-            // If defeated, add this initiative penalty to force actor to the bottom of the group
-            if (c.isDefeated) {
-                c.defeatedInit = HYP3ECombatant.INITIATIVE_MOD_DEFEATED;
-            } else {
-                c.defeatedInit = 0
-            }
+            // If defeated, add this initiative penalty to force actor to the end of the round
+            c.getDefeatedModifier();
         })
 
+        // Update the combatants with their new initiative values
         const updates = this.combatants.map(
             (c) => ({ _id: c.id, 
                         initiative: Math.round((results[c.group].initiative 
                                                 + (c.actor?.system?.attributes?.dex?.value/1000)
-                                                + c.moveInit
                                                 + c.meleeInit
                                                 + c.missileInit
                                                 + c.magicInit
+                                                + c.moveInit
                                                 + c.statusInit
                                                 + c.defeatedInit) * 1000) / 1000
                     })
@@ -106,7 +82,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         await this.#rollInitiativeUIFeedback(results);
         await this.activateCombatant(0);
 
-        if (CONFIG.HYP3E.debugMessages) { console.log("THIS Combat: ", this) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("This Group Combat: ", this) }
 
         return this;
     }
