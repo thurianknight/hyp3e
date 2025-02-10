@@ -50,21 +50,39 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         
         // Add the combat action value to each combatant for initiative calculation
         this.combatants.forEach(c => {
+            if (CONFIG.HYP3E.debugMessages) { console.log("Combatant: ", c) }
+            if (CONFIG.HYP3E.debugMessages) { console.log("Combat Actor: ", c.actor) }
             c.initRoll = results[c.group].initiative
             // Movement partially overrides the other combat actions for initiative order
-            c.moveInit = c.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT : 0;
+            c.moveInit = c.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_MOD_MOVEMENT : 0;
             if (c.moveInit == 0) {
-                c.meleeInit = c.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_VALUE_MELEE : 0;
-                c.missileInit = c.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_VALUE_MISSILE : 0;
-                c.magicInit = c.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_VALUE_MAGIC : 0;
+                c.meleeInit = c.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_MOD_MELEE : 0;
+                c.missileInit = c.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_MOD_MISSILE : 0;
+                c.magicInit = c.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_MOD_MAGIC : 0;
             } else {
-                c.meleeInit = (c.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_VALUE_MELEE : 0)/10;
-                c.missileInit = (c.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_VALUE_MISSILE : 0)/10;
-                c.magicInit = (c.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_VALUE_MAGIC : 0)/10;
+                c.meleeInit = (c.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_MOD_MELEE : 0)/10;
+                c.missileInit = (c.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_MOD_MISSILE : 0)/10;
+                c.magicInit = (c.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_MOD_MAGIC : 0)/10;
             }
+
+            // If deaf or blind, add these initiative penalties
+            c.statusInit = 0;
+            c.isSlowed = false;
+            for ( let e of c.actor.effects ) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${c.actor.name} has effect: `, e) }
+                if (e.name == "Deaf" && !e.disabled) {
+                    c.statusInit += HYP3ECombatant.INITIATIVE_MOD_DEAF;
+                    c.isSlowed = true;
+                }
+                if (e.name == "Blind" && !e.disabled) {
+                    c.statusInit += HYP3ECombatant.INITIATIVE_MOD_BLIND;
+                    c.isSlowed = true;
+                }
+            }
+
             // If defeated, add this initiative penalty to force actor to the bottom of the group
             if (c.isDefeated) {
-                c.defeatedInit = HYP3ECombatant.INITIATIVE_VALUE_DEFEATED;
+                c.defeatedInit = HYP3ECombatant.INITIATIVE_MOD_DEFEATED;
             } else {
                 c.defeatedInit = 0
             }
@@ -78,6 +96,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                                                 + c.meleeInit
                                                 + c.missileInit
                                                 + c.magicInit
+                                                + c.statusInit
                                                 + c.defeatedInit) * 1000) / 1000
                     })
         )
@@ -86,9 +105,9 @@ export class HYP3EGroupCombat extends HYP3ECombat {
 
         await this.#rollInitiativeUIFeedback(results);
         await this.activateCombatant(0);
-        // if (CONFIG.HYP3E.debugMessages) { console.log("All combatants: ", this.combatants) }
+
         if (CONFIG.HYP3E.debugMessages) { console.log("THIS Combat: ", this) }
-        // if (CONFIG.HYP3E.debugMessages) { console.log("THIS Combat Turns: ", this.turns) }
+
         return this;
     }
 

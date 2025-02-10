@@ -66,18 +66,27 @@
                         <i class="fa-solid fa-arrows-to-eye"></i>
                     </a>
                     {{/unless}}
-                    <div class="token-effects">
-                        {{#each this.effects}}
+                    <div class="token-effects {{#if this.isSlowed}}bg-trans-yellow{{/if}}">
+                    {{#each this.effects}}
                         <img class="token-effect" src="{{this}}"/>
-                        {{/each}}
+                    {{/each}}
                     </div>
                 </div>
             </div>
+
+            {{#if this.hasResource}}
+            <div class="token-resource">
+                <span class="resource">{{this.resource}}</span>
+            </div>
+            {{/if}}
+
             <div class="token-initiative">
                 {{#if this.defeated}}
                 <i class="fa fa-dizzy"></i>
-                {{else if this.hasResource}}
-                <span class="resource">{{this.resource}}</span>
+                {{else if this.hasRolled}}
+                    {{#if this.debugMessages}}
+                    <span class="initiative">{{this.initiative}}</span>
+                    {{/if}}
                 {{/if}}
             </div>
         </li>

@@ -34,6 +34,8 @@ export class HYP3ECombatTab extends CombatTracker {
             turn.isMissile = !!combatant.getFlag(game.system.id, "isMissile")
             turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
             turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
+            turn.isSlowed = !!combatant.isSlowed;
+            turn.debugMessages = CONFIG.HYP3E.debugMessages;
             turn.isOwnedByUser = !!combatant.actor.isOwner;
             turn.group = combatant.group;
             if (!isGroupInitiative) turn.initRoll = Math.floor(combatant.initiative)
@@ -93,7 +95,7 @@ export class HYP3ECombatTab extends CombatTracker {
         const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement']
         if (CONFIG.HYP3E.debugMessages) { console.log(`Toggling combatant flag ${flag} to ${!isActive}...`) }
         if (combatActions.some(f => f == flag)) {
-            // Combat actions can be mutually exclusive, so we need to toggle multiple flags here
+            // Combat actions can be mutually exclusive, so we may need to toggle multiple flags
             await combatant.setCombatAction(flag, !isActive)            
         } else {
             // Non-combat actions are toggled normally
