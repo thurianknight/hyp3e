@@ -368,7 +368,7 @@ async function applyHealthDrop(total, extraRoll = "") {
             (e) => e.id === CONFIG.specialStatusEffects.DEFEATED
         );
         const unconscious_status = CONFIG.statusEffects.find(
-            (e) => e.id === CONFIG.specialStatusEffects.UNconscious
+            (e) => e.id === CONFIG.specialStatusEffects.Unconscious
         );
         if (!defeated_status && !isUnconscious) continue;
         let effect = actor && defeated_status ? defeated_status : CONFIG.controlIcons.defeated;
