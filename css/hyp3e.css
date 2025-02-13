@@ -846,6 +846,23 @@ textarea {
   /* font-family: "Herculanum", sans-serif; */
 }
 
+/* Background color example */
+.bg-yellow {
+    background-color: lightyellow;
+}
+
+/* Color transitions */
+.bg-trans-yellow {
+    animation: fadeYellow 3s ease-in-out infinite;
+    background-color:lightyellow;
+}
+
+@keyframes fadeYellow {
+    0% {background-color: transparent;}
+    50% {background-color: lightyellow;}
+    100% {background-color: transparent;}
+}
+
 .combat-set-groups {
     container-name: combat-set-groups;
     container-type: inline-size;

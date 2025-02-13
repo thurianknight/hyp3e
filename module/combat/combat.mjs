@@ -73,7 +73,9 @@ export class HYP3ECombat extends Combat {
                 meleeInit: null,
                 missileInit: null,
                 magicInit: null,
-                moveInit: null
+                moveInit: null,
+                statusInit: null,
+                defeatedInit: null
         })
         )
         if (CONFIG.HYP3E.debugMessages) { console.log("Reset Combatants: ", updates) }

@@ -1,10 +1,12 @@
 export class HYP3ECombatant extends Combatant {
     // These are added to the initiative roll + DX of an actor, to position them in order high to low
-    static INITIATIVE_VALUE_MELEE = 0.80
-    static INITIATIVE_VALUE_MISSILE = 0.60
-    static INITIATIVE_VALUE_MAGIC = 0.40
-    static INITIATIVE_VALUE_MOVEMENT = 0.20
-    static INITIATIVE_VALUE_DEFEATED = -99;
+    static INITIATIVE_MOD_MELEE = 0.80
+    static INITIATIVE_MOD_MISSILE = 0.60
+    static INITIATIVE_MOD_MAGIC = 0.40
+    static INITIATIVE_MOD_MOVEMENT = 0.20
+    static INITIATIVE_MOD_DEAF = -2;
+    static INITIATIVE_MOD_BLIND = -95;
+    static INITIATIVE_MOD_DEFEATED = -99;
   
     // ===========================================================================
     // BOOLEAN FLAGS
@@ -13,36 +15,24 @@ export class HYP3ECombatant extends Combatant {
     get isMelee() {
         return this.getFlag(game.system.id, "isMelee");
     }
-    // set isMelee(value) {
-    //     this.setFlag(game.system.id, 'isMelee', value)
-    // }
 
     get isMissile() {
         return this.getFlag(game.system.id, "isMissile");
     }
-    // set isMissile(value) {
-    //     this.setFlag(game.system.id, 'isMissile', value)
-    // }
 
     get isMagic() {
         return this.getFlag(game.system.id, "isMagic");
     }
-    // set isMagic(value) {
-    //     this.setFlag(game.system.id, 'isMagic', value)
-    // }
 
     get isMovement() {
         return this.getFlag(game.system.id, "isMovement");
     }
-    // set isMovement(value) {
-    //     this.setFlag(game.system.id, 'isMovement', value)
-    // }
 
-    // Any actor is defeated if their HP go to zero or negative
+    // A combatant is defeated if their HP go to zero or negative
     get isDefeated() {
         if (this.defeated)
             return true;
-      
+
         return !this.defeated && (this.actor.system.hp.value <= 0)
     }
 
@@ -66,7 +56,7 @@ export class HYP3ECombatant extends Combatant {
                     // Set these to false
                     this.setFlag(game.system.id, 'isMelee', !value)
                     this.setFlag(game.system.id, 'isMagic', !value)
-                }        
+                }
                 break;
             case "isMagic":
                 if (value === true) {
@@ -90,7 +80,7 @@ export class HYP3ECombatant extends Combatant {
     // ===========================================================================
 
     getInitiativeRoll(formula) {
-        let term = formula || CONFIG.Combat.initiative.formula;
+        let rollTerms = formula || CONFIG.Combat.initiative.formula;
         
         // Get the actor's roll data now, so we can use the DX value
         const rollData = this.actor?.getRollData() || {};
@@ -98,30 +88,64 @@ export class HYP3ECombatant extends Combatant {
         if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data for initiative: ", rollData) }
 
         // Movement partially overrides the other combat actions for initiative order
-        this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_VALUE_MOVEMENT : 0;
-        if (this.moveInit == 0) {
-            this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_VALUE_MELEE : 0;
-            this.missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_VALUE_MISSILE : 0;
-            this.magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_VALUE_MAGIC : 0;
-        } else {
-            this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_VALUE_MELEE : 0)/10;
-            this.missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_VALUE_MISSILE : 0)/10;
-            this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_VALUE_MAGIC : 0)/10;
-        }
-        // Sum all the action values and add to term
-        term += `+ ${this.moveInit + this.meleeInit + this.missileInit + this.magicInit}`
+        this.getActionModifiers();
+        // Add the action values to rollTerms
+        rollTerms += `+ ${this.moveInit + this.meleeInit + this.missileInit + this.magicInit}`
         // Add the actor's DX value
-        term += `+ ${(rollData.attributes?.dex?.value/1000)}`
+        rollTerms += `+ ${(rollData.attributes?.dex?.value/1000)}`
+
+        // If deaf or blind, add these initiative penalties
+        this.getSlowingModifiers();
+        rollTerms += `+ ${this.statusInit}`;
 
         // If defeated, add this initiative penalty to force actor to the bottom of the list
-        if (this.isDefeated) term += `+ ${HYP3ECombatant.INITIATIVE_VALUE_DEFEATED}`;
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${name} initiative roll terms: `, term) }
+        this.getDefeatedModifier();
+        rollTerms += `+ ${this.defeatedInit}`;
+
+        // Log the complete initiative roll formula
+        if (CONFIG.HYP3E.debugMessages) { console.log(`${name} initiative roll terms: `, rollTerms) }
 
         // Finally, roll initiative and return the result
-        const result = new Roll(term, rollData);
-        console.log("Init roll result:", result)
+        const result = new Roll(rollTerms, rollData);
+        if (CONFIG.HYP3E.debugMessages) { console.log("Individual initiative roll:", result) }
         this.initRoll = result.dice[0].total
         return result
+    }
+
+    getActionModifiers() {
+        // Movement partially overrides the other combat actions for initiative order
+        this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_MOD_MOVEMENT : 0;
+        if (this.moveInit == 0) {
+            this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_MOD_MELEE : 0;
+            this.missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_MOD_MISSILE : 0;
+            this.magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_MOD_MAGIC : 0;
+        } else {
+            this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_MOD_MELEE : 0)/10;
+            this.missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_MOD_MISSILE : 0)/10;
+            this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_MOD_MAGIC : 0)/10;
+        }
+    }
+
+    getDefeatedModifier() {
+        // If defeated, add this initiative penalty to force actor to the end of the round
+        this.defeatedInit = this.isDefeated ? HYP3ECombatant.INITIATIVE_MOD_DEFEATED : 0;
+    }
+
+    getSlowingModifiers() {
+        // If deaf or blind, add these initiative penalties
+        this.statusInit = 0;
+        this.isSlowed = false;
+        for ( let e of this.actor.effects) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.actor.name} has effect: `, e) }
+            if (e.name == "Deaf" && !e.disabled) {
+                this.statusInit += HYP3ECombatant.INITIATIVE_MOD_DEAF;
+                this.isSlowed = true;
+            }
+            if (e.name == "Blind" && !e.disabled) {
+                this.statusInit += HYP3ECombatant.INITIATIVE_MOD_BLIND;
+                this.isSlowed = true;
+            }
+        }
     }
 
     // Pretty sure this is not needed...
