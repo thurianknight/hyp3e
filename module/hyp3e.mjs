@@ -177,14 +177,17 @@ Hooks.once('init', async function() {
     //   };
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
     if (isGroupInitiative) { 
+        console.log("Using group-based initiative.")
         CONFIG.Combat.documentClass = HYP3EGroupCombat;
         CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
         CONFIG.Combat.initiative = { decimals: 3, formula: HYP3EGroupCombat.FORMULA }
     } else {
+        console.log("Using individual initiative.")
         CONFIG.Combat.documentClass = HYP3ECombat;
         CONFIG.Combatant.documentClass = HYP3ECombatant;
         CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
     }
+    console.log("CONFIG.Combat.initiative:", CONFIG.Combat.initiative)
     CONFIG.ui.combat = HYP3ECombatTab;
 
   // Define custom Document classes
@@ -303,14 +306,6 @@ Hooks.once("ready", async function() {
     classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
     if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
   }
-
-  // Load blind roll options
-//   if (CONFIG.HYP3E.blindRollOpts) {
-//     for (let [k, v] of Object.entries(CONFIG.HYP3E.blindRollOpts)) {
-//       CONFIG.HYP3E.blindRollOpts[k] = game.i18n.localize(CONFIG.HYP3E.blindRollOpts[k])
-//     }
-//     // console.log("CONFIG Blind Roll options:", CONFIG.HYP3E.blindRollOpts)
-//   }
   
   // Load saving throws
   if (CONFIG.HYP3E.saves) {

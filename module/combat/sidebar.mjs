@@ -25,6 +25,9 @@ export class HYP3ECombatTab extends CombatTracker {
 
     async getData(options) {
         const context = await super.getData(options);
+        // Log the context object
+        if (CONFIG.HYP3E.debugMessages) { console.log("Combat Tab Context: ", context) }
+        
         const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
 
         // @ts-expect-error - We don't have type data for the combat tracker turn object
@@ -113,7 +116,9 @@ export class HYP3ECombatTab extends CombatTracker {
         event.preventDefault();
         event.stopPropagation();
         const btn = event.currentTarget;
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Control Button: `, btn) }
         const li = btn.closest(".combatant");
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant item: `, li) }
         const combat = this.viewed;
         const c = combat.combatants.get(li.dataset.combatantId);
 

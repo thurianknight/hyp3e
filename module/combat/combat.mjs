@@ -31,6 +31,8 @@ export class HYP3ECombat extends Combat {
         await super.startCombat();
         if (this.#rerollBehavior !== "reset")
             await this.#rollAbsolutelyEveryone();
+        // Log the combat object
+        if (CONFIG.HYP3E.debugMessages) { console.log("Combat Started: ", this) }
         return this;
     }
     

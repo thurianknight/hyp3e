@@ -25,14 +25,13 @@ export const preloadHandlebarsTemplates = async function() {
         // chat templates
         `${HYP3E.templatePath}/chat/apply-damage.hbs`,
         `${HYP3E.templatePath}/chat/crit-roll.hbs`,
-        // `${HYP3E.templatePath}/chat/roll-attack.hbs`,
+        `${HYP3E.templatePath}/chat/attack-roll.hbs`,
+        `${HYP3E.templatePath}/chat/damage-roll.hbs`,
 
         // Combat Tab
         `${HYP3E.templatePath}/sidebar/combat-tracker.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-individual.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group.hbs`,
         `${HYP3E.templatePath}/apps/combat-set-groups.hbs`,
-        `${HYP3E.templatePath}/apps/combat-set-groups.hbs`,
-
     ]);
 };
