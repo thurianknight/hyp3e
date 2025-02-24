@@ -85,6 +85,10 @@ export class Hyp3eItem extends Item {
                     // Clear the attack roll if this is an area effect attack
                     itemData.formula = ""
                 }
+                // If weapon launches ammo, set the usesAmmo property
+                if (item.name.toLowerCase().includes("bow") || item.name.toLowerCase().includes("sling") || item.name.toLowerCase().includes("gun")) {
+                    itemData.usesAmmo = true
+                }
             } else {
                 // This should never happen, unless an item is imported with missing data
                 console.log("ITEM ERROR: Weapon has neither melee nor missile property set! Setting to melee...")

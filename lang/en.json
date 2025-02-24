@@ -279,6 +279,7 @@
             "equipped": "Equipped",
             "consumable": "Consumable",
             "ammunition": "Ammunition",
+            "usesAmmo": "Uses ammo",
             "grenade": "Grenade-like item",
             "areaEffect": "Area effect attack",
             "container": "Container",
@@ -324,6 +325,7 @@
             "master": "Master",
             "grandMaster": "Grandmaster",
             "attributes": {
+                "usesAmmo": "The Uses Ammo tag allows this item to decrement ammunition on attacks.",
                 "isGrenade": "The Grenade tag causes this item to attack as a hurled item, from Table 143 of the Player's Manual.",
                 "isAreaEffect": "The Area Effect tag causes this item ignore making an attack roll, and simply roll damage. Note that this is different from the Grenade tag, above."
             }

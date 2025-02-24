@@ -271,6 +271,7 @@
             "wpnGrandmaster": false,
             "isGrenade": false,
             "isAreaEffect": false,
+            "usesAmmo": false,
             "annotations": []
         }
     }

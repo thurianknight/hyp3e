@@ -68,7 +68,7 @@ export class Hyp3eDialog {
      * Handle attack dialogs
      * @param dataset
      */
-    static async ShowAttackRollDialog(dataset, rangeGroup = null, ranges = null, chosen = null) {
+    static async ShowAttackRollDialog(dataset, ammoTypes = null, rangeGroup = null, ranges = null, chosen = null) {
         // Default rollMode to public roll, the user can change it in the roll dialog
         let rollMode = "publicroll"
         let dialogData = {
@@ -76,11 +76,15 @@ export class Hyp3eDialog {
             dataset: dataset,
             rollModes: CONFIG.Dice.rollModes,
             rollMode: rollMode,
+            ammoTypes: ammoTypes,
             rangeGroup: rangeGroup,
             ranges: ranges,
             chosen: chosen
         }
+        // Log dataset, ammo, ranges
         if (CONFIG.HYP3E.debugMessages) { console.log("Attack roll dialog dataset: ", dataset) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Attack roll dialog ammo types: ", ammoTypes) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Attack roll dialog ranges: ", ranges) }
         const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
         const dialogHtml = await renderTemplate(template, dialogData)
 

@@ -481,6 +481,57 @@ export class Hyp3eActor extends Actor {
         let itemName = ""
         let label = `${dataset.label}`
 
+        // Filter the actor's inventory items for ammunition
+        let ammoList = this.items.filter(i => i.system.isAmmunition)
+        if (CONFIG.HYP3E.debugMessages) { console.log("Carried ammo: ", ammoList) }
+        let carriedAmmo = {"":""}
+        if (ammoList.length > 0) {
+            for (let ammo of ammoList) {
+                if (ammo.system.quantity.value > 0) {
+                    carriedAmmo[ammo._id] = ammo.name
+                }
+            }
+        }
+
+        // Get the range unit of measure for the scene
+        dataset.rangeUoM = canvas.scene.grid.units;
+
+        // Get the attacking token's location on the scene
+        let attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+        let attackerPos = attacker ? attacker.center : null
+        if (CONFIG.HYP3E.debugMessages) { console.log("Attacker position:", attackerPos) }
+
+        // Has the user targeted a token? If so, get it's AC and name
+        const userTargets = Array.from(game.user.targets)
+        if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
+        if (userTargets.length > 0) {
+            let targetPos = userTargets[0].center
+            if (CONFIG.HYP3E.debugMessages) { console.log("Target position:", targetPos) }
+            let primaryTargetData = userTargets[0].actor
+            targetAc = primaryTargetData.system.ac.value
+            targetName = primaryTargetData.name
+            targetSize = primaryTargetData.system.size ? primaryTargetData.system.size : "M"
+
+            // Calculate the distance to the target in pixels
+            let dx = targetPos.x - attackerPos.x;
+            let dy = targetPos.y - attackerPos.y;
+            let distancePixels = Math.sqrt(dx * dx + dy * dy);
+            // Convert to grid distance
+            let gridDistance = distancePixels / canvas.grid.size * canvas.scene.grid.distance;
+            // Round to nearest whole number
+            gridDistance = Math.round(gridDistance)
+            if (CONFIG.HYP3E.debugMessages) { console.log("Distance to target:", gridDistance) }
+            dataset.range = gridDistance;
+        } else {
+            // No target selected, so we can't get AC or name
+            targetAc = 9
+            targetName = ""
+            targetSize = ""
+            dataset.range = 0
+            if (CONFIG.HYP3E.debugMessages) { console.log("No target selected!") }
+            ui.notifications.info("No target selected!")
+        }
+
         if (item) {
             // Get the item's friendly name if it has one
             itemName = itemData.friendlyName != "" ? itemData.friendlyName : item.name
@@ -488,13 +539,27 @@ export class Hyp3eActor extends Actor {
             // Missile weapons need to show a range selector in the dialog
             if (itemData.missile) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Range increments:`, itemData.range) }
+                dataset.showAmmo = itemData.usesAmmo
                 dataset.showRanges = true
                 rangeGroup = "rangeGroup"
                 ranges = {
                     short: `Short (${itemData.range.short})`,
-                    medium: `Medium (${itemData.range.medium})`,
-                    long: `Long (${itemData.range.long})`}
-                chosen = "short"
+                    medium: `Med (${itemData.range.medium})`,
+                    long: `Long (${itemData.range.long})`
+                }
+                // Where does our range fall in the range categories?
+                if (dataset.range <= itemData.range.short) {
+                    chosen = "short"
+                } else if (dataset.range <= itemData.range.medium) {
+                    chosen = "medium"
+                } else if (dataset.range <= itemData.range.long) {
+                    chosen = "long"
+                } else {
+                    // If the range is longer than the long range, give a warning
+                    chosen = "long"
+                    if (CONFIG.HYP3E.debugMessages) { console.log("Target is out of range!") }
+                    ui.notifications.info("Target is out of range!")
+                }
             }
         }
 
@@ -508,7 +573,7 @@ export class Hyp3eActor extends Actor {
             }
         } else if (item && item.type == "weapon") {
             try {
-                rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, rangeGroup, ranges, chosen)
+                rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, carriedAmmo, rangeGroup, ranges, chosen)
             } catch(err) {
                 if (CONFIG.HYP3E.debugMessages) { console.log("ERROR: ", err) }
                 return
@@ -517,28 +582,35 @@ export class Hyp3eActor extends Actor {
             try {
                 rollResponse = await Hyp3eDialog.ShowSpellcastingDialog(dataset)
             } catch(err) {
+                if (CONFIG.HYP3E.debugMessages) { console.log("ERROR: ", err) }
                 return
             }
             // Decrement the number memorized
             if (item.type == "spell" && itemData.quantity.value > 0) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Cast memorized spell: ${item.name}`) }
-                // Update the item object
-                await item.update({
-                system: {
-                    quantity: {
-                        value: itemData.quantity.value--,  
-                    }
-                }
-                })
                 // Update the embedded item document
                 this.updateEmbeddedDocuments("Item", [
-                    { _id: item.id, "system.quantity.value": itemData.quantity.value-- },
+                    { _id: item.id, "system.quantity.value": itemData.quantity.value-1 },
                 ])
             }
         }
 
         // Log the roll-dialog response
         if (CONFIG.HYP3E.debugMessages) { console.log("Dialog response:", rollResponse) }
+
+        // Decrement ammunition if selected in the attack dialog
+        if (item && item.type == "weapon" && itemData.usesAmmo && rollResponse.ammunition) {
+            const ammo = this.items.get(rollResponse.ammunition)
+            const ammoData = ammo ? {...ammo.system} : null
+            if (ammo && ammoData) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Use ammo: ${ammo.name}`, ammoData) }
+                // Update the embedded item document
+                this.updateEmbeddedDocuments("Item", [
+                    { _id: ammo.id, "system.quantity.value": ammoData.quantity.value-1 },
+                ])
+            }
+        }
+
         // Add situational modifier and roll mode from the dialog
         dataset.sitMod = rollResponse.sitMod
         dataset.rollMode = rollResponse.rollMode
@@ -580,16 +652,6 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
         // Get d20 natural roll
         naturalRoll = atkRoll.dice[0].total
-
-        // Has the user targeted a token? If so, get it's AC and name
-        const userTargets = Array.from(game.user.targets)
-        if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
-        if (userTargets.length > 0) {
-            let primaryTargetData = userTargets[0].actor
-            targetAc = primaryTargetData.system.ac.value
-            targetName = primaryTargetData.name
-            targetSize = primaryTargetData.system.size ? primaryTargetData.system.size : "M"
-        }
 
         // Update chat card label based on whether we have a target
         if (targetName != "") {
