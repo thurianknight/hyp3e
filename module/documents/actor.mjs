@@ -488,7 +488,7 @@ export class Hyp3eActor extends Actor {
         if (ammoList.length > 0) {
             for (let ammo of ammoList) {
                 if (ammo.system.quantity.value > 0) {
-                    carriedAmmo[ammo._id] = ammo.name
+                    carriedAmmo[ammo._id] = `${ammo.name} (${ammo.system.quantity.value})`
                 }
             }
         }
