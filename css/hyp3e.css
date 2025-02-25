@@ -857,6 +857,11 @@ textarea {
     background-color:lightyellow;
 }
 
+.color-trans-red {
+    animation: fadeRed 2s ease-in-out infinite;
+    background-color:red;
+}
+
 @keyframes fadeYellow {
     0% {background-color: transparent;}
     50% {background-color: lightyellow;}

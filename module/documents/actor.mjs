@@ -474,6 +474,7 @@ export class Hyp3eActor extends Actor {
         let targetAc = 9
         let targetName = ""
         let targetSize = ""
+        let gridDistance = 0
         // let masteryMod = 0
         let debugAtkRollFormula = ""
         let debugDmgRollFormula = ""
@@ -517,17 +518,17 @@ export class Hyp3eActor extends Actor {
             let dy = targetPos.y - attackerPos.y;
             let distancePixels = Math.sqrt(dx * dx + dy * dy);
             // Convert to grid distance
-            let gridDistance = distancePixels / canvas.grid.size * canvas.scene.grid.distance;
+            gridDistance = distancePixels / canvas.grid.size * canvas.scene.grid.distance;
             // Round to nearest whole number
             gridDistance = Math.round(gridDistance)
             if (CONFIG.HYP3E.debugMessages) { console.log("Distance to target:", gridDistance) }
-            dataset.range = gridDistance;
+            dataset.range = `${gridDistance} ${canvas.scene.grid.units}`;
         } else {
             // No target selected, so we can't get AC or name
             targetAc = 9
             targetName = ""
             targetSize = ""
-            dataset.range = 0
+            dataset.range = "No target!"
             if (CONFIG.HYP3E.debugMessages) { console.log("No target selected!") }
             ui.notifications.info("No target selected!")
         }
@@ -548,11 +549,11 @@ export class Hyp3eActor extends Actor {
                     long: `Long (${itemData.range.long})`
                 }
                 // Where does our range fall in the range categories?
-                if (dataset.range <= itemData.range.short) {
+                if (gridDistance <= itemData.range.short) {
                     chosen = "short"
-                } else if (dataset.range <= itemData.range.medium) {
+                } else if (gridDistance <= itemData.range.medium) {
                     chosen = "medium"
-                } else if (dataset.range <= itemData.range.long) {
+                } else if (gridDistance <= itemData.range.long) {
                     chosen = "long"
                 } else {
                     // If the range is longer than the long range, give a warning
