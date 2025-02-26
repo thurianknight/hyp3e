@@ -29,6 +29,14 @@
             </div>
         </div>
         {{/if}}
+        {{#if dataset.showSpellRange}}
+        <div class="flexrow form-group">
+            <label class="dialog-label">{{localize 'HYP3E.weapon.range'}}: {{dataset.range}}</label>
+            <div class="form-fields">
+                <input type="text" name="spellRange" value="{{localize 'HYP3E.spell.spellRange'}}: {{dataset.spellRange}}" disabled />
+            </div>
+        </div>
+        {{/if}}
         <div class="flexrow form-group">
             <label class="dialog-label">{{localize "HYP3E.rollMode"}}</label>
             <select name="rollMode">

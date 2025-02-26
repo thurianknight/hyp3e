@@ -530,7 +530,10 @@ export class Hyp3eActor extends Actor {
             targetSize = ""
             dataset.range = "No target!"
             if (CONFIG.HYP3E.debugMessages) { console.log("No target selected!") }
-            ui.notifications.info("No target selected!")
+            // Popup a notification if this is an untargeted weapon or spell attack
+            if (item && (item.type == "weapon" || (item.type == "spell" && itemData.atkRoll))) {
+                ui.notifications.info("No target selected!")
+            }
         }
 
         if (item) {
@@ -558,6 +561,17 @@ export class Hyp3eActor extends Actor {
                 } else {
                     // If the range is longer than the long range, give a warning
                     chosen = "long"
+                    if (CONFIG.HYP3E.debugMessages) { console.log("Target is out of range!") }
+                    ui.notifications.info("Target is out of range!")
+                }
+            }
+            if (itemData.itemType == "spell" && itemData.atkRoll) {
+                dataset.showSpellRange = true
+                dataset.spellRange = itemData.range
+                // Get distance to target and compare with spell range
+                let spellRange = this._parseSpellRange(itemData.range)
+                if (gridDistance > spellRange) {
+                    // If the target is out of range, give a warning
                     if (CONFIG.HYP3E.debugMessages) { console.log("Target is out of range!") }
                     ui.notifications.info("Target is out of range!")
                 }
@@ -1048,6 +1062,21 @@ export class Hyp3eActor extends Actor {
             speaker: ChatMessage.getSpeaker({ actor: this }),
             content: damageChat
         })
+    }
+
+    // Parse spell range to get distance in feet
+    _parseSpellRange(range) {
+        let distance = 0
+        if (range.includes("ft")) {
+            distance = parseInt(range.split(" ")[0])
+        } else if (range.includes("yd")) {
+            distance = parseInt(range.split(" ")[0]) * 3
+        } else if (range.includes("in")) {
+            distance = parseInt(range.split(" ")[0]) / 12
+        } else if (range.includes("mi")) {
+            distance = parseInt(range.split(" ")[0]) * 5280
+        }
+        return distance
     }
 
 

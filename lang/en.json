@@ -300,6 +300,7 @@
             "addSpell": "Add Spell",
             "classes": "Classes",
             "numMem": "# Mem",
+            "spellRange": "Spell Range",
             "duration": "Duration",
             "numAffected": "# Affected",
             "save": "Save",
