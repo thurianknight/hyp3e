@@ -752,35 +752,7 @@ export class Hyp3eActor extends Actor {
         // If the item attack hit, we roll damage automatically and include it in the chat message
         if (hit && item) {
             if (Roll.validate(itemData.damage)) {
-                // All items start with the base damage formula
-                // dmgRollParts.push(itemData.damage)
-                // if (itemData.melee) {
-                //     if (this.type == "character") {
-                //         // Characters apply their ST Damage Mod to all melee damage
-                //         dmgRollParts.push(actorData.str.dmgMod)
-                //         // Apply the item damage mod
-                //         dmgRollParts.push(itemData.dmgMod)
-                //         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + @str.dmgMod + @item.dmgMod` }
-                //     } else {
-                //         // NPCs and monsters don't have a ST damage modifier, but might have an item damage mod
-                //         dmgRollParts.push(itemData.dmgMod)
-                //         if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + @item.dmgMod` }
-                //     }
-                // } else if (itemData.missile) {
-                //     // Apply the item damage mod
-                //     dmgRollParts.push(itemData.dmgMod)
-                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + @item.dmgMod` }  
-                // } else {
-                //     // This should only happen with spells
-                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage}` }
-                // }
-                // // Add Weapon Mastery mod if applicable
-                // if (masteryMod != 0) {
-                //     dmgRollParts.push(masteryMod)
-                //     if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + masteryMod` }
-                // }
-                // // Construct the damage roll formula from parts
-                // dmgFormula = dmgRollParts.join(" + ")
+                // Build our damage formula
                 const dmgObj = Hyp3eDice.buildDamageFormula(itemData, actorData, this.type)
                 dmgFormula = dmgObj.formula
                 debugDmgRollFormula = dmgObj.debugFormula
@@ -793,11 +765,9 @@ export class Hyp3eActor extends Actor {
                 if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
 
                 // Get the dice roll values of damage for x2/x3 modifier button
-                // let dmgBaseRoll = itemData.damage;
                 const naturalDmgRoll = dmgRoll.dice[0]?.total ? dmgRoll.dice[0]?.total : dmgRoll.total;
             
                 // Now output the damage chat
-                // debugDmgRollFormula = CONFIG.HYP3E.debugMessages? "Damage Formula: " + dmgFormula : ""
                 this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, itemData.damage, item)
             }
         }
@@ -1067,15 +1037,23 @@ export class Hyp3eActor extends Actor {
     // Parse spell range to get distance in feet
     _parseSpellRange(range) {
         let distance = 0
-        if (range.includes("ft")) {
+        if (range.includes("ft") || range.includes("feet") || range.includes("foot")) {
             distance = parseInt(range.split(" ")[0])
-        } else if (range.includes("yd")) {
+        } else if (range.includes("yd") || range.includes("yard")) {
             distance = parseInt(range.split(" ")[0]) * 3
         } else if (range.includes("in")) {
             distance = parseInt(range.split(" ")[0]) / 12
         } else if (range.includes("mi")) {
             distance = parseInt(range.split(" ")[0]) * 5280
+        } else if (range.includes("touch")) {
+            distance = 5
+        } else if (range.includes("m") || range.includes("meter")) {
+            // Hopefully this is a unusual, the game is built around empirical units
+            distance = parseInt(range.split(" ")[0]) * 3
         }
+        // Log original range and calculated distance
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Spell range: ${range} = ${distance} feet`) }
+
         return distance
     }
 
