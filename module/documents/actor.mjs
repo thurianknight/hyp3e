@@ -464,6 +464,7 @@ export class Hyp3eActor extends Actor {
         let rollFormula = ""
         let rollResponse
         let naturalRoll = 0
+        let ammoMods = {}
         let ranges = {}
         let rangeGroup = ""
         let chosen = ""
@@ -540,6 +541,7 @@ export class Hyp3eActor extends Actor {
             // Get the item's friendly name if it has one
             itemName = itemData.friendlyName != "" ? itemData.friendlyName : item.name
             dataset.itemName = itemName
+            // const itemMods = this._parseItemMod(itemName)
             // Missile weapons need to show a range selector in the dialog
             if (itemData.missile) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Range increments:`, itemData.range) }
@@ -618,6 +620,7 @@ export class Hyp3eActor extends Actor {
             const ammo = this.items.get(rollResponse.ammunition)
             const ammoData = ammo ? {...ammo.system} : null
             if (ammo && ammoData) {
+                ammoMods = this._parseItemMod(ammo.name)
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Use ammo: ${ammo.name}`, ammoData) }
                 // Update the embedded item document
                 this.updateEmbeddedDocuments("Item", [
@@ -654,7 +657,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Construct our attack roll formula
-        const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, actorData)
+        const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData)
         rollFormula = atkObj.formula
         debugAtkRollFormula = atkObj.debugFormula
         if (CONFIG.HYP3E.debugMessages) { console.log("Final attack formula:", rollFormula) }
@@ -753,7 +756,7 @@ export class Hyp3eActor extends Actor {
         if (hit && item) {
             if (Roll.validate(itemData.damage)) {
                 // Build our damage formula
-                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, actorData, this.type)
+                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
                 dmgFormula = dmgObj.formula
                 debugDmgRollFormula = dmgObj.debugFormula
                 if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
@@ -1057,6 +1060,32 @@ export class Hyp3eActor extends Actor {
         return distance
     }
 
+    // Parse item name to see if it has an attack/damage modifier
+    _parseItemMod(itemName) {
+        let itemData = {
+            atkMod: 0,
+            dmgMod: 0
+        }
+        // Use a regex to find the attack and damage bonus
+        let mod = itemName.match(/\+(\d+)/g)
+        // Log the regex results
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item mod regex:", mod) }
+        // If we found a modifier, parse
+        if (mod) {
+            itemData.atkMod = parseInt(mod[0].replace("+", ""))
+            itemData.dmgMod = parseInt(mod[0].replace("+", ""))
+        } else {
+            // Check for penalty, if no bonus found
+            mod = itemName.match(/\-(\d+)/g)
+            if (mod) {
+                itemData.atkMod = parseInt(mod[0])
+                itemData.dmgMod = parseInt(mod[0])
+            }
+        }
+        // Log the parsed item data
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item mod data:", itemData) }
+        return itemData
+    }
 
     /**
      * Str attack mods, from -2 to +2.

@@ -7,7 +7,7 @@ export class Hyp3eDice {
      * @param {Object} itemData
      * @param {Object} actorData
      */
-    static buildAttackFormula(rollData, itemData, actorData = null) {
+    static buildAttackFormula(rollData, itemData, ammoData = null, actorData = null) {
         let atkRollParts = []
         let masteryMod = 0
         let debugAtkRollParts = []
@@ -22,6 +22,7 @@ export class Hyp3eDice {
 
         // All items start with their basic attack formula.
         //   For weapons, this includes the item attack mod, FA, and ST or DX mod.
+        //     There may also be an item mod for magic ammunition.
         //   For spells with attack rolls, it might include FA, and ST or DX mods.
         //   For grenade-like items, it only includes the DX mod.
         let tmpAtkRollParts = rollData.roll.split("+")
@@ -49,6 +50,18 @@ export class Hyp3eDice {
             } else {
                 atkRollParts.push(itemData.atkMod)
                 if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('itemAtkMod') }
+            }
+        }
+
+        // Apply the item attack mod for magic ammunition if needed
+        if (ammoData?.atkMod) {
+            // atkRollParts.push(ammoData.atkMod)
+            if (atkRollParts.length > 1) {
+                atkRollParts.splice(2, 0, ammoData.atkMod)
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(2, 0, 'ammoAtkMod') }
+            } else {
+                atkRollParts.push(ammoData.atkMod)
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('ammoAtkMod') }
             }
         }
 
@@ -156,7 +169,7 @@ export class Hyp3eDice {
      * @param {Object} itemData
      * @param {Object} actorData
      */
-    static buildDamageFormula(itemData, actorData = null) {
+    static buildDamageFormula(itemData, ammoData = null, actorData = null) {
         let dmgRollParts = []
         let masteryMod = 0
         let debugDmgRollFormula = ""
@@ -176,6 +189,12 @@ export class Hyp3eDice {
         if (itemData.dmgMod) {
             dmgRollParts.push(itemData.dmgMod)
             if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + itemDmgMod` }
+        }
+
+        // Apply the item damage mod for magic ammunition if needed
+        if (ammoData?.dmgMod) {
+            dmgRollParts.push(ammoData.dmgMod)
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + ammoDmgMod` }
         }
 
         if (itemData.melee) {
