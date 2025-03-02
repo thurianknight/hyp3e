@@ -279,6 +279,7 @@
             "equipped": "Equipped",
             "consumable": "Consumable",
             "ammunition": "Ammunition",
+            "addAmmo": "Add Ammunition",
             "usesAmmo": "Uses ammo",
             "grenade": "Grenade-like item",
             "areaEffect": "Area effect attack",
