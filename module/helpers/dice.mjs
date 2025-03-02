@@ -197,26 +197,15 @@ export class Hyp3eDice {
             if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + ammoDmgMod` }
         }
 
+        // Apply the actor's ST damage mod if the item is a melee weapon
         if (itemData.melee) {
             if (actorData?.actorType == "character") {
-                // Apply the item damage mod first
-                // dmgRollParts.push(itemData.dmgMod)
-                // Characters apply their ST Damage Mod to all melee damage
                 dmgRollParts.push(actorData.str.dmgMod)
-                // if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + itemDmgMod + @str.dmgMod` }
                 if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + @str.dmgMod` }
             } else {
-                // NPCs/monsters don't have a ST attribute, so it's just the item damage mod
-                // dmgRollParts.push(itemData.dmgMod)
-                // if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + itemDmgMod` }
+                // NPCs/monsters don't have a ST attribute, so nothing to do here except 
+                //  note it in a comment. :-)
             }
-        } else if (itemData.missile) {
-            // Apply the item damage mod
-            // dmgRollParts.push(itemData.dmgMod)
-            // if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage} + itemDmgMod` }
-        } else {
-            // This should only happen with spells
-            // if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage}` }
         }
 
         // Add Weapon Mastery mod if applicable
