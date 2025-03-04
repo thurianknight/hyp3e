@@ -1049,7 +1049,7 @@ export class Hyp3eActor extends Actor {
         } else if (range.includes("mi")) {
             distance = parseInt(range.split(" ")[0]) * 5280
         } else if (range.includes("touch")) {
-            distance = 5
+            distance = 7
         } else if (range.includes("m") || range.includes("meter")) {
             // Hopefully this is a unusual, the game is built around empirical units
             distance = parseInt(range.split(" ")[0]) * 3
