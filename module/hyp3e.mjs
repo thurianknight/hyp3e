@@ -598,28 +598,45 @@ async function reportItems() {
  * @returns {Promise}
  */
 async function createItemMacro(data, slot) {
-  // First, determine if this is a valid owned item.
-  if (data.type !== "Item") return;
-  if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.')) {
-    return ui.notifications.warn("You can only create macro buttons for owned Items");
-  }
-  // If it is, retrieve it based on the uuid.
-  const item = await Item.fromDropData(data);
+    // Did we mis the hotbar slot?
+    if ( slot === null ) return;
 
-  // Create the macro command using the uuid.
-  const command = `game.hyp3e.rollItemMacro("${data.uuid}","${item.actor.id}");`;
-  let macro = game.macros.find(m => (m.name === item.name) && (m.command === command));
-  if (!macro) {
-    macro = await Macro.create({
-      name: item.name,
-      type: "script",
-      img: item.img,
-      command: command,
-      flags: { "hyp3e.itemMacro": true }
-    });
-  }
-  game.user.assignHotbarMacro(macro, slot);
-  return false;
+    // Is this a script/macro being added to the macro bar?
+    if (data.type == "Macro" && game.user.isGM) {
+        // If the user is a GM, let them add any macro to the hotbar
+        const macro = await Macro.fromDropData(data);
+        console.log(`Macro:`, macro)
+        console.log(`Adding macro ${macro.name} to hotbar slot ${slot}`)
+        game.user.assignHotbarMacro(macro, slot);
+        return
+    }
+
+    // Is this is a valid owned item?
+    if (data.type !== "Item") {
+        console.log(`Cannot create macro: ${data.type} is not an item`)
+        console.log(`Macro Data:`, data)
+        return;
+    }
+    if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.')) {
+        return ui.notifications.warn("You can only create macro buttons for owned Items");
+    }
+    // If it is, retrieve it based on the uuid.
+    const item = await Item.fromDropData(data);
+
+    // Create the macro command using the uuid.
+    const command = `game.hyp3e.rollItemMacro("${data.uuid}","${item.actor.id}");`;
+    let macro = game.macros.find(m => (m.name === item.name) && (m.command === command));
+    if (!macro) {
+        macro = await Macro.create({
+            name: item.name,
+            type: "script",
+            img: item.img,
+            command: command,
+            flags: { "hyp3e.itemMacro": true }
+        });
+    }
+    game.user.assignHotbarMacro(macro, slot);
+    return false;
 }
 
 /**
