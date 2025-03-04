@@ -598,17 +598,17 @@ async function reportItems() {
  * @returns {Promise}
  */
 async function createItemMacro(data, slot) {
-    // Did we mis the hotbar slot?
+    // Did the user miss the hotbar slot?
     if ( slot === null ) return;
 
     // Is this a script/macro being added to the macro bar?
-    if (data.type == "Macro" && game.user.isGM) {
-        // If the user is a GM, let them add any macro to the hotbar
+    if (data.type == "Macro") {
+        // Get the macro & code from the drop data
         const macro = await Macro.fromDropData(data);
-        console.log(`Macro:`, macro)
-        console.log(`Adding macro ${macro.name} to hotbar slot ${slot}`)
+        console.log(`Macro:`, macro);
+        console.log(`Adding macro ${macro.name} to hotbar slot ${slot}`);
         game.user.assignHotbarMacro(macro, slot);
-        return
+        return false;
     }
 
     // Is this is a valid owned item?
