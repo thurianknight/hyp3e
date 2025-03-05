@@ -545,7 +545,7 @@ export class Hyp3eActor extends Actor {
             // Missile weapons need to show a range selector in the dialog
             if (itemData.missile) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Range increments:`, itemData.range) }
-                dataset.showAmmo = itemData.usesAmmo
+                dataset.showAmmo = itemData?.usesAmmo ? itemData?.usesAmmo : false
                 dataset.showRanges = true
                 rangeGroup = "rangeGroup"
                 ranges = {
@@ -616,7 +616,8 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("Dialog response:", rollResponse) }
 
         // Decrement ammunition if selected in the attack dialog
-        if (item && item.type == "weapon" && itemData.usesAmmo && rollResponse.ammunition) {
+        // if (item && item.type == "weapon" && itemData.usesAmmo && rollResponse.ammunition) {
+        if (item && item.type == "weapon" && rollResponse.ammunition) {
             const ammo = this.items.get(rollResponse.ammunition)
             const ammoData = ammo ? {...ammo.system} : null
             if (ammo && ammoData) {
