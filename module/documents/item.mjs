@@ -38,8 +38,8 @@ export class Hyp3eItem extends Item {
                 data.img = `icons/svg/item-bag.svg`
             }      
         }
-        if (data.system.ammunition == "true") { data.system.isAmmunition = true }
-        if (data.system.consumable == "true") { data.system.isConsumable = true }
+        if (data.system?.ammunition == "true") { data.system.isAmmunition = true }
+        if (data.system?.consumable == "true") { data.system.isConsumable = true }
         if (CONFIG.HYP3E.debugMessages) { console.log("Pre-created item data", data) }
         return this.updateSource(data)
     }
