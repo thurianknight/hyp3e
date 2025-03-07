@@ -496,7 +496,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Get the range unit of measure for the scene
-        dataset.rangeUoM = canvas.scene.grid.units;
+        dataset.rangeUoM = canvas.scene?.grid.units ? canvas.scene?.grid.units : "ft";
 
         // Get the attacking token's location on the scene
         let attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
