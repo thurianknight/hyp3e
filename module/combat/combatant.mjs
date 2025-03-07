@@ -123,6 +123,10 @@ export class HYP3ECombatant extends Combatant {
             this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_MOD_MELEE : 0)/10;
             this.missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_MOD_MISSILE : 0)/10;
             this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_MOD_MAGIC : 0)/10;
+            // If move is combined with another action, reduce its modifier value to 1/10
+            if (this.meleeInit > 0 || this.missileInit > 0 || this.magicInit > 0) {
+                this.moveInit = this.moveInit/10;
+            }
         }
     }
 
