@@ -7,6 +7,7 @@ export class HYP3EGroupCombatant extends HYP3ECombatant {
 
     get groupRaw() {
         const assignedGroup = this.getFlag(game.system.id, "group");
+        if (CONFIG.HYP3E.debugMessages) { console.log("Combatant assigned group: ", this, assignedGroup) }
         if (assignedGroup)
             return assignedGroup;
 
@@ -30,6 +31,7 @@ export class HYP3EGroupCombatant extends HYP3ECombatant {
     }
 
     set group(value) {
+        if (CONFIG.HYP3E.debugMessages) { console.log("Setting group for combatant", this, value) }
         this.setFlag(game.system.id, 'group', value || 'black');
     }
 }
