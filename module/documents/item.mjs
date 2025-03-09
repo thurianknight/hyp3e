@@ -276,6 +276,10 @@ export class Hyp3eItem extends Item {
                 // Display the item check roll with target number
                 content += `<p>Item Check: ${itemData.formula} equal or under ${itemData.tn}</p>`
             }
+            // If the item is tagged as consumable but NOT ammunition, add a Use Item button
+            if (itemData.isConsumable && !itemData.isAmmunition) {
+                content += `<div class='use-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
+            }
         }
 
         // Now we can display the chat message

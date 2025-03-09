@@ -187,6 +187,26 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             });
         });
     }
+
+    // Use button
+    let itemUse = html.find(".use-button");
+    if (itemUse.length > 0) {
+        itemUse.each((_i, b) => {
+            console.log(`Use html: `, b)
+            let itemId = $(b).data('itemId');
+            let actorId = $(b).data('actorId');
+            let itemUseButton = $(
+                `<button class=""><i class="fas fa-hand-paper" title="Click to use item."></i>Use Item</button>`
+            );
+            itemUse.append(itemUseButton);
+
+            // Handle button clicks
+            itemUse.on("click", (ev) => {
+                ev.stopPropagation();
+                useItem(itemId, actorId);
+            });
+        });
+    }
 }
 
 // Show a change in value by a token
@@ -283,6 +303,30 @@ async function rollSaveButton(saveType) {
     }
 }
 
+// Decrement item inventory when used
+async function useItem(itemId, actorId) {
+    const actor = game.actors.get(actorId)
+    // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor: `, actor) }
+    const item = actor.items?.get(itemId);
+    if (!item) {
+        ui.notifications?.error("Item not found");
+        return;
+    }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name
+    // Decrement qty if possible, otherwise just allow it to be used
+    if (item.system.quantity.value > 0) {
+        const newQuantity = item.system.quantity.value - 1;
+        await item.update({ "system.quantity.value": newQuantity });
+    }
+    // Send a chat message that the item was used
+    const chatData = {
+        author: game.user_id,
+        content: `${actor.name} used ${itemName}.`
+    };
+
+    ChatMessage.create(chatData, {});
+}
+
 // Apply a health drop (positive number is damage) to one or more tokens.
 async function applyHealthDrop(total, extraRoll = "") {
     if (extraRoll != "") {
@@ -294,7 +338,7 @@ async function applyHealthDrop(total, extraRoll = "") {
         }
         // For showing the roll
         extraRoll = await roll.render();
-        console.log("Extra roll result: ", extraRoll)
+        if (CONFIG.HYP3E.debugMessages) { console.log("Extra roll result: ", extraRoll) }
     }
 
     if (total == 0) return; // Skip changes of 0
