@@ -306,25 +306,7 @@ async function rollSaveButton(saveType) {
 // Decrement item inventory when used
 async function useItem(itemId, actorId) {
     const actor = game.actors.get(actorId)
-    // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor: `, actor) }
-    const item = actor.items?.get(itemId);
-    if (!item) {
-        ui.notifications?.error("Item not found");
-        return;
-    }
-    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name
-    // Decrement qty if possible, otherwise just allow it to be used
-    if (item.system.quantity.value > 0) {
-        const newQuantity = item.system.quantity.value - 1;
-        await item.update({ "system.quantity.value": newQuantity });
-    }
-    // Send a chat message that the item was used
-    const chatData = {
-        author: game.user_id,
-        content: `${actor.name} used ${itemName}.`
-    };
-
-    ChatMessage.create(chatData, {});
+    actor.useItem(itemId);
 }
 
 // Apply a health drop (positive number is damage) to one or more tokens.

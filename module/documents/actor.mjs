@@ -193,11 +193,11 @@ export class Hyp3eActor extends Actor {
      */
     _getNpcRollData(data) {
         if (this.type !== 'npc') return;
-
         // Anything to load?
-        
+
     }
 
+    // Set token defaults when actor is created
     async _preCreate(data, options, user) {
         await super._preCreate(data, options, user);
         if (data.type == "character") {
@@ -209,9 +209,39 @@ export class Hyp3eActor extends Actor {
         }
     }
 
+    /**
+     * Use a consumable inventory item, decrementing its qty by 1
+     * @param {*} itemId
+     */
+    async useItem(itemId) {
+        const item = this.items?.get(itemId);
+        if (!item) {
+            ui.notifications?.error("Item not found!");
+            return;
+        }
+        const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name
+        // Decrement qty if possible, otherwise just allow it to be used
+        if (item.system.quantity.value > 0) {
+            const newQuantity = item.system.quantity.value - 1;
+            // Update the embedded item document
+            this.updateEmbeddedDocuments("Item", [
+                { _id: item.id, "system.quantity.value": newQuantity },
+            ]);
+        }
+        // Send a chat message that the item was used
+        const chatData = {
+            author: game.user_id,
+            content: `${this.name} used ${itemName}.`
+        };
+        ChatMessage.create(chatData, {});
+    }
+
+    /**
+     * Execute an item check or attack roll
+     * @param {*} dataset 
+     */
     async rollItem(dataset) {
         // Get item info to execute a standard roll
-
         const item = this.items.get(dataset.itemId)
         dataset.roll = item.system.formula
         let itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
@@ -247,6 +277,10 @@ export class Hyp3eActor extends Actor {
         }
     }
 
+    /**
+     * Execute an item macro
+     * @param {*} itemUuid 
+     */
     async rollMacro(itemUuid = null) {
         const dropData = {
             type: 'Item',
@@ -279,7 +313,8 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Handle rolls from the actor sheet
+     * Execute a basic roll directly from the actor sheet
+     * @param {*} dataset 
      */
     async rollBasic(dataset) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
@@ -310,6 +345,10 @@ export class Hyp3eActor extends Actor {
         return roll
     }
 
+    /**
+     * Execute a reaction roll directly from the actor sheet
+     * @param {*} dataset 
+     */
     async rollReaction(dataset) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
 
@@ -346,6 +385,10 @@ export class Hyp3eActor extends Actor {
         return roll
     }
 
+    /**
+     * Execute a check roll directly from the actor sheet
+     * @param {*} dataset 
+     */
     async rollCheck(dataset) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
 
@@ -438,6 +481,10 @@ export class Hyp3eActor extends Actor {
         return roll
     }
 
+    /**
+     * Execute an attack roll or cast a spell
+     * @param {*} dataset 
+     */
     async rollAttackOrSpell(dataset) {
         // Log the dataset and item (if any) before proceeding
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
@@ -779,6 +826,10 @@ export class Hyp3eActor extends Actor {
         return atkRoll
     }
 
+    /**
+     * Execute a saving throw
+     * @param {*} dataset 
+     */
     async rollSave(dataset) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
 
@@ -860,6 +911,10 @@ export class Hyp3eActor extends Actor {
         return roll
     }
 
+    /**
+     * Execute a hit-die roll directly from the actor sheet
+     * @param {*} dataset 
+     */
     async rollHD() {
         if (this.type !== 'npc') return;
         if (!this.system.hd){
