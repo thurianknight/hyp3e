@@ -159,7 +159,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     for (let i of context.items) {
       i.img = i.img || DEFAULT_TOKEN;
       // Calculate total weight carried by character
-      if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
+    //   if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
       if (i.system.weight) {
         if (i.system.quantity.value) {
           i.system.carriedWt = (i.system.weight * i.system.quantity.value)

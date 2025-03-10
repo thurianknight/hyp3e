@@ -277,8 +277,12 @@ export class Hyp3eItem extends Item {
                 content += `<p>Item Check: ${itemData.formula} equal or under ${itemData.tn}</p>`
             }
             // If the item is tagged as consumable but NOT ammunition, add a Use Item button
-            if (itemData.isConsumable && !itemData.isAmmunition) {
+            if ((itemData.isConsumable || item.effects.size > 0) && !itemData.isAmmunition) {
                 content += `<div class='use-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
+            }
+            // If the item has one or more effects, add an Apply Effects button for the GM
+            if (game.user.isGM && item.effects.size > 0) {
+                content += `<div class='apply-effects-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
             }
         }
 

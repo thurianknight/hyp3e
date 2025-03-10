@@ -8,14 +8,14 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let dmgRoll = html.find(".dmg-roll-button");
     if (dmgRoll.length > 0) {
         dmgRoll.each((_i, b) => {
-            console.log(`Damage html: `, b)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Damage html: `, b) }
             const dmgFormula = $(b).data('formula');
             const debugDmgRollFormula = $(b).data('debugFormula');
             const sourceType = $(b).data('sourceType');
             const itemId = $(b).data('itemId');
             const actorId = $(b).data('actorId');
             let dmgButton = $(
-                `<button class=""><i class="fas fa-dice" title="Click to roll damage."></i>Damage: ${dmgFormula}</button>`
+                `<button class="" title="Click to roll damage."><i class="fas fa-dice"></i>Damage: ${dmgFormula}</button>`
             );
             dmgRoll.append(dmgButton);
 
@@ -40,16 +40,16 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             let sourceType = $(b).data('sourceType');
 
             const fullDamageButton = $(
-                `<button class="dice-total-fullDamage-btn chat-button-small"><i class="fas fa-user-minus" title="Click to apply full damage to selected token(s)."></i></button>`
+                `<button class="dice-total-fullDamage-btn chat-button-small" title="Click to apply full damage to selected token(s)."><i class="fas fa-user-minus"></i></button>`
             );
             const halfDamageButton = $(
-                `<button class="dice-total-halfDamage-btn chat-button-small"><i class="fas fa-user-shield" title="Click to apply half damage to selected token(s)."></i></button>`
+                `<button class="dice-total-halfDamage-btn chat-button-small" title="Click to apply half damage to selected token(s)."><i class="fas fa-user-shield"></i></button>`
             );
             const fullHealingButton = $(
-                `<button class="dice-total-fullHealing-btn chat-button-small"><i class="fas fa-user-plus" title="Click to apply full healing to selected token(s)."></i></button>`
+                `<button class="dice-total-fullHealing-btn chat-button-small" title="Click to apply full healing to selected token(s)."><i class="fas fa-user-plus"></i></button>`
             );        
             const fullDamageModifiedButton = $(
-                `<button class="dice-total-fullDamageMod-btn chat-button-small"><i class="fas fa-user-edit" title="Click to apply full damage with modifier prompt to selected token(s)."></i></button>`
+                `<button class="dice-total-fullDamageMod-btn chat-button-small" title="Click to apply full damage with modifier prompt to selected token(s)."><i class="fas fa-user-edit"></i></button>`
             );
             dmg.append(fullDamageButton);
             dmg.append(halfDamageButton);
@@ -125,7 +125,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     }
 
     // "longer" button style for crit miss/hit
-    const long_button = (critType, charType, icon) => `<button class=""><i class="fas ${icon}" title="Click to roll critical ${critType} to selected token(s)."></i>${charType}</button>`;
+    const long_button = (critType, charType, icon) => `<button class="" title="Click to roll critical ${critType} to selected token(s)."><i class="fas ${icon}"></i>${charType}</button>`;
 
     let critMiss = html.find(".critical-miss");
     if (critMiss.length > 0) {
@@ -173,10 +173,10 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let save = html.find(".save-button");
     if (save.length > 0) {
         save.each((_i, b) => {
-            console.log(`Save html: `, b)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Save html: `, b) }
             let saveType = $(b).data('save');
             let saveButton = $(
-                `<button class=""><i class="fas fa-dice-d20" title="Click to roll save to selected token(s)."></i>Save: ${saveType}</button>`
+                `<button class="" title="Click to roll save to selected token(s)."><i class="fas fa-dice-d20"></i>Save: ${saveType}</button>`
             );
             save.append(saveButton);
 
@@ -192,11 +192,11 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let itemUse = html.find(".use-button");
     if (itemUse.length > 0) {
         itemUse.each((_i, b) => {
-            console.log(`Use html: `, b)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Use html: `, b) }
             let itemId = $(b).data('itemId');
             let actorId = $(b).data('actorId');
             let itemUseButton = $(
-                `<button class=""><i class="fas fa-hand-paper" title="Click to use item."></i>Use Item</button>`
+                `<button class="" title="Click to use item."><i class="fas fa-hand-paper"></i>Use Item</button>`
             );
             itemUse.append(itemUseButton);
 
@@ -204,6 +204,26 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             itemUse.on("click", (ev) => {
                 ev.stopPropagation();
                 useItem(itemId, actorId);
+            });
+        });
+    }
+
+    // Apply Effects button
+    let effectApply = html.find(".apply-effects-button");
+    if (effectApply.length > 0) {
+        effectApply.each((_i, b) => {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Effect html: `, b) }
+            let itemId = $(b).data('itemId');
+            let actorId = $(b).data('actorId');
+            let effectApplyButton = $(
+                `<button class="" title="Click to apply effect to selected tokens."><i class="fas fa-user-shield"></i>Apply Effect</button>`
+            );
+            effectApply.append(effectApplyButton);
+
+            // Handle button clicks
+            effectApply.on("click", (ev) => {
+                ev.stopPropagation();
+                applyEffects(itemId, actorId);
             });
         });
     }
@@ -307,6 +327,39 @@ async function rollSaveButton(saveType) {
 async function useItem(itemId, actorId) {
     const actor = game.actors.get(actorId)
     actor.useItem(itemId);
+}
+
+// Apply item effects to selected tokens
+async function applyEffects(itemId, actorId) {
+    // Get selected tokens
+    const tokens = canvas?.tokens?.controlled;
+
+    if (!tokens || tokens.length == 0) {
+        ui.notifications?.error("Please select at least one token");
+        return;
+    }
+
+    // Get the item
+    const actor = game.actors.get(actorId);
+    const item = actor.items.get(itemId);
+    if (!item) {
+        ui.notifications?.error("Item not found");
+        return;
+    }
+
+    // Apply the effects to tokens
+    for (const t of tokens) {
+        if (CONFIG.HYP3E.debugMessages) { console.log("Token: ", t) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Token Actor: ", t.actor) }
+        item.effects.forEach(effect => {
+            // const effectData = foundry.utils.deepClone(effect);
+            const effectData = {...effect};
+            effectData.origin = item.uuid;
+            if (CONFIG.HYP3E.debugMessages) { console.log("Cloned Effect:", effectData) }
+            t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+        });
+    }
+
 }
 
 // Apply a health drop (positive number is damage) to one or more tokens.
