@@ -53,6 +53,22 @@ export class HYP3ECombat extends Combat {
         await this.activateCombatant(0)
     }
     
+    async _onEndTurn(combatant, context) {
+        await super._onEndTurn(combatant, context);
+        // Log the combatant
+        if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
+        // Log effects on the actor
+        // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Actor Effects: ", combatant.actor.effects) }
+        combatant.actor.effects.forEach(effect => {
+            if (effect.isTemporary && !effect.disabled) {
+                console.log(`End-Turn Temporary Effect: ${effect.name}`, effect)
+            }
+        });
+        // Log the context object
+        if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Context: ", context) }
+
+    }
+
     async activateCombatant(turn) {
         if (game.user.isGM) {
             await game.combat.update({ turn });

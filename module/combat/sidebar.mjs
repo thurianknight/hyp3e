@@ -33,6 +33,7 @@ export class HYP3ECombatTab extends CombatTracker {
         // @ts-expect-error - We don't have type data for the combat tracker turn object
         const turns = context.turns.map((turn) => {
             const combatant = game.combat.combatants.get(turn.id);
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`Turn ${turn.name} Combatant: `, combatant) }
             turn.isMelee = !!combatant.getFlag(game.system.id, "isMelee")
             turn.isMissile = !!combatant.getFlag(game.system.id, "isMissile")
             turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
