@@ -36,6 +36,20 @@ export class HYP3ECombat extends Combat {
         return this;
     }
     
+    async endCombat() {
+        // For each combatant, remove any temporary effects
+        for (const combatant of this.combatants) {
+            combatant.actor.effects.forEach(effect => {
+                if (effect.isTemporary) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`End-Combat Temporary Effect to delete: ${effect.name}`, effect) }
+                    return effect.delete();
+                }
+            });
+        }
+        // Cleanup the combat object
+        await super.endCombat();
+    }
+
     async _onEndRound() {
         switch(this.#rerollBehavior) {
             case "reset":
