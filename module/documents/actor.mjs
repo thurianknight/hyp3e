@@ -215,11 +215,13 @@ export class Hyp3eActor extends Actor {
      */
     async useItem(itemId) {
         const item = this.items?.get(itemId);
+        // console.log("Using item:", item)
         if (!item) {
             ui.notifications?.error("Item not found!");
             return;
         }
         const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name
+        let message = `<p>${this.name} used ${itemName}.</p>`
         // Decrement qty if possible, otherwise just allow it to be used
         if (item.system.quantity.value > 0) {
             const newQuantity = item.system.quantity.value - 1;
@@ -228,10 +230,21 @@ export class Hyp3eActor extends Actor {
                 { _id: item.id, "system.quantity.value": newQuantity },
             ]);
         }
+        // If the item has a temporary effect, clone and apply it to the actor
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item effects:", item.effects) }
+        if (item.effects) {
+            item.effects.forEach(effect => {
+                const effectData = foundry.utils.deepClone(effect);
+                if (CONFIG.HYP3E.debugMessages) { console.log("Cloned Effect:", effectData) }
+                effectData.origin = item.id;
+                this.createEmbeddedDocuments("ActiveEffect", [effectData]);
+                message += `<p><i>(Applying effect ${effectData.name}...)</i></p>`
+            });
+        }
         // Send a chat message that the item was used
         const chatData = {
             author: game.user_id,
-            content: `${this.name} used ${itemName}.`
+            content: message
         };
         ChatMessage.create(chatData, {});
     }

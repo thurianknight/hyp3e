@@ -54,18 +54,33 @@ export class HYP3ECombat extends Combat {
     }
     
     async _onEndTurn(combatant, context) {
-        await super._onEndTurn(combatant, context);
-        // Log the combatant
-        if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
-        // Log effects on the actor
-        // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Actor Effects: ", combatant.actor.effects) }
-        combatant.actor.effects.forEach(effect => {
-            if (effect.isTemporary && !effect.disabled) {
-                console.log(`End-Turn Temporary Effect: ${effect.name}`, effect)
-            }
-        });
         // Log the context object
         if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Context: ", context) }
+        await super._onEndTurn(combatant, context);
+
+        // Log the combatant
+        if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
+        // Update temporary effects if expired
+        combatant.actor.effects.forEach(effect => {
+            if (effect.isTemporary && !effect.disabled) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect: ${effect.name}`, effect) }
+                if (effect.duration.remaining <= 0) {
+                    const updates = {
+                        disabled: true,
+                        duration: {
+                            startRound: null,
+                            startTurn: null
+                        }
+                    };
+                    return effect.update(updates);
+                }
+            } else if (effect.isTemporary && effect.disabled) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect to Delete: ${effect.name}`, effect) }
+                if (effect.duration.remaining <= 0) {
+                    return effect.delete();
+                }
+            }
+        });
 
     }
 
