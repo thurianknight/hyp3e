@@ -11,7 +11,7 @@ export class Hyp3eDice {
         let atkRollParts = []
         let masteryMod = 0
         let debugAtkRollParts = []
-        let debugAtkRollFormula = ""
+        let debugAtkRollFormula = "<b>Attack formula elements:</b><table>"
 
         // Check if the weapon attack has Master or Grandmaster flags set
         if (itemData.wpnGrandmaster) {
@@ -28,15 +28,17 @@ export class Hyp3eDice {
         let tmpAtkRollParts = rollData.roll.split("+")
         atkRollParts = tmpAtkRollParts.map(str => str.trim())
         if (CONFIG.HYP3E.debugMessages) { 
-            console.log("Base attack roll parts:", atkRollParts)
+            if (CONFIG.HYP3E.debugMessages) { console.log("Base attack roll parts:", atkRollParts) }
             debugAtkRollParts = [...atkRollParts]
-            console.log("Debug attack roll parts:", debugAtkRollParts)
+            if (CONFIG.HYP3E.debugMessages) { console.log("Debug attack roll parts:", debugAtkRollParts) }
+            // Take the first element in the debug array and wrap it in the table html
+            debugAtkRollParts[0] = `<tr><td>${debugAtkRollParts[0]}</td><td>${atkRollParts[0]}</td></tr>`
         }
 
         // Strip '@item.atkMod' out since we add it automatically anyway...
         //   Ideally this won't ever happen, but some items might have it in their formula.
         if (atkRollParts.includes("@item.atkMod")) {
-            console.log(`DEBUG: ${rollData.itemName} still has @itemData.atkMod in its formula!`)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`DEBUG: ${rollData.itemName} still has @itemData.atkMod in its formula!`) }
             atkRollParts = atkRollParts.filter(part => (part != "@item.atkMod"))
             if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@item.atkMod")) }
         }
@@ -46,10 +48,10 @@ export class Hyp3eDice {
             // atkRollParts.push(itemData.atkMod)
             if (atkRollParts.length > 1) {
                 atkRollParts.splice(1, 0, itemData.atkMod)
-                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(1, 0, 'itemAtkMod') }
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(1, 0, `<tr><td>Item Atk Mod</td><td>${itemData.atkMod}</td></tr>`) }
             } else {
                 atkRollParts.push(itemData.atkMod)
-                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('itemAtkMod') }
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push(`<tr><td>Item Atk Mod</td><td>${itemData.atkMod}</td></tr>`) }
             }
         }
 
@@ -58,10 +60,10 @@ export class Hyp3eDice {
             // atkRollParts.push(ammoData.atkMod)
             if (atkRollParts.length > 1) {
                 atkRollParts.splice(2, 0, ammoData.atkMod)
-                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(2, 0, 'ammoAtkMod') }
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(2, 0, `<tr><td>Ammo Atk Mod</td><td>${ammoData.atkMod}</td></tr>`) }
             } else {
                 atkRollParts.push(ammoData.atkMod)
-                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('ammoAtkMod') }
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push(`<tr><td>Ammo Atk Mod</td><td>${ammoData.atkMod}</td></tr>`) }
             }
         }
 
@@ -79,14 +81,14 @@ export class Hyp3eDice {
                     if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@dex.atkMod")) }
                     // By removing and re-adding, we ensure the parts are in the order we want
                     atkRollParts.push(actorData.dex.atkMod)
-                    if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('dex.atkMod') }
+                    if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push(`<tr><td>DX Atk Mod</td><td>${actorData.dex.atkMod}</td></tr>`) }
                 }
             } else {
                 // Most weapons fall into this section...
 
                 // Add Fighting Ability, even if it's zero
                 atkRollParts.push(actorData.fa)
-                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('fa') }
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push(`<tr><td>Fighting Ability</td><td>${actorData.fa}</td></tr>`) }
 
                 // Characters add ST or DX mods based on what the formula already has in it.
                 //   We do this because some people may have custom formulas that don't 
@@ -100,7 +102,7 @@ export class Hyp3eDice {
                         if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@str.atkMod")) }
                         // By removing and re-adding, we ensure the parts are in the order we want
                         atkRollParts.push(actorData.str.atkMod)
-                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('@str.atkMod') }
+                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push(`<tr><td>ST Atk Mod</td><td>${actorData.str.atkMod}</td></tr>`) }
                     }
                     if (atkRollParts.includes("@dex.atkMod")) {
                         // Remove @dex.atkMod first
@@ -108,7 +110,7 @@ export class Hyp3eDice {
                         if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@dex.atkMod")) }
                         // By removing and re-adding, we ensure the parts are in the order we want
                         atkRollParts.push(actorData.dex.atkMod)
-                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('@dex.atkMod') }
+                        if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push(`<tr><td>DX Atk Mod</td><td>${actorData.dex.atkMod}</td></tr>`) }
                     }
                 }
             }
@@ -117,42 +119,42 @@ export class Hyp3eDice {
             // Spell attack formulas are so bespoke, we need to handle each variable separately
             if (atkRollParts.includes("@fa")) {
                 atkRollParts[atkRollParts.indexOf("@fa")] = actorData.fa
-                // if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@fa")] = 'fa' }
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@fa")] = `<tr><td>Fighting Ability</td><td>${actorData.fa}</td></tr>` }
             }
             if (atkRollParts.includes("@str.atkMod")) {
                 atkRollParts[atkRollParts.indexOf("@str.atkMod")] = actorData.str.atkMod
-                // if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = 'str.atkMod' }
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = `<tr><td>ST Atk Mod</td><td>${actorData.str.atkMod}</td></tr>` }
             }
             if (atkRollParts.includes("@dex.atkMod")) {
                 atkRollParts[atkRollParts.indexOf("@dex.atkMod")] = actorData.dex.atkMod
-                // if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = 'dex.atkMod' }
+                if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = `<tr><td>DX Atk Mod</td><td>${actorData.dex.atkMod}</td></tr>` }
             }
         }
 
         // Add Weapon Mastery mod if applicable
         if (masteryMod > 0) {
             atkRollParts.push(masteryMod)
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('masteryMod') }
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push(`<tr><td>Mastery Mod</td><td>${masteryMod}</td></tr>`) }
         }
 
         // Add situational modifier from the roll dialog
         if (rollData?.sitMod != 0) {
             atkRollParts.push(rollData.sitMod)
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('sitMod') }
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push(`<tr><td>Sit Mod</td><td>${rollData.sitMod}</td></tr>`) }
         }
 
         // Add range modifier from the roll dialog, if needed
         if (rollData?.rangeMod <= 0) {
             if (CONFIG.HYP3E.debugMessages) { console.log("Range mod:", rollData?.rangeMod) }
             atkRollParts.push(rollData.rangeMod)
-            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push('rangeMod') }    
+            if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.push(`<tr><td>Range Mod</td><td>${rollData.rangeMod}</td></tr>`) }    
         }
 
         // Log the attack roll parts & the constructed formula
         if (CONFIG.HYP3E.debugMessages) { 
             console.log("Attack roll parts:", atkRollParts)
             console.log("Debug attack roll parts:", debugAtkRollParts)
-            debugAtkRollFormula = debugAtkRollParts.join(" + ")
+            debugAtkRollFormula += debugAtkRollParts.join("") + "</table>"
         }
 
         // Construct the attack roll formula from parts, and return an object with the formula and debug formula
@@ -183,25 +185,44 @@ export class Hyp3eDice {
 
         // All items start with the base damage formula
         dmgRollParts.push(itemData.damage)
-        if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage}` }
+        // if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula = `Damage Formula: ${itemData.damage}` }
+        if (CONFIG.HYP3E.debugMessages) {
+            // Add the debug message header and first table row
+            debugDmgRollFormula = "<b>Damage formula elements:</b><table>"
+            debugDmgRollFormula += `<tr><td>Base Roll</td><td>${itemData.damage}</td></tr>`
+
+            // Reformat the debug damage string for commonly-used variables
+            // ST Dmg Mod
+            const stdmRegex = /\+\s*@str.dmgMod/g
+            if (debugDmgRollFormula.match(stdmRegex) > "") {
+                debugDmgRollFormula = debugDmgRollFormula.replace(stdmRegex, "")
+                debugDmgRollFormula += `<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>`
+            }
+            // Casting Ability
+            const caRegex = /\+\s*@ca/g
+            if (debugDmgRollFormula.match(caRegex) > "") {
+                debugDmgRollFormula = debugDmgRollFormula.replace(caRegex, "")
+                debugDmgRollFormula += `<tr><td>Casting Ability</td><td>${actorData.ca}</td></tr>`
+            }
+        }
 
         // Apply the item damage mod if needed
         if (itemData.dmgMod) {
             dmgRollParts.push(itemData.dmgMod)
-            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + itemDmgMod` }
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += `<tr><td>Item Dmg Mod</td><td>${itemData.dmgMod}</td></tr>` }
         }
 
-        // Apply the item damage mod for magic ammunition if needed
+        // Apply the ammunition damage mod if needed
         if (ammoData?.dmgMod) {
             dmgRollParts.push(ammoData.dmgMod)
-            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + ammoDmgMod` }
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += `<tr><td>Ammo Dmg Mod</td><td>${ammoData.dmgMod}</td></tr>` }
         }
 
         // Apply the actor's ST damage mod if the item is a melee weapon
         if (itemData.melee) {
             if (actorData?.actorType == "character") {
                 dmgRollParts.push(actorData.str.dmgMod)
-                if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + @str.dmgMod` }
+                if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += `<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>` }
             } else {
                 // NPCs/monsters don't have a ST attribute, so nothing to do here except 
                 //  note it in a comment. :-)
@@ -211,8 +232,11 @@ export class Hyp3eDice {
         // Add Weapon Mastery mod if applicable
         if (masteryMod > 0) {
             dmgRollParts.push(masteryMod)
-            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += ` + masteryMod` }
+            if (CONFIG.HYP3E.debugMessages) { debugDmgRollFormula += `<tr><td>Mastery Mod</td><td>${masteryMod}</td></tr>` }
         }
+
+        // Finish the debug damage roll table
+        debugDmgRollFormula += "</table>"
 
         // Log the damage roll parts & the constructed formula
         if (CONFIG.HYP3E.debugMessages) { 

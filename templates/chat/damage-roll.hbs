@@ -4,12 +4,12 @@
         <div class="dice-formula">{{dmgRoll.formula}}</div>
         <div class="dice-tooltip">
             <section class="tooltip-part">
-                {{debugDmgRollFormula}}
+                {{{debugDmgRollFormula}}}
                 <div class="dice">
-                    <header class="part-header flexrow">
+                    {{!-- <header class="part-header flexrow">
                         <span class="part-formula">{{dmgRoll.formula}}</span>
                         <span class="part-total">{{dmgRoll.total}}</span>
-                    </header>
+                    </header> --}}
                     <ol class="dice-rolls">
                         {{#each dmgRoll.dice as |die key|}}
                         <header class="part-header flexrow">
