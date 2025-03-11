@@ -69,7 +69,6 @@ export class Hyp3eDice {
 
         // Apply the item attack mod if needed
         if (itemData.atkMod) {
-            // atkRollParts.push(itemData.atkMod)
             if (atkRollParts.length > 1) {
                 atkRollParts.splice(1, 0, itemData.atkMod)
                 if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(1, 0, `<tr><td>Item Atk Mod</td><td>${itemData.atkMod}</td></tr>`) }
@@ -81,7 +80,6 @@ export class Hyp3eDice {
 
         // Apply the ammunition attack mod if needed
         if (ammoData?.atkMod) {
-            // atkRollParts.push(ammoData.atkMod)
             if (atkRollParts.length > 1) {
                 atkRollParts.splice(2, 0, ammoData.atkMod)
                 if (CONFIG.HYP3E.debugMessages) { debugAtkRollParts.splice(2, 0, `<tr><td>Ammo Atk Mod</td><td>${ammoData.atkMod}</td></tr>`) }
