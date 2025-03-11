@@ -11,7 +11,7 @@ export class Hyp3eDice {
         let atkRollParts = []
         let masteryMod = 0
         let debugAtkRollParts = []
-        let debugAtkRollFormula = "<b>Attack formula elements:</b><table>"
+        let debugAtkRollFormula = ""
 
         // Check if the weapon attack has Master or Grandmaster flags set
         if (itemData.wpnGrandmaster) {
@@ -27,12 +27,36 @@ export class Hyp3eDice {
         //   For grenade-like items, it only includes the DX mod.
         let tmpAtkRollParts = rollData.roll.split("+")
         atkRollParts = tmpAtkRollParts.map(str => str.trim())
-        if (CONFIG.HYP3E.debugMessages) { 
+        if (CONFIG.HYP3E.debugMessages) {
             if (CONFIG.HYP3E.debugMessages) { console.log("Base attack roll parts:", atkRollParts) }
-            debugAtkRollParts = [...atkRollParts]
-            if (CONFIG.HYP3E.debugMessages) { console.log("Debug attack roll parts:", debugAtkRollParts) }
-            // Take the first element in the debug array and wrap it in the table html
-            debugAtkRollParts[0] = `<tr><td>${debugAtkRollParts[0]}</td><td>${atkRollParts[0]}</td></tr>`
+        }
+
+        // If the formula includes a fixed number like +1, integrate that into the base roll.
+        //   This is a bit of a hack, but it works.
+        if (atkRollParts.length > 1) {
+            // Regex to match +1, -1, +2, -2, etc.
+            const reNum = /[\+|\-]*\s*\d/
+            // Loop through the array and find a match if it exists
+            atkRollParts.forEach((part, index) => {
+                // Skip the first element, that should always be "1d20"
+                if (index == 0) { return }
+                if (part.match(reNum)) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log("Found a fixed number in the formula: ", part) }
+                    // If we find a match, remove it from the array
+                    atkRollParts.splice(index, 1)
+                    // Add it to the first element in the array
+                    let baseRoll = atkRollParts[0]
+                    atkRollParts[0] = `${baseRoll} + ${part}`
+                }
+            })
+            // Start setting up the debug attack roll table & array
+            if (CONFIG.HYP3E.debugMessages) {
+                debugAtkRollFormula = "<b>Attack formula elements:</b><table>"
+                debugAtkRollParts = [...atkRollParts]
+                // Take the first element in the debug array and wrap it in the table html
+                debugAtkRollParts[0] = `<tr><td>${debugAtkRollParts[0]}</td><td>${atkRollParts[0]}</td></tr>`
+                console.log("Debug attack roll parts:", debugAtkRollParts)
+            }
         }
 
         // Strip '@item.atkMod' out since we add it automatically anyway...
@@ -55,7 +79,7 @@ export class Hyp3eDice {
             }
         }
 
-        // Apply the item attack mod for magic ammunition if needed
+        // Apply the ammunition attack mod if needed
         if (ammoData?.atkMod) {
             // atkRollParts.push(ammoData.atkMod)
             if (atkRollParts.length > 1) {
