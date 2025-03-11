@@ -831,7 +831,7 @@ export class Hyp3eActor extends Actor {
 
                 // Get the dice roll values of damage for x2/x3 modifier button
                 const naturalDmgRoll = dmgRoll.dice[0]?.total ? dmgRoll.dice[0]?.total : dmgRoll.total;
-            
+
                 // Now output the damage chat
                 this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, itemData.damage, item)
             }
@@ -1093,6 +1093,7 @@ export class Hyp3eActor extends Actor {
             actorId: this.id,
             sourceType: sourceItem.type,
             save: sourceItem.system.save,
+            hasEffects: sourceItem.effects.size > 0 ? true : false,
             description: sourceItem.system.description
         };
 

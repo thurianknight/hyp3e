@@ -264,6 +264,10 @@ export class Hyp3eItem extends Item {
             } else {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll for spell ${item.name}, ${itemData.damage}, is not rollable.`) }
             }
+            // If the spell has one or more effects, add an Apply Effects button for the GM
+            if (game.user.isGM && item.effects.size > 0) {
+                content += `<div class='apply-effects-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
+            }
         }
         // Both spells and weapons might have a Saving Throw
         if (itemData.save && itemData.save !== "") {
