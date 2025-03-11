@@ -215,8 +215,22 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             if (CONFIG.HYP3E.debugMessages) { console.log(`Effect html: `, b) }
             let itemId = $(b).data('itemId');
             let actorId = $(b).data('actorId');
+            // Get the actor
+            let actor = game.actors.get(actorId);
+            if (!actor) {
+                ui.notifications?.error("Actor not found");
+            }
+            // Get the actor's item
+            let item = actor?.items.get(itemId);
+            if (!item) {
+                ui.notifications?.error("Item not found");
+                return;
+            }
+            // Get an array of effects (if any) provided by the item, and use it for the button label
+            let effects = item?.getEffectNames()
+            let btnLabel = effects.length > 1 ? "Multiple Effects" : effects[0];
             let effectApplyButton = $(
-                `<button class="" title="Click to apply effect to selected tokens."><i class="fas fa-user-shield"></i>Apply Effect</button>`
+                `<button class="" title="Click to apply ${effects.join()} to selected tokens."><i class="fas fa-user-shield"></i>Apply ${btnLabel}</button>`
             );
             effectApply.append(effectApplyButton);
 

@@ -152,6 +152,18 @@ export class Hyp3eItem extends Item {
         return rollData;
     }
 
+    // Get the names of effects applied to the item, and return an array
+    getEffectNames() {
+        let effects = this.effects
+        let effectsArray = []
+        effects.forEach(effect => {
+            // Log the effect
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`Effect ${effect.name}:`, effect) }
+            effectsArray.push(effect.name)
+        })
+        return effectsArray
+    }
+    
     /**
      * Handle displaying an Item description in the chat.
      * @private

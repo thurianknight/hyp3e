@@ -1108,6 +1108,18 @@ export class Hyp3eActor extends Actor {
         })
     }
 
+    // Get the names of effects applied to the actor, and return an array
+    getEffectNames() {
+        let effects = this.effects
+        let effectsArray = []
+        effects.forEach(effect => {
+            // Log the effect
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`Effect ${effect.name}:`, effect) }
+            effectsArray.push(effect.name)
+        })
+        return effectsArray
+    }
+
     // Parse spell range to get distance in feet
     _parseSpellRange(range) {
         let distance = 0
