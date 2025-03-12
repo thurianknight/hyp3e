@@ -2333,7 +2333,7 @@ export class Hyp3eActor extends Actor {
                             if (thisClass.attrReqs.str) {
                                 if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking ST requirements for ${data.details.class}...`) }
                                 if (data.attributes.str.value < thisClass.attrReqs.str) {
-                                    ui.notifications.warn(`ST is too low for class ${data.details.class}!`)
+                                    ui.notifications.warn(`ST is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.str) {
@@ -2374,7 +2374,7 @@ export class Hyp3eActor extends Actor {
                             if (thisClass.attrReqs.dex) {
                                 if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking DX requirements for ${data.details.class}...`) }
                                 if (data.attributes.dex.value < thisClass.attrReqs.dex) {
-                                    ui.notifications.warn(`DX is too low for class ${data.details.class}!`)
+                                    ui.notifications.warn(`DX is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.dex) {
@@ -2417,7 +2417,7 @@ export class Hyp3eActor extends Actor {
                             if (thisClass.attrReqs.con) {
                                 if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking CN requirements for ${data.details.class}...`) }
                                 if (data.attributes.con.value < thisClass.attrReqs.con) {
-                                    ui.notifications.warn(`CN is too low for class ${data.details.class}!`)
+                                    ui.notifications.warn(`CN is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.con) {
@@ -2481,7 +2481,7 @@ export class Hyp3eActor extends Actor {
                             if (thisClass.attrReqs.int) {
                                 if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking IN requirements for ${data.details.class}...`) }
                                 if (data.attributes.int.value < thisClass.attrReqs.int) {
-                                    ui.notifications.warn(`IN is too low for class ${data.details.class}!`)
+                                    ui.notifications.warn(`IN is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.int) {
@@ -2540,7 +2540,7 @@ export class Hyp3eActor extends Actor {
                             if (thisClass.attrReqs.wis) {
                                 if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking WS requirements for ${data.details.class}...`) }
                                 if (data.attributes.wis.value < thisClass.attrReqs.wis) {
-                                    ui.notifications.warn(`WS is too low for class ${data.details.class}!`)
+                                    ui.notifications.warn(`WS is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.wis) {
@@ -2574,7 +2574,7 @@ export class Hyp3eActor extends Actor {
                             if (thisClass.attrReqs.cha) {
                                 if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking CH requirements for ${data.details.class}...`) }
                                 if (data.attributes.cha.value < thisClass.attrReqs.cha) {
-                                    ui.notifications.warn(`CH is too low for class ${data.details.class}!`)
+                                    ui.notifications.warn(`CH is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.cha) {
