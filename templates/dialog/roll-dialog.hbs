@@ -7,12 +7,14 @@
         {{/if}}
         <div class="flexrow form-group">
             <label class="dialog-label">{{localize "HYP3E.rollFormula"}}</label>
-            <input type="text" name="baseRollFormula" value="{{roll}}" disabled />
+            <input type="text" name="baseRollFormula" value="{{dataset.roll}}" disabled />
         </div>
+        {{!-- {{#unless dataset.noRoll}} --}}
         <div class="flexrow form-group">
             <label class="dialog-label">{{localize "HYP3E.sitMod"}}</label>
             <input type="text" name="sitMod" value="" placeholder="{{localize 'HYP3E.rollExample'}}" />
         </div>
+        {{!-- {{/unless}} --}}
         {{#if dataset.showAmmo}}
         <div class="flexrow form-group">
             <label class="dialog-label">{{localize 'HYP3E.item.ammunition'}}</label>
@@ -37,11 +39,13 @@
             </div>
         </div>
         {{/if}}
+        {{!-- {{#unless dataset.noRoll}} --}}
         <div class="flexrow form-group">
             <label class="dialog-label">{{localize "HYP3E.rollMode"}}</label>
             <select name="rollMode">
                 {{selectOptions rollModes selected=rollMode localize=true}}
             </select>
         </div>
+        {{!-- {{/unless}} --}}
     </div>
 </form>

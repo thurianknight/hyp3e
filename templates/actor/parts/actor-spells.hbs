@@ -5,15 +5,8 @@
   <section class="main-content">
     {{!-- Casting ability --}}
     <h2>{{localize 'HYP3E.tabs.spells'}}</h2>
-    {{!-- <div class="spells-block flexrow flex-group-left"> --}}
-    {{!-- <div class="spells-block flexrow"> --}}
     <div class="flexrow">
-      {{!-- <div class="casting-ability flexrow flex-group-center"> --}}
       <div class="casting-ability">
-        {{!-- <span class="rollable" data-roll="1d20 + @ca" data-roll-type="basic" data-roll-mode="publicroll" data-label="{{localize 'HYP3E.dataLabel.caCheck'}}">
-          <label for="system.ca" class="spells-label">{{localize "HYP3E.castingAbility"}}</label> 
-          <i class="fas fa-dice-d20"></i>
-        </span> --}}
         <span class="spells-label">{{localize "HYP3E.castingAbility"}}</span>
         <input type="text" class="spells" name="system.ca" value="{{system.ca}}" data-dtype="Number"/>
       </div>
@@ -66,13 +59,9 @@
             <div class="item-header flexrow">
               <div class="item-name">
                 <div class="item-image">
-                  {{!-- {{#if item.system.atkRoll}} --}}
                   <a class="rollable" data-roll-type="item" data-roll-mode="publicroll" data-label="{{localize 'HYP3E.dataLabel.castSpell'}} {{item.name}}">
                     <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                   </a>
-                  {{!-- {{else}}
-                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-                  {{/if}} --}}
                 </div>
                 <a><h4 class="item-drop">{{item.name}}</h4></a>
               </div>

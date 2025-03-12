@@ -12,7 +12,6 @@ export class Hyp3eDialog {
             rollMode = dataset.rollMode
         }
         let dialogData = {
-            roll: dataset.roll,
             dataset: dataset,
             rollModes: CONFIG.Dice.rollModes,
             rollMode: rollMode
@@ -29,7 +28,7 @@ export class Hyp3eDialog {
                 buttons: {
                     roll: {
                         icon: '<i class="fas fa-dice-d20"></i>',
-                        label: "Roll",
+                        label: dataset.rollButtonLabel,
                         callback: (html) => {
                             const formElement = html[0].querySelector('form')
                             const formData = new FormDataExtended(formElement)
@@ -72,7 +71,7 @@ export class Hyp3eDialog {
         // Default rollMode to public roll, the user can change it in the roll dialog
         let rollMode = "publicroll"
         let dialogData = {
-            roll: dataset.roll,
+            // roll: dataset.roll,
             dataset: dataset,
             rollModes: CONFIG.Dice.rollModes,
             rollMode: rollMode,
@@ -135,7 +134,7 @@ export class Hyp3eDialog {
         // Default rollMode to public roll, the user can change it in the roll dialog
         let rollMode = "publicroll"
         let dialogData = {
-            roll: dataset.roll,
+            // roll: dataset.roll,
             enableRoll: dataset.enableRoll,
             dataset: dataset,
             rollModes: CONFIG.Dice.rollModes,
@@ -153,7 +152,7 @@ export class Hyp3eDialog {
                 buttons: {
                     roll: {
                         icon: '<i class="fas fa-scroll"></i>',
-                        label: "Cast",
+                        label: "Cast Spell",
                         callback: (html) => {
                             const formElement = html[0].querySelector('form')
                             const formData = new FormDataExtended(formElement)
@@ -195,7 +194,7 @@ export class Hyp3eDialog {
         //   rollMode = dataset.rollMode
         // }
         let dialogData = {
-            roll: dataset.roll,
+            // roll: dataset.roll,
             dataset: dataset,
             rollModes: CONFIG.Dice.rollModes,
             rollMode: rollMode
@@ -212,7 +211,7 @@ export class Hyp3eDialog {
                 buttons: {
                     roll: {
                         icon: '<i class="fas fa-dice-d20"></i>',
-                        label: "Roll",
+                        label: "Roll Save",
                         callback: (html) => {
                             const formElement = html[0].querySelector('form')
                             const formData = new FormDataExtended(formElement)

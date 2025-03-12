@@ -274,6 +274,7 @@ export class Hyp3eActor extends Actor {
             dataset.label = `${mastery} with ${itemName}`
             if (item.system.isAreaEffect) {
                 dataset.details = `No attack roll required to use ${itemName}.`
+                dataset.noRoll = true
             }
             this.rollAttackOrSpell(dataset)
         } else if (item.type == "spell") {
@@ -281,13 +282,24 @@ export class Hyp3eActor extends Actor {
             dataset.label = `Cast spell ${itemName}`
             if (item.system.formula == "" || item.system.formula == undefined) {
                 dataset.details = `No attack roll required to cast ${itemName}.`
+                dataset.noRoll = true
             }
             this.rollAttackOrSpell(dataset)
         } else {  // ==> Neither a weapon nor a spell
             // The default for other item types (i.e. class abilities or actual items) is a check
-            dataset.label = `${itemName} check`
-            dataset.rollTarget = item.system.tn
-            this.rollCheck(dataset)
+            dataset.label = `Using ${itemName}`
+            if (item.system.formula && item.system.formula != "") {
+                dataset.rollTarget = item.system.tn
+                this.rollCheck(dataset)
+            } else if (item.effects.size > 0) {
+                let effectList = []
+                item.effects.forEach(effect => {
+                    effectList.push(effect.name)
+                });
+                dataset.details = `Using ${itemName} applies the following: ${effectList.join(", ")}.`
+                dataset.noRoll = true
+                this.rollApplyEffects(dataset)
+            }
         }
     }
 
@@ -335,6 +347,7 @@ export class Hyp3eActor extends Actor {
 
         let rollResponse
         let label = `${dataset.label}...`
+        dataset.rollButtonLabel = "Roll"
 
         // Log the dataset before the dialog renders
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
@@ -368,6 +381,7 @@ export class Hyp3eActor extends Actor {
 
         let rollResponse
         let label = `${dataset.label}...`
+        dataset.rollButtonLabel = "Roll Reaction"
 
         // Log the dataset before the dialog renders
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
@@ -430,7 +444,22 @@ export class Hyp3eActor extends Actor {
         if (item) {
             itemId = item.id
             itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
+            // Determine the roll-button label to use
+            switch (item.type) {
+                case "item":
+                    dataset.rollButtonLabel = "Use Item"
+                    break
+                case "feature":
+                    dataset.rollButtonLabel = "Use Ability"
+                    break
+                default:
+                    dataset.rollButtonLabel = "Use"
+                    break
+            }
+        } else {
+            dataset.rollButtonLabel = "Roll"
         }
+
         // This is needed for Turn Undead results
         let turnUndeadHtml = ""
     
@@ -493,6 +522,30 @@ export class Hyp3eActor extends Actor {
         await this.renderCustomChat(roll, itemId, label, "", "", turnUndeadHtml, rollResponse.rollMode)
 
         return roll
+    }
+
+    /**
+     * Use an item to apply its effects to the owner or another target
+     * @param {*} dataset 
+     */
+    async rollApplyEffects(dataset) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: ${dataset.label}...`) }
+
+        const item = this.items.get(dataset.itemId)
+        let label = `${dataset.label}...`
+        dataset.rollButtonLabel = "Use Item"
+
+        // Log the dataset before the dialog renders
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: ${dataset.label} dataset: `, dataset) }
+        try {
+            let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
+            // Since we don't need to roll anything, just display the item in chat.
+            if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: roll response: `, rollResponse) }
+            item._displayItemInChat()
+        } catch(err) {
+            return
+        }
+
     }
 
     /**
@@ -884,6 +937,7 @@ export class Hyp3eActor extends Actor {
             }
         } else {
             // NPC/monster save, no attribute-based mods
+            dataset.rollButtonLabel = "Roll Save"
             // Log the dataset before the dialog renders
             if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
             try {

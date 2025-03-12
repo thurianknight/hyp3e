@@ -193,7 +193,7 @@ export class Hyp3eItem extends Item {
         // Chat message header text
         const label = `<h3>${typeLabel}: ${itemName}</h3>`
         
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item clicked:", item) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("_displayItemInChat: Item clicked:", item) }
         let content = itemData.description
 
         // Setup clickable buttons for item properties if they have a roll macro,
@@ -229,7 +229,7 @@ export class Hyp3eItem extends Item {
                     // Resolve damage string & variables to a rollable formula
                     // const roll = new Roll(`${itemData.damage} + ${itemData.dmgMod}`, actorData)
                     const roll = new Roll(dmgFormula, actorData)
-                    console.log("Spell damage roll: ", roll)
+                    console.log("_displayItemInChat: Damage roll: ", roll)
                     content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-actor-id='${actor.id}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}' data-source-type='${item.type}'></div>`;
                 } else {
                     content += `<p>Damage: ${itemData.damage}</p>`
@@ -274,7 +274,7 @@ export class Hyp3eItem extends Item {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
             } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll for spell ${item.name}, ${itemData.damage}, is not rollable.`) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`_displayItemInChat: Damage roll for spell ${item.name}, ${itemData.damage}, is not rollable.`) }
             }
             // If the spell has one or more effects, add an Apply Effects button for the GM
             if (game.user.isGM && item.effects.size > 0) {

@@ -16,15 +16,6 @@
           <h2>{{localize "HYP3E.headers.taskResolution"}}</h2>
         </div>
         <div class="abilities flexcol">
-          {{!-- {{#each system.explorationSkills as |skill key|}}
-          <div class="ability flexrow flex-group-center">
-            <span class="rollable flex-xlarge align-left" data-roll="d6" data-roll-target="{{skill.value}}" data-roll-type="check" data-roll-mode="{{skill.rollMode}}" data-label="{{skill.label}}">
-              <label for="system.explorationSkills.{{key}}.value" class="exploration-label">{{skill.label}}</label>
-              <i class="fas fa-dice-d6"></i>
-            </span>
-            <input type="text" name="system.explorationSkills.{{key}}.value" value="{{skill.value}}" data-dtype="Number"/>
-          </div>
-          {{/each}} --}}
           {{#each system.taskResolution as |task key|}}
           <div class="ability flexrow flex-group-center">
             <span class="rollable flex-xlarge align-left" 

@@ -563,10 +563,14 @@ export class Hyp3eActorSheet extends ActorSheet {
     //      Formula can be built into turning ability => item sheet of type "feature"
     //    Attack rolls: d20 roll-over target
     //      Formula can be built into weapon => item sheet of type "weapon"
+    //    Casting spells: may be attack roll or simply cast the spell
+    //      Formula can be built into spell => item sheet of type "spell"
     //    Damage rolls: dX and sum total
     //      Formula can be built into weapon => item sheet of type "weapon"
     //    Spell duration, number affected, etc.: varies
     //      Formulas can be built into spell => item sheet of type "spell"
+    //    Using items: applying an item effect to the actor
+    //      No formula needed, but item effect can be built into item => item sheet of type "item"
 
     try {
       // What is our roll type?
