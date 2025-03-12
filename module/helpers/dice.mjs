@@ -163,7 +163,6 @@ export class Hyp3eDice {
 
         // Add range modifier from the roll dialog, if needed
         if (rollData?.rangeMod <= 0) {
-            if (CONFIG.HYP3E.debugMessages) { console.log("Range mod:", rollData?.rangeMod) }
             atkRollParts.push(rollData.rangeMod)
             debugAtkRollParts.push(`<tr><td>Range Mod</td><td>${rollData.rangeMod}</td></tr>`)
         }
