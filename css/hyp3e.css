@@ -859,13 +859,19 @@ textarea {
 
 .color-trans-red {
     animation: fadeRed 2s ease-in-out infinite;
-    background-color:red;
+    color:red;
 }
 
 @keyframes fadeYellow {
     0% {background-color: transparent;}
     50% {background-color: lightyellow;}
     100% {background-color: transparent;}
+}
+
+@keyframes fadeRed {
+    0% {color: black;}
+    50% {color: red;}
+    100% {color: black;}
 }
 
 .combat-set-groups {

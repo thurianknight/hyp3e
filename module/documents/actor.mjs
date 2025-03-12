@@ -2129,6 +2129,16 @@ export class Hyp3eActor extends Actor {
         return output
     }
 
+    isAttributeLow(attr) {
+        const attrReqs = this.classData[this.system.details.class].attrReqs
+        if (attrReqs[attr]) {
+            if (this.system.attributes[attr].value < attrReqs[attr]) {
+                return true
+            }    
+        }
+        return false
+    }
+
     /**
      * Handle adding and removing a bonus spell
      * @param {String} spellLvl The bonus spell level to be updated

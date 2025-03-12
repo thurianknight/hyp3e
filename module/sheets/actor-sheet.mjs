@@ -70,51 +70,86 @@ export class Hyp3eActorSheet extends ActorSheet {
     return context;
   }
 
-  /**
-   * Organize and classify Data for Character sheets.
-   *
-   * @param {Object} context The actor to prepare.
-   *
-   * @return {undefined}
-   */
-  _prepareCharacterData(context) {
+    /**
+     * Organize and classify Data for Character sheets.
+     *
+     * @param {Object} context The actor to prepare.
+     *
+     * @return {undefined}
+     */
+    _prepareCharacterData(context) {
 
-    // Handle attribute scores
-    for (let [k, v] of Object.entries(context.system.attributes)) {
-      v.label = game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[k]) ?? k;
-      if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
+        // Handle attribute scores
+        for (let [k, v] of Object.entries(context.system.attributes)) {
+            v.label = game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[k]) ?? k;
+            if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
+            // Flag attributes that are too low for the character class
+            switch (k) {
+                case "str":
+                    if (this.actor.isAttributeLow(k)) {
+                        context.warnStr = true
+                    }
+                    break
+                case "dex":
+                    if (this.actor.isAttributeLow(k)) {
+                        context.warnDex = true
+                    }
+                    break
+                case "con":
+                    if (this.actor.isAttributeLow(k)) {
+                        context.warnCon = true
+                    }
+                    break
+                case "int":
+                    if (this.actor.isAttributeLow(k)) {
+                        context.warnInt = true
+                    }
+                    break
+                case "wis":
+                    if (this.actor.isAttributeLow(k)) {
+                        context.warnWis = true
+                    }
+                    break
+                case "cha":
+                    if (this.actor.isAttributeLow(k)) {
+                        context.warnCha = true
+                    }
+                    break
+                default:
+                    break
+            }
+        }
+
+        // Handle movement types
+        for (let [k, v] of Object.entries(context.system.movement)) {
+            v.label = game.i18n.localize(CONFIG.HYP3E.movement[k]) ?? k;
+            if (CONFIG.HYP3E.debugMessages) { console.log("Movement Types:", k, v, v.label) }
+        }
+
+        // Handle money types
+        for (let [k, v] of Object.entries(context.system.money)) {
+            v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
+            if (CONFIG.HYP3E.debugMessages) { console.log("Money Types:", k, v, v.label) }
+        }
+
+        // The following are global system settings
+        context.enableAttrChecks = CONFIG.HYP3E.enableAttrChecks
+        if (CONFIG.HYP3E.debugMessages) { console.log("Enable attribute checks:", context.enableAttrChecks) }
+
+        context.characterClasses = CONFIG.HYP3E.characterClasses
+        if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet class list:", context.characterClasses) }
+
+        context.races = CONFIG.HYP3E.races
+        if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet races list:", context.races) }
+
+        context.languages = CONFIG.HYP3E.languages
+        if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet languages:", context.languages) }
+
+        // System-defined roll modes
+        context.rollModes = CONFIG.Dice.rollModes
+        if (CONFIG.HYP3E.debugMessages) { console.log("Dice-roll modes:", context.rollModes) }
+
     }
-
-    // Handle movement types
-    for (let [k, v] of Object.entries(context.system.movement)) {
-      v.label = game.i18n.localize(CONFIG.HYP3E.movement[k]) ?? k;
-      if (CONFIG.HYP3E.debugMessages) { console.log("Movement Types:", k, v, v.label) }
-    }
-
-    // Handle money types
-    for (let [k, v] of Object.entries(context.system.money)) {
-      v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
-      if (CONFIG.HYP3E.debugMessages) { console.log("Money Types:", k, v, v.label) }
-    }
-
-    // The following are global system settings
-    context.enableAttrChecks = CONFIG.HYP3E.enableAttrChecks
-    if (CONFIG.HYP3E.debugMessages) { console.log("Enable attribute checks:", context.enableAttrChecks) }
-
-    context.characterClasses = CONFIG.HYP3E.characterClasses
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet class list:", context.characterClasses) }
-
-    context.races = CONFIG.HYP3E.races
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet races list:", context.races) }
-
-    context.languages = CONFIG.HYP3E.languages
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet languages:", context.languages) }
-
-    // System-defined roll modes
-    context.rollModes = CONFIG.Dice.rollModes
-    if (CONFIG.HYP3E.debugMessages) { console.log("Dice-roll modes:", context.rollModes) }
-
-  }
 
     /**
    * Organize and classify Data for NPC sheets.
@@ -433,122 +468,8 @@ export class Hyp3eActorSheet extends ActorSheet {
   async _displayItemInChat(event) {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
-    const actor = this.actor
-    const actorData = actor.system
-    // const speaker = ChatMessage.getSpeaker()
-
     // Use the item's display function to do it
     item._displayItemInChat()
-
-    // // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
-    // let typeLabel = ""
-    // if (item.type == 'feature') {
-    //   typeLabel = 'Ability'
-    // } else {
-    //   typeLabel = (item.type).capitalize()
-    // }
-    // // Replace names like "Bow, composite, long" with something that looks nicer
-    // let itemName = ""
-    // if (item.system.friendlyName != "") {
-    //   itemName = item.system.friendlyName
-    // } else {
-    //   itemName = item.name
-    // }
-
-    // // Chat message header text
-    // const label = `<h3>${typeLabel}: ${itemName}</h3>`
-    
-    // if (CONFIG.HYP3E.debugMessages) { console.log("Item clicked:", item) }
-    // let content = item.system.description
-
-    // // Setup clickable buttons for item properties if they have a roll macro,
-    // //  otherwise just display the value.
-
-    // // Features/Abilities
-    // if (item.type == 'feature') {
-    //   if (item.system.formula && item.system.tn) {
-    //     // Display the ability check roll with target number
-    //     content += `<p>Ability Check: ${item.system.formula} equal or under ${item.system.tn}</p>`
-    //   }
-    // }
-
-    // // Weapons
-    // if (item.type == 'weapon') {
-    //   if (item.system.rof) {
-    //     // Display missile rate of fire or melee attack rate
-    //     content += `<p>Atk Rate: ${item.system.rof}</p>`
-    //   }
-    //   if (item.system.type == 'missile') {
-    //     // For a missile weapon we display the range increments
-    //     content += `<p>Range: ${item.system.range.short} / ${item.system.range.medium} / ${item.system.range.long}</p>`
-    //   } else {
-    //     // For melee weapons we display the weapon class
-    //     content += `<p>Wpn Class: ${item.system.wc}</p>`
-    //   }
-    //   if (item.system.damage) {
-    //     if (Roll.validate(item.system.damage)) {
-    //         // Resolve damage string & variables to a rollable formula
-    //         const roll = new Roll(item.system.damage, actorData)
-    //         if (CONFIG.HYP3E.debugMessages) { console.log("Weapon damage roll: ", roll) }
-    //         content += `<div class='dmg-roll-button' data-formula='${roll.formula}'></div>`;
-    //     } else {
-    //         content += `<p>Damage: ${item.system.damage}</p>`
-    //     }
-    //   }
-    // }
-
-    // // Spells
-    // if (item.type == 'spell') {
-    //   if (item.system.range) {
-    //     // Display the range
-    //     content += `<p>Range: ${item.system.range}</p>`
-    //   }
-    //   if (item.system.duration) {
-    //     if ((item.system.duration).match(/.*d[1-9].*/)) {
-    //       // Add a duration roll macro
-    //       content += `<p>Duration: [[/r ${item.system.duration}]]</p>`
-    //     } else {
-    //       // If duration is not variable, simply display the value
-    //       content += `<p>Duration: ${item.system.duration}</p>`
-    //     }
-    //   }
-    //   if (item.system.affected) {
-    //     if ((item.system.affected).match(/.*d[1-9].*/)) {
-    //       // Add a number affected roll macro
-    //       content += `<p># Affected: [[/r ${item.system.affected}</p>`
-    //     } else {
-    //       content += `<p># Affected: ${item.system.affected}</p>`
-    //     }
-    //   }
-    //   if (item.system.save) {
-    //     content += `<p> Save: ${item.system.save}</p>`
-    //   }
-    //   if (item.system.damage) {
-    //     if (Roll.validate(item.system.damage)) {
-    //         // Resolve damage string & variables to a rollable formula
-    //         const roll = new Roll(item.system.damage, actorData)
-    //         if (CONFIG.HYP3E.debugMessages) { console.log("Spell damage roll: ", roll) }
-    //         content += `<div class='dmg-roll-button' data-formula='${roll.formula}'></div>`;
-    //     } else {
-    //         content += `<p>Damage: ${item.system.damage}</p>`
-    //     }
-    //   }      
-    // }
-
-    // // Item
-    // if (item.type == 'item') {
-    //   if (item.system.formula && item.system.tn) {
-    //     // Display the item check roll with target number
-    //     content += `<p>Item Check: ${item.system.formula} equal or under ${item.system.tn}</p>`
-    //   }
-    // }
-
-    // // Now we can display the chat message
-    // ChatMessage.create({
-    //   speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-    //   flavor: label,
-    //   content: content ?? ''
-    // })
   }
 
   _onSortItem(event, itemData) {
