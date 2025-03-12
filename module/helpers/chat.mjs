@@ -360,6 +360,8 @@ async function applyEffects(itemId, actorId) {
         ui.notifications?.error("Item not found");
         return;
     }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+    let message = `<p>${actor.name} used ${itemName}.</p>`
 
     // Apply the effects to tokens
     for (const t of tokens) {
@@ -370,10 +372,16 @@ async function applyEffects(itemId, actorId) {
             const effectData = {...effect};
             effectData.origin = item.uuid;
             if (CONFIG.HYP3E.debugMessages) { console.log("Cloned Effect:", effectData) }
+            message += `<p><i>(Applying effect ${effectData.name} to ${t.name}...)</i></p>`
             t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
         });
     }
-
+    // Send a chat message that the item was used
+    const chatData = {
+        author: game.user_id,
+        content: message
+    };
+    ChatMessage.create(chatData, {});
 }
 
 // Apply a health drop (positive number is damage) to one or more tokens.
