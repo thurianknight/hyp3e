@@ -219,9 +219,10 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             let actor = game.actors.get(actorId);
             if (!actor) {
                 ui.notifications?.error("Actor not found");
+                return;
             }
             // Get the actor's item
-            let item = actor?.items.get(itemId);
+            let item = actor.items.get(itemId);
             if (!item) {
                 ui.notifications?.error("Item not found");
                 return;
