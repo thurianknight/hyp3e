@@ -2249,10 +2249,10 @@ export class Hyp3eActor extends Actor {
      * Set or reset all attribute modifiers
      */
     async SetAttributeMods(dataset) {
-        console.log("Setting attribute modifiers...")
+        console.log("SetAttributeMods: Setting attribute modifiers...")
 
         // Log the dataset before the dialog renders
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${this.name} dataset: `, dataset) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: ${this.name} dataset: `, dataset) }
         
         // Display the confirmation dialog, and exit if the user cancels this action
         try {
@@ -2273,13 +2273,13 @@ export class Hyp3eActor extends Actor {
         let content = `<ul>`
 
         // Here we modify the cloned data object of the actor...
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor system data:", data) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("SetAttributeMods: cloned Actor system data:", data) }
         if (data.details.class) {
             // Override label if character class selected
             label = `<h3>Values for ${data.details.class} updated...</h3>`
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${data.details.class} hit die...`) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${data.details.class} hit die...`) }
             thisClass = this.classData[data.details.class]
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Class Data for ${data.details.class}: `, thisClass) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Class Data for ${data.details.class}: `, thisClass) }
             data.hd = thisClass.hitDie
             content += `<li>Hit Die: ${thisClass.hitDie}</li>`
             data.fa = thisClass.fa
@@ -2308,7 +2308,7 @@ export class Hyp3eActor extends Actor {
             for (let [k, v] of Object.entries(data.attributes)) {
                 switch (k) {
                     case "str":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+                        if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${k} modifiers...`) }
                         content += `<li>ST Mods:</li><ul>`
                         data.attributes.str.atkMod = this._valueFromTable(this.strAtkMod, data.attributes.str.value)
                         content += `<li>Melee Attack Mod: ${data.attributes.str.atkMod}</li>`
@@ -2319,21 +2319,28 @@ export class Hyp3eActor extends Actor {
                         data.attributes.str.feat = this._valueFromTable(this.featOfAttr, data.attributes.str.value)
                         content += `<li>Feat of ST: ${data.attributes.str.feat}</li>`
                         if (data.details.class) {
-                            if (thisClass.xpBonusReq.str) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high ST...`) }
-                                if (data.attributes.str.value >= thisClass.xpBonusReq.str && xpBonusPossible != false) {
-                                xpBonusPossible = true
-                                } else {
-                                xpBonusPossible = false
-                                }
-                                if (data.details.xp.primeAttr == "") {
-                                data.details.xp.primeAttr = "ST"
-                                } else {
-                                data.details.xp.primeAttr += ", ST"
+                            // Check if ST does not meet attribute pre-req for this class
+                            if (thisClass.attrReqs.str) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking ST requirements for ${data.details.class}...`) }
+                                if (data.attributes.str.value < thisClass.attrReqs.str) {
+                                    ui.notifications.warn(`ST is too low for class ${data.details.class}!`)
                                 }
                             }
-                            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of ST...`) }
+                            if (thisClass.xpBonusReq.str) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking XP bonus on high ST...`) }
+                                if (data.attributes.str.value >= thisClass.xpBonusReq.str && xpBonusPossible != false) {
+                                    xpBonusPossible = true
+                                } else {
+                                    xpBonusPossible = false
+                                }
+                                if (data.details.xp.primeAttr == "") {
+                                    data.details.xp.primeAttr = "ST"
+                                } else {
+                                    data.details.xp.primeAttr += ", ST"
+                                }
+                            }
                             if (thisClass.featBonus && thisClass.featBonus.str) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking for Extraordinary Feat of ST...`) }
                                 data.attributes.str.feat += thisClass.featBonus.str
                                 content += `<li>Extraordinary Feat of ST override: ${data.attributes.str.feat}</li>`
                             }
@@ -2342,7 +2349,7 @@ export class Hyp3eActor extends Actor {
                         break
 
                     case "dex":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+                        if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${k} modifiers...`) }
                         content += `<li>DX Mods:</li><ul>`
                         data.attributes.dex.atkMod = this._valueFromTable(this.dexAtkMod, data.attributes.dex.value)
                         content += `<li>Missile Attack Mod: ${data.attributes.dex.atkMod}</li>`
@@ -2352,20 +2359,29 @@ export class Hyp3eActor extends Actor {
                         content += `<li>Test of DX: ${data.attributes.dex.test}</li>`
                         data.attributes.dex.feat = this._valueFromTable(this.featOfAttr, data.attributes.dex.value)
                         content += `<li>Feat of DX: ${data.attributes.dex.feat}</li>`
-                        if (data.details.class && thisClass.xpBonusReq.dex) {
-                            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high DX...`) }
-                            if (data.attributes.dex.value >= thisClass.xpBonusReq.dex && xpBonusPossible != false) {
-                                xpBonusPossible = true
-                            } else {
-                                xpBonusPossible = false
+                        if (data.details.class) {
+                            // Check if DX does not meet attribute pre-req for this class
+                            if (thisClass.attrReqs.dex) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking DX requirements for ${data.details.class}...`) }
+                                if (data.attributes.dex.value < thisClass.attrReqs.dex) {
+                                    ui.notifications.warn(`DX is too low for class ${data.details.class}!`)
+                                }
                             }
-                            if (data.details.xp.primeAttr == "") {
-                                data.details.xp.primeAttr = "DX"
-                            } else {
-                                data.details.xp.primeAttr += ", DX"
+                            if (thisClass.xpBonusReq.dex) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking XP bonus on high DX...`) }
+                                if (data.attributes.dex.value >= thisClass.xpBonusReq.dex && xpBonusPossible != false) {
+                                    xpBonusPossible = true
+                                } else {
+                                    xpBonusPossible = false
+                                }
+                                if (data.details.xp.primeAttr == "") {
+                                    data.details.xp.primeAttr = "DX"
+                                } else {
+                                    data.details.xp.primeAttr += ", DX"
+                                }    
                             }
-                            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of DX...`) }
                             if (thisClass.featBonus && thisClass.featBonus.dex) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking for Extraordinary Feat of DX...`) }
                                 data.attributes.dex.feat += thisClass.featBonus.dex
                                 content += `<li>Extraordinary Feat of DX override: ${data.attributes.dex.feat}</li>`
                             }
@@ -2374,7 +2390,7 @@ export class Hyp3eActor extends Actor {
                         break
 
                     case "con":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+                        if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${k} modifiers...`) }
                         content += `<li>CN Mods:</li><ul>`
                         data.attributes.con.hpMod = this._valueFromTable(this.conHpMod, data.attributes.con.value)
                         content += `<li>Hit Point Mod: ${data.attributes.con.hpMod}</li>`
@@ -2386,20 +2402,29 @@ export class Hyp3eActor extends Actor {
                         content += `<li>Test of CN: ${data.attributes.con.test}</li>`
                         data.attributes.con.feat = this._valueFromTable(this.featOfAttr, data.attributes.con.value)
                         content += `<li>Feat of CN: ${data.attributes.con.feat}</li>`
-                        if (data.details.class && thisClass.xpBonusReq.con) {
-                            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high CN...`) }
-                            if (data.attributes.con.value >= thisClass.xpBonusReq.con && xpBonusPossible != false) {
-                                xpBonusPossible = true
-                            } else {
-                                xpBonusPossible = false
+                        if (data.details.class) {
+                            // Check if CN does not meet attribute pre-req for this class
+                            if (thisClass.attrReqs.con) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking CN requirements for ${data.details.class}...`) }
+                                if (data.attributes.con.value < thisClass.attrReqs.con) {
+                                    ui.notifications.warn(`CN is too low for class ${data.details.class}!`)
+                                }
                             }
-                            if (data.details.xp.primeAttr == "") {
-                                data.details.xp.primeAttr = "CN"
-                            } else {
-                                data.details.xp.primeAttr += ", CN"
+                            if (thisClass.xpBonusReq.con) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking XP bonus on high CN...`) }
+                                if (data.attributes.con.value >= thisClass.xpBonusReq.con && xpBonusPossible != false) {
+                                    xpBonusPossible = true
+                                } else {
+                                    xpBonusPossible = false
+                                }
+                                if (data.details.xp.primeAttr == "") {
+                                    data.details.xp.primeAttr = "CN"
+                                } else {
+                                    data.details.xp.primeAttr += ", CN"
+                                }
                             }
-                            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking for Extraordinary Feat of CN...`) }
                             if (thisClass.featBonus && thisClass.featBonus.con) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking for Extraordinary Feat of CN...`) }
                                 data.attributes.con.feat += thisClass.featBonus.con
                                 content += `<li>Extraordinary Feat of CN override: ${data.attributes.con.feat}</li>`
                             }
@@ -2408,7 +2433,7 @@ export class Hyp3eActor extends Actor {
                         break
 
                     case "int":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+                        if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${k} modifiers...`) }
                         content += `<li>IN Mods:</li><ul>`
 
                         data.attributes.int.languages = this._valueFromTable(this.intLanguages, data.attributes.int.value)
@@ -2441,26 +2466,33 @@ export class Hyp3eActor extends Actor {
                         data.attributes.int.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.int.value)
                         content += `<li>% Chance to Learn Spell: ${data.attributes.int.learnSpell}</li>`
 
-                        if (data.details.class && thisClass.xpBonusReq.int) {
-                            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high IN...`) }
-
-                            if (data.attributes.int.value >= thisClass.xpBonusReq.int && xpBonusPossible != false) {
-                                xpBonusPossible = true
-                            } else {
-                                xpBonusPossible = false
+                        if (data.details.class) {
+                            // Check if IN does not meet attribute pre-req for this class
+                            if (thisClass.attrReqs.int) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking IN requirements for ${data.details.class}...`) }
+                                if (data.attributes.int.value < thisClass.attrReqs.int) {
+                                    ui.notifications.warn(`IN is too low for class ${data.details.class}!`)
+                                }
                             }
-
-                            if (data.details.xp.primeAttr == "") {
-                                data.details.xp.primeAttr = "IN"
-                            } else {
-                                data.details.xp.primeAttr += ", IN"
+                            if (thisClass.xpBonusReq.int) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking XP bonus on high IN...`) }
+                                if (data.attributes.int.value >= thisClass.xpBonusReq.int && xpBonusPossible != false) {
+                                    xpBonusPossible = true
+                                } else {
+                                    xpBonusPossible = false
+                                }
+                                if (data.details.xp.primeAttr == "") {
+                                    data.details.xp.primeAttr = "IN"
+                                } else {
+                                    data.details.xp.primeAttr += ", IN"
+                                }
                             }
                         }
                         content += `</ul>`
                         break
 
                     case "wis":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+                        if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${k} modifiers...`) }
                         content += `<li>WS Mods:</li><ul>`
 
                         data.attributes.wis.willMod = this._valueFromTable(this.wisWillMod, data.attributes.wis.value)
@@ -2493,26 +2525,33 @@ export class Hyp3eActor extends Actor {
                         data.attributes.wis.learnSpell = this._valueFromTable(this.learnSpell, data.attributes.wis.value)
                         content += `<li>% Chance to Learn Spell: ${data.attributes.wis.learnSpell}</li>`
 
-                        if (data.details.class && thisClass.xpBonusReq.wis) {
-                            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high WS...`) }
-
-                            if (data.attributes.wis.value >= thisClass.xpBonusReq.wis && xpBonusPossible != false) {
-                                xpBonusPossible = true
-                            } else {
-                                xpBonusPossible = false
+                        if (data.details.class) {
+                            // Check if WS does not meet attribute pre-req for this class
+                            if (thisClass.attrReqs.wis) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking WS requirements for ${data.details.class}...`) }
+                                if (data.attributes.wis.value < thisClass.attrReqs.wis) {
+                                    ui.notifications.warn(`WS is too low for class ${data.details.class}!`)
+                                }
                             }
-
-                            if (data.details.xp.primeAttr == "") {
-                                data.details.xp.primeAttr = "WS"
-                            } else {
-                                data.details.xp.primeAttr += ", WS"
+                            if (thisClass.xpBonusReq.wis) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking XP bonus on high WS...`) }
+                                if (data.attributes.wis.value >= thisClass.xpBonusReq.wis && xpBonusPossible != false) {
+                                    xpBonusPossible = true
+                                } else {
+                                    xpBonusPossible = false
+                                }
+                                if (data.details.xp.primeAttr == "") {
+                                    data.details.xp.primeAttr = "WS"
+                                } else {
+                                    data.details.xp.primeAttr += ", WS"
+                                }
                             }
                         }
                         content += `</ul>`
                         break
 
                     case "cha":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`Setting ${k} modifiers...`) }
+                        if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${k} modifiers...`) }
                         content += `<li>CH Mods:</li><ul>`
                         data.attributes.cha.reaction = this._valueFromTable(this.chaReactionMod, data.attributes.cha.value)
                         content += `<li>Reaction Mod: ${data.attributes.cha.reaction}</li>`
@@ -2520,17 +2559,26 @@ export class Hyp3eActor extends Actor {
                         content += `<li>Max Henchmen: ${data.attributes.cha.maxHenchmen}</li>`
                         data.attributes.cha.turnUndead = this._valueFromTable(this.chaTurnUndead, data.attributes.cha.value)
                         content += `<li>Turn Undead Mod: ${data.attributes.cha.turnUndead}</li>`
-                        if (data.details.class && thisClass.xpBonusReq.cha) {
-                            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking XP bonus on high CH...`) }
-                            if (data.attributes.cha.value >= thisClass.xpBonusReq.cha && xpBonusPossible != false) {
-                                xpBonusPossible = true
-                            } else {
-                                xpBonusPossible = false
+                        if (data.details.class) {
+                            // Check if CH does not meet attribute pre-req for this class
+                            if (thisClass.attrReqs.cha) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking CH requirements for ${data.details.class}...`) }
+                                if (data.attributes.cha.value < thisClass.attrReqs.cha) {
+                                    ui.notifications.warn(`CH is too low for class ${data.details.class}!`)
+                                }
                             }
-                            if (data.details.xp.primeAttr == "") {
-                                data.details.xp.primeAttr = "CH"
-                            } else {
-                                data.details.xp.primeAttr += ", CH"
+                            if (thisClass.xpBonusReq.cha) {
+                                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Checking XP bonus on high CH...`) }
+                                if (data.attributes.cha.value >= thisClass.xpBonusReq.cha && xpBonusPossible != false) {
+                                    xpBonusPossible = true
+                                } else {
+                                    xpBonusPossible = false
+                                }
+                                if (data.details.xp.primeAttr == "") {
+                                    data.details.xp.primeAttr = "CH"
+                                } else {
+                                    data.details.xp.primeAttr += ", CH"
+                                }
                             }
                         }
                         content += `</ul>`
@@ -2628,16 +2676,16 @@ export class Hyp3eActor extends Actor {
 
             // Apply updates to the actor
             try {
-                if (CONFIG.HYP3E.debugMessages) { console.log('Updated attribute modifier data:', updateData) }
+                if (CONFIG.HYP3E.debugMessages) { console.log('SetAttributeMods: Updated attribute modifier data:', updateData) }
                 if(this.validate(updateData)) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log('Validation OK, executing update...') }
+                    if (CONFIG.HYP3E.debugMessages) { console.log('SetAttributeMods: Validation OK, executing update...') }
                     // Update the main actor data
                     await this.update(updateData)
                     // Log the actor data after updating
-                    if (CONFIG.HYP3E.debugMessages) { console.log('Actor after update:', this.system) }
+                    if (CONFIG.HYP3E.debugMessages) { console.log('SetAttributeMods: Actor after update:', this.system) }
                 }
             } catch(err) {
-                console.log(`Actor update error: ${err}`)
+                console.log(`SetAttributeMods: Actor update error: ${err}`)
             }
 
             // Now we can display the chat message
