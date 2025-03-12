@@ -363,6 +363,15 @@ async function applyEffects(itemId, actorId) {
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
     let message = `<p>${actor.name} used ${itemName}.</p>`
 
+    // Decrement qty if it's consumable, otherwise just allow it to be used
+    if (item.system.isConsumable && item.system.quantity.value > 0) {
+        const newQuantity = item.system.quantity.value - 1;
+        // Update the embedded item document
+        actor.updateEmbeddedDocuments("Item", [
+            { _id: item.id, "system.quantity.value": newQuantity },
+        ]);
+    }
+
     // Apply the effects to tokens
     for (const t of tokens) {
         if (CONFIG.HYP3E.debugMessages) { console.log("Token: ", t) }
