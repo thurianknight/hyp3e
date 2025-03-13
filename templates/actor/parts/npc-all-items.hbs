@@ -130,17 +130,7 @@
       <div class="item-header flexrow">
         <div class="item-name">
           <div class="item-image">
-            {{#if item.system.formula}}
-            <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
             <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-            </a>
-            {{else if item.effects}}
-            <a class="rollable" data-roll-type="item" data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
-            <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-            </a>
-            {{else}}
-            <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-            {{/if}}
           </div>
           <a><h4 class="item-drop">{{item.name}}</h4></a>
         </div>

@@ -158,7 +158,7 @@ export class Hyp3eItem extends Item {
         let effectsArray = []
         effects.forEach(effect => {
             // Log the effect
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Effect ${effect.name}:`, effect) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`getEffectNames: Effect ${effect.name}:`, effect) }
             effectsArray.push(effect.name)
         })
         return effectsArray

@@ -214,10 +214,16 @@ export class Hyp3eActor extends Actor {
      * @param {*} itemId
      */
     async useItem(itemId) {
+        if (CONFIG.HYP3E.debugMessages) { console.log("useItem: All actor items:", this.items) }
         const item = this.items?.get(itemId);
-        console.log("Using item:", item)
+        if (CONFIG.HYP3E.debugMessages) { console.log("useItem: Using item:", item) }
         if (!item) {
-            ui.notifications?.error("Item not found!");
+            ui.notifications?.error(`Use Item: Item ${itemId} not found! See console log for details.`);
+            if (CONFIG.HYP3E.debugMessages) {
+                console.log(`useItem: Item ${itemId} not found!`)
+                console.log(`useItem: Likely issue is that the item is owned by a token, but not the base actor.`)
+                console.log(`useItem: This is most common with NPCs and monsters, if the GM drags an item or creates a new item directly in the token sheet.`)
+            }
             return;
         }
         const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name

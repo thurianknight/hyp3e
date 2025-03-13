@@ -192,7 +192,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let itemUse = html.find(".use-button");
     if (itemUse.length > 0) {
         itemUse.each((_i, b) => {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Use html: `, b) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Use Item html: `, b) }
             let itemId = $(b).data('itemId');
             let actorId = $(b).data('actorId');
             let itemUseButton = $(
@@ -212,19 +212,25 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let effectApply = html.find(".apply-effects-button");
     if (effectApply.length > 0) {
         effectApply.each((_i, b) => {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Effect html: `, b) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Apply Effects html: `, b) }
             let itemId = $(b).data('itemId');
             let actorId = $(b).data('actorId');
             // Get the actor
             let actor = game.actors.get(actorId);
             if (!actor) {
-                ui.notifications?.error("Actor not found");
+                ui.notifications?.error(`Apply Effects Button: Actor ${actorId} not found!`);
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Apply Effects Button: Actor ${actorId} not found!`) }
                 return;
             }
             // Get the actor's item
             let item = actor.items.get(itemId);
             if (!item) {
-                ui.notifications?.error("Item not found");
+                ui.notifications?.error(`Apply Effects Button: Item ${itemId} not found! See console log for details.`);
+                if (CONFIG.HYP3E.debugMessages) {
+                    console.log(`Apply Effects Button: Item ${itemId} not found!`)
+                    console.log(`Apply Effects Button: Likely issue is that the item is owned by a token, but not the base actor.`)
+                    console.log(`Apply Effects Button: This is most common with NPCs and monsters, if the GM drags an item or creates a new item directly in the token sheet.`)
+                }
                 return;
             }
             // Get an array of effects (if any) provided by the item, and use it for the button label
@@ -350,7 +356,7 @@ async function applyEffects(itemId, actorId) {
     const tokens = canvas?.tokens?.controlled;
 
     if (!tokens || tokens.length == 0) {
-        ui.notifications?.error("Please select at least one token");
+        ui.notifications?.error("Apply Effects: Please select at least one token.");
         return;
     }
 
@@ -358,9 +364,10 @@ async function applyEffects(itemId, actorId) {
     const actor = game.actors.get(actorId);
     const item = actor.items.get(itemId);
     if (!item) {
-        ui.notifications?.error("Item not found");
+        ui.notifications?.error(`Apply Effects: Item ${itemId} not found!`);
         return;
     }
+    if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Item: ", item) }
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
     let message = `<p>${actor.name} used ${itemName}.</p>`
 
@@ -368,20 +375,20 @@ async function applyEffects(itemId, actorId) {
     if (item.system.isConsumable && item.system.quantity.value > 0) {
         const newQuantity = item.system.quantity.value - 1;
         // Update the embedded item document
-        actor.updateEmbeddedDocuments("Item", [
+        await actor.updateEmbeddedDocuments("Item", [
             { _id: item.id, "system.quantity.value": newQuantity },
         ]);
     }
 
     // Apply the effects to tokens
     for (const t of tokens) {
-        if (CONFIG.HYP3E.debugMessages) { console.log("Token: ", t) }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Token Actor: ", t.actor) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Token: ", t) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Token Actor: ", t.actor) }
         item.effects.forEach(effect => {
             // const effectData = foundry.utils.deepClone(effect);
             const effectData = {...effect};
             effectData.origin = item.uuid;
-            if (CONFIG.HYP3E.debugMessages) { console.log("Cloned Effect:", effectData) }
+            if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Cloned Effect:", effectData) }
             message += `<p><i>(Applying effect ${effectData.name} to ${t.name}...)</i></p>`
             t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
         });
@@ -405,14 +412,14 @@ async function applyHealthDrop(total, extraRoll = "") {
         }
         // For showing the roll
         extraRoll = await roll.render();
-        if (CONFIG.HYP3E.debugMessages) { console.log("Extra roll result: ", extraRoll) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyHealthDrop: Extra roll result: ", extraRoll) }
     }
 
     if (total == 0) return; // Skip changes of 0
     const tokens = canvas?.tokens?.controlled;
 
     if (!tokens || tokens.length == 0) {
-        ui.notifications?.error("Please select at least one token");
+        ui.notifications?.error("Apply Damage: Please select at least one token.");
         return;
     }
 
