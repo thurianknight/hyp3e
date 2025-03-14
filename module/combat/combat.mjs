@@ -64,7 +64,7 @@ export class HYP3ECombat extends Combat {
         }
         // @ts-expect-error - This method exists, but the types package doesn't have it
         await super._onEndRound();
-        await this.activateCombatant(0)
+        // await this.activateCombatant(0)
     }
     
     async _onEndTurn(combatant, context) {
@@ -78,7 +78,7 @@ export class HYP3ECombat extends Combat {
         combatant.actor.effects.forEach(effect => {
             if (effect.isTemporary && !effect.disabled) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect: ${effect.name}`, effect) }
-                if (effect.duration.remaining <= 0) {
+                if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
                     const updates = {
                         disabled: true,
                         duration: {
@@ -90,7 +90,7 @@ export class HYP3ECombat extends Combat {
                 }
             } else if (effect.isTemporary && effect.disabled) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect to Delete: ${effect.name}`, effect) }
-                if (effect.duration.remaining <= 0) {
+                if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
                     return effect.delete();
                 }
             }

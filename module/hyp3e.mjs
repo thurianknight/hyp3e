@@ -180,7 +180,7 @@ Hooks.once('init', async function() {
         console.log("Using group-based initiative.")
         CONFIG.Combat.documentClass = HYP3EGroupCombat;
         CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
-        CONFIG.Combat.initiative = { decimals: 3, formula: HYP3EGroupCombat.FORMULA }
+        CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
     } else {
         console.log("Using individual initiative.")
         CONFIG.Combat.documentClass = HYP3ECombat;

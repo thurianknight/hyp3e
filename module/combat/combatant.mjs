@@ -108,7 +108,7 @@ export class HYP3ECombatant extends Combatant {
         // Finally, roll initiative and return the result
         const result = new Roll(rollTerms, rollData);
         if (CONFIG.HYP3E.debugMessages) { console.log("Individual initiative roll:", result) }
-        this.initRoll = result.dice[0].total
+        // this.initRoll = result.dice[0].total
         return result
     }
 
@@ -152,15 +152,27 @@ export class HYP3ECombatant extends Combatant {
         }
     }
 
+    setInitRoll() {
+        // Set the combatant's initiative roll value
+        if (CONFIG.HYP3E.debugMessages) { console.log(`setInitRoll: ${this.actor.name}: `, this) }
+        this.initRoll = Math.floor(this.initiative);
+        if (CONFIG.HYP3E.debugMessages) { console.log(`setInitRoll: ${this.actor.name} base init roll: `, this.initRoll) }
+        return this.initRoll;
+    }
+
     // Pretty sure this is not needed...
     // async getData(options = {}) {
     //     const context = await super.getData(options);
-    //     return foundry.utils.mergeObject(context, {
-    //         melee: this.isMelee,
-    //         missile: this.isMissile,
-    //         magic: this.isMagic,
-    //         movement: this.isMovement
+    //     const combatantData = foundry.utils.mergeObject(context, {
+    //                             isMelee: this.isMelee,
+    //                             isMissile: this.isMissile,
+    //                             isMagic: this.isMagic,
+    //                             isMovement: this.isMovement,
+    //                             initRoll: this.initRoll,
     //     })
+    //     // Log the combatantData object
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("getData: Combatant Data: ", combatantData) }
+    //     return combatantData
     // }
 
 }

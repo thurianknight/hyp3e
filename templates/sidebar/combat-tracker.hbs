@@ -23,9 +23,10 @@
         {{/if}}
 
         <div class="encounter-controls flexrow {{#if hasCombat}}combat{{/if}}">
+            {{!-- GM initiative and group controls --}}
             {{#if user.isGM}}
                 {{#if isGroupInitiative}}
-                    <a class="combat-button combat-control" aria-label="{{localize 'HYP3E.reroll'}}" role="button" data-tooltip="{{localize 'HYP3E.reroll'}}" data-control="reroll">
+                    <a class="combat-button combat-control" aria-label="{{localize 'HYP3E.rollAll'}}" role="button" data-tooltip="{{localize 'HYP3E.rollAll'}}" data-control="reroll">
                         <i class="fas fa-dice"></i>
                     </a>
                     <a class="combat-button combat-control" aria-label="{{localize 'HYP3E.combat.setCombatantGroups'}}" role="button" data-tooltip="HYP3E.combat.setCombatantGroups" data-control="set-groups" {{#unless turns}}disabled{{/unless}}>
@@ -39,6 +40,14 @@
                         <i class="fas fa-users-cog"></i>
                     </a>
                 {{/if}}
+            {{/if}}
+            {{!-- Player-group initiative control --}}
+            {{#if isGroupInitiative}}
+            {{#unless user.isGM}}
+                <a class="combat-button combat-control" aria-label="{{localize 'HYP3E.rollGroup'}}" role="button" data-tooltip="HYP3E.rollGroup" data-control="rollGroup" {{#unless turns}}disabled{{/unless}}>
+                    <i class="fas fa-dice"></i>
+                </a>
+            {{/unless}}
             {{/if}}
 
             {{#if combatCount}}

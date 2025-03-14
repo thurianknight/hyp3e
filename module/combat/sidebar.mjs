@@ -26,7 +26,7 @@ export class HYP3ECombatTab extends CombatTracker {
     async getData(options) {
         const context = await super.getData(options);
         // Log the context object
-        if (CONFIG.HYP3E.debugMessages) { console.log("Combat Tab Context: ", context) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Sidebar getData: Combat Tab Context: ", context) }
         
         const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
 
@@ -42,8 +42,9 @@ export class HYP3ECombatTab extends CombatTracker {
             turn.debugMessages = CONFIG.HYP3E.debugMessages;
             turn.isOwnedByUser = !!combatant.actor.isOwner;
             turn.group = combatant.group;
-            if (!isGroupInitiative) turn.initRoll = Math.floor(combatant.initiative)
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Turn: `, turn) }
+            // if (!isGroupInitiative) turn.initRoll = Math.floor(combatant.initiative)
+            turn.initRoll = Math.floor(combatant.initiative)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Sidebar getData: Combatant Turn: `, turn) }
             return turn;
         });
 
@@ -55,8 +56,9 @@ export class HYP3ECombatTab extends CombatTracker {
                 return arr;
             }
 
-            // if (CONFIG.HYP3E.debugMessages) { console.log("Group Initiative Scores: ", game.combat.groupInitiativeScores) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Sidebar getData: Group Initiative object: `, game.combat.groupInitiativeScores) }
             const initiative = game.combat.groupInitiativeScores?.get(turn.group) ? game.combat.groupInitiativeScores.get(turn.group) : null
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Sidebar getData: Group ${turn.group} Initiative: `, initiative) }
 
             return [...arr, {
                 group: turn.group,
@@ -65,6 +67,7 @@ export class HYP3ECombatTab extends CombatTracker {
                 turns: [turn]
             }];
         }, []);
+        if (CONFIG.HYP3E.debugMessages) { console.log("Sidebar getData: Grouped Combat Turns: ", groups) }
         
         return foundry.utils.mergeObject(context, {
             turns,
@@ -87,6 +90,15 @@ export class HYP3ECombatTab extends CombatTracker {
             game.combat.rollInitiative();
         });
 
+        // Roll for group that the player's combatant is in
+        html.find('.combat-button[data-control="rollGroup"]').click((ev) => {
+            const combatant = game.combat.combatants.find(c => c.actor.isOwner);
+            if (combatant) {
+                game.combat.rollInitiative([combatant.id]);
+            }
+        });
+
+        // Set combat groups
         html.find('.combat-button[data-control="set-groups"]').click((ev) => {
             HYP3ECombatTab.GROUP_CONFIG_APP.render(true, { focus: true });
         });

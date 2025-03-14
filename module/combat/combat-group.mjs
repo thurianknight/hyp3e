@@ -20,7 +20,6 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     // ===========================================================================
     // STATIC MEMBERS
     // ===========================================================================
-    static FORMULA = "1d6";
 
     static get GROUPS () {
         return {
@@ -37,21 +36,39 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         await this.rollInitiative();
     }
 
-    async rollInitiative() {
-        const groupsToRollFor = this.availableGroups;
+    async rollInitiative(combatantIds = null) {
+        // const groupsToRollFor = this.availableGroups;
+        // If one or more combatant IDs was provided, get any applicable groups, otherwise get all
+        let groupsToRollFor
+        let combatantsAffected = []
+        if (combatantIds) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Combatant IDs: ", combatantIds) }
+            groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
+            // combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.group))
+        } else {
+            groupsToRollFor = this.availableGroups;
+            // combatantsAffected = this.combatants;
+        }
+        combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.group))
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: All groups: ", this.availableGroups) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Groups to roll for: ", groupsToRollFor) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Affected Combatants:", combatantsAffected) }
+
+        // Take the groups array and append a roll object to each group
         const rollPerGroup = groupsToRollFor.reduce((prev, curr) => ({
             ...prev,
-            [curr]: new Roll(HYP3EGroupCombat.FORMULA) 
+            [curr]: new Roll(HYP3ECombat.FORMULA) 
         }), {});
-        if (CONFIG.HYP3E.debugMessages) { console.log("Initiative roll per group: ", rollPerGroup) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Initiative roll per group: ", rollPerGroup) }
 
         const results = await this.#prepareGroupInitiativeDice(rollPerGroup);
-        if (CONFIG.HYP3E.debugMessages) { console.log("Group initiative rolls:", results) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Group initiative results:", results) }
         
         // Add the combat action value to each combatant for initiative calculation
-        this.combatants.forEach(c => {
-            if (CONFIG.HYP3E.debugMessages) { console.log("Combatant: ", c) }
-            if (CONFIG.HYP3E.debugMessages) { console.log("Combat Actor: ", c.actor) }
+        // this.combatants.forEach(c => {
+        combatantsAffected.forEach(c => {
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Combatant: ", c) }
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Combat Actor: ", c.actor) }
             c.initRoll = results[c.group].initiative
             // Movement partially overrides the other combat actions for initiative order
             c.getActionModifiers();
@@ -64,35 +81,57 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         })
 
         // Update the combatants with their new initiative values
-        const updates = this.combatants.map(
+        // const updates = this.combatants.map(
+        const updates = combatantsAffected.map(
             (c) => ({ _id: c.id, 
-                        initiative: Math.round((results[c.group].initiative 
-                                                + (c.actor?.system?.attributes?.dex?.value/1000)
-                                                + c.meleeInit
-                                                + c.missileInit
-                                                + c.magicInit
-                                                + c.moveInit
-                                                + c.statusInit
-                                                + c.defeatedInit) * 1000) / 1000
-                    })
+                initRoll: results[c.group].initiative,
+                initiative: Math.round((results[c.group].initiative 
+                                        + (c.actor?.system?.attributes?.dex?.value/1000)
+                                        + c.meleeInit
+                                        + c.missileInit
+                                        + c.magicInit
+                                        + c.moveInit
+                                        + c.statusInit
+                                        + c.defeatedInit) * 1000) / 1000
+                })
         )
-        if (CONFIG.HYP3E.debugMessages) { console.log("All initiative updates: ", updates) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Group initiative updates: ", updates) }
         await this.updateEmbeddedDocuments("Combatant", updates);
 
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Group roll results: ", results) }
         await this.#rollInitiativeUIFeedback(results);
         await this.activateCombatant(0);
 
-        if (CONFIG.HYP3E.debugMessages) { console.log("This Group Combat: ", this) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: This Group Combat: ", this) }
 
         return this;
     }
 
+    // Given a list of combatant IDs, return the list of unique group names for those combatants
+    getCombatantGroupsFromList(combatantIds) {
+        let combatants = []
+        combatantIds.forEach(c => {
+            combatants.push(this.combatants.find(combatant => combatant.id === c))
+        })
+        // Map combatant IDs to groups, and remove duplicate groups at the same time
+        return [...new Set(
+            combatants.map(c => c.group)
+        )]
+    }
+
     async #prepareGroupInitiativeDice(rollPerGroup) {
+        if (CONFIG.HYP3E.debugMessages) { console.log("prepareGroupInitiativeDice: Group object(s): ", rollPerGroup) }
         const pool = foundry.dice.terms.PoolTerm.fromRolls(Object.values(rollPerGroup));
         const evaluatedRolls = await Roll.fromTerms([pool]).roll()
         const rollValues = evaluatedRolls.dice.map(d => d.total);
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Initiative rolls: `, rollValues) }
-        return this.availableGroups.reduce((prev, curr, i) => ({
+        if (CONFIG.HYP3E.debugMessages) { console.log(`prepareGroupInitiativeDice: roll values: `, rollValues) }
+
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`prepareGroupInitiativeDice: available groups: `, this.availableGroups) }
+        // return this.availableGroups.reduce((prev, curr, i) => ({
+        // Instead of availableGroups (above), we want just the array of groups to roll...
+        const rollGroups = Object.keys(rollPerGroup)
+        if (CONFIG.HYP3E.debugMessages) { console.log(`prepareGroupInitiativeDice: roll groups: `, rollGroups) }
+        return rollGroups.reduce((prev, curr, i) => ({
             ...prev,
             [curr]: {
                 initiative: rollValues[i],
@@ -167,12 +206,25 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     }
 
     get groupInitiativeScores() {
+        // Refresh combatant initRoll based on current initiative score
+        this.combatants.forEach(c => {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`groupInitiativeScores: Updating combatant ${c.name} initRoll...`) }
+            c.setInitRoll()
+        })
         const initiativeMap = new Map()
         for (const group in this.combatantsByGroup) {
             // initiativeMap.set(group, this.combatantsByGroup[group][0].initiative)
-            initiativeMap.set(group, this.combatantsByGroup[group][0].initRoll)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`groupInitiativeScores: Combatants in group : ${group}`, this.combatantsByGroup[group]) }
+            this.combatantsByGroup[group].forEach(c => {
+                // Use the highest combatant initiative roll as the group's initiative score
+                if (CONFIG.HYP3E.debugMessages) { console.log(`groupInitiativeScores: Combatant ${c.name} initiative: ${c.initRoll}`) }
+                if (c.initRoll > (initiativeMap.get(group) || 0)) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`groupInitiativeScores: Updating group ${group} initiative to ${c.initRoll}`) }
+                    initiativeMap.set(group, c.initRoll)
+                }
+            });
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Get Initiative Map: ", initiativeMap) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("groupInitiativeScores: Initiative Map: ", initiativeMap) }
         return initiativeMap;
     }
 

@@ -379,6 +379,8 @@
         },
         "roll": "Roll",
         "reroll": "Reroll",
+        "rollAll": "Roll All",
+        "rollGroup": "Roll My Group",
         "rollFormula": "Roll Formula",
         "rollExample": "e.g. 1d6+1",
         "attackRoll": "Attack Roll",
