@@ -236,6 +236,15 @@ export class Hyp3eItem extends Item {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
             }
+            // If the weapon has one or more effects, add an Apply Effects button for the GM
+            if (item.effects.size > 0) {
+                content += "<p>Weapon effects:<br/>"
+                item.effects.forEach(effect => {
+                    const effectData = {...effect};
+                    content += `&nbsp;&nbsp;<i>${effectData.name}</i><br/>`
+                });
+                content += "</p>"
+            }
         }
 
         // Spells
@@ -277,9 +286,14 @@ export class Hyp3eItem extends Item {
             } else {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`_displayItemInChat: Damage roll for spell ${item.name}, ${itemData.damage}, is not rollable.`) }
             }
-            // If the spell has one or more effects, add an Apply Effects button for the GM
-            if (game.user.isGM && item.effects.size > 0) {
-                content += `<div class='apply-effects-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
+            // If the spell has one or more effects, add an Apply Effects button
+            if (item.effects.size > 0) {
+                content += "<p>Spell effects:<br/>"
+                item.effects.forEach(effect => {
+                    const effectData = {...effect};
+                    content += `&nbsp;&nbsp;<i>${effectData.name}</i><br/>`
+                });
+                content += "</p>"
             }
         }
         // Both spells and weapons might have a Saving Throw
@@ -293,14 +307,8 @@ export class Hyp3eItem extends Item {
                 // Display the item check roll with target number
                 content += `<p>Item Check: ${itemData.formula} equal or under ${itemData.tn}</p>`
             }
-            // If the item is tagged as consumable but NOT ammunition, add a Use Item button
-            // if ((itemData.isConsumable || item.effects.size > 0) && !itemData.isAmmunition) {
-            //     content += `<div class='use-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
-            // }
-            // If the item has one or more effects, add an Apply Effects button for the GM
-            // if (game.user.isGM && item.effects.size > 0) {
+            // If the item has one or more effects, add an Apply Effects button
             if (item.effects.size > 0) {
-                // content += `<div class='apply-effects-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
                 content += "<p>Item effects:<br/>"
                 item.effects.forEach(effect => {
                     const effectData = {...effect};
@@ -315,7 +323,6 @@ export class Hyp3eItem extends Item {
             item: item,
             actor: actor,
             user: game.user,
-            // usable: (itemData.isConsumable || item.effects.size > 0),
             hasEffects: item.effects.size > 0,
             content: content,
         };

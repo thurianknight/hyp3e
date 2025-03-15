@@ -188,26 +188,6 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
         });
     }
 
-    // Use button
-    let itemUse = html.find(".use-button");
-    if (itemUse.length > 0) {
-        itemUse.each((_i, b) => {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Use Item html: `, b) }
-            let itemId = $(b).data('itemId');
-            let actorId = $(b).data('actorId');
-            let itemUseButton = $(
-                `<button class="" title="Click to use item."><i class="fas fa-hand-paper"></i>Use Item</button>`
-            );
-            itemUse.append(itemUseButton);
-
-            // Handle button clicks
-            itemUse.on("click", (ev) => {
-                ev.stopPropagation();
-                useItem(itemId, actorId);
-            });
-        });
-    }
-
     // Apply Effects button
     let effectApply = html.find(".apply-effects-button");
     if (effectApply.length > 0) {
@@ -237,7 +217,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             let effects = item?.getEffectNames()
             let btnLabel = effects.length > 1 ? "Multiple Effects" : effects[0];
             let effectApplyButton = $(
-                `<button class="" title="Click to apply ${effects.join()} to selected tokens."><i class="fas fa-user-shield"></i>Apply ${btnLabel}</button>`
+                `<button class="" title="Click to apply ${effects.join(", ")} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${btnLabel}</button>`
             );
             effectApply.append(effectApplyButton);
 
