@@ -10,7 +10,9 @@ export class HYP3ECombatTab extends CombatTracker {
 
     /** @inheritdoc */
     static get defaultOptions() {
-        console.log(`Loading template ${HYP3E.templatePath}/sidebar/combat-tracker.hbs...`)
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Loading template ${HYP3E.templatePath}/sidebar/combat-tracker.hbs...`) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`HYP3ECombatTab defaultOptions: `, super.defaultOptions) }
+        // Merge the default options with the custom template path
         return foundry.utils.mergeObject(super.defaultOptions, {
             template: `${HYP3E.templatePath}/sidebar/combat-tracker.hbs`,
         });

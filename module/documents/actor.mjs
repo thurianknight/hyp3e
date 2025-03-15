@@ -237,17 +237,17 @@ export class Hyp3eActor extends Actor {
             ]);
         }
         // If the item has any effects, clone and apply them to the actor
-        if (item.effects.size > 0) {
-            if (CONFIG.HYP3E.debugMessages) { console.log("Item effects:", item.effects) }
-            item.effects.forEach(effect => {
-                // const effectData = foundry.utils.deepClone(effect);
-                const effectData = {...effect};
-                effectData.origin = item.uuid
-                if (CONFIG.HYP3E.debugMessages) { console.log("Cloned Effect:", effectData) }
-                this.createEmbeddedDocuments("ActiveEffect", [effectData]);
-                message += `<p><i>(Applying effect ${effectData.name}...)</i></p>`
-            });
-        }
+        // if (item.effects.size > 0) {
+        //     if (CONFIG.HYP3E.debugMessages) { console.log("Item effects:", item.effects) }
+        //     item.effects.forEach(effect => {
+        //         // const effectData = foundry.utils.deepClone(effect);
+        //         const effectData = {...effect};
+        //         effectData.origin = item.uuid
+        //         if (CONFIG.HYP3E.debugMessages) { console.log("Cloned Effect:", effectData) }
+        //         this.createEmbeddedDocuments("ActiveEffect", [effectData]);
+        //         message += `<p><i>(Applying effect ${effectData.name}...)</i></p>`
+        //     });
+        // }
         // Send a chat message that the item was used
         const chatData = {
             author: game.user_id,
@@ -292,19 +292,61 @@ export class Hyp3eActor extends Actor {
             }
             this.rollAttackOrSpell(dataset)
         } else {  // ==> Neither a weapon nor a spell
-            // The default for other item types (i.e. class abilities or actual items) is a check
+            // The default for other item types (i.e. class abilities and actual items) is a check,
+            //  followed by using inventory and applying applicable effects if the check succeeded
+            //  or no check was required to proceed.
+            let proceed = true
+            let ranCheck = false
             dataset.label = `Using ${itemName}`
             if (item.system.formula && item.system.formula != "") {
                 dataset.rollTarget = item.system.tn
-                this.rollCheck(dataset)
-            } else if (item.effects.size > 0) {
-                let effectList = []
-                item.effects.forEach(effect => {
-                    effectList.push(effect.name)
-                });
-                dataset.details = `Using ${itemName} applies the following: ${effectList.join(", ")}.`
-                dataset.noRoll = true
-                this.rollApplyEffects(dataset)
+                proceed = this.rollCheck(dataset)
+                ranCheck = true
+            }
+            if (proceed) {
+                // If a check was done, proceed immediately
+                if (ranCheck) {
+                    if (item.system.isConsumable) {
+                        this.useItem(item.id)
+                    }
+                    if (item.effects.size > 0) {
+                        item._displayItemInChat()
+                    }
+                } else {
+                    // No item check, so we will popup a basic dialog to confirm use
+                    if (item.effects.size > 0) {
+                        let effectList = []
+                        item.effects.forEach(effect => {
+                            effectList.push(effect.name)
+                        });
+                        dataset.details = `Using ${itemName} applies the following: ${effectList.join(", ")}.`
+                        dataset.noRoll = true
+                    }
+                    // let label = `${dataset.label}...`
+                    dataset.rollButtonLabel = "Use Item"
+                    // Log the dataset before the dialog renders
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+                    try {
+                        let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
+                        if (item.system.isConsumable) {
+                            this.useItem(item.id)
+                        }
+                        // Since we don't need to roll anything, just display the item in chat.
+                        if (CONFIG.HYP3E.debugMessages) { console.log(`Roll response: `, rollResponse) }
+                        item._displayItemInChat()
+                    } catch(err) {
+                        return
+                    }
+                }
+                // if (item.effects.size > 0) {
+                //     let effectList = []
+                //     item.effects.forEach(effect => {
+                //         effectList.push(effect.name)
+                //     });
+                //     dataset.details = `Using ${itemName} applies the following: ${effectList.join(", ")}.`
+                //     dataset.noRoll = true
+                //     this.rollApplyEffects(dataset)
+                // }
             }
         }
     }
@@ -433,7 +475,7 @@ export class Hyp3eActor extends Actor {
         if (dataset.rollTarget == '' || dataset.rollTarget == undefined || dataset.rollTarget <= 0) {
             console.log("Missing or invalid target number, cannot confirm success of check!")
             ui.notifications.info("Missing or invalid target number, cannot confirm success of check!")
-            return
+            return false
         }
 
         // Retrieve roll data from the actor
@@ -445,6 +487,7 @@ export class Hyp3eActor extends Actor {
         let itemName = ""
         let rollFormula = ""
         let rollResponse
+        let success = true
         let label = `${dataset.label}...`
         // Get the item's ID and friendly name if it has one
         if (item) {
@@ -485,7 +528,7 @@ export class Hyp3eActor extends Actor {
         try {
             rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
         } catch(err) {
-            return
+            return false
         }
 
         // Add/subtract situational modifier from the dice dialog
@@ -514,20 +557,23 @@ export class Hyp3eActor extends Actor {
             if (roll.total <= dataset.rollTarget) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
                 label += "<br /><b>Success!</b>"
+                success = true
         
             } else {
                 if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + dataset.rollTarget + "!") }
                 label += "<br /><b>Fail.</b>"
+                success = false
             }
         } else {
             // Resolve the results of the attempted turning undead
             turnUndeadHtml = this.resolveTurnUndead(roll.total, rollData)
+            success = true
         }
 
         // Construct a custom chat card for the check
         await this.renderCustomChat(roll, itemId, label, "", "", turnUndeadHtml, rollResponse.rollMode)
 
-        return roll
+        return success
     }
 
     /**

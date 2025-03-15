@@ -1,4 +1,5 @@
 import {Hyp3eDice} from "../helpers/dice.mjs";
+import { HYP3E } from "../helpers/config.mjs"
 // import {Hyp3eDialog} from "../helpers/dialog.mjs";
 
 /**
@@ -169,11 +170,11 @@ export class Hyp3eItem extends Item {
      * @private
      */
     async _displayItemInChat() {
-        const item = this
+        // const item = this
+        const item = foundry.utils.deepClone(this)
         const itemData = item.system
-        const actor = this.actor
+        const actor = item.actor
         const actorData = actor.system
-        // const speaker = ChatMessage.getSpeaker()
         
         // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
         let typeLabel = ""
@@ -293,20 +294,38 @@ export class Hyp3eItem extends Item {
                 content += `<p>Item Check: ${itemData.formula} equal or under ${itemData.tn}</p>`
             }
             // If the item is tagged as consumable but NOT ammunition, add a Use Item button
-            if ((itemData.isConsumable || item.effects.size > 0) && !itemData.isAmmunition) {
-                content += `<div class='use-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
-            }
+            // if ((itemData.isConsumable || item.effects.size > 0) && !itemData.isAmmunition) {
+            //     content += `<div class='use-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
+            // }
             // If the item has one or more effects, add an Apply Effects button for the GM
-            if (game.user.isGM && item.effects.size > 0) {
-                content += `<div class='apply-effects-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
+            // if (game.user.isGM && item.effects.size > 0) {
+            if (item.effects.size > 0) {
+                // content += `<div class='apply-effects-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
+                content += "<p>Item effects:<br/>"
+                item.effects.forEach(effect => {
+                    const effectData = {...effect};
+                    content += `&nbsp;&nbsp;<i>${effectData.name}</i><br/>`
+                });
+                content += "</p>"
             }
         }
 
-        // Now we can display the chat message
+        // Setup & display the item in chat
+        const templateData = {
+            item: item,
+            actor: actor,
+            user: game.user,
+            // usable: (itemData.isConsumable || item.effects.size > 0),
+            hasEffects: item.effects.size > 0,
+            content: content,
+        };
+        const template = `${HYP3E.templatePath}/chat/show-item.hbs`;
+        let itemChat = await renderTemplate(template, templateData);
+        // Log the rendered chat message
         ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+            speaker: ChatMessage.getSpeaker({ actor: actor }),
             flavor: label,
-            content: content ?? ''
-        })
+            content: itemChat
+        });
     }
 }

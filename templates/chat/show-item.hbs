@@ -1,0 +1,18 @@
+<div class="message-content">
+    {{!-- HTML-formatted content. Comes from item description. --}}
+    {{{content}}}
+    {{!-- If the actor owns this item, give him a Use Item button --}}
+    {{!-- 
+    {{#if usable}}
+    {{#unless user.isGM}}
+    <div class="use-button" data-item-id="{{itemId}}" data-actor-id="{{actorId}}"></div>
+    {{/unless}}
+    {{/if}} 
+    --}}
+    {{!-- If the user is a GM, give him an Apply Effects button --}}
+    {{#if hasEffects}}
+    {{!-- {{#if user.isGM}} --}}
+    <div class="apply-effects-button" data-item-id="{{item.id}}" data-actor-id="{{actor.id}}"></div>
+    {{!-- {{/if}} --}}
+    {{/if}}
+</div>

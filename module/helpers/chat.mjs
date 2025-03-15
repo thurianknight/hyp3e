@@ -327,7 +327,7 @@ async function rollSaveButton(saveType) {
     const tokens = canvas?.tokens?.controlled;
 
     if (!tokens || tokens.length == 0) {
-        ui.notifications?.error("Please select at least one token");
+        ui.notifications?.error("Roll Save: Please select at least one token.");
         return;
     }
 
@@ -350,7 +350,7 @@ async function useItem(itemId, actorId) {
     actor.useItem(itemId);
 }
 
-// Apply item effects to selected tokens
+// Apply item effects to user's own token or GM-selected tokens
 async function applyEffects(itemId, actorId) {
     // Get selected tokens
     const tokens = canvas?.tokens?.controlled;
@@ -359,6 +359,8 @@ async function applyEffects(itemId, actorId) {
         ui.notifications?.error("Apply Effects: Please select at least one token.");
         return;
     }
+
+    let chatMsg = ""
 
     // Get the item
     const actor = game.actors.get(actorId);
@@ -369,18 +371,17 @@ async function applyEffects(itemId, actorId) {
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Item: ", item) }
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
-    let message = `<p>${actor.name} used ${itemName}.</p>`
-
+    // chatMsg = `<p>${actor.name} used ${itemName}.</p>`
     // Decrement qty if it's consumable, otherwise just allow it to be used
-    if (item.system.isConsumable && item.system.quantity.value > 0) {
-        const newQuantity = item.system.quantity.value - 1;
-        // Update the embedded item document
-        await actor.updateEmbeddedDocuments("Item", [
-            { _id: item.id, "system.quantity.value": newQuantity },
-        ]);
-    }
+    // if (item.system.isConsumable && item.system.quantity.value > 0) {
+    //     const newQuantity = item.system.quantity.value - 1;
+    //     // Update the embedded item document
+    //     await actor.updateEmbeddedDocuments("Item", [
+    //         { _id: item.id, "system.quantity.value": newQuantity },
+    //     ]);
+    // }
 
-    // Apply the effects to tokens
+    // Apply the effects to selected tokens
     for (const t of tokens) {
         if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Token: ", t) }
         if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Token Actor: ", t.actor) }
@@ -389,14 +390,14 @@ async function applyEffects(itemId, actorId) {
             const effectData = {...effect};
             effectData.origin = item.uuid;
             if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Cloned Effect:", effectData) }
-            message += `<p><i>(Applying effect ${effectData.name} to ${t.name}...)</i></p>`
+            chatMsg += `<p>${actor.name} applied <i>${effectData.name}</i> to ${t.name}.</p>`
             t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
         });
     }
     // Send a chat message that the item was used
     const chatData = {
         author: game.user_id,
-        content: message
+        content: chatMsg
     };
     ChatMessage.create(chatData, {});
 }

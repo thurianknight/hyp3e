@@ -82,7 +82,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         // Handle attribute scores
         for (let [k, v] of Object.entries(context.system.attributes)) {
             v.label = game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[k]) ?? k;
-            if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
+            // if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
             // Flag attributes that are too low for the character class
             switch (k) {
                 case "str":
@@ -129,31 +129,31 @@ export class Hyp3eActorSheet extends ActorSheet {
         // Handle movement types
         for (let [k, v] of Object.entries(context.system.movement)) {
             v.label = game.i18n.localize(CONFIG.HYP3E.movement[k]) ?? k;
-            if (CONFIG.HYP3E.debugMessages) { console.log("Movement Types:", k, v, v.label) }
+            // if (CONFIG.HYP3E.debugMessages) { console.log("Movement Types:", k, v, v.label) }
         }
 
         // Handle money types
         for (let [k, v] of Object.entries(context.system.money)) {
             v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
-            if (CONFIG.HYP3E.debugMessages) { console.log("Money Types:", k, v, v.label) }
+            // if (CONFIG.HYP3E.debugMessages) { console.log("Money Types:", k, v, v.label) }
         }
 
         // The following are global system settings
         context.enableAttrChecks = CONFIG.HYP3E.enableAttrChecks
-        if (CONFIG.HYP3E.debugMessages) { console.log("Enable attribute checks:", context.enableAttrChecks) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Enable attribute checks:", context.enableAttrChecks) }
 
         context.characterClasses = CONFIG.HYP3E.characterClasses
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet class list:", context.characterClasses) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet class list:", context.characterClasses) }
 
         context.races = CONFIG.HYP3E.races
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet races list:", context.races) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet races list:", context.races) }
 
         context.languages = CONFIG.HYP3E.languages
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet languages:", context.languages) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet languages:", context.languages) }
 
         // System-defined roll modes
         context.rollModes = CONFIG.Dice.rollModes
-        if (CONFIG.HYP3E.debugMessages) { console.log("Dice-roll modes:", context.rollModes) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Dice-roll modes:", context.rollModes) }
 
     }
 
@@ -168,7 +168,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         
         // Load creature sizes
         context.creatureSizes = CONFIG.HYP3E.creatureSizes
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet sizes:", context.creatureSizes) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet sizes:", context.creatureSizes) }
     
     }
 
