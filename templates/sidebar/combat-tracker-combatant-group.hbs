@@ -14,12 +14,12 @@
             <div class="token-name flexcol">
                 <h4>{{this.name}}</h4>
                 <div class="combatant-controls flexrow">
-                    {{#if this.isOwnedByUser}}
+                    {{!-- {{#if this.isOwnedByUser}} --}}
                     <a
                         class='combatant-control move-combat{{#if this.isMelee}} active{{/if}}'
                         data-tooltip="{{localize 'HYP3E.combat.meleeDeclared'}}"
                         role="button"
-                        data-control="melee"
+                        {{#if this.isOwnedByUser}}data-control="melee"{{/if}}
                     >
                         <i class='fas fa-sword'></i>
                     </a>
@@ -27,7 +27,7 @@
                         class='combatant-control prepare-spell{{#if this.isMissile}} active{{/if}}'
                         data-tooltip="{{localize 'HYP3E.combat.missileDeclared'}}"
                         role="button"
-                        data-control="missile"
+                        {{#if this.isOwnedByUser}}data-control="missile"{{/if}}
                     >
                         <i class='fas fa-bow-arrow'></i>
                     </a>
@@ -35,7 +35,7 @@
                         class='combatant-control move-combat{{#if this.isMagic}} active{{/if}}'
                         data-tooltip="{{localize 'HYP3E.combat.magicDeclared'}}"
                         role="button"
-                        data-control="magic"
+                        {{#if this.isOwnedByUser}}data-control="magic"{{/if}}
                     >
                         <i class='fas fa-scroll'></i>
                     </a>
@@ -43,11 +43,11 @@
                         class='combatant-control move-combat{{#if this.isMovement}} active{{/if}}'
                         data-tooltip="{{localize 'HYP3E.combat.moveDeclared'}}"
                         role="button"
-                        data-control="movement"
+                        {{#if this.isOwnedByUser}}data-control="movement"{{/if}}
                     >
                         <i class='fas fa-walking'></i>
                     </a>
-                    {{/if}}
+                    {{!-- {{/if}} --}}
                     {{#if @root.user.isGM}}
                     <a class="combatant-control {{#if this.hidden}}active{{/if}}" aria-label="{{localize 'COMBAT.ToggleVis'}}" role="button" data-tooltip="COMBAT.ToggleVis" data-control="toggleHidden">
                         <i class="fas fa-eye-slash"></i>
