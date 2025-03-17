@@ -141,11 +141,11 @@ export class Hyp3eDice {
             }
             if (atkRollParts.includes("@str.atkMod")) {
                 atkRollParts[atkRollParts.indexOf("@str.atkMod")] = actorData.str?.atkMod ? actorData.str?.atkMod : 0
-                debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = actorData.str?.atkMod ? `<tr><td>ST Atk Mod</td><td>${actorData.str.atkMod}</td></tr>` : null
+                debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = actorData.str?.atkMod ? `<tr><td>ST Atk Mod</td><td>${actorData.str.atkMod}</td></tr>` : `<tr><td>ST Atk Mod</td><td>0</td></tr>`
             }
             if (atkRollParts.includes("@dex.atkMod")) {
                 atkRollParts[atkRollParts.indexOf("@dex.atkMod")] = actorData.dex?.atkMod ? actorData.dex?.atkMod : 0
-                debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = actorData.dex?.atkMod ? `<tr><td>DX Atk Mod</td><td>${actorData.dex.atkMod}</td></tr>` : null
+                debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = actorData.dex?.atkMod ? `<tr><td>DX Atk Mod</td><td>${actorData.dex.atkMod}</td></tr>` : `<tr><td>DX Atk Mod</td><td>0</td></tr>`
             }
         }
 
