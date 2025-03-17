@@ -140,12 +140,12 @@ export class Hyp3eDice {
                 debugAtkRollParts[debugAtkRollParts.indexOf("@fa")] = `<tr><td>Fighting Ability</td><td>${actorData.fa}</td></tr>`
             }
             if (atkRollParts.includes("@str.atkMod")) {
-                atkRollParts[atkRollParts.indexOf("@str.atkMod")] = actorData.str.atkMod
-                debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = `<tr><td>ST Atk Mod</td><td>${actorData.str.atkMod}</td></tr>`
+                atkRollParts[atkRollParts.indexOf("@str.atkMod")] = actorData.str?.atkMod ? actorData.str?.atkMod : 0
+                debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = actorData.str?.atkMod ? `<tr><td>ST Atk Mod</td><td>${actorData.str.atkMod}</td></tr>` : null
             }
             if (atkRollParts.includes("@dex.atkMod")) {
-                atkRollParts[atkRollParts.indexOf("@dex.atkMod")] = actorData.dex.atkMod
-                debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = `<tr><td>DX Atk Mod</td><td>${actorData.dex.atkMod}</td></tr>`
+                atkRollParts[atkRollParts.indexOf("@dex.atkMod")] = actorData.dex?.atkMod ? actorData.dex?.atkMod : 0
+                debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = actorData.dex?.atkMod ? `<tr><td>DX Atk Mod</td><td>${actorData.dex.atkMod}</td></tr>` : null
             }
         }
 
