@@ -83,46 +83,49 @@ export class Hyp3eActorSheet extends ActorSheet {
         for (let [k, v] of Object.entries(context.system.attributes)) {
             v.label = game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[k]) ?? k;
             // if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
-            // Flag attributes that are too low for the character class
-            switch (k) {
-                case "str":
-                    if (this.actor.isAttributeLow(k)) {
-                        ui.notifications.warn(`ST is too low for ${context.system.details.class}!`)
-                        context.warnStr = true
-                    }
-                    break
-                case "dex":
-                    if (this.actor.isAttributeLow(k)) {
-                        ui.notifications.warn(`DX is too low for ${context.system.details.class}!`)
-                        context.warnDex = true
-                    }
-                    break
-                case "con":
-                    if (this.actor.isAttributeLow(k)) {
-                        ui.notifications.warn(`CN is too low for ${context.system.details.class}!`)
-                        context.warnCon = true
-                    }
-                    break
-                case "int":
-                    if (this.actor.isAttributeLow(k)) {
-                        ui.notifications.warn(`IN is too low for ${context.system.details.class}!`)
-                        context.warnInt = true
-                    }
-                    break
-                case "wis":
-                    if (this.actor.isAttributeLow(k)) {
-                        ui.notifications.warn(`WS is too low for ${context.system.details.class}!`)
-                        context.warnWis = true
-                    }
-                    break
-                case "cha":
-                    if (this.actor.isAttributeLow(k)) {
-                        ui.notifications.warn(`CH is too low for ${context.system.details.class}!`)
-                        context.warnCha = true
-                    }
-                    break
-                default:
-                    break
+            // Have we selected a class yet?
+            if (context.system.details.class) {
+                // Flag attributes that are too low for the character class
+                switch (k) {
+                    case "str":
+                        if (this.actor.isAttributeLow(k)) {
+                            ui.notifications.warn(`ST is too low for ${context.system.details.class}!`)
+                            context.warnStr = true
+                        }
+                        break
+                    case "dex":
+                        if (this.actor.isAttributeLow(k)) {
+                            ui.notifications.warn(`DX is too low for ${context.system.details.class}!`)
+                            context.warnDex = true
+                        }
+                        break
+                    case "con":
+                        if (this.actor.isAttributeLow(k)) {
+                            ui.notifications.warn(`CN is too low for ${context.system.details.class}!`)
+                            context.warnCon = true
+                        }
+                        break
+                    case "int":
+                        if (this.actor.isAttributeLow(k)) {
+                            ui.notifications.warn(`IN is too low for ${context.system.details.class}!`)
+                            context.warnInt = true
+                        }
+                        break
+                    case "wis":
+                        if (this.actor.isAttributeLow(k)) {
+                            ui.notifications.warn(`WS is too low for ${context.system.details.class}!`)
+                            context.warnWis = true
+                        }
+                        break
+                    case "cha":
+                        if (this.actor.isAttributeLow(k)) {
+                            ui.notifications.warn(`CH is too low for ${context.system.details.class}!`)
+                            context.warnCha = true
+                        }
+                        break
+                    default:
+                        break
+                }
             }
         }
 

@@ -2236,7 +2236,9 @@ export class Hyp3eActor extends Actor {
     }
 
     isAttributeLow(attr) {
-        const attrReqs = this.classData[this.system.details.class].attrReqs
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Checking ${attr} attribute for ${this.system.details.class}...`) }
+        const attrReqs = this.classData[this.system.details.class]?.attrReqs
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`Attribute requirements: `, attrReqs) }
         if (attrReqs[attr]) {
             if (this.system.attributes[attr].value < attrReqs[attr]) {
                 return true
