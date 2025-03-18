@@ -192,8 +192,17 @@ export class Hyp3eItem extends Item {
         }
 
         // Chat message header text
-        const label = `<h3>${typeLabel}: ${itemName}</h3>`
-        
+        // const label = `<h3><img src="${item.img}" style="border: none; padding: 3px 0;" width="24px"> ${typeLabel}: ${itemName}</h3>`
+        const label = `
+        <hr/>
+        <div style="margin: 10px 0;">
+            <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
+            <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
+                ${typeLabel}: ${itemName}
+            </span>
+        </div>
+        <hr/>`
+
         if (CONFIG.HYP3E.debugMessages) { console.log("_displayItemInChat: Item clicked:", item) }
         let content = itemData.description
 

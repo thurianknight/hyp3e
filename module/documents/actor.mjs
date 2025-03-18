@@ -468,8 +468,32 @@ export class Hyp3eActor extends Actor {
     async rollCheck(dataset) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
 
+        // Declare vars
+        let itemId = ""
+        let itemName = ""
+        let label = ""
+        let checkText = dataset.label
+        let rollFormula = ""
+        let rollResponse
+        let success = true
+
         // Is this an item or ability check?
         const item = this.items.get(dataset.itemId) ?? null
+        if (item) {
+            itemId = item.id
+            itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
+            // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}...</span>`
+            // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${itemName}</span>`
+            label = `
+            <hr/>
+            <div style="margin: 10px 0;">
+                <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
+                <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
+                    ${itemName}
+                </span>
+            </div>
+            <hr/>`
+        }
 
         // Determine whether we have a valid target number or formula
         if (dataset.rollTarget == '' || dataset.rollTarget == undefined || dataset.rollTarget <= 0) {
@@ -481,18 +505,9 @@ export class Hyp3eActor extends Actor {
         // Retrieve roll data from the actor
         const rollData = this.getRollData();
         if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", rollData) }
-        
-        // Declare vars
-        let itemId = ""
-        let itemName = ""
-        let rollFormula = ""
-        let rollResponse
-        let success = true
-        let label = `${dataset.label}...`
+
         // Get the item's ID and friendly name if it has one
         if (item) {
-            itemId = item.id
-            itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
             // Determine the roll-button label to use
             switch (item.type) {
                 case "item":
@@ -521,7 +536,8 @@ export class Hyp3eActor extends Actor {
         }
         // Override rollTarget, even if it has the same value
         dataset.rollTarget = targetRoll.total
-        label += ` (target ${targetRoll.total})`
+        // label += ` (target ${targetRoll.total})`
+        checkText += ` (target ${targetRoll.total})... `
 
         // Log the dataset before the dialog renders
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
@@ -556,12 +572,14 @@ export class Hyp3eActor extends Actor {
         if (!turnUndead) {
             if (roll.total <= dataset.rollTarget) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
-                label += "<br /><b>Success!</b>"
+                // label += "<br /><b>Success!</b>"
+                checkText += "<b>Success!</b>"
                 success = true
         
             } else {
                 if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + dataset.rollTarget + "!") }
-                label += "<br /><b>Fail.</b>"
+                // label += "<br /><b>Fail.</b>"
+                checkText += "<b>Fail.</b>"
                 success = false
             }
         } else {
@@ -571,7 +589,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Construct a custom chat card for the check
-        await this.renderCustomChat(roll, itemId, label, "", "", turnUndeadHtml, rollResponse.rollMode)
+        await this.renderCustomChat(roll, itemId, label, "", checkText, turnUndeadHtml, rollResponse.rollMode)
 
         return success
     }
@@ -605,6 +623,27 @@ export class Hyp3eActor extends Actor {
      * @param {*} dataset 
      */
     async rollAttackOrSpell(dataset) {
+
+        // Declare vars
+        let rollFormula = ""
+        let rollResponse
+        let naturalRoll = 0
+        let ammoMods = {}
+        let ranges = {}
+        let rangeGroup = ""
+        let chosen = ""
+        let dmgFormula = ""
+        let dmgRoll
+        let targetAc = 9
+        let targetName = ""
+        let targetSize = ""
+        let gridDistance = 0
+        let debugAtkRollFormula = ""
+        let debugDmgRollFormula = ""        
+        let itemName = ""
+        let label = ""
+        let attackText = ""
+
         // Log the dataset and item (if any) before proceeding
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
@@ -613,6 +652,22 @@ export class Hyp3eActor extends Actor {
         const item = this.items.get(dataset.itemId) ?? null
         if (CONFIG.HYP3E.debugMessages) { console.log("Item:", item) }
         const itemData = item ? {...item.system} : null
+        if (item) {
+            // Get the item's friendly name if it has one
+            itemName = itemData.friendlyName != "" ? itemData.friendlyName : item.name
+            dataset.itemName = itemName
+            if (item.type == "weapon") {
+                // The default for weapons is an attack
+                attackText = "Attack"
+                // if (item.system.wpnGrandmaster) {
+                //     attackText = "Grandmaster attack"
+                // } else if (item.system.wpnMaster) {
+                //     attackText = "Master attack"
+                // }
+            } else if (item.type == "spell") {
+                attackText = "Cast spell"
+            }
+        }
         if (itemData) {
             itemData.itemType = item.type
         }
@@ -625,29 +680,16 @@ export class Hyp3eActor extends Actor {
         }
         if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", actorData) }
 
-        // Declare vars
-        // let atkRollParts = []
-        let rollFormula = ""
-        let rollResponse
-        let naturalRoll = 0
-        let ammoMods = {}
-        let ranges = {}
-        let rangeGroup = ""
-        let chosen = ""
-        let dmgFormula = ""
-        // let dmgRollParts = []
-        // let damageChat = ""
-        let dmgRoll
-        let targetAc = 9
-        let targetName = ""
-        let targetSize = ""
-        let gridDistance = 0
-        // let masteryMod = 0
-        let debugAtkRollFormula = ""
-        let debugDmgRollFormula = ""
-        let itemId = dataset.itemId
-        let itemName = ""
-        let label = `${dataset.label}`
+        // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}</span>`
+        label = `
+        <hr/>
+        <div style="margin: 10px 0;">
+            <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
+            <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
+                ${itemName}
+            </span>
+        </div>
+        <hr/>`
 
         // Filter the actor's inventory items for ammunition
         let ammoList = this.items.filter(i => i.system.isAmmunition)
@@ -704,9 +746,6 @@ export class Hyp3eActor extends Actor {
         }
 
         if (item) {
-            // Get the item's friendly name if it has one
-            itemName = itemData.friendlyName != "" ? itemData.friendlyName : item.name
-            dataset.itemName = itemName
             // const itemMods = this._parseItemMod(itemName)
             // Missile weapons need to show a range selector in the dialog
             if (itemData.missile) {
@@ -840,9 +879,11 @@ export class Hyp3eActor extends Actor {
 
         // Update chat card label based on whether we have a target
         if (targetName != "") {
-            label += ` vs. ${targetName}...`
+            // label += ` vs. ${targetName}...`
+            attackText += ` vs. ${targetName}...`
         } else {
-            label += `...`
+            // label += `...`
+            attackText += `...`
         }
 
         // Footer used for adding crit buttons (if enabled)
@@ -857,7 +898,8 @@ export class Hyp3eActor extends Actor {
             if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
             if (naturalRoll == 20) {
                 if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
-                label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
+                // label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
+                attackText += `<span style='color:#00b34c'><b>Critical Hit!</b></span>`
                 hit = true
                 if (game.settings.get(game.system.id, "critHit") && item) {
                     // critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'><h4>Critical Hit:</h4></div>`;
@@ -865,7 +907,8 @@ export class Hyp3eActor extends Actor {
                 }
             } else if (naturalRoll == 1) {
                 if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
-                label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
+                // label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
+                attackText += "<span style='color:#e90000'><b>Critical Miss!</b></span>"
 
                 if (game.settings.get(game.system.id, "critMiss") && item) {
                     // critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'><h4>Xathoqqua’s Woe:</h4></div>`;
@@ -873,14 +916,17 @@ export class Hyp3eActor extends Actor {
                 }
             } else if (atkRoll.total >= tn) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
-                label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
+                // label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
+                attackText += `<b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
                 hit = true
             } else {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
                 if (eval(20 - atkRoll.total) <= 9) {
-                    label += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
+                    // label += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
+                    attackText += `<b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
                 } else {
-                    label += `<br /><b>Misses AC 9.</b>`
+                    // label += `<br /><b>Misses AC 9.</b>`
+                    attackText += `<b>Misses AC 9.</b>`
                 }
             }
 
@@ -908,16 +954,19 @@ export class Hyp3eActor extends Actor {
                 }
             if (atkRoll.total >= tn) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to ${tn}.`) }
-                label += `<br /><b>Hits a ${sizeFromTable} target!</b>`
+                // label += `<br /><b>Hits a ${sizeFromTable} target!</b>`
+                attackText += `<b>Hits a ${sizeFromTable} target!</b>`
                 hit = true
             } else {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than ${tn}.`) }
-                label += `<br /><b>Misses a ${sizeFromTable} target.</b>`
+                // label += `<br /><b>Misses a ${sizeFromTable} target.</b>`
+                attackText += `<b>Misses a ${sizeFromTable} target.</b>`
             }
         }
 
         // Construct a custom chat card for the attack
-        await this.renderCustomChat(atkRoll, item.id, label, debugAtkRollFormula, "", critFooterHTML, rollResponse.rollMode);
+        // await this.renderCustomChat(atkRoll, item.id, label, debugAtkRollFormula, "", critFooterHTML, rollResponse.rollMode);
+        await this.renderCustomChat(atkRoll, item.id, label, debugAtkRollFormula, attackText, critFooterHTML, rollResponse.rollMode);
 
         // If the item attack hit, we roll damage automatically and include it in the chat message
         if (hit && item) {
@@ -1160,7 +1209,7 @@ export class Hyp3eActor extends Actor {
     // Render custom html for attacks and turning undead
     async renderCustomChat(roll, itemId, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
         // Prettify label
-        label = "<h3>" + label + "</h3>"
+        // label = "<h3>" + label + "</h3>"
 
         const templateData = {
             roll: roll,
