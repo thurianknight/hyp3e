@@ -89,37 +89,37 @@ export class Hyp3eActorSheet extends ActorSheet {
                 switch (k) {
                     case "str":
                         if (this.actor.isAttributeLow(k)) {
-                            ui.notifications.warn(`ST is too low for ${context.system.details.class}!`)
+                            // ui.notifications.warn(`ST is too low for ${context.system.details.class}!`)
                             context.warnStr = true
                         }
                         break
                     case "dex":
                         if (this.actor.isAttributeLow(k)) {
-                            ui.notifications.warn(`DX is too low for ${context.system.details.class}!`)
+                            // ui.notifications.warn(`DX is too low for ${context.system.details.class}!`)
                             context.warnDex = true
                         }
                         break
                     case "con":
                         if (this.actor.isAttributeLow(k)) {
-                            ui.notifications.warn(`CN is too low for ${context.system.details.class}!`)
+                            // ui.notifications.warn(`CN is too low for ${context.system.details.class}!`)
                             context.warnCon = true
                         }
                         break
                     case "int":
                         if (this.actor.isAttributeLow(k)) {
-                            ui.notifications.warn(`IN is too low for ${context.system.details.class}!`)
+                            // ui.notifications.warn(`IN is too low for ${context.system.details.class}!`)
                             context.warnInt = true
                         }
                         break
                     case "wis":
                         if (this.actor.isAttributeLow(k)) {
-                            ui.notifications.warn(`WS is too low for ${context.system.details.class}!`)
+                            // ui.notifications.warn(`WS is too low for ${context.system.details.class}!`)
                             context.warnWis = true
                         }
                         break
                     case "cha":
                         if (this.actor.isAttributeLow(k)) {
-                            ui.notifications.warn(`CH is too low for ${context.system.details.class}!`)
+                            // ui.notifications.warn(`CH is too low for ${context.system.details.class}!`)
                             context.warnCha = true
                         }
                         break
