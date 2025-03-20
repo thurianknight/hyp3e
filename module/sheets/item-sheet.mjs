@@ -1,4 +1,5 @@
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
+import HYP3EItemSetAnnotations from "../helpers/item-set-annotations.mjs";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -15,6 +16,8 @@ export class Hyp3eItemSheet extends ItemSheet {
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }]
     });
   }
+
+  static ITEM_ANNOTATIONS_APP = new HYP3EItemSetAnnotations();
 
   /** @override */
   get template() {
@@ -49,7 +52,7 @@ export class Hyp3eItemSheet extends ItemSheet {
     context.system = itemData.system;
     context.flags = itemData.flags;
 
-    // Log full context data
+    // Log item context data
     if (CONFIG.HYP3E.debugMessages) { console.log("Item Context Data:", context) }
 
     // Prepare item data.
@@ -70,15 +73,30 @@ export class Hyp3eItemSheet extends ItemSheet {
     // Handle weapon types
     if (context.item.type == 'weapon') {
       context.weaponTypes = CONFIG.HYP3E.weaponTypes
-      if (CONFIG.HYP3E.debugMessages) { console.log("Item weapon types:", context.weaponTypes) }
+    //   if (CONFIG.HYP3E.debugMessages) { console.log("Item weapon types:", context.weaponTypes) }
     }
 
     // Handle armor types
     if (context.item.type == 'armor') {
       context.armorTypes = CONFIG.HYP3E.armorTypes
-      if (CONFIG.HYP3E.debugMessages) { console.log("Item armor types:", context.armorTypes) }
+    //   if (CONFIG.HYP3E.debugMessages) { console.log("Item armor types:", context.armorTypes) }
       context.system.isShield = context.system.type == "shield" ? true : false
-      if (CONFIG.HYP3E.debugMessages) { console.log(`Shield: ${context.system.isShield}`) }
+    //   if (CONFIG.HYP3E.debugMessages) { console.log(`Shield: ${context.system.isShield}`) }
+    }
+
+    // Handle weapon annotations
+    if (context.item.type == 'weapon') {
+        context.weaponAnnotations = CONFIG.HYP3E.weaponAnnotations
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item weapon annotations:", context.weaponAnnotations) }
+    }
+    // Refresh the annotations list for the item sheet
+    context.annotList = []
+    try {
+        context.system.annotations.forEach(annot => {
+            context.annotList.push(context.weaponAnnotations[annot])
+        })
+    } catch (err) {
+        console.log("Error loading weapon annotations:", err)
     }
 
     // Handle blind roll true/false for any item types
@@ -87,11 +105,11 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Handle system roll modes
     context.rollModes = CONFIG.Dice.rollModes
-    if (CONFIG.HYP3E.debugMessages) { console.log("Item roll modes:", context.rollModes) }
+    // if (CONFIG.HYP3E.debugMessages) { console.log("Item roll modes:", context.rollModes) }
 
     // Handle saving throws for any item types
     context.saveThrows = CONFIG.HYP3E.saves
-    if (CONFIG.HYP3E.debugMessages) { console.log("Item saves:", context.saveThrows) }
+    // if (CONFIG.HYP3E.debugMessages) { console.log("Item saves:", context.saveThrows) }
 
   }
   
@@ -123,6 +141,11 @@ export class Hyp3eItemSheet extends ItemSheet {
       this._updateWpnMastery(mastery)
     });
 
+    // Set item annotations
+    html.find('.item-button[data-control="set-annotations"]').click((ev) => {
+        Hyp3eItemSheet.ITEM_ANNOTATIONS_APP.render(true, { itemUuid: this.item.uuid, focus: true });
+    });
+    
     // Active Effect management
     html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.item));
 

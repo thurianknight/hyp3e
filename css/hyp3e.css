@@ -846,6 +846,11 @@ textarea {
   /* font-family: "Herculanum", sans-serif; */
 }
 
+/* Font color example */
+.font-color-red {
+    color: red;
+}
+
 /* Background color example */
 .bg-yellow {
     background-color: lightyellow;
@@ -874,6 +879,14 @@ textarea {
     100% {color: black;}
 }
 
+/* Styles for item annotations app */
+.item-set-annotations {
+    ul {
+        list-style-type: none;
+    }
+}
+
+/* Styles for the custom combat tracker */
 .combat-set-groups {
     container-name: combat-set-groups;
     container-type: inline-size;

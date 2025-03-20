@@ -330,6 +330,20 @@
                 "usesAmmo": "The Uses Ammo tag allows this item to decrement ammunition on attacks.",
                 "isGrenade": "The Grenade tag causes this item to attack as a hurled item, from Table 143 of the Player's Manual.",
                 "isAreaEffect": "The Area Effect tag causes this item ignore making an attack roll, and simply roll damage. Note that this is different from the Grenade tag, above."
+            },
+            "annotations": {
+                "ignoreShieldAc": "Ignores AC bonus provided by opponent's shield (if any).",
+                "p1VsPlate": "+1 'to hit' opponents wearing plate mail, field plate, or full plate.",
+                "1hOr2h": "Melee weapon may be wielded one- or two-handed. If hurled, use one-handed damage.",
+                "true2Hand": "A 'true' two-handed melee weapon; must be wielded with two hands.",
+                "hurled": "Melee weapon may be hurled one-handed; strength damage adjustment applies.",
+                "p1VsMelee": "+1 AC bonus versus melee attacks; quarterstaff must be wielded with two hands; tonfa and hand trident must be dual wielded (one in each hand).",
+                "dblDmgVsCharge": "Double damage dice (apply modifiers after) when set to receive a charge.",
+                "dismountRider": "Weapon has a 4-in-6 chance to dismount a rider on a natural 19 or 20 attack roll.",
+                "dblDmgFromCharge": "Double damage dice (apply modifiers after) when used from a charging mount.",
+                "d10FromWarhorse": "Base damage improves to 1d10 when mounted on a heavy warhorse.",
+                "strDmgAdj": "Strength damage adjustment applies.",
+                "strDmgIfCustomized": "Strength damage adjustment applies only if draw weight is adjusted for the archer."
             }
         },
         "armor": {
@@ -409,6 +423,7 @@
             "spells": "Spells",
             "spellsPerDay": "Spells/Day",
             "friendlyName": "Friendly Name",
+            "annotations": "Annotations",
             "itemId": "Item ID",
             "containerId": "Container ID",
             "containedItemIds": "Contained Item IDs",

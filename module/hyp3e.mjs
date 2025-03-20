@@ -240,8 +240,15 @@ Handlebars.registerHelper('isMax', function(val, maxVal) {
     return val == maxVal ? "max" : ""
 });
 
-Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
+Handlebars.registerHelper('ifEq', function(arg1, arg2, options) {
     return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('ifInList', function(str, arr, options) {
+    if (arr.includes(str)) {
+        return options.fn(this)
+    }
+    return options.inverse(this);
 });
 
 /* -------------------------------------------- */
@@ -334,7 +341,15 @@ Hooks.once("ready", async function() {
     }
     console.log("CONFIG Weapon Types:", CONFIG.HYP3E.weaponTypes)
   }
-  
+
+  // Load weapon annotations
+  if (CONFIG.HYP3E.weaponAnnotations) { 
+    for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponAnnotations)) {
+      CONFIG.HYP3E.weaponAnnotations[k] = game.i18n.localize(CONFIG.HYP3E.weaponAnnotations[k])
+    }
+    console.log("CONFIG Weapon Annotations:", CONFIG.HYP3E.weaponAnnotations)
+  }
+
   // Load armor types
   if (CONFIG.HYP3E.armorTypes) { 
     for (let [k, v] of Object.entries(CONFIG.HYP3E.armorTypes)) {
@@ -348,7 +363,7 @@ Hooks.once("ready", async function() {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "1.1.6"
+    const NEEDS_MIGRATION_TO_VERSION = "1.1.14"
     const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
         migrateWorld()
@@ -384,19 +399,64 @@ async function migrateWorld() {
 
     // Migrate Actor directory
     for (let actor of game.actors.contents) {
+        // Migrate NPC data
+        if (actor.type == "npc") {
+            // do stuff to npcs
+        }
+        // Migrate PC data
         if (actor.type == "character") {
-            // do stuff only to characters
+            // do stuff to characters
         }
         // Migrate the actor document's items if any exist
         if (actor.items) {
             for (let item of actor.items) {
                 if (item.type === "weapon") {
-                    const atkFormula = updateWeaponFormula(item)
-                    if (atkFormula) {
-                        await item.update(atkFormula)
+                    if (item.system?.annotations > ""){
+                        console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
+                        continue
                     }
+                    // Convert annotations from a string to an array
+                    if (item.system?.annotations == "") {
+                        console.log(`Deleting annotation element from item ${item.name}...`)
+                        delete item.system["annotations"]
+                        await item.update()
+                    }
+                    if (!item.system.annotations) {
+                        console.log(`Adding annotation array to item ${item.name}...`)
+                        item.system.annotations = []
+                        await item.update()    
+                    }
+                    // const atkFormula = updateWeaponFormula(item)
+                    // if (atkFormula) {
+                    //     await item.update(atkFormula)
+                    // }
                 }
             }
+        }
+    }
+
+    // Migrate Items directory
+    for (let item of game.items.contents) {
+        if (item.type === "weapon") {
+            if (item.system?.annotations > ""){
+                console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
+                continue
+            }
+            // Convert annotations from a string to an array
+            if (item.system.annotations == "") {
+                console.log(`Deleting annotation element from item ${item.name}...`)
+                delete item.system["annotations"]
+                await item.update()
+            }
+            if (!item.system.annotations) {
+                console.log(`Adding annotation array to item ${item.name}...`)
+                item.system.annotations = []
+                await item.update()
+            }
+            // const atkFormula = updateWeaponFormula(item)
+            // if (atkFormula) {
+            //     await item.update(atkFormula)
+            // }
         }
     }
 
@@ -413,7 +473,12 @@ async function migrateWorld() {
         // if (packType != "Actor") {
         //     continue
         // }
-        
+
+        // Skip anything that's not an Item compendium pack
+        // if (packType != "Item") {
+        //     continue
+        // }
+
         console.log(`Compendium pack ${pack.metadata.label}:`, pack)
         const documentName = pack.documentName;
 
@@ -435,14 +500,28 @@ async function migrateWorld() {
                     if (doc.type == "npc") {
                         // do stuff to npcs
                     }
+                    // Migrate PC data
+                    if (doc.type == "character") {
+                        // do stuff to characters
+                    }
                     // Migrate the actor document's items if any exist
                     if (doc.items) {
                         for (let item of doc.items) {
                             if (item.type === "weapon") {
-                                // Update the weapon document
-                                const atkFormula = updateWeaponFormula(item)
-                                if (atkFormula) {
-                                    await item.update(atkFormula)
+                                if (item.system?.annotations > ""){
+                                    console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
+                                    continue
+                                }
+                                // Convert annotations from a string to an array
+                                if (item.system.annotations == "") {
+                                    console.log(`Deleting annotation element from item ${item.name}...`)
+                                    delete item.system["annotations"]
+                                    await item.update()
+                                }
+                                if (!item.system.annotations) {
+                                    console.log(`Adding annotation array to item ${item.name}...`)
+                                    item.system.annotations = []
+                                    await item.update()
                                 }
                             }
                         }
@@ -451,10 +530,20 @@ async function migrateWorld() {
 
                 case "Item":
                     if (doc.type === "weapon") {
-                        // Update the weapon document
-                        const atkFormula = updateWeaponFormula(doc)
-                        if (atkFormula) {
-                            await doc.update(atkFormula)
+                        if (doc.system?.annotations > ""){
+                            console.log(`Could not migrate item ${doc.name} with annotations ${doc.system.annotations}!`)
+                            continue
+                        }
+                        // Convert annotations from a string to an array
+                        if (doc.system.annotations == "") {
+                            console.log(`Deleting annotation element from item ${doc.name}...`)
+                            delete doc.system["annotations"]
+                            await doc.update()
+                        }
+                        if (!doc.system.annotations) {
+                            console.log(`Adding annotation array to item ${doc.name}...`)
+                            doc.system.annotations = []
+                            await doc.update()
                         }
                     }
                     break

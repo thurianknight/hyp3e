@@ -1,0 +1,18 @@
+<div>
+    <label class="resource-label">{{item.name}}</label> - 
+    <label class="resource-label">{{localize 'HYP3E.dataLabel.annotations'}}</label>
+    {{!-- <p>Item UUID: {{itemUuid}}</p> --}}
+    <ul>
+        {{#each annotList as |annot id|}}
+        <li class="item-set-annotations" data-item-uuid="{{../itemUuid}}">
+            <a class='item-control {{#ifInList id ../item.system.annotations}}font-color-red{{/ifInList}}' 
+                data-tooltip="{{id}}" data-action="toggleAnnotation"
+                data-control="{{id}}" data-item-uuid="{{../itemUuid}}"
+                role="button"
+            >
+                {{annot}}
+            </a>
+        </li>
+        {{/each}}
+    </ul>
+</div>

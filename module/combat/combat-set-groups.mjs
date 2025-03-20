@@ -9,7 +9,7 @@ const {
 export default class HYP3ECombatGroupSelector extends HandlebarsApplicationMixin(ApplicationV2) {
     _highlighted;
 
-  
+
     // ===========================================================================
     // APPLICATION SETUP
     // ===========================================================================
@@ -72,7 +72,7 @@ export default class HYP3ECombatGroupSelector extends HandlebarsApplicationMixin
     // ===========================================================================
 
     async _updateObject(event) {
-        const combatant = game.combat.combatants.get(event.target.name);   
+        const combatant = game.combat.combatants.get(event.target.name);
         await combatant.setFlag(game.system.id, "group", event.target.value)
     }
 

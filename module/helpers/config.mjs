@@ -156,6 +156,25 @@ HYP3E.weaponTypes = {
 };
 
 /**
+ * Weapon annotations, both melee and missile
+ * @type {Object}
+ */
+HYP3E.weaponAnnotations = {
+    "ignoreShieldAc": "HYP3E.weapon.annotations.ignoreShieldAc",
+    "p1VsPlate": "HYP3E.weapon.annotations.p1VsPlate",
+    "1hOr2h": "HYP3E.weapon.annotations.1hOr2h",
+    "true2Hand": "HYP3E.weapon.annotations.true2Hand",
+    "hurled": "HYP3E.weapon.annotations.hurled",
+    "p1VsMelee": "HYP3E.weapon.annotations.p1VsMelee",
+    "dblDmgVsCharge": "HYP3E.weapon.annotations.dblDmgVsCharge",
+    "dismountRider": "HYP3E.weapon.annotations.dismountRider",
+    "dblDmgFromCharge": "HYP3E.weapon.annotations.dblDmgFromCharge",
+    "d10FromWarhorse": "HYP3E.weapon.annotations.d10FromWarhorse",
+    "strDmgAdj": "HYP3E.weapon.annotations.strDmgAdj",
+    "strDmgIfCustomized": "HYP3E.weapon.annotations.strDmgIfCustomized"
+};
+
+/**
  * The armor types
  * @type {Object}
  */
