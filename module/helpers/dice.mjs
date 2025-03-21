@@ -186,83 +186,149 @@ export class Hyp3eDice {
     /**
      * Construct damage roll from relevant parts, return roll formula
      * @param {Object} itemData
+     * @param {Object} ammoData
      * @param {Object} actorData
      */
     static buildDamageFormula(itemData, ammoData = null, actorData = null) {
         let dmgRollParts = []
-        let masteryMod = 0
-        let debugDmgRollFormula = ""
-
-        // Check if the weapon attack has Master or Grandmaster flags set
-        if (itemData.wpnGrandmaster) {
-            masteryMod = 2
-        } else if (itemData.wpnMaster) {
-            masteryMod = 1
-        }
+        let debugDmgRollParts = []
+        // let debugDmgRollFormula = ""
+        // I may regret this, but I'm going to assume we will never have more than 2 damage fields 
+        //  and hard-code it into this function.
+        let dmgRoll2Parts = []
+        let debugDmgRoll2Parts = []
+        // let debugDmgRoll2Formula = ""
 
         // All items start with the base damage formula
         dmgRollParts.push(itemData.damage)
-        // Add the debug message header and first table row
-        debugDmgRollFormula = "<b>Damage formula elements:</b><table>"
-        debugDmgRollFormula += `<tr><td>Base Roll</td><td>${itemData.damage}</td></tr>`
 
-        // Reformat the debug damage string for commonly-used variables
+        // Add the debug message header and first table row
+        // debugDmgRollFormula = "<b>Damage formula elements:</b><table>"
+        debugDmgRollParts.push("<b>Damage formula elements:</b><table>")
+        // debugDmgRollFormula += `<tr><td>Base Roll</td><td>${itemData.damage}</td></tr>`
+        debugDmgRollParts.push(`<tr><td>Base Roll</td><td>${itemData.damage}</td></tr>`)
+
+        // Do we have 2-handed damage?
+        if (itemData.damage2h) {
+            dmgRoll2Parts.push(itemData.damage2h)
+            debugDmgRoll2Parts.push("<b>Damage formula elements:</b><table>")
+            debugDmgRoll2Parts.push(`<tr><td>Base Roll</td><td>${itemData.damage2h}</td></tr>`)
+        }
+
+        // Reformat the item damage string for commonly-used variables
         // ST Dmg Mod
-        const stdmRegex = /\+\s*@str.dmgMod/g
-        if (debugDmgRollFormula.match(stdmRegex) > "") {
-            debugDmgRollFormula = debugDmgRollFormula.replace(stdmRegex, "")
-            debugDmgRollFormula += `<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>`
+        const strDmgModRegex = /\+\s*@str.dmgMod/g
+        // if (debugDmgRollFormula.match(strDmgModRegex) > "") {
+            // debugDmgRollFormula = debugDmgRollFormula.replace(strDmgModRegex, "")
+            // debugDmgRollFormula += `<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>`
+        if (debugDmgRollParts[1].match(strDmgModRegex) > "") {
+            dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, `+ ${actorData.str.dmgMod}`)
+            debugDmgRollParts[1] = debugDmgRollParts[1].replace(strDmgModRegex, "")
+            debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>`)
+        }
+        if (itemData.damage2h) {
+            if (debugDmgRoll2Parts[1].match(strDmgModRegex) > "") {
+                dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(strDmgModRegex, `+ ${actorData.str.dmgMod}`)
+                debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(strDmgModRegex, "")
+                debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>`)
+            }
         }
         // Casting Ability
         const caRegex = /\+\s*@ca/g
-        if (debugDmgRollFormula.match(caRegex) > "") {
-            debugDmgRollFormula = debugDmgRollFormula.replace(caRegex, "")
-            debugDmgRollFormula += `<tr><td>Casting Ability</td><td>${actorData.ca}</td></tr>`
+        // if (debugDmgRollFormula.match(caRegex) > "") {
+            // debugDmgRollFormula = debugDmgRollFormula.replace(caRegex, "")
+            // debugDmgRollFormula += `<tr><td>Casting Ability</td><td>${actorData.ca}</td></tr>`
+        if (debugDmgRollParts[1].match(caRegex) > "") {
+            dmgRollParts[0] = dmgRollParts[0].replace(caRegex, `+ ${actorData.ca}`)
+            debugDmgRollParts[1] = debugDmgRollParts[1].replace(caRegex, "")
+            debugDmgRollParts.push(`<tr><td>Casting Ability</td><td>${actorData.ca}</td></tr>`)
+        }
+        if (itemData.damage2h) {
+            if (debugDmgRoll2Parts[1].match(caRegex) > "") {
+                dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(caRegex, `+ ${actorData.ca}`)
+                debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(caRegex, "")
+                debugDmgRoll2Parts.push(`<tr><td>Casting Ability</td><td>${actorData.ca}</td></tr>`)
+            }
         }
 
         // Apply the item damage mod if needed
         if (itemData.dmgMod) {
             dmgRollParts.push(itemData.dmgMod)
-            debugDmgRollFormula += `<tr><td>Item Dmg Mod</td><td>${itemData.dmgMod}</td></tr>`
+            // debugDmgRollFormula += `<tr><td>Item Dmg Mod</td><td>${itemData.dmgMod}</td></tr>`
+            debugDmgRollParts.push(`<tr><td>Item Dmg Mod</td><td>${itemData.dmgMod}</td></tr>`)
+            if (itemData.damage2h) {
+                dmgRoll2Parts.push(itemData.dmgMod)
+                debugDmgRoll2Parts.push(`<tr><td>Item Dmg Mod</td><td>${itemData.dmgMod}</td></tr>`)
+            }
         }
 
         // Apply the ammunition damage mod if needed
         if (ammoData?.dmgMod) {
             dmgRollParts.push(ammoData.dmgMod)
-            debugDmgRollFormula += `<tr><td>Ammo Dmg Mod</td><td>${ammoData.dmgMod}</td></tr>`
+            // debugDmgRollFormula += `<tr><td>Ammo Dmg Mod</td><td>${ammoData.dmgMod}</td></tr>`
+            debugDmgRollParts.push(`<tr><td>Ammo Dmg Mod</td><td>${ammoData.dmgMod}</td></tr>`)
+            if (itemData.damage2h) {
+                dmgRoll2Parts.push(ammoData.dmgMod)
+                debugDmgRoll2Parts.push(`<tr><td>Ammo Dmg Mod</td><td>${ammoData.dmgMod}</td></tr>`)
+            }
         }
 
         // Apply the actor's ST damage mod if the item is a melee weapon
         if (itemData.melee) {
             if (actorData?.actorType == "character") {
                 dmgRollParts.push(actorData.str.dmgMod)
-                debugDmgRollFormula += `<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>`
+                // debugDmgRollFormula += `<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>`
+                debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>`)
+                if (itemData.damage2h) {
+                    dmgRoll2Parts.push(actorData.str.dmgMod)
+                    debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${actorData.str.dmgMod}</td></tr>`)
+                }
             } else {
                 // NPCs/monsters don't have a ST attribute, so nothing to do here except 
                 //  note it in a comment. :-)
             }
         }
 
-        // Add Weapon Mastery mod if applicable
+        // Check if the weapon attack has Master or Grandmaster flags set
+        let masteryMod = 0
+        if (itemData.wpnGrandmaster) {
+            masteryMod = 2
+        } else if (itemData.wpnMaster) {
+            masteryMod = 1
+        }        
+        // Add Weapon Mastery mod, if applicable
         if (masteryMod > 0) {
             dmgRollParts.push(masteryMod)
-            debugDmgRollFormula += `<tr><td>Mastery Mod</td><td>${masteryMod}</td></tr>`
+            // debugDmgRollFormula += `<tr><td>Mastery Mod</td><td>${masteryMod}</td></tr>`
+            debugDmgRollParts.push(`<tr><td>Mastery Mod</td><td>${masteryMod}</td></tr>`)
+            if (itemData.damage2h) {
+                dmgRoll2Parts.push(masteryMod)
+                debugDmgRoll2Parts.push(`<tr><td>Mastery Mod</td><td>${masteryMod}</td></tr>`)
+            }
         }
 
         // Finish the debug damage roll table
-        debugDmgRollFormula += "</table>"
+        // debugDmgRollFormula += "</table>"
+        debugDmgRollParts.push("</table>")
+        if (itemData.damage2h) { debugDmgRoll2Parts.push("</table>") }
 
         // Log the damage roll parts & the constructed formula
         if (CONFIG.HYP3E.debugMessages) { 
             console.log("Damage roll parts:", dmgRollParts)
-            console.log(debugDmgRollFormula)
+            // console.log(debugDmgRollFormula)
+            console.log("Debug damage parts:", debugDmgRollParts)
+            console.log("Damage 2H roll parts:", dmgRoll2Parts)
+            console.log("Debug damage 2H parts:", debugDmgRoll2Parts)
         }
 
         // Construct the damage roll formula from parts, and return an object with the formula and debug formula
-        const dmgRollFormula = dmgRollParts.join(" + ")
+        // const dmgRollFormula = dmgRollParts.join(" + ")
+        // const debugDmgRollFormula = debugDmgRollParts.join("")
         const dmgObj = {
-            formula: dmgRollFormula,
-            debugFormula: debugDmgRollFormula
+            formula: dmgRollParts.join(" + "),
+            debugFormula: debugDmgRollParts.join(""),
+            formula2h: dmgRoll2Parts.join(" + "),
+            debugFormula2h: debugDmgRoll2Parts.join("")
         }
         return dmgObj
     }

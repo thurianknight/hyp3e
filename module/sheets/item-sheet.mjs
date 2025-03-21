@@ -88,15 +88,15 @@ export class Hyp3eItemSheet extends ItemSheet {
     if (context.item.type == 'weapon') {
         context.weaponAnnotations = CONFIG.HYP3E.weaponAnnotations
         if (CONFIG.HYP3E.debugMessages) { console.log("Item weapon annotations:", context.weaponAnnotations) }
-    }
-    // Refresh the annotations list for the item sheet
-    context.annotList = []
-    try {
-        context.system.annotations.forEach(annot => {
-            context.annotList.push(context.weaponAnnotations[annot])
-        })
-    } catch (err) {
-        console.log("Error loading weapon annotations:", err)
+        // Refresh the annotations list for the item sheet
+        context.annotList = []
+        try {
+            context.system.annotations.forEach(annot => {
+                context.annotList.push(context.weaponAnnotations[annot])
+            })
+        } catch (err) {
+            console.log("Error loading weapon annotations:", err)
+        }
     }
 
     // Handle blind roll true/false for any item types

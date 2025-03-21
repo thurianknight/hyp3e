@@ -61,6 +61,7 @@
             "atkMod": "Atk Mod",
             "dmgMod": "Dmg Mod",
             "damage": "Damage",
+            "damage2h": "2-Hand Dmg",
             "weaponMastery": "Weapon Mastery",
             "type": "Type",
             "biography": "Biography",
@@ -303,6 +304,7 @@
             "numMem": "# Mem",
             "spellRange": "Spell Range",
             "duration": "Duration",
+            "dur": "Dur.",
             "numAffected": "# Affected",
             "save": "Save",
             "attributes": {

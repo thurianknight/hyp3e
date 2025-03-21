@@ -27,6 +27,28 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
         });
     }
 
+    // Damage-roll button for 2-hand damage
+    let dmgRoll2h = html.find(".dmg-roll-button2h");
+    if (dmgRoll2h.length > 0) {
+        dmgRoll2h.each((_i, b) => {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Damage html: `, b) }
+            const dmgFormula = $(b).data('formula');
+            const debugDmgRollFormula = $(b).data('debugFormula');
+            const sourceType = $(b).data('sourceType');
+            const itemId = $(b).data('itemId');
+            const actorId = $(b).data('actorId');
+            let dmgButton = $(
+                `<button class="" title="Click to roll damage."><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
+            );
+            dmgRoll2h.append(dmgButton);
+
+            // Handle button clicks
+            dmgRoll2h.on("click", (ev) => {
+                ev.stopPropagation();
+                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, itemId, sourceType);
+            });
+        });
+    }
     // Four damage-applying buttons
     let dmg = html.find(".damage-button");
     let baseClass = ""

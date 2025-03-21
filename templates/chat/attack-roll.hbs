@@ -1,7 +1,7 @@
 <div style="padding-bottom: 5px">
     {{{headerHTML}}}
 </div>
-<div class="dice-roll" data-item-id="{{itemId}}" data-actor-id="{{actorId}}">
+<div class="dice-roll" data-item-id="{{item.id}}" data-actor-id="{{actorId}}">
     <div class="dice-result">
         <div class="dice-formula">{{roll.formula}}</div>
         <div class="dice-tooltip" style="display: none;">
@@ -29,6 +29,19 @@
         <h4 class="dice-total">{{roll.total}}</h4>
     </div>
 </div>
+{{#if roll.hit}}
+<div class='dmg-roll-button' data-item-id='{{item.id}}' data-actor-id='{{actorId}}' 
+    data-formula='{{item.dmgFormula}}' data-debug-formula='{{item.debugDmgRollFormula}}' 
+    data-source-type='{{item.type}}'>
+</div>
+{{#if item.dmgFormula2h}}
+<div class='dmg-roll-button2h' data-item-id='{{item.id}}' data-actor-id='{{actorId}}' 
+    data-formula='{{item.dmgFormula2h}}' data-debug-formula='{{item.debugDmgRollFormula2h}}' 
+    data-source-type='{{item.type}}'>
+</div>
+{{/if}}
+{{/if}}
+
 <div style="padding-top: 10px">
     {{{footerHTML}}}
 </div>

@@ -7,7 +7,8 @@
                 "hp": {
                     "value": 0,
                     "min": -10,
-                    "max": 0
+                    "max": 0,
+                    "tempHp": 0
                 },
                 "ac": {
                     "value": 9,
@@ -15,6 +16,8 @@
                 },
                 "atkRate": "1/1",
                 "fa": 0,
+                "tempAtkMod": 0,
+                "tempDmgMod": 0,
                 "ca": null,
                 "ta": null,
                 "saves": {
@@ -209,6 +212,8 @@
                 "tn": "",
                 "save": "",
                 "damage": "",
+                "damage2h": "",
+                "altDmg": {},
                 "duration": "",
                 "affected": ""
             }

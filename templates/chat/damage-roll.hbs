@@ -43,11 +43,9 @@
         <div>{{{description}}}</div>
         <div class='save-button' data-save='{{save}}'></div>
         {{/if}}
-        {{!-- If the attack has one or more effects, add an Apply Effects button for the GM --}}
-        {{!-- {{#if @root.user.isGM}} --}}
+        {{!-- If the attack has one or more effects, add an Apply Effects button --}}
         {{#if hasEffects}}
         <div class='apply-effects-button' data-item-id='{{itemId}}' data-actor-id='{{actorId}}'></div>
         {{/if}}
-        {{!-- {{/if}} --}}
     </div>
 </div>

@@ -587,9 +587,11 @@ export class Hyp3eActor extends Actor {
             turnUndeadHtml = this.resolveTurnUndead(roll.total, rollData)
             success = true
         }
+        // Hit must be false so we don't display any damage buttons
+        roll.hit = false
 
         // Construct a custom chat card for the check
-        await this.renderCustomChat(roll, itemId, label, "", checkText, turnUndeadHtml, rollResponse.rollMode)
+        await this.renderCustomChat(roll, item, label, "", checkText, turnUndeadHtml, rollResponse.rollMode)
 
         return success
     }
@@ -963,33 +965,53 @@ export class Hyp3eActor extends Actor {
                 attackText += `<b>Misses a ${sizeFromTable} target.</b>`
             }
         }
+        // Pass hit status to the attack chat
+        atkRoll.hit = hit
+
+        // If the item attack hit, calculate the damage formula and include it in the chat message
+        if (hit && item) {
+            if (Roll.validate(itemData.damage)) {
+                // Build our primary damage formula
+                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
+                item.dmgFormula = dmgObj.formula
+                item.debugDmgRollFormula = dmgObj.debugFormula
+                if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", item.dmgFormula) }
+                // Do we have 2-hand damage?
+                if (item.system.damage2h > "") {
+                    // const dmgObj2h = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
+                    item.dmgFormula2h = dmgObj.formula2h
+                    item.debugDmgRollFormula2h = dmgObj.debugFormula2h
+                    if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula 2H:", item.dmgFormula2h) }
+                }
+            }
+        }
 
         // Construct a custom chat card for the attack
         // await this.renderCustomChat(atkRoll, item.id, label, debugAtkRollFormula, "", critFooterHTML, rollResponse.rollMode);
-        await this.renderCustomChat(atkRoll, item.id, label, debugAtkRollFormula, attackText, critFooterHTML, rollResponse.rollMode);
+        await this.renderCustomChat(atkRoll, item, label, debugAtkRollFormula, attackText, critFooterHTML, rollResponse.rollMode);
 
-        // If the item attack hit, we roll damage automatically and include it in the chat message
-        if (hit && item) {
-            if (Roll.validate(itemData.damage)) {
-                // Build our damage formula
-                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
-                dmgFormula = dmgObj.formula
-                debugDmgRollFormula = dmgObj.debugFormula
-                if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
+        // // If the item attack hit, we roll damage automatically and include it in the chat message
+        // if (hit && item) {
+        //     if (Roll.validate(itemData.damage)) {
+        //         // Build our damage formula
+        //         const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
+        //         dmgFormula = dmgObj.formula
+        //         debugDmgRollFormula = dmgObj.debugFormula
+        //         if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
 
-                // Invoke the damage roll
-                dmgRoll = new Roll(dmgFormula, actorData);
-                // Resolve the roll
-                let result = await dmgRoll.roll();
-                if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
+        //         // Invoke the damage roll
+        //         dmgRoll = new Roll(dmgFormula, actorData);
+        //         // Resolve the roll
+        //         let result = await dmgRoll.roll();
+        //         if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
 
-                // Get the dice roll values of damage for x2/x3 modifier button
-                const naturalDmgRoll = dmgRoll.dice[0]?.total ? dmgRoll.dice[0]?.total : dmgRoll.total;
+        //         // Get the dice roll values of damage for x2/x3 modifier button
+        //         const naturalDmgRoll = dmgRoll.dice[0]?.total ? dmgRoll.dice[0]?.total : dmgRoll.total;
 
-                // Now output the damage chat
-                this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, itemData.damage, item)
-            }
-        }
+        //         // Now output the damage chat
+        //         this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, itemData.damage, item)
+        //     }
+        // }
 
         return atkRoll
     }
@@ -1207,7 +1229,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Render custom html for attacks and turning undead
-    async renderCustomChat(roll, itemId, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
+    async renderCustomChat(roll, item, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
         // Prettify label
         // label = "<h3>" + label + "</h3>"
 
@@ -1215,7 +1237,7 @@ export class Hyp3eActor extends Actor {
             roll: roll,
             headerHTML: headerHTML,
             debugRollFormula: debugRollFormula,
-            itemId: itemId,
+            item: item,
             actorId: this.id,
             footerHTML: footerHTML,
         };
