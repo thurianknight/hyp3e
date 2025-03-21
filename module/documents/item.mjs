@@ -43,8 +43,8 @@ export class Hyp3eItem extends Item {
         if (data.system?.consumable == "true") { data.system.isConsumable = true }
         // If an item is copied from one actor to another, blank out the containerId & location
         if (data.system?.containerId > "") {
-            data.system.containerId = ""
-            data.system.location = ""
+            data.system?.containerId = ""
+            data.system?.location = ""
         }
         if (CONFIG.HYP3E.debugMessages) { console.log("Pre-created item data", data) }
         return this.updateSource(data)
