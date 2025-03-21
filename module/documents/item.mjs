@@ -41,6 +41,10 @@ export class Hyp3eItem extends Item {
         }
         if (data.system?.ammunition == "true") { data.system.isAmmunition = true }
         if (data.system?.consumable == "true") { data.system.isConsumable = true }
+        if (data.system?.containerId > "") { 
+            data.system.containerId = ""
+            data.system.location = ""
+        }
         if (CONFIG.HYP3E.debugMessages) { console.log("Pre-created item data", data) }
         return this.updateSource(data)
     }
