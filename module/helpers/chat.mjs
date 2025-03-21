@@ -305,8 +305,6 @@ async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, sour
         naturalDmgRoll = dmgRoll.total
     }
 
-    // const debugDmgRollFormula = CONFIG.HYP3E.debugMessages? "Damage Formula: " + formula : ""
-
     const title = "Rolling Damage..."
     const templateData = {
         title: title,
@@ -324,13 +322,6 @@ async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, sour
 
     const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;
     const html = await renderTemplate(template, templateData);
-
-    // const chatData = {
-    //     user: game.user_id,
-    //     speaker: ChatMessage.getSpeaker({ actor: actorId }),
-    //     content: html
-    // };
-    // ChatMessage.create(chatData, {});
 
     // Send to chat
     dmgRoll.toMessage({
