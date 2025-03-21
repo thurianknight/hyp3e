@@ -905,7 +905,7 @@ export class Hyp3eActor extends Actor {
                 hit = true
                 if (game.settings.get(game.system.id, "critHit") && item) {
                     // critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'><h4>Critical Hit:</h4></div>`;
-                    critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'>&nbsp;</div>`;
+                    critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'>&nbsp;</div>`;
                 }
             } else if (naturalRoll == 1) {
                 if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
@@ -914,7 +914,7 @@ export class Hyp3eActor extends Actor {
 
                 if (game.settings.get(game.system.id, "critMiss") && item) {
                     // critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'><h4>Xathoqqua’s Woe:</h4></div>`;
-                    critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'>&nbsp;</div>`;
+                    critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'>&nbsp;</div>`;
                 }
             } else if (atkRoll.total >= tn) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }

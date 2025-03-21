@@ -26,7 +26,6 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             });
         });
     }
-
     // Damage-roll button for 2-hand damage
     let dmgRoll2h = html.find(".dmg-roll-button2h");
     if (dmgRoll2h.length > 0) {
@@ -49,6 +48,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             });
         });
     }
+
     // Four damage-applying buttons
     let dmg = html.find(".damage-button");
     let baseClass = ""
@@ -158,6 +158,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             } else {
                 baseClassLabel = "NPC"
             }
+            let actorId = $(b).data('actorId');
             const icon = "fa-user-slash";
             const critMissButton = $(long_button('miss',`Roll Critical Miss for ${baseClassLabel}-class`, icon));
             critMiss.append(critMissButton);
@@ -165,7 +166,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             critMissButton.on("click", (ev) => {
                 ev.stopPropagation();
-                rollCritMiss(baseClass);
+                rollCritMiss(baseClass, actorId);
             });
         });
     }
@@ -179,6 +180,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             } else {
                 baseClassLabel = "NPC"
             }
+            let actorId = $(b).data('actorId');
             const icon = "fa-user";
             const critHitButton = $(long_button('hit',`Roll Critical Hit for ${baseClassLabel}-class`, icon));
             critHit.append(critHitButton);
@@ -186,7 +188,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             critHitButton.on("click", (ev) => {
                 ev.stopPropagation();
-                rollCritHit(baseClass);
+                rollCritHit(baseClass, actorId);
             });
         });
     }
@@ -278,6 +280,17 @@ export async function showValueChange(t, fillColor,total) {
 async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, sourceType) {
     if (formula == "") { return } // Exit on empty formula
 
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`Roll Damage: Actor ${actorId} not found!`)
+        return
+    }
+    const item = actor.items.get(itemId)
+    if (!item) {
+        ui.notifications?.error(`Roll Damage: Item ${itemId} not found!`);
+        return;
+    }
+
     if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll formula: ${formula}`) }
     // Invoke the damage roll
     let dmgRoll = new Roll(formula);
@@ -301,8 +314,12 @@ async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, sour
         debugDmgRollFormula: debugDmgRollFormula,
         naturalDmgRoll: naturalDmgRoll,
         dmgBaseRoll: formula,
+        itemId: itemId,
         actorId: actorId,
-        sourceType: sourceType
+        sourceType: item.type,
+        save: item.system.save,
+        hasEffects: item.effects.size > 0 ? true : false,
+        description: item.system.description
     };
 
     const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;
@@ -318,7 +335,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, sour
     // Send to chat
     dmgRoll.toMessage({
         author: game.user_id,
-        speaker: ChatMessage.getSpeaker({ actor: actorId }),
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
         content: html
     })
 
@@ -364,8 +381,12 @@ async function applyEffects(itemId, actorId) {
 
     let chatMsg = ""
 
-    // Get the item
-    const actor = game.actors.get(actorId);
+    // Get the actor & item
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`Apply Effects: Actor ${actorId} not found!`)
+        return
+    }
     const item = actor.items.get(itemId);
     if (!item) {
         ui.notifications?.error(`Apply Effects: Item ${itemId} not found!`);
@@ -399,6 +420,7 @@ async function applyEffects(itemId, actorId) {
     // Send a chat message that the item was used
     const chatData = {
         author: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
         content: chatMsg
     };
     ChatMessage.create(chatData, {});
@@ -576,7 +598,7 @@ async function getCritMissHitCrit(charType) {
     return false;
 }
 
-async function rollCritHit(charType) {
+async function rollCritHit(charType, actorId) {
     let content = "";
     const dmg = game.i18n.localize("HYP3E.headers.damage");
     let roll = await new Roll("1d6").roll();
@@ -619,29 +641,25 @@ async function rollCritHit(charType) {
         content: content,
         diceRoll: await roll.render()
     };
-
     const template = `${HYP3E.templatePath}/chat/crit-roll.hbs`;
     const html = await renderTemplate(template, templateData);
 
-    // const chatData = {
-    //     speaker: ChatMessage.getSpeaker(),
-    //     roll: JSON.stringify(roll),
-    //     content: html,
-    //     type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-    // };
-    // getDocumentClass("ChatMessage").create(chatData);
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        console.log(`Roll Crit Hit: Actor ${actorId} not found!`)
+    }
 
     // Send to chat
     roll.toMessage({
         author: game.user_id,
-        speaker: ChatMessage.getSpeaker(),
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
         roll: roll,
         content: html
     })
-    
+
 }
 
-async function rollCritMiss(charType) {
+async function rollCritMiss(charType, actorId) {
     let content = "";
     let roll = await new Roll("1d12").roll();
     if (roll.total <= 2) {
@@ -732,27 +750,24 @@ async function rollCritMiss(charType) {
             content = "Critical Miss -- Error in getting result";
         }
     }
+
     const templateData = {
         title: game.i18n.localize(`HYP3E.attack.critMiss.${charType}`),
         content: content,
         diceRoll: await roll.render()
     };
-
     const template = `${HYP3E.templatePath}/chat/crit-roll.hbs`;
     const html = await renderTemplate(template, templateData);
 
-    // const chatData = {
-    //     speaker: ChatMessage.getSpeaker(),
-    //     roll: JSON.stringify(roll),
-    //     content: html,
-    //     type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-    // };
-    // getDocumentClass("ChatMessage").create(chatData);
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        console.log(`Roll Crit Hit: Actor ${actorId} not found!`)
+    }
 
     // Send to chat
     roll.toMessage({
         author: game.user_id,
-        speaker: ChatMessage.getSpeaker(),
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
         roll: roll,
         content: html
     })
