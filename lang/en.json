@@ -22,6 +22,8 @@
             "initiativeKeep": "Keep same for each round",
             "initiativeReset": "Reset to blank each round",
             "initiativeReroll": "Reroll each round",
+            "enableCombatSitModDetection": "[BETA] Enable combat situation mod detection.",
+            "enableCombatSitModDetectionHint": "The system will try to automatically detect and calculate situational attack modifiers based on a number of token effects, targeted status, etc.",
             "critHits": "Critical Hits",
             "critHitsHint": "Show buttons to roll critical hits on natural 20.",
             "critMiss": "Critical Misses / Xathoqqua’s Woe",

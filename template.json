@@ -8,16 +8,29 @@
                     "value": 0,
                     "min": -10,
                     "max": 0,
-                    "tempHp": 0
+                    "tempHp": {
+                        "value": 0,
+                        "sources": []
+                    }
                 },
                 "ac": {
                     "value": 9,
-                    "dr": 0
+                    "dr": 0,
+                    "tempAcMod": {
+                        "value": 0,
+                        "sources": []
+                    }
                 },
                 "atkRate": "1/1",
                 "fa": 0,
-                "tempAtkMod": 0,
-                "tempDmgMod": 0,
+                "tempAtkMod": {
+                    "value": 0,
+                    "sources": []
+                },
+                "tempDmgMod": {
+                    "value": 0,
+                    "sources": []
+                },
                 "ca": null,
                 "ta": null,
                 "saves": {

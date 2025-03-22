@@ -12,8 +12,13 @@
         {{!-- {{#unless dataset.noRoll}} --}}
         <div class="flexrow form-group">
             <label class="dialog-label">{{localize "HYP3E.sitMod"}}</label>
-            <input type="text" name="sitMod" value="" placeholder="{{localize 'HYP3E.rollExample'}}" />
+            <input type="text" name="sitMod" value="{{dataset.sitMod}}" placeholder="{{localize 'HYP3E.rollExample'}}" />
         </div>
+        {{#if dataset.sitModList}}
+        <div class="flexrow form-group" style="padding-left: 15px;">
+            <span style="font-style: italic">{{dataset.sitModList}}</span>
+        </div>
+        {{/if}}
         {{!-- {{/unless}} --}}
         {{#if dataset.showAmmo}}
         <div class="flexrow form-group">

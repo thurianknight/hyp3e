@@ -236,18 +236,6 @@ export class Hyp3eActor extends Actor {
                 { _id: item.id, "system.quantity.value": newQuantity },
             ]);
         }
-        // If the item has any effects, clone and apply them to the actor
-        // if (item.effects.size > 0) {
-        //     if (CONFIG.HYP3E.debugMessages) { console.log("Item effects:", item.effects) }
-        //     item.effects.forEach(effect => {
-        //         // const effectData = foundry.utils.deepClone(effect);
-        //         const effectData = {...effect};
-        //         effectData.origin = item.uuid
-        //         if (CONFIG.HYP3E.debugMessages) { console.log("Cloned Effect:", effectData) }
-        //         this.createEmbeddedDocuments("ActiveEffect", [effectData]);
-        //         message += `<p><i>(Applying effect ${effectData.name}...)</i></p>`
-        //     });
-        // }
         // Send a chat message that the item was used
         const chatData = {
             author: game.user_id,
@@ -338,15 +326,6 @@ export class Hyp3eActor extends Actor {
                         return
                     }
                 }
-                // if (item.effects.size > 0) {
-                //     let effectList = []
-                //     item.effects.forEach(effect => {
-                //         effectList.push(effect.name)
-                //     });
-                //     dataset.details = `Using ${itemName} applies the following: ${effectList.join(", ")}.`
-                //     dataset.noRoll = true
-                //     this.rollApplyEffects(dataset)
-                // }
             }
         }
     }
@@ -709,25 +688,25 @@ export class Hyp3eActor extends Actor {
         dataset.rangeUoM = canvas.scene?.grid.units ? canvas.scene?.grid.units : "ft";
 
         // Get the attacking token's location on the scene
-        let attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
-        let attackerPos = attacker ? attacker.center : null
+        const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+        const attackerPos = attacker ? attacker.center : null
         if (CONFIG.HYP3E.debugMessages) { console.log("Attacker position:", attackerPos) }
 
         // Has the user targeted a token? If so, get it's AC and name
         const userTargets = Array.from(game.user.targets)
         if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
         if (userTargets.length > 0) {
-            let targetPos = userTargets[0].center
+            const targetPos = userTargets[0].center
             if (CONFIG.HYP3E.debugMessages) { console.log("Target position:", targetPos) }
-            let primaryTargetData = userTargets[0].actor
+            const primaryTargetData = userTargets[0].actor
             targetAc = primaryTargetData.system.ac.value
             targetName = primaryTargetData.name
             targetSize = primaryTargetData.system.size ? primaryTargetData.system.size : "M"
 
             // Calculate the distance to the target in pixels
-            let dx = targetPos.x - attackerPos.x;
-            let dy = targetPos.y - attackerPos.y;
-            let distancePixels = Math.sqrt(dx * dx + dy * dy);
+            const dx = targetPos.x - attackerPos.x;
+            const dy = targetPos.y - attackerPos.y;
+            const distancePixels = Math.sqrt(dx * dx + dy * dy);
             // Convert to grid distance
             gridDistance = distancePixels / canvas.grid.size * canvas.scene.grid.distance;
             // Round to nearest whole number
@@ -750,6 +729,25 @@ export class Hyp3eActor extends Actor {
 
         if (item) {
             // const itemMods = this._parseItemMod(itemName)
+            // Melee weapons have a range based on their weapon class
+            if (itemData.melee) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Weapon class:`, itemData.wc) }
+                if (itemData.wc <= 3) {
+                    // We need some wiggle room, so range 5 => 8
+                    dataset.meleeRange = 8
+                } else if (itemData.wc <= 5) {
+                    // Range 10 => 14
+                    dataset.meleeRange = 14
+                } else {
+                    //itemData.wc == 6
+                    // Range 15 => 20
+                    dataset.meleeRange = 20
+                }
+                if (gridDistance > dataset.meleeRange) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`Target is beyond melee range! Calculated distance is ${gridDistance} ft.`) }
+                    ui.notifications.info("Target is beyond melee range!")
+                }
+            }
             // Missile weapons need to show a range selector in the dialog
             if (itemData.missile) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Range increments:`, itemData.range) }
@@ -788,9 +786,16 @@ export class Hyp3eActor extends Actor {
             }
         }
 
+        // Get any situational modifiers that can be detected from token status or other means
+        if (game.settings.get(game.system.id, "enableCombatSitModDetection")) {
+            let sitModObj = this._getCombatantSitMods()
+            dataset.sitMod = sitModObj?.sitMod
+            dataset.sitModList = sitModObj?.sitModList    
+        }
+
         // Show the roll dialog (type and item-dependent)
         if (!item) {
-            // Since removing the basic attack from Fighting Ability, this may not be needed
+            // Since removing the basic attack from Fighting Ability, this should not be needed
             try {
                 rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset)
             } catch(err) {
@@ -1284,6 +1289,78 @@ export class Hyp3eActor extends Actor {
             speaker: ChatMessage.getSpeaker({ actor: this }),
             content: damageChat
         })
+    }
+
+    _getCombatantSitMods() {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for ${this.name}`) }
+        let sitModObj = {}
+        const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker token:`, attacker) }
+        const effects = this.getEffectNames()
+        let target, targetActor, targetEffects
+        const userTargets = Array.from(game.user.targets)
+        if (userTargets.length > 0) {
+            target = userTargets[0]
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target token:`, target) }
+            targetActor = target.actor
+            targetEffects = targetActor.getEffectNames()
+        }
+
+        // Start gathering situational modifiers
+        let sitModSum = 0
+        let sitModsArr = []
+        // Attacker token status "Blind"
+        if (effects.includes('Blind')) {
+            sitModSum += -4
+            sitModsArr.push("Blind (-4)")
+        }
+        // Attacker token status "Invisible"
+        if (effects.includes('Invisible')) {
+            sitModSum += 4
+            sitModsArr.push("Invisible (+4)")
+        }
+        // Hopefully we have a target!
+        if (target) {
+            // Attacker on higher ground (token height vs. target token height)
+            if (attacker.document.elevation > target.document.elevation) {
+                sitModSum += 1
+                sitModsArr.push("Higher Ground (+1)")
+            }
+            // Attacker is flanking (Three or more melee combatants engage a single opponent)
+
+            // Target of missile attack engaged in melee with ally of attacker
+
+            // Defender is encumbered
+
+            // Defender is *heavily* encumbered
+
+            // Defender is hindered
+            if (targetEffects.includes("Restrained")) {
+                sitModSum += 2
+                sitModsArr.push("Defender is Hindered (+2)")
+            }
+            // Defender is prone
+            if (targetEffects.includes("Prone")) {
+                sitModSum += 4
+                sitModsArr.push("Defender is Prone (+4)")
+            }
+            // Defender is stunned
+            if (targetEffects.includes("Stunned")) {
+                sitModSum += 4
+                sitModsArr.push("Defender is Stunned (+4)")
+            }
+            // Defender is on higher ground
+            if (attacker.document.elevation < target.document.elevation) {
+                sitModSum += -1
+                sitModsArr.push("Defender on Higher Ground (-1)")
+            }
+        }
+        // Finalize the modifiers & return
+        sitModObj = {
+            sitMod: sitModSum,
+            sitModList: sitModsArr.join(", ")
+        }
+        return sitModObj
     }
 
     // Get the names of effects applied to the actor, and return an array

@@ -104,7 +104,18 @@ Hooks.once('init', async function() {
     },
   });
 
-  // Critical hit 
+  // Enable beta-test of combat situational modifier detection
+  game.settings.register(game.system.id, "enableCombatSitModDetection", {
+    name: game.i18n.localize("HYP3E.settings.enableCombatSitModDetection"),
+    hint: game.i18n.localize("HYP3E.settings.enableCombatSitModDetectionHint"),
+    default: false,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+
+  // Critical hit
   game.settings.register(game.system.id, "critHit", {
     name: game.i18n.localize("HYP3E.settings.critHits"),
     hint: game.i18n.localize("HYP3E.settings.critHitsHint"),
@@ -115,7 +126,7 @@ Hooks.once('init', async function() {
     requiresReload: true,
   });
   
-  // Critical Miss 
+  // Critical Miss
   game.settings.register(game.system.id, "critMiss", {
     name: game.i18n.localize("HYP3E.settings.critMiss"),
     hint: game.i18n.localize("HYP3E.settings.critMissHint"),
