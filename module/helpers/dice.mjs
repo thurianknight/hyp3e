@@ -151,8 +151,22 @@ export class Hyp3eDice {
 
         // Add Weapon Mastery mod if applicable
         if (masteryMod > 0) {
+            // Is the actor using a bow or crossbow, and is the target at point-blank range?
+            let pointBlank = ""
+            if (rollData.itemName.toLowerCase().includes("crossbow")) {
+                if (rollData.gridDistance >= 6 && rollData.gridDistance <= 50) {
+                    masteryMod += 1
+                    pointBlank = " + point blank"
+                }
+            } else if (rollData.itemName.toLowerCase().includes("bow")) {
+                if (rollData.gridDistance >= 6 && rollData.gridDistance <= 30) {
+                    masteryMod += 1
+                    pointBlank = " + point blank"
+                }
+            }
+            // Apply the weapon mastery/grandmastery mod
             atkRollParts.push(masteryMod)
-            debugAtkRollParts.push(`<tr><td>Mastery Mod</td><td>${masteryMod}</td></tr>`)
+            debugAtkRollParts.push(`<tr><td>Mastery Mod${pointBlank}</td><td>${masteryMod}</td></tr>`)
         }
 
         // Add situational modifier from the roll dialog

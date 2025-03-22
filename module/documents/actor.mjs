@@ -733,6 +733,7 @@ export class Hyp3eActor extends Actor {
             // Round to nearest whole number
             gridDistance = Math.round(gridDistance)
             if (CONFIG.HYP3E.debugMessages) { console.log("Distance to target:", gridDistance) }
+            dataset.gridDistance = gridDistance
             dataset.range = `${gridDistance} ${canvas.scene.grid.units}`;
         } else {
             // No target selected, so we can't get AC or name
