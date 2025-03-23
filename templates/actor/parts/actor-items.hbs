@@ -161,7 +161,13 @@
     <div class="money-block flexrow">
       <div class="money-block flex-group-center">
         <label for="system.encumbrance" class="exploration-label">Total Carried:</label><br />
-        {{encumbrance}} pounds
+        <span>{{encumbrance}} pounds</span>
+        {{#if isEncumbered}}
+        <br /><span style="color: red;">Encumbered!</span>
+        {{/if}}
+        {{#if isHeavilyEncumbered}}
+        <br /><span style="color: red; font-weight: bold;">Heavily Encumbered!</span>
+        {{/if}}
       </div>
       <div class="money-block flex-group-center">
         {{#each system.money as |coin key|}}

@@ -55,7 +55,15 @@
           {{!-- <input type="text" name="system.unarmoredAc" value="{{system.unarmoredAc}}" /> --}}
         </div>
         <div class="resource-content flexrow flex-group-center">
-          <span></span><span></span>
+          {{!-- <span></span> --}}
+          <span>
+            {{#if isEncumbered}}
+            <div style="margin-left: 15px; color: red;">Encumbered!</div>
+            {{/if}}
+            {{#if isHeavilyEncumbered}}
+            <div style="margin-left: 15px; color: red; font-weight: bold;">Heavily Encumbered!</div>
+            {{/if}}
+          </span>
           <label for="system.movement.base.value" class="combat-label">{{localize "HYP3E.movement.base.abbrev"}}</label>
           <input type="text" name="system.movement.base.value" value="{{system.movement.base.value}}" data-dtype="Number"/>
           <label for="system.otherMv.value" class="combat-label">{{localize "HYP3E.otherMv.abbrev"}}</label>

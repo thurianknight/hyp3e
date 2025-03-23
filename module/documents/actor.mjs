@@ -127,6 +127,14 @@ export class Hyp3eActor extends Actor {
                     }
                 }
             }
+            if (game.settings.get(game.system.id, "enableEncumbrance")) {
+                // Encumbered and Heavily Encumbered negatively impact both AC and MV
+                if (this.getFlag(game.system.id, "isEncumbered")) {
+                    tempAC += 1
+                } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
+                    tempAC += 2
+                }
+            }
             // Now calculate & set the final values
             systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
             systemData.ac.dr = tempDR

@@ -200,7 +200,7 @@
         }
     },
     "Item": {
-        "types": ["armor", "container", "feature", "item", "spell", "weapon"],
+        "types": ["armor", "feature", "item", "spell", "weapon"],
         "templates": {
             "base": {
                 "friendlyName": "",

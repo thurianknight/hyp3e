@@ -203,7 +203,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     for (let i of context.items) {
       i.img = i.img || DEFAULT_TOKEN;
       // Calculate total weight carried by character
-    //   if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
+      // if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
       if (i.system.weight) {
         if (i.system.quantity.value) {
           i.system.carriedWt = (i.system.weight * i.system.quantity.value)
@@ -259,6 +259,32 @@ export class Hyp3eActorSheet extends ActorSheet {
     }
     encumbrance = Math.round(encumbrance * 10)/10
     if (CONFIG.HYP3E.debugMessages) { console.log(`Total weight carried: ${encumbrance} pounds`) }
+
+    // We can set these two constants, even if they aren't used because encumbrance is disabled
+    const encumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "encumbered")
+    const heavilyEncumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "heavilyEncumbered")
+    if (game.settings.get(game.system.id, "enableEncumbrance")) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Checking encumbrance vs Strength...`) }
+        if (encumbrance > heavilyEncumberedWt) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is Heavily Encumbered!`) }
+            this.actor.setFlag(game.system.id, "isHeavilyEncumbered", true)
+            this.actor.setFlag(game.system.id, "isEncumbered", false)
+            context.isHeavilyEncumbered = true
+            context.isEncumbered = false
+        } else if (encumbrance > encumberedWt) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is Encumbered!`) }
+            this.actor.setFlag(game.system.id, "isEncumbered", true)
+            this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
+            context.isEncumbered = true
+            context.isHeavilyEncumbered = false
+        } else {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is not Encumbered. :-)`) }
+            this.actor.setFlag(game.system.id, "isEncumbered", false)
+            this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
+            context.isEncumbered = false
+            context.isHeavilyEncumbered = false
+        }
+    }
 
     // Assign and return
     context.encumbrance = encumbrance;
@@ -507,6 +533,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     if ( (target?.type === "container" || target?.system.isContainer) ) {
       // One container cannot hold another container
       if (source.type === 'container' || source.system.isContainer) { 
+        ui.notifications.info(`Cannot move container (${source.name}) into another container (${target.name})!`)
         if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot move container (${source.name}) into another container (${target.name})!`) }
         return 
       }

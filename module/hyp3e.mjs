@@ -137,6 +137,36 @@ Hooks.once('init', async function() {
     requiresReload: true,
   });
 
+  // Encumbrance formulas
+  game.settings.register(game.system.id, "enableEncumbrance", {
+    name: game.i18n.localize("HYP3E.settings.enableEncumbrance"),
+    hint: game.i18n.localize("HYP3E.settings.enableEncumbranceHint"),
+    default: false,
+    scope: "world",
+    type: Boolean,
+    config: true,
+    requiresReload: true,
+  });
+  game.settings.register(game.system.id, "encumbered", {
+    name: game.i18n.localize("HYP3E.settings.encumberedLabel"),
+    hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
+    default: "10",
+    scope: "world",
+    type: Number,
+    config: true,
+    requiresReload: true,
+  });
+  game.settings.register(game.system.id, "heavilyEncumbered", {
+    name: game.i18n.localize("HYP3E.settings.heavilyEncumberedLabel"),
+    hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
+    default: "15",
+    scope: "world",
+    type: Number,
+    config: true,
+    requiresReload: true,
+  });
+
+
   // Human races
   game.settings.register(game.system.id, "races", {
     name: game.i18n.localize("HYP3E.settings.races"),
@@ -191,13 +221,13 @@ Hooks.once('init', async function() {
         console.log("Using group-based initiative.")
         CONFIG.Combat.documentClass = HYP3EGroupCombat;
         CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
-        CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
     } else {
         console.log("Using individual initiative.")
         CONFIG.Combat.documentClass = HYP3ECombat;
         CONFIG.Combatant.documentClass = HYP3ECombatant;
-        CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
     }
+    // Initiative roll is the same, regardless of group/individual
+    CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
     console.log("CONFIG.Combat.initiative:", CONFIG.Combat.initiative)
     CONFIG.ui.combat = HYP3ECombatTab;
 
