@@ -1296,14 +1296,14 @@ export class Hyp3eActor extends Actor {
         let sitModObj = {}
         const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker token:`, attacker) }
-        const effects = this.getEffectNames()
+        const effects = this._getEffectNames()
         let target, targetActor, targetEffects
         const userTargets = Array.from(game.user.targets)
         if (userTargets.length > 0) {
             target = userTargets[0]
             if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target token:`, target) }
             targetActor = target.actor
-            targetEffects = targetActor.getEffectNames()
+            targetEffects = targetActor._getEffectNames()
         }
 
         // Start gathering situational modifiers
@@ -1326,13 +1326,22 @@ export class Hyp3eActor extends Actor {
                 sitModSum += 1
                 sitModsArr.push("Higher Ground (+1)")
             }
-            // Attacker is flanking (Three or more melee combatants engage a single opponent)
+            // Attacker is flanking, +1 (Three or more melee combatants engage a single opponent)
+            // We have the target token. The token does have a 'targeted' array which is an array
+            //  of USERs (not actors) who have selected this token to target. So we could count the
+            //  length of the array and if it is 3 or more, apply this modifier. However we also
+            //  need to make sure that they are all engaged in melee (not missile) combat... so we
+            //  would need to get the actual tokens owned by the players, and then determine whether
+            //  they are in melee range of their target. It gets really complicated.
 
-            // Target of missile attack engaged in melee with ally of attacker
+            // Target of missile attack engaged in melee with ally of attacker, -2
+            // Similar to the above, determining other tokens that are in melee with the targeted
+            //  token gets really complicated. May be possible, just need to think hard on this.
+            //  And then determine whether it is really worth it.
 
-            // Defender is encumbered
+            // Defender is encumbered - RAW say this is a GM / common sense decision
 
-            // Defender is *heavily* encumbered
+            // Defender is *heavily* encumbered - RAW say this is a GM / common sense decision
 
             // Defender is hindered
             if (targetEffects.includes("Restrained")) {
@@ -1364,7 +1373,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Get the names of effects applied to the actor, and return an array
-    getEffectNames() {
+    _getEffectNames() {
         let effects = this.effects
         let effectsArray = []
         effects.forEach(effect => {

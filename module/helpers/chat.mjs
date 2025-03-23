@@ -238,7 +238,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 return;
             }
             // Get an array of effects (if any) provided by the item, and use it for the button label
-            let effects = item?.getEffectNames()
+            let effects = item?._getEffectNames()
             let btnLabel = effects.length > 1 ? "Multiple Effects" : effects[0];
             let effectApplyButton = $(
                 `<button class="" title="Click to apply ${effects.join(", ")} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${btnLabel}</button>`
