@@ -54,6 +54,28 @@ export class Hyp3eActor extends Actor {
         // Make modifications to data here. For example:
         const systemData = actorData.system;
 
+        // Notes on system.tempModifiers
+        //  This is an array of modifiers that may be applied to any field in the data template.
+        //  However, note that it is better to use effects and apply them to the data template
+        //  whenever possible. The known exceptions are AC the MV, as these are auto-calculated
+        //  below and cannot be modified by effects.
+        //
+        //  Example tempModifiers entry:
+        //      {
+        //          templateField: "system.ac.value",
+        //          source: "isEncumbered",
+        //          modifier: 1
+        //      }
+        //  Each entry must be unique by templateField and source!
+        //  In theory, we could use an effect to create an entry... need to test.
+        if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[]:`, systemData.tempModifiers) }
+        systemData.tempModifiers.forEach((mod, id) => {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, mod) }
+            // const obj = JSON.parse(mod)
+            // let obj = JSON.parse('{"templateField": "system.ac.value", "source": "isEncumbered", "modifier": 1}')
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, obj) }
+        })
+
         // Calculated fields go here...
 
         // Add actor type & base class, used for crit hit & crit miss tables
@@ -134,9 +156,29 @@ export class Hyp3eActor extends Actor {
                 if (this.getFlag(game.system.id, "isEncumbered")) {
                     tempAC += 1
                     tempMV -= 10
+                    // These aren't really used yet, but maybe in the future
+                    this.addTempModifier("ac.value", "isEncumbered", 1)
+                    this.addTempModifier("movement.base.value", "isEncumbered", -10)
+                    this.deleteTempModifier("ac.value", "isHeavilyEncumbered")
+                    this.deleteTempModifier("movement.base.value", "isHeavilyEncumbered",)
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`Encumbered:`, tempAC, tempMV) }
                 } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
                     tempAC += 2
                     tempMV -= 20
+                    // These aren't really used yet, but maybe in the future
+                    this.addTempModifier("ac.value", "isHeavilyEncumbered", 2)
+                    this.addTempModifier("movement.base.value", "isHeavilyEncumbered", -20)
+                    this.deleteTempModifier("ac.value", "isEncumbered")
+                    this.deleteTempModifier("movement.base.value", "isEncumbered",)
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`Heavily Encumbered:`, tempAC, tempMV) }
+                } else {
+                    // Not encumbered -- find any instances of encumbrance mods and remove them
+                    // These aren't really used yet, but maybe in the future
+                    this.deleteTempModifier("ac.value", "isEncumbered")
+                    this.deleteTempModifier("movement.base.value", "isEncumbered",)
+                    this.deleteTempModifier("ac.value", "isHeavilyEncumbered")
+                    this.deleteTempModifier("movement.base.value", "isHeavilyEncumbered",)
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`Not Encumbered:`, tempAC, tempMV) }
                 }
             }
             // Now calculate & set the final values
@@ -220,6 +262,40 @@ export class Hyp3eActor extends Actor {
                 "prototypeToken.disposition": 0
             });
         }
+    }
+
+    addTempModifier(templateField, source, modifier) {
+        //  Example tempModifiers entry:
+        //      {
+        //          templateField: "ac.value",
+        //          source: "isEncumbered",
+        //          modifier: 1
+        //      }
+
+        // Check for existence of this modifier, before we try adding it
+        this.system.tempModifiers.forEach((mod, id) => {
+            if (mod.templateField == templateField && mod.source == source) { 
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot add temp modifier, it already exists! templateField ${templateField}, source ${source}.`) }
+                return
+            }
+        })
+        this.system.tempModifiers.push(
+            {
+                templateField: templateField,
+                source: source,
+                modifier: modifier
+            }
+        )
+    }
+
+    deleteTempModifier(templateField, source) {
+        // Find & delete the modifier
+        this.system.tempModifiers.forEach((mod, id) => {
+            if (mod.templateField == templateField && mod.source == source) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Found temp modifier, deleting. templateField ${templateField}, source ${source}.`) }
+                this.system.tempModifiers.splice(id, 1)
+            }
+        })
     }
 
     /**

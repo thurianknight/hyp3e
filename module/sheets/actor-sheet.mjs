@@ -187,12 +187,12 @@ export class Hyp3eActorSheet extends ActorSheet {
     }
 
     /**
-   * Organize and classify Data for NPC sheets.
-   *
-   * @param {Object} context The actor to prepare.
-   *
-   * @return {undefined}
-   */
+     * Organize and classify Data for NPC sheets.
+     *
+     * @param {Object} context The actor to prepare.
+     *
+     * @return {undefined}
+     */
     _prepareNpcData(context) {
         
         // Load creature sizes
