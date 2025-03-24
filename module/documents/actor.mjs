@@ -83,6 +83,7 @@ export class Hyp3eActor extends Actor {
             systemData.ac.value = 9 - systemData.attributes.dex.defMod
             systemData.ac.dr = 0
             let tempAC = 9
+            let tempMV = 40
             let shieldMod = 0
             let tempDR = 0
             // Loop through all inventory item types to find armor
@@ -108,9 +109,10 @@ export class Hyp3eActor extends Actor {
                                 if (obj.system.ac < tempAC) {
                                     // Only update AC if this equipped item is superior to the current AC
                                     tempAC = obj.system.ac
+                                    tempMV = obj.system.mv
                                 }
                                 if (CONFIG.HYP3E.debugMessages) { 
-                                    console.log("Armor equipped: ", obj.name, ", Base AC: ", tempAC, ", Base DR: ", tempDR)
+                                    console.log(`Armor equipped: ${obj.name}, Base AC: ${tempAC}, Base DR: ${tempDR}, Base MV: ${tempMV}`)
                                 }
                             } else {
                                 // Shield AC is a modifier subtracted from base AC.
@@ -131,13 +133,16 @@ export class Hyp3eActor extends Actor {
                 // Encumbered and Heavily Encumbered negatively impact both AC and MV
                 if (this.getFlag(game.system.id, "isEncumbered")) {
                     tempAC += 1
+                    tempMV -= 10
                 } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
                     tempAC += 2
+                    tempMV -= 20
                 }
             }
             // Now calculate & set the final values
             systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
             systemData.ac.dr = tempDR
+            systemData.movement.base.value = tempMV
         }
 
         // Log the prepared data

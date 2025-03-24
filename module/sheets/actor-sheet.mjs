@@ -158,6 +158,32 @@ export class Hyp3eActorSheet extends ActorSheet {
         context.rollModes = CONFIG.Dice.rollModes
         // if (CONFIG.HYP3E.debugMessages) { console.log("Dice-roll modes:", context.rollModes) }
 
+        // We can set these two constants even if they aren't used (when encumbrance is disabled)
+        const encumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "encumbered")
+        const heavilyEncumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "heavilyEncumbered")
+        if (game.settings.get(game.system.id, "enableEncumbrance")) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking encumbrance vs Strength...`) }
+            if (context.encumbrance > heavilyEncumberedWt) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is Heavily Encumbered!`) }
+                this.actor.setFlag(game.system.id, "isHeavilyEncumbered", true)
+                this.actor.setFlag(game.system.id, "isEncumbered", false)
+                context.isHeavilyEncumbered = true
+                context.isEncumbered = false
+            } else if (context.encumbrance > encumberedWt) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is Encumbered!`) }
+                this.actor.setFlag(game.system.id, "isEncumbered", true)
+                this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
+                context.isEncumbered = true
+                context.isHeavilyEncumbered = false
+            } else {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is not Encumbered. :-)`) }
+                this.actor.setFlag(game.system.id, "isEncumbered", false)
+                this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
+                context.isEncumbered = false
+                context.isHeavilyEncumbered = false
+            }
+        }
+
     }
 
     /**
@@ -259,32 +285,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     }
     encumbrance = Math.round(encumbrance * 10)/10
     if (CONFIG.HYP3E.debugMessages) { console.log(`Total weight carried: ${encumbrance} pounds`) }
-
-    // We can set these two constants, even if they aren't used because encumbrance is disabled
-    const encumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "encumbered")
-    const heavilyEncumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "heavilyEncumbered")
-    if (game.settings.get(game.system.id, "enableEncumbrance")) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Checking encumbrance vs Strength...`) }
-        if (encumbrance > heavilyEncumberedWt) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is Heavily Encumbered!`) }
-            this.actor.setFlag(game.system.id, "isHeavilyEncumbered", true)
-            this.actor.setFlag(game.system.id, "isEncumbered", false)
-            context.isHeavilyEncumbered = true
-            context.isEncumbered = false
-        } else if (encumbrance > encumberedWt) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is Encumbered!`) }
-            this.actor.setFlag(game.system.id, "isEncumbered", true)
-            this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
-            context.isEncumbered = true
-            context.isHeavilyEncumbered = false
-        } else {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is not Encumbered. :-)`) }
-            this.actor.setFlag(game.system.id, "isEncumbered", false)
-            this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
-            context.isEncumbered = false
-            context.isHeavilyEncumbered = false
-        }
-    }
 
     // Assign and return
     context.encumbrance = encumbrance;
