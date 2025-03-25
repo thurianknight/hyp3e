@@ -1432,6 +1432,12 @@ export class Hyp3eActor extends Actor {
 
             // Defender is *heavily* encumbered - RAW say this is a GM / common sense decision
 
+            // Defender token status "Invisible"
+            if (targetEffects.includes('Invisible')) {
+                sitModSum -= 4
+                sitModsArr.push("Defender is Invisible (-4)")
+            }
+
             // Defender is hindered
             if (targetEffects.includes("Restrained")) {
                 sitModSum += 2
