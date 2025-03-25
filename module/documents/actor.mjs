@@ -161,7 +161,7 @@ export class Hyp3eActor extends Actor {
                     this.addTempModifier("movement.base.value", "isEncumbered", -10)
                     this.deleteTempModifier("ac.value", "isHeavilyEncumbered")
                     this.deleteTempModifier("movement.base.value", "isHeavilyEncumbered",)
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`Encumbered:`, tempAC, tempMV) }
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`Encumbered: AC ${tempAC}, MV ${tempMV}`) }
                 } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
                     tempAC += 2
                     tempMV -= 20
@@ -170,7 +170,7 @@ export class Hyp3eActor extends Actor {
                     this.addTempModifier("movement.base.value", "isHeavilyEncumbered", -20)
                     this.deleteTempModifier("ac.value", "isEncumbered")
                     this.deleteTempModifier("movement.base.value", "isEncumbered",)
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`Heavily Encumbered:`, tempAC, tempMV) }
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`Heavily Encumbered: AC ${tempAC}, MV ${tempMV}`) }
                 } else {
                     // Not encumbered -- find any instances of encumbrance mods and remove them
                     // These aren't really used yet, but maybe in the future
@@ -178,7 +178,7 @@ export class Hyp3eActor extends Actor {
                     this.deleteTempModifier("movement.base.value", "isEncumbered",)
                     this.deleteTempModifier("ac.value", "isHeavilyEncumbered")
                     this.deleteTempModifier("movement.base.value", "isHeavilyEncumbered",)
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`Not Encumbered:`, tempAC, tempMV) }
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`Not Encumbered: AC ${tempAC}, MV ${tempMV}`) }
                 }
             }
             // Now calculate & set the final values

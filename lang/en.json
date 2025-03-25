@@ -343,7 +343,7 @@
             "annotations": {
                 "ignoreShieldAc": "Ignores AC bonus provided by opponent's shield (if any).",
                 "p1VsPlate": "+1 'to hit' opponents wearing plate mail, field plate, or full plate.",
-                "1hOr2h": "Melee weapon may be wielded one- or two-handed. If hurled, use one-handed damage.",
+                "1hOr2h": "Melee weapon may be wielded one- or two-handed. If the weapon can also be hurled, use one-handed damage.",
                 "true2Hand": "A 'true' two-handed melee weapon; must be wielded with two hands.",
                 "hurled": "Melee weapon may be hurled one-handed; strength damage adjustment applies.",
                 "p1VsMelee": "+1 AC bonus versus melee attacks; quarterstaff must be wielded with two hands; tonfa and hand trident must be dual wielded (one in each hand).",
