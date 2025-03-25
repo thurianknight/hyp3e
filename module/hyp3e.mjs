@@ -137,7 +137,7 @@ Hooks.once('init', async function() {
     requiresReload: true,
   });
 
-  // Encumbrance formulas
+  // Enable beta-test of encumbrance calculations applied to characters
   game.settings.register(game.system.id, "enableEncumbrance", {
     name: game.i18n.localize("HYP3E.settings.enableEncumbrance"),
     hint: game.i18n.localize("HYP3E.settings.enableEncumbranceHint"),
@@ -147,6 +147,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+  // GM-defined strength multiplier for encumbered status
   game.settings.register(game.system.id, "encumbered", {
     name: game.i18n.localize("HYP3E.settings.encumberedLabel"),
     hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
@@ -156,6 +157,7 @@ Hooks.once('init', async function() {
     config: true,
     requiresReload: true,
   });
+  // GM-defined strength multiplier for heavily encumbered status
   game.settings.register(game.system.id, "heavilyEncumbered", {
     name: game.i18n.localize("HYP3E.settings.heavilyEncumberedLabel"),
     hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
