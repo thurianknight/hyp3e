@@ -170,13 +170,13 @@ export class Hyp3eDice {
         }
 
         // Add situational modifier from the roll dialog
-        if (rollData?.sitMod != 0) {
+        if (rollData?.sitMod) {
             atkRollParts.push(rollData.sitMod)
             debugAtkRollParts.push(`<tr><td>Sit Mod</td><td>${rollData.sitMod}</td></tr>`)
         }
 
         // Add range modifier from the roll dialog, if needed
-        if (rollData?.rangeMod <= 0) {
+        if (rollData?.rangeMod) {
             atkRollParts.push(rollData.rangeMod)
             debugAtkRollParts.push(`<tr><td>Range Mod</td><td>${rollData.rangeMod}</td></tr>`)
         }
