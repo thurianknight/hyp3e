@@ -1311,7 +1311,9 @@ export class Hyp3eActor extends Actor {
     // Send roll results to the chat window
     sendRollToChat(roll, label, content, rollMode) {
         // Prettify label
-        label = "<h3>" + label + "</h3>"
+        // label = "<h3>" + label + "</h3>"
+        label = "<div class='medium'>" + label + "</div>"
+
         // Send to chat
         roll.toMessage({
             author: game.user_id,
@@ -1327,6 +1329,9 @@ export class Hyp3eActor extends Actor {
     async renderCustomChat(roll, item, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
         // Prettify label
         // label = "<h3>" + label + "</h3>"
+        label = "<div class='medium'>" + label + "</div>"
+        headerHTML = "<div class='medium'>" + headerHTML + "</div>"
+        footerHTML = "<div class='medium'>" + footerHTML + "</div>"
 
         const templateData = {
             roll: roll,
@@ -2640,14 +2645,14 @@ export class Hyp3eActor extends Actor {
         let getsBonusSpell = false
         
         // Setup chat message variables
-        let label = `<h3>Values for character updated...</h3>`
+        let label = `<div class='medium-bold'>Values for character updated...</div>`
         let content = `<ul>`
 
         // Here we modify the cloned data object of the actor...
         if (CONFIG.HYP3E.debugMessages) { console.log("SetAttributeMods: cloned Actor system data:", data) }
         if (data.details.class) {
             // Override label if character class selected
-            label = `<h3>Values for ${data.details.class} updated...</h3>`
+            label = `<div class='medium-bold'>Values for ${data.details.class} updated...</div>`
             if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${data.details.class} hit die...`) }
             thisClass = this.classData[data.details.class]
             if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Class Data for ${data.details.class}: `, thisClass) }

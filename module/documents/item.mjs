@@ -200,7 +200,6 @@ export class Hyp3eItem extends Item {
         }
 
         // Chat message header text
-        // const label = `<h3><img src="${item.img}" style="border: none; padding: 3px 0;" width="24px"> ${typeLabel}: ${itemName}</h3>`
         const label = `
         <hr/>
         <div style="margin: 10px 0;">

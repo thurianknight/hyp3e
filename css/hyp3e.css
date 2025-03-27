@@ -846,6 +846,21 @@ textarea {
   /* font-family: "Herculanum", sans-serif; */
 }
 
+/* Font styling */
+.medium {
+    font-size: medium;
+}
+
+.medium-bold {
+    font-weight: bold;
+    font-size: medium;
+}
+  
+.medium-italic {
+    font-style: italic;
+    font-size: medium;
+}
+
 /* Font color example */
 .font-color-red {
     color: red;

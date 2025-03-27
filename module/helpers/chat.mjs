@@ -595,34 +595,34 @@ async function rollCritHit(charType, actorId) {
     let roll = await new Roll("1d6").roll();
     if (charType === "fighter") {
         if (roll.total <= 2) {
-            content = `<h4 class="dice-damage">+2 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+2 ${dmg}</div>`;
         } else if (roll.total <= 4) {
-            content = `<h4 class="dice-damage">x2 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
         } else if (roll.total <= 6) {
-            content = `<h4 class="dice-damage">x3 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x3 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else if (charType === "magician") {
         if (roll.total <= 2) {
-            content = `<h4 class="dice-damage">+1 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+1 ${dmg}</div>`;
         } else if (roll.total <= 4) {
-            content = `<h4 class="dice-damage">+2 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+2 ${dmg}</div>`;
         } else if (roll.total <= 6) {
-            content = `<h4 class="dice-damage">x2 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else {
         // cleric/thief/npc-monster
         if (roll.total <= 1) {
-            content = `<h4 class="dice-damage">+1 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+1 ${dmg}</div>`;
         } else if (roll.total <= 3) {
-            content = `<h4 class="dice-damage">+2 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+2 ${dmg}</div>`;
         } else if (roll.total <= 5) {
-            content = `<h4 class="dice-damage">x2 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
         }  else if (roll.total <= 6) {
-            content = `<h4 class="dice-damage">x3 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x3 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }

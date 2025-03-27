@@ -1,4 +1,4 @@
-<h4 class="dice-damage">{{title}}</h4>
+<div class="dice-damage">{{title}}</div>
 <div class="dice-roll" data-actor-id="{{actorId}}">
     <div class="dice-result">
         <div class="dice-formula">{{dmgRoll.formula}}</div>
@@ -30,14 +30,14 @@
             </section>
         </div>
         <div class="dice-roll">
-            <h4 class="dice-formula">
+            <div class="dice-formula">
                 <span class="dice-damage">{{dmgRoll.total}} HP damage!</span>
                 <span class="damage-button" data-total="{{dmgRoll.total}}"  
                     data-natural="{{naturalDmgRoll}}" 
                     data-roll="{{dmgBaseRoll}}" 
                     data-source-type="{{sourceType}}">
                 </span>
-            </h4>
+            </div>
         </div>
         {{#if save}}
         <div>{{{description}}}</div>
