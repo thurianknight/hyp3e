@@ -240,7 +240,7 @@ export class Hyp3eItem extends Item {
             if (itemData.damage) {
                 if (Roll.validate(itemData.damage)) {
                     // Build our damage roll formula, including actor and weapon mods
-                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, actorData, actor.type)
+                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData)
                     const dmgFormula = dmgObj.formula
                     const debugDmgRollFormula = dmgObj.debugFormula
                     // Resolve damage string & variables to a rollable formula
@@ -289,7 +289,7 @@ export class Hyp3eItem extends Item {
             if (itemData.damage) {
                 if (Roll.validate(itemData.damage)) {
                     // Build our damage roll formula, including actor and weapon mods
-                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, actorData, actor.type)
+                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData)
                     const dmgFormula = dmgObj.formula
                     const debugDmgRollFormula = dmgObj.debugFormula
                     // Resolve damage string & variables to a rollable formula

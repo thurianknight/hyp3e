@@ -1067,13 +1067,13 @@ export class Hyp3eActor extends Actor {
         if (hit && item) {
             if (Roll.validate(itemData.damage)) {
                 // Build our primary damage formula
-                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
+                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData)
                 item.dmgFormula = dmgObj.formula
                 item.debugDmgRollFormula = dmgObj.debugFormula
                 if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", item.dmgFormula) }
                 // Do we have 2-hand damage?
                 if (item.system.damage2h > "") {
-                    // const dmgObj2h = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
+                    // const dmgObj2h = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData)
                     item.dmgFormula2h = dmgObj.formula2h
                     item.debugDmgRollFormula2h = dmgObj.debugFormula2h
                     if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula 2H:", item.dmgFormula2h) }
@@ -1084,29 +1084,6 @@ export class Hyp3eActor extends Actor {
         // Construct a custom chat card for the attack
         // await this.renderCustomChat(atkRoll, item.id, label, debugAtkRollFormula, "", critFooterHTML, rollResponse.rollMode);
         await this.renderCustomChat(atkRoll, item, label, debugAtkRollFormula, attackText, critFooterHTML, rollResponse.rollMode);
-
-        // // If the item attack hit, we roll damage automatically and include it in the chat message
-        // if (hit && item) {
-        //     if (Roll.validate(itemData.damage)) {
-        //         // Build our damage formula
-        //         const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
-        //         dmgFormula = dmgObj.formula
-        //         debugDmgRollFormula = dmgObj.debugFormula
-        //         if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
-
-        //         // Invoke the damage roll
-        //         dmgRoll = new Roll(dmgFormula, actorData);
-        //         // Resolve the roll
-        //         let result = await dmgRoll.roll();
-        //         if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
-
-        //         // Get the dice roll values of damage for x2/x3 modifier button
-        //         const naturalDmgRoll = dmgRoll.dice[0]?.total ? dmgRoll.dice[0]?.total : dmgRoll.total;
-
-        //         // Now output the damage chat
-        //         this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, itemData.damage, item)
-        //     }
-        // }
 
         return atkRoll
     }
