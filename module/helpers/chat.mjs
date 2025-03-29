@@ -15,7 +15,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const itemId = $(b).data('itemId');
             const actorId = $(b).data('actorId');
             let dmgButton = $(
-                `<button class="" title="Click to roll damage."><i class="fas fa-dice"></i>Damage: ${dmgFormula}</button>`
+                `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>Damage: ${dmgFormula}</button>`
             );
             dmgRoll.append(dmgButton);
 
@@ -37,7 +37,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const itemId = $(b).data('itemId');
             const actorId = $(b).data('actorId');
             let dmgButton = $(
-                `<button class="" title="Click to roll damage."><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
+                `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
             );
             dmgRoll2h.append(dmgButton);
 
@@ -147,7 +147,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     }
 
     // "longer" button style for crit miss/hit
-    const long_button = (critType, charType, icon) => `<button class="" title="Click to roll critical ${critType} to selected token(s)."><i class="fas ${icon}"></i>${charType}</button>`;
+    const long_button = (critType, charType, icon) => `<button class="chat-btn-full-width" title="Click to roll critical ${critType} to selected token(s)."><i class="fas ${icon}"></i>${charType}</button>`;
 
     let critMiss = html.find(".critical-miss");
     if (critMiss.length > 0) {
@@ -200,7 +200,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             if (CONFIG.HYP3E.debugMessages) { console.log(`Save html: `, b) }
             let saveType = $(b).data('save');
             let saveButton = $(
-                `<button class="" title="Click to roll save to selected token(s)."><i class="fas fa-dice-d20"></i>Save: ${saveType}</button>`
+                `<button class="chat-btn-full-width" title="Click to roll save to selected token(s)."><i class="fas fa-dice-d20"></i>Save: ${saveType}</button>`
             );
             save.append(saveButton);
 
@@ -241,7 +241,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             let effects = item?._getEffectNames()
             let btnLabel = effects.length > 1 ? "Multiple Effects" : effects[0];
             let effectApplyButton = $(
-                `<button class="" title="Click to apply ${effects.join(", ")} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${btnLabel}</button>`
+                `<button class="chat-btn-full-width" title="Click to apply ${effects.join(", ")} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${btnLabel}</button>`
             );
             effectApply.append(effectApplyButton);
 

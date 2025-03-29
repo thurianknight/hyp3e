@@ -1,47 +1,50 @@
 <div style="padding-bottom: 5px">
     {{{headerHTML}}}
 </div>
-<div class="dice-roll" data-item-id="{{item.id}}" data-actor-id="{{actorId}}">
+
+<div class="dice-roll" data-item-id="{{item.id}}" data-actor-id="{{actorId}}" data-action="expandRoll">
     <div class="dice-result">
         <div class="dice-formula">{{roll.formula}}</div>
-        <div class="dice-tooltip" style="display: none;">
-            <section class="tooltip-part">
-                {{{debugRollFormula}}}
-                <div class="dice">
-                    {{#each roll.dice as |die key|}}
-                    <header class="part-header flexrow">
-                        <span class="part-formula">{{die.expression}}</span>
-                        <span>
-                            <ol class="dice-rolls">
-                                {{#each die.values as |val d|}}
-                                <li class="roll die d{{die.faces}} 
-                                    {{isMin val}}
-                                    {{isMax val die.faces}}">{{val}}</li>
-                                {{/each}}
-                            </ol>
-                        </span>
-                        <span class="part-total">{{die.total}}</span>
-                    </header>
-                    {{/each}}
-                </div>
-            </section>
+        <div class="dice-tooltip">
+            <div class="wrapper">
+                <section class="tooltip-part">
+                    {{{debugRollFormula}}}
+                    <div class="dice">
+                        {{#each roll.dice as |die key|}}
+                        <header class="part-header flexrow">
+                            <span class="part-formula">{{die.expression}}</span>
+                            <span>
+                                <ol class="dice-rolls">
+                                    {{#each die.values as |val d|}}
+                                    <li class="roll die d{{die.faces}} 
+                                        {{isMin val}}
+                                        {{isMax val die.faces}}">{{val}}</li>
+                                    {{/each}}
+                                </ol>
+                            </span>
+                            <span class="part-total">{{die.total}}</span>
+                        </header>
+                        {{/each}}
+                    </div>
+                </section>
+            </div>
         </div>
         <div class="dice-total">{{roll.total}}</div>
     </div>
 </div>
 {{#if roll.hit}}
-<div class='dmg-roll-button' data-item-id='{{item.id}}' data-actor-id='{{actorId}}' 
+<div class='dmg-roll-button' style='padding-top: 5px' data-item-id='{{item.id}}' data-actor-id='{{actorId}}' 
     data-formula='{{item.dmgFormula}}' data-debug-formula='{{item.debugDmgRollFormula}}' 
     data-source-type='{{item.type}}'>
 </div>
 {{#if item.dmgFormula2h}}
-<div class='dmg-roll-button2h' data-item-id='{{item.id}}' data-actor-id='{{actorId}}' 
+<div class='dmg-roll-button2h' style='padding-top: 2px' data-item-id='{{item.id}}' data-actor-id='{{actorId}}' 
     data-formula='{{item.dmgFormula2h}}' data-debug-formula='{{item.debugDmgRollFormula2h}}' 
     data-source-type='{{item.type}}'>
 </div>
 {{/if}}
 {{/if}}
 
-<div style="padding-top: 10px">
+<div style="padding-top: 5px">
     {{{footerHTML}}}
 </div>

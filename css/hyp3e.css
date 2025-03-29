@@ -276,11 +276,27 @@ textarea {
 
 .chat-button-small {
   width: 22px;
-  height:22px;
-  font-size:10px;
-  line-height:1px
+  height: 22px;
+  font-size: 10px;
+  line-height: 1px;
+  padding: 1px 1px;
+  margin: 1px 2px;
 }
 
+.chat-btn-full-width {
+    width: 100%;
+}
+
+.chat-table {
+    width: 100%;
+    border-top: 1px solid #8d896d;
+    border-bottom: 1px solid #8d896d;
+    border-collapse: collapse;
+    margin: 3px 10px;
+    th, td {
+        padding: 3px 10px;
+    }
+}
 
 /* Styles limited to hyp3e sheets */
 .hyp3e {
@@ -846,6 +862,13 @@ textarea {
   /* font-family: "Herculanum", sans-serif; */
 }
 
+/* Horizontal rule plain style */
+.plain-hr {
+    border: 0;
+    border-top: 1px solid #8d896d;
+    margin: 5px 0;
+}
+
 /* Font styling */
 .medium {
     font-size: medium;
@@ -855,7 +878,7 @@ textarea {
     font-weight: bold;
     font-size: medium;
 }
-  
+
 .medium-italic {
     font-style: italic;
     font-size: medium;

@@ -553,14 +553,14 @@ export class Hyp3eActor extends Actor {
             // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}...</span>`
             // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${itemName}</span>`
             label = `
-            <hr/>
+            <hr class="plain-hr" />
             <div style="margin: 10px 0;">
                 <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
                 <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
                     ${itemName}
                 </span>
             </div>
-            <hr/>`
+            <hr class="plain-hr" />`
         }
 
         // Determine whether we have a valid target number or formula
@@ -752,14 +752,14 @@ export class Hyp3eActor extends Actor {
 
         // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}</span>`
         label = `
-        <hr/>
+        <hr class="plain-hr" />
         <div style="margin: 10px 0;">
             <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
             <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
                 ${itemName}
             </span>
         </div>
-        <hr/>`
+        <hr class="plain-hr" />`
 
         // Filter the actor's inventory items for ammunition
         let ammoList = this.items.filter(i => i.system.isAmmunition)
@@ -1000,7 +1000,7 @@ export class Hyp3eActor extends Actor {
                 hit = true
                 if (game.settings.get(game.system.id, "critHit") && item) {
                     // critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'><h4>Critical Hit:</h4></div>`;
-                    critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'>&nbsp;</div>`;
+                    critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
                 }
             } else if (naturalRoll == 1) {
                 if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
@@ -1009,7 +1009,7 @@ export class Hyp3eActor extends Actor {
 
                 if (game.settings.get(game.system.id, "critMiss") && item) {
                     // critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'><h4>Xathoqqua’s Woe:</h4></div>`;
-                    critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'>&nbsp;</div>`;
+                    critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
                 }
             } else if (atkRoll.total >= tn) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
@@ -1381,12 +1381,12 @@ export class Hyp3eActor extends Actor {
         let sitModSum = 0
         let sitModsArr = []
         // Attacker token status "Blind"
-        if (effects.includes('Blind')) {
+        if (effects.includes("Blind")) {
             sitModSum += -4
             sitModsArr.push("Blind (-4)")
         }
         // Attacker token status "Invisible"
-        if (effects.includes('Invisible')) {
+        if (effects.includes("Invisible")) {
             sitModSum += 4
             sitModsArr.push("Invisible (+4)")
         }
@@ -1415,7 +1415,7 @@ export class Hyp3eActor extends Actor {
             // Defender is *heavily* encumbered - RAW say this is a GM / common sense decision
 
             // Defender token status "Invisible"
-            if (targetEffects.includes('Invisible')) {
+            if (targetEffects.includes("Invisible")) {
                 sitModSum -= 4
                 sitModsArr.push("Defender is Invisible (-4)")
             }

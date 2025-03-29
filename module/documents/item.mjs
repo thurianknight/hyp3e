@@ -201,14 +201,14 @@ export class Hyp3eItem extends Item {
 
         // Chat message header text
         const label = `
-        <hr/>
+        <hr class="plain-hr" />
         <div style="margin: 10px 0;">
             <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
             <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
                 ${typeLabel}: ${itemName}
             </span>
         </div>
-        <hr/>`
+        <hr class="plain-hr" />`
 
         if (CONFIG.HYP3E.debugMessages) { console.log("_displayItemInChat: Item clicked:", item) }
         let content = itemData.description
