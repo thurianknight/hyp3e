@@ -32,7 +32,7 @@ export class HYP3ECombat extends Combat {
         if (this.#rerollBehavior !== "reset")
             await this.#rollAbsolutelyEveryone();
         // Log the combat object
-        if (CONFIG.HYP3E.debugMessages) { console.log("Combat Started: ", this) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Combat Started: ", this) }
         return this;
     }
     
@@ -41,7 +41,7 @@ export class HYP3ECombat extends Combat {
         for (const combatant of this.combatants) {
             combatant.actor.effects.forEach(effect => {
                 if (effect.isTemporary) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`End-Combat Temporary Effect to delete: ${effect.name}`, effect) }
+                    // if (CONFIG.HYP3E.debugMessages) { console.log(`End-Combat Temporary Effect to delete: ${effect.name}`, effect) }
                     return effect.delete();
                 }
             });
@@ -69,15 +69,15 @@ export class HYP3ECombat extends Combat {
     
     async _onEndTurn(combatant, context) {
         // Log the context object
-        if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Context: ", context) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Context: ", context) }
         await super._onEndTurn(combatant, context);
 
         // Log the combatant
-        if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
         // Update temporary effects if expired
         combatant.actor.effects.forEach(effect => {
             if (effect.isTemporary && !effect.disabled) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect: ${effect.name}`, effect) }
+                // if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect: ${effect.name}`, effect) }
                 if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
                     const updates = {
                         disabled: true,
@@ -89,7 +89,7 @@ export class HYP3ECombat extends Combat {
                     return effect.update(updates);
                 }
             } else if (effect.isTemporary && effect.disabled) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect to Delete: ${effect.name}`, effect) }
+                // if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect to Delete: ${effect.name}`, effect) }
                 if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
                     return effect.delete();
                 }
@@ -105,9 +105,6 @@ export class HYP3ECombat extends Combat {
     }
 
     async resetAll() {
-        // Start with the main reset
-        // await super.resetAll()
-
         // Reset combat actions on all actors
         const updates = this.combatants.map(
             (c) => ({ _id: c.id, 
@@ -125,7 +122,7 @@ export class HYP3ECombat extends Combat {
                 defeatedInit: null
         })
         )
-        if (CONFIG.HYP3E.debugMessages) { console.log("Reset Combatants: ", updates) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Reset Combatants: ", updates) }
         await this.updateEmbeddedDocuments("Combatant", updates);
 
         // Reset turn init rolls in combat
@@ -137,7 +134,7 @@ export class HYP3ECombat extends Combat {
                         initRoll: null
             })
         )
-        if (CONFIG.HYP3E.debugMessages) { console.log("Reset Turns: ", turnUpdates) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Reset Turns: ", turnUpdates) }
         await this.updateEmbeddedDocuments("Combatant", turnUpdates);
 
         // Reset group initiatives
@@ -145,14 +142,13 @@ export class HYP3ECombat extends Combat {
         for (const group in this.combatantsByGroup) {
             initiativeMap.set(group, null)
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Reset Initiative Map: ", initiativeMap) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Reset Initiative Map: ", initiativeMap) }
         await this.update({initiativeMap})
 
         // Try again with the main reset
         await super.resetAll()
 
-        if (CONFIG.HYP3E.debugMessages) { console.log("Reset Combat: ", this) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Reset Combat: ", this) }
     }
 
 }
-  

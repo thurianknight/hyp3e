@@ -73,7 +73,9 @@ export default class HYP3ECombatGroupSelector extends HandlebarsApplicationMixin
 
     async _updateObject(event) {
         const combatant = game.combat.combatants.get(event.target.name);
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`Setting group for combatant ${combatant.name} to ${event.target.value}`) }
         await combatant.setFlag(game.system.id, "group", event.target.value)
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`Updated combatant:`, combatant) }
     }
 
 

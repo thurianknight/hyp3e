@@ -7,13 +7,14 @@ export class HYP3EGroupCombatant extends HYP3ECombatant {
 
     get groupRaw() {
         const assignedGroup = this.getFlag(game.system.id, "group");
-        if (assignedGroup) {
-            // if (CONFIG.HYP3E.debugMessages) { console.log("Combatant assigned group: ", this, assignedGroup) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Combatant assigned group: ", this, assignedGroup) }
+        if (assignedGroup)
             return assignedGroup;
-        }
 
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Canvas tokens: ", canvas.tokens) }
         if (canvas.tokens) {
             const token = canvas.tokens.get(this.token.id);
+            // if (CONFIG.HYP3E.debugMessages) { console.log("Combatant token: ", token) }
             const disposition = token.document.disposition;
             switch (disposition) {
                 case -1:

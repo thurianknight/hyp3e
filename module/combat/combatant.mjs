@@ -85,7 +85,7 @@ export class HYP3ECombatant extends Combatant {
         // Get the actor's roll data now, so we can use the DX value
         const rollData = this.actor?.getRollData() || {};
         const name = this.actor?.name || ""
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data for initiative: ", rollData) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data for initiative: ", rollData) }
 
         // Movement partially overrides the other combat actions for initiative order
         this.getActionModifiers();
@@ -103,11 +103,11 @@ export class HYP3ECombatant extends Combatant {
         rollTerms += `+ ${this.defeatedInit}`;
 
         // Log the complete initiative roll formula
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${name} initiative roll terms: `, rollTerms) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`${name} initiative roll terms: `, rollTerms) }
 
         // Finally, roll initiative and return the result
         const result = new Roll(rollTerms, rollData);
-        if (CONFIG.HYP3E.debugMessages) { console.log("Individual initiative roll:", result) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Individual initiative roll:", result) }
         // this.initRoll = result.dice[0].total
         return result
     }
@@ -140,7 +140,7 @@ export class HYP3ECombatant extends Combatant {
         this.statusInit = 0;
         this.isSlowed = false;
         for ( let e of this.actor.effects) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.actor.name} has effect: `, e) }
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.actor.name} has effect: `, e) }
             if (e.name == "Deaf" && !e.disabled) {
                 this.statusInit += HYP3ECombatant.INITIATIVE_MOD_DEAF;
                 this.isSlowed = true;
@@ -154,9 +154,9 @@ export class HYP3ECombatant extends Combatant {
 
     setInitRoll() {
         // Set the combatant's initiative roll value
-        if (CONFIG.HYP3E.debugMessages) { console.log(`setInitRoll: ${this.actor.name}: `, this) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`setInitRoll: ${this.actor.name}: `, this) }
         this.initRoll = Math.floor(this.initiative);
-        if (CONFIG.HYP3E.debugMessages) { console.log(`setInitRoll: ${this.actor.name} base init roll: `, this.initRoll) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`setInitRoll: ${this.actor.name} base init roll: `, this.initRoll) }
         return this.initRoll;
     }
 
