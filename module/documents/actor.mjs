@@ -1365,8 +1365,26 @@ export class Hyp3eActor extends Actor {
 
     _getCombatantSitMods() {
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for ${this.name}`) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: All Tokens:`, canvas.tokens) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Controlled Token:`, canvas.tokens.controlled[0]) }
         let sitModObj = {}
-        const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+
+        // Try to get the attacking token
+        let attacker
+        // Get the currently selected token, if possible
+        if (canvas.tokens.controlled[0]) {
+            // Get the first controlled token. This is preferred for GMs, who may have multiple tokens
+            //  selected. For players, this will always be the player character. Players running multiple
+            //  characters will need to select the correct token before rolling.
+            // This is the preferred method for getting the token, as it will always be the one that the
+            //  player has selected. The API does not allow us to get the token from the actor directly.
+            attacker = canvas.tokens.controlled[0]
+        } else {
+            // Get the first matching token. This works perfectly for the player character
+            //  but not so well for NPCs. It will always return the first token that matches the actor ID.
+            //  This is a limitation of the Foundry API, and I don't know how to get around it.
+            attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+        }
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker token:`, attacker) }
         let effects
         if (!foundry.utils.isNewerVersion(game.version, "13")) {
@@ -1379,6 +1397,7 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effects:`, effects) }
         // const effects = this._getEffectNames()
 
+        // Target token is easy to get, assuming we have one
         let target, targetActor, targetEffects
         const userTargets = Array.from(game.user.targets)
         if (userTargets.length > 0) {
