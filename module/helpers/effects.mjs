@@ -5,10 +5,11 @@
  */
  export function onManageActiveEffect(event, owner) {
     event.preventDefault();
-    if (CONFIG.HYP3E.debugMessages) { console.log("Owner of Active Effect: ", owner) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("onManageActiveEffect: Owner of Effect: ", owner) }
     const a = event.currentTarget;
     const li = a.closest("li");
     const effect = li.dataset.effectId ? owner.effects.get(li.dataset.effectId) : null;
+    if (CONFIG.HYP3E.debugMessages) { console.log("onManageActiveEffect: Effect: ", effect) }
     switch ( a.dataset.action ) {
         case "create":
             return owner.createEmbeddedDocuments("ActiveEffect", [{
@@ -20,10 +21,22 @@
                 disabled: li.dataset.effectType === "inactive"
             }]);
         case "edit":
+            if (!effect) {
+                ui.notifications.info("Could not edit effect. Most likely, this is because the effect is coming from an item the actor owns.");
+                return;
+            }
             return effect.sheet.render(true);
         case "delete":
+            if (!effect) {
+                ui.notifications.info("Could not delete effect. Most likely, this is because the effect is coming from an item the actor owns.");
+                return;
+            }
             return effect.delete();
         case "toggle":
+            if (!effect) {
+                ui.notifications.info("Could not toggle effect. Most likely, this is because the effect is coming from an item the actor owns.");
+                return;
+            }
             let updates = {}
             if (effect.disabled) {
                 if (CONFIG.HYP3E.debugMessages) { console.log("Enabling Effect: ", effect) }
@@ -88,7 +101,6 @@ export function prepareActiveEffectCategories(effects) {
 
     // Iterate over active effects, classifying them into categories
     for ( let e of effects ) {
-        // e._getSourceName(); // Trigger a lookup for the source name
         if ( e.disabled ) categories.inactive.effects.push(e);
         else if ( e.isTemporary ) categories.temporary.effects.push(e);
         else categories.passive.effects.push(e);

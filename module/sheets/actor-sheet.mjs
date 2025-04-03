@@ -62,7 +62,18 @@ export class Hyp3eActorSheet extends ActorSheet {
     context.rollData = context.actor.getRollData();
 
     // Prepare active effects
-    context.effects = prepareActiveEffectCategories(this.actor.effects);
+    // if (CONFIG.HYP3E.debugMessages) { console.log(`Preparing active effects...`) }
+    // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor effects: `, this.actor.effects) }
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applied effects: `, this.actor.appliedEffects) }
+    // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor.allApplicableEffects) }
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor._getAllApplicableEffects()) }
+    if (!foundry.utils.isNewerVersion(game.version, "13")) {
+        // For Foundry v12...
+        context.effects = prepareActiveEffectCategories(this.actor.effects);
+    } else if (foundry.utils.isNewerVersion(game.version, "13")) {
+        // For Foundry v13...
+        context.effects = prepareActiveEffectCategories(this.actor._getAllApplicableEffects());
+    }
 
     // Log the actor's data
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet data complete:", context) }
@@ -230,6 +241,19 @@ export class Hyp3eActorSheet extends ActorSheet {
       i.img = i.img || DEFAULT_TOKEN;
       // Calculate total weight carried by character
       // if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
+      if (CONFIG.HYP3E.debugMessages) {
+        if (i.effects.length > 0) {
+            // console.log("Item effects:", i.effects)
+            i.effects.forEach(eff => {
+                // console.log("Effect transfer:", eff.transfer)
+                if (eff.transfer) {
+                    console.log(`Item ${i.name}:`, i)
+                    console.log("Effect to transfer:", eff)
+                    // this.actor.effects.push(eff)
+                }
+            })
+        }
+      }
       if (i.system.weight) {
         if (i.system.quantity.value) {
           i.system.carriedWt = (i.system.weight * i.system.quantity.value)

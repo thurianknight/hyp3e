@@ -168,7 +168,6 @@ Hooks.once('init', async function() {
     requiresReload: true,
   });
 
-
   // Human races
   game.settings.register(game.system.id, "races", {
     name: game.i18n.localize("HYP3E.settings.races"),
@@ -203,7 +202,15 @@ Hooks.once('init', async function() {
   });
     
   // If we ever need migration scripts, use this version number for comparison
+  console.log("Game info:", game)
   console.log("System info:", game.system)
+  console.log("Foundry version:", game.version)
+  if (foundry.utils.isNewerVersion(game.version, "12")) {
+    console.log("Foundry version is 12 or higher")
+  }
+  if (foundry.utils.isNewerVersion(game.version, "13")) {
+    console.log("Foundry version is 13 or higher")
+  }
 
   // Add custom constants for configuration.
   CONFIG.HYP3E = HYP3E;

@@ -43,6 +43,7 @@ export class Hyp3eActor extends Actor {
         // things organized.
         this._prepareCharacterData(actorData);
         this._prepareNpcData(actorData);
+
     }
 
     /**
@@ -57,7 +58,7 @@ export class Hyp3eActor extends Actor {
         // Notes on system.tempModifiers
         //  This is an array of modifiers that may be applied to any field in the data template.
         //  However, note that it is better to use effects and apply them to the data template
-        //  whenever possible. The known exceptions are AC the MV, as these are auto-calculated
+        //  whenever possible. The known exceptions are AC and MV, as these are auto-calculated
         //  below and cannot be modified by effects.
         //
         //  Example tempModifiers entry:
@@ -1367,29 +1368,49 @@ export class Hyp3eActor extends Actor {
         let sitModObj = {}
         const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker token:`, attacker) }
-        const effects = this._getEffectNames()
+        let effects
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12...
+            effects = this.effects
+        } else if (foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v13...
+            effects = this._getAllApplicableEffects()
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effects:`, effects) }
+        // const effects = this._getEffectNames()
+
         let target, targetActor, targetEffects
         const userTargets = Array.from(game.user.targets)
         if (userTargets.length > 0) {
             target = userTargets[0]
             if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target token:`, target) }
             targetActor = target.actor
-            targetEffects = targetActor._getEffectNames()
+            if (!foundry.utils.isNewerVersion(game.version, "13")) {
+                // For Foundry v12...
+                targetEffects = targetActor.effects
+            } else if (foundry.utils.isNewerVersion(game.version, "13")) {
+                // For Foundry v13...
+                targetEffects = targetActor._getAllApplicableEffects()
+            }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effects:`, targetEffects) }
+            // targetEffects = targetActor._getEffectNames()
         }
 
         // Start gathering situational modifiers
         let sitModSum = 0
         let sitModsArr = []
-        // Attacker token status "Blind"
-        if (effects.includes("Blind")) {
-            sitModSum += -4
-            sitModsArr.push("Blind (-4)")
-        }
-        // Attacker token status "Invisible"
-        if (effects.includes("Invisible")) {
-            sitModSum += 4
-            sitModsArr.push("Invisible (+4)")
-        }
+        // Effect names can be arbitrary, what we care about is the token status/condition
+        effects.forEach(effect => {
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effect statuses:`, effect.statuses) }
+            if (effect.statuses.has("blind")) {
+                sitModSum += -4
+                sitModsArr.push("Blind (-4)")
+            }
+            if (effect.statuses.has("invisible")) {
+                sitModSum += 4
+                sitModsArr.push("Invisible (+4)")
+            }
+        });
         // Hopefully we have a target!
         if (target) {
             // Attacker on higher ground (token height vs. target token height)
@@ -1397,8 +1418,39 @@ export class Hyp3eActor extends Actor {
                 sitModSum += 1
                 sitModsArr.push("Higher Ground (+1)")
             }
+            // Defender is on higher ground
+            if (attacker.document.elevation < target.document.elevation) {
+                sitModSum += -1
+                sitModsArr.push("Defender on Higher Ground (-1)")
+            }
+
+            // Effect names can be arbitrary, what we care about is the token status/condition
+            targetEffects.forEach(effect => {
+                // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effect statuses:`, effect.statuses) }
+                if (effect.statuses.has("blind")) {
+                    sitModSum += 4
+                    sitModsArr.push("Defender Blind (+4)")
+                }
+                if (effect.statuses.has("invisible")) {
+                    sitModSum += -4
+                    sitModsArr.push("Defender Invisible (-4)")
+                }
+                if (effect.statuses.has("restrain")) {
+                    sitModSum += 2
+                    sitModsArr.push("Defender Hindered (+2)")
+                }
+                if (effect.statuses.has("prone")) {
+                    sitModSum += 4
+                    sitModsArr.push("Defender Prone (+4)")
+                }
+                if (effect.statuses.has("stun")) {
+                    sitModSum += 4
+                    sitModsArr.push("Defender Stunned (+4)")
+                }
+            });
+
             // Attacker is flanking, +1 (Three or more melee combatants engage a single opponent)
-            // We have the target token. The token does have a 'targeted' array which is an array
+            // We have the target token. The token does have a "targeted" array which is an array
             //  of USERs (not actors) who have selected this token to target. So we could count the
             //  length of the array and if it is 3 or more, apply this modifier. However we also
             //  need to make sure that they are all engaged in melee (not missile) combat... so we
@@ -1410,36 +1462,8 @@ export class Hyp3eActor extends Actor {
             //  token gets really complicated. May be possible, just need to think hard on this.
             //  And then determine whether it is really worth it.
 
-            // Defender is encumbered - RAW say this is a GM / common sense decision
+            // Defender is encumbered or heavily encumbered - this is handled by a different option.
 
-            // Defender is *heavily* encumbered - RAW say this is a GM / common sense decision
-
-            // Defender token status "Invisible"
-            if (targetEffects.includes("Invisible")) {
-                sitModSum -= 4
-                sitModsArr.push("Defender is Invisible (-4)")
-            }
-
-            // Defender is hindered
-            if (targetEffects.includes("Restrained")) {
-                sitModSum += 2
-                sitModsArr.push("Defender is Hindered (+2)")
-            }
-            // Defender is prone
-            if (targetEffects.includes("Prone")) {
-                sitModSum += 4
-                sitModsArr.push("Defender is Prone (+4)")
-            }
-            // Defender is stunned
-            if (targetEffects.includes("Stunned")) {
-                sitModSum += 4
-                sitModsArr.push("Defender is Stunned (+4)")
-            }
-            // Defender is on higher ground
-            if (attacker.document.elevation < target.document.elevation) {
-                sitModSum += -1
-                sitModsArr.push("Defender on Higher Ground (-1)")
-            }
         }
         // Finalize the modifiers & return
         sitModObj = {
@@ -1449,13 +1473,35 @@ export class Hyp3eActor extends Actor {
         return sitModObj
     }
 
+    // Return an array of applicable effects
+    _getAllApplicableEffects() {
+        let effects = []
+        // Get all effects from the actor
+        for ( const effect of this.effects ) {
+            effects.push(effect);
+        }
+        for ( const item of this.items ) {
+            for ( const effect of item.effects ) {
+                if ( effect.transfer ) effects.push(effect);
+            }
+        }
+        return effects;
+    }
+
     // Get the names of effects applied to the actor, and return an array
     _getEffectNames() {
-        let effects = this.effects
+        let effects
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12...
+            effects = this.effects
+        } else if (foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v13...
+            effects = this._getAllApplicableEffects()
+        }
         let effectsArray = []
         effects.forEach(effect => {
             // Log the effect
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Effect ${effect.name}:`, effect) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.name}, effect ${effect.name}:`, effect) }
             effectsArray.push(effect.name)
         })
         return effectsArray
