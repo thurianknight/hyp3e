@@ -50,7 +50,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
             groupsToRollFor = this.availableGroups;
             // combatantsAffected = this.combatants;
         }
-        combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.group))
+        combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.initGroup))
         // if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: All groups: ", this.availableGroups) }
         // if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Groups to roll for: ", groupsToRollFor) }
         // if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Affected Combatants:", combatantsAffected) }
@@ -70,7 +70,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         combatantsAffected.forEach(c => {
             // if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Combatant: ", c) }
             // if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Combat Actor: ", c.actor) }
-            c.initRoll = results[c.group].initiative
+            c.initRoll = results[c.initGroup].initiative
             // Movement partially overrides the other combat actions for initiative order
             c.getActionModifiers();
 
@@ -85,8 +85,8 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         // const updates = this.combatants.map(
         const updates = combatantsAffected.map(
             (c) => ({ _id: c.id, 
-                initRoll: results[c.group].initiative,
-                initiative: Math.round((results[c.group].initiative 
+                initRoll: results[c.initGroup].initiative,
+                initiative: Math.round((results[c.initGroup].initiative 
                                         + (c.actor?.system?.attributes?.dex?.value/1000)
                                         + c.meleeInit
                                         + c.missileInit
@@ -116,7 +116,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         })
         // Map combatant IDs to groups, and remove duplicate groups at the same time
         return [...new Set(
-            combatants.map(c => c.group)
+            combatants.map(c => c.initGroup)
         )]
     }
 
@@ -141,10 +141,10 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         }), {});
     }
 
-    async #rollInitiativeUIFeedback(groups = []) {
+    async #rollInitiativeUIFeedback(initGroups = []) {
         const content = [
-            Object.keys(groups).map(
-                (k) => this.#constructInitiativeOutputForGroup(k, groups[k].roll)
+            Object.keys(initGroups).map(
+                (k) => this.#constructInitiativeOutputForGroup(k, initGroups[k].roll)
             ).join("\n")
         ];
         const chatData = content.map(c => {
@@ -157,9 +157,9 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         ChatMessage.implementation.createDocuments(chatData);
     }
 
-    #constructInitiativeOutputForGroup(group, roll) {
+    #constructInitiativeOutputForGroup(initGroup, roll) {
         return `    
-            <p class="medium">${game.i18n.format("HYP3E.combat.rollInitiative", { group })}</p>
+            <p class="medium">${game.i18n.format("HYP3E.combat.rollInitiative", { initGroup })}</p>
             <div class="dice-roll">   
                 <div class="dice-result">
                 <div class="dice-formula">${roll.formula}</div>
@@ -195,14 +195,14 @@ export class HYP3EGroupCombat extends HYP3ECombat {
 
     get availableGroups() {
         return [...new Set(
-            this.combatants.map(c => c.group)
+            this.combatants.map(c => c.initGroup)
         )]
     }
 
     get combatantsByGroup() {
         return this.availableGroups.reduce((prev, curr) => ({
             ...prev,
-            [curr]: this.combatants.filter(c => c.group === curr)
+            [curr]: this.combatants.filter(c => c.initGroup === curr)
         }), {});
     }
 
@@ -213,15 +213,15 @@ export class HYP3EGroupCombat extends HYP3ECombat {
             c.setInitRoll()
         })
         const initiativeMap = new Map()
-        for (const group in this.combatantsByGroup) {
+        for (const initGroup in this.combatantsByGroup) {
             // initiativeMap.set(group, this.combatantsByGroup[group][0].initiative)
             // if (CONFIG.HYP3E.debugMessages) { console.log(`groupInitiativeScores: Combatants in group : ${group}`, this.combatantsByGroup[group]) }
-            this.combatantsByGroup[group].forEach(c => {
+            this.combatantsByGroup[initGroup].forEach(c => {
                 // Use the highest combatant initiative roll as the group's initiative score
                 // if (CONFIG.HYP3E.debugMessages) { console.log(`groupInitiativeScores: Combatant ${c.name} initiative: ${c.initRoll}`) }
-                if (c.initRoll > (initiativeMap.get(group) || 0)) {
+                if (c.initRoll > (initiativeMap.get(initGroup) || 0)) {
                     // if (CONFIG.HYP3E.debugMessages) { console.log(`groupInitiativeScores: Updating group ${group} initiative to ${c.initRoll}`) }
-                    initiativeMap.set(group, c.initRoll)
+                    initiativeMap.set(initGroup, c.initRoll)
                 }
             });
         }

@@ -139,8 +139,8 @@ export class HYP3ECombat extends Combat {
 
         // Reset group initiatives
         const initiativeMap = this.groupInitiativeScores
-        for (const group in this.combatantsByGroup) {
-            initiativeMap.set(group, null)
+        for (const initGroup in this.combatantsByGroup) {
+            initiativeMap.set(initGroup, null)
         }
         // if (CONFIG.HYP3E.debugMessages) { console.log("Reset Initiative Map: ", initiativeMap) }
         await this.update({initiativeMap})

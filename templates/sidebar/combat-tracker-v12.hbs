@@ -78,7 +78,7 @@
 
     <ol id="combat-tracker" class="directory-list">
         {{#if isGroupInitiative}}
-            {{#each groups}}
+            {{#each initGroups}}
                 {{> "systems/hyp3e/templates/sidebar/combat-tracker-combatant-group-v12.hbs" }}
             {{/each}}
         {{else}}

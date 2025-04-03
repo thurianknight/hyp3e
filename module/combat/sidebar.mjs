@@ -72,15 +72,15 @@ export class HYP3ECombatTab extends CombatTracker {
             turn.isSlowed = !!combatant.isSlowed;
             turn.debugMessages = CONFIG.HYP3E.debugMessages;
             turn.isOwnedByUser = !!combatant.actor.isOwner;
-            turn.group = combatant.group;
+            turn.initGroup = combatant.initGroup;
             // if (!isGroupInitiative) turn.initRoll = Math.floor(combatant.initiative)
             turn.initRoll = Math.floor(combatant.initiative)
             // if (CONFIG.HYP3E.debugMessages) { console.log(`Sidebar getData: Combatant Turn: `, turn) }
             return turn;
         });
 
-        const groups = turns.reduce((arr, turn) => {
-            const idx = arr.findIndex(r => r.group === turn.group);
+        const initGroups = turns.reduce((arr, turn) => {
+            const idx = arr.findIndex(r => r.initGroup === turn.initGroup);
 
             if (idx !== -1) {
                 arr[idx].turns.push(turn);
@@ -88,12 +88,12 @@ export class HYP3ECombatTab extends CombatTracker {
             }
 
             // if (CONFIG.HYP3E.debugMessages) { console.log(`Sidebar getData: Group Initiative object: `, game.combat.groupInitiativeScores) }
-            const initiative = game.combat.groupInitiativeScores?.get(turn.group) ? game.combat.groupInitiativeScores.get(turn.group) : null
+            const initiative = game.combat.groupInitiativeScores?.get(turn.initGroup) ? game.combat.groupInitiativeScores.get(turn.initGroup) : null
             // if (CONFIG.HYP3E.debugMessages) { console.log(`Sidebar getData: Group ${turn.group} Initiative: `, initiative) }
 
             return [...arr, {
-                group: turn.group,
-                label: HYP3EGroupCombat.GROUPS[turn.group],
+                initGroup: turn.initGroup,
+                label: HYP3EGroupCombat.GROUPS[turn.initGroup],
                 initiative: initiative,
                 turns: [turn]
             }];
@@ -102,7 +102,7 @@ export class HYP3ECombatTab extends CombatTracker {
         
         return foundry.utils.mergeObject(context, {
             turns,
-            groups,
+            initGroups,
             isGroupInitiative
         })
     }

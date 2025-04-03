@@ -1,12 +1,12 @@
 import { HYP3ECombatant } from "./combatant.mjs";
 
 export class HYP3EGroupCombatant extends HYP3ECombatant {
-    get group() {
+    get initGroup() {
         return this.groupRaw;
     }
 
     get groupRaw() {
-        const assignedGroup = this.getFlag(game.system.id, "group");
+        const assignedGroup = this.getFlag(game.system.id, "initGroup");
         // if (CONFIG.HYP3E.debugMessages) { console.log("Combatant assigned group: ", this, assignedGroup) }
         if (assignedGroup)
             return assignedGroup;
@@ -32,8 +32,8 @@ export class HYP3EGroupCombatant extends HYP3ECombatant {
         return 'white';
     }
 
-    set group(value) {
+    set initGroup(value) {
         // if (CONFIG.HYP3E.debugMessages) { console.log("Setting group for combatant", this, value) }
-        this.setFlag(game.system.id, 'group', value || 'black');
+        this.setFlag(game.system.id, 'initGroup', value || 'black');
     }
 }
