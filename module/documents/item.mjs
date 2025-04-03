@@ -252,7 +252,7 @@ export class Hyp3eItem extends Item {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
             }
-            // If the weapon has one or more effects, add an Apply Effects button for the GM
+            // If the weapon has one or more effects, add an Apply Effects button
             // if (item.effects.size > 0) {
             //     content += "<p>Weapon effects:<br/>"
             //     item.effects.forEach(effect => {
