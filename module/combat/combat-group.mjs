@@ -42,8 +42,8 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         // If one or more combatant IDs was provided, get any applicable groups, otherwise get all
         let groupsToRollFor
         let combatantsAffected = []
-        if (combatantIds) {
-            // if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Combatant IDs: ", combatantIds) }
+        if (combatantIds !== null && combatantIds.length > 0) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Combatant IDs: ", combatantIds) }
             groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
             // combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.group))
         } else {
@@ -60,7 +60,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
             ...prev,
             [curr]: new Roll(HYP3ECombat.FORMULA) 
         }), {});
-        // if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Initiative roll per group: ", rollPerGroup) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Initiative roll per group: ", rollPerGroup) }
 
         const results = await this.#prepareGroupInitiativeDice(rollPerGroup);
         // if (CONFIG.HYP3E.debugMessages) { console.log("rollInitiative: Group initiative results:", results) }
@@ -121,7 +121,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     }
 
     async #prepareGroupInitiativeDice(rollPerGroup) {
-        // if (CONFIG.HYP3E.debugMessages) { console.log("prepareGroupInitiativeDice: Group object(s): ", rollPerGroup) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("prepareGroupInitiativeDice: Group object(s): ", rollPerGroup) }
         const pool = foundry.dice.terms.PoolTerm.fromRolls(Object.values(rollPerGroup));
         const evaluatedRolls = await Roll.fromTerms([pool]).roll()
         const rollValues = evaluatedRolls.dice.map(d => d.total);
@@ -158,25 +158,27 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     }
 
     #constructInitiativeOutputForGroup(initGroup, roll) {
-        return `    
+        return `
             <p class="medium">${game.i18n.format("HYP3E.combat.rollInitiative", { initGroup })}</p>
-            <div class="dice-roll">   
+            <div class="dice-roll" data-action="expandRoll">
                 <div class="dice-result">
                 <div class="dice-formula">${roll.formula}</div>
                     <div class="dice-tooltip">
-                        <section class="tooltip-part">
-                            <div class="dice">
-                                <header class="part-header flexrow">
-                                    <span class="part-formula">${roll.formula}</span>
-                                    <span class="part-total">${roll.total}</span>
-                                </header>
-                                <ol class="dice-rolls">
-                                ${roll.results.map(r => `
-                                    <li class="roll">${r.result}</li>
-                                `).join("\n")}
-                                </ol>
-                            </div>
-                        </section>
+                        <div class="wrapper">
+                            <section class="tooltip-part">
+                                <div class="dice">
+                                    <header class="part-header flexrow">
+                                        <span class="part-formula">${roll.formula}</span>
+                                        <span class="part-total">${roll.total}</span>
+                                    </header>
+                                    <ol class="dice-rolls">
+                                    ${roll.results.map(r => `
+                                        <li class="roll">${r.result}</li>
+                                    `).join("\n")}
+                                    </ol>
+                                </div>
+                            </section>
+                        </div>
                     </div>
                 <div class="dice-total">${roll.total}</div>
                 </div>

@@ -12,11 +12,11 @@ export class HYP3ECombatTab extends CombatTracker {
     /** @inheritdoc */
     static get defaultOptions() {
         if (super.defaultOptions) {
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Loading template ${HYP3E.templatePath}/sidebar/combat-tracker-v12.hbs...`) }
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`Loading template ${HYP3E.templatePath}/sidebar/combat-tracker.hbs...`) }
             // if (CONFIG.HYP3E.debugMessages) { console.log(`HYP3ECombatTab defaultOptions: `, super.defaultOptions) }
             // Merge the default options with the custom template path
             return foundry.utils.mergeObject(super.defaultOptions, {
-                template: `${HYP3E.templatePath}/sidebar/combat-tracker-v12.hbs`,
+                template: `${HYP3E.templatePath}/sidebar/combat-tracker.hbs`,
             });    
         }
     }
@@ -273,7 +273,10 @@ export class HYP3ECombatTab extends CombatTracker {
         name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
         icon: '<i class="fas fa-star-of-life"></i>',
         callback: (li) => {
+          // Foundry v12 code...
           const combatantId = li.data('combatant-id')
+          // Foundry v13 code...
+          //   const combatantId = li.dataset.combatantId
           const turnToActivate = this.viewed.turns.findIndex(t => t.id === combatantId);
           this.viewed.activateCombatant(turnToActivate);
         }

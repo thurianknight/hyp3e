@@ -1420,14 +1420,16 @@ export class Hyp3eActor extends Actor {
         let sitModsArr = []
         // Effect names can be arbitrary, what we care about is the token status/condition
         effects.forEach(effect => {
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effect statuses:`, effect.statuses) }
-            if (effect.statuses.has("blind")) {
-                sitModSum += -4
-                sitModsArr.push("Blind (-4)")
-            }
-            if (effect.statuses.has("invisible")) {
-                sitModSum += 4
-                sitModsArr.push("Invisible (+4)")
+            if (!effect.disabled) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effect statuses:`, effect.statuses) }
+                if (effect.statuses.has("blind")) {
+                    sitModSum += -4
+                    sitModsArr.push("Blind (-4)")
+                }
+                if (effect.statuses.has("invisible")) {
+                    sitModSum += 4
+                    sitModsArr.push("Invisible (+4)")
+                }
             }
         });
         // Hopefully we have a target!
@@ -1445,26 +1447,28 @@ export class Hyp3eActor extends Actor {
 
             // Effect names can be arbitrary, what we care about is the token status/condition
             targetEffects.forEach(effect => {
-                // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effect statuses:`, effect.statuses) }
-                if (effect.statuses.has("blind")) {
-                    sitModSum += 4
-                    sitModsArr.push("Defender Blind (+4)")
-                }
-                if (effect.statuses.has("invisible")) {
-                    sitModSum += -4
-                    sitModsArr.push("Defender Invisible (-4)")
-                }
-                if (effect.statuses.has("restrain")) {
-                    sitModSum += 2
-                    sitModsArr.push("Defender Hindered (+2)")
-                }
-                if (effect.statuses.has("prone")) {
-                    sitModSum += 4
-                    sitModsArr.push("Defender Prone (+4)")
-                }
-                if (effect.statuses.has("stun")) {
-                    sitModSum += 4
-                    sitModsArr.push("Defender Stunned (+4)")
+                if (!effect.disabled) {
+                    // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effect statuses:`, effect.statuses) }
+                    if (effect.statuses.has("blind")) {
+                        sitModSum += 4
+                        sitModsArr.push("Defender Blind (+4)")
+                    }
+                    if (effect.statuses.has("invisible")) {
+                        sitModSum += -4
+                        sitModsArr.push("Defender Invisible (-4)")
+                    }
+                    if (effect.statuses.has("restrain")) {
+                        sitModSum += 2
+                        sitModsArr.push("Defender Hindered (+2)")
+                    }
+                    if (effect.statuses.has("prone")) {
+                        sitModSum += 4
+                        sitModsArr.push("Defender Prone (+4)")
+                    }
+                    if (effect.statuses.has("stun")) {
+                        sitModSum += 4
+                        sitModsArr.push("Defender Stunned (+4)")
+                    }
                 }
             });
 

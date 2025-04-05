@@ -1,98 +1,85 @@
-    <li class="combatant directory-item {{ css }}" data-combatant-id="{{ id }}" data-action="activateCombatant">
-
-        {{!-- Image --}}
-        <img class="token-image" src="{{ img }}" alt="{{ name }}" loading="lazy">
-
-        {{!-- Name & Controls --}}
-        <div class="token-name">
-            <strong class="name">{{ name }}</strong>
-
-            <div class="combatant-controls">
-                {{#if this.isOwnedByUser}}
-                {{!-- Combat action declaration buttons --}}
-                <button type="button" class="inline-control combatant-control icon fa-solid fa-sword {{#if isMelee}}active{{/if}}"
-                        data-action="melee" data-tooltip="{{localize 'HYP3E.combat.meleeDeclared'}}"
-                        aria-label="{{localize 'HYP3E.combat.meleeDeclared'}}"></button>
-                <button type="button" class="inline-control combatant-control icon fa-solid fa-bow-arrow {{#if isMissile}}active{{/if}}"
-                        data-action="missile" data-tooltip="{{localize 'HYP3E.combat.missileDeclared'}}"
-                        aria-label="{{localize 'HYP3E.combat.missileDeclared'}}"></button>
-                <button type="button" class="inline-control combatant-control icon fa-solid fa-scroll {{#if isMagic}}active{{/if}}"
-                        data-action="magic" data-tooltip="{{localize 'HYP3E.combat.magicDeclared'}}"
-                        aria-label="{{localize 'HYP3E.combat.magicDeclared'}}"></button>
-                <button type="button" class="inline-control combatant-control icon fa-solid fa-walking {{#if isMovement}}active{{/if}}"
-                        data-action="movement" data-tooltip="{{localize 'HYP3E.combat.moveDeclared'}}"
-                        aria-label="{{localize 'HYP3E.combat.moveDeclared'}}"></button>
-                {{/if}}
-
-                {{#if @root.user.isGM}}
-                {{!-- GM can set invisible or dead --}}
-                <button type="button" class="inline-control combatant-control icon fa-solid fa-eye-slash {{#if hidden}}active{{/if}}"
-                        data-action="toggleHidden" data-tooltip="COMBAT.ToggleVis"
-                        aria-label="{{ localize "COMBAT.ToggleVis" }}"></button>
-                <button type="button" class="inline-control combatant-control icon fa-solid fa-skull {{#if isDefeated}}active{{/if}}"
-                        data-action="toggleDefeated" data-tooltip="COMBAT.ToggleDead"
-                        aria-label="{{ localize "COMBAT.ToggleDead" }}"></button>
-                {{/if}}
-
-                {{#if canPing}}
-                {{!-- Ping token --}}
-                <button type="button" class="inline-control combatant-control icon fa-solid fa-bullseye-arrow"
-                        data-action="pingCombatant" data-tooltip="COMBAT.PingCombatant"
-                        aria-label="{{ localize "COMBAT.PingCombatant" }}"></button>
-                {{/if}}
-
-                {{#unless @root.user.isGM}}
-                {{!-- Pan to token --}}
-                <button type="button" class="inline-control combatant-control icon fa-solid fa-arrows-to-eye"
-                        data-action="panToCombatant" data-tooltip="COMBAT.PanToCombatant"
-                        aria-label="{{ localize "COMBAT.PanToCombatant" }}"></button>
-                {{/unless}}
-
-                {{!-- Actor/token effects --}}
-                <div class="token-effects {{#if isSlowed}}bg-trans-yellow{{/if}}" data-tooltip="{{ effects.tooltip }}">
-                    {{#each effects.icons}}
-                    <img class="token-effect" src="{{ img }}" alt="{{ name }}">
+        <li class="combatant actor directory-item flexrow {{this.css}}" data-combatant-id="{{this.id}}">
+            <img class="token-image" data-src="{{this.img}}" alt="{{this.name}}"/>
+            <div class="token-name flexcol">
+                <strong class="name">{{this.name}}</strong>
+                <div class="combatant-controls flexrow">
+                    {{!-- {{#if this.isOwnedByUser}} --}}
+                    <a
+                        class='combatant-control move-combat{{#if this.isMelee}} active{{/if}}'
+                        data-tooltip="{{localize 'HYP3E.combat.meleeDeclared'}}"
+                        role="button"
+                        {{#if this.isOwnedByUser}}data-control="melee"{{/if}}
+                    >
+                        <i class='fas fa-sword'></i>
+                    </a>
+                    <a
+                        class='combatant-control prepare-spell{{#if this.isMissile}} active{{/if}}'
+                        data-tooltip="{{localize 'HYP3E.combat.missileDeclared'}}"
+                        role="button"
+                        {{#if this.isOwnedByUser}}data-control="missile"{{/if}}
+                    >
+                        <i class='fas fa-bow-arrow'></i>
+                    </a>
+                    <a
+                        class='combatant-control move-combat{{#if this.isMagic}} active{{/if}}'
+                        data-tooltip="{{localize 'HYP3E.combat.magicDeclared'}}"
+                        role="button"
+                        {{#if this.isOwnedByUser}}data-control="magic"{{/if}}
+                    >
+                        <i class='fas fa-scroll'></i>
+                    </a>
+                    <a
+                        class='combatant-control move-combat{{#if this.isMovement}} active{{/if}}'
+                        data-tooltip="{{localize 'HYP3E.combat.moveDeclared'}}"
+                        role="button"
+                        {{#if this.isOwnedByUser}}data-control="movement"{{/if}}
+                    >
+                        <i class='fas fa-walking'></i>
+                    </a>
+                    {{!-- {{/if}} --}}
+                    {{#if @root.user.isGM}}
+                    <a class="combatant-control {{#if this.hidden}}active{{/if}}" aria-label="{{localize 'COMBAT.ToggleVis'}}" role="button" data-tooltip="COMBAT.ToggleVis" data-control="toggleHidden">
+                        <i class="fas fa-eye-slash"></i>
+                    </a>
+                    <a class="combatant-control {{#if this.defeated}}active{{/if}}" aria-label="{{localize 'COMBAT.ToggleDead'}}" role="button" data-tooltip="COMBAT.ToggleDead" data-control="toggleDefeated">
+                        <i class="fas fa-skull"></i>
+                    </a>
+                    {{/if}}
+                    {{#if this.canPing}}
+                    <a class="combatant-control" aria-label="{{localize 'COMBAT.PingCombatant'}}" role="button" data-tooltip="COMBAT.PingCombatant" data-control="pingCombatant">
+                        <i class="fa-solid fa-bullseye-arrow"></i>
+                    </a>
+                    {{/if}}
+                    {{#unless @root.user.isGM}}
+                    <a class="combatant-control" aria-label="{{localize 'COMBAT.PanToCombatant'}}" role="button" data-tooltip="COMBAT.PanToCombatant" data-control="panToCombatant">
+                        <i class="fa-solid fa-arrows-to-eye"></i>
+                    </a>
+                    {{/unless}}
+                    <div class="token-effects {{#if this.isSlowed}}bg-trans-yellow{{/if}}">
+                    {{#each this.effects}}
+                        <img class="token-effect" src="{{this}}"/>
                     {{/each}}
+                    </div>
                 </div>
             </div>
-        </div>
 
-        {{!-- Resource --}}
-        {{#if resource includeZero=true}}
-        <div class="token-resource">
-            <span class="resource">{{ resource }}</span>
-        </div>
-        {{/if}}
-
-        {{!-- Initiative --}}
-        <div class="token-initiative">
-            {{#if initiative includeZero=true}}
-
-            {{#if defeated}}
-            <i class="fa fa-dizzy"></i>
-
-            {{!-- Decimal Initiative --}}
-            {{else if @root.hasDecimals}}
-            {{#if this.debugMessages}}
-            <span>{{ initiative }}</span>
+            {{#if this.hasResource}}
+            <div class="token-resource">
+                <span class="resource">{{this.resource}}</span>
+            </div>
             {{/if}}
 
-            {{!-- Simple Initiative --}}
-            {{else}}
-            {{#if this.debugMessages}}
-            <input type="text" inputmode="numeric" pattern="^[+=\-]?\d*" value="{{ initiative }}"
-                aria-label="{{ localize "COMBAT.InitiativeScore" }}" {{#unless @root.user.isGM}}readonly{{/unless}}>
-            {{/if}}
-            {{/if}}
-
-            {{!-- Roll Initiative --}}
-            {{else if isOwner}}
-            {{#unless isGroupInitiative}}
-            <button type="button" class="combatant-control roll" data-action="rollInitiative"
-                    data-tooltip="COMBAT.InitiativeRoll" aria-label="{{ localize "COMBAT.InitiativeRoll" }}"
-                    style="--initiative-icon: url('{{ @root.initiativeIcon.icon }}'); --initiative-icon-hover: url('{{ @root.initiativeIcon.hover }}');"></button>
-            {{/unless}}
-            {{/if}}
-        </div>
-
-    </li>
+            <div class="token-initiative">
+                {{#if this.defeated}}
+                    <i class="fa fa-dizzy"></i>
+                {{else if this.hasRolled}}
+                    {{#if this.debugMessages}}
+                    <span class="initiative">{{this.initiative}}</span>
+                    {{else}}
+                    <span class="initiative">{{this.initRoll}}</span>
+                    {{/if}}
+                {{else if this.owner}}
+                    <a class="combatant-control roll" aria-label="{{localize 'COMBAT.InitiativeRoll'}}" role="button" data-tooltip="COMBAT.InitiativeRoll" data-control="rollInitiative"></a>
+                {{/if}}
+            </div>
+        </li>

@@ -504,26 +504,30 @@ textarea {
   /* margin-right: 5px; */
   margin-bottom: 3px;
   /* background-color: aqua; */
+  input {
+    text-align: center;
+    min-width: 20px;
+    max-width: 50px;
+    margin-bottom: 2px;
+  }
 }
-.hyp3e .combat-block input {
-  text-align: center;
-  min-width: 20px;
-  max-width: 50px;
-  margin-bottom: 2px;
-}
-/* .hyp3e .combat-block .class-weapons {
-} */
-.hyp3e .combat-block .class-weapons input {
-  min-width: 200px;
-  margin-bottom: 2px;
+.hyp3e .combat-block .class-weapons {
+  text-align: right;
+  input {
+    min-width: 200px;
+    margin-bottom: 2px;
+    margin-right: 15px;
+  }
 }
 .hyp3e .combat-block .weapon-field {
-  padding-left: 15px;
+  text-align: right;
+  input {
+    min-width: 200px;
+    margin-bottom: 2px;
+    margin-right: 15px;
+  }
 }
-.hyp3e .combat-block .weapon-field input {
-  min-width: 200px;
-  margin-bottom: 2px;
-}
+
 .hyp3e .combat-header {
   font-weight: bold;
   font-size: large;
@@ -536,7 +540,6 @@ textarea {
   padding: 5px 10px;
   /* background-color: dodgerblue; */
 }
-
 .hyp3e .combat-label-small {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
@@ -545,15 +548,25 @@ textarea {
   /* background-color: dodgerblue; */
 }
 
+.hyp3e .movement-other {
+  /* padding: 0 2px;
+  margin-right: 5px; */
+  input {
+    min-width: 100px;
+    max-width: 125px;
+    margin-bottom: 2px;
+  }
+}
+
 .hyp3e .saves-block {
   padding: 2px 2px;
   margin-bottom: 5px;
   /* background-color: aqua; */
-}
-.hyp3e .saves-block input {
-  text-align: center;
-  min-width: 20px;
-  max-width: 50px;
+  input {
+    text-align: center;
+    min-width: 20px;
+    max-width: 50px;
+  }
 }
 
 /* Character Spells-tab styles */

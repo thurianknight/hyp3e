@@ -13,7 +13,7 @@ export class HYP3ECombat extends Combat {
     get #rerollBehavior() {
         return game.settings.get(game.system.id, "rerollInitiative");
     }
-    
+
     // ===========================================================================
     // INITIATIVE MANAGEMENT
     // ===========================================================================
@@ -21,8 +21,8 @@ export class HYP3ECombat extends Combat {
     async #rollAbsolutelyEveryone() {
         await this.rollInitiative(this.combatants.map(c => c.id), { formula: (this.constructor).FORMULA });
     }
-    
-  
+
+
     // ===========================================================================
     // COMBAT LIFECYCLE MANAGEMENT
     // ===========================================================================
@@ -32,20 +32,20 @@ export class HYP3ECombat extends Combat {
         if (this.#rerollBehavior !== "reset")
             await this.#rollAbsolutelyEveryone();
         // Log the combat object
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Combat Started: ", this) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("startCombat: Combat Started: ", this) }
         return this;
     }
     
     async endCombat() {
-        // For each combatant, remove any temporary effects
-        for (const combatant of this.combatants) {
-            combatant.actor.effects.forEach(effect => {
-                if (effect.isTemporary) {
-                    // if (CONFIG.HYP3E.debugMessages) { console.log(`End-Combat Temporary Effect to delete: ${effect.name}`, effect) }
-                    return effect.delete();
-                }
-            });
-        }
+        // For each combatant, disable any temporary effects
+        // for (const combatant of this.combatants) {
+        //     combatant.actor.effects.forEach(effect => {
+        //         if (effect.isTemporary) {
+        //             // if (CONFIG.HYP3E.debugMessages) { console.log(`endCombat: Temporary Effect to delete: ${effect.name}`, effect) }
+        //             return effect.delete();
+        //         }
+        //     });
+        // }
         // Cleanup the combat object
         await super.endCombat();
     }
@@ -66,7 +66,7 @@ export class HYP3ECombat extends Combat {
         await super._onEndRound();
         // await this.activateCombatant(0)
     }
-    
+
     async _onEndTurn(combatant, context) {
         // Log the context object
         // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Context: ", context) }
@@ -88,14 +88,13 @@ export class HYP3ECombat extends Combat {
                     };
                     return effect.update(updates);
                 }
-            } else if (effect.isTemporary && effect.disabled) {
-                // if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect to Delete: ${effect.name}`, effect) }
-                if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-                    return effect.delete();
-                }
+            // } else if (effect.isTemporary && effect.disabled) {
+            //     // if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect to Delete: ${effect.name}`, effect) }
+            //     if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
+            //         return effect.delete();
+            //     }
             }
         });
-
     }
 
     async activateCombatant(turn) {
@@ -122,7 +121,7 @@ export class HYP3ECombat extends Combat {
                 defeatedInit: null
         })
         )
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Reset Combatants: ", updates) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("resetAll: Combatants Updates: ", updates) }
         await this.updateEmbeddedDocuments("Combatant", updates);
 
         // Reset turn init rolls in combat
@@ -134,21 +133,21 @@ export class HYP3ECombat extends Combat {
                         initRoll: null
             })
         )
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Reset Turns: ", turnUpdates) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("resetAll: Turns Updates: ", turnUpdates) }
         await this.updateEmbeddedDocuments("Combatant", turnUpdates);
 
-        // Reset group initiatives
+        // Reset group initiatives, if needed
         const initiativeMap = this.groupInitiativeScores
         for (const initGroup in this.combatantsByGroup) {
             initiativeMap.set(initGroup, null)
         }
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Reset Initiative Map: ", initiativeMap) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("resetAll: Initiative Map Updates: ", initiativeMap) }
         await this.update({initiativeMap})
 
         // Try again with the main reset
         await super.resetAll()
 
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Reset Combat: ", this) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("resetAll: Combat: ", this) }
     }
 
 }

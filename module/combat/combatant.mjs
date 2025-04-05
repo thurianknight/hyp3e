@@ -176,4 +176,3 @@ export class HYP3ECombatant extends Combatant {
     // }
 
 }
-  
