@@ -574,6 +574,11 @@ textarea {
   padding: 0 5px;
   margin-right: 5px;
   /* background-color: aqua; */
+  .spell-list input {
+    text-align: center;
+    min-width: 100px;
+    margin-bottom: 2px;
+  }
 }
 .hyp3e .casting-ability {
   min-width: 190px;
@@ -583,6 +588,11 @@ textarea {
   font-weight: bold;
   padding: 5px 5px;
   /* background-color: darkcyan; */
+}
+.hyp3e .spell-list input {
+    text-align: center;
+    min-width: 100px;
+    margin-bottom: 2px;
 }
 .hyp3e .spells input {
   text-align: center;

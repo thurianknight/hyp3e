@@ -1923,6 +1923,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d8",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Druid", "Illusionist"],
             "ta": null,
             "unskilled": 0,
             "attrReqs": {
@@ -2006,6 +2007,7 @@ export class Hyp3eActor extends Actor {
             "baseClass": "cleric",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Cleric"],
             "ta": 1,
             "unskilled": -2,
             "hitDie": "1d8",
@@ -2028,6 +2030,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Cryomancer"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2051,6 +2054,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d8",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Druid"],
             "ta": null,
             "unskilled": -2,
             "attrReqs": {
@@ -2126,6 +2130,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Illusionist"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2152,6 +2157,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d6",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Magician"],
             "ta": null,
             "unskilled": -2,
             "attrReqs": {
@@ -2178,6 +2184,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Magician"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2226,6 +2233,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Necromancer"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2277,6 +2285,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Cleric"],
             "ta": 1,
             "unskilled": -4,
             "attrReqs": {
@@ -2300,6 +2309,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d6",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Cleric"],
             "ta": null,
             "unskilled": -2,
             "attrReqs": {
@@ -2326,6 +2336,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Pyromancer"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2429,6 +2440,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d6",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Cleric", "Magician"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2476,6 +2488,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d8",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Magician"],
             "ta": null,
             "unskilled": 0,
             "attrReqs": {
@@ -2502,6 +2515,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Witch"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2708,6 +2722,12 @@ export class Hyp3eActor extends Actor {
             content += `<li>Fighting Ability: ${thisClass.fa}</li>`
             data.ca = thisClass.ca
             content += `<li>Casting Ability: ${thisClass.ca}</li>`
+            if (thisClass.spellLists) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${data.details.class} spell lists...`) }
+                data.spellList = thisClass.spellLists[0]
+                data.spellList2 = thisClass.spellLists.length > 1 ? thisClass.spellLists[1] : null
+                content += `<li>Spell List(s): ${thisClass.spellLists.join(", ")}</li>`
+            }
             data.ta = thisClass.ta
             content += `<li>Turning Ability: ${thisClass.ta}</li>`
             data.unskilled = thisClass.unskilled
@@ -3022,6 +3042,8 @@ export class Hyp3eActor extends Actor {
                     hd: data.hd,
                     fa: data.fa,
                     ca: data.ca,
+                    spellList: data.spellList,
+                    spellList2: data.spellList2,
                     ta: data.ta,
                     saves: {
                         death: {
