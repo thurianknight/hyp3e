@@ -448,7 +448,7 @@
             "lvl6": "L6"
         },
         "combat": {
-            "rollInitiative": "Group {group} rolls for Initiative!",
+            "rollInitiative": "Group {initGroup} rolls for Initiative!",
             "initiative": "Initiative",
             "setCombatantGroups": "Set Combatant Groups",
             "setCombatantAsActive": "Set Combatant as Active",

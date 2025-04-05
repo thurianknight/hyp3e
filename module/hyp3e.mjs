@@ -168,7 +168,6 @@ Hooks.once('init', async function() {
     requiresReload: true,
   });
 
-
   // Human races
   game.settings.register(game.system.id, "races", {
     name: game.i18n.localize("HYP3E.settings.races"),
@@ -203,7 +202,15 @@ Hooks.once('init', async function() {
   });
     
   // If we ever need migration scripts, use this version number for comparison
+  console.log("Game info:", game)
   console.log("System info:", game.system)
+  console.log("Foundry version:", game.version)
+  if (foundry.utils.isNewerVersion(game.version, "12")) {
+    console.log("Foundry version is 12 or higher")
+  }
+  if (foundry.utils.isNewerVersion(game.version, "13")) {
+    console.log("Foundry version is 13 or higher")
+  }
 
   // Add custom constants for configuration.
   CONFIG.HYP3E = HYP3E;
@@ -219,6 +226,7 @@ Hooks.once('init', async function() {
     //     decimals: 0
     //   };
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
+    // Custom combat classes based on group initiative setting
     if (isGroupInitiative) { 
         console.log("Using group-based initiative.")
         CONFIG.Combat.documentClass = HYP3EGroupCombat;
@@ -233,18 +241,18 @@ Hooks.once('init', async function() {
     console.log("CONFIG.Combat.initiative:", CONFIG.Combat.initiative)
     CONFIG.ui.combat = HYP3ECombatTab;
 
-  // Define custom Document classes
-  CONFIG.Actor.documentClass = Hyp3eActor;
-  CONFIG.Item.documentClass = Hyp3eItem;
+    // Define custom Document classes
+    CONFIG.Actor.documentClass = Hyp3eActor;
+    CONFIG.Item.documentClass = Hyp3eItem;
 
-  // Register sheet application classes
-  Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: true });
-  Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: true });
+    // Register sheet application classes
+    Actors.unregisterSheet("core", ActorSheet);
+    Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: true });
+    Items.unregisterSheet("core", ItemSheet);
+    Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: true });
 
-  // Preload Handlebars templates.
-  return preloadHandlebarsTemplates();
+    // Preload Handlebars templates.
+    return preloadHandlebarsTemplates();
   
 });
 

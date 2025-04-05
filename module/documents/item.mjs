@@ -200,16 +200,15 @@ export class Hyp3eItem extends Item {
         }
 
         // Chat message header text
-        // const label = `<h3><img src="${item.img}" style="border: none; padding: 3px 0;" width="24px"> ${typeLabel}: ${itemName}</h3>`
         const label = `
-        <hr/>
+        <hr class="plain-hr" />
         <div style="margin: 10px 0;">
             <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
             <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
                 ${typeLabel}: ${itemName}
             </span>
         </div>
-        <hr/>`
+        <hr class="plain-hr" />`
 
         if (CONFIG.HYP3E.debugMessages) { console.log("_displayItemInChat: Item clicked:", item) }
         let content = itemData.description
@@ -241,7 +240,7 @@ export class Hyp3eItem extends Item {
             if (itemData.damage) {
                 if (Roll.validate(itemData.damage)) {
                     // Build our damage roll formula, including actor and weapon mods
-                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, actorData, actor.type)
+                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData)
                     const dmgFormula = dmgObj.formula
                     const debugDmgRollFormula = dmgObj.debugFormula
                     // Resolve damage string & variables to a rollable formula
@@ -253,7 +252,7 @@ export class Hyp3eItem extends Item {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
             }
-            // If the weapon has one or more effects, add an Apply Effects button for the GM
+            // If the weapon has one or more effects, add an Apply Effects button
             // if (item.effects.size > 0) {
             //     content += "<p>Weapon effects:<br/>"
             //     item.effects.forEach(effect => {
@@ -290,7 +289,7 @@ export class Hyp3eItem extends Item {
             if (itemData.damage) {
                 if (Roll.validate(itemData.damage)) {
                     // Build our damage roll formula, including actor and weapon mods
-                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, actorData, actor.type)
+                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData)
                     const dmgFormula = dmgObj.formula
                     const debugDmgRollFormula = dmgObj.debugFormula
                     // Resolve damage string & variables to a rollable formula

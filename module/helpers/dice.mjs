@@ -48,7 +48,7 @@ export class Hyp3eDice {
                 }
             })
             // Start setting up the debug attack roll table & array
-            debugAtkRollFormula = "<b>Attack formula elements:</b><table>"
+            debugAtkRollFormula = "<b>Attack formula elements:</b><table class='chat-table'>"
             debugAtkRollParts = [...atkRollParts]
             // Take the first element in the debug array and wrap it in the table html
             debugAtkRollParts[0] = `<tr><td>${debugAtkRollParts[0]}</td><td>${atkRollParts[0]}</td></tr>`
@@ -218,14 +218,14 @@ export class Hyp3eDice {
 
         // Add the debug message header and first table row
         // debugDmgRollFormula = "<b>Damage formula elements:</b><table>"
-        debugDmgRollParts.push("<b>Damage formula elements:</b><table>")
+        debugDmgRollParts.push(`<b>Damage formula elements:</b><table class="chat-table">`)
         // debugDmgRollFormula += `<tr><td>Base Roll</td><td>${itemData.damage}</td></tr>`
         debugDmgRollParts.push(`<tr><td>Base Roll</td><td>${itemData.damage}</td></tr>`)
 
         // Do we have 2-handed damage?
         if (itemData.damage2h) {
             dmgRoll2Parts.push(itemData.damage2h)
-            debugDmgRoll2Parts.push("<b>Damage formula elements:</b><table>")
+            debugDmgRoll2Parts.push(`<b>Damage formula elements:</b><table class="chat-table">`)
             debugDmgRoll2Parts.push(`<tr><td>Base Roll</td><td>${itemData.damage2h}</td></tr>`)
         }
 
@@ -323,8 +323,8 @@ export class Hyp3eDice {
 
         // Finish the debug damage roll table
         // debugDmgRollFormula += "</table>"
-        debugDmgRollParts.push("</table>")
-        if (itemData.damage2h) { debugDmgRoll2Parts.push("</table>") }
+        debugDmgRollParts.push(`</table>`)
+        if (itemData.damage2h) { debugDmgRoll2Parts.push(`</table>`) }
 
         // Log the damage roll parts & the constructed formula
         if (CONFIG.HYP3E.debugMessages) { 

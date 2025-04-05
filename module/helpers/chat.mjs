@@ -15,7 +15,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const itemId = $(b).data('itemId');
             const actorId = $(b).data('actorId');
             let dmgButton = $(
-                `<button class="" title="Click to roll damage."><i class="fas fa-dice"></i>Damage: ${dmgFormula}</button>`
+                `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>Damage: ${dmgFormula}</button>`
             );
             dmgRoll.append(dmgButton);
 
@@ -37,7 +37,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const itemId = $(b).data('itemId');
             const actorId = $(b).data('actorId');
             let dmgButton = $(
-                `<button class="" title="Click to roll damage."><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
+                `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
             );
             dmgRoll2h.append(dmgButton);
 
@@ -147,7 +147,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     }
 
     // "longer" button style for crit miss/hit
-    const long_button = (critType, charType, icon) => `<button class="" title="Click to roll critical ${critType} to selected token(s)."><i class="fas ${icon}"></i>${charType}</button>`;
+    const long_button = (critType, charType, icon) => `<button class="chat-btn-full-width" title="Click to roll critical ${critType} to selected token(s)."><i class="fas ${icon}"></i>${charType}</button>`;
 
     let critMiss = html.find(".critical-miss");
     if (critMiss.length > 0) {
@@ -200,7 +200,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             if (CONFIG.HYP3E.debugMessages) { console.log(`Save html: `, b) }
             let saveType = $(b).data('save');
             let saveButton = $(
-                `<button class="" title="Click to roll save to selected token(s)."><i class="fas fa-dice-d20"></i>Save: ${saveType}</button>`
+                `<button class="chat-btn-full-width" title="Click to roll save to selected token(s)."><i class="fas fa-dice-d20"></i>Save: ${saveType}</button>`
             );
             save.append(saveButton);
 
@@ -226,6 +226,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Apply Effects Button: Actor ${actorId} not found!`) }
                 return;
             }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Apply Effects Button actor: `, actor) }
             // Get the actor's item
             let item = actor.items.get(itemId);
             if (!item) {
@@ -237,19 +238,63 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 }
                 return;
             }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Apply Effects Button item: `, item) }
+
+            // Is the owner/actor targeted by this effect?
+            let actorTargeted = false
+            let effect = item.effects.find(e => e.transfer === true);
+            // This just grabbed the first match, if there are multiple effects coming from the item.
+            //  The first effect will act as a proxy for the others, as we assume that all effects are
+            //  either enabled or disabled. If not, we can add logic to handle that later.
+            if (effect) actorTargeted = true
+
+            // The logic we need here will do the following:
+            // Check to see if the item applies effects to the actor (the actor is targeted).
+            //  If the actor is targeted, check to see if the effect is already applied & enabled.
+            //      If not, create a button to enable the effect on the actor.
+            //      If so, create a button to disable the effect on the actor.
+            //  If the actor is not targeted, create a button to apply the effect to the selected token(s).
+
             // Get an array of effects (if any) provided by the item, and use it for the button label
             let effects = item?._getEffectNames()
             let btnLabel = effects.length > 1 ? "Multiple Effects" : effects[0];
-            let effectApplyButton = $(
-                `<button class="" title="Click to apply ${effects.join(", ")} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${btnLabel}</button>`
-            );
-            effectApply.append(effectApplyButton);
-
-            // Handle button clicks
-            effectApply.on("click", (ev) => {
-                ev.stopPropagation();
-                applyEffects(itemId, actorId);
-            });
+            // Check if the actor is targeted by the item
+            if (actorTargeted) {
+                if (!effect.disabled) {
+                    // The effect is enabled, so create a button to disable it
+                    let effectDisableButton = $(
+                        `<button class="chat-btn-full-width" title="Click to disable ${effects.join(", ")} on ${actor.name}."><i class="fas fa-user-slash"></i>Disable ${btnLabel}</button>`
+                    );
+                    effectApply.append(effectDisableButton);
+                    // Handle button clicks
+                    effectApply.on("click", (ev) => {
+                        ev.stopPropagation();
+                        disableEffects(itemId, actorId);
+                    });
+                } else {
+                    // Effect is disabled, so create a button to enable it
+                    let effectEnableButton = $(
+                        `<button class="chat-btn-full-width" title="Click to enable ${effects.join(", ")} on ${actor.name}."><i class="fas fa-user-check"></i>Enable ${btnLabel}</button>`
+                    );
+                    effectApply.append(effectEnableButton);
+                    // Handle button clicks
+                    effectApply.on("click", (ev) => {
+                        ev.stopPropagation();
+                        enableEffects(itemId, actorId);
+                    });
+                }
+            } else {
+                // The actor is not targeted, so create a button to apply the effect to selected token(s)
+                let effectApplyButton = $(
+                    `<button class="chat-btn-full-width" title="Click to apply ${effects.join(", ")} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${btnLabel}</button>`
+                );
+                effectApply.append(effectApplyButton);
+                // Handle button clicks
+                effectApply.on("click", (ev) => {
+                    ev.stopPropagation();
+                    applyEffects(itemId, actorId);
+                });
+            }
         });
     }
 }
@@ -361,7 +406,7 @@ async function useItem(itemId, actorId) {
 }
 
 // Apply item effects to user's own token or GM-selected tokens
-async function applyEffects(itemId, actorId) {
+async function applyEffects(itemId, actorId, disabled = false) {
     // Get selected tokens
     const tokens = canvas?.tokens?.controlled;
 
@@ -385,17 +430,8 @@ async function applyEffects(itemId, actorId) {
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Item: ", item) }
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
-    // chatMsg = `<p>${actor.name} used ${itemName}.</p>`
-    // Decrement qty if it's consumable, otherwise just allow it to be used
-    // if (item.system.isConsumable && item.system.quantity.value > 0) {
-    //     const newQuantity = item.system.quantity.value - 1;
-    //     // Update the embedded item document
-    //     await actor.updateEmbeddedDocuments("Item", [
-    //         { _id: item.id, "system.quantity.value": newQuantity },
-    //     ]);
-    // }
 
-    // Apply the effects to selected tokens
+    // Apply the effects to selected tokens/actors
     for (const t of tokens) {
         if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Token: ", t) }
         if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Token Actor: ", t.actor) }
@@ -403,12 +439,101 @@ async function applyEffects(itemId, actorId) {
             // const effectData = foundry.utils.deepClone(effect);
             const effectData = {...effect};
             effectData.origin = item.uuid;
+            if (disabled) effectData.disabled = true;
             if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Cloned Effect:", effectData) }
             chatMsg += `<p>${actor.name} applied <i>${effectData.name}</i> to ${t.name}.</p>`
             t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
         });
     }
     // Send a chat message that the item was used
+    const chatData = {
+        author: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        content: chatMsg
+    };
+    ChatMessage.create(chatData, {});
+}
+
+async function enableEffects(itemId, actorId) {
+    let chatMsg = ""
+
+    // Get the actor & item
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`Enable Effects: Actor ${actorId} not found!`)
+        return
+    }
+    const item = actor.items.get(itemId);
+    if (!item) {
+        ui.notifications?.error(`Enable Effects: Item ${itemId} not found!`);
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("enableEffects: Item: ", item) }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+
+    item.effects.forEach(effect => {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`enableEffects: Effect to enable: `, effect) }
+        // Update the item effect
+        effect.update({ disabled: false });
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12 only...
+            // We updated the effect on the source item. Now, find the matching effect on 
+            //  the actor, so we can toggle that as well.
+            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+            if (actorEffect) {
+                actorEffect.update({ disabled: false });
+            } else {
+                // If the effect can't be found, we apply the effect to the actor instead.
+                applyEffects(itemId, actorId, false);
+            }
+        }
+        chatMsg += `<p>${actor.name} enabled <i>${effect.name}</i> on ${actor.name}.</p>`
+    })
+    // Send a chat message that the effects were enabled
+    const chatData = {
+        author: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        content: chatMsg
+    };
+    ChatMessage.create(chatData, {});
+}
+
+async function disableEffects(itemId, actorId) {
+    let chatMsg = ""
+
+    // Get the actor & item
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`disableEffects: Actor ${actorId} not found!`)
+        return
+    }
+    const item = actor.items.get(itemId);
+    if (!item) {
+        ui.notifications?.error(`disableEffects: Item ${itemId} not found!`);
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("disableEffects: Item: ", item) }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+
+    item.effects.forEach(effect => {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`disableEffects: Effect to disable: `, effect) }
+        // Update the item effect
+        effect.update({ disabled: true });
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12 only...
+            // We updated the effect on the source item. Now, find the matching effect on 
+            //  the actor, so we can toggle that as well.
+            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+            if (actorEffect) {
+                actorEffect.update({ disabled: true });
+            } else {
+                // If the effect can't be found, we apply the effect to the actor instead.
+                applyEffects(itemId, actorId, true);
+            }
+        }
+        chatMsg += `<p>${actor.name} disabled <i>${effect.name}</i> on ${actor.name}.</p>`
+    })
+    // Send a chat message that the effects were disabled
     const chatData = {
         author: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: actor }),
@@ -595,34 +720,34 @@ async function rollCritHit(charType, actorId) {
     let roll = await new Roll("1d6").roll();
     if (charType === "fighter") {
         if (roll.total <= 2) {
-            content = `<h4 class="dice-damage">+2 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+2 ${dmg}</div>`;
         } else if (roll.total <= 4) {
-            content = `<h4 class="dice-damage">x2 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
         } else if (roll.total <= 6) {
-            content = `<h4 class="dice-damage">x3 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x3 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else if (charType === "magician") {
         if (roll.total <= 2) {
-            content = `<h4 class="dice-damage">+1 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+1 ${dmg}</div>`;
         } else if (roll.total <= 4) {
-            content = `<h4 class="dice-damage">+2 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+2 ${dmg}</div>`;
         } else if (roll.total <= 6) {
-            content = `<h4 class="dice-damage">x2 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else {
         // cleric/thief/npc-monster
         if (roll.total <= 1) {
-            content = `<h4 class="dice-damage">+1 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+1 ${dmg}</div>`;
         } else if (roll.total <= 3) {
-            content = `<h4 class="dice-damage">+2 ${dmg}</h4>`;
+            content = `<div class="dice-damage">+2 ${dmg}</div>`;
         } else if (roll.total <= 5) {
-            content = `<h4 class="dice-damage">x2 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
         }  else if (roll.total <= 6) {
-            content = `<h4 class="dice-damage">x3 Dice ${dmg}</h4>`;
+            content = `<div class="dice-damage">x3 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }

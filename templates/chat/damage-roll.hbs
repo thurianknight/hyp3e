@@ -1,51 +1,53 @@
-<h4 class="dice-damage">{{title}}</h4>
-<div class="dice-roll" data-actor-id="{{actorId}}">
+<div class="dice-damage">{{title}}</div>
+<div class="dice-roll" data-actor-id="{{actorId}}" data-action="expandRoll">
     <div class="dice-result">
         <div class="dice-formula">{{dmgRoll.formula}}</div>
         <div class="dice-tooltip">
-            <section class="tooltip-part">
-                {{{debugDmgRollFormula}}}
-                <div class="dice">
-                    {{!-- <header class="part-header flexrow">
-                        <span class="part-formula">{{dmgRoll.formula}}</span>
-                        <span class="part-total">{{dmgRoll.total}}</span>
-                    </header> --}}
-                    <ol class="dice-rolls">
-                        {{#each dmgRoll.dice as |die key|}}
-                        <header class="part-header flexrow">
-                            <span>
-                                <ol class="dice-rolls">
-                                    {{#each die.values as |val d|}}
-                                    <li class="roll die d{{die.faces}}
-                                        {{isMin val}}
-                                        {{isMax val die.faces}}">{{val}}</li>
-                                    {{/each}}
-                                </ol>
-                            </span>
-                            <span class="part-total">{{die.total}}</span>
-                        </header>
-                        {{/each}}
-                    </ol>
-                </div>
-            </section>
+            <div class="wrapper">
+                <section class="tooltip-part">
+                    {{{debugDmgRollFormula}}}
+                    <div class="dice">
+                        {{!-- <header class="part-header flexrow">
+                            <span class="part-formula">{{dmgRoll.formula}}</span>
+                            <span class="part-total">{{dmgRoll.total}}</span>
+                        </header> --}}
+                        <ol class="dice-rolls">
+                            {{#each dmgRoll.dice as |die key|}}
+                            <header class="part-header flexrow">
+                                <span>
+                                    <ol class="dice-rolls">
+                                        {{#each die.values as |val d|}}
+                                        <li class="roll die d{{die.faces}}
+                                            {{isMin val}}
+                                            {{isMax val die.faces}}">{{val}}</li>
+                                        {{/each}}
+                                    </ol>
+                                </span>
+                                <span class="part-total">{{die.total}}</span>
+                            </header>
+                            {{/each}}
+                        </ol>
+                    </div>
+                </section>
+            </div>
         </div>
         <div class="dice-roll">
-            <h4 class="dice-formula">
+            <div class="dice-formula flexrow">
                 <span class="dice-damage">{{dmgRoll.total}} HP damage!</span>
-                <span class="damage-button" data-total="{{dmgRoll.total}}"  
+                <span class="damage-button flexrow" data-total="{{dmgRoll.total}}"  
                     data-natural="{{naturalDmgRoll}}" 
                     data-roll="{{dmgBaseRoll}}" 
                     data-source-type="{{sourceType}}">
                 </span>
-            </h4>
+            </div>
         </div>
         {{#if save}}
         <div>{{{description}}}</div>
-        <div class='save-button' data-save='{{save}}'></div>
+        <div class='save-button' style='padding-top: 5px' data-save='{{save}}'></div>
         {{/if}}
         {{!-- If the attack has one or more effects, add an Apply Effects button --}}
         {{#if hasEffects}}
-        <div class='apply-effects-button' data-item-id='{{itemId}}' data-actor-id='{{actorId}}'></div>
+        <div class='apply-effects-button' style='padding-top: 5px' data-item-id='{{itemId}}' data-actor-id='{{actorId}}'></div>
         {{/if}}
     </div>
 </div>

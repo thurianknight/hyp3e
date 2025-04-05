@@ -276,11 +276,27 @@ textarea {
 
 .chat-button-small {
   width: 22px;
-  height:22px;
-  font-size:10px;
-  line-height:1px
+  height: 22px;
+  font-size: 10px;
+  line-height: 1px;
+  padding: 1px 1px;
+  margin: 1px 2px;
 }
 
+.chat-btn-full-width {
+    width: 100%;
+}
+
+.chat-table {
+    width: 100%;
+    border-top: 1px solid #8d896d;
+    border-bottom: 1px solid #8d896d;
+    border-collapse: collapse;
+    margin: 3px 10px;
+    th, td {
+        padding: 3px 10px;
+    }
+}
 
 /* Styles limited to hyp3e sheets */
 .hyp3e {
@@ -488,26 +504,30 @@ textarea {
   /* margin-right: 5px; */
   margin-bottom: 3px;
   /* background-color: aqua; */
+  input {
+    text-align: center;
+    min-width: 20px;
+    max-width: 50px;
+    margin-bottom: 2px;
+  }
 }
-.hyp3e .combat-block input {
-  text-align: center;
-  min-width: 20px;
-  max-width: 50px;
-  margin-bottom: 2px;
-}
-/* .hyp3e .combat-block .class-weapons {
-} */
-.hyp3e .combat-block .class-weapons input {
-  min-width: 200px;
-  margin-bottom: 2px;
+.hyp3e .combat-block .class-weapons {
+  text-align: right;
+  input {
+    min-width: 200px;
+    margin-bottom: 2px;
+    margin-right: 15px;
+  }
 }
 .hyp3e .combat-block .weapon-field {
-  padding-left: 15px;
+  text-align: right;
+  input {
+    min-width: 200px;
+    margin-bottom: 2px;
+    margin-right: 15px;
+  }
 }
-.hyp3e .combat-block .weapon-field input {
-  min-width: 200px;
-  margin-bottom: 2px;
-}
+
 .hyp3e .combat-header {
   font-weight: bold;
   font-size: large;
@@ -520,7 +540,6 @@ textarea {
   padding: 5px 10px;
   /* background-color: dodgerblue; */
 }
-
 .hyp3e .combat-label-small {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
@@ -529,15 +548,25 @@ textarea {
   /* background-color: dodgerblue; */
 }
 
+.hyp3e .movement-other {
+  /* padding: 0 2px;
+  margin-right: 5px; */
+  input {
+    min-width: 100px;
+    max-width: 125px;
+    margin-bottom: 2px;
+  }
+}
+
 .hyp3e .saves-block {
   padding: 2px 2px;
   margin-bottom: 5px;
   /* background-color: aqua; */
-}
-.hyp3e .saves-block input {
-  text-align: center;
-  min-width: 20px;
-  max-width: 50px;
+  input {
+    text-align: center;
+    min-width: 20px;
+    max-width: 50px;
+  }
 }
 
 /* Character Spells-tab styles */
@@ -545,6 +574,11 @@ textarea {
   padding: 0 5px;
   margin-right: 5px;
   /* background-color: aqua; */
+  .spell-list input {
+    text-align: center;
+    min-width: 100px;
+    margin-bottom: 2px;
+  }
 }
 .hyp3e .casting-ability {
   min-width: 190px;
@@ -554,6 +588,11 @@ textarea {
   font-weight: bold;
   padding: 5px 5px;
   /* background-color: darkcyan; */
+}
+.hyp3e .spell-list input {
+    text-align: center;
+    min-width: 100px;
+    margin-bottom: 2px;
 }
 .hyp3e .spells input {
   text-align: center;
@@ -844,6 +883,28 @@ textarea {
 .hyp3e .item-form {
   font-family: "Roboto", sans-serif;
   /* font-family: "Herculanum", sans-serif; */
+}
+
+/* Horizontal rule plain style */
+.plain-hr {
+    border: 0;
+    border-top: 1px solid #8d896d;
+    margin: 5px 0;
+}
+
+/* Font styling */
+.medium {
+    font-size: medium;
+}
+
+.medium-bold {
+    font-weight: bold;
+    font-size: medium;
+}
+
+.medium-italic {
+    font-style: italic;
+    font-size: medium;
 }
 
 /* Font color example */

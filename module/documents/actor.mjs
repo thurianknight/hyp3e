@@ -43,6 +43,7 @@ export class Hyp3eActor extends Actor {
         // things organized.
         this._prepareCharacterData(actorData);
         this._prepareNpcData(actorData);
+
     }
 
     /**
@@ -57,7 +58,7 @@ export class Hyp3eActor extends Actor {
         // Notes on system.tempModifiers
         //  This is an array of modifiers that may be applied to any field in the data template.
         //  However, note that it is better to use effects and apply them to the data template
-        //  whenever possible. The known exceptions are AC the MV, as these are auto-calculated
+        //  whenever possible. The known exceptions are AC and MV, as these are auto-calculated
         //  below and cannot be modified by effects.
         //
         //  Example tempModifiers entry:
@@ -553,14 +554,14 @@ export class Hyp3eActor extends Actor {
             // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}...</span>`
             // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${itemName}</span>`
             label = `
-            <hr/>
+            <hr class="plain-hr" />
             <div style="margin: 10px 0;">
                 <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
                 <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
                     ${itemName}
                 </span>
             </div>
-            <hr/>`
+            <hr class="plain-hr" />`
         }
 
         // Determine whether we have a valid target number or formula
@@ -752,14 +753,14 @@ export class Hyp3eActor extends Actor {
 
         // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}</span>`
         label = `
-        <hr/>
+        <hr class="plain-hr" />
         <div style="margin: 10px 0;">
             <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
             <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
                 ${itemName}
             </span>
         </div>
-        <hr/>`
+        <hr class="plain-hr" />`
 
         // Filter the actor's inventory items for ammunition
         let ammoList = this.items.filter(i => i.system.isAmmunition)
@@ -1000,7 +1001,7 @@ export class Hyp3eActor extends Actor {
                 hit = true
                 if (game.settings.get(game.system.id, "critHit") && item) {
                     // critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'><h4>Critical Hit:</h4></div>`;
-                    critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'>&nbsp;</div>`;
+                    critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
                 }
             } else if (naturalRoll == 1) {
                 if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
@@ -1009,7 +1010,7 @@ export class Hyp3eActor extends Actor {
 
                 if (game.settings.get(game.system.id, "critMiss") && item) {
                     // critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'><h4>Xathoqqua’s Woe:</h4></div>`;
-                    critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'>&nbsp;</div>`;
+                    critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
                 }
             } else if (atkRoll.total >= tn) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
@@ -1067,13 +1068,13 @@ export class Hyp3eActor extends Actor {
         if (hit && item) {
             if (Roll.validate(itemData.damage)) {
                 // Build our primary damage formula
-                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
+                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData)
                 item.dmgFormula = dmgObj.formula
                 item.debugDmgRollFormula = dmgObj.debugFormula
                 if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", item.dmgFormula) }
                 // Do we have 2-hand damage?
                 if (item.system.damage2h > "") {
-                    // const dmgObj2h = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
+                    // const dmgObj2h = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData)
                     item.dmgFormula2h = dmgObj.formula2h
                     item.debugDmgRollFormula2h = dmgObj.debugFormula2h
                     if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula 2H:", item.dmgFormula2h) }
@@ -1084,29 +1085,6 @@ export class Hyp3eActor extends Actor {
         // Construct a custom chat card for the attack
         // await this.renderCustomChat(atkRoll, item.id, label, debugAtkRollFormula, "", critFooterHTML, rollResponse.rollMode);
         await this.renderCustomChat(atkRoll, item, label, debugAtkRollFormula, attackText, critFooterHTML, rollResponse.rollMode);
-
-        // // If the item attack hit, we roll damage automatically and include it in the chat message
-        // if (hit && item) {
-        //     if (Roll.validate(itemData.damage)) {
-        //         // Build our damage formula
-        //         const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, this.type)
-        //         dmgFormula = dmgObj.formula
-        //         debugDmgRollFormula = dmgObj.debugFormula
-        //         if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", dmgFormula) }
-
-        //         // Invoke the damage roll
-        //         dmgRoll = new Roll(dmgFormula, actorData);
-        //         // Resolve the roll
-        //         let result = await dmgRoll.roll();
-        //         if (CONFIG.HYP3E.debugMessages) { console.log("Damage result: ", dmgRoll) }
-
-        //         // Get the dice roll values of damage for x2/x3 modifier button
-        //         const naturalDmgRoll = dmgRoll.dice[0]?.total ? dmgRoll.dice[0]?.total : dmgRoll.total;
-
-        //         // Now output the damage chat
-        //         this.renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, itemData.damage, item)
-        //     }
-        // }
 
         return atkRoll
     }
@@ -1311,7 +1289,9 @@ export class Hyp3eActor extends Actor {
     // Send roll results to the chat window
     sendRollToChat(roll, label, content, rollMode) {
         // Prettify label
-        label = "<h3>" + label + "</h3>"
+        // label = "<h3>" + label + "</h3>"
+        label = "<div class='medium'>" + label + "</div>"
+
         // Send to chat
         roll.toMessage({
             author: game.user_id,
@@ -1327,6 +1307,9 @@ export class Hyp3eActor extends Actor {
     async renderCustomChat(roll, item, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
         // Prettify label
         // label = "<h3>" + label + "</h3>"
+        label = "<div class='medium'>" + label + "</div>"
+        headerHTML = "<div class='medium'>" + headerHTML + "</div>"
+        footerHTML = "<div class='medium'>" + footerHTML + "</div>"
 
         const templateData = {
             roll: roll,
@@ -1382,32 +1365,73 @@ export class Hyp3eActor extends Actor {
 
     _getCombatantSitMods() {
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for ${this.name}`) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: All Tokens:`, canvas.tokens) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Controlled Token:`, canvas.tokens.controlled[0]) }
         let sitModObj = {}
-        const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+
+        // Try to get the attacking token
+        let attacker
+        // Get the currently selected token, if possible
+        if (canvas.tokens.controlled[0]) {
+            // Get the first controlled token. This is preferred for GMs, who may have multiple tokens
+            //  selected. For players, this will always be the player character. Players running multiple
+            //  characters will need to select the correct token before rolling.
+            // This is the preferred method for getting the token, as it will always be the one that the
+            //  player has selected. The API does not allow us to get the token from the actor directly.
+            attacker = canvas.tokens.controlled[0]
+        } else {
+            // Get the first matching token. This works perfectly for the player character
+            //  but not so well for NPCs. It will always return the first token that matches the actor ID.
+            //  This is a limitation of the Foundry API, and I don't know how to get around it.
+            attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+        }
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker token:`, attacker) }
-        const effects = this._getEffectNames()
+        let effects
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12...
+            effects = this.effects
+        } else if (foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v13...
+            effects = this._getAllApplicableEffects()
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effects:`, effects) }
+        // const effects = this._getEffectNames()
+
+        // Target token is easy to get, assuming we have one
         let target, targetActor, targetEffects
         const userTargets = Array.from(game.user.targets)
         if (userTargets.length > 0) {
             target = userTargets[0]
             if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target token:`, target) }
             targetActor = target.actor
-            targetEffects = targetActor._getEffectNames()
+            if (!foundry.utils.isNewerVersion(game.version, "13")) {
+                // For Foundry v12...
+                targetEffects = targetActor.effects
+            } else if (foundry.utils.isNewerVersion(game.version, "13")) {
+                // For Foundry v13...
+                targetEffects = targetActor._getAllApplicableEffects()
+            }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effects:`, targetEffects) }
+            // targetEffects = targetActor._getEffectNames()
         }
 
         // Start gathering situational modifiers
         let sitModSum = 0
         let sitModsArr = []
-        // Attacker token status "Blind"
-        if (effects.includes('Blind')) {
-            sitModSum += -4
-            sitModsArr.push("Blind (-4)")
-        }
-        // Attacker token status "Invisible"
-        if (effects.includes('Invisible')) {
-            sitModSum += 4
-            sitModsArr.push("Invisible (+4)")
-        }
+        // Effect names can be arbitrary, what we care about is the token status/condition
+        effects.forEach(effect => {
+            if (!effect.disabled) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effect statuses:`, effect.statuses) }
+                if (effect.statuses.has("blind")) {
+                    sitModSum += -4
+                    sitModsArr.push("Blind (-4)")
+                }
+                if (effect.statuses.has("invisible")) {
+                    sitModSum += 4
+                    sitModsArr.push("Invisible (+4)")
+                }
+            }
+        });
         // Hopefully we have a target!
         if (target) {
             // Attacker on higher ground (token height vs. target token height)
@@ -1415,8 +1439,41 @@ export class Hyp3eActor extends Actor {
                 sitModSum += 1
                 sitModsArr.push("Higher Ground (+1)")
             }
+            // Defender is on higher ground
+            if (attacker.document.elevation < target.document.elevation) {
+                sitModSum += -1
+                sitModsArr.push("Defender on Higher Ground (-1)")
+            }
+
+            // Effect names can be arbitrary, what we care about is the token status/condition
+            targetEffects.forEach(effect => {
+                if (!effect.disabled) {
+                    // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effect statuses:`, effect.statuses) }
+                    if (effect.statuses.has("blind")) {
+                        sitModSum += 4
+                        sitModsArr.push("Defender Blind (+4)")
+                    }
+                    if (effect.statuses.has("invisible")) {
+                        sitModSum += -4
+                        sitModsArr.push("Defender Invisible (-4)")
+                    }
+                    if (effect.statuses.has("restrain")) {
+                        sitModSum += 2
+                        sitModsArr.push("Defender Hindered (+2)")
+                    }
+                    if (effect.statuses.has("prone")) {
+                        sitModSum += 4
+                        sitModsArr.push("Defender Prone (+4)")
+                    }
+                    if (effect.statuses.has("stun")) {
+                        sitModSum += 4
+                        sitModsArr.push("Defender Stunned (+4)")
+                    }
+                }
+            });
+
             // Attacker is flanking, +1 (Three or more melee combatants engage a single opponent)
-            // We have the target token. The token does have a 'targeted' array which is an array
+            // We have the target token. The token does have a "targeted" array which is an array
             //  of USERs (not actors) who have selected this token to target. So we could count the
             //  length of the array and if it is 3 or more, apply this modifier. However we also
             //  need to make sure that they are all engaged in melee (not missile) combat... so we
@@ -1428,36 +1485,8 @@ export class Hyp3eActor extends Actor {
             //  token gets really complicated. May be possible, just need to think hard on this.
             //  And then determine whether it is really worth it.
 
-            // Defender is encumbered - RAW say this is a GM / common sense decision
+            // Defender is encumbered or heavily encumbered - this is handled by a different option.
 
-            // Defender is *heavily* encumbered - RAW say this is a GM / common sense decision
-
-            // Defender token status "Invisible"
-            if (targetEffects.includes('Invisible')) {
-                sitModSum -= 4
-                sitModsArr.push("Defender is Invisible (-4)")
-            }
-
-            // Defender is hindered
-            if (targetEffects.includes("Restrained")) {
-                sitModSum += 2
-                sitModsArr.push("Defender is Hindered (+2)")
-            }
-            // Defender is prone
-            if (targetEffects.includes("Prone")) {
-                sitModSum += 4
-                sitModsArr.push("Defender is Prone (+4)")
-            }
-            // Defender is stunned
-            if (targetEffects.includes("Stunned")) {
-                sitModSum += 4
-                sitModsArr.push("Defender is Stunned (+4)")
-            }
-            // Defender is on higher ground
-            if (attacker.document.elevation < target.document.elevation) {
-                sitModSum += -1
-                sitModsArr.push("Defender on Higher Ground (-1)")
-            }
         }
         // Finalize the modifiers & return
         sitModObj = {
@@ -1467,13 +1496,35 @@ export class Hyp3eActor extends Actor {
         return sitModObj
     }
 
+    // Return an array of applicable effects
+    _getAllApplicableEffects() {
+        let effects = []
+        // Get all effects from the actor
+        for ( const effect of this.effects ) {
+            effects.push(effect);
+        }
+        for ( const item of this.items ) {
+            for ( const effect of item.effects ) {
+                if ( effect.transfer ) effects.push(effect);
+            }
+        }
+        return effects;
+    }
+
     // Get the names of effects applied to the actor, and return an array
     _getEffectNames() {
-        let effects = this.effects
+        let effects
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12...
+            effects = this.effects
+        } else if (foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v13...
+            effects = this._getAllApplicableEffects()
+        }
         let effectsArray = []
         effects.forEach(effect => {
             // Log the effect
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Effect ${effect.name}:`, effect) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.name}, effect ${effect.name}:`, effect) }
             effectsArray.push(effect.name)
         })
         return effectsArray
@@ -1872,6 +1923,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d8",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Druid", "Illusionist"],
             "ta": null,
             "unskilled": 0,
             "attrReqs": {
@@ -1955,6 +2007,7 @@ export class Hyp3eActor extends Actor {
             "baseClass": "cleric",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Cleric"],
             "ta": 1,
             "unskilled": -2,
             "hitDie": "1d8",
@@ -1977,6 +2030,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Cryomancer"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2000,6 +2054,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d8",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Druid"],
             "ta": null,
             "unskilled": -2,
             "attrReqs": {
@@ -2075,6 +2130,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Illusionist"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2101,6 +2157,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d6",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Magician"],
             "ta": null,
             "unskilled": -2,
             "attrReqs": {
@@ -2127,6 +2184,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Magician"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2175,6 +2233,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Necromancer"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2226,6 +2285,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Cleric"],
             "ta": 1,
             "unskilled": -4,
             "attrReqs": {
@@ -2249,6 +2309,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d6",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Cleric"],
             "ta": null,
             "unskilled": -2,
             "attrReqs": {
@@ -2275,6 +2336,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Pyromancer"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2378,6 +2440,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d6",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Cleric", "Magician"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2425,6 +2488,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d8",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Magician"],
             "ta": null,
             "unskilled": 0,
             "attrReqs": {
@@ -2451,6 +2515,7 @@ export class Hyp3eActor extends Actor {
             "hitDie": "1d4",
             "fa": 0,
             "ca": 1,
+            "spellLists": ["Witch"],
             "ta": null,
             "unskilled": -4,
             "attrReqs": {
@@ -2640,14 +2705,14 @@ export class Hyp3eActor extends Actor {
         let getsBonusSpell = false
         
         // Setup chat message variables
-        let label = `<h3>Values for character updated...</h3>`
+        let label = `<div class='medium-bold'>Values for character updated...</div>`
         let content = `<ul>`
 
         // Here we modify the cloned data object of the actor...
         if (CONFIG.HYP3E.debugMessages) { console.log("SetAttributeMods: cloned Actor system data:", data) }
         if (data.details.class) {
             // Override label if character class selected
-            label = `<h3>Values for ${data.details.class} updated...</h3>`
+            label = `<div class='medium-bold'>Values for ${data.details.class} updated...</div>`
             if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${data.details.class} hit die...`) }
             thisClass = this.classData[data.details.class]
             if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Class Data for ${data.details.class}: `, thisClass) }
@@ -2657,6 +2722,12 @@ export class Hyp3eActor extends Actor {
             content += `<li>Fighting Ability: ${thisClass.fa}</li>`
             data.ca = thisClass.ca
             content += `<li>Casting Ability: ${thisClass.ca}</li>`
+            if (thisClass.spellLists) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`SetAttributeMods: Setting ${data.details.class} spell lists...`) }
+                data.spellList = thisClass.spellLists[0]
+                data.spellList2 = thisClass.spellLists.length > 1 ? thisClass.spellLists[1] : null
+                content += `<li>Spell List(s): ${thisClass.spellLists.join(", ")}</li>`
+            }
             data.ta = thisClass.ta
             content += `<li>Turning Ability: ${thisClass.ta}</li>`
             data.unskilled = thisClass.unskilled
@@ -2971,6 +3042,8 @@ export class Hyp3eActor extends Actor {
                     hd: data.hd,
                     fa: data.fa,
                     ca: data.ca,
+                    spellList: data.spellList,
+                    spellList2: data.spellList2,
                     ta: data.ta,
                     saves: {
                         death: {
