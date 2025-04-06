@@ -538,6 +538,7 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
 
         // Declare vars
+        let tokenId = ""
         let itemId = ""
         let itemName = ""
         let label = ""
@@ -545,6 +546,20 @@ export class Hyp3eActor extends Actor {
         let rollFormula = ""
         let rollResponse
         let success = true
+
+        // Did we get a token ID?
+        if (dataset.tokenId) {
+            // Get the token ID from the dataset
+            tokenId = dataset.tokenId
+            // Get the token from the canvas
+            const token = canvas.tokens.get(tokenId)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Token (ID ${tokenId}): `, token) }
+            if (token) {
+                // Get the token's actor
+                const tokenActor = token.actor
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Token actor: `, tokenActor) }
+            }
+        }
 
         // Is this an item or ability check?
         const item = this.items.get(dataset.itemId) ?? null
@@ -660,7 +675,7 @@ export class Hyp3eActor extends Actor {
         roll.hit = false
 
         // Construct a custom chat card for the check
-        await this.renderCustomChat(roll, item, label, "", checkText, turnUndeadHtml, rollResponse.rollMode)
+        await this.renderCustomChat(roll, item, tokenId, label, "", checkText, turnUndeadHtml, rollResponse.rollMode)
 
         return success
     }
@@ -696,6 +711,7 @@ export class Hyp3eActor extends Actor {
     async rollAttackOrSpell(dataset) {
 
         // Declare vars
+        let tokenId = ""
         let rollFormula = ""
         let rollResponse
         let naturalRoll = 0
@@ -718,7 +734,21 @@ export class Hyp3eActor extends Actor {
         // Log the dataset and item (if any) before proceeding
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
-        
+
+        // Did we get a token ID?
+        if (dataset.tokenId) {
+            // Get the token ID from the dataset
+            tokenId = dataset.tokenId
+            // Get the token from the canvas
+            const token = canvas.tokens.get(tokenId)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Token (ID ${tokenId}): `, token) }
+            if (token) {
+                // Get the token's actor
+                const tokenActor = token.actor
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Token actor: `, tokenActor) }
+            }
+        }
+
         // Is this an item-based attack?
         const item = this.items.get(dataset.itemId) ?? null
         if (CONFIG.HYP3E.debugMessages) { console.log("Item:", item) }
@@ -1083,8 +1113,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Construct a custom chat card for the attack
-        // await this.renderCustomChat(atkRoll, item.id, label, debugAtkRollFormula, "", critFooterHTML, rollResponse.rollMode);
-        await this.renderCustomChat(atkRoll, item, label, debugAtkRollFormula, attackText, critFooterHTML, rollResponse.rollMode);
+        await this.renderCustomChat(atkRoll, item, tokenId, label, debugAtkRollFormula, attackText, critFooterHTML, rollResponse.rollMode);
 
         return atkRoll
     }
@@ -1304,7 +1333,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Render custom html for attacks and turning undead
-    async renderCustomChat(roll, item, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
+    async renderCustomChat(roll, item, tokenId, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
         // Prettify label
         // label = "<h3>" + label + "</h3>"
         label = "<div class='medium'>" + label + "</div>"
@@ -1317,6 +1346,7 @@ export class Hyp3eActor extends Actor {
             debugRollFormula: debugRollFormula,
             item: item,
             actorId: this.id,
+            tokenId: tokenId,
             footerHTML: footerHTML,
         };
 
@@ -1371,21 +1401,27 @@ export class Hyp3eActor extends Actor {
 
         // Try to get the attacking token
         let attacker
-        // Get the currently selected token, if possible
-        if (canvas.tokens.controlled[0]) {
-            // Get the first controlled token. This is preferred for GMs, who may have multiple tokens
+        if (this.token) {
+            // Get the token from the actor
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker actual token:`, this.token) }
+            attacker = this.token
+        } else if (canvas.tokens.controlled[0]) {
+            // Get the currently selected token, if the actor was not attached to one. To do this, 
+            //  we get the first controlled token. This is preferred for GMs, who may have multiple tokens
             //  selected. For players, this will always be the player character. Players running multiple
             //  characters will need to select the correct token before rolling.
-            // This is the preferred method for getting the token, as it will always be the one that the
-            //  player has selected. The API does not allow us to get the token from the actor directly.
-            attacker = canvas.tokens.controlled[0]
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Player-controlled token:`, canvas.tokens.controlled[0]) }
+            attacker = canvas.tokens.controlled[0].document
         } else {
-            // Get the first matching token. This works perfectly for the player character
-            //  but not so well for NPCs. It will always return the first token that matches the actor ID.
-            //  This is a limitation of the Foundry API, and I don't know how to get around it.
-            attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+            // Get the first matching token based on actorId. This works fine for player characters
+            //  but not so well for NPCs. It will always return the first token that matches the actor ID,
+            //  and with unlinked tokens, there may be multiple actors with the same ID.
+            const tempToken = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker discovered token:`, tempToken) }
+            attacker = tempToken ? tempToken.document : null
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker token:`, attacker) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker:`, attacker) }
+
         let effects
         if (!foundry.utils.isNewerVersion(game.version, "13")) {
             // For Foundry v12...
@@ -1394,15 +1430,15 @@ export class Hyp3eActor extends Actor {
             // For Foundry v13...
             effects = this._getAllApplicableEffects()
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effects:`, effects) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker effects:`, effects) }
         // const effects = this._getEffectNames()
 
         // Target token is easy to get, assuming we have one
         let target, targetActor, targetEffects
         const userTargets = Array.from(game.user.targets)
         if (userTargets.length > 0) {
-            target = userTargets[0]
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target token:`, target) }
+            target = userTargets[0].document
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target:`, target) }
             targetActor = target.actor
             if (!foundry.utils.isNewerVersion(game.version, "13")) {
                 // For Foundry v12...
@@ -1434,13 +1470,16 @@ export class Hyp3eActor extends Actor {
         });
         // Hopefully we have a target!
         if (target) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target elevation (${target.elevation}) vs. Attacker elevation (${attacker.elevation})...`) }
             // Attacker on higher ground (token height vs. target token height)
-            if (attacker.document.elevation > target.document.elevation) {
+            // if (attacker.document.elevation > target.document.elevation) {
+            if (attacker.elevation > target.elevation) {
                 sitModSum += 1
                 sitModsArr.push("Higher Ground (+1)")
             }
             // Defender is on higher ground
-            if (attacker.document.elevation < target.document.elevation) {
+            // if (attacker.document.elevation < target.document.elevation) {
+            if (attacker.elevation < target.elevation) {
                 sitModSum += -1
                 sitModsArr.push("Defender on Higher Ground (-1)")
             }

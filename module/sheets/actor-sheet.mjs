@@ -592,8 +592,12 @@ export class Hyp3eActorSheet extends ActorSheet {
     if (CONFIG.HYP3E.debugMessages) { console.log("Clicked element: ", element) }
     // Log the element dataset
     if (CONFIG.HYP3E.debugMessages) { console.log("Element dataset: ", dataset) }
+    // Log the sheet data
+    if (CONFIG.HYP3E.debugMessages) { console.log("Current Actor-Sheet Data:", this) }
     // Log the actor
     if (CONFIG.HYP3E.debugMessages) { console.log("Current Actor:", this.actor) }
+    // Log the token
+    if (CONFIG.HYP3E.debugMessages) { console.log("Current Token:", this.token) }
 
     // How many different roll types do we have?
     //  Test of Attribute: d6 roll-under target
@@ -633,6 +637,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       dataset.itemId = ""
       dataset.actorId = this.actor.id
       dataset.baseClass = this.actor.system.baseClass
+      dataset.tokenId = this.token.id
 
       switch (dataset.rollType) {
         case "item":

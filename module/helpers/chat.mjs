@@ -14,6 +14,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const sourceType = $(b).data('sourceType');
             const itemId = $(b).data('itemId');
             const actorId = $(b).data('actorId');
+            const tokenId = $(b).data('tokenId');
             let dmgButton = $(
                 `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>Damage: ${dmgFormula}</button>`
             );
@@ -22,7 +23,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, itemId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, itemId, tokenId, sourceType);
             });
         });
     }
@@ -30,12 +31,13 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let dmgRoll2h = html.find(".dmg-roll-button2h");
     if (dmgRoll2h.length > 0) {
         dmgRoll2h.each((_i, b) => {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Damage html: `, b) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`2-hand damage html: `, b) }
             const dmgFormula = $(b).data('formula');
             const debugDmgRollFormula = $(b).data('debugFormula');
             const sourceType = $(b).data('sourceType');
             const itemId = $(b).data('itemId');
             const actorId = $(b).data('actorId');
+            const tokenId = $(b).data('tokenId');
             let dmgButton = $(
                 `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
             );
@@ -44,7 +46,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll2h.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, itemId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, itemId, tokenId, sourceType);
             });
         });
     }
@@ -322,14 +324,27 @@ export async function showValueChange(t, fillColor,total) {
     );
 }
 
-async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, sourceType) {
+async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, tokenId, sourceType) {
     if (formula == "") { return } // Exit on empty formula
 
-    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    let actor = {}
+
+    // Log the attacking token, if available
+    const token = canvas?.tokens.get(tokenId);
+    if (CONFIG.HYP3E.debugMessages) { console.log(`rollDmgButton: Token (ID ${tokenId}): `, token) }
+    if (token) {
+        // Get the token's actor
+        actor = token.actor;
+    } else {
+        // Get the game actor
+        actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    }
     if (!actor) {
         ui.notifications?.error(`Roll Damage: Actor ${actorId} not found!`)
         return
     }
+    if (CONFIG.HYP3E.debugMessages) { console.log(`rollDmgButton: Actor: `, actor) }
+
     const item = actor.items.get(itemId)
     if (!item) {
         ui.notifications?.error(`Roll Damage: Item ${itemId} not found!`);
