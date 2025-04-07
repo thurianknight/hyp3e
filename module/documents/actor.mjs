@@ -712,6 +712,7 @@ export class Hyp3eActor extends Actor {
 
         // Declare vars
         let tokenId = ""
+        let attacker, target = null
         let rollFormula = ""
         let rollResponse
         let naturalRoll = 0
@@ -719,39 +720,40 @@ export class Hyp3eActor extends Actor {
         let ranges = {}
         let rangeGroup = ""
         let chosen = ""
-        let dmgFormula = ""
-        let dmgRoll
+        // let dmgFormula = ""
+        // let dmgRoll
         let targetAc = 9
         let targetName = ""
         let targetSize = ""
         let gridDistance = 0
         let debugAtkRollFormula = ""
-        let debugDmgRollFormula = ""        
+        // let debugDmgRollFormula = ""
         let itemName = ""
         let label = ""
         let attackText = ""
 
         // Log the dataset and item (if any) before proceeding
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Rolling ${dataset.label}...`) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: ${dataset.label} dataset: `, dataset) }
 
-        // Did we get a token ID?
+        // Did we get a token ID? For NPCs and monsters this should pretty much always be true,
+        //  but for PCs, it may not be true if the attack was made from the macro bar.
         if (dataset.tokenId) {
             // Get the token ID from the dataset
             tokenId = dataset.tokenId
             // Get the token from the canvas
-            const token = canvas.tokens.get(tokenId)
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Token (ID ${tokenId}): `, token) }
-            if (token) {
-                // Get the token's actor
-                const tokenActor = token.actor
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Token actor: `, tokenActor) }
+            // const token = canvas.tokens.get(tokenId)
+            attacker = canvas.tokens.get(tokenId)
+            if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Token (ID ${tokenId}): `, attacker) }
+            if (attacker) {
+                // Log the token's actor
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Token actor: `, attacker.actor) }
             }
         }
 
         // Is this an item-based attack?
         const item = this.items.get(dataset.itemId) ?? null
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item:", item) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item:", item) }
         const itemData = item ? {...item.system} : null
         if (item) {
             // Get the item's friendly name if it has one
@@ -772,14 +774,14 @@ export class Hyp3eActor extends Actor {
         if (itemData) {
             itemData.itemType = item.type
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item roll data:", itemData) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item roll data:", itemData) }
 
         // Retrieve roll data from the actor
         const actorData = this.getRollData()
         if (actorData) {
             actorData.actorType = this.type
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", actorData) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Actor roll data:", actorData) }
 
         // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}</span>`
         label = `
@@ -794,7 +796,7 @@ export class Hyp3eActor extends Actor {
 
         // Filter the actor's inventory items for ammunition
         let ammoList = this.items.filter(i => i.system.isAmmunition)
-        if (CONFIG.HYP3E.debugMessages) { console.log("Carried ammo: ", ammoList) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Carried ammo: ", ammoList) }
         let carriedAmmo = {"":""}
         if (ammoList.length > 0) {
             for (let ammo of ammoList) {
@@ -807,18 +809,52 @@ export class Hyp3eActor extends Actor {
         // Get the range unit of measure for the scene
         dataset.rangeUoM = canvas.scene?.grid.units ? canvas.scene?.grid.units : "ft";
 
-        // Get the attacking token's location on the scene
-        const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+        // // Get the attacking token's location on the scene
+        // // const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+        // // Try to get the attacking token
+
+        // No token in the incoming dataset, so we need to find it. If the actor is linked to a token, 
+        //  use that token.
+        if (!attacker) {
+            if (this.token) {
+                // Get the token from the actor, if it is linked
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Attacker actual token:`, this.token) }
+                attacker = this.token
+            } else {
+                // No token in the dataset and no linked token, so we need to find it.
+                // Get the first matching token based on actorId. This works fine for player characters
+                //  but not so well for NPCs. It will always return the first token that matches the actor ID,
+                //  and with unlinked tokens, there may be multiple actors with the same ID. So we need to 
+                //  filter out unlinked tokens and deal with them separately.
+                const tempToken = canvas.tokens.placeables.find(t => t.document.isLinked && t.actor && t.actor.id === this.id);
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Attacker discovered token:`, tempToken) }
+                attacker = tempToken ? tempToken : null
+            }
+        }
+        // If we still have no attacker, check if the user has a controlled token. Ideally this should
+        //  never happen, but it can if the actor is not linked to a token and the user has multiple tokens
+        //  selected. This is preferred for GMs who may have multiple tokens selected.
+        if (!attacker && canvas.tokens.controlled[0]) {
+            // Get the currently selected token, since the actor was not attached to one. To do this, 
+            //  we get the first controlled token. This is preferred for GMs who may have multiple tokens
+            //  selected. Players running multiple characters will need to select the correct token before 
+            //  rolling.
+            if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Player-controlled token:`, canvas.tokens.controlled[0]) }
+            attacker = canvas.tokens.controlled[0]
+        }
+
         const attackerPos = attacker ? attacker.center : null
-        if (CONFIG.HYP3E.debugMessages) { console.log("Attacker position:", attackerPos) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Attacker position:", attackerPos) }
 
         // Has the user targeted a token? If so, get it's AC and name
         const userTargets = Array.from(game.user.targets)
-        if (CONFIG.HYP3E.debugMessages) { console.log("Target Actor Data:", userTargets) }
+        // let target
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target Actor Data:", userTargets) }
         if (userTargets.length > 0) {
-            const targetPos = userTargets[0].center
-            if (CONFIG.HYP3E.debugMessages) { console.log("Target position:", targetPos) }
-            const primaryTargetData = userTargets[0].actor
+            target = userTargets[0]
+            const targetPos = target.center
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target position:", targetPos) }
+            const primaryTargetData = target.actor
             targetAc = primaryTargetData.system.ac.value
             targetName = primaryTargetData.name
             targetSize = primaryTargetData.system.size ? primaryTargetData.system.size : "M"
@@ -831,7 +867,7 @@ export class Hyp3eActor extends Actor {
             gridDistance = distancePixels / canvas.grid.size * canvas.scene.grid.distance;
             // Round to nearest whole number
             gridDistance = Math.round(gridDistance)
-            if (CONFIG.HYP3E.debugMessages) { console.log("Distance to target:", gridDistance) }
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Distance to target:", gridDistance) }
             dataset.gridDistance = gridDistance
             dataset.range = `${gridDistance} ${canvas.scene.grid.units}`;
         } else {
@@ -840,7 +876,7 @@ export class Hyp3eActor extends Actor {
             targetName = ""
             targetSize = ""
             dataset.range = "No target!"
-            if (CONFIG.HYP3E.debugMessages) { console.log("No target selected!") }
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: No target selected!") }
             // Popup a notification if this is an untargeted weapon or spell attack
             if (item && (item.type == "weapon" || (item.type == "spell" && itemData.atkRoll))) {
                 ui.notifications.info("No target selected!")
@@ -851,7 +887,7 @@ export class Hyp3eActor extends Actor {
             // const itemMods = this._parseItemMod(itemName)
             // Melee weapons have a range based on their weapon class
             if (itemData.melee) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Weapon class:`, itemData.wc) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Weapon class:`, itemData.wc) }
                 if (itemData.wc <= 3) {
                     // We need some wiggle room, so range 5 => 8
                     dataset.meleeRange = 8
@@ -864,13 +900,13 @@ export class Hyp3eActor extends Actor {
                     dataset.meleeRange = 20
                 }
                 if (gridDistance > dataset.meleeRange) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`Target is beyond melee range! Calculated distance is ${gridDistance} ft.`) }
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is beyond melee range! Calculated distance is ${gridDistance} ft.`) }
                     ui.notifications.info("Target is beyond melee range!")
                 }
             }
             // Missile weapons need to show a range selector in the dialog
             if (itemData.missile) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Range increments:`, itemData.range) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Range increments:`, itemData.range) }
                 dataset.showAmmo = itemData?.usesAmmo ? itemData?.usesAmmo : false
                 dataset.showRanges = true
                 rangeGroup = "rangeGroup"
@@ -889,7 +925,7 @@ export class Hyp3eActor extends Actor {
                 } else {
                     // If the range is longer than the long range, give a warning
                     chosen = "long"
-                    if (CONFIG.HYP3E.debugMessages) { console.log("Target is out of range!") }
+                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is out of range!") }
                     ui.notifications.info("Target is out of range!")
                 }
             }
@@ -900,7 +936,7 @@ export class Hyp3eActor extends Actor {
                 let spellRange = this._parseSpellRange(itemData.range)
                 if (gridDistance > spellRange) {
                     // If the target is out of range, give a warning
-                    if (CONFIG.HYP3E.debugMessages) { console.log("Target is out of range!") }
+                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is out of range!") }
                     ui.notifications.info("Target is out of range!")
                 }
             }
@@ -908,7 +944,7 @@ export class Hyp3eActor extends Actor {
 
         // Get any situational modifiers that can be detected from token status or other means
         if (game.settings.get(game.system.id, "enableCombatSitModDetection")) {
-            let sitModObj = this._getCombatantSitMods()
+            let sitModObj = this._getCombatantSitMods(attacker, target)
             dataset.sitMod = sitModObj?.sitMod
             dataset.sitModList = sitModObj?.sitModList    
         }
@@ -925,19 +961,19 @@ export class Hyp3eActor extends Actor {
             try {
                 rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, carriedAmmo, rangeGroup, ranges, chosen)
             } catch(err) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("ERROR: ", err) }
+                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: ERROR: ", err) }
                 return
             }
         } else if (item && item.type == "spell") {
             try {
                 rollResponse = await Hyp3eDialog.ShowSpellcastingDialog(dataset)
             } catch(err) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("ERROR: ", err) }
+                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: ERROR: ", err) }
                 return
             }
             // Decrement the number memorized
             if (item.type == "spell" && itemData.quantity.value > 0) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Cast memorized spell: ${item.name}`) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Cast memorized spell: ${item.name}`) }
                 // Update the embedded item document
                 this.updateEmbeddedDocuments("Item", [
                     { _id: item.id, "system.quantity.value": itemData.quantity.value-1 },
@@ -946,7 +982,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Log the roll-dialog response
-        if (CONFIG.HYP3E.debugMessages) { console.log("Dialog response:", rollResponse) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Dialog response:", rollResponse) }
 
         // Decrement ammunition if selected in the attack dialog
         // if (item && item.type == "weapon" && itemData.usesAmmo && rollResponse.ammunition) {
@@ -955,7 +991,7 @@ export class Hyp3eActor extends Actor {
             const ammoData = ammo ? {...ammo.system} : null
             if (ammo && ammoData) {
                 ammoMods = this._parseItemMod(ammo.name)
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Use ammo: ${ammo.name}`, ammoData) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Use ammo: ${ammo.name}`, ammoData) }
                 // Update the embedded item document
                 this.updateEmbeddedDocuments("Item", [
                     { _id: ammo.id, "system.quantity.value": ammoData.quantity.value-1 },
@@ -994,14 +1030,14 @@ export class Hyp3eActor extends Actor {
         const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData)
         rollFormula = atkObj.formula
         debugAtkRollFormula = atkObj.debugFormula
-        if (CONFIG.HYP3E.debugMessages) { console.log("Final attack formula:", rollFormula) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Final attack formula:", rollFormula) }
 
         // Roll the dice!
         let atkRoll = new Roll(rollFormula, actorData)
-        if (CONFIG.HYP3E.debugMessages) { console.log("Attack roll: ", atkRoll) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Attack roll: ", atkRoll) }
         // Resolve the roll
         let result = await atkRoll.roll()
-        if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Roll result: ", result) }
         // Get d20 natural roll
         naturalRoll = atkRoll.dice[0].total
 
@@ -1023,9 +1059,9 @@ export class Hyp3eActor extends Actor {
         if (!itemData.isGrenade) {
             // If this is a normal attack, TN is based on target's AC
             tn = 20 - targetAc
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
             if (naturalRoll == 20) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("Natural 20 always crit hits!") }
+                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Natural 20 always crit hits!") }
                 // label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
                 attackText += `<span style='color:#00b34c'><b>Critical Hit!</b></span>`
                 hit = true
@@ -1034,7 +1070,7 @@ export class Hyp3eActor extends Actor {
                     critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
                 }
             } else if (naturalRoll == 1) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("Natural 1 always crit misses!") }
+                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Natural 1 always crit misses!") }
                 // label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
                 attackText += "<span style='color:#e90000'><b>Critical Miss!</b></span>"
 
@@ -1043,12 +1079,12 @@ export class Hyp3eActor extends Actor {
                     critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
                 }
             } else if (atkRoll.total >= tn) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
                 // label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
                 attackText += `<b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
                 hit = true
             } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
                 if (eval(20 - atkRoll.total) <= 9) {
                     // label += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
                     attackText += `<b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
@@ -1081,12 +1117,12 @@ export class Hyp3eActor extends Actor {
                     break
                 }
             if (atkRoll.total >= tn) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Hit! Attack roll ${atkRoll.total} is greater than or equal to ${tn}.`) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Hit! Attack roll ${atkRoll.total} is greater than or equal to ${tn}.`) }
                 // label += `<br /><b>Hits a ${sizeFromTable} target!</b>`
                 attackText += `<b>Hits a ${sizeFromTable} target!</b>`
                 hit = true
             } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Miss! Attack roll ${atkRoll.total} is less than ${tn}.`) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Miss! Attack roll ${atkRoll.total} is less than ${tn}.`) }
                 // label += `<br /><b>Misses a ${sizeFromTable} target.</b>`
                 attackText += `<b>Misses a ${sizeFromTable} target.</b>`
             }
@@ -1101,13 +1137,13 @@ export class Hyp3eActor extends Actor {
                 const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData)
                 item.dmgFormula = dmgObj.formula
                 item.debugDmgRollFormula = dmgObj.debugFormula
-                if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula:", item.dmgFormula) }
+                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Damage formula:", item.dmgFormula) }
                 // Do we have 2-hand damage?
                 if (item.system.damage2h > "") {
                     // const dmgObj2h = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData)
                     item.dmgFormula2h = dmgObj.formula2h
                     item.debugDmgRollFormula2h = dmgObj.debugFormula2h
-                    if (CONFIG.HYP3E.debugMessages) { console.log("Damage formula 2H:", item.dmgFormula2h) }
+                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Damage formula 2H:", item.dmgFormula2h) }
                 }
             }
         }
@@ -1393,59 +1429,32 @@ export class Hyp3eActor extends Actor {
         })
     }
 
-    _getCombatantSitMods() {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for ${this.name}`) }
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: All Tokens:`, canvas.tokens) }
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Controlled Token:`, canvas.tokens.controlled[0]) }
+    _getCombatantSitMods(attacker, target) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for attacker ${this.name} and target ${target.name}.`) }
+
+        // Our return object
         let sitModObj = {}
 
-        // Try to get the attacking token
-        let attacker
-        if (this.token) {
-            // Get the token from the actor
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker actual token:`, this.token) }
-            attacker = this.token
-        } else if (canvas.tokens.controlled[0]) {
-            // Get the currently selected token, if the actor was not attached to one. To do this, 
-            //  we get the first controlled token. This is preferred for GMs, who may have multiple tokens
-            //  selected. For players, this will always be the player character. Players running multiple
-            //  characters will need to select the correct token before rolling.
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Player-controlled token:`, canvas.tokens.controlled[0]) }
-            attacker = canvas.tokens.controlled[0].document
-        } else {
-            // Get the first matching token based on actorId. This works fine for player characters
-            //  but not so well for NPCs. It will always return the first token that matches the actor ID,
-            //  and with unlinked tokens, there may be multiple actors with the same ID.
-            const tempToken = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker discovered token:`, tempToken) }
-            attacker = tempToken ? tempToken.document : null
-        }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker:`, attacker) }
-
-        let effects
+        let attackerEffects
         if (!foundry.utils.isNewerVersion(game.version, "13")) {
             // For Foundry v12...
-            effects = this.effects
+            attackerEffects = this.effects
         } else if (foundry.utils.isNewerVersion(game.version, "13")) {
             // For Foundry v13...
-            effects = this._getAllApplicableEffects()
+            attackerEffects = this._getAllApplicableEffects()
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker effects:`, effects) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker effects:`, attackerEffects) }
         // const effects = this._getEffectNames()
 
-        // Target token is easy to get, assuming we have one
-        let target, targetActor, targetEffects
-        const userTargets = Array.from(game.user.targets)
-        if (userTargets.length > 0) {
-            target = userTargets[0].document
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target:`, target) }
-            targetActor = target.actor
+        // Hopefully we have a target!
+        let targetEffects
+        if (target) {
             if (!foundry.utils.isNewerVersion(game.version, "13")) {
                 // For Foundry v12...
-                targetEffects = targetActor.effects
+                targetEffects = target.actor.effects
             } else if (foundry.utils.isNewerVersion(game.version, "13")) {
                 // For Foundry v13...
-                targetEffects = targetActor._getAllApplicableEffects()
+                targetEffects = target.actor._getAllApplicableEffects()
             }
             if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effects:`, targetEffects) }
             // targetEffects = targetActor._getEffectNames()
@@ -1455,7 +1464,7 @@ export class Hyp3eActor extends Actor {
         let sitModSum = 0
         let sitModsArr = []
         // Effect names can be arbitrary, what we care about is the token status/condition
-        effects.forEach(effect => {
+        attackerEffects.forEach(effect => {
             if (!effect.disabled) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effect statuses:`, effect.statuses) }
                 if (effect.statuses.has("blind")) {
@@ -1470,16 +1479,16 @@ export class Hyp3eActor extends Actor {
         });
         // Hopefully we have a target!
         if (target) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target elevation (${target.elevation}) vs. Attacker elevation (${attacker.elevation})...`) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target elevation (${target.document.elevation}) vs. Attacker elevation (${attacker.document.elevation})...`) }
             // Attacker on higher ground (token height vs. target token height)
-            // if (attacker.document.elevation > target.document.elevation) {
-            if (attacker.elevation > target.elevation) {
+            if (attacker.document.elevation > target.document.elevation) {
+            // if (attacker.elevation > target.elevation) {
                 sitModSum += 1
                 sitModsArr.push("Higher Ground (+1)")
             }
             // Defender is on higher ground
-            // if (attacker.document.elevation < target.document.elevation) {
-            if (attacker.elevation < target.elevation) {
+            if (attacker.document.elevation < target.document.elevation) {
+            // if (attacker.elevation < target.elevation) {
                 sitModSum += -1
                 sitModsArr.push("Defender on Higher Ground (-1)")
             }

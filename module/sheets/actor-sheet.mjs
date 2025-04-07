@@ -589,15 +589,15 @@ export class Hyp3eActorSheet extends ActorSheet {
     const dataset = element.dataset
 
     // Log the element
-    if (CONFIG.HYP3E.debugMessages) { console.log("Clicked element: ", element) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Clicked element: ", element) }
     // Log the element dataset
-    if (CONFIG.HYP3E.debugMessages) { console.log("Element dataset: ", dataset) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Element dataset: ", dataset) }
     // Log the sheet data
-    if (CONFIG.HYP3E.debugMessages) { console.log("Current Actor-Sheet Data:", this) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Actor-Sheet Data:", this) }
     // Log the actor
-    if (CONFIG.HYP3E.debugMessages) { console.log("Current Actor:", this.actor) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Actor:", this.actor) }
     // Log the token
-    if (CONFIG.HYP3E.debugMessages) { console.log("Current Token:", this.token) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Token:", this.token) }
 
     // How many different roll types do we have?
     //  Test of Attribute: d6 roll-under target
@@ -632,12 +632,12 @@ export class Hyp3eActorSheet extends ActorSheet {
 
     try {
       // What is our roll type?
-      if (CONFIG.HYP3E.debugMessages) { console.log("Roll Type:", dataset.rollType) }
+      if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Roll Type:", dataset.rollType) }
 
       dataset.itemId = ""
       dataset.actorId = this.actor.id
       dataset.baseClass = this.actor.system.baseClass
-      dataset.tokenId = this.token.id
+      dataset.tokenId = this.token?.id ? this.token?.id : null
 
       switch (dataset.rollType) {
         case "item":
@@ -678,13 +678,13 @@ export class Hyp3eActorSheet extends ActorSheet {
         default:
           // This should never happen, all rolls should have a roll-type
           ui.notifications.info("No Roll Type provided, this should never happen...")
-          console.log("No Roll Type provided, this should never happen...");
+          console.log("_onRoll: No Roll Type provided, this should never happen...");
 
       }
       
     } catch(err) {
       // Log the error
-      console.log("_onRoll Error: ", err)
+      console.log("_onRoll: Error: ", err)
     }
   }
 
