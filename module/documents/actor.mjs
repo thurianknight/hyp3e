@@ -1243,16 +1243,16 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Execute a hit-die roll directly from the actor sheet
+     * Execute a hit-die roll directly from the npc-actor sheet
      * @param {*} dataset 
      */
     async rollHD() {
         if (this.type !== 'npc') return;
         if (!this.system.hd){
-            if (CONFIG.HYP3E.debugMessages) { console.log("No HD value to roll!") }
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHD: No HD value to roll!") }
             return;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling HD ${this.system.hd}...`) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHD: Rolling HD ${this.system.hd}...`) }
         const roll = new Roll(this.system.hd);
         await roll.roll();
         if (roll != undefined && roll.total != undefined) {
@@ -1266,7 +1266,40 @@ export class Hyp3eActor extends Actor {
                 }
             });
         } else {
-            if (CONFIG.HYP3E.debugMessages) { console.log("Roll failed, no total value!") }
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHD: Roll failed, no total value!") }
+        }
+    }
+
+    /**
+     * Execute a hit-point increase (hit die + CN roll) directly from the character-actor sheet
+     * @param {*} dataset 
+     */
+    async rollHP() {
+        if (this.type !== 'character') return;
+        if (!this.system.hd){
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: No HD value to roll!") }
+            return;
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHP: Rolling HD ${this.system.hd} + ${this.system.attributes.con.hpMod}...`) }
+        const roll = new Roll(`${this.system.hd} + ${this.system.attributes.con.hpMod}`);
+        await roll.roll();
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll result: ", roll) }
+        if (roll != undefined && roll.total != undefined) {
+            const hpIncrease = roll.total;
+            const newHealth = parseInt(this.system.hp.value) + hpIncrease;
+            const newMax = parseInt(this.system.hp.max) + hpIncrease;
+            // Log the update
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Updated HP:", newHealth, "Max HP:", newMax) }
+            await this.update({
+                system: {
+                    hp: {
+                        value: newHealth,
+                        max: newMax
+                    }
+                }
+            });
+        } else {
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll failed, no total value!") }
         }
     }
 
@@ -1912,680 +1945,680 @@ export class Hyp3eActor extends Actor {
      *   Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, 
      *   Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch
      */
-    classData = {
-        "Assassin": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "int": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-        },
-        "Barbarian": {
-            "baseClass": "fighter",
-            "hitDie": "1d12",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 13,
-                "dex": 13,
-                "con": 13,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "dex": 16,
-            },
-            "featBonus": {
-                "str": 8,
-                "dex": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 14,
-                "transformation": 14,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-        },
-        "Bard": {
-            "baseClass": "thief",
-            "hitDie": "1d8",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Druid", "Illusionist"],
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "int": 9,
-                "wis": 9,
-                "cha": 15,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "cha": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-        },
-        "Berserker": {
-            "baseClass": "fighter",
-            "hitDie": "1d12",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 15,
-                "con": 15,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "con": 16,
-            },
-            "featBonus": {
-                "str": 8,
-                "con": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 14,
-                "transformation": 14,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-        },
-        "Cataphract": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "wis": 9,
-                "cha": 9,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "cha": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 16
-            },
-        },
-        "Cleric": {
-            "baseClass": "cleric",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Cleric"],
-            "ta": 1,
-            "unskilled": -2,
-            "hitDie": "1d8",
-            "attrReqs": {
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "wis": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Cryomancer": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Cryomancer"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "wis": 16,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Druid": {
-            "baseClass": "cleric",
-            "hitDie": "1d8",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Druid"],
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "wis": 9,
-                "cha": 12,
-            },
-            "xpBonusReq": {
-                "wis": 16,
-                "cha": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Fighter": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-            },
-            "xpBonusReq": {
-                "str": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 16
-            },
-        },
-        "Huntsman": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "wis": 9,
-                "cha": 12
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 16
-            },
-        },
-        "Illusionist": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Illusionist"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "dex": 9,
-                "int": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Legerdemainist": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Magician"],
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "dex": 12,
-                "int": 12,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-        },
-        "Magician": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Magician"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-            },
-            "xpBonusReq": {
-                "int": 16,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Monk": {
-            "baseClass": "cleric",
-            "hitDie": "1d8",
-            "fa": 0,
-            "ca": null,
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-        },
-        "Necromancer": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Necromancer"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "wis": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Paladin": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "wis": 9,
-                "cha": 15,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "cha": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 14,
-                "transformation": 14,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-        },
-        "Priest": {
-            "baseClass": "cleric",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Cleric"],
-            "ta": 1,
-            "unskilled": -4,
-            "attrReqs": {
-                "wis": 9,
-                "cha": 9,
-            },
-            "xpBonusReq": {
-                "wis": 16,
-                "cha": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Purloiner": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Cleric"],
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "dex": 12,
-                "wis": 12,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-        },
-        "Pyromancer": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Pyromancer"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "wis": 16,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Ranger": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "int": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 16
-            },
-        },
-        "Runegraver": {
-            "baseClass": "cleric",
-            "hitDie": "1d8",
-            "fa": 1,
-            "ca": 1,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "wis": 12,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Scout": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "dex": 9,
-                "int": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-        },
-        "Shaman": {
-            "baseClass": "cleric",
-            "hitDie": "1d6",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Cleric", "Magician"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 12
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "wis": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Thief": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "dex": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-        },
-        "Warlock": {
-            "baseClass": "fighter",
-            "hitDie": "1d8",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Magician"],
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 12,
-                "int": 12,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-        "Witch": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Witch"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 9,
-                "cha": 12,
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "cha": 16,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-        },
-    }
+    // classData = {
+    //     "Assassin": {
+    //         "baseClass": "thief",
+    //         "hitDie": "1d6",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": -2,
+    //         "attrReqs": {
+    //             "str": 9,
+    //             "dex": 9,
+    //             "int": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "dex": 16,
+    //             "int": 16,
+    //         },
+    //         "featBonus": {
+    //             "dex": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 14,
+    //             "transformation": 16,
+    //             "avoidance": 14,
+    //             "sorcery": 16
+    //         },
+    //     },
+    //     "Barbarian": {
+    //         "baseClass": "fighter",
+    //         "hitDie": "1d12",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 13,
+    //             "dex": 13,
+    //             "con": 13,
+    //         },
+    //         "xpBonusReq": {
+    //             "str": 16,
+    //             "dex": 16,
+    //         },
+    //         "featBonus": {
+    //             "str": 8,
+    //             "dex": 8,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 14,
+    //             "transformation": 14,
+    //             "avoidance": 14,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Bard": {
+    //         "baseClass": "thief",
+    //         "hitDie": "1d8",
+    //         "fa": 1,
+    //         "ca": 1,
+    //         "spellLists": ["Druid", "Illusionist"],
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 9,
+    //             "dex": 9,
+    //             "int": 9,
+    //             "wis": 9,
+    //             "cha": 15,
+    //         },
+    //         "xpBonusReq": {
+    //             "dex": 16,
+    //             "cha": 16,
+    //         },
+    //         "featBonus": {
+    //             "dex": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 14,
+    //             "transformation": 16,
+    //             "avoidance": 14,
+    //             "sorcery": 16
+    //         },
+    //     },
+    //     "Berserker": {
+    //         "baseClass": "fighter",
+    //         "hitDie": "1d12",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 15,
+    //             "con": 15,
+    //         },
+    //         "xpBonusReq": {
+    //             "str": 16,
+    //             "con": 16,
+    //         },
+    //         "featBonus": {
+    //             "str": 8,
+    //             "con": 8,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 14,
+    //             "transformation": 14,
+    //             "avoidance": 14,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Cataphract": {
+    //         "baseClass": "fighter",
+    //         "hitDie": "1d10",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 9,
+    //             "dex": 9,
+    //             "wis": 9,
+    //             "cha": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "str": 16,
+    //             "cha": 16,
+    //         },
+    //         "featBonus": {
+    //             "str": 8,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 16,
+    //             "transformation": 14,
+    //             "avoidance": 16,
+    //             "sorcery": 16
+    //         },
+    //     },
+    //     "Cleric": {
+    //         "baseClass": "cleric",
+    //         "fa": 1,
+    //         "ca": 1,
+    //         "spellLists": ["Cleric"],
+    //         "ta": 1,
+    //         "unskilled": -2,
+    //         "hitDie": "1d8",
+    //         "attrReqs": {
+    //             "wis": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "wis": 16,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 16,
+    //             "transformation": 16,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Cryomancer": {
+    //         "baseClass": "magician",
+    //         "hitDie": "1d4",
+    //         "fa": 0,
+    //         "ca": 1,
+    //         "spellLists": ["Cryomancer"],
+    //         "ta": null,
+    //         "unskilled": -4,
+    //         "attrReqs": {
+    //             "int": 9,
+    //             "wis": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "int": 16,
+    //             "wis": 16,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 14,
+    //             "transformation": 16,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Druid": {
+    //         "baseClass": "cleric",
+    //         "hitDie": "1d8",
+    //         "fa": 1,
+    //         "ca": 1,
+    //         "spellLists": ["Druid"],
+    //         "ta": null,
+    //         "unskilled": -2,
+    //         "attrReqs": {
+    //             "wis": 9,
+    //             "cha": 12,
+    //         },
+    //         "xpBonusReq": {
+    //             "wis": 16,
+    //             "cha": 16,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 16,
+    //             "transformation": 16,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Fighter": {
+    //         "baseClass": "fighter",
+    //         "hitDie": "1d10",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "str": 16,
+    //         },
+    //         "featBonus": {
+    //             "str": 8,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 16,
+    //             "transformation": 14,
+    //             "avoidance": 16,
+    //             "sorcery": 16
+    //         },
+    //     },
+    //     "Huntsman": {
+    //         "baseClass": "fighter",
+    //         "hitDie": "1d10",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 9,
+    //             "dex": 9,
+    //             "wis": 9,
+    //             "cha": 12
+    //         },
+    //         "xpBonusReq": {
+    //             "str": 16,
+    //             "wis": 16,
+    //         },
+    //         "featBonus": {
+    //             "str": 8,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 16,
+    //             "transformation": 14,
+    //             "avoidance": 16,
+    //             "sorcery": 16
+    //         },
+    //     },
+    //     "Illusionist": {
+    //         "baseClass": "magician",
+    //         "hitDie": "1d4",
+    //         "fa": 0,
+    //         "ca": 1,
+    //         "spellLists": ["Illusionist"],
+    //         "ta": null,
+    //         "unskilled": -4,
+    //         "attrReqs": {
+    //             "dex": 9,
+    //             "int": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "dex": 16,
+    //             "int": 16,
+    //         },
+    //         "featBonus": {
+    //             "dex": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 14,
+    //             "transformation": 16,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Legerdemainist": {
+    //         "baseClass": "thief",
+    //         "hitDie": "1d6",
+    //         "fa": 1,
+    //         "ca": 1,
+    //         "spellLists": ["Magician"],
+    //         "ta": null,
+    //         "unskilled": -2,
+    //         "attrReqs": {
+    //             "dex": 12,
+    //             "int": 12,
+    //         },
+    //         "xpBonusReq": {
+    //             "dex": 16,
+    //             "int": 16,
+    //         },
+    //         "featBonus": {
+    //             "dex": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 16,
+    //             "transformation": 16,
+    //             "avoidance": 14,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Magician": {
+    //         "baseClass": "magician",
+    //         "hitDie": "1d4",
+    //         "fa": 0,
+    //         "ca": 1,
+    //         "spellLists": ["Magician"],
+    //         "ta": null,
+    //         "unskilled": -4,
+    //         "attrReqs": {
+    //             "int": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "int": 16,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 14,
+    //             "transformation": 16,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Monk": {
+    //         "baseClass": "cleric",
+    //         "hitDie": "1d8",
+    //         "fa": 0,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": -2,
+    //         "attrReqs": {
+    //             "str": 9,
+    //             "dex": 9,
+    //             "wis": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "dex": 16,
+    //             "wis": 16,
+    //         },
+    //         "featBonus": {
+    //             "dex": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 16,
+    //             "transformation": 14,
+    //             "avoidance": 14,
+    //             "sorcery": 16
+    //         },
+    //     },
+    //     "Necromancer": {
+    //         "baseClass": "magician",
+    //         "hitDie": "1d4",
+    //         "fa": 0,
+    //         "ca": 1,
+    //         "spellLists": ["Necromancer"],
+    //         "ta": null,
+    //         "unskilled": -4,
+    //         "attrReqs": {
+    //             "int": 9,
+    //             "wis": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "int": 16,
+    //             "wis": 16,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 16,
+    //             "transformation": 16,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Paladin": {
+    //         "baseClass": "fighter",
+    //         "hitDie": "1d10",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 9,
+    //             "dex": 9,
+    //             "wis": 9,
+    //             "cha": 15,
+    //         },
+    //         "xpBonusReq": {
+    //             "str": 16,
+    //             "cha": 16,
+    //         },
+    //         "featBonus": {
+    //             "str": 8,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 14,
+    //             "transformation": 14,
+    //             "avoidance": 14,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Priest": {
+    //         "baseClass": "cleric",
+    //         "hitDie": "1d4",
+    //         "fa": 0,
+    //         "ca": 1,
+    //         "spellLists": ["Cleric"],
+    //         "ta": 1,
+    //         "unskilled": -4,
+    //         "attrReqs": {
+    //             "wis": 9,
+    //             "cha": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "wis": 16,
+    //             "cha": 16,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 16,
+    //             "transformation": 16,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Purloiner": {
+    //         "baseClass": "thief",
+    //         "hitDie": "1d6",
+    //         "fa": 1,
+    //         "ca": 1,
+    //         "spellLists": ["Cleric"],
+    //         "ta": null,
+    //         "unskilled": -2,
+    //         "attrReqs": {
+    //             "dex": 12,
+    //             "wis": 12,
+    //         },
+    //         "xpBonusReq": {
+    //             "dex": 16,
+    //             "wis": 16,
+    //         },
+    //         "featBonus": {
+    //             "dex": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 16,
+    //             "transformation": 16,
+    //             "avoidance": 14,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Pyromancer": {
+    //         "baseClass": "magician",
+    //         "hitDie": "1d4",
+    //         "fa": 0,
+    //         "ca": 1,
+    //         "spellLists": ["Pyromancer"],
+    //         "ta": null,
+    //         "unskilled": -4,
+    //         "attrReqs": {
+    //             "int": 9,
+    //             "wis": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "int": 16,
+    //             "wis": 16,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 14,
+    //             "transformation": 16,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Ranger": {
+    //         "baseClass": "fighter",
+    //         "hitDie": "1d10",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 9,
+    //             "dex": 9,
+    //             "int": 9,
+    //             "wis": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "str": 16,
+    //             "wis": 16,
+    //         },
+    //         "featBonus": {
+    //             "str": 8,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 16,
+    //             "transformation": 14,
+    //             "avoidance": 16,
+    //             "sorcery": 16
+    //         },
+    //     },
+    //     "Runegraver": {
+    //         "baseClass": "cleric",
+    //         "hitDie": "1d8",
+    //         "fa": 1,
+    //         "ca": 1,
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 9,
+    //             "wis": 12,
+    //         },
+    //         "xpBonusReq": {
+    //             "str": 16,
+    //             "wis": 16,
+    //         },
+    //         "featBonus": {
+    //             "str": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 16,
+    //             "transformation": 14,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Scout": {
+    //         "baseClass": "thief",
+    //         "hitDie": "1d6",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": -2,
+    //         "attrReqs": {
+    //             "dex": 9,
+    //             "int": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "dex": 16,
+    //             "int": 16,
+    //         },
+    //         "featBonus": {
+    //             "dex": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 14,
+    //             "transformation": 16,
+    //             "avoidance": 14,
+    //             "sorcery": 16
+    //         },
+    //     },
+    //     "Shaman": {
+    //         "baseClass": "cleric",
+    //         "hitDie": "1d6",
+    //         "fa": 0,
+    //         "ca": 1,
+    //         "spellLists": ["Cleric", "Magician"],
+    //         "ta": null,
+    //         "unskilled": -4,
+    //         "attrReqs": {
+    //             "int": 9,
+    //             "wis": 12
+    //         },
+    //         "xpBonusReq": {
+    //             "int": 16,
+    //             "wis": 16,
+    //         },
+    //         "saves": {
+    //             "death": 14,
+    //             "device": 16,
+    //             "transformation": 16,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Thief": {
+    //         "baseClass": "thief",
+    //         "hitDie": "1d6",
+    //         "fa": 1,
+    //         "ca": null,
+    //         "ta": null,
+    //         "unskilled": -2,
+    //         "attrReqs": {
+    //             "dex": 9,
+    //         },
+    //         "xpBonusReq": {
+    //             "dex": 16,
+    //         },
+    //         "featBonus": {
+    //             "dex": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 14,
+    //             "transformation": 16,
+    //             "avoidance": 14,
+    //             "sorcery": 16
+    //         },
+    //     },
+    //     "Warlock": {
+    //         "baseClass": "fighter",
+    //         "hitDie": "1d8",
+    //         "fa": 1,
+    //         "ca": 1,
+    //         "spellLists": ["Magician"],
+    //         "ta": null,
+    //         "unskilled": 0,
+    //         "attrReqs": {
+    //             "str": 12,
+    //             "int": 12,
+    //         },
+    //         "xpBonusReq": {
+    //             "str": 16,
+    //             "int": 16,
+    //         },
+    //         "featBonus": {
+    //             "str": 8,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 16,
+    //             "transformation": 14,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    //     "Witch": {
+    //         "baseClass": "magician",
+    //         "hitDie": "1d4",
+    //         "fa": 0,
+    //         "ca": 1,
+    //         "spellLists": ["Witch"],
+    //         "ta": null,
+    //         "unskilled": -4,
+    //         "attrReqs": {
+    //             "int": 9,
+    //             "wis": 9,
+    //             "cha": 12,
+    //         },
+    //         "xpBonusReq": {
+    //             "int": 16,
+    //             "cha": 16,
+    //         },
+    //         "saves": {
+    //             "death": 16,
+    //             "device": 16,
+    //             "transformation": 14,
+    //             "avoidance": 16,
+    //             "sorcery": 14
+    //         },
+    //     },
+    // }
 
     _valueFromTable(table, val) {
         let output;

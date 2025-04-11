@@ -2621,11 +2621,21 @@ export class Hyp3eCharacter {
         // Update the actor's level and next-level XP
         data.details.level.value = nextLevel
         data.details.xp.toNextLvl = nextLevelXp
+        // Increase current & max hit points
+        let hpIncrease = 0
+        const roll = new Roll(`${data.hd} + ${data.attributes.con.hpMod}`);
+        await roll.roll();
+        if (CONFIG.HYP3E.debugMessages) { console.log("levelUp: HP roll result: ", roll) }
+        if (roll != undefined && roll.total != undefined) {
+            hpIncrease = roll.total;
+            data.hp.value = parseInt(data.hp.value) + hpIncrease
+            data.hp.max = parseInt(data.hp.max) + hpIncrease
+        }
         // Update fighting ability, casting ability, and turning ability
         data.fa = thisClass.levelAdvancement[nextLevel].fa
         if (thisClass.levelAdvancement[nextLevel].ca) { data.ca = thisClass.levelAdvancement[nextLevel].ca }
         if (thisClass.levelAdvancement[nextLevel].ta) { data.ta = thisClass.levelAdvancement[nextLevel].ta }
-        
+
         // Update saving throws, if needed
         let currentSave = this._valueFromTable(this.savingThrows, currLevel)
         let newSave = this._valueFromTable(this.savingThrows, nextLevel)
@@ -2676,6 +2686,10 @@ export class Hyp3eCharacter {
         let updateData = {
             system: {
                 hd: data.hd,
+                hp: {
+                    value: data.hp.value,
+                    max: data.hp.max,
+                },
                 fa: data.fa,
                 ca: data.ca,
                 ta: data.ta,
@@ -2729,6 +2743,7 @@ export class Hyp3eCharacter {
         let content = `<ul>`
         content += `<li>New Level: ${nextLevel}</li>`
         content += `<li>XP: ${currentXp} / ${nextLevelXp}</li>`
+        content += `<li>Hit Point Increase: ${hpIncrease} (${data.hp.value} HP / ${data.hp.max} max)</li>`
         content += `<li>Fighting Ability: ${data.fa}</li>`
         if (data.ca) { content += `<li>Casting Ability: ${data.ca}</li>` }
         if (data.ta) { content += `<li>Turning Ability: ${data.ta}</li>` }
