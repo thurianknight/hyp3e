@@ -64,7 +64,7 @@ export class HYP3ECombat extends Combat {
         }
         // @ts-expect-error - This method exists, but the types package doesn't have it
         await super._onEndRound();
-        // await this.activateCombatant(0)
+        await this.activateCombatant(0)
     }
 
     async _onEndTurn(combatant, context) {
