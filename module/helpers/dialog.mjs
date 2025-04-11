@@ -362,5 +362,4 @@ export class Hyp3eDialog {
             }).render(true);
         })
     }
-
 }

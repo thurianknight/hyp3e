@@ -669,7 +669,6 @@ export class Hyp3eActorSheet extends ActorSheet {
   
         case "setAttr":
           // Take the attribute scores and class, and lookup/calculate modifiers
-          //   let returnOk = await this.actor.SetAttributeMods(dataset)
           let setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset)
           if (setAttrOk) {
             this.render()
@@ -677,13 +676,13 @@ export class Hyp3eActorSheet extends ActorSheet {
           break
 
         case "levelUp":
-            // Checek current XP, and level up if possible
+            // Check current XP, and level up if possible
             let levelUpOk = await Hyp3eCharacter.levelUp(dataset)
             if (levelUpOk) {
               this.render()
             }
             break
-  
+
         default:
           // This should never happen, all rolls should have a roll-type
           ui.notifications.info("No Roll Type provided, this should never happen...")
