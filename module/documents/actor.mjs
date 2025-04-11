@@ -1,5 +1,6 @@
-import {Hyp3eDice} from "../helpers/dice.mjs";
-import {Hyp3eDialog} from "../helpers/dialog.mjs";
+import { Hyp3eCharacter } from "../helpers/character.mjs";
+import { Hyp3eDice } from "../helpers/dice.mjs";
+import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 
 /**
@@ -82,7 +83,8 @@ export class Hyp3eActor extends Actor {
         // Add actor type & base class, used for crit hit & crit miss tables
         try {
             systemData.actorType = actorData.type
-            systemData.baseClass = this.classData[systemData.details.class].baseClass
+            // systemData.baseClass = this.classData[systemData.details.class].baseClass
+            systemData.baseClass = Hyp3eCharacter.classData[systemData.details.class].baseClass
         } catch (err) {
             // No match found (happens with custom classes), use "npc"
             systemData.baseClass = "npc"
@@ -2603,7 +2605,8 @@ export class Hyp3eActor extends Actor {
 
     isAttributeLow(attr) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Checking ${attr} attribute for ${this.system.details.class}...`) }
-        const attrReqs = this.classData[this.system.details.class]?.attrReqs
+        // const attrReqs = this.classData[this.system.details.class]?.attrReqs
+        const attrReqs = Hyp3eCharacter.classData[this.system.details.class]?.attrReqs
         // if (CONFIG.HYP3E.debugMessages) { console.log(`Attribute requirements: `, attrReqs) }
         if (attrReqs[attr]) {
             if (this.system.attributes[attr].value < attrReqs[attr]) {

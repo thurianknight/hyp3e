@@ -1,5 +1,5 @@
+import { Hyp3eCharacter } from "../helpers/character.mjs";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
-// import {Hyp3eDice} from "../dice.mjs";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -669,12 +669,21 @@ export class Hyp3eActorSheet extends ActorSheet {
   
         case "setAttr":
           // Take the attribute scores and class, and lookup/calculate modifiers
-          let returnOk = await this.actor.SetAttributeMods(dataset)
-          if (returnOk) {
+          //   let returnOk = await this.actor.SetAttributeMods(dataset)
+          let setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset)
+          if (setAttrOk) {
             this.render()
           }
           break
 
+        case "levelUp":
+            // Checek current XP, and level up if possible
+            let levelUpOk = await Hyp3eCharacter.levelUp(dataset)
+            if (levelUpOk) {
+              this.render()
+            }
+            break
+  
         default:
           // This should never happen, all rolls should have a roll-type
           ui.notifications.info("No Roll Type provided, this should never happen...")

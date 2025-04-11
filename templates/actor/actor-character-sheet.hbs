@@ -50,8 +50,11 @@
         </div>
         <div class="character-header-block flexcol">
           <div class="flexrow flex-group-center">
-            <label class="header-label align-left">{{localize "HYP3E.details.level"}}</label>
+            <label for="system.details.level.value" class="header-label align-left">{{localize "HYP3E.details.level"}}</label>
             <input type="text" name="system.details.level.value" value="{{system.details.level.value}}" data-dtype="Number" />
+            <span class="rollable flex" data-roll="" data-roll-type="levelUp" title="Level-Up!">
+                <i class="fa fa-book" style="font-size: small"></i>
+            </span>
             <span></span>
             <span></span>
             <span></span>
