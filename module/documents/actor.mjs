@@ -1465,7 +1465,7 @@ export class Hyp3eActor extends Actor {
     }
 
     _getCombatantSitMods(attacker, target) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for attacker ${this.name} and target ${target.name}.`) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for attacker ${this.name}...`) }
 
         // Our return object
         let sitModObj = {}
