@@ -78,6 +78,11 @@ export class Hyp3eActor extends Actor {
             // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, obj) }
         })
 
+        // If tempAcMod is an object, convert it to zero
+        if (typeof systemData.ac.tempAcMod == "object") {
+            systemData.ac.tempAcMod = 0
+        }
+
         // Calculated fields go here...
 
         // Add actor type & base class, used for crit hit & crit miss tables
@@ -97,7 +102,7 @@ export class Hyp3eActor extends Actor {
             systemData.taskResolution[key].name = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].name)
             systemData.taskResolution[key].hint = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].hint)
         }
-        
+
         // Auto-calculate AC if configuration is enabled
         if (CONFIG.HYP3E.autoCalcAc) {
             // systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
@@ -183,6 +188,15 @@ export class Hyp3eActor extends Actor {
                     this.deleteTempModifier("movement.base.value", "isHeavilyEncumbered",)
                     if (CONFIG.HYP3E.debugMessages) { console.log(`Not Encumbered: AC ${tempAC}, MV ${tempMV}`) }
                 }
+            }
+            // Apply temporary modifiers (typically from effects) to AC and DR
+            if (parseInt(systemData.ac.tempAcMod)) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Temp AC mod: ${systemData.ac.tempAcMod}`) }
+                tempAC -= parseInt(systemData.ac.tempAcMod)
+            }
+            if (parseInt(systemData.ac.tempDrMod)) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Temp DR mod: ${systemData.ac.tempDrMod}`) }
+                tempDR += parseInt(systemData.ac.tempDrMod)
             }
             // Now calculate & set the final values
             systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod

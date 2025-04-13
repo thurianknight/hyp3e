@@ -414,7 +414,7 @@ Hooks.once("ready", async function() {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "1.5.1"
+    const NEEDS_MIGRATION_TO_VERSION = "1.5.5"
     const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
         migrateWorld()
@@ -457,8 +457,11 @@ async function migrateWorld() {
         // Migrate PC data
         if (actor.type == "character") {
             // do stuff to characters
+            actor = fixTempAcMods(actor)
+            await actor.update()
         }
         // Migrate the actor document's items if any exist
+        /** 
         if (actor.items) {
             for (let item of actor.items) {
                 if (item.type === "weapon") {
@@ -484,9 +487,11 @@ async function migrateWorld() {
                 }
             }
         }
+        */
     }
 
     // Migrate Items directory
+    /**
     for (let item of game.items.contents) {
         if (item.type === "weapon") {
             if (item.system?.annotations > ""){
@@ -510,6 +515,10 @@ async function migrateWorld() {
             // }
         }
     }
+    */
+
+    // Skip out early, no compendium migrations needed
+    return
 
     // Migrate Actor compendia, one document at a time (time-consuming!)
     for (let pack of game.packs) {
@@ -613,6 +622,20 @@ async function migrateWorld() {
         console.log(`Migrated all ${documentName} documents from Compendium ${pack.collection}`);
 
     }
+}
+
+function fixTempAcMods(doc) {
+    // If tempAcMod is an object, convert it to zero
+    if (typeof doc.system.ac.tempAcMod == "object") {
+        console.log(`Fixing temp AC mod for ${doc.name}...`)
+        doc.system.ac.tempAcMod = 0
+    }
+    // If tempDrMod is an object, convert it to zero
+    if (typeof doc.system.ac.tempDrMod == "object") {
+        console.log(`Fixing temp DR mod for ${doc.name}...`)
+        doc.system.ac.tempDrMod = 0
+    }
+    return doc
 }
 
 function updateWeaponFormula(doc) {

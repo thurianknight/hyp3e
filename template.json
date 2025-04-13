@@ -15,10 +15,14 @@
                 },
                 "ac": {
                     "value": 9,
-                    "dr": 0
+                    "dr": 0,
+                    "tempAcMod": 0,
+                    "tempDrMod": 0
                 },
                 "atkRate": "1/1",
                 "fa": 0,
+                "tempAtkMod": 0,
+                "tempDmgMod": 0,
                 "ca": null,
                 "ta": null,
                 "saves": {
@@ -235,7 +239,8 @@
             "type": "unarmored",
             "ac": 9,
             "dr": 0,
-            "mv": 40
+            "mv": 40,
+            "resistances": {}
         },
         "container": {
             "templates": ["base", "physical"],
