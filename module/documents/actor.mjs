@@ -958,7 +958,7 @@ export class Hyp3eActor extends Actor {
             }
         }
 
-        // Initiatlize sitMod and sitModList
+        // Initialize sitMod and sitModList
         dataset.sitMod = 0
         dataset.sitModList = ""
 
