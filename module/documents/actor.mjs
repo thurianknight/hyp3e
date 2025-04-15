@@ -958,11 +958,20 @@ export class Hyp3eActor extends Actor {
             }
         }
 
+        // Initiatlize sitMod and sitModList
+        dataset.sitMod = 0
+        dataset.sitModList = ""
+
         // Get any situational modifiers that can be detected from token status or other means
         if (game.settings.get(game.system.id, "enableCombatSitModDetection")) {
             let sitModObj = this._getCombatantSitMods(attacker, target)
-            dataset.sitMod = sitModObj?.sitMod
-            dataset.sitModList = sitModObj?.sitModList    
+            if (sitModObj.sitModList  && sitModObj?.sitModList != "") {
+                if (dataset.sitModList != "") {
+                    dataset.sitModList += ", "
+                }
+                dataset.sitMod = parseInt(dataset.sitMod) + parseInt(sitModObj?.sitMod)
+                dataset.sitModList += sitModObj?.sitModList
+            }
         }
 
         // Show the roll dialog (type and item-dependent)
@@ -1516,11 +1525,22 @@ export class Hyp3eActor extends Actor {
         attackerEffects.forEach(effect => {
             if (!effect.disabled) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effect statuses:`, effect.statuses) }
-                if (effect.statuses.has("blind")) {
+                // Does the effect apply a tempAtkMod?
+                effect.changes.forEach(change => {
+                    if (change.key == "system.tempAtkMod") {
+                        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor ${this.name} has tempAtkMod: ${change.value}`) }
+                        // Add the tempAtkMod to the sitMod
+                        sitModSum += parseInt(change.value)
+                        const changeString = parseInt(change.value) > 0 ? `+${change.value}` : `${change.value}`
+                        sitModsArr.push(`${effect.name} (${changeString})`)
+                    }
+                });
+                // Status effects that may not apply any changes
+                if (effect.statuses.has("blind") && effect.changes.length == 0) {
                     sitModSum += -4
                     sitModsArr.push("Blind (-4)")
                 }
-                if (effect.statuses.has("invisible")) {
+                if (effect.statuses.has("invisible") && effect.changes.length == 0) {
                     sitModSum += 4
                     sitModsArr.push("Invisible (+4)")
                 }
@@ -1545,7 +1565,7 @@ export class Hyp3eActor extends Actor {
             // Effect names can be arbitrary, what we care about is the token status/condition
             targetEffects.forEach(effect => {
                 if (!effect.disabled) {
-                    // if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effect statuses:`, effect.statuses) }
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effect statuses:`, effect.statuses) }
                     if (effect.statuses.has("blind")) {
                         sitModSum += 4
                         sitModsArr.push("Defender Blind (+4)")
