@@ -84,54 +84,6 @@
         },
         "character": {
             "templates": ["base", "spellcaster"],
-            "details": {
-                "notes": "",
-                "class": "",
-                "level": {
-                    "value": 1
-                },
-                "xp": {
-                    "value": "0",
-                    "toNextLvl": "0",
-                    "bonus": "0",
-                    "primeAttr": ""
-                },
-                "race": "",
-                "gender": "",
-                "age": "",
-                "religion": "",
-                "height": "",
-                "weight": "",
-                "hair": "",
-                "eyes": "",
-                "complexion": "",
-                "physicalFeatures": ""
-            },
-            "unskilled": 0,
-            "proficiencies": {
-            "class": "",
-            "lvl4": "",
-            "lvl8": "",
-            "lvl12": ""
-            },
-            "money" : {
-                "cp": {
-                    "value": 0
-                },
-                "sp": {
-                    "value": 0
-                },
-                "ep": {
-                    "value": 0
-                },
-                "gp": {
-                    "value": 0
-                },
-                "pp": {
-                    "value": 0
-                }
-            },
-            "treasure": "",
             "attributes": {
                 "str": {
                     "value": 10,
@@ -183,7 +135,55 @@
                     "maxHenchmen": 0,
                     "turnUndead": 0
                 }
-            }
+            },
+            "details": {
+                "notes": "",
+                "class": "",
+                "level": {
+                    "value": 1
+                },
+                "xp": {
+                    "value": "0",
+                    "toNextLvl": "0",
+                    "bonus": "0",
+                    "primeAttr": ""
+                },
+                "race": "",
+                "gender": "",
+                "age": "",
+                "religion": "",
+                "height": "",
+                "weight": "",
+                "hair": "",
+                "eyes": "",
+                "complexion": "",
+                "physicalFeatures": ""
+            },
+            "unskilled": 0,
+            "proficiencies": {
+                "class": "",
+                "lvl4": "",
+                "lvl8": "",
+                "lvl12": ""
+            },
+            "money" : {
+                "cp": {
+                    "value": 0
+                },
+                "sp": {
+                    "value": 0
+                },
+                "ep": {
+                    "value": 0
+                },
+                "gp": {
+                    "value": 0
+                },
+                "pp": {
+                    "value": 0
+                }
+            },
+            "treasure": ""
         },
         "npc": {
             "templates": ["base"],
