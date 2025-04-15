@@ -325,6 +325,16 @@ export class Hyp3eDice {
             }
         }
 
+        // Does the actor have a temporary damage mod applied?
+        if (actorData?.tempDmgMod) {
+            dmgRollParts.push(actorData.tempDmgMod)
+            debugDmgRollParts.push(`<tr><td>Effect Mod</td><td>${actorData.tempDmgMod}</td></tr>`)
+            if (itemData.damage2h) {
+                dmgRoll2Parts.push(actorData.tempDmgMod)
+                debugDmgRoll2Parts.push(`<tr><td>Effect Mod</td><td>${actorData.tempDmgMod}</td></tr>`)
+            }
+        }
+
         // Finish the debug damage roll table
         debugDmgRollParts.push(`</table>`)
         if (itemData.damage2h) { debugDmgRoll2Parts.push(`</table>`) }
