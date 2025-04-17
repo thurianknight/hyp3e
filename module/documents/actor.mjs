@@ -164,24 +164,24 @@ export class Hyp3eActor extends Actor {
                 if (this.getFlag(game.system.id, "isEncumbered")) {
                     tempAC += 1
                     tempMV -= 10
-                    // These aren't really used yet, but maybe in the future
-                    this.addTempModifier("ac.value", "isEncumbered", 1)
-                    this.addTempModifier("movement.base.value", "isEncumbered", -10)
+                    // These temp modifiers aren't really used yet, but maybe in the future
+                    // this.addTempModifier("ac.value", "isEncumbered", 1)
+                    // this.addTempModifier("movement.base.value", "isEncumbered", -10)
                     this.deleteTempModifier("ac.value", "isHeavilyEncumbered")
                     this.deleteTempModifier("movement.base.value", "isHeavilyEncumbered",)
                     if (CONFIG.HYP3E.debugMessages) { console.log(`Encumbered: AC ${tempAC}, MV ${tempMV}`) }
                 } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
                     tempAC += 2
                     tempMV -= 20
-                    // These aren't really used yet, but maybe in the future
-                    this.addTempModifier("ac.value", "isHeavilyEncumbered", 2)
-                    this.addTempModifier("movement.base.value", "isHeavilyEncumbered", -20)
+                    // These temp modifiers aren't really used yet, but maybe in the future
+                    // this.addTempModifier("ac.value", "isHeavilyEncumbered", 2)
+                    // this.addTempModifier("movement.base.value", "isHeavilyEncumbered", -20)
                     this.deleteTempModifier("ac.value", "isEncumbered")
                     this.deleteTempModifier("movement.base.value", "isEncumbered",)
                     if (CONFIG.HYP3E.debugMessages) { console.log(`Heavily Encumbered: AC ${tempAC}, MV ${tempMV}`) }
                 } else {
                     // Not encumbered -- find any instances of encumbrance mods and remove them
-                    // These aren't really used yet, but maybe in the future
+                    // These temp modifiers aren't really used yet, but maybe in the future
                     this.deleteTempModifier("ac.value", "isEncumbered")
                     this.deleteTempModifier("movement.base.value", "isEncumbered",)
                     this.deleteTempModifier("ac.value", "isHeavilyEncumbered")
@@ -226,6 +226,42 @@ export class Hyp3eActor extends Actor {
         systemData.actorType = actorData.type
         systemData.baseClass = "npc"
 
+        // Can we do this here? NOPE!
+        // if (systemData.size == "L") {
+        //     this.updateSource({
+        //         "prototypeToken.width": 2,
+        //         "prototypeToken.height": 2,
+        //     });    
+        // }
+        // if (systemData.size == "H") {
+        //     this.updateSource({
+        //         "prototypeToken.width": 3,
+        //         "prototypeToken.height": 3,
+        //     });    
+        // }
+        // if (systemData.size == "S") {
+        //     this.updateSource({
+        //         "prototypeToken.texture.scaleX": 0.5,
+        //         "prototypeToken.texture.scaleY": 0.5,
+        //     });    
+        // }
+    }
+
+    /**
+     * Set token defaults when actor is created
+     */
+    async _preCreate(data, options, user) {
+        await super._preCreate(data, options, user);
+        if (data.type == "character") {
+            this.updateSource({
+                "prototypeToken.actorLink": true,
+                "prototypeToken.sight.enabled": true,
+                "prototypeToken.disposition": 0
+            });
+        }
+        if (data.type == "npc") {
+            // Do nothing for now
+        }
     }
 
     /**
@@ -267,18 +303,6 @@ export class Hyp3eActor extends Actor {
         if (this.type !== 'npc') return;
         // Anything to load?
 
-    }
-
-    // Set token defaults when actor is created
-    async _preCreate(data, options, user) {
-        await super._preCreate(data, options, user);
-        if (data.type == "character") {
-            this.updateSource({
-                "prototypeToken.actorLink": true,
-                "prototypeToken.sight.enabled": true,
-                "prototypeToken.disposition": 0
-            });
-        }
     }
 
     addTempModifier(templateField, source, modifier) {
