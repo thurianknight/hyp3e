@@ -453,12 +453,30 @@ async function migrateWorld() {
         // Migrate NPC data
         if (actor.type == "npc") {
             // do stuff to npcs
+            const tempAcMod = fixTempAcMod(actor)
+            if (tempAcMod) {
+                await actor.update(tempAcMod)
+            }
+            const tempDrMod = fixTempDrMod(actor)
+            if (tempDrMod) {
+                await actor.update(tempDrMod)
+            }
+            const tokenSize = fixTokenSize(actor)
+            if (tokenSize) {
+                await actor.update(tokenSize)
+            }
         }
         // Migrate PC data
         if (actor.type == "character") {
             // do stuff to characters
-            actor = fixTempAcMods(actor)
-            await actor.update()
+            const tempAcMod = fixTempAcMod(actor)
+            if (tempAcMod) {
+                await actor.update(tempAcMod)
+            }
+            const tempDrMod = fixTempDrMod(actor)
+            if (tempDrMod) {
+                await actor.update(tempDrMod)
+            }
         }
         // Migrate the actor document's items if any exist
         /** 
@@ -518,21 +536,21 @@ async function migrateWorld() {
     */
 
     // Skip out early, no compendium migrations needed
-    return
+    // return
 
-    // Migrate Actor compendia, one document at a time (time-consuming!)
+    // Migrate compendia, one document at a time (time-consuming!)
     for (let pack of game.packs) {
 
         const packType = pack.metadata.type
         // Skip anything that's not an Item or Actor compendium pack
-        if (packType != "Item" && packType != "Actor") {
-            continue
-        }
-
-        // Skip anything that's not an Actor compendium pack
-        // if (packType != "Actor") {
+        // if (packType != "Item" && packType != "Actor") {
         //     continue
         // }
+
+        // Skip anything that's not an Actor compendium pack
+        if (packType != "Actor") {
+            continue
+        }
 
         // Skip anything that's not an Item compendium pack
         // if (packType != "Item") {
@@ -559,12 +577,33 @@ async function migrateWorld() {
                     // Migrate NPC data
                     if (doc.type == "npc") {
                         // do stuff to npcs
+                        const tempAcMod = fixTempAcMod(doc)
+                        if (tempAcMod) {
+                            await doc.update(tempAcMod)
+                        }
+                        const tempDrMod = fixTempDrMod(doc)
+                        if (tempDrMod) {
+                            await doc.update(tempDrMod)
+                        }
+                        const tokenSize = fixTokenSize(doc)
+                        if (tokenSize) {
+                            await doc.update(tokenSize)
+                        }
                     }
                     // Migrate PC data
                     if (doc.type == "character") {
                         // do stuff to characters
+                        const tempAcMod = fixTempAcMod(doc)
+                        if (tempAcMod) {
+                            await doc.update(tempAcMod)
+                        }
+                        const tempDrMod = fixTempDrMod(doc)
+                        if (tempDrMod) {
+                            await doc.update(tempDrMod)
+                        }
                     }
                     // Migrate the actor document's items if any exist
+                    /**
                     if (doc.items) {
                         for (let item of doc.items) {
                             if (item.type === "weapon") {
@@ -586,6 +625,7 @@ async function migrateWorld() {
                             }
                         }
                     }
+                    */
                     break
 
                 case "Item":
@@ -624,18 +664,51 @@ async function migrateWorld() {
     }
 }
 
-function fixTempAcMods(doc) {
+function fixTempAcMod(doc) {
     // If tempAcMod is an object, convert it to zero
     if (typeof doc.system.ac.tempAcMod == "object") {
         console.log(`Fixing temp AC mod for ${doc.name}...`)
-        doc.system.ac.tempAcMod = 0
+        const update = {system: {}}
+        update.system = {ac: {tempAcMod: 0}}
+        return update;
     }
+    return null
+}
+
+function fixTempDrMod(doc) {
     // If tempDrMod is an object, convert it to zero
     if (typeof doc.system.ac.tempDrMod == "object") {
         console.log(`Fixing temp DR mod for ${doc.name}...`)
-        doc.system.ac.tempDrMod = 0
+        const update = {system: {}}
+        update.system = {ac: {tempDrMod: 0}}
+        return update;
     }
-    return doc
+    return null
+}
+
+function fixTokenSize(doc) {
+    // If actor size is Large, convert prototype token size to 2
+    if (doc.system.size == "L") {
+        console.log(`Fixing token size for ${doc.name}...`)
+        const update = {prototypeToken: {}}
+        update.prototypeToken = {width: 2, height: 2}
+        return update
+    }
+    // If actor size is Huge, convert prototype token size to 3
+    if (doc.system.size == "H") {
+        console.log(`Fixing token size for ${doc.name}...`)
+        const update = {prototypeToken: {}}
+        update.prototypeToken = {width: 3, height: 3}
+        return update
+    }
+    // If actor size is Small, convert prototype token scale to 0.5
+    if (doc.system.size == "S") {
+        console.log(`Fixing token size for ${doc.name}...`)
+        const update = {prototypeToken: {}}
+        update.prototypeToken = {texture: {scaleX: 0.5, scaleY: 0.5}}
+        return update
+    }
+    return null
 }
 
 function updateWeaponFormula(doc) {
