@@ -107,3 +107,330 @@ export function prepareActiveEffectCategories(effects) {
     }
     return categories;
 }
+
+/**
+ * Apply specified effect from an item to the selected tokens
+ * @param {itemId} string      The item that has the effect
+ * @param {effectId} string    The effect ID to apply
+ * @param {actorId} string     The actor that owns the item
+ * @param {disabled} boolean   Whether to disable the effect when applying it
+ */
+export async function applyEffect(itemId, effectId, actorId, disabled = false) {
+    // Get selected tokens
+    const tokens = canvas?.tokens?.controlled;
+    if (!tokens || tokens.length == 0) {
+        ui.notifications?.error("Apply Effect: Please select at least one token.");
+        return;
+    }
+    // Get the source actor & item for the effect
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`Apply Effect: Actor ${actorId} not found!`)
+        return
+    }
+    const item = actor.items.get(itemId);
+    if (!item) {
+        ui.notifications?.error(`Apply Effect: Item ${itemId} not found!`);
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Item: ", item) }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+    // Get the item effect to be applied
+    const effect = item.effects.find(e => e.id === effectId);
+    if (!effect) {
+        ui.notifications?.error(`Apply Effect: Effect ${effectId} not found!`);
+        return;
+    }
+
+    // Initialize the chat string
+    let chatMsg = ""
+
+    // Apply the effect to selected tokens/actors
+    for (const t of tokens) {
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Token: ", t) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Token Actor: ", t.actor) }
+        const effectData = {...effect};
+        effectData.origin = item.uuid;
+        if (disabled) effectData.disabled = true;
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Cloned Effect:", effectData) }
+        chatMsg += `<p>${actor.name} applied <i>${effectData.name}</i> to ${t.name}.</p>`
+        t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+    }
+    // Send a chat message that the effect was applied
+    const chatData = {
+        author: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        content: chatMsg
+    };
+    ChatMessage.create(chatData, {});
+
+}
+
+/**
+ * Apply all effects from an item to the selected tokens
+ * @param {itemId} string      The item that has the effects to apply
+ * @param {actorId} string     The actor that owns the item
+ * @param {disabled} boolean   Whether to disable the effects when applying them
+ */
+export async function applyAllEffects(itemId, actorId, disabled = false) {
+    // Get selected tokens
+    const tokens = canvas?.tokens?.controlled;
+    if (!tokens || tokens.length == 0) {
+        ui.notifications?.error("Apply Effects: Please select at least one token.");
+        return;
+    }
+    // Get the actor & item
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`Apply Effects: Actor ${actorId} not found!`)
+        return
+    }
+    const item = actor.items.get(itemId);
+    if (!item) {
+        ui.notifications?.error(`Apply Effects: Item ${itemId} not found!`);
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Item: ", item) }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+
+    // Initialize the chat string
+    let chatMsg = ""
+
+    // Apply the effects to selected tokens/actors
+    for (const t of tokens) {
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Token: ", t) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Token Actor: ", t.actor) }
+        item.effects.forEach(effect => {
+            // const effectData = foundry.utils.deepClone(effect);
+            const effectData = {...effect};
+            effectData.origin = item.uuid;
+            if (disabled) effectData.disabled = true;
+            if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Cloned Effect:", effectData) }
+            chatMsg += `<p>${actor.name} applied <i>${effectData.name}</i> to ${t.name}.</p>`
+            t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+        });
+    }
+    // Send a chat message that the item was used
+    const chatData = {
+        author: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        content: chatMsg
+    };
+    ChatMessage.create(chatData, {});
+}
+
+/**
+ * Enable specified effect from the item, on the actor
+ * @param {itemId} string      The item that has the effect
+ * @param {effectId} string    The effect ID to enable
+ * @param {actorId} string     The actor that owns the item and will receive/enable the effect
+ */
+export async function enableEffect(itemId, effectId, actorId) {
+    // Get the actor & item
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`Enable Effects: Actor ${actorId} not found!`)
+        return
+    }
+    const item = actor.items.get(itemId);
+    if (!item) {
+        ui.notifications?.error(`Enable Effects: Item ${itemId} not found!`);
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("enableAllEffects: Item: ", item) }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+    // Get the item effect to be enabled
+    const effect = item.effects.find(e => e.id === effectId);
+    if (!effect) {
+        ui.notifications?.error(`Enable Effect: Effect ${effectId} not found!`);
+        return;
+    }
+
+    // Initialize the chat string
+    let chatMsg = ""
+
+    // Enable the effect on the actor
+    if (CONFIG.HYP3E.debugMessages) { console.log(`enableAllEffects: Effect to enable: `, effect) }
+    // Update the item effect
+    effect.update({ disabled: false });
+    if (!foundry.utils.isNewerVersion(game.version, "13")) {
+        // For Foundry v12 only...
+        // We updated the effect on the source item. Now, find the matching effect on 
+        //  the actor, so we can toggle that as well.
+        const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+        if (actorEffect) {
+            actorEffect.update({ disabled: false });
+        } else {
+            // If the effect can't be found, we apply the effect to the actor instead.
+            applyEffect(itemId, effectId, actorId, false);
+        }
+    }
+    chatMsg += `<p><i>${effect.name}</i> enabled on ${actor.name}.</p>`
+
+    // Send a chat message that the effect was enabled
+    const chatData = {
+        author: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        content: chatMsg
+    };
+    ChatMessage.create(chatData, {});
+
+}
+
+/**
+ * Enable all effects from the item, on the actor
+ * @param {itemId} string      The item that has the effects to enable
+ * @param {actorId} string     The actor that owns the item and will receive/enable the effects
+ */
+export async function enableAllEffects(itemId, actorId) {
+    // Get the actor & item
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`Enable Effects: Actor ${actorId} not found!`)
+        return
+    }
+    const item = actor.items.get(itemId);
+    if (!item) {
+        ui.notifications?.error(`Enable Effects: Item ${itemId} not found!`);
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("enableAllEffects: Item: ", item) }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+
+    // Initialize the chat string
+    let chatMsg = ""
+
+    // Enable the effects on the actor
+    item.effects.forEach(effect => {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`enableAllEffects: Effect to enable: `, effect) }
+        // Update the item effect
+        effect.update({ disabled: false });
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12 only...
+            // We updated the effect on the source item. Now, find the matching effect on 
+            //  the actor, so we can toggle that as well.
+            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+            if (actorEffect) {
+                actorEffect.update({ disabled: false });
+            } else {
+                // If the effect can't be found, we apply the effect to the actor instead.
+                applyAllEffects(itemId, actorId, false);
+            }
+        }
+        chatMsg += `<p><i>${effect.name}</i> enabled on ${actor.name}.</p>`
+    })
+    // Send a chat message that the effects were enabled
+    const chatData = {
+        author: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        content: chatMsg
+    };
+    ChatMessage.create(chatData, {});
+
+}
+
+/**
+ * Disable specified effect from the item, on the actor
+ * @param {itemId} string      The item that has the effect
+ * @param {effectId} string    The effect ID to disable
+ * @param {actorId} string     The actor that owns the item and will disable the effect
+ */
+export async function disableEffect(itemId, effectId, actorId) {
+    // Get the actor & item
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`Disable Effect: Actor ${actorId} not found!`)
+        return
+    }
+    const item = actor.items.get(itemId);
+    if (!item) {
+        ui.notifications?.error(`Disable Effect: Item ${itemId} not found!`);
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("disableEffect: Item: ", item) }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+    // Get the item effect to be disabled
+    const effect = item.effects.find(e => e.id === effectId);
+    if (!effect) {
+        ui.notifications?.error(`Disable Effect: Effect ${effectId} not found!`);
+        return;
+    }
+
+    // Initialize the chat string
+    let chatMsg = ""
+
+    if (CONFIG.HYP3E.debugMessages) { console.log(`disableEffect: Effect to disable: `, effect) }
+    // Update the item effect
+    effect.update({ disabled: true });
+    if (!foundry.utils.isNewerVersion(game.version, "13")) {
+        // For Foundry v12 only...
+        // We updated the effect on the source item. Now, find the matching effect on 
+        //  the actor, so we can toggle that as well.
+        const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+        if (actorEffect) {
+            actorEffect.update({ disabled: true });
+        } else {
+            // If the effect can't be found, we apply the effect to the actor instead.
+            applyEffect(itemId, effectId, actorId, true);
+        }
+    }
+    chatMsg += `<p><i>${effect.name}</i> disabled on ${actor.name}.</p>`
+    // Send a chat message that the effect was disabled
+    const chatData = {
+        author: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        content: chatMsg
+    };
+    ChatMessage.create(chatData, {});
+
+}
+
+/**
+ * Disable all effects from the item, on the actor
+ * @param {itemId} string      The item that has the effects to disable
+ * @param {actorId} string     The actor that owns the item and will disable the effects
+ */
+export async function disableAllEffects(itemId, actorId) {
+    let chatMsg = ""
+
+    // Get the actor & item
+    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    if (!actor) {
+        ui.notifications?.error(`disableAllEffects: Actor ${actorId} not found!`)
+        return
+    }
+    const item = actor.items.get(itemId);
+    if (!item) {
+        ui.notifications?.error(`disableAllEffects: Item ${itemId} not found!`);
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("disableAllEffects: Item: ", item) }
+    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+
+    item.effects.forEach(effect => {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`disableAllEffects: Effect to disable: `, effect) }
+        // Update the item effect
+        effect.update({ disabled: true });
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12 only...
+            // We updated the effect on the source item. Now, find the matching effect on 
+            //  the actor, so we can toggle that as well.
+            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+            if (actorEffect) {
+                actorEffect.update({ disabled: true });
+            } else {
+                // If the effect can't be found, we apply the effect to the actor instead.
+                applyAllEffects(itemId, actorId, true);
+            }
+        }
+        chatMsg += `<p><i>${effect.name}</i> disabled on ${actor.name}.</p>`
+    })
+    // Send a chat message that the effects were disabled
+    const chatData = {
+        author: game.user_id,
+        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        content: chatMsg
+    };
+    ChatMessage.create(chatData, {});
+
+}

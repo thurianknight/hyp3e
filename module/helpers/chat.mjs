@@ -1,4 +1,5 @@
 import { HYP3E } from "./config.mjs"
+import {applyEffect, enableEffect, disableEffect} from "./effects.mjs";
 
 // hook listener for adding buttons to damage roll
 // done here instead of inline to add listeners in js
@@ -214,7 +215,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
         });
     }
 
-    // Apply Effects button
+    // Apply/Enable/Disable Effect buttons
     let effectApply = html.find(".apply-effects-button");
     if (effectApply.length > 0) {
         effectApply.each((_i, b) => {
@@ -244,59 +245,76 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
 
             // Is the owner/actor targeted by this effect?
             let actorTargeted = false
-            let effect = item.effects.find(e => e.transfer === true);
+            // let effect = item.effects.find(e => e.transfer === true);
             // This just grabbed the first match, if there are multiple effects coming from the item.
             //  The first effect will act as a proxy for the others, as we assume that all effects are
             //  either enabled or disabled. If not, we can add logic to handle that later.
-            if (effect) actorTargeted = true
+            // if (effect) actorTargeted = true
 
             // The logic we need here will do the following:
-            // Check to see if the item applies effects to the actor (the actor is targeted).
+            // Check to see if the item applies effect(s) to the actor (the actor is targeted).
+            //      - The actor is usually targeted for item-based passive effects, those that are 
+            //      either always-on, or can be enabled & disabled.
+            //      - Spells and charge-based items usually do NOT target the actor, because they 
+            //      only apply temporary effects, and only upon casting or charge expenditure.
             //  If the actor is targeted, check to see if the effect is already applied & enabled.
-            //      If not, create a button to enable the effect on the actor.
-            //      If so, create a button to disable the effect on the actor.
+            //      - If disabled, create a button to enable the effect on the actor.
+            //      - If enabled, create a button to disable the effect on the actor.
             //  If the actor is not targeted, create a button to apply the effect to the selected token(s).
 
             // Get an array of effects (if any) provided by the item, and use it for the button label
-            let effects = item?._getEffectNames()
-            let btnLabel = effects.length > 1 ? "Multiple Effects" : effects[0];
-            // Check if the actor is targeted by the item
-            if (actorTargeted) {
-                if (!effect.disabled) {
-                    // The effect is enabled, so create a button to disable it
-                    let effectDisableButton = $(
-                        `<button class="chat-btn-full-width" title="Click to disable ${effects.join(", ")} on ${actor.name}."><i class="fas fa-user-slash"></i>Disable ${btnLabel}</button>`
-                    );
-                    effectApply.append(effectDisableButton);
-                    // Handle button clicks
-                    effectApply.on("click", (ev) => {
-                        ev.stopPropagation();
-                        disableEffects(itemId, actorId);
-                    });
+            // let effects = item?._getEffectNames()
+            // let btnLabel = effects.length > 1 ? "Multiple Effects" : effects[0];
+
+            // Loop through the effects and create a separate button for each one
+            item.effects.forEach(effect => {
+                // Check if the actor is targeted by the item/effect
+                if (effect.transfer) {
+                    if (!effect.disabled) {
+                        // The effect is enabled, so create a button to disable it
+                        let effectDisableButton = $(
+                            // `<button class="chat-btn-full-width" title="Click to disable ${effects.join(", ")} on ${actor.name}."><i class="fas fa-user-slash"></i>Disable ${btnLabel}</button>`
+                            `<button class="chat-btn-full-width" title="Click to disable ${effect.name} on ${actor.name}."><i class="fas fa-user-slash"></i>Disable ${effect.name}</button>`
+                        );
+                        effectApply.append(effectDisableButton);
+                        // Handle button clicks
+                        // effectApply.on("click", (ev) => {
+                        effectDisableButton.on("click", (ev) => {
+                            ev.stopPropagation();
+                            // disableAllEffects(itemId, actorId);
+                            disableEffect(itemId, effect.id, actorId);
+                        });
+                    } else {
+                        // Effect is disabled, so create a button to enable it
+                        let effectEnableButton = $(
+                            // `<button class="chat-btn-full-width" title="Click to enable ${effects.join(", ")} on ${actor.name}."><i class="fas fa-user-check"></i>Enable ${btnLabel}</button>`
+                            `<button class="chat-btn-full-width" title="Click to enable ${effect.name} on ${actor.name}."><i class="fas fa-user-check"></i>Enable ${effect.name}</button>`
+                        );
+                        effectApply.append(effectEnableButton);
+                        // Handle button clicks
+                        // effectApply.on("click", (ev) => {
+                        effectEnableButton.on("click", (ev) => {
+                            ev.stopPropagation();
+                            // enableAllEffects(itemId, actorId);
+                            enableEffect(itemId, effect.id, actorId);
+                        });
+                    }
                 } else {
-                    // Effect is disabled, so create a button to enable it
-                    let effectEnableButton = $(
-                        `<button class="chat-btn-full-width" title="Click to enable ${effects.join(", ")} on ${actor.name}."><i class="fas fa-user-check"></i>Enable ${btnLabel}</button>`
+                    // The actor is not targeted, so create a button to apply the effect to selected token(s)
+                    let effectApplyButton = $(
+                        // `<button class="chat-btn-full-width" title="Click to apply ${effects.join(", ")} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${btnLabel}</button>`
+                        `<button class="chat-btn-full-width" title="Click to apply ${effect.name} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${effect.name}</button>`
                     );
-                    effectApply.append(effectEnableButton);
+                    effectApply.append(effectApplyButton);
                     // Handle button clicks
-                    effectApply.on("click", (ev) => {
+                    // effectApply.on("click", (ev) => {
+                    effectApplyButton.on("click", (ev) => {
                         ev.stopPropagation();
-                        enableEffects(itemId, actorId);
+                        // applyAllEffects(itemId, actorId);
+                        applyEffect(itemId, effect.id, actorId);
                     });
                 }
-            } else {
-                // The actor is not targeted, so create a button to apply the effect to selected token(s)
-                let effectApplyButton = $(
-                    `<button class="chat-btn-full-width" title="Click to apply ${effects.join(", ")} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${btnLabel}</button>`
-                );
-                effectApply.append(effectApplyButton);
-                // Handle button clicks
-                effectApply.on("click", (ev) => {
-                    ev.stopPropagation();
-                    applyEffects(itemId, actorId);
-                });
-            }
+            });
         });
     }
 }
@@ -324,6 +342,7 @@ export async function showValueChange(t, fillColor,total) {
     );
 }
 
+// Roll damage button and display in chat
 async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, tokenId, sourceType) {
     if (formula == "") { return } // Exit on empty formula
 
@@ -392,6 +411,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, toke
 
 }
 
+// Roll a saving throw for the selected token(s) and display in chat
 async function rollSaveButton(saveType) {
     if (saveType == "") return; // Skip empty save
     const tokens = canvas?.tokens?.controlled;
@@ -418,143 +438,6 @@ async function rollSaveButton(saveType) {
 async function useItem(itemId, actorId) {
     const actor = game.actors.get(actorId)
     actor.useItem(itemId);
-}
-
-// Apply item effects to user's own token or GM-selected tokens
-async function applyEffects(itemId, actorId, disabled = false) {
-    // Get selected tokens
-    const tokens = canvas?.tokens?.controlled;
-
-    if (!tokens || tokens.length == 0) {
-        ui.notifications?.error("Apply Effects: Please select at least one token.");
-        return;
-    }
-
-    let chatMsg = ""
-
-    // Get the actor & item
-    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
-    if (!actor) {
-        ui.notifications?.error(`Apply Effects: Actor ${actorId} not found!`)
-        return
-    }
-    const item = actor.items.get(itemId);
-    if (!item) {
-        ui.notifications?.error(`Apply Effects: Item ${itemId} not found!`);
-        return;
-    }
-    if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Item: ", item) }
-    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
-
-    // Apply the effects to selected tokens/actors
-    for (const t of tokens) {
-        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Token: ", t) }
-        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Token Actor: ", t.actor) }
-        item.effects.forEach(effect => {
-            // const effectData = foundry.utils.deepClone(effect);
-            const effectData = {...effect};
-            effectData.origin = item.uuid;
-            if (disabled) effectData.disabled = true;
-            if (CONFIG.HYP3E.debugMessages) { console.log("applyEffects: Cloned Effect:", effectData) }
-            chatMsg += `<p>${actor.name} applied <i>${effectData.name}</i> to ${t.name}.</p>`
-            t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
-        });
-    }
-    // Send a chat message that the item was used
-    const chatData = {
-        author: game.user_id,
-        speaker: ChatMessage.getSpeaker({ actor: actor }),
-        content: chatMsg
-    };
-    ChatMessage.create(chatData, {});
-}
-
-async function enableEffects(itemId, actorId) {
-    let chatMsg = ""
-
-    // Get the actor & item
-    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
-    if (!actor) {
-        ui.notifications?.error(`Enable Effects: Actor ${actorId} not found!`)
-        return
-    }
-    const item = actor.items.get(itemId);
-    if (!item) {
-        ui.notifications?.error(`Enable Effects: Item ${itemId} not found!`);
-        return;
-    }
-    if (CONFIG.HYP3E.debugMessages) { console.log("enableEffects: Item: ", item) }
-    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
-
-    item.effects.forEach(effect => {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`enableEffects: Effect to enable: `, effect) }
-        // Update the item effect
-        effect.update({ disabled: false });
-        if (!foundry.utils.isNewerVersion(game.version, "13")) {
-            // For Foundry v12 only...
-            // We updated the effect on the source item. Now, find the matching effect on 
-            //  the actor, so we can toggle that as well.
-            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
-            if (actorEffect) {
-                actorEffect.update({ disabled: false });
-            } else {
-                // If the effect can't be found, we apply the effect to the actor instead.
-                applyEffects(itemId, actorId, false);
-            }
-        }
-        chatMsg += `<p>${actor.name} enabled <i>${effect.name}</i> on ${actor.name}.</p>`
-    })
-    // Send a chat message that the effects were enabled
-    const chatData = {
-        author: game.user_id,
-        speaker: ChatMessage.getSpeaker({ actor: actor }),
-        content: chatMsg
-    };
-    ChatMessage.create(chatData, {});
-}
-
-async function disableEffects(itemId, actorId) {
-    let chatMsg = ""
-
-    // Get the actor & item
-    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
-    if (!actor) {
-        ui.notifications?.error(`disableEffects: Actor ${actorId} not found!`)
-        return
-    }
-    const item = actor.items.get(itemId);
-    if (!item) {
-        ui.notifications?.error(`disableEffects: Item ${itemId} not found!`);
-        return;
-    }
-    if (CONFIG.HYP3E.debugMessages) { console.log("disableEffects: Item: ", item) }
-    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
-
-    item.effects.forEach(effect => {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`disableEffects: Effect to disable: `, effect) }
-        // Update the item effect
-        effect.update({ disabled: true });
-        if (!foundry.utils.isNewerVersion(game.version, "13")) {
-            // For Foundry v12 only...
-            // We updated the effect on the source item. Now, find the matching effect on 
-            //  the actor, so we can toggle that as well.
-            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
-            if (actorEffect) {
-                actorEffect.update({ disabled: true });
-            } else {
-                // If the effect can't be found, we apply the effect to the actor instead.
-                applyEffects(itemId, actorId, true);
-            }
-        }
-        chatMsg += `<p>${actor.name} disabled <i>${effect.name}</i> on ${actor.name}.</p>`
-    })
-    // Send a chat message that the effects were disabled
-    const chatData = {
-        author: game.user_id,
-        speaker: ChatMessage.getSpeaker({ actor: actor }),
-        content: chatMsg
-    };
-    ChatMessage.create(chatData, {});
 }
 
 // Apply a health drop (positive number is damage) to one or more tokens.
