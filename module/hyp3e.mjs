@@ -455,10 +455,12 @@ async function migrateWorld() {
             // do stuff to npcs
             const tempAcMod = fixTempAcMod(actor)
             if (tempAcMod) {
+                delete actor.system.ac["tempAcMod"]
                 await actor.update(tempAcMod)
             }
             const tempDrMod = fixTempDrMod(actor)
             if (tempDrMod) {
+                delete actor.system.ac["tempDrMod"]
                 await actor.update(tempDrMod)
             }
             const tokenSize = fixTokenSize(actor)
@@ -471,10 +473,12 @@ async function migrateWorld() {
             // do stuff to characters
             const tempAcMod = fixTempAcMod(actor)
             if (tempAcMod) {
+                delete actor.system.ac["tempAcMod"]
                 await actor.update(tempAcMod)
             }
             const tempDrMod = fixTempDrMod(actor)
             if (tempDrMod) {
+                delete actor.system.ac["tempDrMod"]
                 await actor.update(tempDrMod)
             }
         }
@@ -579,10 +583,12 @@ async function migrateWorld() {
                         // do stuff to npcs
                         const tempAcMod = fixTempAcMod(doc)
                         if (tempAcMod) {
+                            delete doc.system.ac["tempAcMod"]
                             await doc.update(tempAcMod)
                         }
                         const tempDrMod = fixTempDrMod(doc)
                         if (tempDrMod) {
+                            delete doc.system.ac["tempDrMod"]
                             await doc.update(tempDrMod)
                         }
                         const tokenSize = fixTokenSize(doc)
@@ -595,10 +601,12 @@ async function migrateWorld() {
                         // do stuff to characters
                         const tempAcMod = fixTempAcMod(doc)
                         if (tempAcMod) {
+                            delete doc.system.ac["tempAcMod"]
                             await doc.update(tempAcMod)
                         }
                         const tempDrMod = fixTempDrMod(doc)
                         if (tempDrMod) {
+                            delete doc.system.ac["tempDrMod"]
                             await doc.update(tempDrMod)
                         }
                     }
@@ -679,6 +687,7 @@ function fixTempDrMod(doc) {
     // If tempDrMod is an object, convert it to zero
     if (typeof doc.system.ac.tempDrMod == "object") {
         console.log(`Fixing temp DR mod for ${doc.name}...`)
+        delete doc.system.ac["tempDrMod"]
         const update = {system: {}}
         update.system = {ac: {tempDrMod: 0}}
         return update;

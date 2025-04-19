@@ -198,8 +198,12 @@ export class Hyp3eActor extends Actor {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Temp DR mod: ${systemData.ac.tempDrMod}`) }
                 tempDR += parseInt(systemData.ac.tempDrMod)
             }
-            // Now calculate & set the final values
+            // Now calculate & set the final values...
             systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
+            // AC can't be worse (higher) than 9, nor better than -9
+            systemData.ac.value = systemData.ac.value > 9 ? 9 : systemData.ac.value
+            systemData.ac.value = systemData.ac.value < -9 ? -9 : systemData.ac.value
+            // DR & MV
             systemData.ac.dr = tempDR
             systemData.movement.base.value = tempMV
         }
@@ -221,6 +225,19 @@ export class Hyp3eActor extends Actor {
         systemData.hp.min = 0
 
         // Calculated fields go here...
+
+        // Apply temporary modifiers (typically from effects) to AC and DR
+        if (parseInt(systemData.ac.tempAcMod)) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Temp AC mod: ${systemData.ac.tempAcMod}`) }
+            systemData.ac.value -= parseInt(systemData.ac.tempAcMod)
+            // AC can't be worse (higher) than 9, nor better than -9
+            systemData.ac.value = systemData.ac.value > 9 ? 9 : systemData.ac.value
+            systemData.ac.value = systemData.ac.value < -9 ? -9 : systemData.ac.value
+        }
+        if (parseInt(systemData.ac.tempDrMod)) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Temp DR mod: ${systemData.ac.tempDrMod}`) }
+            systemData.ac.dr += parseInt(systemData.ac.tempDrMod)
+        }
 
         // Add actor type & base class, used for crit hit & crit miss tables
         systemData.actorType = actorData.type
@@ -691,7 +708,7 @@ export class Hyp3eActor extends Actor {
             turnUndead = true
             // If we are turning undead, that resolution is executed separately...
         }
-        
+
         // Determine success or failure on a simple check, not turning undead
         if (!turnUndead) {
             if (roll.total <= dataset.rollTarget) {
@@ -1560,23 +1577,28 @@ export class Hyp3eActor extends Actor {
             if (!effect.disabled) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effect statuses:`, effect.statuses) }
                 // Does the effect apply a tempAtkMod?
-                effect.changes.forEach(change => {
-                    if (change.key == "system.tempAtkMod") {
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor ${this.name} has tempAtkMod: ${change.value}`) }
-                        // Add the tempAtkMod to the sitMod
-                        sitModSum += parseInt(change.value)
-                        const changeString = parseInt(change.value) > 0 ? `+${change.value}` : `${change.value}`
-                        sitModsArr.push(`${effect.name} (${changeString})`)
-                    }
-                });
-                // Status effects that may not apply any changes
-                if (effect.statuses.has("blind") && effect.changes.length == 0) {
-                    sitModSum += -4
-                    sitModsArr.push("Blind (-4)")
+                if (effect.changes.find(c => c.key == "system.tempAtkMod")) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor ${this.name} has tempAtkMod: ${c.value}`) }
+                    // Add the tempAtkMod to the sitMod
+                    sitModSum += parseInt(c.value)
+                    const changeString = parseInt(c.value) > 0 ? `+${c.value}` : `${c.value}`
+                    sitModsArr.push(`${effect.name} (${changeString})`)
                 }
-                if (effect.statuses.has("invisible") && effect.changes.length == 0) {
-                    sitModSum += 4
-                    sitModsArr.push("Invisible (+4)")
+                // Status effects that may not apply any changes...
+                //      The assumption here is that if an effect has at least one change 
+                //      being applied, it is probably modifying the attacker's roll. So we don't
+                //      want to "double-dip" that modifier by applying it again here.
+                //      But if the status was just applied from the token right-click menu,
+                //      then there won't be any changes, and we should handle it here.
+                if (!effect.changes.find(c => c.key == "system.tempAtkMod")) {
+                    if (effect.statuses.has("blind")) {
+                        sitModSum += -4
+                        sitModsArr.push("Blind (-4)")
+                    }
+                    if (effect.statuses.has("invisible")) {
+                        sitModSum += 4
+                        sitModsArr.push("Invisible (+4)")
+                    }
                 }
             }
         });
@@ -1600,25 +1622,33 @@ export class Hyp3eActor extends Actor {
             targetEffects.forEach(effect => {
                 if (!effect.disabled) {
                     if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effect statuses:`, effect.statuses) }
-                    if (effect.statuses.has("blind")) {
-                        sitModSum += 4
-                        sitModsArr.push("Defender Blind (+4)")
-                    }
-                    if (effect.statuses.has("invisible")) {
-                        sitModSum += -4
-                        sitModsArr.push("Defender Invisible (-4)")
-                    }
-                    if (effect.statuses.has("restrain")) {
-                        sitModSum += 2
-                        sitModsArr.push("Defender Hindered (+2)")
-                    }
-                    if (effect.statuses.has("prone")) {
-                        sitModSum += 4
-                        sitModsArr.push("Defender Prone (+4)")
-                    }
-                    if (effect.statuses.has("stun")) {
-                        sitModSum += 4
-                        sitModsArr.push("Defender Stunned (+4)")
+                    // Status effects that may not apply any changes...
+                    //      The assumption here is that if an effect has at least one change 
+                    //      being applied, it is probably modifying the target's AC. So we don't
+                    //      want to "double-dip" that modifier by applying it again here.
+                    //      But if the status was just applied from the token right-click menu,
+                    //      then there won't be any changes, and we should handle it here.
+                    if (!effect.changes.find(c => c.key == "system.ac.tempAcMod")) {
+                        if (effect.statuses.has("blind")) {
+                            sitModSum += 4
+                            sitModsArr.push("Defender Blind (+4)")
+                        }
+                        if (effect.statuses.has("invisible")) {
+                            sitModSum += -4
+                            sitModsArr.push("Defender Invisible (-4)")
+                        }
+                        if (effect.statuses.has("restrain")) {
+                            sitModSum += 2
+                            sitModsArr.push("Defender Hindered (+2)")
+                        }
+                        if (effect.statuses.has("prone")) {
+                            sitModSum += 4
+                            sitModsArr.push("Defender Prone (+4)")
+                        }
+                        if (effect.statuses.has("stun")) {
+                            sitModSum += 4
+                            sitModsArr.push("Defender Stunned (+4)")
+                        }
                     }
                 }
             });
