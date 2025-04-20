@@ -453,6 +453,16 @@ async function migrateWorld() {
         // Migrate NPC data
         if (actor.type == "npc") {
             // do stuff to npcs
+            const tempAtkMod = fixTempAtkMod(actor)
+            if (tempAtkMod) {
+                delete actor.system["tempAtkMod"]
+                await actor.update(tempAtkMod)
+            }
+            const tempDmgMod = fixTempDmgMod(actor)
+            if (tempDmgMod) {
+                delete actor.system["tempDmgMod"]
+                await actor.update(tempDmgMod)
+            }
             const tempAcMod = fixTempAcMod(actor)
             if (tempAcMod) {
                 delete actor.system.ac["tempAcMod"]
@@ -471,6 +481,16 @@ async function migrateWorld() {
         // Migrate PC data
         if (actor.type == "character") {
             // do stuff to characters
+            const tempAtkMod = fixTempAtkMod(actor)
+            if (tempAtkMod) {
+                delete actor.system["tempAtkMod"]
+                await actor.update(tempAtkMod)
+            }
+            const tempDmgMod = fixTempDmgMod(actor)
+            if (tempDmgMod) {
+                delete actor.system["tempDmgMod"]
+                await actor.update(tempDmgMod)
+            }
             const tempAcMod = fixTempAcMod(actor)
             if (tempAcMod) {
                 delete actor.system.ac["tempAcMod"]
@@ -581,6 +601,16 @@ async function migrateWorld() {
                     // Migrate NPC data
                     if (doc.type == "npc") {
                         // do stuff to npcs
+                        const tempAtkMod = fixTempAtkMod(doc)
+                        if (tempAtkMod) {
+                            delete doc.system["tempAtkMod"]
+                            await doc.update(tempAtkMod)
+                        }
+                        const tempDmgMod = fixTempDmgMod(doc)
+                        if (tempDmgMod) {
+                            delete doc.system["tempDmgMod"]
+                            await doc.update(tempDmgMod)
+                        }
                         const tempAcMod = fixTempAcMod(doc)
                         if (tempAcMod) {
                             delete doc.system.ac["tempAcMod"]
@@ -599,6 +629,16 @@ async function migrateWorld() {
                     // Migrate PC data
                     if (doc.type == "character") {
                         // do stuff to characters
+                        const tempAtkMod = fixTempAtkMod(doc)
+                        if (tempAtkMod) {
+                            delete doc.system["tempAtkMod"]
+                            await doc.update(tempAtkMod)
+                        }
+                        const tempDmgMod = fixTempDmgMod(doc)
+                        if (tempDmgMod) {
+                            delete doc.system["tempDmgMod"]
+                            await doc.update(tempDmgMod)
+                        }
                         const tempAcMod = fixTempAcMod(doc)
                         if (tempAcMod) {
                             delete doc.system.ac["tempAcMod"]
@@ -672,12 +712,31 @@ async function migrateWorld() {
     }
 }
 
+function fixTempAtkMod(doc) {
+    // If tempAcMod is an object, convert it to zero
+    if (typeof doc.system.tempAtkMod == "object") {
+        console.log(`Fixing temp attack mod for ${doc.name}...`)
+        const update = {system: {tempAtkMod: 0}}
+        return update;
+    }
+    return null
+}
+
+function fixTempDmgMod(doc) {
+    // If tempAcMod is an object, convert it to zero
+    if (typeof doc.system.tempDmgMod == "object") {
+        console.log(`Fixing temp damage mod for ${doc.name}...`)
+        const update = {system: {tempDmgMod: 0}}
+        return update;
+    }
+    return null
+}
+
 function fixTempAcMod(doc) {
     // If tempAcMod is an object, convert it to zero
     if (typeof doc.system.ac.tempAcMod == "object") {
         console.log(`Fixing temp AC mod for ${doc.name}...`)
-        const update = {system: {}}
-        update.system = {ac: {tempAcMod: 0}}
+        const update = {system: {ac: {tempAcMod: 0}}}
         return update;
     }
     return null
@@ -688,33 +747,35 @@ function fixTempDrMod(doc) {
     if (typeof doc.system.ac.tempDrMod == "object") {
         console.log(`Fixing temp DR mod for ${doc.name}...`)
         delete doc.system.ac["tempDrMod"]
-        const update = {system: {}}
-        update.system = {ac: {tempDrMod: 0}}
+        const update = {system: {ac: {tempDrMod: 0}}}
         return update;
     }
     return null
 }
 
 function fixTokenSize(doc) {
+    // If actor size is Medium, convert prototype token size to 1
+    if (doc.system.size == "M") {
+        console.log(`Fixing token size for ${doc.name}...`)
+        const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 1, scaleY: 1}}}
+        return update
+    }
     // If actor size is Large, convert prototype token size to 2
     if (doc.system.size == "L") {
         console.log(`Fixing token size for ${doc.name}...`)
-        const update = {prototypeToken: {}}
-        update.prototypeToken = {width: 2, height: 2}
+        const update = {prototypeToken: {width: 2, height: 2, texture: {scaleX: 1, scaleY: 1}}}
         return update
     }
     // If actor size is Huge, convert prototype token size to 3
     if (doc.system.size == "H") {
         console.log(`Fixing token size for ${doc.name}...`)
-        const update = {prototypeToken: {}}
-        update.prototypeToken = {width: 3, height: 3}
+        const update = {prototypeToken: {width: 3, height: 3, texture: {scaleX: 1, scaleY: 1}}}
         return update
     }
     // If actor size is Small, convert prototype token scale to 0.5
     if (doc.system.size == "S") {
         console.log(`Fixing token size for ${doc.name}...`)
-        const update = {prototypeToken: {}}
-        update.prototypeToken = {texture: {scaleX: 0.5, scaleY: 0.5}}
+        const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 0.5, scaleY: 0.5}}}
         return update
     }
     return null

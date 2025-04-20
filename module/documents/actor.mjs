@@ -22,6 +22,39 @@ export class Hyp3eActor extends Actor {
     prepareBaseData() {
         // Data modifications in this step occur before processing embedded
         // documents or derived data.
+        const actorData = this;
+        const systemData = actorData.system;
+
+        // Notes on system.tempModifiers:
+        //  I'm not sure this code should go here, but since it is disabled anyway, it doesn't 
+        //  matter... yet.
+        //
+        //  This is an array of modifiers that may be applied to any field in the data template.
+        //  However, note that it is better to use effects and apply them to the data template
+        //  whenever possible. The known exceptions are AC and MV, as these are auto-calculated
+        //  below and cannot be modified by effects.
+        //
+        //  Example tempModifiers entry:
+        //      {
+        //          templateField: "system.ac.value",
+        //          source: "isEncumbered",
+        //          modifier: 1
+        //      }
+        //  Each entry must be unique by templateField and source!
+        //  In theory, we could use an effect to create an entry... need to test.
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[]:`, systemData.tempModifiers) }
+        systemData.tempModifiers.forEach((mod, id) => {
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, mod) }
+            // const obj = JSON.parse(mod)
+            // let obj = JSON.parse('{"templateField": "system.ac.value", "source": "isEncumbered", "modifier": 1}')
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, obj) }
+        })
+
+        // If tempAcMod is an object, convert it to zero
+        if (typeof systemData.ac.tempAcMod == "object") {
+            systemData.ac.tempAcMod = 0
+        }
+
     }
 
     /**
@@ -39,38 +72,11 @@ export class Hyp3eActor extends Actor {
         const flags = actorData.flags.hyp3e || {};
         // systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
         systemData.hp.percentage = Math.min(Math.max((systemData.hp.value * 100) / systemData.hp.max, 0), 100);
-    
+
         // Make separate methods for each Actor type (character, npc, etc.) to keep
         // things organized.
         this._prepareCharacterData(actorData);
         this._prepareNpcData(actorData);
-
-        // Set prototypeToken size & scale...
-        // If actor size is Medium, convert prototype token size to 1
-        if (this.system.size == "M") {
-            console.log(`Fixing token size for ${this.name}...`)
-            const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 1, scaleY: 1}}}
-            this.update(update)
-        }
-        // If actor size is Large, convert prototype token size to 2
-        if (this.system.size == "L") {
-            console.log(`Fixing token size for ${this.name}...`)
-            const update = {prototypeToken: {width: 2, height: 2, texture: {scaleX: 1, scaleY: 1}}}
-            this.update(update)
-        }
-        // If actor size is Huge, convert prototype token size to 3
-        if (this.system.size == "H") {
-            console.log(`Fixing token size for ${this.name}...`)
-            const update = {prototypeToken: {width: 3, height: 3, texture: {scaleX: 1, scaleY: 1}}}
-            this.update(update)
-        }
-        // If actor size is Small, convert prototype token scale to 0.5
-        if (this.system.size == "S") {
-            console.log(`Fixing token size for ${this.name}...`)
-            const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 0.5, scaleY: 0.5}}}
-            this.update(update)
-        }
-
     }
 
     /**
@@ -81,33 +87,6 @@ export class Hyp3eActor extends Actor {
 
         // Make modifications to data here. For example:
         const systemData = actorData.system;
-
-        // Notes on system.tempModifiers
-        //  This is an array of modifiers that may be applied to any field in the data template.
-        //  However, note that it is better to use effects and apply them to the data template
-        //  whenever possible. The known exceptions are AC and MV, as these are auto-calculated
-        //  below and cannot be modified by effects.
-        //
-        //  Example tempModifiers entry:
-        //      {
-        //          templateField: "system.ac.value",
-        //          source: "isEncumbered",
-        //          modifier: 1
-        //      }
-        //  Each entry must be unique by templateField and source!
-        //  In theory, we could use an effect to create an entry... need to test.
-        if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[]:`, systemData.tempModifiers) }
-        systemData.tempModifiers.forEach((mod, id) => {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, mod) }
-            // const obj = JSON.parse(mod)
-            // let obj = JSON.parse('{"templateField": "system.ac.value", "source": "isEncumbered", "modifier": 1}')
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, obj) }
-        })
-
-        // If tempAcMod is an object, convert it to zero
-        if (typeof systemData.ac.tempAcMod == "object") {
-            systemData.ac.tempAcMod = 0
-        }
 
         // Calculated fields go here...
 
@@ -268,26 +247,6 @@ export class Hyp3eActor extends Actor {
         // Add actor type & base class, used for crit hit & crit miss tables
         systemData.actorType = actorData.type
         systemData.baseClass = "npc"
-
-        // Can we do this here? NOPE!
-        // if (systemData.size == "L") {
-        //     this.updateSource({
-        //         "prototypeToken.width": 2,
-        //         "prototypeToken.height": 2,
-        //     });    
-        // }
-        // if (systemData.size == "H") {
-        //     this.updateSource({
-        //         "prototypeToken.width": 3,
-        //         "prototypeToken.height": 3,
-        //     });    
-        // }
-        // if (systemData.size == "S") {
-        //     this.updateSource({
-        //         "prototypeToken.texture.scaleX": 0.5,
-        //         "prototypeToken.texture.scaleY": 0.5,
-        //     });    
-        // }
     }
 
     /**
@@ -1603,11 +1562,12 @@ export class Hyp3eActor extends Actor {
             if (!effect.disabled) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effect statuses:`, effect.statuses) }
                 // Does the effect apply a tempAtkMod?
-                if (effect.changes.find(c => c.key == "system.tempAtkMod")) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor ${this.name} has tempAtkMod: ${c.value}`) }
+                const chg = effect.changes.find(c => c.key === "system.tempAtkMod")
+                if (chg) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor ${this.name} has tempAtkMod: ${chg.value}`) }
                     // Add the tempAtkMod to the sitMod
-                    sitModSum += parseInt(c.value)
-                    const changeString = parseInt(c.value) > 0 ? `+${c.value}` : `${c.value}`
+                    sitModSum += parseInt(chg.value)
+                    const changeString = parseInt(chg.value) > 0 ? `+${chg.value}` : `${chg.value}`
                     sitModsArr.push(`${effect.name} (${changeString})`)
                 }
                 // Status effects that may not apply any changes...
@@ -1616,7 +1576,7 @@ export class Hyp3eActor extends Actor {
                 //      want to "double-dip" that modifier by applying it again here.
                 //      But if the status was just applied from the token right-click menu,
                 //      then there won't be any changes, and we should handle it here.
-                if (!effect.changes.find(c => c.key == "system.tempAtkMod")) {
+                if (!chg) {
                     if (effect.statuses.has("blind")) {
                         sitModSum += -4
                         sitModsArr.push("Blind (-4)")
