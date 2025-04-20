@@ -45,6 +45,32 @@ export class Hyp3eActor extends Actor {
         this._prepareCharacterData(actorData);
         this._prepareNpcData(actorData);
 
+        // Set prototypeToken size & scale...
+        // If actor size is Medium, convert prototype token size to 1
+        if (this.system.size == "M") {
+            console.log(`Fixing token size for ${this.name}...`)
+            const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 1, scaleY: 1}}}
+            this.update(update)
+        }
+        // If actor size is Large, convert prototype token size to 2
+        if (this.system.size == "L") {
+            console.log(`Fixing token size for ${this.name}...`)
+            const update = {prototypeToken: {width: 2, height: 2, texture: {scaleX: 1, scaleY: 1}}}
+            this.update(update)
+        }
+        // If actor size is Huge, convert prototype token size to 3
+        if (this.system.size == "H") {
+            console.log(`Fixing token size for ${this.name}...`)
+            const update = {prototypeToken: {width: 3, height: 3, texture: {scaleX: 1, scaleY: 1}}}
+            this.update(update)
+        }
+        // If actor size is Small, convert prototype token scale to 0.5
+        if (this.system.size == "S") {
+            console.log(`Fixing token size for ${this.name}...`)
+            const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 0.5, scaleY: 0.5}}}
+            this.update(update)
+        }
+
     }
 
     /**
