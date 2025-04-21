@@ -414,7 +414,7 @@ Hooks.once("ready", async function() {
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
     // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "1.5.5"
+    const NEEDS_MIGRATION_TO_VERSION = "1.6.5"
     const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
     if (needsMigration) {
         migrateWorld()
@@ -426,9 +426,9 @@ Hooks.once("ready", async function() {
         // if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
         //     reportBestiary()
         // }
-        if (foundry.utils.isNewerVersion("1.1.5", game.system.version)) {
-            reportItems()
-        }
+        // if (foundry.utils.isNewerVersion("1.1.5", game.system.version)) {
+        //     reportItems()
+        // }
     }
 
 });

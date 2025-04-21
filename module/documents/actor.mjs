@@ -970,10 +970,13 @@ export class Hyp3eActor extends Actor {
                 // Where does our range fall in the range categories?
                 if (gridDistance <= itemData.range.short) {
                     chosen = "short"
+                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is at short range.") }
                 } else if (gridDistance <= itemData.range.medium) {
                     chosen = "medium"
+                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is at medium range.") }
                 } else if (gridDistance <= itemData.range.long) {
                     chosen = "long"
+                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is at long range.") }
                 } else {
                     // If the range is longer than the long range, give a warning
                     chosen = "long"
