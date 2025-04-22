@@ -21,215 +21,215 @@ import { HYP3ECombatTab } from "./combat/sidebar.mjs";
 
 Hooks.once('init', async function() {
 
-  // Add utility classes to the global game object so that they're more easily
-  // accessible in global contexts.
-  game.hyp3e = {
-    Hyp3eActor,
-    Hyp3eItem,
-    rollItemMacro
-  };
+    // Add utility classes to the global game object so that they're more easily
+    // accessible in global contexts.
+    game.hyp3e = {
+        Hyp3eActor,
+        Hyp3eItem,
+        rollItemMacro
+    };
 
-  // Register system settings
-  // Debug logging & messages
-  game.settings.register(game.system.id, "debugMessages", {
-    name: game.i18n.localize("HYP3E.settings.debugMessages"),
-    hint: game.i18n.localize("HYP3E.settings.debugMessagesHint"),
-    default: false,
-    scope: "world",
-    type: Boolean,
-    config: true,
-    requiresReload: true,
-  });
+    // Register system settings
+    // Debug logging & messages
+    game.settings.register(game.system.id, "debugMessages", {
+        name: game.i18n.localize("HYP3E.settings.debugMessages"),
+        hint: game.i18n.localize("HYP3E.settings.debugMessagesHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
 
-  // Automatic Armor Class calculation
-  game.settings.register(game.system.id, "autoCalcAc", {
-    name: game.i18n.localize("HYP3E.settings.autoCalcAc"),
-    hint: game.i18n.localize("HYP3E.settings.autoCalcAcHint"),
-    default: true,
-    scope: "world",
-    type: Boolean,
-    config: true,
-    requiresReload: true,
-  });
+    // Automatic Armor Class calculation
+    game.settings.register(game.system.id, "autoCalcAc", {
+        name: game.i18n.localize("HYP3E.settings.autoCalcAc"),
+        hint: game.i18n.localize("HYP3E.settings.autoCalcAcHint"),
+        default: true,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
 
-  // Enable basic attribute checks
-  game.settings.register(game.system.id, "enableAttrChecks", {
-    name: game.i18n.localize("HYP3E.settings.enableAttrChecks"),
-    hint: game.i18n.localize("HYP3E.settings.enableAttrChecksHint"),
-    default: "",
-    scope: "world",
-    type: String,
-    choices: {
-      "": "Disabled",
-      "3d6": "3d6 roll-under"
-    },
-    config: true,
-    requiresReload: true,
-  });
+    // Enable basic attribute checks
+    game.settings.register(game.system.id, "enableAttrChecks", {
+        name: game.i18n.localize("HYP3E.settings.enableAttrChecks"),
+        hint: game.i18n.localize("HYP3E.settings.enableAttrChecksHint"),
+        default: "",
+        scope: "world",
+        type: String,
+        choices: {
+            "": "Disabled",
+            "3d6": "3d6 roll-under"
+        },
+        config: true,
+        requiresReload: true,
+    });
 
-  // Reverse situational modifiers on roll-under checks
-  game.settings.register(game.system.id, "flipRollUnderMods", {
-    name: game.i18n.localize("HYP3E.settings.flipRollUnderMods"),
-    hint: game.i18n.localize("HYP3E.settings.flipRollUnderModsHint"),
-    default: true,
-    scope: "world",
-    type: Boolean,
-    config: true,
-    requiresReload: true,
-  });
+    // Reverse situational modifiers on roll-under checks
+    game.settings.register(game.system.id, "flipRollUnderMods", {
+        name: game.i18n.localize("HYP3E.settings.flipRollUnderMods"),
+        hint: game.i18n.localize("HYP3E.settings.flipRollUnderModsHint"),
+        default: true,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
 
-  // Enable/disable group-based initiative
-  game.settings.register(game.system.id, "isGroupInitiative", {
-    name: game.i18n.localize("HYP3E.settings.isGroupInitiative"),
-    hint: game.i18n.localize("HYP3E.settings.isGroupInitiativeHint"),
-    default: true,
-    scope: "world",
-    type: Boolean,
-    config: true,
-    requiresReload: true,
-  });
+    // Enable/disable group-based initiative
+    game.settings.register(game.system.id, "isGroupInitiative", {
+        name: game.i18n.localize("HYP3E.settings.isGroupInitiative"),
+        hint: game.i18n.localize("HYP3E.settings.isGroupInitiativeHint"),
+        default: true,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
 
-  // Re-roll Initiative action
-  game.settings.register(game.system.id, "rerollInitiative", {
-    name: game.i18n.localize("HYP3E.settings.rerollInitiative"),
-    hint: game.i18n.localize("HYP3E.settings.rerollInitiativeHint"),
-    default: "reset",
-    scope: "world",
-    type: String,
-    config: true,
-    choices: {
-      keep: "HYP3E.settings.initiativeKeep",
-      reset: "HYP3E.settings.initiativeReset",
-      reroll: "HYP3E.settings.initiativeReroll",
-    },
-  });
+    // Re-roll Initiative action
+    game.settings.register(game.system.id, "rerollInitiative", {
+        name: game.i18n.localize("HYP3E.settings.rerollInitiative"),
+        hint: game.i18n.localize("HYP3E.settings.rerollInitiativeHint"),
+        default: "reset",
+        scope: "world",
+        type: String,
+        config: true,
+        choices: {
+            keep: "HYP3E.settings.initiativeKeep",
+            reset: "HYP3E.settings.initiativeReset",
+            reroll: "HYP3E.settings.initiativeReroll",
+        },
+    });
 
-  // Enable beta-test of combat situational modifier detection
-  game.settings.register(game.system.id, "enableCombatSitModDetection", {
-    name: game.i18n.localize("HYP3E.settings.enableCombatSitModDetection"),
-    hint: game.i18n.localize("HYP3E.settings.enableCombatSitModDetectionHint"),
-    default: false,
-    scope: "world",
-    type: Boolean,
-    config: true,
-    requiresReload: true,
-  });
+    // Enable beta-test of combat situational modifier detection
+    game.settings.register(game.system.id, "enableCombatSitModDetection", {
+        name: game.i18n.localize("HYP3E.settings.enableCombatSitModDetection"),
+        hint: game.i18n.localize("HYP3E.settings.enableCombatSitModDetectionHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
 
-  // Critical hit
-  game.settings.register(game.system.id, "critHit", {
-    name: game.i18n.localize("HYP3E.settings.critHits"),
-    hint: game.i18n.localize("HYP3E.settings.critHitsHint"),
-    default: true,
-    scope: "world",
-    type: Boolean,
-    config: true,
-    requiresReload: true,
-  });
-  
-  // Critical Miss
-  game.settings.register(game.system.id, "critMiss", {
-    name: game.i18n.localize("HYP3E.settings.critMiss"),
-    hint: game.i18n.localize("HYP3E.settings.critMissHint"),
-    default: true,
-    scope: "world",
-    type: Boolean,
-    config: true,
-    requiresReload: true,
-  });
-
-  // Enable beta-test of encumbrance calculations applied to characters
-  game.settings.register(game.system.id, "enableEncumbrance", {
-    name: game.i18n.localize("HYP3E.settings.enableEncumbrance"),
-    hint: game.i18n.localize("HYP3E.settings.enableEncumbranceHint"),
-    default: false,
-    scope: "world",
-    type: Boolean,
-    config: true,
-    requiresReload: true,
-  });
-  // GM-defined strength multiplier for encumbered status
-  game.settings.register(game.system.id, "encumbered", {
-    name: game.i18n.localize("HYP3E.settings.encumberedLabel"),
-    hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
-    default: "10",
-    scope: "world",
-    type: Number,
-    config: true,
-    requiresReload: true,
-  });
-  // GM-defined strength multiplier for heavily encumbered status
-  game.settings.register(game.system.id, "heavilyEncumbered", {
-    name: game.i18n.localize("HYP3E.settings.heavilyEncumberedLabel"),
-    hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
-    default: "15",
-    scope: "world",
-    type: Number,
-    config: true,
-    requiresReload: true,
-  });
-
-  // Human races
-  game.settings.register(game.system.id, "races", {
-    name: game.i18n.localize("HYP3E.settings.races"),
-    hint: game.i18n.localize("HYP3E.settings.racesHint"),
-    default: "Common (Mixed), Amazon, Atlantean, Esquimaux, Hyperborean, Ixian, Kelt, Kimmerian, Kimmeri-Kelt, Pict, Pict (Half-Blood), Viking, Anglo-Saxon, Carolingian Frank, Carthaginian, Esquimaux-Ixian, Greek, Lapp, Lemurian, Moor, Mu, Oon, Roman, Tlingit, Yakut",
-    scope: "world",
-    type: String,
-    config: true,
-    requiresReload: true,
-  });
-
-  // Languages
-  game.settings.register(game.system.id, "languages", {
-    name: game.i18n.localize("HYP3E.settings.languages"),
-    hint: game.i18n.localize("HYP3E.settings.languagesHint"),
-    default: "Common, Berber, Esquimaux (Coastal), Esquimaux (Tundra), Esquimaux-Ixian (pidgin), Hellenic (Amazon), Hellenic (Atlantean), Hellenic (Greek), Hellenic (Hyperborean), Hellenic (Kimmerian), Keltic (Goidelic), Keltic (Pictish), Latin, Lemurian, Muat, Old Norse (Anglo-Saxon), Old Norse (Viking), Oonat, Thracian (Ixian), Thracian (Kimmerian), Tlingit, Uralic (Lapp), Uralic (Yakut)",
-    scope: "world",
-    type: String,
-    config: true,
-    requiresReload: true,
-  });
-  
-  // Classes
-  game.settings.register(game.system.id, "characterClasses", {
-    name: game.i18n.localize("HYP3E.settings.characterClasses"),
-    hint: game.i18n.localize("HYP3E.settings.characterClassesHint"),
-    default: "Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch",
-    scope: "world",
-    type: String,
-    config: true,
-    requiresReload: true,
-  });
+    // Critical hit
+    game.settings.register(game.system.id, "critHit", {
+        name: game.i18n.localize("HYP3E.settings.critHits"),
+        hint: game.i18n.localize("HYP3E.settings.critHitsHint"),
+        default: true,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
     
-  // If we ever need migration scripts, use this version number for comparison
-  console.log("Game info:", game)
-  console.log("System info:", game.system)
-  console.log("Foundry version:", game.version)
-  if (foundry.utils.isNewerVersion(game.version, "12")) {
-    console.log("Foundry version is 12 or higher")
-  }
-  if (foundry.utils.isNewerVersion(game.version, "13")) {
-    console.log("Foundry version is 13 or higher")
-  }
+    // Critical Miss
+    game.settings.register(game.system.id, "critMiss", {
+        name: game.i18n.localize("HYP3E.settings.critMiss"),
+        hint: game.i18n.localize("HYP3E.settings.critMissHint"),
+        default: true,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
 
-  // Add custom statusEffects
-  const hasted = {
-    id: "hasted",
-    name: "HYP3E.statusEffects.hasted",
-    img: `${HYP3E.assetsPath}/run.svg`,
-    isActive: false
-  }
-  CONFIG.statusEffects.push(hasted)
-  const slowed = {
-    id: "slowed",
-    name: "HYP3E.statusEffects.slowed",
-    img: `${HYP3E.assetsPath}/snail.svg`,
-    isActive: false
-  }
-  CONFIG.statusEffects.push(slowed)
+    // Enable beta-test of encumbrance calculations applied to characters
+    game.settings.register(game.system.id, "enableEncumbrance", {
+        name: game.i18n.localize("HYP3E.settings.enableEncumbrance"),
+        hint: game.i18n.localize("HYP3E.settings.enableEncumbranceHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
+    // GM-defined strength multiplier for encumbered status
+    game.settings.register(game.system.id, "encumbered", {
+        name: game.i18n.localize("HYP3E.settings.encumberedLabel"),
+        hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
+        default: "10",
+        scope: "world",
+        type: Number,
+        config: true,
+        requiresReload: true,
+    });
+    // GM-defined strength multiplier for heavily encumbered status
+    game.settings.register(game.system.id, "heavilyEncumbered", {
+        name: game.i18n.localize("HYP3E.settings.heavilyEncumberedLabel"),
+        hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
+        default: "15",
+        scope: "world",
+        type: Number,
+        config: true,
+        requiresReload: true,
+    });
 
-  // Add custom constants for configuration.
-  CONFIG.HYP3E = HYP3E;
+    // Human races
+    game.settings.register(game.system.id, "races", {
+        name: game.i18n.localize("HYP3E.settings.races"),
+        hint: game.i18n.localize("HYP3E.settings.racesHint"),
+        default: "Common (Mixed), Amazon, Atlantean, Esquimaux, Hyperborean, Ixian, Kelt, Kimmerian, Kimmeri-Kelt, Pict, Pict (Half-Blood), Viking, Anglo-Saxon, Carolingian Frank, Carthaginian, Esquimaux-Ixian, Greek, Lapp, Lemurian, Moor, Mu, Oon, Roman, Tlingit, Yakut",
+        scope: "world",
+        type: String,
+        config: true,
+        requiresReload: true,
+    });
+
+    // Languages
+    game.settings.register(game.system.id, "languages", {
+        name: game.i18n.localize("HYP3E.settings.languages"),
+        hint: game.i18n.localize("HYP3E.settings.languagesHint"),
+        default: "Common, Berber, Esquimaux (Coastal), Esquimaux (Tundra), Esquimaux-Ixian (pidgin), Hellenic (Amazon), Hellenic (Atlantean), Hellenic (Greek), Hellenic (Hyperborean), Hellenic (Kimmerian), Keltic (Goidelic), Keltic (Pictish), Latin, Lemurian, Muat, Old Norse (Anglo-Saxon), Old Norse (Viking), Oonat, Thracian (Ixian), Thracian (Kimmerian), Tlingit, Uralic (Lapp), Uralic (Yakut)",
+        scope: "world",
+        type: String,
+        config: true,
+        requiresReload: true,
+    });
+
+    // Classes
+    game.settings.register(game.system.id, "characterClasses", {
+        name: game.i18n.localize("HYP3E.settings.characterClasses"),
+        hint: game.i18n.localize("HYP3E.settings.characterClassesHint"),
+        default: "Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch",
+        scope: "world",
+        type: String,
+        config: true,
+        requiresReload: true,
+    });
+
+    // If we ever need migration scripts, use this version number for comparison
+    console.log("Game info:", game)
+    console.log("System info:", game.system)
+    console.log("Foundry version:", game.version)
+    if (foundry.utils.isNewerVersion(game.version, "12")) {
+        console.log("Foundry version is 12 or higher")
+    }
+    if (foundry.utils.isNewerVersion(game.version, "13")) {
+        console.log("Foundry version is 13 or higher")
+    }
+
+    // Add custom statusEffects
+    const hasted = {
+        id: "hasted",
+        name: "HYP3E.statusEffects.hasted",
+        img: `${HYP3E.assetsPath}/run.svg`,
+        isActive: false
+    }
+    CONFIG.statusEffects.push(hasted)
+    const slowed = {
+        id: "slowed",
+        name: "HYP3E.statusEffects.slowed",
+        img: `${HYP3E.assetsPath}/snail.svg`,
+        isActive: false
+    }
+    CONFIG.statusEffects.push(slowed)
+
+    // Add custom constants for configuration.
+    CONFIG.HYP3E = HYP3E;
 
     /**
      * Set an initiative formula for the system
@@ -278,25 +278,25 @@ Hooks.once('init', async function() {
 
 // If you need to add Handlebars helpers, here are a few useful examples:
 Handlebars.registerHelper('concat', function() {
-  var outStr = '';
-  for (var arg in arguments) {
-    if (typeof arguments[arg] != 'object') {
-      outStr += arguments[arg];
+    var outStr = '';
+    for (var arg in arguments) {
+        if (typeof arguments[arg] != 'object') {
+            outStr += arguments[arg];
+        }
     }
-  }
-  return outStr;
+    return outStr;
 });
 
 Handlebars.registerHelper('toLowerCase', function(str) {
-  return str.toLowerCase();
+    return str.toLowerCase();
 });
 
 Handlebars.registerHelper('add', function(num1, num2) {
-  return num1 + num2
+    return num1 + num2
 });
 
 Handlebars.registerHelper('subtract', function(num1, num2) {
-  return num1 - num2
+    return num1 - num2
 });
 
 Handlebars.registerHelper('isMin', function(val) {
@@ -323,119 +323,119 @@ Handlebars.registerHelper('ifInList', function(str, arr, options) {
 /* -------------------------------------------- */
 
 Hooks.once("ready", async function() {
-  // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
-  Hooks.on("hotbarDrop", (bar, data, slot) => {
-    createItemMacro(data, slot);
-    return false;
-  });
+    // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
+    Hooks.on("hotbarDrop", (bar, data, slot) => {
+        createItemMacro(data, slot);
+        return false;
+    });
 
-  /**
-   * Load system settings
-   */
-  const debugMessages = game.settings.get(game.system.id, "debugMessages");
-  CONFIG.HYP3E.debugMessages = debugMessages;
+    /**
+     * Load system settings
+     */
+    const debugMessages = game.settings.get(game.system.id, "debugMessages");
+    CONFIG.HYP3E.debugMessages = debugMessages;
 
-  // Automatically calculate AC
-  const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");
-  CONFIG.HYP3E.autoCalcAc = autoCalcAc;
-  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc) }
+    // Automatically calculate AC
+    const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");
+    CONFIG.HYP3E.autoCalcAc = autoCalcAc;
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc) }
 
-  // Enable basic attribute checks
-  const enableAttrChecks = game.settings.get(game.system.id, "enableAttrChecks");
-  CONFIG.HYP3E.enableAttrChecks = enableAttrChecks;
-  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Enable basic attribute checks:", CONFIG.HYP3E.enableAttrChecks) }
+    // Enable basic attribute checks
+    const enableAttrChecks = game.settings.get(game.system.id, "enableAttrChecks");
+    CONFIG.HYP3E.enableAttrChecks = enableAttrChecks;
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Enable basic attribute checks:", CONFIG.HYP3E.enableAttrChecks) }
 
-  // Reverse situational modifiers on roll-under checks
-  const flipRollUnderMods = game.settings.get(game.system.id, "flipRollUnderMods");
-  CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
-  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods) }
+    // Reverse situational modifiers on roll-under checks
+    const flipRollUnderMods = game.settings.get(game.system.id, "flipRollUnderMods");
+    CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods) }
 
-  // Enable/disable group-based initiative
-  const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
-  CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
-  if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative) }
+    // Enable/disable group-based initiative
+    const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
+    CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative) }
 
-  // Set crit configs
-  //const critHits = game.settings.get(game.system.id, "critHits");
+    // Set crit configs
+    //const critHits = game.settings.get(game.system.id, "critHits");
 
-  // Load races list
-  const races = game.settings.get(game.system.id, "races");
-  if (races != "") {
-    CONFIG.HYP3E.races = {}
-    const racesArray = races.split(",");
-    racesArray.forEach((l, i) => (CONFIG.HYP3E.races[l.trim()] = l.trim()));
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Races:", CONFIG.HYP3E.races) }
-  }
-
-  // Load language list
-  const languages = game.settings.get(game.system.id, "languages");
-  if (languages != "") {
-    CONFIG.HYP3E.languages = {}
-    const langArray = languages.split(",");
-    langArray.forEach((l, i) => (CONFIG.HYP3E.languages[l.trim()] = l.trim()));
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Languages:", CONFIG.HYP3E.languages) }
-  }
-
-  // Load class list
-  const characterClasses = game.settings.get(game.system.id, "characterClasses");
-  if (characterClasses != "") {
-    CONFIG.HYP3E.characterClasses = {}
-    const classArray = characterClasses.split(",");
-    classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
-  }
-  
-  // Load saving throws
-  if (CONFIG.HYP3E.saves) {
-    for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {
-      CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
+    // Load races list
+    const races = game.settings.get(game.system.id, "races");
+    if (races != "") {
+        CONFIG.HYP3E.races = {}
+        const racesArray = races.split(",");
+        racesArray.forEach((l, i) => (CONFIG.HYP3E.races[l.trim()] = l.trim()));
+        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Races:", CONFIG.HYP3E.races) }
     }
-    console.log("CONFIG Saves:", CONFIG.HYP3E.saves)
-  }
 
-  // Load creature sizes
-  if (CONFIG.HYP3E.creatureSizes) {
-    for (let [k, v] of Object.entries(CONFIG.HYP3E.creatureSizes)) {
-        CONFIG.HYP3E.creatureSizes[k] = game.i18n.localize(CONFIG.HYP3E.creatureSizes[k])
+    // Load language list
+    const languages = game.settings.get(game.system.id, "languages");
+    if (languages != "") {
+        CONFIG.HYP3E.languages = {}
+        const langArray = languages.split(",");
+        langArray.forEach((l, i) => (CONFIG.HYP3E.languages[l.trim()] = l.trim()));
+        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Languages:", CONFIG.HYP3E.languages) }
     }
-    console.log("CONFIG Creature Sizes:", CONFIG.HYP3E.creatureSizes)
-  }
 
-  // Load weapon types
-  if (CONFIG.HYP3E.weaponTypes) { 
-    for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponTypes)) {
-      CONFIG.HYP3E.weaponTypes[k] = game.i18n.localize(CONFIG.HYP3E.weaponTypes[k])
+    // Load class list
+    const characterClasses = game.settings.get(game.system.id, "characterClasses");
+    if (characterClasses != "") {
+        CONFIG.HYP3E.characterClasses = {}
+        const classArray = characterClasses.split(",");
+        classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
+        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
     }
-    console.log("CONFIG Weapon Types:", CONFIG.HYP3E.weaponTypes)
-  }
+    
+    // Load saving throws
+    if (CONFIG.HYP3E.saves) {
+        for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {
+            CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
+        }
+        console.log("CONFIG Saves:", CONFIG.HYP3E.saves)
+    }
 
-  // Load weapon annotations
-  if (CONFIG.HYP3E.weaponAnnotations) { 
-    for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponAnnotations)) {
-      CONFIG.HYP3E.weaponAnnotations[k] = game.i18n.localize(CONFIG.HYP3E.weaponAnnotations[k])
+    // Load creature sizes
+    if (CONFIG.HYP3E.creatureSizes) {
+        for (let [k, v] of Object.entries(CONFIG.HYP3E.creatureSizes)) {
+            CONFIG.HYP3E.creatureSizes[k] = game.i18n.localize(CONFIG.HYP3E.creatureSizes[k])
+        }
+        console.log("CONFIG Creature Sizes:", CONFIG.HYP3E.creatureSizes)
     }
-    console.log("CONFIG Weapon Annotations:", CONFIG.HYP3E.weaponAnnotations)
-  }
 
-  // Load armor types
-  if (CONFIG.HYP3E.armorTypes) { 
-    for (let [k, v] of Object.entries(CONFIG.HYP3E.armorTypes)) {
-      CONFIG.HYP3E.armorTypes[k] = game.i18n.localize(CONFIG.HYP3E.armorTypes[k])
+    // Load weapon types
+    if (CONFIG.HYP3E.weaponTypes) { 
+        for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponTypes)) {
+            CONFIG.HYP3E.weaponTypes[k] = game.i18n.localize(CONFIG.HYP3E.weaponTypes[k])
+        }
+        console.log("CONFIG Weapon Types:", CONFIG.HYP3E.weaponTypes)
     }
-    console.log("CONFIG Armor Types:", CONFIG.HYP3E.armorTypes)
-  }
 
-  // If we need to do a system migration, do it after the other settings are loaded
-  if (game.user.isGM) {
-    const currentVersion = game.system.version
-    console.log(`System version ${currentVersion}`)
-    // No need to migrate if system version is x.x.x or higher
-    const NEEDS_MIGRATION_TO_VERSION = "1.6.5"
-    const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
-    if (needsMigration) {
-        migrateWorld()
+    // Load weapon annotations
+    if (CONFIG.HYP3E.weaponAnnotations) { 
+        for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponAnnotations)) {
+            CONFIG.HYP3E.weaponAnnotations[k] = game.i18n.localize(CONFIG.HYP3E.weaponAnnotations[k])
+        }
+        console.log("CONFIG Weapon Annotations:", CONFIG.HYP3E.weaponAnnotations)
     }
-  }
+
+    // Load armor types
+    if (CONFIG.HYP3E.armorTypes) { 
+        for (let [k, v] of Object.entries(CONFIG.HYP3E.armorTypes)) {
+            CONFIG.HYP3E.armorTypes[k] = game.i18n.localize(CONFIG.HYP3E.armorTypes[k])
+        }
+        console.log("CONFIG Armor Types:", CONFIG.HYP3E.armorTypes)
+    }
+
+    // If we need to do a system migration, do it after the other settings are loaded
+    if (game.user.isGM) {
+        const currentVersion = game.system.version
+        console.log(`System version ${currentVersion}`)
+        // No need to migrate if system version is x.x.x or higher
+        const NEEDS_MIGRATION_TO_VERSION = "1.6.5"
+        const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
+        if (needsMigration) {
+            migrateWorld()
+        }
+    }
 
     // Report on compendium data, for data-error hunting
     if (game.user.isGM) {
@@ -453,9 +453,9 @@ Hooks.once("ready", async function() {
 Hooks.on("renderChatMessage", addChatMessageButtons);
 
 Hooks.on("createToken", (document, options, userId) => {
-  if (document.actor?.type == "npc" && document.actor.system.rollHD) {
-    document.actor.rollHD()
-  }
+    if (document.actor?.type == "npc" && document.actor.system.rollHD) {
+        document.actor.rollHD()
+    }
 });
 
 /* -------------------------------------------- */
@@ -857,30 +857,30 @@ function filterBlind(doc) {
 }
 
 async function reportBestiary() {
-  // Generate a report on bestiary data
-  // Loop through all compendia to find the bestiary
-  for (let pack of game.packs) {
+    // Generate a report on bestiary data
+    // Loop through all compendia to find the bestiary
+    for (let pack of game.packs) {
 
-    // Skip anything that's not an Actor compendium pack
-    if (pack.metadata.type != "Actor") {
-      continue
-    }
+        // Skip anything that's not an Actor compendium pack
+        if (pack.metadata.type != "Actor") {
+            continue
+        }
 
-    // We only need to do the Bestiary compendium for this specific migration
-    if (pack.metadata.label !== "Bestiary") {
-      continue
-    }
-    
-    // OK, we have the bestiary compendium... generate the report
+        // We only need to do the Bestiary compendium for this specific migration
+        if (pack.metadata.label !== "Bestiary") {
+            continue
+        }
+        
+        // OK, we have the bestiary compendium... generate the report
 
-    // Iterate over compendium entries and report
-    const documents = await pack.getDocuments()
-    for (let doc of documents) {
-      if (doc.name != doc.prototypeToken.name) {
-        console.log(`Compendium Bestiary error: ${doc.name} is not the same as token ${doc.prototypeToken.name}!`)
-      }
+        // Iterate over compendium entries and report
+        const documents = await pack.getDocuments()
+        for (let doc of documents) {
+            if (doc.name != doc.prototypeToken.name) {
+                console.log(`Compendium Bestiary error: ${doc.name} is not the same as token ${doc.prototypeToken.name}!`)
+            }
+        }
     }
-  }
 }
 
 async function reportItems() {
