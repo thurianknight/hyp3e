@@ -74,7 +74,10 @@ export class HYP3EGroupCombat extends HYP3ECombat {
             // Movement partially overrides the other combat actions for initiative order
             c.getActionModifiers();
 
-            // If deaf or blind, add these initiative penalties
+            // Add the actor's temporary initiative modifier, if one exists
+            c.getTempInitMod();
+
+            // Get initiative penalties based on status effects like blind or deaf
             c.getSlowingModifiers();
 
             // If defeated, add this initiative penalty to force actor to the end of the round
@@ -88,6 +91,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                 initRoll: results[c.initGroup].initiative,
                 initiative: Math.round((results[c.initGroup].initiative 
                                         + (c.actor?.system?.attributes?.dex?.value/1000)
+                                        + c.tempInitMod
                                         + c.meleeInit
                                         + c.missileInit
                                         + c.magicInit

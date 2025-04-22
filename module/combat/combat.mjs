@@ -119,7 +119,7 @@ export class HYP3ECombat extends Combat {
                 moveInit: null,
                 statusInit: null,
                 defeatedInit: null
-        })
+            })
         )
         // if (CONFIG.HYP3E.debugMessages) { console.log("resetAll: Combatants Updates: ", updates) }
         await this.updateEmbeddedDocuments("Combatant", updates);

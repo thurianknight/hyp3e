@@ -6,6 +6,7 @@ export class HYP3ECombatant extends Combatant {
     static INITIATIVE_MOD_MOVEMENT = 0.20
     static INITIATIVE_MOD_DEAF = -2;
     static INITIATIVE_MOD_BLIND = -95;
+    static INITIATIVE_MOD_SLOWED = 0;
     static INITIATIVE_MOD_DEFEATED = -99;
   
     // ===========================================================================
@@ -94,6 +95,10 @@ export class HYP3ECombatant extends Combatant {
         // Add the actor's DX value
         rollTerms += `+ ${(rollData.attributes?.dex?.value/1000)}`
 
+        // Add the actor's temporary initiative modifier, if one exists
+        this.getTempInitMod();
+        rollTerms += `+ ${this.tempInitMod}`;
+
         // If deaf or blind, add these initiative penalties
         this.getSlowingModifiers();
         rollTerms += `+ ${this.statusInit}`;
@@ -130,6 +135,11 @@ export class HYP3ECombatant extends Combatant {
         }
     }
 
+    getTempInitMod() {
+        // If the actor has a temporary init mod set, apply it here
+        this.tempInitMod = this.actor?.system?.tempInitiativeMod ? this.actor?.system?.tempInitiativeMod : 0
+    }
+
     getDefeatedModifier() {
         // If defeated, add this initiative penalty to force actor to the end of the round
         this.defeatedInit = this.isDefeated ? HYP3ECombatant.INITIATIVE_MOD_DEFEATED : 0;
@@ -141,6 +151,10 @@ export class HYP3ECombatant extends Combatant {
         this.isSlowed = false;
         for ( let e of this.actor.effects) {
             // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.actor.name} has effect: `, e) }
+            if (e.name == "Slowed" && !e.disabled) {
+                this.statusInit += HYP3ECombatant.INITIATIVE_MOD_SLOWED;
+                this.isSlowed = true;
+            }
             if (e.name == "Deaf" && !e.disabled) {
                 this.statusInit += HYP3ECombatant.INITIATIVE_MOD_DEAF;
                 this.isSlowed = true;

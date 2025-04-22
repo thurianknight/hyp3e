@@ -212,6 +212,22 @@ Hooks.once('init', async function() {
     console.log("Foundry version is 13 or higher")
   }
 
+  // Add custom statusEffects
+  const hasted = {
+    id: "hasted",
+    name: "HYP3E.statusEffects.hasted",
+    img: `${HYP3E.assetsPath}/run.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(hasted)
+  const slowed = {
+    id: "slowed",
+    name: "HYP3E.statusEffects.slowed",
+    img: `${HYP3E.assetsPath}/snail.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(slowed)
+
   // Add custom constants for configuration.
   CONFIG.HYP3E = HYP3E;
 

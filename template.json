@@ -23,6 +23,7 @@
                 "fa": 0,
                 "tempAtkMod": 0,
                 "tempDmgMod": 0,
+                "tempInitiativeMod": 0,
                 "ca": null,
                 "ta": null,
                 "saves": {

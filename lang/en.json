@@ -471,6 +471,10 @@
             "blue": "Blue",
             "orange": "Orange",
             "white": "White"
+        },
+        "statusEffects": {
+            "hasted": "Hasted",
+            "slowed": "Slowed"
         }
     }
 }
