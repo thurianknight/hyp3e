@@ -1205,7 +1205,6 @@ export class Hyp3eActor extends Actor {
                 if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Damage formula:", item.dmgFormula) }
                 // Do we have 2-hand damage?
                 if (item.system.damage2h > "") {
-                    // const dmgObj2h = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData)
                     item.dmgFormula2h = dmgObj.formula2h
                     item.debugDmgRollFormula2h = dmgObj.debugFormula2h
                     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Damage formula 2H:", item.dmgFormula2h) }

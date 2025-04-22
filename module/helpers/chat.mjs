@@ -10,6 +10,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     if (dmgRoll.length > 0) {
         dmgRoll.each((_i, b) => {
             if (CONFIG.HYP3E.debugMessages) { console.log(`Damage html: `, b) }
+            const baseDmgFormula = $(b).data('baseDamage');
             const dmgFormula = $(b).data('formula');
             const debugDmgRollFormula = $(b).data('debugFormula');
             const sourceType = $(b).data('sourceType');
@@ -24,7 +25,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, itemId, tokenId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, tokenId, sourceType);
             });
         });
     }
@@ -33,6 +34,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     if (dmgRoll2h.length > 0) {
         dmgRoll2h.each((_i, b) => {
             if (CONFIG.HYP3E.debugMessages) { console.log(`2-hand damage html: `, b) }
+            const baseDmgFormula = $(b).data('baseDamage');
             const dmgFormula = $(b).data('formula');
             const debugDmgRollFormula = $(b).data('debugFormula');
             const sourceType = $(b).data('sourceType');
@@ -47,7 +49,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll2h.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, debugDmgRollFormula, actorId, itemId, tokenId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, tokenId, sourceType);
             });
         });
     }
@@ -153,6 +155,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     if (critDmg.length > 0) {
         critDmg.each((_i, b) => {
             let total = Number($(b).data('total'));
+            // let dieFormula =$(b).data('roll');
             const critDamageButton = $(
                 `<button class="dice-total-critDamage-btn chat-button-crit" title="Click to apply damage to selected token(s).">Apply Damage <i class="fas fa-user"></i></button>`
             );
@@ -359,7 +362,7 @@ export async function showValueChange(t, fillColor,total) {
 }
 
 // Roll damage button and display in chat
-async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, tokenId, sourceType) {
+async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, tokenId, sourceType) {
     if (formula == "") { return } // Exit on empty formula
 
     let actor = {}
@@ -406,7 +409,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, actorId, itemId, toke
         dmgRoll: dmgRoll,
         debugDmgRollFormula: debugDmgRollFormula,
         naturalDmgRoll: naturalDmgRoll,
-        dmgBaseRoll: formula,
+        dmgBaseRoll: baseDmgFormula,
         itemId: itemId,
         actorId: actorId,
         sourceType: item.type,
