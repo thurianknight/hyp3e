@@ -104,32 +104,32 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                         icon: "<i class='fas fa-check'></i>",
                         label: `Apply Modifier Above`,
                         callback: (html) => {
-                          const form = html[0].querySelector("form");
-                          const modifier = ((
-                            form.querySelector('[name="inputField"]')
-                          ))?.value;
-                          if (modifier && modifier != "") {
-                            const nModifier = Number(modifier);
-                            if (nModifier) {
-                              applyHealthDrop(total + nModifier);
-                            } else {
-                              ui.notifications?.error(modifier + " is not a number");
+                            const form = html[0].querySelector("form");
+                            const modifier = ((
+                                form.querySelector('[name="inputField"]')
+                            ))?.value;
+                            if (modifier && modifier != "") {
+                                const nModifier = Number(modifier);
+                                if (nModifier) {
+                                    rollCriticalDamage(total + nModifier);
+                                } else {
+                                    ui.notifications?.error(modifier + " is not a number");
+                                }
                             }
-                          }
                         }
-                      }
+                    }
                 };
                 if (sourceType === "weapon") {
                     if (CONFIG.HYP3E.debugMessages) { console.log("Adding 2x/3x button for weapon") }
                     buttons["two"] = {
                         icon: "<i class='fas fa-check'></i>",
                         label: `2x Dice Dmg (roll only)`,
-                        callback: () => applyHealthDrop(total, dieFormula)
+                        callback: () => rollCriticalDamage(total, dieFormula)
                     };
                     buttons["three"] = {
                         icon: "<i class='fas fa-check'></i>",
                         label: `3x Dice Dmg (roll only)`,
-                        callback: () => applyHealthDrop(total, `${dieFormula}+${dieFormula}`)
+                        callback: () => rollCriticalDamage(total, `${dieFormula}+${dieFormula}`)
                     };
                 }
                 new Dialog({
@@ -144,8 +144,24 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                   buttons,
                   default: "yes",
                 }).render(true);
-              });
+            });
+        });
+    }
 
+    // Apply critical damage button
+    let critDmg = html.find(".crit-damage-button");
+    if (critDmg.length > 0) {
+        critDmg.each((_i, b) => {
+            let total = Number($(b).data('total'));
+            const critDamageButton = $(
+                `<button class="dice-total-critDamage-btn chat-button-crit" title="Click to apply damage to selected token(s).">Apply Damage <i class="fas fa-user"></i></button>`
+            );
+            critDmg.append(critDamageButton);
+            // Handle button clicks
+            critDamageButton.on("click", (ev) => {
+                ev.stopPropagation();
+                applyHealthDrop(total);
+            });
         });
     }
 
@@ -440,6 +456,52 @@ async function useItem(itemId, actorId) {
     actor.useItem(itemId);
 }
 
+// Roll additional critical-hit damage and display, with a button to apply
+async function rollCriticalDamage(total, extraRoll = "") {
+    if (extraRoll != "") {
+        const roll = await new Roll(extraRoll).roll();
+        if (total => 0) {
+            total += roll.total;
+        } else {
+            total -= roll.total;
+        }
+        // For showing the roll
+        extraRoll = await roll.render();
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollCriticalDamage: Extra roll result: ", extraRoll) }
+    }
+    const body = `
+        <div class="dice-roll">
+            <div class="dice-formula flexrow">
+                <span class="dice-damage">${total} HP damage!</span>
+                <span class="crit-damage-button flexrow" data-total="${total}"</span>
+            </div>
+        </div>
+    `
+
+    if (extraRoll != "") {
+        extraRoll = `<p>Extra damage roll: ${extraRoll}</p>`;
+    }
+
+    // Log normal + critical damage as a chat message
+    // const title = `Total damage ${total} HP!`
+    const title = ``
+    const templateData = {
+        extraRoll: extraRoll,
+        title: title,
+        body: body
+        // image: image
+    };
+
+    const template = `${HYP3E.templatePath}/chat/apply-damage.hbs`;
+    const html = await renderTemplate(template, templateData);
+    const chatData = {
+        author: game.user_id,
+        content: html
+    };
+    ChatMessage.create(chatData, {});
+
+}
+
 // Apply a health drop (positive number is damage) to one or more tokens.
 async function applyHealthDrop(total, extraRoll = "") {
     if (extraRoll != "") {
@@ -555,13 +617,11 @@ async function applyHealthDrop(total, extraRoll = "") {
         // }
     }
     let body = "";
+    body += `<ul><li>${names.join("</li><li>")}</li></ul>`;
+
     if (extraRoll != "") {
         extraRoll = `<p>Extra damage roll: ${extraRoll}</p>`;
     }
-    body += `<ul><li>${names
-        // .map((t) => t.name)
-        .join("</li><li>")}</li></ul>`;
-
 
     // Log health hit as a chat message
     const title = total > 0
