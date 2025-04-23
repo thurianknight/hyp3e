@@ -37,6 +37,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const baseDmgFormula = $(b).data('baseDamage');
             const dmgFormula = $(b).data('formula');
             const debugDmgRollFormula = $(b).data('debugFormula');
+            const applyDr = $(b).data('applyDr');
             const sourceType = $(b).data('sourceType');
             const itemId = $(b).data('itemId');
             const actorId = $(b).data('actorId');
@@ -63,7 +64,8 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
         dmg.each((_i, b) => {
             let total = Number($(b).data('total'));
             let naturalRoll = Number($(b).data('natural'));
-            let dieFormula =$(b).data('roll');
+            const applyDr = $(b).data('applyDr');
+            let dieFormula = $(b).data('roll');
             let sourceType = $(b).data('sourceType');
 
             const fullDamageButton = $(
@@ -86,12 +88,12 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             fullDamageButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthDrop(total);
+                applyHealthDrop(total, applyDr);
             });
 
             halfDamageButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthDrop(Math.floor(total*0.5));
+                applyHealthDrop(Math.floor(total*0.5), applyDr);
             });
 
             fullHealingButton.on("click", (ev) => {
@@ -113,7 +115,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                             if (modifier && modifier != "") {
                                 const nModifier = Number(modifier);
                                 if (nModifier) {
-                                    rollCriticalDamage(total + nModifier);
+                                    rollCriticalDamage(total + nModifier, "", applyDr);
                                 } else {
                                     ui.notifications?.error(modifier + " is not a number");
                                 }
@@ -126,12 +128,12 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     buttons["two"] = {
                         icon: "<i class='fas fa-check'></i>",
                         label: `2x Dice Dmg (roll only)`,
-                        callback: () => rollCriticalDamage(total, dieFormula)
+                        callback: () => rollCriticalDamage(total, dieFormula, applyDr)
                     };
                     buttons["three"] = {
                         icon: "<i class='fas fa-check'></i>",
                         label: `3x Dice Dmg (roll only)`,
-                        callback: () => rollCriticalDamage(total, `${dieFormula}+${dieFormula}`)
+                        callback: () => rollCriticalDamage(total, `${dieFormula}+${dieFormula}`, applyDr)
                     };
                 }
                 new Dialog({
@@ -154,7 +156,8 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     let critDmg = html.find(".crit-damage-button");
     if (critDmg.length > 0) {
         critDmg.each((_i, b) => {
-            let total = Number($(b).data('total'));
+            const total = Number($(b).data('total'));
+            const applyDr = $(b).data('applyDr');
             // let dieFormula =$(b).data('roll');
             const critDamageButton = $(
                 `<button class="dice-total-critDamage-btn chat-button-crit" title="Click to apply damage to selected token(s).">Apply Damage <i class="fas fa-user"></i></button>`
@@ -163,7 +166,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             critDamageButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthDrop(total);
+                applyHealthDrop(total, applyDr);
             });
         });
     }
@@ -389,6 +392,12 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actor
         return;
     }
 
+    // Is this attack type reduced by DR? Answer YES if:
+    //  - The attack is a weapon (melee or missile), AND it is not a grenade-like or area-effect attack
+    // Answer NO if:
+    //  - The attack is a spell, grenade-like attack, or area-effect attack
+    const applyDr = (item.type == "weapon" && !item.system?.isGrenade && !item.system?.isAreaEffect) ? true : false
+
     if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll formula: ${formula}`) }
     // Invoke the damage roll
     let dmgRoll = new Roll(formula);
@@ -413,6 +422,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actor
         itemId: itemId,
         actorId: actorId,
         sourceType: item.type,
+        applyDr: applyDr,
         save: item.system.save,
         hasEffects: item.effects.size > 0 ? true : false,
         description: item.system.description
@@ -460,7 +470,7 @@ async function useItem(itemId, actorId) {
 }
 
 // Roll additional critical-hit damage and display, with a button to apply
-async function rollCriticalDamage(total, extraRoll = "") {
+async function rollCriticalDamage(total, extraRoll, applyDr) {
     if (extraRoll != "") {
         const roll = await new Roll(extraRoll).roll();
         if (total => 0) {
@@ -476,10 +486,9 @@ async function rollCriticalDamage(total, extraRoll = "") {
         <div class="dice-roll">
             <div class="dice-formula flexrow">
                 <span class="dice-damage">${total} HP damage!</span>
-                <span class="crit-damage-button flexrow" data-total="${total}"</span>
+                <span class="crit-damage-button flexrow" data-apply-dr="${applyDr}" data-total="${total}"></span>
             </div>
-        </div>
-    `
+        </div>`
 
     if (extraRoll != "") {
         extraRoll = `<p>Extra damage roll: ${extraRoll}</p>`;
@@ -506,18 +515,18 @@ async function rollCriticalDamage(total, extraRoll = "") {
 }
 
 // Apply a health drop (positive number is damage) to one or more tokens.
-async function applyHealthDrop(total, extraRoll = "") {
-    if (extraRoll != "") {
-        const roll = await new Roll(extraRoll).roll();
-        if (total => 0) {
-            total += roll.total;
-        } else {
-            total -= roll.total;
-        }
-        // For showing the roll
-        extraRoll = await roll.render();
-        if (CONFIG.HYP3E.debugMessages) { console.log("applyHealthDrop: Extra roll result: ", extraRoll) }
-    }
+async function applyHealthDrop(total, applyDr=true) {
+    // if (extraRoll != "") {
+    //     const roll = await new Roll(extraRoll).roll();
+    //     if (total => 0) {
+    //         total += roll.total;
+    //     } else {
+    //         total -= roll.total;
+    //     }
+    //     // For showing the roll
+    //     extraRoll = await roll.render();
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("applyHealthDrop: Extra roll result: ", extraRoll) }
+    // }
 
     if (total == 0) return; // Skip changes of 0
     const tokens = canvas?.tokens?.controlled;
@@ -528,23 +537,23 @@ async function applyHealthDrop(total, extraRoll = "") {
     }
 
     const names = [];
-    
+
     for (const t of tokens) {
         const actor = t.actor;
         let isDefeated = false;
         let isUnconscious = false;
-        //Update Health
+        // Update Health
         const oldHealth = actor.system.hp.value;
         // consider dr
         let damage_mod = total;
         // If applying damage check dr
-        if (total > 0 && actor.system.ac.dr > 0) {
+        if (applyDr && total > 0 && actor.system.ac.dr > 0) {
             damage_mod = Math.max(0, total - actor.system.ac.dr);
             names.push(`${t.name} (dr ${actor.system.ac.dr} applied)`)
         } else {
             names.push(t.name);
         }
-        
+
         if (damage_mod == 0) continue;
 
         // find updated health
@@ -622,16 +631,16 @@ async function applyHealthDrop(total, extraRoll = "") {
     let body = "";
     body += `<ul><li>${names.join("</li><li>")}</li></ul>`;
 
-    if (extraRoll != "") {
-        extraRoll = `<p>Extra damage roll: ${extraRoll}</p>`;
-    }
+    // if (extraRoll != "") {
+    //     extraRoll = `<p>Extra damage roll: ${extraRoll}</p>`;
+    // }
 
     // Log health hit as a chat message
     const title = total > 0
         ? `Applied ${total} damage to...`
         : `Applied ${total*-1} healing to...`;
     const templateData = {
-        extraRoll: extraRoll,
+        extraRoll: "",
         title: title,
         body: body,
         // image: image
@@ -644,7 +653,6 @@ async function applyHealthDrop(total, extraRoll = "") {
         author: game.user_id,
         content: html
     };
-
     ChatMessage.create(chatData, {});
 }
 

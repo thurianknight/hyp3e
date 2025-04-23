@@ -1498,33 +1498,33 @@ export class Hyp3eActor extends Actor {
     }
 
     // Render html template for damage rolls
-    async renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll, sourceItem = null) {
+    // async renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll, sourceItem = null) {
 
-        const title = "Rolling Damage..."
-        const templateData = {
-            title: title,
-            dmgRoll: dmgRoll,
-            debugDmgRollFormula: debugDmgRollFormula,
-            naturalDmgRoll: naturalDmgRoll,
-            dmgBaseRoll: dmgBaseRoll,
-            itemId: sourceItem.id,
-            actorId: this.id,
-            sourceType: sourceItem.type,
-            save: sourceItem.system.save,
-            hasEffects: sourceItem.effects.size > 0 ? true : false,
-            description: sourceItem.system.description
-        };
+    //     const title = "Rolling Damage..."
+    //     const templateData = {
+    //         title: title,
+    //         dmgRoll: dmgRoll,
+    //         debugDmgRollFormula: debugDmgRollFormula,
+    //         naturalDmgRoll: naturalDmgRoll,
+    //         dmgBaseRoll: dmgBaseRoll,
+    //         itemId: sourceItem.id,
+    //         actorId: this.id,
+    //         sourceType: sourceItem.type,
+    //         save: sourceItem.system.save,
+    //         hasEffects: sourceItem.effects.size > 0 ? true : false,
+    //         description: sourceItem.system.description
+    //     };
 
-        const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;
-        let damageChat = await renderTemplate(template, templateData);
+    //     const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;
+    //     let damageChat = await renderTemplate(template, templateData);
 
-        // Send to chat
-        dmgRoll.toMessage({
-            author: game.user_id,
-            speaker: ChatMessage.getSpeaker({ actor: this }),
-            content: damageChat
-        })
-    }
+    //     // Send to chat
+    //     dmgRoll.toMessage({
+    //         author: game.user_id,
+    //         speaker: ChatMessage.getSpeaker({ actor: this }),
+    //         content: damageChat
+    //     })
+    // }
 
     _getCombatantSitMods(attacker, target) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for attacker ${this.name}...`) }
