@@ -436,6 +436,11 @@ Hooks.once("ready", async function() {
         console.log("CONFIG Armor Types:", CONFIG.HYP3E.armorTypes)
     }
 
+    // If the token resize option is set, do that now, while the game is loading
+    if (game.settings.get(game.system.id, "resizeTokens")) {
+        resizeTokenPrototypes()
+    }
+
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
         const currentVersion = game.system.version
@@ -499,12 +504,6 @@ async function migrateWorld() {
             if (tempDrMod) {
                 delete actor.system.ac["tempDrMod"]
                 await actor.update(tempDrMod)
-            }
-            if (game.settings.get(game.system.id, "resizeTokens")) {
-                const tokenSize = fixTokenSize(actor)
-                if (tokenSize) {
-                    await actor.update(tokenSize)
-                }    
             }
         }
         // Migrate PC data
@@ -650,12 +649,6 @@ async function migrateWorld() {
                             delete doc.system.ac["tempDrMod"]
                             await doc.update(tempDrMod)
                         }
-                        if (game.settings.get(game.system.id, "resizeTokens")) {
-                            const tokenSize = fixTokenSize(doc)
-                            if (tokenSize) {
-                                await doc.update(tokenSize)
-                            }
-                        }
                     }
                     // Migrate PC data
                     if (doc.type == "character") {
@@ -740,6 +733,19 @@ async function migrateWorld() {
         await pack.configure({ locked: wasLocked })
         console.log(`Migrated all ${documentName} documents from Compendium ${pack.collection}`);
 
+    }
+}
+
+async function resizeTokenPrototypes() {
+    // Update the actor directory first
+    for (let actor of game.actors.contents) {
+        // Migrate NPC data
+        if (actor.type == "npc") {
+            const tokenSize = fixTokenSize(actor)
+            if (tokenSize) {
+                await actor.update(tokenSize)
+            }
+        }
     }
 }
 
