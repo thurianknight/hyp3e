@@ -78,6 +78,17 @@ Hooks.once('init', async function() {
         requiresReload: true,
     });
 
+    // Resize tokens for small & large NPCs
+    game.settings.register(game.system.id, "resizeTokens", {
+        name: game.i18n.localize("HYP3E.settings.resizeTokens"),
+        hint: game.i18n.localize("HYP3E.settings.resizeTokensHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: false,
+    });
+
     // Enable/disable group-based initiative
     game.settings.register(game.system.id, "isGroupInitiative", {
         name: game.i18n.localize("HYP3E.settings.isGroupInitiative"),
@@ -489,9 +500,11 @@ async function migrateWorld() {
                 delete actor.system.ac["tempDrMod"]
                 await actor.update(tempDrMod)
             }
-            const tokenSize = fixTokenSize(actor)
-            if (tokenSize) {
-                await actor.update(tokenSize)
+            if (game.settings.get(game.system.id, "resizeTokens")) {
+                const tokenSize = fixTokenSize(actor)
+                if (tokenSize) {
+                    await actor.update(tokenSize)
+                }    
             }
         }
         // Migrate PC data
@@ -637,9 +650,11 @@ async function migrateWorld() {
                             delete doc.system.ac["tempDrMod"]
                             await doc.update(tempDrMod)
                         }
-                        const tokenSize = fixTokenSize(doc)
-                        if (tokenSize) {
-                            await doc.update(tokenSize)
+                        if (game.settings.get(game.system.id, "resizeTokens")) {
+                            const tokenSize = fixTokenSize(doc)
+                            if (tokenSize) {
+                                await doc.update(tokenSize)
+                            }
                         }
                     }
                     // Migrate PC data
