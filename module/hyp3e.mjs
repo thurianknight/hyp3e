@@ -436,25 +436,25 @@ Hooks.once("ready", async function() {
         console.log("CONFIG Armor Types:", CONFIG.HYP3E.armorTypes)
     }
 
-    // If the token resize option is set, do that now, while the game is loading
-    if (game.settings.get(game.system.id, "resizeTokens")) {
-        resizeTokenPrototypes()
-    }
-
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
         const currentVersion = game.system.version
         console.log(`System version ${currentVersion}`)
         // No need to migrate if system version is x.x.x or higher
-        const NEEDS_MIGRATION_TO_VERSION = "1.6.2"
+        const NEEDS_MIGRATION_TO_VERSION = "1.6.3"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
             migrateWorld()
         }
     }
 
-    // Report on compendium data, for data-error hunting
+    // Pre-load processing
     if (game.user.isGM) {
+        // If the token resize option is set, do that now, while the game is loading
+        if (game.settings.get(game.system.id, "resizeTokens")) {
+            resizeTokenPrototypes()
+        }
+        // Data reports for analysis & troubleshooting
         // if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
         //     reportBestiary()
         // }
@@ -485,6 +485,7 @@ async function migrateWorld() {
         // Migrate NPC data
         if (actor.type == "npc") {
             // do stuff to npcs
+            console.log(`Correcting temporary modifier data for NPCs in the directory...`)
             const tempAtkMod = fixTempAtkMod(actor)
             if (tempAtkMod) {
                 delete actor.system["tempAtkMod"]
@@ -509,6 +510,7 @@ async function migrateWorld() {
         // Migrate PC data
         if (actor.type == "character") {
             // do stuff to characters
+            console.log(`Correcting temporary modifier data for PCs in the directory...`)
             const tempAtkMod = fixTempAtkMod(actor)
             if (tempAtkMod) {
                 delete actor.system["tempAtkMod"]
@@ -629,6 +631,7 @@ async function migrateWorld() {
                     // Migrate NPC data
                     if (doc.type == "npc") {
                         // do stuff to npcs
+                        console.log(`Correcting temporary modifier data for NPCs in the compendium...`)
                         const tempAtkMod = fixTempAtkMod(doc)
                         if (tempAtkMod) {
                             delete doc.system["tempAtkMod"]
@@ -653,6 +656,7 @@ async function migrateWorld() {
                     // Migrate PC data
                     if (doc.type == "character") {
                         // do stuff to characters
+                        console.log(`Correcting temporary modifier data for PCs in the compendium...`)
                         const tempAtkMod = fixTempAtkMod(doc)
                         if (tempAtkMod) {
                             delete doc.system["tempAtkMod"]
