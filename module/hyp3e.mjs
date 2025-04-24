@@ -481,11 +481,11 @@ async function migrateWorld() {
     console.log(`Migrating world ${game.system.version}...`)
 
     // Migrate Actor directory
+    console.log(`Correcting data for actors in the directory...`)
     for (let actor of game.actors.contents) {
         // Migrate NPC data
         if (actor.type == "npc") {
             // do stuff to npcs
-            console.log(`Correcting temporary modifier data for NPCs in the directory...`)
             const tempAtkMod = fixTempAtkMod(actor)
             if (tempAtkMod) {
                 delete actor.system["tempAtkMod"]
@@ -510,7 +510,6 @@ async function migrateWorld() {
         // Migrate PC data
         if (actor.type == "character") {
             // do stuff to characters
-            console.log(`Correcting temporary modifier data for PCs in the directory...`)
             const tempAtkMod = fixTempAtkMod(actor)
             if (tempAtkMod) {
                 delete actor.system["tempAtkMod"]
@@ -564,6 +563,7 @@ async function migrateWorld() {
 
     // Migrate Items directory
     /**
+    console.log(`Correcting data for items in the directory...`)
     for (let item of game.items.contents) {
         if (item.type === "weapon") {
             if (item.system?.annotations > ""){
@@ -631,7 +631,6 @@ async function migrateWorld() {
                     // Migrate NPC data
                     if (doc.type == "npc") {
                         // do stuff to npcs
-                        console.log(`Correcting temporary modifier data for NPCs in the compendium...`)
                         const tempAtkMod = fixTempAtkMod(doc)
                         if (tempAtkMod) {
                             delete doc.system["tempAtkMod"]
@@ -656,7 +655,6 @@ async function migrateWorld() {
                     // Migrate PC data
                     if (doc.type == "character") {
                         // do stuff to characters
-                        console.log(`Correcting temporary modifier data for PCs in the compendium...`)
                         const tempAtkMod = fixTempAtkMod(doc)
                         if (tempAtkMod) {
                             delete doc.system["tempAtkMod"]
