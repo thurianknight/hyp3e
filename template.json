@@ -58,6 +58,7 @@
                 "otherMv": {
                     "value": ""
                 },
+                "tempMvMod": 0,
                 "alignment": "",
                 "biography": "",
                 "knownLanguages": "",

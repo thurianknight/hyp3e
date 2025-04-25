@@ -203,6 +203,11 @@ export class Hyp3eActor extends Actor {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Temp DR mod: ${systemData.ac.tempDrMod}`) }
                 tempDR += parseInt(systemData.ac.tempDrMod)
             }
+            // Apply temporary modifier (typically from effects) to encounter-mode MV
+            if (parseInt(systemData.tempMvMod)) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Temp MV mod: ${systemData.tempMvMod}`) }
+                tempMV += parseInt(systemData.tempMvMod)
+            }
             // Now calculate & set the final values...
             systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
             // AC can't be worse (higher) than 9, nor better than -9
