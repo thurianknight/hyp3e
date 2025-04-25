@@ -967,7 +967,7 @@ export class Hyp3eActor extends Actor {
                 }
                 if (gridDistance > dataset.meleeRange) {
                     if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is beyond melee range! Calculated distance is ${gridDistance} ft.`) }
-                    ui.notifications.info(`Target is beyond melee range! Calculated distance is ${gridDistance} ft.`)
+                    ui.notifications.warn(`Target is beyond melee range! Calculated distance is ${gridDistance} ft.`)
                     if (CONFIG.HYP3E.forceRangeLimit) {
                         // If the target is out of range, prevent the attack from proceeding
                         return
@@ -999,7 +999,7 @@ export class Hyp3eActor extends Actor {
                     // If the range is longer than the long range, give a warning
                     chosen = "long"
                     if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is out of range! Calculated distance is ${gridDistance} ft.`) }
-                    ui.notifications.info(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
+                    ui.notifications.warn(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
                     if (CONFIG.HYP3E.forceRangeLimit) {
                         // If the target is out of range, prevent the attack from proceeding
                         return
@@ -1014,7 +1014,7 @@ export class Hyp3eActor extends Actor {
                 if (gridDistance > spellRange) {
                     // If the target is out of range, give a warning
                     if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is out of range! Calculated distance is ${gridDistance} ft.`) }
-                    ui.notifications.info(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
+                    ui.notifications.warn(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
                     if (CONFIG.HYP3E.forceRangeLimit) {
                         // If the target is out of range, prevent the attack from proceeding
                         return

@@ -146,7 +146,7 @@ Hooks.once('init', async function() {
         requiresReload: true,
     });
 
-    // Enable beta-test of combat situational modifier detection
+    // Enable combat situational modifier detection
     game.settings.register(game.system.id, "enableCombatSitModDetection", {
         name: game.i18n.localize("HYP3E.settings.enableCombatSitModDetection"),
         hint: game.i18n.localize("HYP3E.settings.enableCombatSitModDetectionHint"),
@@ -179,7 +179,7 @@ Hooks.once('init', async function() {
         requiresReload: true,
     });
 
-    // Enable beta-test of encumbrance calculations applied to characters
+    // Enable encumbrance calculations applied to characters
     game.settings.register(game.system.id, "enableEncumbrance", {
         name: game.i18n.localize("HYP3E.settings.enableEncumbrance"),
         hint: game.i18n.localize("HYP3E.settings.enableEncumbranceHint"),
