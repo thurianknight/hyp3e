@@ -115,6 +115,37 @@ Hooks.once('init', async function() {
         },
     });
 
+    // Force range limitations on weapon & spell attacks
+    game.settings.register(game.system.id, "forceRangeLimit", {
+        name: game.i18n.localize("HYP3E.settings.forceRangeLimit"),
+        hint: game.i18n.localize("HYP3E.settings.forceRangeLimitHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
+    // Force weapon equippage to use
+    game.settings.register(game.system.id, "forceWeaponEquip", {
+        name: game.i18n.localize("HYP3E.settings.forceWeaponEquip"),
+        hint: game.i18n.localize("HYP3E.settings.forceWeaponEquipHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
+    // Force spell memorization to cast
+    game.settings.register(game.system.id, "forceSpellMemorize", {
+        name: game.i18n.localize("HYP3E.settings.forceSpellMemorize"),
+        hint: game.i18n.localize("HYP3E.settings.forceSpellMemorizeHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
+
     // Enable beta-test of combat situational modifier detection
     game.settings.register(game.system.id, "enableCombatSitModDetection", {
         name: game.i18n.localize("HYP3E.settings.enableCombatSitModDetection"),
@@ -365,6 +396,21 @@ Hooks.once("ready", async function() {
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
     CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
     if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative) }
+
+    // Force range limitations on weapon & spell attacks
+    const forceRangeLimit = game.settings.get(game.system.id, "forceRangeLimit");
+    CONFIG.HYP3E.forceRangeLimit = forceRangeLimit;
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Force range limitations on weapon & spell attacks:", CONFIG.HYP3E.forceRangeLimit) }
+
+    // Force weapon equippage to use
+    const forceWeaponEquip = game.settings.get(game.system.id, "forceWeaponEquip");
+    CONFIG.HYP3E.forceWeaponEquip = forceWeaponEquip;
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Force weapon equippage to use:", CONFIG.HYP3E.forceWeaponEquip) }
+
+    // Force spell memorization to cast
+    const forceSpellMemorize = game.settings.get(game.system.id, "forceSpellMemorize");
+    CONFIG.HYP3E.forceSpellMemorize = forceSpellMemorize;
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Force spell memorization to cast:", CONFIG.HYP3E.forceSpellMemorize) }
 
     // Set crit configs
     //const critHits = game.settings.get(game.system.id, "critHits");

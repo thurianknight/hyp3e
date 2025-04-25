@@ -377,14 +377,22 @@ export class Hyp3eActorSheet extends ActorSheet {
 
     // Toggle equip/unequip
     html.find(".item-equip").click(async (event) => {
-      const li = $(event.currentTarget).closest(".item-entry")
-      const item = this.actor.items.get(li.data("itemId"))
-      if (CONFIG.HYP3E.debugMessages) { console.log("Actor item-equip toggle:", item) }
-      await item.update({
-        system: {
-          equipped: !item.system.equipped,
-        },
-      })
+        const li = $(event.currentTarget).closest(".item-entry")
+        const item = this.actor.items.get(li.data("itemId"))
+        if (CONFIG.HYP3E.debugMessages) { console.log("Actor item-equip toggle:", item) }
+        await item.update({
+            system: {
+                equipped: !item.system.equipped,
+            },
+        })
+        // Send a chat message that the item was equipped/unequipped
+        const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
+        const message = `${this.actor.name} ${(item.system.equipped ? "equipped" : "unequipped")} ${itemName}`
+        const chatData = {
+            author: game.user_id,
+            content: message
+        };
+        ChatMessage.create(chatData, {});    
     });
 
     // Active Effect management

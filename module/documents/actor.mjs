@@ -388,6 +388,14 @@ export class Hyp3eActor extends Actor {
 
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
         if (item.type == "weapon") {
+            // Are we enforcing the weapon equippage rule for PCs?
+            if (CONFIG.HYP3E.forceWeaponEquip && this.type == "character") {
+                // Check if the weapon is equipped
+                if (!item.system.equipped) {
+                    ui.notifications.warn(`${itemName} is not equipped!`)
+                    return
+                }
+            }
             // The default for weapons is an attack
             let mastery = "Attack"
             if (item.system.wpnGrandmaster) {
@@ -404,6 +412,14 @@ export class Hyp3eActor extends Actor {
             }
             this.rollAttackOrSpell(dataset)
         } else if (item.type == "spell") {
+            // Are we enforcing the spell memorization rule for PCs?
+            if (CONFIG.HYP3E.forceSpellMemorize && this.type == "character") {
+                // Check if the spell is memorized
+                if (item.system.quantity.value <= 0) {
+                    ui.notifications.warn(`${itemName} is not memorized!`)
+                    return
+                }
+            }
             // The default for spells is to cast
             dataset.label = `Cast spell ${itemName}`
             if (item.system.formula == "" || item.system.formula == undefined) {
@@ -763,14 +779,11 @@ export class Hyp3eActor extends Actor {
         let ranges = {}
         let rangeGroup = ""
         let chosen = ""
-        // let dmgFormula = ""
-        // let dmgRoll
         let targetAc = 9
         let targetName = ""
         let targetSize = ""
         let gridDistance = 0
         let debugAtkRollFormula = ""
-        // let debugDmgRollFormula = ""
         let itemName = ""
         let label = ""
         let attackText = ""
@@ -954,7 +967,11 @@ export class Hyp3eActor extends Actor {
                 }
                 if (gridDistance > dataset.meleeRange) {
                     if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is beyond melee range! Calculated distance is ${gridDistance} ft.`) }
-                    ui.notifications.info("Target is beyond melee range!")
+                    ui.notifications.info(`Target is beyond melee range! Calculated distance is ${gridDistance} ft.`)
+                    if (CONFIG.HYP3E.forceRangeLimit) {
+                        // If the target is out of range, prevent the attack from proceeding
+                        return
+                    }
                 }
             }
             // Missile weapons need to show a range selector in the dialog
@@ -971,18 +988,22 @@ export class Hyp3eActor extends Actor {
                 // Where does our range fall in the range categories?
                 if (gridDistance <= itemData.range.short) {
                     chosen = "short"
-                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is at short range.") }
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is at short range. Calculated distance is ${gridDistance} ft.`) }
                 } else if (gridDistance <= itemData.range.medium) {
                     chosen = "medium"
-                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is at medium range.") }
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is at medium range. Calculated distance is ${gridDistance} ft.`) }
                 } else if (gridDistance <= itemData.range.long) {
                     chosen = "long"
-                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is at long range.") }
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is at long range. Calculated distance is ${gridDistance} ft.`) }
                 } else {
                     // If the range is longer than the long range, give a warning
                     chosen = "long"
-                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is out of range!") }
-                    ui.notifications.info("Target is out of range!")
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is out of range! Calculated distance is ${gridDistance} ft.`) }
+                    ui.notifications.info(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
+                    if (CONFIG.HYP3E.forceRangeLimit) {
+                        // If the target is out of range, prevent the attack from proceeding
+                        return
+                    }
                 }
             }
             if (itemData.itemType == "spell" && itemData.atkRoll) {
@@ -992,8 +1013,12 @@ export class Hyp3eActor extends Actor {
                 let spellRange = this._parseSpellRange(itemData.range)
                 if (gridDistance > spellRange) {
                     // If the target is out of range, give a warning
-                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target is out of range!") }
-                    ui.notifications.info("Target is out of range!")
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is out of range! Calculated distance is ${gridDistance} ft.`) }
+                    ui.notifications.info(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
+                    if (CONFIG.HYP3E.forceRangeLimit) {
+                        // If the target is out of range, prevent the attack from proceeding
+                        return
+                    }
                 }
             }
         }
