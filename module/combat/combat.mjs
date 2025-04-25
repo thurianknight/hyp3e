@@ -73,11 +73,21 @@ export class HYP3ECombat extends Combat {
         await super._onEndTurn(combatant, context);
 
         // Log the combatant
-        // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
-        // Update temporary effects if expired
+        if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
+
+        // Cycle through active effects
         combatant.actor.effects.forEach(effect => {
             if (effect.isTemporary && !effect.disabled) {
                 // if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect: ${effect.name}`, effect) }
+                // Apply any persistent damage effects
+                const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
+                if (persistentDamage) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Persistent Damage Effect: ${effect.name}`, persistentDamage) }
+                    const damageType = persistentDamage.value.split(",")[0];
+                    const damageRoll = persistentDamage.value.split(",")[1];
+                    combatant.applyDamage(damageType, damageRoll);
+                }
+                // Disable any temporary effects that have expired
                 if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
                     const updates = {
                         disabled: true,

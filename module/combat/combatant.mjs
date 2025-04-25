@@ -174,6 +174,31 @@ export class HYP3ECombatant extends Combatant {
         return this.initRoll;
     }
 
+   async applyDamage(damageType, damageRoll) {
+        // Roll damage formula and log the result
+        if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage: ${damageRoll} ${damageType}`) }
+        const roll = await new Roll(damageRoll).roll();
+        if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage roll: ${damageRoll}`, roll) }
+        const damage = roll.total;
+        if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage total: ${damage}`) }
+
+        // Send a chat message that damage is being applied
+        const message = `${this.actor.name} takes ${damage} ${damageType} damage!`;
+        const chatData = {
+            author: game.user_id,
+            speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+            content: message
+        };
+        ChatMessage.create(chatData, {});    
+
+        // Apply the damage to the combatant
+        const updates = {
+            "system.hp.value": this.actor.system.hp.value - damage
+        };
+        return this.actor.update(updates);
+    }
+
+
     // Pretty sure this is not needed...
     // async getData(options = {}) {
     //     const context = await super.getData(options);

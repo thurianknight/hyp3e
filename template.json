@@ -24,6 +24,7 @@
                 "tempAtkMod": 0,
                 "tempDmgMod": 0,
                 "tempInitiativeMod": 0,
+                "tempPersistentDmg": "",
                 "ca": null,
                 "ta": null,
                 "saves": {
