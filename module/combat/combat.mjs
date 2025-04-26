@@ -84,7 +84,8 @@ export class HYP3ECombat extends Combat {
                 if (persistentDamage) {
                     if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Persistent Damage Effect: ${effect.name}`, persistentDamage) }
                     const damageType = persistentDamage.value.split(",")[0];
-                    const damageRoll = persistentDamage.value.split(",")[1];
+                    let damageRoll = persistentDamage.value.split(",")[1];
+                    damageRoll = damageRoll.replace(";", "");
                     combatant.applyDamage(damageType, damageRoll);
                 }
                 // Disable any temporary effects that have expired

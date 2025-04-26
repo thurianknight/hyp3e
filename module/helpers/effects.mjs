@@ -128,6 +128,7 @@ export async function applyEffect(itemId, effectId, actorId, disabled = false) {
         ui.notifications?.error(`Apply Effect: Actor ${actorId} not found!`)
         return
     }
+    const actorData = actor.getRollData();
     const item = actor.items.get(itemId);
     if (!item) {
         ui.notifications?.error(`Apply Effect: Item ${itemId} not found!`);
@@ -142,19 +143,58 @@ export async function applyEffect(itemId, effectId, actorId, disabled = false) {
         return;
     }
 
+    // Clone the effect, then work from that clone
+    // const effectData = foundry.utils.deepClone(effect)
+    const effectData = new Object({...effect, v:"1"});
+    effectData.origin = item.uuid;
+    if (disabled) effectData.disabled = true;
+    if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Cloned Effect:", effectData) }
+
+    // Check persistent damage effects for a valid roll formula, and resolve variables if needed
+    const persistentDamage = effectData.changes.find(c => c.key === "system.tempPersistentDamage");
+    let damageType, damageRoll
+    if (persistentDamage) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`applyEffect: ${effectData.name}`, persistentDamage) }
+        damageType = persistentDamage.value.split(",")[0];
+        damageRoll = persistentDamage.value.split(",")[1];
+        damageRoll = damageRoll.replace(";", "");
+        // Check if the damage roll is a valid formula
+        if (!Roll.validate(damageRoll, actorData)) {
+            ui.notifications?.error(`Apply Effect: Invalid damage roll formula: ${damageRoll}`);
+            return;
+        }
+        // Resolve variables in the damage roll formula
+        const roll = new Roll(damageRoll, actor.getRollData());
+        if (CONFIG.HYP3E.debugMessages) { console.log(`applyEffect: ${effectData.name} Roll: `, roll) }
+        roll.evaluate({ evaluateSync: true });
+        // Save the resolved roll formula for later use
+        damageRoll = roll.formula;
+    }
+
     // Initialize the chat string
     let chatMsg = ""
 
     // Apply the effect to selected tokens/actors
     for (const t of tokens) {
-        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Token: ", t) }
-        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Token Actor: ", t.actor) }
-        const effectData = {...effect};
-        effectData.origin = item.uuid;
-        if (disabled) effectData.disabled = true;
-        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Cloned Effect:", effectData) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Target Token: ", t) }
+        const result = await t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+        const childEffect = result[0];
+        console.log("applyEffect: Created Effect: ", childEffect)
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Target Actor: ", t.actor) }
         chatMsg += `<p>${actor.name} applied <i>${effectData.name}</i> to ${t.name}.</p>`
-        t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+        // Now we get the newly-created effect, and modify the persistent damage roll if needed
+        if (persistentDamage) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: New Effect: ", childEffect) }
+            if (childEffect) {
+                // If the effect has a persistent damage value, we need to update the effect with that value
+                const newPersistentDamage = childEffect.changes.find(c => c.key === "system.tempPersistentDamage");
+                if (newPersistentDamage) {
+                    newPersistentDamage.value = `${damageType},${damageRoll}`;
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`applyEffect: ${effectData.name} New Persistent Damage: `, newPersistentDamage) }
+                    childEffect.update({ changes: [newPersistentDamage] });
+                }
+            }
+        }
     }
     // Send a chat message that the effect was applied
     const chatData = {
