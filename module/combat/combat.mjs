@@ -75,37 +75,14 @@ export class HYP3ECombat extends Combat {
         // Log the combatant
         if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
 
-        // Cycle through active effects
-        combatant.actor.effects.forEach(effect => {
-            if (effect.isTemporary && !effect.disabled) {
-                // if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect: ${effect.name}`, effect) }
-                // Apply any persistent damage effects
-                const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
-                if (persistentDamage) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Persistent Damage Effect: ${effect.name}`, persistentDamage) }
-                    const damageType = persistentDamage.value.split(",")[0];
-                    let damageRoll = persistentDamage.value.split(",")[1];
-                    damageRoll = damageRoll.replace(";", "");
-                    combatant.applyDamage(damageType, damageRoll);
-                }
-                // Disable any temporary effects that have expired
-                if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-                    const updates = {
-                        disabled: true,
-                        duration: {
-                            startRound: null,
-                            startTurn: null
-                        }
-                    };
-                    return effect.update(updates);
-                }
-            // } else if (effect.isTemporary && effect.disabled) {
-            //     // if (CONFIG.HYP3E.debugMessages) { console.log(`End-Turn Temporary Effect to Delete: ${effect.name}`, effect) }
-            //     if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-            //         return effect.delete();
-            //     }
-            }
-        });
+        // Cycle through active effects and update combatant status
+        const actor = combatant.actor;
+        if (actor) {
+            await combatant.actor.processTemporaryEffects();
+            await combatant.updateStatus();
+        } else {
+            console.warn("_onEndTurn: Combatant has no actor, cannot process temporary effects!");
+        }
     }
 
     async activateCombatant(turn) {

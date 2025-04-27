@@ -174,14 +174,59 @@ export class HYP3ECombatant extends Combatant {
         return this.initRoll;
     }
 
-   async applyDamage(damageType, damageRoll) {
+    async updateStatus() {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`updateStatus Combatant: `, this) }
+        // Check if the actor is unconscious or defeated
+        let isDefeated = false;
+        let isUnconscious = false;
+        if (this.actor.system.hp.value <= 0) {
+            if (this.actor.type == "character") {
+                if (this.actor.system.hp.value == 0) {
+                    isDefeated = true;
+                    isUnconscious = false;
+                } else {
+                    isDefeated = true;
+                    isUnconscious = true;
+                }
+            } else if (this.actor.type == "npc") {
+                isDefeated = true;
+                isUnconscious = false;
+            }
+        } else {
+            // Actor is alive & conscious
+            isDefeated = false;
+            isUnconscious = false;
+        }
+        await this.update({ defeated: isDefeated, unconscious: isUnconscious });
+        const defeated_status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED);
+        // const unconscious_status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.Unconscious);
+        if (isDefeated) {
+            let effect = this.actor && defeated_status ? defeated_status : CONFIG.controlIcons.defeated;
+            if (this.token.object) {
+                await this.token.object.toggleEffect(effect, {
+                    overlay: true,
+                    active: isDefeated,
+                });
+            } else {
+                await this.token.toggleEffect(effect, {
+                    overlay: true,
+                    active: isDefeated,
+                });
+            }    
+        }
+    }
+
+    async applyDamage(damageType, damageRoll, applyDr=true) {
         // Roll damage formula and log the result
         if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage Combatant: `, this) }
         if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage: ${damageRoll} ${damageType}`) }
         const roll = await new Roll(damageRoll).roll();
-        if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage roll: ${damageRoll}`, roll) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage roll: ${damageRoll}`, roll) }
         const damage = roll.total;
         if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage total: ${damage}`) }
+
+        // Apply the damage to the combatant
+        await this.actor.applyHealthChange(damage, applyDr)
 
         // Send a chat message that damage is being applied
         const message = `${this.actor.name} takes ${damage} ${damageType} damage!`;
@@ -192,17 +237,6 @@ export class HYP3ECombatant extends Combatant {
         };
         ChatMessage.create(chatData, {});    
 
-        // Apply the damage to the combatant
-        const updates = {
-            "system.hp.value": this.actor.system.hp.value - damage
-        };
-        try {
-            await this.actor.update(updates);
-        }
-        catch (error) {
-            console.error(`Error applying ${damageType} damage to ${this.actor.name}:`, error);
-            ui.notifications.error(`Error applying ${damageType} damage to ${this.actor.name}: ${error.message}`);
-        }
         // Check if the actor is unconscious or defeated
         let isDefeated = false;
         let isUnconscious = false;
@@ -221,13 +255,9 @@ export class HYP3ECombatant extends Combatant {
             }
         }
         await this.update({ defeated: isDefeated, unconscious: isUnconscious });
-        const defeated_status = CONFIG.statusEffects.find(
-            (e) => e.id === CONFIG.specialStatusEffects.DEFEATED
-        );
-        const unconscious_status = CONFIG.statusEffects.find(
-            (e) => e.id === CONFIG.specialStatusEffects.Unconscious
-        );
-        if (defeated_status || unconscious_status) {
+        const defeated_status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED);
+        // const unconscious_status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.Unconscious);
+        if (isDefeated) {
             let effect = this.actor && defeated_status ? defeated_status : CONFIG.controlIcons.defeated;
             if (this.token.object) {
                 await this.token.object.toggleEffect(effect, {

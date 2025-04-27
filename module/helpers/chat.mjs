@@ -98,7 +98,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
 
             fullHealingButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthDrop(total*-1);
+                applyHealthDrop(total*-1, false);
             });
 
             fullDamageModifiedButton.on("click", (ev) => {
@@ -342,7 +342,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
 }
 
 // Show a change in value by a token
-export async function showValueChange(t, fillColor,total) {
+export async function showValueChange(t, fillColor, total) {
     const floaterData = {
       anchor: CONST.TEXT_ANCHOR_POINTS.CENTER,
       direction:
@@ -516,21 +516,10 @@ async function rollCriticalDamage(total, extraRoll, applyDr) {
 
 // Apply a health drop (positive number is damage) to one or more tokens.
 async function applyHealthDrop(total, applyDr=true) {
-    // if (extraRoll != "") {
-    //     const roll = await new Roll(extraRoll).roll();
-    //     if (total => 0) {
-    //         total += roll.total;
-    //     } else {
-    //         total -= roll.total;
-    //     }
-    //     // For showing the roll
-    //     extraRoll = await roll.render();
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("applyHealthDrop: Extra roll result: ", extraRoll) }
-    // }
-
     if (total == 0) return; // Skip changes of 0
-    const tokens = canvas?.tokens?.controlled;
 
+    // Get selected tokens
+    const tokens = canvas?.tokens?.controlled;
     if (!tokens || tokens.length == 0) {
         ui.notifications?.error("Apply Damage: Please select at least one token.");
         return;
@@ -540,11 +529,12 @@ async function applyHealthDrop(total, applyDr=true) {
 
     for (const t of tokens) {
         const actor = t.actor;
-        let isDefeated = false;
-        let isUnconscious = false;
-        // Update Health
-        const oldHealth = actor.system.hp.value;
-        // consider dr
+        if (!actor) {
+            ui.notifications?.error(`Apply Damage: Actor ${t.name} not found!`);
+            continue;
+        }
+
+        // Consider DR for the chat msg
         let damage_mod = total;
         // If applying damage check dr
         if (applyDr && total > 0 && actor.system.ac.dr > 0) {
@@ -553,17 +543,11 @@ async function applyHealthDrop(total, applyDr=true) {
         } else {
             names.push(t.name);
         }
-
+        // Did DR soak up all the damage?
         if (damage_mod == 0) continue;
 
-        // find updated health
-        let newHealth = oldHealth - damage_mod;
-        if (newHealth <  actor.system.hp.min) {
-            newHealth = actor.system.hp.min;
-        } else if (newHealth > actor.system.hp.max) {
-            newHealth = actor.system.hp.max;
-        }
-        await actor.update({ "system.hp.value": newHealth });
+        // Apply the change to the actor
+        await actor.applyHealthChange(total, applyDr)
 
         // Show the health change by the token
         // Taken from Mana
@@ -571,69 +555,12 @@ async function applyHealthDrop(total, applyDr=true) {
         const fillColor = damage_mod < 0 ? "0x00FF00" : "0xFF0000";
         showValueChange(t, fillColor, damage_mod);
 
-        // Change token status 
-        if (newHealth <= 0) {
-            if (actor.type == "character") {
-                if (newHealth == 0) {
-                    isDefeated = true;
-                    isUnconscious = false;
-                } else {
-                    //TODO (wsAI) split defeated and isUnconscious
-                    isDefeated = true;
-                    isUnconscious = true;
-                }
-            } else if (actor.type == "npc") {
-                isDefeated = true;
-                isUnconscious = false;
-            }
-        } else if (oldHealth <= 0) {
-        // token was at <=0 and now is not
-            isDefeated = false;
-            isUnconscious = false;
-        } else {
-        // we can return no status to update
-            continue;
-        }
-        await t.combatant?.update({ defeated: isDefeated, unconscious: isUnconscious });
-        const defeated_status = CONFIG.statusEffects.find(
-            (e) => e.id === CONFIG.specialStatusEffects.DEFEATED
-        );
-        const unconscious_status = CONFIG.statusEffects.find(
-            (e) => e.id === CONFIG.specialStatusEffects.Unconscious
-        );
-        if (!defeated_status && !isUnconscious) continue;
-        let effect = actor && defeated_status ? defeated_status : CONFIG.controlIcons.defeated;
-        if (t.object) {
-            await t.object.toggleEffect(effect, {
-                overlay: true,
-                active: isDefeated,
-            });
-        } else {
-            await t.toggleEffect(effect, {
-                overlay: true,
-                active: isDefeated,
-            });
-        }
-        // TODO(wsAI) figure out how to show effect properly
-        // effect = actor && defeated_status ? defeated_status : CONFIG.controlIcons.unconscious;
-        // if (t.object) {
-        //     await t.object.toggleEffect(effect, {
-        //         overlay: true,
-        //         active: isUnconscious,
-        //     });
-        // } else {
-        //     await t.toggleEffect(effect, {
-        //         overlay: true,
-        //         active: isUnconscious,
-        //     });
-        // }
+        // Update token status
+        await t.combatant.updateStatus();
     }
+
     let body = "";
     body += `<ul><li>${names.join("</li><li>")}</li></ul>`;
-
-    // if (extraRoll != "") {
-    //     extraRoll = `<p>Extra damage roll: ${extraRoll}</p>`;
-    // }
 
     // Log health hit as a chat message
     const title = total > 0

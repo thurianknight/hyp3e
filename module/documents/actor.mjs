@@ -312,6 +312,12 @@ export class Hyp3eActor extends Actor {
 
     }
 
+    /**
+     * Add a temporary modifier to the actor's system.tempModifiers array
+     * @param {*} templateField 
+     * @param {*} source 
+     * @param {*} modifier 
+     */
     addTempModifier(templateField, source, modifier) {
         //  Example tempModifiers entry:
         //      {
@@ -336,6 +342,11 @@ export class Hyp3eActor extends Actor {
         )
     }
 
+    /**
+     * Remove a temporary modifier from the actor's system.tempModifiers array
+     * @param {*} templateField 
+     * @param {*} source 
+     */
     deleteTempModifier(templateField, source) {
         // Find & delete the modifier
         this.system.tempModifiers.forEach((mod, id) => {
@@ -346,6 +357,127 @@ export class Hyp3eActor extends Actor {
         })
     }
 
+    /**
+     * Apply a health change to the actor, either damage or healing
+     * @param {*} change
+     * @param {*} applyDr
+     */
+    async applyHealthChange(change, applyDr=true) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${change} HP to be applied to ${this.name}.`) }
+        // Check if the change is a number
+        if (typeof change !== "number") {
+            ui.notifications?.error(`Invalid health change: ${change}`);
+            return;
+        }
+        // Check if the actor is dead, no need to do more damage--but healing will work
+        if (this.system.hp.value <= this.system.hp.min && change > 0) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${this.name} is already dead!`) }
+            return;
+        }
+        // Check if the change is zero
+        if (change == 0) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${this.name} has no health change!`) }
+            return;
+        }
+
+        // Update Health
+        const oldHp = this.system.hp.value;
+
+        let netChange = change;
+        // If applying damage, check DR
+        if (applyDr && netChange > 0 && this.system.ac.dr > 0) {
+            netChange = Math.max(0, change - this.system.ac.dr);
+        }
+        // Did DR soak up all the damage?
+        if (netChange == 0) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${this.name} is unharmed!`) }
+            return;
+        }
+
+        // Calculate updated health & apply it
+        let newHp = oldHp - netChange;
+        if (newHp < this.system.hp.min) {
+            newHp = this.system.hp.min;
+        } else if (newHp > this.system.hp.max) {
+            newHp = this.system.hp.max;
+        }
+        try {
+            await this.update({ "system.hp.value": newHp }, { async: true });
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${this.name} took ${netChange} damage!`) }
+            return;
+        } catch (err) {
+            console.error(`applyHealthChange: Error applying health change to ${this.name}:`, err);
+            ui.notifications?.error(`Error applying health change to ${this.name}. See console log for details.`);
+            return err;
+        }
+    }
+
+    /**
+     * Process temporary effects on the actor, including persistent damage. Disable any expired effects.
+     */
+    async processTemporaryEffects() {
+        let totalDamage = 0;
+        let damageMessages = [];
+    
+        // Collect updates to disable expired effects
+        const expiredEffectUpdates = [];
+    
+        for (const effect of this.effects) {
+            if (effect.isTemporary && !effect.disabled) {
+                const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
+                if (persistentDamage) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: ${effect.name}`, persistentDamage); }
+                    
+                    const [damageType, rawDamageRoll] = persistentDamage.value.split(",");
+                    const damageRollFormula = rawDamageRoll.replace(";", "").trim();
+    
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: rolling ${damageRollFormula} ${damageType}`); }
+    
+                    const roll = new Roll(damageRollFormula);
+                    await roll.evaluate();
+    
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects roll result:`, roll); }
+    
+                    totalDamage += roll.total;
+    
+                    damageMessages.push(`${this.name} takes ${roll.total} ${damageType} damage!`);
+                }
+    
+                if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
+                    expiredEffectUpdates.push(effect);
+                }
+            }
+        }
+    
+        // Apply total damage once
+        if (totalDamage > 0) {
+            await this.applyHealthChange(totalDamage, false);
+    
+            // Post all the damage messages together
+            const chatContent = damageMessages.join("<br>");
+            await ChatMessage.create({
+                author: game.user.id,
+                speaker: ChatMessage.getSpeaker({ actor: this }),
+                content: chatContent
+            });
+        }
+    
+        // Update all expired effects
+        if (expiredEffectUpdates.length > 0) {
+            const updates = expiredEffectUpdates.map(effect => ({
+                _id: effect.id,
+                disabled: true,
+                "duration.startRound": null,
+                "duration.startTurn": null
+            }));
+            await this.updateEmbeddedDocuments("ActiveEffect", updates);
+        }
+            
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log(`processTemporaryEffects: ${this.name} took ${totalDamage} total damage!`);
+        }
+    }
+    
     /**
      * Use a consumable inventory item, decrementing its qty by 1
      * @param {*} itemId
