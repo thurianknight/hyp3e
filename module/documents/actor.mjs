@@ -454,7 +454,9 @@ export class Hyp3eActor extends Actor {
             await this.applyHealthChange(totalDamage, false);
     
             // Post all the damage messages together
-            const chatContent = damageMessages.join("<br>");
+            let chatContent = "Applying persistent damage effects...<ul><li>";
+            chatContent += damageMessages.join("</li><li>");
+            chatContent += "</li></ul>";
             await ChatMessage.create({
                 author: game.user.id,
                 speaker: ChatMessage.getSpeaker({ actor: this }),
