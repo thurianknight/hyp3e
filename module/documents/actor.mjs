@@ -1092,11 +1092,11 @@ export class Hyp3eActor extends Actor {
             if (itemData.melee) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Weapon class:`, itemData.wc) }
                 if (itemData.wc <= 3) {
-                    // We need to allow for diagonal distances, so range 5 => 8
-                    dataset.meleeRange = 8
+                    // We need to allow for diagonal distances, so range 5 => 7
+                    dataset.meleeRange = 7
                 } else if (itemData.wc <= 5) {
                     // Range 10 => 14
-                    dataset.meleeRange = 14
+                    dataset.meleeRange = 12
                 } else {
                     //itemData.wc == 6
                     // Range 15 => 20
