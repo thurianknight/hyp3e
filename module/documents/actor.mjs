@@ -477,7 +477,7 @@ export class Hyp3eActor extends Actor {
             console.log(`processTemporaryEffects: ${this.name} took ${totalDamage} total damage!`);
         }
     }
-    
+
     /**
      * Use a consumable inventory item, decrementing its qty by 1
      * @param {*} itemId

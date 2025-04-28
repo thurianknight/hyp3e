@@ -144,7 +144,6 @@ export async function applyEffect(itemId, effectId, actorId, disabled = false) {
     }
 
     // Clone the effect, then work from that clone
-    // const effectData = foundry.utils.deepClone(effect)
     const effectData = new Object({...effect, v:"1"});
     effectData.origin = item.uuid;
     if (disabled) effectData.disabled = true;

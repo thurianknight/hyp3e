@@ -392,7 +392,7 @@ export class Hyp3eActorSheet extends ActorSheet {
             author: game.user_id,
             content: message
         };
-        ChatMessage.create(chatData, {});    
+        ChatMessage.create(chatData, {});
     });
 
     // Active Effect management
