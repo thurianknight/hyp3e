@@ -556,7 +556,7 @@ async function applyHealthDrop(total, applyDr=true) {
         showValueChange(t, fillColor, damage_mod);
 
         // Update token status
-        await t.combatant.updateStatus();
+        await t.combatant?.updateStatus();
     }
 
     let body = "";
