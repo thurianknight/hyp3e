@@ -519,9 +519,10 @@ export class Hyp3eActor extends Actor {
      */
     async rollItem(dataset) {
         // Get item info to execute a standard roll
-        const item = this.items.get(dataset.itemId)
+        const { item, itemData, itemName, attackTextBase } = this._getItemDetails(dataset.itemId);
+        // const item = this.items.get(dataset.itemId)
         dataset.roll = item.system.formula
-        let itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
+        // let itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
 
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
         if (item.type == "weapon") {
@@ -533,16 +534,9 @@ export class Hyp3eActor extends Actor {
                     return
                 }
             }
-            // The default for weapons is an attack
-            let mastery = "Attack"
-            if (item.system.wpnGrandmaster) {
-                mastery = "Grandmaster attack"
-            } else if (item.system.wpnMaster) {
-                mastery = "Master attack"
-            }
             dataset.isGrenade = item.system.isGrenade
             dataset.isAreaEffect = item.system.isAreaEffect
-            dataset.label = `${mastery} with ${itemName}`
+            dataset.label = `${attackTextBase} with ${itemName}`;
             if (item.system.isAreaEffect) {
                 dataset.details = `No attack roll required to use ${itemName}.`
                 dataset.noRoll = true
@@ -558,7 +552,7 @@ export class Hyp3eActor extends Actor {
                 }
             }
             // The default for spells is to cast
-            dataset.label = `Cast spell ${itemName}`
+            dataset.label = `${attackTextBase} ${itemName}`
             if (item.system.formula == "" || item.system.formula == undefined) {
                 dataset.details = `No attack roll required to cast ${itemName}.`
                 dataset.noRoll = true
@@ -900,485 +894,1093 @@ export class Hyp3eActor extends Actor {
 
     }
 
+    // /**
+    //  * Execute an attack roll or cast a spell
+    //  * @param {*} dataset 
+    //  */
+    // async rollAttackOrSpell(dataset) {
+
+    //     // Declare vars
+    //     let tokenId = ""
+    //     let attacker, target = null
+    //     let rollFormula = ""
+    //     let rollResponse
+    //     let naturalRoll = 0
+    //     let ammoMods = {}
+    //     let ranges = {}
+    //     let rangeGroup = ""
+    //     let chosen = ""
+    //     let targetAc = 9
+    //     let targetName = ""
+    //     let targetSize = ""
+    //     let gridDistance = 0
+    //     let debugAtkRollFormula = ""
+    //     let itemName = ""
+    //     let label = ""
+    //     let attackText = ""
+
+    //     // Log the dataset and item (if any) before proceeding
+    //     if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Rolling ${dataset.label}...`) }
+    //     if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: ${dataset.label} dataset: `, dataset) }
+
+    //     // Did we get a token ID? For NPCs and monsters this should pretty much always be true,
+    //     //  but for PCs, it may not be true if the attack was made from the macro bar.
+    //     if (dataset.tokenId) {
+    //         // Get the token ID from the dataset
+    //         tokenId = dataset.tokenId
+    //         // Get the token from the canvas
+    //         // const token = canvas.tokens.get(tokenId)
+    //         attacker = canvas.tokens.get(tokenId)
+    //         if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Token (ID ${tokenId}): `, attacker) }
+    //         if (attacker) {
+    //             // Log the token's actor
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Token actor: `, attacker.actor) }
+    //         }
+    //     }
+
+    //     // Is this an item-based attack?
+    //     const item = this.items.get(dataset.itemId) ?? null
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item:", item) }
+    //     const itemData = item ? {...item.system} : null
+    //     if (item) {
+    //         // Get the item's friendly name if it has one
+    //         itemName = itemData.friendlyName != "" ? itemData.friendlyName : item.name
+    //         dataset.itemName = itemName
+    //         if (item.type == "weapon") {
+    //             // The default for weapons is an attack
+    //             attackText = "Attack"
+    //             // if (item.system.wpnGrandmaster) {
+    //             //     attackText = "Grandmaster attack"
+    //             // } else if (item.system.wpnMaster) {
+    //             //     attackText = "Master attack"
+    //             // }
+    //         } else if (item.type == "spell") {
+    //             attackText = "Cast spell"
+    //         }
+    //     }
+    //     if (itemData) {
+    //         itemData.itemType = item.type
+    //     }
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item roll data:", itemData) }
+
+    //     // Retrieve roll data from the actor
+    //     const actorData = this.getRollData()
+    //     if (actorData) {
+    //         actorData.actorType = this.type
+    //     }
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Actor roll data:", actorData) }
+
+    //     // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}</span>`
+    //     label = `
+    //     <hr class="plain-hr" />
+    //     <div style="margin: 10px 0;">
+    //         <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
+    //         <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
+    //             ${itemName}
+    //         </span>
+    //     </div>
+    //     <hr class="plain-hr" />`
+
+    //     // Filter the actor's inventory items for ammunition
+    //     let ammoList = this.items.filter(i => i.system.isAmmunition)
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Carried ammo: ", ammoList) }
+    //     let carriedAmmo = {"":""}
+    //     if (ammoList.length > 0) {
+    //         for (let ammo of ammoList) {
+    //             if (ammo.system.quantity.value > 0) {
+    //                 carriedAmmo[ammo._id] = `${ammo.name} (${ammo.system.quantity.value})`
+    //             }
+    //         }
+    //     }
+
+    //     // Get the range unit of measure for the scene
+    //     dataset.rangeUoM = canvas.scene?.grid.units ? canvas.scene?.grid.units : "ft";
+
+    //     // // Get the attacking token's location on the scene
+    //     // // const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
+    //     // // Try to get the attacking token
+
+    //     // No token in the incoming dataset, so we need to find it. If the actor is linked to a token, 
+    //     //  use that token.
+    //     if (!attacker) {
+    //         if (this.token) {
+    //             // Get the token from the actor, if it is linked
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Attacker actual token:`, this.token) }
+    //             attacker = this.token
+    //         } else {
+    //             // No token in the dataset and no linked token, so we need to find it.
+    //             // Get the first matching token based on actorId. This works fine for player characters
+    //             //  but not so well for NPCs. It will always return the first token that matches the actor ID,
+    //             //  and with unlinked tokens, there may be multiple actors with the same ID. So we need to 
+    //             //  filter out unlinked tokens and deal with them separately.
+    //             const tempToken = canvas.tokens.placeables.find(t => t.document.isLinked && t.actor && t.actor.id === this.id);
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Attacker discovered token:`, tempToken) }
+    //             attacker = tempToken ? tempToken : null
+    //         }
+    //     }
+    //     // If we still have no attacker, check if the user has a controlled token. Ideally this should
+    //     //  never happen, but it can if the actor is not linked to a token and the user has multiple tokens
+    //     //  selected. This is preferred for GMs who may have multiple tokens selected.
+    //     if (!attacker && canvas.tokens.controlled[0]) {
+    //         // Get the currently selected token, since the actor was not attached to one. To do this, 
+    //         //  we get the first controlled token. This is preferred for GMs who may have multiple tokens
+    //         //  selected. Players running multiple characters will need to select the correct token before 
+    //         //  rolling.
+    //         if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Player-controlled token:`, canvas.tokens.controlled[0]) }
+    //         attacker = canvas.tokens.controlled[0]
+    //     }
+
+    //     const attackerPos = attacker ? attacker.center : null
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Attacker position:", attackerPos) }
+
+    //     // Has the user targeted a token? If so, get it's AC and name
+    //     const userTargets = Array.from(game.user.targets)
+    //     // let target
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target Actor Data:", userTargets) }
+    //     if (userTargets.length > 0) {
+    //         target = userTargets[0]
+    //         const targetPos = target.center
+    //         if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target position:", targetPos) }
+    //         const primaryTargetData = target.actor
+    //         targetAc = primaryTargetData.system.ac.value
+    //         targetName = primaryTargetData.name
+    //         targetSize = primaryTargetData.system.size ? primaryTargetData.system.size : "M"
+
+    //         // Calculate the distance to the target in pixels
+    //         const dx = targetPos.x - attackerPos.x;
+    //         const dy = targetPos.y - attackerPos.y;
+    //         const distancePixels = Math.sqrt(dx * dx + dy * dy);
+    //         // Convert to grid distance
+    //         gridDistance = (distancePixels / canvas.grid.size) * canvas.scene.grid.distance;
+    //         // Round to nearest whole number
+    //         gridDistance = Math.round(gridDistance)
+    //         // Adjust distance downward based on token size
+    //         if (targetSize == "L") {
+    //             gridDistance -= 5
+    //         } else if (targetSize == "H") {
+    //             gridDistance -= 10
+    //         }
+    //         // If the distance is negative, set it to 0
+    //         if (gridDistance < 0) {
+    //             gridDistance = 0
+    //         }
+    //         if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Distance to target:", gridDistance) }
+    //         dataset.gridDistance = gridDistance
+    //         dataset.range = `${gridDistance} ${canvas.scene.grid.units}`;
+    //     } else {
+    //         // No target selected, so we can't get AC or name
+    //         targetAc = 9
+    //         targetName = ""
+    //         targetSize = ""
+    //         dataset.range = "No target!"
+    //         if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: No target selected!") }
+    //         // Popup a notification if this is an untargeted weapon or spell attack
+    //         if (item && (item.type == "weapon" || (item.type == "spell" && itemData.atkRoll))) {
+    //             ui.notifications.info("No target selected!")
+    //         }
+    //     }
+
+    //     if (item) {
+    //         // const itemMods = this._parseItemMod(itemName)
+    //         // Melee weapons have a range based on their weapon class
+    //         if (itemData.melee) {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Weapon class:`, itemData.wc) }
+    //             if (itemData.wc <= 3) {
+    //                 // We need to allow for diagonal distances, so range 5 => 7
+    //                 dataset.meleeRange = 7
+    //             } else if (itemData.wc <= 5) {
+    //                 // Range 10 => 14
+    //                 dataset.meleeRange = 12
+    //             } else {
+    //                 //itemData.wc == 6
+    //                 // Range 15 => 20
+    //                 dataset.meleeRange = 20
+    //             }
+    //             if (gridDistance > dataset.meleeRange) {
+    //                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is beyond melee range! Calculated distance is ${gridDistance} ft.`) }
+    //                 ui.notifications.warn(`Target is beyond melee range! Calculated distance is ${gridDistance} ft.`)
+    //                 if (CONFIG.HYP3E.forceRangeLimit) {
+    //                     // If the target is out of range, prevent the attack from proceeding
+    //                     return
+    //                 }
+    //             }
+    //         }
+    //         // Missile weapons need to show a range selector in the dialog
+    //         if (itemData.missile) {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Range increments:`, itemData.range) }
+    //             dataset.showAmmo = itemData?.usesAmmo ? itemData?.usesAmmo : false
+    //             dataset.showRanges = true
+    //             rangeGroup = "rangeGroup"
+    //             ranges = {
+    //                 short: `Short (${itemData.range.short})`,
+    //                 medium: `Med (${itemData.range.medium})`,
+    //                 long: `Long (${itemData.range.long})`
+    //             }
+    //             // Where does our range fall in the range categories?
+    //             if (gridDistance <= itemData.range.short) {
+    //                 chosen = "short"
+    //                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is at short range. Calculated distance is ${gridDistance} ft.`) }
+    //             } else if (gridDistance <= itemData.range.medium) {
+    //                 chosen = "medium"
+    //                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is at medium range. Calculated distance is ${gridDistance} ft.`) }
+    //             } else if (gridDistance <= itemData.range.long) {
+    //                 chosen = "long"
+    //                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is at long range. Calculated distance is ${gridDistance} ft.`) }
+    //             } else {
+    //                 // If the range is longer than the long range, give a warning
+    //                 chosen = "long"
+    //                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is out of range! Calculated distance is ${gridDistance} ft.`) }
+    //                 ui.notifications.warn(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
+    //                 if (CONFIG.HYP3E.forceRangeLimit) {
+    //                     // If the target is out of range, prevent the attack from proceeding
+    //                     return
+    //                 }
+    //             }
+    //         }
+    //         if (itemData.itemType == "spell" && itemData.atkRoll) {
+    //             dataset.showSpellRange = true
+    //             dataset.spellRange = itemData.range
+    //             // Get distance to target and compare with spell range
+    //             let spellRange = this._parseSpellRange(itemData.range)
+    //             if (gridDistance > spellRange) {
+    //                 // If the target is out of range, give a warning
+    //                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is out of range! Calculated distance is ${gridDistance} ft.`) }
+    //                 ui.notifications.warn(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
+    //                 if (CONFIG.HYP3E.forceRangeLimit) {
+    //                     // If the target is out of range, prevent the attack from proceeding
+    //                     return
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     // Initialize sitMod and sitModList
+    //     dataset.sitMod = 0
+    //     dataset.sitModList = ""
+
+    //     // Get any situational modifiers that can be detected from token status or other means
+    //     if (game.settings.get(game.system.id, "enableCombatSitModDetection")) {
+    //         let sitModObj = this._getCombatantSitMods(attacker, target)
+    //         if (sitModObj.sitModList  && sitModObj?.sitModList != "") {
+    //             if (dataset.sitModList != "") {
+    //                 dataset.sitModList += ", "
+    //             }
+    //             dataset.sitMod = parseInt(dataset.sitMod) + parseInt(sitModObj?.sitMod)
+    //             dataset.sitModList += sitModObj?.sitModList
+    //         }
+    //     }
+
+    //     // Show the roll dialog (type and item-dependent)
+    //     if (!item) {
+    //         // Since removing the basic attack from Fighting Ability, this should not be needed
+    //         try {
+    //             rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset)
+    //         } catch(err) {
+    //             return
+    //         }
+    //     } else if (item && item.type == "weapon") {
+    //         try {
+    //             rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, carriedAmmo, rangeGroup, ranges, chosen)
+    //         } catch(err) {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: ERROR: ", err) }
+    //             return
+    //         }
+    //     } else if (item && item.type == "spell") {
+    //         try {
+    //             rollResponse = await Hyp3eDialog.ShowSpellcastingDialog(dataset)
+    //         } catch(err) {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: ERROR: ", err) }
+    //             return
+    //         }
+    //         // Decrement the number memorized
+    //         if (item.type == "spell" && itemData.quantity.value > 0) {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Cast memorized spell: ${item.name}`) }
+    //             // Update the embedded item document
+    //             this.updateEmbeddedDocuments("Item", [
+    //                 { _id: item.id, "system.quantity.value": itemData.quantity.value-1 },
+    //             ])
+    //         }
+    //     }
+
+    //     // Log the roll-dialog response
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Dialog response:", rollResponse) }
+
+    //     // Decrement ammunition if selected in the attack dialog
+    //     // if (item && item.type == "weapon" && itemData.usesAmmo && rollResponse.ammunition) {
+    //     if (item && item.type == "weapon" && rollResponse.ammunition) {
+    //         const ammo = this.items.get(rollResponse.ammunition)
+    //         const ammoData = ammo ? {...ammo.system} : null
+    //         if (ammo && ammoData) {
+    //             ammoMods = this._parseItemMod(ammo.name)
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Use ammo: ${ammo.name}`, ammoData) }
+    //             // Update the embedded item document
+    //             this.updateEmbeddedDocuments("Item", [
+    //                 { _id: ammo.id, "system.quantity.value": ammoData.quantity.value-1 },
+    //             ])
+    //         }
+    //     }
+
+    //     // Add situational modifier and roll mode from the dialog
+    //     dataset.sitMod = rollResponse.sitMod
+    //     dataset.rollMode = rollResponse.rollMode
+    //     // Did we get a range modifier from the dialog?
+    //     if (rollResponse.rangeGroup != "") {
+    //         switch (rollResponse.rangeGroup) {
+    //             case "short":
+    //                 dataset.rangeMod = 0
+    //                 break
+    //             case "medium":
+    //                 dataset.rangeMod = -2
+    //                 break
+    //             case "long":
+    //                 dataset.rangeMod = -5
+    //                 break
+    //         }
+    //     }
+
+    //     // Does the item have an attack formula?
+    //     if (item) {
+    //         // If there's no item roll formula (typically a spell), send a chat message and exit
+    //         if (!itemData.formula) {
+    //             item._displayItemInChat()
+    //             return null
+    //         }
+    //     }
+
+    //     // Construct our attack roll formula
+    //     const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData)
+    //     rollFormula = atkObj.formula
+    //     debugAtkRollFormula = atkObj.debugFormula
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Final attack formula:", rollFormula) }
+
+    //     // Roll the dice!
+    //     let atkRoll = new Roll(rollFormula, actorData)
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Attack roll: ", atkRoll) }
+    //     // Resolve the roll
+    //     let result = await atkRoll.roll()
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Roll result: ", result) }
+    //     // Get d20 natural roll
+    //     naturalRoll = atkRoll.dice[0].total
+
+    //     // Update chat card label based on whether we have a target
+    //     if (targetName != "") {
+    //         // label += ` vs. ${targetName}...`
+    //         attackText += ` vs. ${targetName}...`
+    //     } else {
+    //         // label += `...`
+    //         attackText += `...`
+    //     }
+
+    //     // Footer used for adding crit buttons (if enabled)
+    //     let critFooterHTML = "";
+
+    //     // Determine hit or miss
+    //     let hit = false
+    //     let tn = 31 // some fake number just to initialize the variable
+    //     if (!itemData.isGrenade) {
+    //         // If this is a normal attack, TN is based on target's AC
+    //         tn = 20 - targetAc
+    //         if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
+    //         if (naturalRoll == 20) {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Natural 20 always crit hits!") }
+    //             // label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
+    //             attackText += `<span style='color:#00b34c'><b>Critical Hit!</b></span>`
+    //             hit = true
+    //             if (game.settings.get(game.system.id, "critHit") && item) {
+    //                 // critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'><h4>Critical Hit:</h4></div>`;
+    //                 critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
+    //             }
+    //         } else if (naturalRoll == 1) {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Natural 1 always crit misses!") }
+    //             // label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
+    //             attackText += "<span style='color:#e90000'><b>Critical Miss!</b></span>"
+
+    //             if (game.settings.get(game.system.id, "critMiss") && item) {
+    //                 // critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'><h4>Xathoqqua’s Woe:</h4></div>`;
+    //                 critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
+    //             }
+    //         } else if (atkRoll.total >= tn) {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
+    //             // label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
+    //             attackText += `<b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
+    //             hit = true
+    //         } else {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
+    //             if (eval(20 - atkRoll.total) <= 9) {
+    //                 // label += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
+    //                 attackText += `<b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
+    //             } else {
+    //                 // label += `<br /><b>Misses AC 9.</b>`
+    //                 attackText += `<b>Misses AC 9.</b>`
+    //             }
+    //         }
+
+    //     } else {
+    //         // This is a grenade-like attack
+    //         let sizeFromTable = ""
+    //         switch (targetSize) {
+    //             case "S":
+    //                 sizeFromTable = "Small"
+    //                 tn = 13
+    //                 break
+    //             case "M":
+    //                 sizeFromTable = "Medium"
+    //                 tn = 11
+    //                 break
+    //             case "L":
+    //                 sizeFromTable = "Large"
+    //                 tn = 9
+    //                 break
+    //             default:
+    //                 // No target selected (or no size specified), assume an area or object
+    //                 sizeFromTable = "Stationary"
+    //                 tn = 7
+    //                 break
+    //             }
+    //         if (atkRoll.total >= tn) {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Hit! Attack roll ${atkRoll.total} is greater than or equal to ${tn}.`) }
+    //             // label += `<br /><b>Hits a ${sizeFromTable} target!</b>`
+    //             attackText += `<b>Hits a ${sizeFromTable} target!</b>`
+    //             hit = true
+    //         } else {
+    //             if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Miss! Attack roll ${atkRoll.total} is less than ${tn}.`) }
+    //             // label += `<br /><b>Misses a ${sizeFromTable} target.</b>`
+    //             attackText += `<b>Misses a ${sizeFromTable} target.</b>`
+    //         }
+    //     }
+    //     // Pass hit status to the attack chat
+    //     atkRoll.hit = hit
+
+    //     // If the item attack hit, calculate the damage formula and include it in the chat message
+    //     if (hit && item) {
+    //         if (Roll.validate(itemData.damage)) {
+    //             // Build our primary damage formula
+    //             const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData)
+    //             item.dmgFormula = dmgObj.formula
+    //             item.debugDmgRollFormula = dmgObj.debugFormula
+    //             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Damage formula:", item.dmgFormula) }
+    //             // Do we have 2-hand damage?
+    //             if (item.system.damage2h > "") {
+    //                 item.dmgFormula2h = dmgObj.formula2h
+    //                 item.debugDmgRollFormula2h = dmgObj.debugFormula2h
+    //                 if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Damage formula 2H:", item.dmgFormula2h) }
+    //             }
+    //         }
+    //     }
+
+    //     // Construct a custom chat card for the attack
+    //     await this.renderCustomChat(atkRoll, item, tokenId, label, debugAtkRollFormula, attackText, critFooterHTML, rollResponse.rollMode);
+
+    //     return atkRoll
+    // }
+
     /**
-     * Execute an attack roll or cast a spell
-     * @param {*} dataset 
+     * Main orchestrator for executing an attack roll or casting a spell.
+     * @param {object} dataset - Initial data for the roll (label, itemId, tokenId, etc.).
      */
     async rollAttackOrSpell(dataset) {
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log(`rollAttackOrSpell: Rolling ${dataset.label}...`, dataset);
+        }
 
-        // Declare vars
-        let tokenId = ""
-        let attacker, target = null
-        let rollFormula = ""
-        let rollResponse
-        let naturalRoll = 0
-        let ammoMods = {}
-        let ranges = {}
-        let rangeGroup = ""
-        let chosen = ""
-        let targetAc = 9
-        let targetName = ""
-        let targetSize = ""
-        let gridDistance = 0
-        let debugAtkRollFormula = ""
-        let itemName = ""
-        let label = ""
-        let attackText = ""
+        // 1. Gather Initial Information
+        const { attacker, attackerPos } = await this._getAttackerDetails(dataset);
+        const { item, itemData, itemName, attackTextBase } = this._getItemDetails(dataset.itemId);
+        const actorData = this._getActorRollData();
 
-        // Log the dataset and item (if any) before proceeding
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Rolling ${dataset.label}...`) }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: ${dataset.label} dataset: `, dataset) }
+        if (!item && !dataset.formula) { // If there's no item and no predefined formula (e.g., basic attack removed)
+            console.warn("rollAttackOrSpell: No item or formula provided for the roll.");
+            ui.notifications.warn("Cannot perform action: No item or formula specified.");
+            return null;
+        }
+        dataset.itemName = itemName || "";
 
-        // Did we get a token ID? For NPCs and monsters this should pretty much always be true,
-        //  but for PCs, it may not be true if the attack was made from the macro bar.
+        // Early exit if item requires a roll but has no formula (data setup errors)
+        if (item && !itemData.formula && (item.type === "weapon" || (item.type === "spell" && itemData.atkRoll))) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item has no roll formula, displaying description instead."); }
+            item._displayItemInChat();
+            return null;
+        }
+
+        // 2. Gather Target Information & Calculate Distance/Range
+        const { target, targetData, gridDistance } = this._getTargetDetails(attacker);
+        dataset.rangeUoM = canvas.scene?.grid.units || "ft";
+        dataset.gridDistance = gridDistance;
+        dataset.targetName = targetData.name; // Store for later use
+        dataset.targetAc = targetData.ac;     // Store for later use
+        dataset.targetSize = targetData.size; // Store for later use
+
+        // 3. Prepare Data for Dialog (Range, Ammo, Initial Mods)
+        const { ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance);
+        rangeMessages.forEach(msg => ui.notifications.warn(msg)); // Show range warnings immediately
+        if (isOutOfRange && CONFIG.HYP3E.forceRangeLimit) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target out of range and forceRangeLimit enabled. Aborting."); }
+            return null; // Abort if out of range and setting is enabled
+        }
+
+        const carriedAmmo = this._getCarriedAmmo();
+        dataset.sitMod = 0;
+        dataset.sitModList = "";
+        if (game.settings.get(game.system.id, "enableCombatSitModDetection")) {
+            const sitModObj = this._getCombatantSitMods(attacker, target); // Assuming this function exists
+            dataset.sitMod = parseInt(sitModObj?.sitMod || 0);
+            dataset.sitModList = sitModObj?.sitModList || "";
+        }
+
+        // Combine item/roll specific data for the dialog
+        const dialogData = {
+            ...dataset, // Include initial dataset
+            showAmmo: itemData?.usesAmmo ?? false,
+            showRanges: !!itemData?.missile,
+            showSpellRange: item?.type === "spell" && itemData?.atkRoll,
+            spellRangeText: itemData?.range, // Use descriptive range text for spells
+            meleeRange: itemData?.melee ? this._getMeleeRange(itemData.wc) : undefined,
+            isGrenade: itemData?.isGrenade ?? false, // Pass grenade status
+            itemName: itemName // Ensure item name is in dialog data
+        };
+
+        // 4. Show Dialog and Get User Input
+        let rollResponse;
+        try {
+            rollResponse = await this._showRollDialog(dialogData, item?.type, carriedAmmo, rangeGroup, ranges, chosenRange);
+            if (!rollResponse) { // Handle dialog cancellation
+                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Dialog cancelled by user."); }
+                return null;
+            }
+        } catch (err) {
+            console.error("rollAttackOrSpell: Error displaying dialog:", err);
+            return null;
+        }
+        // If there's no item roll formula (typically a spell), send a chat message and exit
+        if (!itemData.formula) {
+            item._displayItemInChat();
+            return null;
+        }
+
+        // 5. Process Dialog Response (Ammo, Mods)
+        const { ammoMods, ammoUpdated } = await this._processDialogResponse(rollResponse, item, itemData);
+        if (ammoUpdated) {
+            // If ammo was used, refresh the actor sheet or relevant UI if needed
+            // this.sheet.render(false); // Example
+        }
+
+        // Update dataset with final situational mods and roll mode from dialog
+        dataset.sitMod = rollResponse.sitMod;
+        dataset.rollMode = rollResponse.rollMode;
+        dataset.rangeMod = this._getRangeModifier(rollResponse.rangeGroup); // Calculate range mod based on selection
+
+        // 6. Handle Spell Slot Consumption (if applicable)
+        if (item?.type === "spell" && itemData?.quantity?.value > 0) {
+            await this._consumeSpellSlot(item);
+        }
+
+        // 7. Build Roll Formula
+        const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData); // Assuming this exists
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Final attack formula:", rollFormula); }
+
+        // 8. Execute the Roll
+        const { atkRoll, naturalRoll } = await this._executeRoll(rollFormula, actorData);
+        if (!atkRoll) {
+            console.error("rollAttackOrSpell: Roll execution failed.");
+            return null;
+        }
+
+        // 9. Determine Hit/Miss Result
+        const { hit, attackTextResult, critFooterHTML } = this._determineHitResult(
+            atkRoll,
+            naturalRoll,
+            itemData,
+            dataset.targetAc,
+            dataset.targetSize,
+            this.system.baseClass, // Pass base class for crit/fumble tables
+            this.id // Pass actor ID for crit/fumble tables
+        );
+        atkRoll.hit = hit; // Attach hit status to the roll object
+
+        // 10. Prepare Damage Formula (if hit)
+        let damageFormulas = {};
+        if (hit && item && Roll.validate(itemData.damage)) {
+            damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);
+            // Temporarily attach to item object for chat card context
+            item.dmgFormula = damageFormulas.primary?.formula;
+            item.debugDmgRollFormula = damageFormulas.primary?.debugFormula;
+            item.dmgFormula2h = damageFormulas.secondary?.formula;
+            item.debugDmgRollFormula2h = damageFormulas.secondary?.debugFormula;
+        }
+
+        // 11. Render Chat Message
+        const chatLabel = this._createChatLabel(item?.img, itemName);
+        const finalAttackText = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
+
+        await this.renderCustomChat(atkRoll, item, attacker?.id, chatLabel, debugAtkRollFormula, finalAttackText, critFooterHTML, rollResponse.rollMode); // Assuming this exists
+
+        // 12. Return Roll Result
+        return atkRoll;
+    }
+
+    // --- Helper Functions ---
+    /**
+     * Gets the attacker token and position.
+     * @param {object} dataset - Initial roll dataset, may contain tokenId.
+     * @returns {Promise<{attacker: Token|null, attackerPos: Point|null}>}
+     */
+    async _getAttackerDetails(dataset) {
+        let attacker = null;
         if (dataset.tokenId) {
-            // Get the token ID from the dataset
-            tokenId = dataset.tokenId
-            // Get the token from the canvas
-            // const token = canvas.tokens.get(tokenId)
-            attacker = canvas.tokens.get(tokenId)
-            if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Token (ID ${tokenId}): `, attacker) }
-            if (attacker) {
-                // Log the token's actor
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Token actor: `, attacker.actor) }
-            }
+            attacker = canvas.tokens.get(dataset.tokenId);
         }
 
-        // Is this an item-based attack?
-        const item = this.items.get(dataset.itemId) ?? null
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item:", item) }
-        const itemData = item ? {...item.system} : null
-        if (item) {
-            // Get the item's friendly name if it has one
-            itemName = itemData.friendlyName != "" ? itemData.friendlyName : item.name
-            dataset.itemName = itemName
-            if (item.type == "weapon") {
-                // The default for weapons is an attack
-                attackText = "Attack"
-                // if (item.system.wpnGrandmaster) {
-                //     attackText = "Grandmaster attack"
-                // } else if (item.system.wpnMaster) {
-                //     attackText = "Master attack"
-                // }
-            } else if (item.type == "spell") {
-                attackText = "Cast spell"
-            }
-        }
-        if (itemData) {
-            itemData.itemType = item.type
-        }
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item roll data:", itemData) }
-
-        // Retrieve roll data from the actor
-        const actorData = this.getRollData()
-        if (actorData) {
-            actorData.actorType = this.type
-        }
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Actor roll data:", actorData) }
-
-        // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}</span>`
-        label = `
-        <hr class="plain-hr" />
-        <div style="margin: 10px 0;">
-            <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
-            <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
-                ${itemName}
-            </span>
-        </div>
-        <hr class="plain-hr" />`
-
-        // Filter the actor's inventory items for ammunition
-        let ammoList = this.items.filter(i => i.system.isAmmunition)
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Carried ammo: ", ammoList) }
-        let carriedAmmo = {"":""}
-        if (ammoList.length > 0) {
-            for (let ammo of ammoList) {
-                if (ammo.system.quantity.value > 0) {
-                    carriedAmmo[ammo._id] = `${ammo.name} (${ammo.system.quantity.value})`
+        if (!attacker) {
+            // Try linked token first
+            attacker = this.token ?? null;
+            if (!attacker) {
+                // Find first linked token matching the actor
+                attacker = canvas.tokens.placeables.find(t => t.document.isLinked && t.actor?.id === this.id) ?? null;
+                // Fallback to the first controlled token if still no attacker (common for GMs)
+                if (!attacker && canvas.tokens.controlled.length > 0) {
+                    attacker = canvas.tokens.controlled[0];
                 }
             }
         }
 
-        // Get the range unit of measure for the scene
-        dataset.rangeUoM = canvas.scene?.grid.units ? canvas.scene?.grid.units : "ft";
+        const attackerPos = attacker?.center ?? null;
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log("rollAttackOrSpell/_getAttackerDetails: Attacker:", attacker);
+            console.log("rollAttackOrSpell/_getAttackerDetails: Attacker Position:", attackerPos);
+        }
+        return { attacker, attackerPos };
+    }
 
-        // // Get the attacking token's location on the scene
-        // // const attacker = canvas.tokens.placeables.find(t => t.actor && t.actor.id === this.id);
-        // // Try to get the attacking token
+    /**
+     * Retrieves item details.
+     * @param {string} itemId - The ID of the item to retrieve.
+     * @returns {{item: Item|null, itemData: object|null, itemName: string, attackTextBase: string}}
+     */
+    _getItemDetails(itemId) {
+        const item = this.items.get(itemId) ?? null;
+        const itemData = item ? { ...item.system, itemType: item.type } : null; // Include item type
+        let itemName = item ? (item.system.friendlyName || item.name) : "Unknown Action";
+        let attackTextBase = "Attack";
 
-        // No token in the incoming dataset, so we need to find it. If the actor is linked to a token, 
-        //  use that token.
-        if (!attacker) {
-            if (this.token) {
-                // Get the token from the actor, if it is linked
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Attacker actual token:`, this.token) }
-                attacker = this.token
-            } else {
-                // No token in the dataset and no linked token, so we need to find it.
-                // Get the first matching token based on actorId. This works fine for player characters
-                //  but not so well for NPCs. It will always return the first token that matches the actor ID,
-                //  and with unlinked tokens, there may be multiple actors with the same ID. So we need to 
-                //  filter out unlinked tokens and deal with them separately.
-                const tempToken = canvas.tokens.placeables.find(t => t.document.isLinked && t.actor && t.actor.id === this.id);
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Attacker discovered token:`, tempToken) }
-                attacker = tempToken ? tempToken : null
+        if (item) {
+            if (item.type === "weapon") {
+                // Potentially add master/grandmaster text later if needed
+            } else if (item.type === "spell") {
+                attackTextBase = "Cast spell";
             }
         }
-        // If we still have no attacker, check if the user has a controlled token. Ideally this should
-        //  never happen, but it can if the actor is not linked to a token and the user has multiple tokens
-        //  selected. This is preferred for GMs who may have multiple tokens selected.
-        if (!attacker && canvas.tokens.controlled[0]) {
-            // Get the currently selected token, since the actor was not attached to one. To do this, 
-            //  we get the first controlled token. This is preferred for GMs who may have multiple tokens
-            //  selected. Players running multiple characters will need to select the correct token before 
-            //  rolling.
-            if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Player-controlled token:`, canvas.tokens.controlled[0]) }
-            attacker = canvas.tokens.controlled[0]
+
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log("rollAttackOrSpell/_getItemDetails: Item:", item);
+            console.log("rollAttackOrSpell/_getItemDetails: Item Data:", itemData);
         }
+        return { item, itemData, itemName, attackTextBase };
+    }
 
-        const attackerPos = attacker ? attacker.center : null
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Attacker position:", attackerPos) }
+    /**
+     * Retrieves actor roll data.
+     * @returns {object} Actor's roll data.
+     */
+    _getActorRollData() {
+        const actorData = this.getRollData(); // Assuming this method exists on the actor
+        if (actorData) {
+            actorData.actorType = this.type;
+        }
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log("rollAttackOrSpell/_getActorRollData: Actor roll data:", actorData);
+        }
+        return actorData;
+    }
 
-        // Has the user targeted a token? If so, get it's AC and name
-        const userTargets = Array.from(game.user.targets)
-        // let target
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target Actor Data:", userTargets) }
-        if (userTargets.length > 0) {
-            target = userTargets[0]
-            const targetPos = target.center
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target position:", targetPos) }
-            const primaryTargetData = target.actor
-            targetAc = primaryTargetData.system.ac.value
-            targetName = primaryTargetData.name
-            targetSize = primaryTargetData.system.size ? primaryTargetData.system.size : "M"
+    /**
+     * Gets details of the primary targeted token.
+     * @param {Token|null} attacker - The attacking token (used for distance calculation).
+     * @returns {{target: Token|null, targetData: {ac: number, name: string, size: string}, gridDistance: number}}
+     */
+    _getTargetDetails(attacker) {
+        const userTargets = Array.from(game.user.targets);
+        const target = userTargets.length > 0 ? userTargets[0] : null;
+        let targetData = { ac: 9, name: "", size: "" }; // Default values
+        let gridDistance = 0;
 
-            // Calculate the distance to the target in pixels
+        if (target && target.actor && attacker) {
+            const targetActorData = target.actor.system;
+            targetData.ac = targetActorData.ac?.value ?? 9;
+            targetData.name = target.actor.name ?? "";
+            targetData.size = targetActorData.size ?? "M";
+
+            // Calculate distance
+            const attackerPos = attacker.center;
+            const targetPos = target.center;
             const dx = targetPos.x - attackerPos.x;
             const dy = targetPos.y - attackerPos.y;
             const distancePixels = Math.sqrt(dx * dx + dy * dy);
-            // Convert to grid distance
             gridDistance = (distancePixels / canvas.grid.size) * canvas.scene.grid.distance;
-            // Round to nearest whole number
-            gridDistance = Math.round(gridDistance)
-            // Adjust distance downward based on token size
-            if (targetSize == "L") {
-                gridDistance -= 5
-            } else if (targetSize == "H") {
-                gridDistance -= 10
+            gridDistance = Math.round(gridDistance);
+
+            // Adjust distance for target size (this seems specific, ensure logic is correct)
+            if (targetData.size === "L") gridDistance -= 5;
+            else if (targetData.size === "H") gridDistance -= 10;
+            if (gridDistance < 0) gridDistance = 0;
+
+            if (CONFIG.HYP3E.debugMessages) {
+                console.log("rollAttackOrSpell/_getTargetDetails: Target:", target);
+                console.log("rollAttackOrSpell/_getTargetDetails: Target Data:", targetData);
+                console.log("rollAttackOrSpell/_getTargetDetails: Distance:", gridDistance);
             }
-            // If the distance is negative, set it to 0
-            if (gridDistance < 0) {
-                gridDistance = 0
-            }
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Distance to target:", gridDistance) }
-            dataset.gridDistance = gridDistance
-            dataset.range = `${gridDistance} ${canvas.scene.grid.units}`;
         } else {
-            // No target selected, so we can't get AC or name
-            targetAc = 9
-            targetName = ""
-            targetSize = ""
-            dataset.range = "No target!"
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: No target selected!") }
-            // Popup a notification if this is an untargeted weapon or spell attack
-            if (item && (item.type == "weapon" || (item.type == "spell" && itemData.atkRoll))) {
-                ui.notifications.info("No target selected!")
-            }
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_getTargetDetails: No target selected or attacker missing."); }
+            // Optionally notify if an attack requires a target but none is selected
+            ui.notifications.info("No target selected!"); // Consider moving this notification logic elsewhere if needed more broadly
         }
 
-        if (item) {
-            // const itemMods = this._parseItemMod(itemName)
-            // Melee weapons have a range based on their weapon class
-            if (itemData.melee) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Weapon class:`, itemData.wc) }
-                if (itemData.wc <= 3) {
-                    // We need to allow for diagonal distances, so range 5 => 7
-                    dataset.meleeRange = 7
-                } else if (itemData.wc <= 5) {
-                    // Range 10 => 14
-                    dataset.meleeRange = 12
-                } else {
-                    //itemData.wc == 6
-                    // Range 15 => 20
-                    dataset.meleeRange = 20
-                }
-                if (gridDistance > dataset.meleeRange) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is beyond melee range! Calculated distance is ${gridDistance} ft.`) }
-                    ui.notifications.warn(`Target is beyond melee range! Calculated distance is ${gridDistance} ft.`)
-                    if (CONFIG.HYP3E.forceRangeLimit) {
-                        // If the target is out of range, prevent the attack from proceeding
-                        return
-                    }
-                }
-            }
-            // Missile weapons need to show a range selector in the dialog
-            if (itemData.missile) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Range increments:`, itemData.range) }
-                dataset.showAmmo = itemData?.usesAmmo ? itemData?.usesAmmo : false
-                dataset.showRanges = true
-                rangeGroup = "rangeGroup"
-                ranges = {
-                    short: `Short (${itemData.range.short})`,
-                    medium: `Med (${itemData.range.medium})`,
-                    long: `Long (${itemData.range.long})`
-                }
-                // Where does our range fall in the range categories?
-                if (gridDistance <= itemData.range.short) {
-                    chosen = "short"
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is at short range. Calculated distance is ${gridDistance} ft.`) }
-                } else if (gridDistance <= itemData.range.medium) {
-                    chosen = "medium"
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is at medium range. Calculated distance is ${gridDistance} ft.`) }
-                } else if (gridDistance <= itemData.range.long) {
-                    chosen = "long"
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is at long range. Calculated distance is ${gridDistance} ft.`) }
-                } else {
-                    // If the range is longer than the long range, give a warning
-                    chosen = "long"
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is out of range! Calculated distance is ${gridDistance} ft.`) }
-                    ui.notifications.warn(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
-                    if (CONFIG.HYP3E.forceRangeLimit) {
-                        // If the target is out of range, prevent the attack from proceeding
-                        return
-                    }
-                }
-            }
-            if (itemData.itemType == "spell" && itemData.atkRoll) {
-                dataset.showSpellRange = true
-                dataset.spellRange = itemData.range
-                // Get distance to target and compare with spell range
-                let spellRange = this._parseSpellRange(itemData.range)
-                if (gridDistance > spellRange) {
-                    // If the target is out of range, give a warning
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Target is out of range! Calculated distance is ${gridDistance} ft.`) }
-                    ui.notifications.warn(`Target is out of range! Calculated distance is ${gridDistance} ft.`)
-                    if (CONFIG.HYP3E.forceRangeLimit) {
-                        // If the target is out of range, prevent the attack from proceeding
-                        return
-                    }
-                }
-            }
-        }
-
-        // Initialize sitMod and sitModList
-        dataset.sitMod = 0
-        dataset.sitModList = ""
-
-        // Get any situational modifiers that can be detected from token status or other means
-        if (game.settings.get(game.system.id, "enableCombatSitModDetection")) {
-            let sitModObj = this._getCombatantSitMods(attacker, target)
-            if (sitModObj.sitModList  && sitModObj?.sitModList != "") {
-                if (dataset.sitModList != "") {
-                    dataset.sitModList += ", "
-                }
-                dataset.sitMod = parseInt(dataset.sitMod) + parseInt(sitModObj?.sitMod)
-                dataset.sitModList += sitModObj?.sitModList
-            }
-        }
-
-        // Show the roll dialog (type and item-dependent)
-        if (!item) {
-            // Since removing the basic attack from Fighting Ability, this should not be needed
-            try {
-                rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset)
-            } catch(err) {
-                return
-            }
-        } else if (item && item.type == "weapon") {
-            try {
-                rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, carriedAmmo, rangeGroup, ranges, chosen)
-            } catch(err) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: ERROR: ", err) }
-                return
-            }
-        } else if (item && item.type == "spell") {
-            try {
-                rollResponse = await Hyp3eDialog.ShowSpellcastingDialog(dataset)
-            } catch(err) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: ERROR: ", err) }
-                return
-            }
-            // Decrement the number memorized
-            if (item.type == "spell" && itemData.quantity.value > 0) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Cast memorized spell: ${item.name}`) }
-                // Update the embedded item document
-                this.updateEmbeddedDocuments("Item", [
-                    { _id: item.id, "system.quantity.value": itemData.quantity.value-1 },
-                ])
-            }
-        }
-
-        // Log the roll-dialog response
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Dialog response:", rollResponse) }
-
-        // Decrement ammunition if selected in the attack dialog
-        // if (item && item.type == "weapon" && itemData.usesAmmo && rollResponse.ammunition) {
-        if (item && item.type == "weapon" && rollResponse.ammunition) {
-            const ammo = this.items.get(rollResponse.ammunition)
-            const ammoData = ammo ? {...ammo.system} : null
-            if (ammo && ammoData) {
-                ammoMods = this._parseItemMod(ammo.name)
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Use ammo: ${ammo.name}`, ammoData) }
-                // Update the embedded item document
-                this.updateEmbeddedDocuments("Item", [
-                    { _id: ammo.id, "system.quantity.value": ammoData.quantity.value-1 },
-                ])
-            }
-        }
-
-        // Add situational modifier and roll mode from the dialog
-        dataset.sitMod = rollResponse.sitMod
-        dataset.rollMode = rollResponse.rollMode
-        // Did we get a range modifier from the dialog?
-        if (rollResponse.rangeGroup != "") {
-            switch (rollResponse.rangeGroup) {
-                case "short":
-                    dataset.rangeMod = 0
-                    break
-                case "medium":
-                    dataset.rangeMod = -2
-                    break
-                case "long":
-                    dataset.rangeMod = -5
-                    break
-            }
-        }
-
-        // Does the item have an attack formula?
-        if (item) {
-            // If there's no item roll formula (typically a spell), send a chat message and exit
-            if (!itemData.formula) {
-                item._displayItemInChat()
-                return null
-            }
-        }
-
-        // Construct our attack roll formula
-        const atkObj = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData)
-        rollFormula = atkObj.formula
-        debugAtkRollFormula = atkObj.debugFormula
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Final attack formula:", rollFormula) }
-
-        // Roll the dice!
-        let atkRoll = new Roll(rollFormula, actorData)
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Attack roll: ", atkRoll) }
-        // Resolve the roll
-        let result = await atkRoll.roll()
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Roll result: ", result) }
-        // Get d20 natural roll
-        naturalRoll = atkRoll.dice[0].total
-
-        // Update chat card label based on whether we have a target
-        if (targetName != "") {
-            // label += ` vs. ${targetName}...`
-            attackText += ` vs. ${targetName}...`
-        } else {
-            // label += `...`
-            attackText += `...`
-        }
-
-        // Footer used for adding crit buttons (if enabled)
-        let critFooterHTML = "";
-
-        // Determine hit or miss
-        let hit = false
-        let tn = 31 // some fake number just to initialize the variable
-        if (!itemData.isGrenade) {
-            // If this is a normal attack, TN is based on target's AC
-            tn = 20 - targetAc
-            if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Attack roll ${atkRoll.total} hits AC [20 - ${atkRoll.total} => ] ${eval(20 - atkRoll.total)}`) }
-            if (naturalRoll == 20) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Natural 20 always crit hits!") }
-                // label += `<br /><span style='color:#00b34c'><b>Critical Hit!</b></span>`
-                attackText += `<span style='color:#00b34c'><b>Critical Hit!</b></span>`
-                hit = true
-                if (game.settings.get(game.system.id, "critHit") && item) {
-                    // critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}'><h4>Critical Hit:</h4></div>`;
-                    critFooterHTML += `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
-                }
-            } else if (naturalRoll == 1) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Natural 1 always crit misses!") }
-                // label += "<br /><span style='color:#e90000'><b>Critical Miss!</b></span>"
-                attackText += "<span style='color:#e90000'><b>Critical Miss!</b></span>"
-
-                if (game.settings.get(game.system.id, "critMiss") && item) {
-                    // critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}'><h4>Xathoqqua’s Woe:</h4></div>`;
-                    critFooterHTML += `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
-                }
-            } else if (atkRoll.total >= tn) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Hit! Attack roll ${atkRoll.total} is greater than or equal to [20 - ${targetAc} => ] ${tn}.`) }
-                // label += `<br /><b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
-                attackText += `<b>Hits AC ${eval(20 - atkRoll.total)}!</b>`
-                hit = true
-            } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Miss! Attack roll ${atkRoll.total} is less than [20 - ${targetAc} => ] ${tn}.`) }
-                if (eval(20 - atkRoll.total) <= 9) {
-                    // label += `<br /><b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
-                    attackText += `<b>Miss, would have hit AC ${eval(20 - atkRoll.total)}.</b>`
-                } else {
-                    // label += `<br /><b>Misses AC 9.</b>`
-                    attackText += `<b>Misses AC 9.</b>`
-                }
-            }
-
-        } else {
-            // This is a grenade-like attack
-            let sizeFromTable = ""
-            switch (targetSize) {
-                case "S":
-                    sizeFromTable = "Small"
-                    tn = 13
-                    break
-                case "M":
-                    sizeFromTable = "Medium"
-                    tn = 11
-                    break
-                case "L":
-                    sizeFromTable = "Large"
-                    tn = 9
-                    break
-                default:
-                    // No target selected (or no size specified), assume an area or object
-                    sizeFromTable = "Stationary"
-                    tn = 7
-                    break
-                }
-            if (atkRoll.total >= tn) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Hit! Attack roll ${atkRoll.total} is greater than or equal to ${tn}.`) }
-                // label += `<br /><b>Hits a ${sizeFromTable} target!</b>`
-                attackText += `<b>Hits a ${sizeFromTable} target!</b>`
-                hit = true
-            } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell: Miss! Attack roll ${atkRoll.total} is less than ${tn}.`) }
-                // label += `<br /><b>Misses a ${sizeFromTable} target.</b>`
-                attackText += `<b>Misses a ${sizeFromTable} target.</b>`
-            }
-        }
-        // Pass hit status to the attack chat
-        atkRoll.hit = hit
-
-        // If the item attack hit, calculate the damage formula and include it in the chat message
-        if (hit && item) {
-            if (Roll.validate(itemData.damage)) {
-                // Build our primary damage formula
-                const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData)
-                item.dmgFormula = dmgObj.formula
-                item.debugDmgRollFormula = dmgObj.debugFormula
-                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Damage formula:", item.dmgFormula) }
-                // Do we have 2-hand damage?
-                if (item.system.damage2h > "") {
-                    item.dmgFormula2h = dmgObj.formula2h
-                    item.debugDmgRollFormula2h = dmgObj.debugFormula2h
-                    if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Damage formula 2H:", item.dmgFormula2h) }
-                }
-            }
-        }
-
-        // Construct a custom chat card for the attack
-        await this.renderCustomChat(atkRoll, item, tokenId, label, debugAtkRollFormula, attackText, critFooterHTML, rollResponse.rollMode);
-
-        return atkRoll
+        return { target, targetData, gridDistance };
     }
+
+    /**
+     * Calculates melee range based on weapon class.
+     * @param {number} wc - Weapon class.
+     * @returns {number} Melee reach distance in grid units.
+     */
+    _getMeleeRange(wc) {
+        if (wc <= 3) return 7; // Adjust for diagonal? Base 5ft -> 7 allows diagonal
+        if (wc <= 5) return 12; // Base 10ft -> 12 allows diagonal
+        return 20; // Base 15ft -> 20 allows diagonal
+    }
+
+    /**
+     * Parses spell range string into a numerical distance.
+     * @param {string} rangeStr - The spell range description (e.g., "Touch", "60 ft", "Self").
+     * @returns {number} Numerical range in grid units, or Infinity for non-distance ranges.
+     */
+    _parseSpellRange(rangeStr) {
+        if (!rangeStr) return Infinity; // Or handle as error?
+        rangeStr = rangeStr.toLowerCase();
+        if (rangeStr === "touch" || rangeStr === "melee") return 7; // Assume touch = melee reach
+        if (rangeStr === "self") return 0;
+        const match = rangeStr.match(/(\d+)\s*(ft|feet|yd|yards|m|meters)/);
+        if (match) {
+            let value = parseInt(match[1]);
+            const unit = match[2];
+            // Convert other units to feet if necessary, assuming base grid is feet
+            if (unit === 'yd' || unit === 'yards') value *= 3;
+            if (unit === 'm' || unit === 'meters') value *= 3.28084;
+            return Math.round(value);
+        }
+        return Infinity; // Unknown range format
+    }
+
+    /**
+     * Prepares range data, checks limits, and determines the default range category.
+     * @param {object|null} itemData - The system data of the item.
+     * @param {number} gridDistance - Calculated distance to the target.
+     * @returns {{ranges: object, rangeGroup: string, chosenRange: string, rangeMessages: string[], isOutOfRange: boolean}}
+     */
+    _prepareRangeData(itemData, gridDistance) {
+        let ranges = {};
+        let rangeGroup = "";
+        let chosenRange = "";
+        let rangeMessages = [];
+        let isOutOfRange = false;
+
+        if (!itemData) return { ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange };
+
+        // Melee Check
+        if (itemData.melee) {
+            const meleeRange = this._getMeleeRange(itemData.wc);
+            if (gridDistance > meleeRange) {
+                const msg = `Target is beyond melee range! (${gridDistance} ${canvas.scene.grid.units} > ${meleeRange} ${canvas.scene.grid.units})`;
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
+                rangeMessages.push(msg);
+                isOutOfRange = true;
+            }
+        }
+
+        // Missile Check
+        if (itemData.missile && itemData.range) {
+            rangeGroup = "rangeGroup"; // Identifier for the dialog field
+            ranges = {
+                short: `Short (${itemData.range.short})`,
+                medium: `Med (${itemData.range.medium})`,
+                long: `Long (${itemData.range.long})`
+            };
+            if (gridDistance <= itemData.range.short) {
+                chosenRange = "short";
+            } else if (gridDistance <= itemData.range.medium) {
+                chosenRange = "medium";
+            } else if (gridDistance <= itemData.range.long) {
+                chosenRange = "long";
+            } else {
+                chosenRange = "long"; // Default to long even if out
+                const msg = `Target is out of missile range! (${gridDistance} ${canvas.scene.grid.units} > ${itemData.range.long} ${canvas.scene.grid.units})`;
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
+                rangeMessages.push(msg);
+                isOutOfRange = true;
+            }
+        }
+
+        // Spell Attack Roll Check
+        if (itemData.itemType === "spell" && itemData.atkRoll && itemData.range) {
+            const spellRange = this._parseSpellRange(itemData.range);
+            if (gridDistance > spellRange) {
+                const msg = `Target is out of spell range! (${gridDistance} ${canvas.scene.grid.units} > ${spellRange} ${canvas.scene.grid.units})`;
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
+                rangeMessages.push(msg);
+                isOutOfRange = true;
+            }
+        }
+
+        return { ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange };
+    }
+
+    /**
+     * Filters inventory for usable ammunition.
+     * @returns {object} Object suitable for dropdown { ammoId: "Ammo Name (Qty)" }.
+     */
+    _getCarriedAmmo() {
+        const ammoList = this.items.filter(i => i.system.isAmmunition && i.system.quantity?.value > 0);
+        let carriedAmmo = { "": "None" }; // Start with a None option
+        for (let ammo of ammoList) {
+            carriedAmmo[ammo._id] = `${ammo.name} (${ammo.system.quantity.value})`;
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_getCarriedAmmo: Carried ammo:", carriedAmmo); }
+        return carriedAmmo;
+    }
+
+    /**
+     * Shows the appropriate roll dialog.
+     * @param {object} dataset - Data for the dialog template.
+     * @param {string|null} itemType - Type of the item ('weapon', 'spell', null).
+     * @param {object} carriedAmmo - List of available ammo.
+     * @param {string} rangeGroup - Name for the range input group.
+     * @param {object} ranges - Available range options.
+     * @param {string} chosenRange - Pre-selected range category.
+     * @returns {Promise<object|null>} The dialog response object, or null if cancelled.
+     */
+    async _showRollDialog(dataset, itemType, carriedAmmo, rangeGroup, ranges, chosenRange) {
+        try {
+            let rollResponse;
+            if (itemType === "weapon") {
+                rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, carriedAmmo, rangeGroup, ranges, chosenRange); // Assuming this exists
+            } else if (itemType === "spell") {
+                rollResponse = await Hyp3eDialog.ShowSpellcastingDialog(dataset); // Assuming this exists
+            } else {
+                // Fallback for non-item rolls if needed, potentially reusing ShowAttackRollDialog
+                rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, {}, "", {}, "");
+            }
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_showRollDialog: Dialog response:", rollResponse); }
+            return rollResponse;
+        } catch (err) {
+            // Catch dialog cancellation (often returns null or throws specific error)
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_showRollDialog: Dialog closed or error:", err); }
+            return null; // Indicate cancellation
+        }
+    }
+
+    /**
+     * Processes dialog results, like consuming ammunition.
+     * @param {object} rollResponse - The data returned from the dialog.
+     * @param {Item|null} item - The item being used.
+     * @param {object|null} itemData - The system data for the item.
+     * @returns {Promise<{ammoMods: object, ammoUpdated: boolean}>} Object containing ammo modifiers and whether ammo was updated.
+     */
+    async _processDialogResponse(rollResponse, item, itemData) {
+        let ammoMods = {};
+        let ammoUpdated = false;
+
+        // Decrement ammunition if selected
+        // if (item?.type === "weapon" && itemData?.usesAmmo && rollResponse.ammunition) { // Check usesAmmo flag too?
+        if (item?.type === "weapon" && rollResponse.ammunition) {
+            const ammo = this.items.get(rollResponse.ammunition);
+            if (ammo && ammo.system.quantity?.value > 0) {
+                ammoMods = this._parseItemMod(ammo.name); // Assuming this helper exists
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_processDialogResponse: Using ammo: ${ammo.name}`, ammo.system); }
+                try {
+                    await this.updateEmbeddedDocuments("Item", [
+                        { _id: ammo.id, "system.quantity.value": ammo.system.quantity.value - 1 },
+                    ]);
+                    ammoUpdated = true;
+                } catch (err) {
+                    console.error(`rollAttackOrSpell/_processDialogResponse: Failed to update ammo quantity for ${ammo.name}:`, err);
+                }
+            } else if (rollResponse.ammunition && CONFIG.HYP3E.debugMessages) {
+                console.warn(`rollAttackOrSpell/_processDialogResponse: Selected ammo ${rollResponse.ammunition} not found or has 0 quantity.`);
+            }
+        }
+        return { ammoMods, ammoUpdated };
+    }
+
+    /**
+     * Gets the attack modifier based on the selected range band.
+     * @param {string} rangeSelection - 'short', 'medium', or 'long'.
+     * @returns {number} The modifier for the range.
+     */
+    _getRangeModifier(rangeSelection) {
+        switch (rangeSelection) {
+            case "short": return 0;
+            case "medium": return -2;
+            case "long": return -5;
+            default: return 0; // Default if no range or invalid selection
+        }
+    }
+
+    /**
+     * Consumes a spell slot if the spell is memorized.
+     * @param {Item} spellItem - The spell item being cast.
+     */
+    async _consumeSpellSlot(spellItem) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeSpellSlot: Consuming memorized spell: ${spellItem.name}`); }
+        try {
+            await this.updateEmbeddedDocuments("Item", [
+                { _id: spellItem.id, "system.quantity.value": spellItem.system.quantity.value - 1 },
+            ]);
+            // Optionally refresh sheet: this.sheet.render(false);
+        } catch (err) {
+            console.error(`rollAttackOrSpell/_consumeSpellSlot: Failed to update spell quantity for ${spellItem.name}:`, err);
+        }
+    }
+
+    /**
+     * Executes the dice roll.
+     * @param {string} rollFormula - The formula string to roll.
+     * @param {object} actorData - Roll data context.
+     * @returns {Promise<{atkRoll: Roll|null, naturalRoll: number}>} The completed Roll object and the natural d20 result.
+     */
+    async _executeRoll(rollFormula, actorData) {
+        try {
+            const atkRoll = new Roll(rollFormula, actorData);
+            await atkRoll.evaluate({ async: true }); // Use evaluate for modern FVTT
+            const d20Die = atkRoll.dice.find(d => d.faces === 20);
+            const naturalRoll = d20Die ? d20Die.results[0].result : 0; // Get the first d20 result
+
+            if (CONFIG.HYP3E.debugMessages) {
+                console.log("rollAttackOrSpell/_executeRoll: Attack Roll:", atkRoll);
+                console.log("rollAttackOrSpell/_executeRoll: Roll Result:", atkRoll.total);
+                console.log("rollAttackOrSpell/_executeRoll: Natural d20 Roll:", naturalRoll);
+            }
+            return { atkRoll, naturalRoll };
+        } catch (err) {
+            console.error("rollAttackOrSpell/_executeRoll: Error rolling formula:", rollFormula, err);
+            ui.notifications.error(`Error rolling formula: ${rollFormula}`);
+            return { atkRoll: null, naturalRoll: 0 };
+        }
+    }
+
+    /**
+     * Determines if the roll hits or misses and generates result text.
+     * @param {Roll} atkRoll - The completed roll object.
+     * @param {number} naturalRoll - The natural d20 result.
+     * @param {object|null} itemData - System data of the item used.
+     * @param {number} targetAc - AC of the target.
+     * @param {string} targetSize - Size category of the target.
+     * @param {string} actorBaseClass - Base class for crit/fumble tables.
+     * @param {string} actorId - Actor ID for crit/fumble tables.
+     * @returns {{hit: boolean, attackTextResult: string, critFooterHTML: string}}
+     */
+    _determineHitResult(atkRoll, naturalRoll, itemData, targetAc, targetSize, actorBaseClass, actorId) {
+        let hit = false;
+        let attackTextResult = "";
+        let critFooterHTML = "";
+        const total = atkRoll.total;
+        const isGrenade = itemData?.isGrenade ?? false;
+
+        if (isGrenade) {
+            // Grenade-like attack TN based on size
+            let tn = 7;
+            let sizeFromTable = "Stationary";
+            switch (targetSize) {
+                case "S": sizeFromTable = "Small"; tn = 13; break;
+                case "M": sizeFromTable = "Medium"; tn = 11; break;
+                case "L": sizeFromTable = "Large"; tn = 9; break;
+            }
+            if (total >= tn) {
+                hit = true;
+                attackTextResult = `<b>Hits a ${sizeFromTable} target!</b>`;
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_determineHitResult: Grenade Hit! ${total} >= ${tn}`); }
+            } else {
+                attackTextResult = `<b>Misses a ${sizeFromTable} target.</b>`;
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_determineHitResult: Grenade Miss! ${total} < ${tn}`); }
+            }
+        } else {
+            // Normal attack TN based on AC
+            const tn = 20 - targetAc;
+            const hitAC = 20 - total; // AC the roll would hit
+
+            if (naturalRoll === 20) {
+                hit = true;
+                attackTextResult = `<span style='color:#00b34c'><b>Critical Hit!</b></span>`;
+                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_determineHitResult: Natural 20 Crit Hit!"); }
+                if (game.settings.get(game.system.id, "critHit")) {
+                    critFooterHTML = `<div class='critical-hit' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
+                }
+            } else if (naturalRoll === 1) {
+                attackTextResult = `<span style='color:#e90000'><b>Critical Miss!</b></span>`;
+                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_determineHitResult: Natural 1 Crit Miss!"); }
+                if (game.settings.get(game.system.id, "critMiss")) {
+                    critFooterHTML = `<div class='critical-miss' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
+                }
+            } else if (total >= tn) {
+                hit = true;
+                attackTextResult = `<b>Hits AC ${hitAC}!</b>`;
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_determineHitResult: Hit! ${total} >= ${tn}`); }
+            } else {
+                attackTextResult = `<b>Miss${hitAC <= 9 ? `, would have hit AC ${hitAC}` : 'es AC 9'}.</b>`;
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_determineHitResult: Miss! ${total} < ${tn}`); }
+            }
+        }
+
+        return { hit, attackTextResult, critFooterHTML };
+    }
+
+    /**
+     * Prepares damage formula strings if the attack hits.
+     * @param {object} itemData - System data of the item.
+     * @param {object} ammoMods - Modifiers from ammunition.
+     * @param {object} actorData - Roll data context.
+     * @returns {object} Object containing primary and secondary damage formulas {primary: {formula, debugFormula}, secondary: {formula, debugFormula}}.
+     */
+    _prepareDamageFormulas(itemData, ammoMods, actorData) {
+        const dmgFormulas = {};
+        // Build primary damage formula
+        const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData); // Assuming this exists
+        dmgFormulas.primary = {
+            formula: dmgObj.formula,
+            debugFormula: dmgObj.debugFormula
+        };
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_prepareDamageFormulas: Damage formula:", dmgObj.formula); }
+
+        // Build secondary (e.g., 2-handed) damage formula if applicable
+        if (itemData.damage2h) { // Check if damage2h field has content
+            dmgFormulas.secondary = {
+                formula: dmgObj.formula2h, // Assuming buildDamageFormula handles this
+                debugFormula: dmgObj.debugFormula2h
+            };
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_prepareDamageFormulas: Damage formula 2H:", dmgObj.formula2h); }
+        }
+        return dmgFormulas;
+    }
+
+    /**
+     * Creates the HTML for the chat card header/label.
+     * @param {string|null} itemImg - Path to the item image.
+     * @param {string} itemName - Name of the item/action.
+     * @returns {string} HTML string for the label.
+     */
+    _createChatLabel(itemImg, itemName) {
+        // Use a default image if itemImg is missing
+        const imgSrc = itemImg || "icons/svg/mystery-man.svg";
+        return `
+            <hr class="plain-hr" />
+            <div style="margin: 10px 0;">
+                <img src="${imgSrc}" style="border: none; float: left;" width="24px" height="24px">
+                <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
+                    ${itemName}
+                </span>
+            </div>
+            <hr class="plain-hr" />`;
+    }
+    // --- END Helper Functions for attack rolls & spellcasting ---
+
 
     /**
      * Execute a saving throw
