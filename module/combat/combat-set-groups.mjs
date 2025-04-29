@@ -93,7 +93,7 @@ export default class HYP3ECombatGroupSelector extends HandlebarsApplicationMixin
         if ( !canvas.ready ) return;
         const li = event.currentTarget;
         const combatant = game.combat.combatants.get(li.dataset.combatantId);
-        const token = combatant.token?.object;
+        const token = combatant?.token?.object;
         if ( token?.isVisible ) {
             if ( !token.controlled ) token._onHoverIn(event, {hoverOutOthers: true});
             this._highlighted = token;

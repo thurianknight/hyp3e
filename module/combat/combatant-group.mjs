@@ -14,9 +14,9 @@ export class HYP3EGroupCombatant extends HYP3ECombatant {
 
         // if (CONFIG.HYP3E.debugMessages) { console.log("get groupRaw: Canvas tokens: ", canvas.tokens) }
         if (canvas.tokens) {
-            const token = canvas.tokens.get(this.token.id);
+            const token = canvas.tokens.get(this.token?.id);
             // if (CONFIG.HYP3E.debugMessages) { console.log(`get groupRaw: Combatant ${this.name} disposition: `, token.document.disposition) }
-            const disposition = token.document.disposition;
+            const disposition = token?.document.disposition;
             switch (disposition) {
                 case -1:
                     // Token disposition is Hostile
