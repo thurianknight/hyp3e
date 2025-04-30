@@ -8,12 +8,6 @@ import { Hyp3eItemSheet } from "./sheets/item-sheet.mjs";
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./helpers/chat.mjs";
-// Import Combat classes
-import { HYP3EGroupCombat } from "./combat/combat-group.mjs";
-import { HYP3EGroupCombatant } from "./combat/combatant-group.mjs";
-import { HYP3ECombat } from "./combat/combat.mjs";
-import { HYP3ECombatant } from "./combat/combatant.mjs";
-import { HYP3ECombatTab } from "./combat/sidebar.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -243,17 +237,6 @@ Hooks.once('init', async function() {
         requiresReload: true,
     });
 
-    // If we ever need migration scripts, use this version number for comparison
-    console.log("Game info:", game)
-    console.log("System info:", game.system)
-    console.log("Foundry version:", game.version)
-    if (foundry.utils.isNewerVersion(game.version, "12")) {
-        console.log("Foundry version is 12 or higher")
-    }
-    if (foundry.utils.isNewerVersion(game.version, "13")) {
-        console.log("Foundry version is 13 or higher")
-    }
-
     // Add custom statusEffects
     const hasted = {
         id: "hasted",
@@ -273,19 +256,19 @@ Hooks.once('init', async function() {
     // Add custom constants for configuration.
     CONFIG.HYP3E = HYP3E;
 
-    /**
-     * Set an initiative formula for the system
-     * @type {String}
-     */
-    //   CONFIG.Combat.initiative = {
-    //     // formula: "1d20 + @attributes.dex.mod",
-    //     // decimals: 2
-    //     formula: "1d6 + @dex.value",
-    //     decimals: 0
-    //   };
+    // Get initiative mode: group vs. individual
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
-    // Custom combat classes based on group initiative setting
-    if (isGroupInitiative) { 
+
+    // Load combat classes
+    const { HYP3ECombat } = await import( "./combat/combat.mjs");
+    const { HYP3ECombatant } = await import( "./combat/combatant.mjs");
+        const { HYP3EGroupCombat } = await import( "./combat/combat-group.mjs" );
+    const { HYP3EGroupCombatant } = await import( "./combat/combatant-group.mjs");
+    // Initiative roll is the same d6, regardless of group/individual
+    CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
+    console.log("CONFIG.Combat.initiative:", CONFIG.Combat.initiative)
+    // Set the Combat and Combatant document classes based on initiative mode
+    if (isGroupInitiative) {
         console.log("Using group-based initiative.")
         CONFIG.Combat.documentClass = HYP3EGroupCombat;
         CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
@@ -294,10 +277,21 @@ Hooks.once('init', async function() {
         CONFIG.Combat.documentClass = HYP3ECombat;
         CONFIG.Combatant.documentClass = HYP3ECombatant;
     }
-    // Initiative roll is the same, regardless of group/individual
-    CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
-    console.log("CONFIG.Combat.initiative:", CONFIG.Combat.initiative)
-    CONFIG.ui.combat = HYP3ECombatTab;
+
+    console.log("Game info:", game)
+    console.log("System info:", game.system)
+    // Check the game version and load the appropriate class for Combat Tracker
+    console.log("Foundry version:", game.version)
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    if (majorVersion >= 13) {
+        // Load v13-specific Combat Tracker class
+        const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v13.mjs");
+        CONFIG.ui.combat = HYP3ECombatTracker;
+    } else {
+        // Load v12-specific Combat Tracker class
+        const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v12.mjs");
+        CONFIG.ui.combat = HYP3ECombatTracker;
+    }
 
     // Define custom Document classes
     CONFIG.Actor.documentClass = Hyp3eActor;

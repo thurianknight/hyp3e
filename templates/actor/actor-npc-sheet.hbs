@@ -32,7 +32,7 @@
         </div>
         <div class="character-header-block flexrow">
           <div class="npc-field align-center">
-            <input type="text" name="system.morale" value="{{system.morale}}" />
+            <input type="text" name="system.morale" value="{{system.morale}}" data-dtype="Number" />
             <span class="rollable small-label" data-roll="2d6" data-roll-type="check" data-roll-target="{{system.morale}}" data-label="{{localize 'HYP3E.morale'}}">{{localize 'HYP3E.morale'}} <i class="fas fa-dice"></i></span>
           </div>
           <div class="npc-field align-center">
@@ -61,7 +61,7 @@
 
     {{!-- Abilities Tab --}}
     <div class="tab abilities" data-group="primary" data-tab="abilities">
-      {{> "systems/hyp3e/templates/actor/parts/npc-abilities.hbs"}}
+      {{> "npc-abilities"}}
     </div>
 
     {{!-- Description Tab --}}
@@ -83,7 +83,7 @@
     {{!-- Active Effects Tab --}}
     <div class="tab effects" data-group="primary" data-tab="effects">
       <div class="flex npc-description-block">
-        {{> "systems/hyp3e/templates/actor/parts/actor-effects.hbs"}}
+        {{> "actor-effects"}}
       </div>
     </div>
 

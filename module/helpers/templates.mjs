@@ -6,8 +6,8 @@
 import HYP3E from "./config.mjs"
 
 export const preloadHandlebarsTemplates = async function() {
-    return loadTemplates([
-
+    // Register Handlebars partials
+    const partialPaths = [
         // Actor partials
         `${HYP3E.templatePath}/actor/parts/actor-abilities.hbs`,
         `${HYP3E.templatePath}/actor/parts/actor-attributes.hbs`,
@@ -22,16 +22,36 @@ export const preloadHandlebarsTemplates = async function() {
         // Item partials
         `${HYP3E.templatePath}/item/parts/item-effects.hbs`,
 
-        // chat templates
+        // Combat Tab
+        `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-ind-v12.hbs`,
+        `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group-v12.hbs`,
+        `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-ind-v13.hbs`,
+        `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group-v13.hbs`,
+    ];
+
+    // Load and register partials
+    await Promise.all(partialPaths.map(async (path) => {
+        const name = path.split("/").pop().replace(".hbs", "");
+        const source = await fetch(path).then(r => r.text());
+        Handlebars.registerPartial(name, source);
+    }));
+
+    // Preload Handlebars templates
+    return loadTemplates([
+        // Dialog templates
+        `${HYP3E.templatePath}/dialog/roll-dialog.hbs`,
+
+        // Chat templates
         `${HYP3E.templatePath}/chat/apply-damage.hbs`,
-        `${HYP3E.templatePath}/chat/crit-roll.hbs`,
         `${HYP3E.templatePath}/chat/attack-roll.hbs`,
+        `${HYP3E.templatePath}/chat/crit-roll.hbs`,
         `${HYP3E.templatePath}/chat/damage-roll.hbs`,
+        `${HYP3E.templatePath}/chat/show-item.hbs`,
 
         // Combat Tab
-        `${HYP3E.templatePath}/sidebar/combat-tracker.hbs`,
-        `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-individual.hbs`,
-        `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group.hbs`,
-        `${HYP3E.templatePath}/apps/combat-set-groups.hbs`,
+        `${HYP3E.templatePath}/sidebar/combat-tracker-v12.hbs`,
+        `${HYP3E.templatePath}/sidebar/combat-tracker-v13.hbs`,
+        `${HYP3E.templatePath}/sidebar/combat-header-v13.hbs`,
+        `${HYP3E.templatePath}/sidebar/combat-footer-v13.hbs`,
     ]);
 };

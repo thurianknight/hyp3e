@@ -273,20 +273,4 @@ export class HYP3ECombatant extends Combatant {
         }
     }
 
-
-    // Pretty sure this is not needed...
-    // async getData(options = {}) {
-    //     const context = await super.getData(options);
-    //     const combatantData = foundry.utils.mergeObject(context, {
-    //                             isMelee: this.isMelee,
-    //                             isMissile: this.isMissile,
-    //                             isMagic: this.isMagic,
-    //                             isMovement: this.isMovement,
-    //                             initRoll: this.initRoll,
-    //     })
-    //     // Log the combatantData object
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("getData: Combatant Data: ", combatantData) }
-    //     return combatantData
-    // }
-
 }

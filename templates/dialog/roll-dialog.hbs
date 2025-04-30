@@ -30,7 +30,7 @@
         {{/if}}
         {{#if dataset.showRanges}}
         <div class="flexrow form-group">
-            <label class="dialog-label">{{localize 'HYP3E.weapon.range'}}: {{dataset.range}}</label>
+            <label class="dialog-label">{{localize 'HYP3E.weapon.range'}}: {{dataset.rangeText}}</label>
             <div class="form-fields">
                 {{radioBoxes rangeGroup ranges checked=chosen localize=true}}
             </div>
@@ -38,7 +38,7 @@
         {{/if}}
         {{#if dataset.showSpellRange}}
         <div class="flexrow form-group">
-            <label class="dialog-label">{{localize 'HYP3E.weapon.range'}}: {{dataset.range}}</label>
+            <label class="dialog-label">{{localize 'HYP3E.weapon.range'}}: {{dataset.rangeText}}</label>
             <div class="form-fields">
                 <input type="text" name="spellRange" value="{{localize 'HYP3E.spell.spellRange'}}: {{dataset.spellRange}}" disabled />
             </div>

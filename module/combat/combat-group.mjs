@@ -1,7 +1,5 @@
 import HYP3E from "../helpers/config.mjs";
 import { HYP3ECombat } from "./combat.mjs";
-import { HYP3ECombatant } from "./combatant.mjs";
-import { HYP3EGroupCombatant } from "./combatant-group.mjs";
 
 export const colorGroups = HYP3E.colors;
 export const actionGroups = {

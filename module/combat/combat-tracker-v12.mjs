@@ -1,9 +1,8 @@
 import HYP3E from "../helpers/config.mjs";
 import { HYP3EGroupCombat } from "./combat-group.mjs";
 import HYP3ECombatGroupSelector from "./combat-set-groups.mjs";
-import { HYP3ECombatant } from "./combatant.mjs";
 
-export class HYP3ECombatTab extends CombatTracker {
+export class HYP3ECombatTracker extends CombatTracker {
     // ===========================================================================
     // APPLICATION SETUP
     // ===========================================================================
@@ -13,38 +12,13 @@ export class HYP3ECombatTab extends CombatTracker {
     static get defaultOptions() {
         if (super.defaultOptions) {
             // if (CONFIG.HYP3E.debugMessages) { console.log(`Loading template ${HYP3E.templatePath}/sidebar/combat-tracker.hbs...`) }
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`HYP3ECombatTab defaultOptions: `, super.defaultOptions) }
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`HYP3ECombatTracker defaultOptions: `, super.defaultOptions) }
             // Merge the default options with the custom template path
             return foundry.utils.mergeObject(super.defaultOptions, {
-                template: `${HYP3E.templatePath}/sidebar/combat-tracker.hbs`,
+                template: `${HYP3E.templatePath}/sidebar/combat-tracker-v12.hbs`,
             });    
         }
     }
-
-    // Foundry v13 code
-    /*
-    // Merge parent CombatTracker default options + custom options
-    static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS,{
-        actions: {
-            melee: HYP3ECombatTab._onCombatantControl,
-            missile: HYP3ECombatTab._onCombatantControl,
-            magic: HYP3ECombatTab._onCombatantControl,
-            movement: HYP3ECombatTab._onCombatantControl,
-        }
-    })
-    // Load the new combat-tracker template
-    static PARTS = {
-        header: {
-            template: `${HYP3E.templatePath}/sidebar/combat-header.hbs`
-        },
-        tracker: {
-            template: `${HYP3E.templatePath}/sidebar/combat-tracker.hbs`
-        },
-        footer: {
-            template: `${HYP3E.templatePath}/sidebar/combat-footer.hbs`
-        }
-    }
-    */
 
     static GROUP_CONFIG_APP = new HYP3ECombatGroupSelector();
 
@@ -107,87 +81,6 @@ export class HYP3ECombatTab extends CombatTracker {
         })
     }
 
-    // Foundry v13 code
-    /*
-    async _prepareCombatContext(context, options) {
-        // Log incoming parameters
-        console.log("Combat Context: ", context, options)
-        
-        // Prepare the combat context
-        await super._prepareCombatContext(context, options);
-        // Add group initiative flag
-        const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
-        this.isGroupInitiative = isGroupInitiative;
-        context.isGroupInitiative = isGroupInitiative;
-    }
-    
-    async _prepareTrackerContext(context, options) {
-        // Log incoming parmeters
-        console.log("Combat Tracker Context: ", context, options)
-        // Log the combat object
-        console.log("Combat Tracker Combat: ", this.viewed)
-
-        // Prepare the combat tracker context
-        await super._prepareTrackerContext(context, options);
-
-        if (context.turns && context.turns.length > 0) {
-            const groups = context.turns.reduce((arr, turn) => {
-                const idx = arr.findIndex(r => r.group === turn.group);
-
-                if (idx !== -1) {
-                    arr[idx].turns.push(turn);
-                    return arr;
-                }
-
-                if (CONFIG.HYP3E.debugMessages) { console.log("Group Initiative Scores: ", game.combat.groupInitiativeScores) }
-                const initiative = game.combat.groupInitiativeScores?.get(turn.group) ? game.combat.groupInitiativeScores.get(turn.group) : null
-
-                return [...arr, {
-                    group: turn.group,
-                    label: HYP3EGroupCombat.GROUPS[turn.group],
-                    initiative: initiative,
-                    turns: [turn]
-                }];
-            }, []);
-
-            // Log the initiative groups
-            if (CONFIG.HYP3E.debugMessages) { console.log("Initiative Groups: ", groups) }
-            context.groups = groups;
-        }
-
-    }
-
-    async _prepareTurnContext(combat, combatant, index) {
-        // Log incoming parameters
-        console.log("Combat Tab Combatant: ", combatant)
-        // Log the combat object
-        console.log("Combat Tab Combat: ", combat)
-        // Prepare the combatant context
-        const turn = await super._prepareTurnContext(combat, combatant, index);
-        // Log the turn context
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Combat Turn: ", turn) }
-
-        // Add group initiative flag
-        const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
-        turn.isGroupInitiative = isGroupInitiative;
-
-        // Add all of our custom flags to the combatant context
-        turn.isMelee = !!combatant.getFlag(game.system.id, "isMelee")
-        turn.isMissile = !!combatant.getFlag(game.system.id, "isMissile")
-        turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
-        turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
-        turn.isSlowed = !!combatant.isSlowed;
-        turn.debugMessages = CONFIG.HYP3E.debugMessages;
-        turn.isOwnedByUser = !!combatant.actor.isOwner;
-        turn.group = combatant.group;
-        if (!isGroupInitiative) turn.initRoll = Math.floor(combatant.initiative)
-
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Turn Context: `, turn) }
-        return turn;
-
-    }
-    */
-
     // ===========================================================================
     // UI EVENTS
     // ===========================================================================
@@ -211,7 +104,7 @@ export class HYP3ECombatTab extends CombatTracker {
 
         // Set combat groups
         html.find('.combat-button[data-control="set-groups"]').click((ev) => {
-            HYP3ECombatTab.GROUP_CONFIG_APP.render(true, { focus: true });
+            HYP3ECombatTracker.GROUP_CONFIG_APP.render(true, { focus: true });
         });
     }
 

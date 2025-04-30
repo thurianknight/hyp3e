@@ -358,58 +358,107 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Apply a health change to the actor, either damage or healing
-     * @param {*} change
-     * @param {*} applyDr
+     * Apply a health change (damage or healing) to the actor, optionally considering Damage Reduction (DR).
+     * Handles HP clamping, DR application, and prevents updates if no actual change occurs.
+     *
+     * @param {number} amount - The amount of health change. Positive values represent damage, negative values represent healing.
+     * @param {boolean} [applyDr=true] - If true (default), apply the actor's Damage Reduction (system.ac.dr) against positive (damage) amounts.
+     * @returns {Promise<void|Error>} Returns nothing on success or early exit, or the Error object if the actor update fails.
      */
-    async applyHealthChange(change, applyDr=true) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${change} HP to be applied to ${this.name}.`) }
-        // Check if the change is a number
-        if (typeof change !== "number") {
-            ui.notifications?.error(`Invalid health change: ${change}`);
+    async applyHealthChange(amount, applyDr = true) {
+        const actorName = this.name ?? 'Unknown Actor'; // Use actor's name for logging
+
+        // --- 1. Input Validation ---
+        if (typeof amount !== "number" || isNaN(amount)) {
+            const errorMsg = `Invalid health change amount: '${amount}'. Must be a valid number.`;
+            console.error(`applyHealthChange Error for ${actorName}: ${errorMsg}`);
+            ui.notifications?.error(errorMsg);
+            return; // Exit early for invalid input
+        }
+
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log(`applyHealthChange: Processing ${amount} HP change for ${actorName}. Apply DR: ${applyDr}`);
+        }
+
+        // --- 2. Get Current State & Define Change Type ---
+        const currentHp = this.system.hp?.value ?? 0;
+        const minHp = this.system.hp?.min ?? 0; // Default to 0 if min HP isn't defined
+        const maxHp = this.system.hp?.max ?? Infinity; // Default to Infinity if max HP isn't defined
+        const isDamage = amount > 0;
+        const isHealing = amount < 0;
+
+        // --- 3. Check Early Exit Conditions ---
+        // Condition: Trying to damage an already incapacitated/dead actor
+        if (isDamage && currentHp <= minHp) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${actorName} is already incapacitated (HP <= ${minHp}). No damage applied.`); }
+            // You might want to trigger "overkill" effects or messages here if applicable
             return;
         }
-        // Check if the actor is dead, no need to do more damage--but healing will work
-        if (this.system.hp.value <= this.system.hp.min && change > 0) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${this.name} is already dead!`) }
-            return;
-        }
-        // Check if the change is zero
-        if (change == 0) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${this.name} has no health change!`) }
+        // Condition: Change amount is zero
+        if (amount === 0) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Health change for ${actorName} is zero. No changes needed.`); }
             return;
         }
 
-        // Update Health
-        const oldHp = this.system.hp.value;
+        // --- 4. Calculate Net Change (Applying DR if applicable) ---
+        let netChange = amount; // This is the raw amount before DR/clamping affects the *final* HP
 
-        let netChange = change;
-        // If applying damage, check DR
-        if (applyDr && netChange > 0 && this.system.ac.dr > 0) {
-            netChange = Math.max(0, change - this.system.ac.dr);
+        // Apply Damage Reduction only if it's damage and the flag is set
+        if (isDamage && applyDr) {
+            const drValue = this.system.ac?.dr ?? 0; // Safely access DR, defaulting to 0
+            if (drValue > 0) {
+                const damageAfterDr = Math.max(0, amount - drValue); // Ensure damage doesn't become negative healing due to DR
+                if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Applying DR ${drValue} to ${amount} damage for ${actorName}. Resulting damage: ${damageAfterDr}`); }
+
+                // Condition: DR absorbed all the damage
+                if (damageAfterDr === 0 && amount > 0) { // Check amount > 0 to ensure it was actual damage initially
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: DR absorbed all damage for ${actorName}.`); }
+                    // Optionally, trigger chat message or automation for "damage absorbed"
+                    // e.g., ChatMessage.create({content: `${this.name}'s armor absorbs the blow!`});
+                    return; // Exit as no health change will occur
+                }
+                netChange = damageAfterDr; // Update netChange to the post-DR damage amount
+            }
         }
-        // Did DR soak up all the damage?
-        if (netChange == 0) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${this.name} is unharmed!`) }
-            return;
+        // If it was healing (amount < 0), netChange remains negative here.
+
+        // --- 5. Calculate and Clamp New HP ---
+        // We *subtract* the netChange. If netChange is positive (damage), HP decreases.
+        // If netChange is negative (healing), subtracting a negative increases HP.
+        let newHp = currentHp - netChange;
+
+        // Clamp the calculated HP between the actor's min and max HP values
+        newHp = Math.max(minHp, Math.min(newHp, maxHp));
+
+        // --- 6. Check if Update is Necessary ---
+        // Avoid updating the actor if the clamped HP is the same as the current HP
+        // (e.g., healing when already at max HP, or taking 0 damage after DR)
+        if (newHp === currentHp) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: No actual HP change needed for ${actorName} after clamping/DR (Current: ${currentHp}, Calculated New: ${newHp}).`); }
+            return; // No update needed
         }
 
-        // Calculate updated health & apply it
-        let newHp = oldHp - netChange;
-        if (newHp < this.system.hp.min) {
-            newHp = this.system.hp.min;
-        } else if (newHp > this.system.hp.max) {
-            newHp = this.system.hp.max;
+        // --- 7. Perform Actor Update ---
+        if (CONFIG.HYP3E.debugMessages) {
+            const actualChangeAmount = Math.abs(currentHp - newHp); // How much HP *really* changed
+            const changeType = (newHp < currentHp) ? "damage" : "healing";
+            console.log(`applyHealthChange: Updating ${actorName} HP. Old: ${currentHp}, New: ${newHp} (${actualChangeAmount} ${changeType}).`);
         }
         try {
-            await this.update({ "system.hp.value": newHp }, { async: true });
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${this.name} took ${netChange} damage!`) }
-            return;
+            // Perform the asynchronous update on the actor document
+            await this.update({ "system.hp.value": newHp });
+
+            // Optional: Add hook calls after successful update if other modules/systems need to react
+            // Hooks.callAll("actorHealthChanged", this, currentHp, newHp, netChange, isDamage, isHealing);
+
         } catch (err) {
-            console.error(`applyHealthChange: Error applying health change to ${this.name}:`, err);
-            ui.notifications?.error(`Error applying health change to ${this.name}. See console log for details.`);
-            return err;
+            // Log the error and notify the user if the update fails
+            console.error(`applyHealthChange: Failed to update HP for ${actorName}:`, err);
+            ui.notifications?.error(`Failed to update HP for ${actorName}. See console log for details.`);
+            return err; // Return the error object as the original function did
         }
+
+        // Implicitly return undefined on successful update or handled early exit
     }
 
     /**
@@ -1411,7 +1460,7 @@ export class Hyp3eActor extends Actor {
         dataset.targetSize = targetData.size; // Store for later use
 
         // 3. Prepare Data for Dialog (Range, Ammo, Initial Mods)
-        const { ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance);
+        const { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance);
         rangeMessages.forEach(msg => ui.notifications.warn(msg)); // Show range warnings immediately
         if (isOutOfRange && CONFIG.HYP3E.forceRangeLimit) {
             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target out of range and forceRangeLimit enabled. Aborting."); }
@@ -1433,8 +1482,8 @@ export class Hyp3eActor extends Actor {
             showAmmo: itemData?.usesAmmo ?? false,
             showRanges: !!itemData?.missile,
             showSpellRange: item?.type === "spell" && itemData?.atkRoll,
-            spellRangeText: itemData?.range, // Use descriptive range text for spells
-            meleeRange: itemData?.melee ? this._getMeleeRange(itemData.wc) : undefined,
+            spellRange: itemData?.range, // Use descriptive range text for spells
+            rangeText: rangeText,
             isGrenade: itemData?.isGrenade ?? false, // Pass grenade status
             itemName: itemName // Ensure item name is in dialog data
         };
@@ -1451,13 +1500,18 @@ export class Hyp3eActor extends Actor {
             console.error("rollAttackOrSpell: Error displaying dialog:", err);
             return null;
         }
+
+        // 5. Handle Spell Slot Consumption (if applicable)
+        if (item?.type === "spell" && itemData?.quantity?.value > 0) {
+            await this._consumeSpellSlot(item);
+        }
         // If there's no item roll formula (typically a spell), send a chat message and exit
         if (!itemData.formula) {
             item._displayItemInChat();
             return null;
         }
 
-        // 5. Process Dialog Response (Ammo, Mods)
+        // 6. Process Dialog Response (Ammo, Mods)
         const { ammoMods, ammoUpdated } = await this._processDialogResponse(rollResponse, item, itemData);
         if (ammoUpdated) {
             // If ammo was used, refresh the actor sheet or relevant UI if needed
@@ -1468,11 +1522,6 @@ export class Hyp3eActor extends Actor {
         dataset.sitMod = rollResponse.sitMod;
         dataset.rollMode = rollResponse.rollMode;
         dataset.rangeMod = this._getRangeModifier(rollResponse.rangeGroup); // Calculate range mod based on selection
-
-        // 6. Handle Spell Slot Consumption (if applicable)
-        if (item?.type === "spell" && itemData?.quantity?.value > 0) {
-            await this._consumeSpellSlot(item);
-        }
 
         // 7. Build Roll Formula
         const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData); // Assuming this exists
@@ -1608,6 +1657,12 @@ export class Hyp3eActor extends Actor {
             targetData.ac = targetActorData.ac?.value ?? 9;
             targetData.name = target.actor.name ?? "";
             targetData.size = targetActorData.size ?? "M";
+            // Get the attacker's actual token size
+            const attackerWidth = attacker.document.width ?? 1; // Default to 1 if not found
+            const attackerHeight = attacker.document.height ?? 1; // Default to 1 if not found
+            // Get the target's actual token size
+            const targetWidth = target.document.width ?? 1; // Default to 1 if not found
+            const targetHeight = target.document.height ?? 1; // Default to 1 if not found
 
             // Calculate distance
             const attackerPos = attacker.center;
@@ -1619,8 +1674,15 @@ export class Hyp3eActor extends Actor {
             gridDistance = Math.round(gridDistance);
 
             // Adjust distance for target size (this seems specific, ensure logic is correct)
-            if (targetData.size === "L") gridDistance -= 5;
-            else if (targetData.size === "H") gridDistance -= 10;
+            // if (targetData.size === "L") gridDistance -= 5;
+            // If either token is larger than 1, reduce the grid distance to account for reach
+            if (attackerWidth > 1 || attackerHeight > 1) {
+                gridDistance -= (Math.max(attackerWidth, attackerHeight) - 1) * 5;
+            }
+            if (targetWidth > 1 || targetHeight > 1) {
+                gridDistance -= (Math.max(targetWidth, targetHeight) - 1) * 5;
+            }
+            // Ensure distance is not negative
             if (gridDistance < 0) gridDistance = 0;
 
             if (CONFIG.HYP3E.debugMessages) {
@@ -1678,6 +1740,7 @@ export class Hyp3eActor extends Actor {
      */
     _prepareRangeData(itemData, gridDistance) {
         let ranges = {};
+        let rangeText = "";
         let rangeGroup = "";
         let chosenRange = "";
         let rangeMessages = [];
@@ -1729,8 +1792,9 @@ export class Hyp3eActor extends Actor {
                 isOutOfRange = true;
             }
         }
+        rangeText = `${gridDistance} ${canvas.scene.grid.units}`;
 
-        return { ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange };
+        return { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange };
     }
 
     /**
@@ -2260,35 +2324,6 @@ export class Hyp3eActor extends Actor {
             rollMode: rollMode
         })
     }
-
-    // Render html template for damage rolls
-    // async renderDamageChat(dmgRoll, debugDmgRollFormula, naturalDmgRoll, dmgBaseRoll, sourceItem = null) {
-
-    //     const title = "Rolling Damage..."
-    //     const templateData = {
-    //         title: title,
-    //         dmgRoll: dmgRoll,
-    //         debugDmgRollFormula: debugDmgRollFormula,
-    //         naturalDmgRoll: naturalDmgRoll,
-    //         dmgBaseRoll: dmgBaseRoll,
-    //         itemId: sourceItem.id,
-    //         actorId: this.id,
-    //         sourceType: sourceItem.type,
-    //         save: sourceItem.system.save,
-    //         hasEffects: sourceItem.effects.size > 0 ? true : false,
-    //         description: sourceItem.system.description
-    //     };
-
-    //     const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;
-    //     let damageChat = await renderTemplate(template, templateData);
-
-    //     // Send to chat
-    //     dmgRoll.toMessage({
-    //         author: game.user_id,
-    //         speaker: ChatMessage.getSpeaker({ actor: this }),
-    //         content: damageChat
-    //     })
-    // }
 
     _getCombatantSitMods(attacker, target) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for attacker ${this.name}...`) }

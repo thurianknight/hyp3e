@@ -79,11 +79,11 @@
     <ol id="combat-tracker" class="directory-list">
         {{#if isGroupInitiative}}
             {{#each initGroups}}
-                {{> "systems/hyp3e/templates/sidebar/combat-tracker-combatant-group.hbs" }}
+                {{> "combat-tracker-combatant-group-v12" }}
             {{/each}}
         {{else}}
             {{#each turns}} 
-                {{> "systems/hyp3e/templates/sidebar/combat-tracker-combatant-individual.hbs" }}
+                {{> "combat-tracker-combatant-ind-v12" }}
             {{/each}}
         {{/if}}
     </ol>

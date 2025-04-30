@@ -1,0 +1,11 @@
+<ol id="combat-tracker" class="combat-tracker plain">
+    {{#if isGroupInitiative}}
+        {{#each initGroups}}
+            {{> "combat-tracker-combatant-group-v13" }}
+        {{/each}}
+    {{else}}
+        {{#each turns}}
+            {{> "combat-tracker-combatant-ind-v13" }}
+        {{/each}}
+    {{/if}}
+</ol>

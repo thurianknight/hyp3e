@@ -73,7 +73,7 @@ export class HYP3ECombat extends Combat {
         await super._onEndTurn(combatant, context);
 
         // Log the combatant
-        if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
 
         // Cycle through active effects and update combatant status
         const actor = combatant.actor;

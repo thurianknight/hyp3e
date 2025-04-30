@@ -71,7 +71,6 @@ export class Hyp3eDialog {
         // Default rollMode to public roll, the user can change it in the roll dialog
         let rollMode = "publicroll"
         let dialogData = {
-            // roll: dataset.roll,
             dataset: dataset,
             rollModes: CONFIG.Dice.rollModes,
             rollMode: rollMode,

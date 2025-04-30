@@ -1,0 +1,15 @@
+<li class="folder flexcol">
+    <header class="folder-header" style="background: linear-gradient(90deg, var(--hyp3e-group-color-{{this.initGroup}}, {{this.initGroup}}), transparent)">
+        <i class="fas fa-dice-d6"></i>
+        <span class="folder-name ellipsis">{{localize this.label}}</span>
+        <span class="create-button">
+            {{initiative}}
+        </span>
+    </header>
+
+    <ol class="subdirectory plain" style="border-left-color: {{this.initGroup}}">
+        {{#each turns}}
+        {{> "combat-tracker-combatant-ind-v13" }}
+        {{/each}}
+    </ol>
+</li>
