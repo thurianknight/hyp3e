@@ -111,15 +111,18 @@ export function prepareActiveEffectCategories(effects) {
 export function setupEffectRollHandler() {
     Hooks.on("createActiveEffect", async (effect, options, userId) => {
         // Only process if we're the one who owns this actor
-        if (!effect.parent?.isOwner) return;
-      
+        const actor = effect.parent;
+        if (!actor?.isOwner) return;
+
+        // Store all changes for a single batch update at the end
         const updates = [];
-      
+
         for (const change of effect.changes) {
             // Check if the value looks like a dice formula
-            if (/\d+d\d+/.test(change.value)) {
+            // if (/\d+d\d+/.test(change.value)) {
+            if (Roll.validate(change.value)) {
                 try {
-                    const roll = new Roll(change.value);
+                    const roll = new Roll(change.value, actor?.getRollData?.());
                     await roll.evaluate();
                     if (CONFIG.HYP3E.debugMessages) {
                         console.log(`createActiveEffect: Rolling effect change ${change.key} = ${change.value} → ${roll.total}`);
