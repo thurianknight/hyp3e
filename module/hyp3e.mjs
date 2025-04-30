@@ -8,6 +8,7 @@ import { Hyp3eItemSheet } from "./sheets/item-sheet.mjs";
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./helpers/chat.mjs";
+import { setupEffectRollHandler } from "./helpers/effects.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -364,6 +365,9 @@ Hooks.once("ready", async function() {
         createItemMacro(data, slot);
         return false;
     });
+
+    // Register effects roll handler
+    setupEffectRollHandler();
 
     /**
      * Load system settings

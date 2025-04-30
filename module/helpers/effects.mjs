@@ -108,6 +108,36 @@ export function prepareActiveEffectCategories(effects) {
     return categories;
 }
 
+export function setupEffectRollHandler() {
+    Hooks.on("createActiveEffect", async (effect, options, userId) => {
+        // Only process if we're the one who owns this actor
+        if (!effect.parent?.isOwner) return;
+      
+        const updates = [];
+      
+        for (const change of effect.changes) {
+            // Check if the value looks like a dice formula
+            if (/\d+d\d+/.test(change.value)) {
+                try {
+                    const roll = new Roll(change.value);
+                    await roll.evaluate();
+                    if (CONFIG.HYP3E.debugMessages) {
+                        console.log(`createActiveEffect: Rolling effect change ${change.key} = ${change.value} → ${roll.total}`);
+                    }            
+                    // Modify the effect's value with the rolled result
+                    updates.push({ _id: effect.id, changes: [{ ...change, value: roll.total }] });
+                } catch (err) {
+                    console.warn(`createActiveEffect: Failed to roll effect change: ${change.value}`, err);
+                }
+            }
+        }
+        // Update the active effects with the rolled values
+        if (updates.length > 0) {
+          await effect.parent.updateEmbeddedDocuments("ActiveEffect", updates);
+        }
+    });
+}
+
 /**
  * Apply specified effect from an item to the selected tokens
  * @param {itemId} string      The item that has the effect
@@ -144,7 +174,7 @@ export async function applyEffect(itemId, effectId, actorId, disabled = false) {
     }
 
     // Clone the effect, then work from that clone
-    const effectData = new Object({...effect, v:"1"});
+    const effectData = new Object({...effect});
     effectData.origin = item.uuid;
     if (disabled) effectData.disabled = true;
     if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Cloned Effect:", effectData) }
@@ -268,15 +298,15 @@ export async function enableEffect(itemId, effectId, actorId) {
     // Get the actor & item
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
-        ui.notifications?.error(`Enable Effects: Actor ${actorId} not found!`)
+        ui.notifications?.error(`Enable Effect: Actor ${actorId} not found!`)
         return
     }
     const item = actor.items.get(itemId);
     if (!item) {
-        ui.notifications?.error(`Enable Effects: Item ${itemId} not found!`);
+        ui.notifications?.error(`Enable Effect: Item ${itemId} not found!`);
         return;
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log("enableAllEffects: Item: ", item) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("enableEffect: Item: ", item) }
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
     // Get the item effect to be enabled
     const effect = item.effects.find(e => e.id === effectId);
@@ -289,7 +319,7 @@ export async function enableEffect(itemId, effectId, actorId) {
     let chatMsg = ""
 
     // Enable the effect on the actor
-    if (CONFIG.HYP3E.debugMessages) { console.log(`enableAllEffects: Effect to enable: `, effect) }
+    if (CONFIG.HYP3E.debugMessages) { console.log(`enableEffect: Effect to enable: `, effect) }
     // Update the item effect
     effect.update({ disabled: false });
     if (!foundry.utils.isNewerVersion(game.version, "13")) {
@@ -325,12 +355,12 @@ export async function enableAllEffects(itemId, actorId) {
     // Get the actor & item
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
-        ui.notifications?.error(`Enable Effects: Actor ${actorId} not found!`)
+        ui.notifications?.error(`Enable All Effects: Actor ${actorId} not found!`)
         return
     }
     const item = actor.items.get(itemId);
     if (!item) {
-        ui.notifications?.error(`Enable Effects: Item ${itemId} not found!`);
+        ui.notifications?.error(`Enable All Effects: Item ${itemId} not found!`);
         return;
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("enableAllEffects: Item: ", item) }
@@ -435,12 +465,12 @@ export async function disableAllEffects(itemId, actorId) {
     // Get the actor & item
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
-        ui.notifications?.error(`disableAllEffects: Actor ${actorId} not found!`)
+        ui.notifications?.error(`Disable All Effects: Actor ${actorId} not found!`)
         return
     }
     const item = actor.items.get(itemId);
     if (!item) {
-        ui.notifications?.error(`disableAllEffects: Item ${itemId} not found!`);
+        ui.notifications?.error(`Disable All Effects: Item ${itemId} not found!`);
         return;
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("disableAllEffects: Item: ", item) }
