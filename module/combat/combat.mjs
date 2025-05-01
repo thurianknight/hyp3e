@@ -4,8 +4,6 @@
 
 /**
  * An extension of Foundry's Combat class that implements initiative for indivitual combatants.
- *
- * @todo Use a single chat card for rolling group initiative
  */
 export class HYP3ECombat extends Combat {
     static FORMULA = "1d6";
@@ -17,7 +15,7 @@ export class HYP3ECombat extends Combat {
     // ===========================================================================
     // INITIATIVE MANAGEMENT
     // ===========================================================================
-  
+
     async #rollAbsolutelyEveryone() {
         await this.rollInitiative(this.combatants.map(c => c.id), { formula: (this.constructor).FORMULA });
     }
@@ -26,16 +24,16 @@ export class HYP3ECombat extends Combat {
     // ===========================================================================
     // COMBAT LIFECYCLE MANAGEMENT
     // ===========================================================================
-  
+
     async startCombat() {
         await super.startCombat();
         if (this.#rerollBehavior !== "reset")
             await this.#rollAbsolutelyEveryone();
         // Log the combat object
-        // if (CONFIG.HYP3E.debugMessages) { console.log("startCombat: Combat Started: ", this) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("startCombat: Combat Started: ", this) }
         return this;
     }
-    
+
     async endCombat() {
         // For each combatant, disable any temporary effects
         // for (const combatant of this.combatants) {

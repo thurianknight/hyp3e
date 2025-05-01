@@ -16,7 +16,7 @@ export class HYP3ECombatTracker extends CombatTracker {
             movement: HYP3ECombatTracker._onCombatantControl,
         }
     })
-    // Load the new combat-tracker template
+    // Load the new combat-tracker templates
     static PARTS = {
         header: {
             template: `${HYP3E.templatePath}/sidebar/combat-header-v13.hbs`
@@ -46,7 +46,7 @@ export class HYP3ECombatTracker extends CombatTracker {
         this.isGroupInitiative = isGroupInitiative;
         context.isGroupInitiative = isGroupInitiative;
     }
-    
+
     async _prepareTrackerContext(context, options) {
         // Log incoming parmeters
         console.log("_prepareTrackerContext: Context: ", context, options)
@@ -60,15 +60,15 @@ export class HYP3ECombatTracker extends CombatTracker {
             if (context.turns && context.turns.length > 0) {
                 const initGroups = context.turns.reduce((arr, turn) => {
                     const idx = arr.findIndex(r => r.initGroup === turn.initGroup);
-    
+
                     if (idx !== -1) {
                         arr[idx].turns.push(turn);
                         return arr;
                     }
-    
+
                     if (CONFIG.HYP3E.debugMessages) { console.log("_prepareTrackerContext: Group Init Scores: ", game.combat.groupInitiativeScores) }
                     const initiative = game.combat.groupInitiativeScores?.get(turn.initGroup) ? game.combat.groupInitiativeScores.get(turn.initGroup) : null
-    
+
                     return [...arr, {
                         initGroup: turn.initGroup,
                         label: HYP3EGroupCombat.GROUPS[turn.initGroup],
@@ -76,7 +76,7 @@ export class HYP3ECombatTracker extends CombatTracker {
                         turns: [turn]
                     }];
                 }, []);
-    
+
                 // Log the initiative groups
                 if (CONFIG.HYP3E.debugMessages) { console.log("_prepareTrackerContext: Init Groups: ", initGroups) }
                 context.initGroups = initGroups;
@@ -201,28 +201,25 @@ export class HYP3ECombatTracker extends CombatTracker {
                 return super._onCombatantControl(event, target);
         }
     }
-  
-  // ===========================================================================
-  // ADDITIONS TO THE COMBATANT CONTEXT MENU
-  // ===========================================================================
 
-  _getEntryContextOptions() {
-    const options = super._getEntryContextOptions();
-    // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Context Options: `, options) }
-    return [
-      {
-        name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
-        icon: '<i class="fas fa-star-of-life"></i>',
-        callback: (li) => {
-          // Foundry v12 code...
-          // const combatantId = li.data('combatant-id')
-          // Foundry v13 code...
-          const combatantId = li.dataset.combatantId
-          const turnToActivate = this.viewed.turns.findIndex(t => t.id === combatantId);
-          this.viewed.activateCombatant(turnToActivate);
-        }
-      },
-      ...options
-    ];
-  }
+    // ===========================================================================
+    // ADDITIONS TO THE COMBATANT CONTEXT MENU
+    // ===========================================================================
+
+    _getEntryContextOptions() {
+        const options = super._getEntryContextOptions();
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Context Options: `, options) }
+        return [
+            {
+                name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
+                icon: '<i class="fas fa-star-of-life"></i>',
+                callback: (li) => {
+                    const combatantId = li.dataset.combatantId
+                    const turnToActivate = this.viewed.turns.findIndex(t => t.id === combatantId);
+                    this.viewed.activateCombatant(turnToActivate);
+                }
+            },
+            ...options
+        ];
+    }
 }

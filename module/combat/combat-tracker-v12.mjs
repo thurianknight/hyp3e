@@ -7,7 +7,6 @@ export class HYP3ECombatTracker extends CombatTracker {
     // APPLICATION SETUP
     // ===========================================================================
 
-    // Foundry v12 code
     /** @inheritdoc */
     static get defaultOptions() {
         if (super.defaultOptions) {
@@ -61,9 +60,8 @@ export class HYP3ECombatTracker extends CombatTracker {
                 return arr;
             }
 
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Sidebar getData: Group Initiative object: `, game.combat.groupInitiativeScores) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`getData: Group Init Scores: `, game.combat.groupInitiativeScores) }
             const initiative = game.combat.groupInitiativeScores?.get(turn.initGroup) ? game.combat.groupInitiativeScores.get(turn.initGroup) : null
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Sidebar getData: Group ${turn.group} Initiative: `, initiative) }
 
             return [...arr, {
                 initGroup: turn.initGroup,
@@ -72,7 +70,7 @@ export class HYP3ECombatTracker extends CombatTracker {
                 turns: [turn]
             }];
         }, []);
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Sidebar getData: Grouped Combat Turns: ", groups) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("getData: Grouped Combat Turns: ", initGroups) }
         
         return foundry.utils.mergeObject(context, {
             turns,
@@ -153,28 +151,25 @@ export class HYP3ECombatTracker extends CombatTracker {
                 return super._onCombatantControl(event);
         }
     }
-  
-  // ===========================================================================
-  // ADDITIONS TO THE COMBATANT CONTEXT MENU
-  // ===========================================================================
 
-  _getEntryContextOptions() {
-    const options = super._getEntryContextOptions();
-    // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Context Options: `, options) }
-    return [
-      {
-        name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
-        icon: '<i class="fas fa-star-of-life"></i>',
-        callback: (li) => {
-          // Foundry v12 code...
-          const combatantId = li.data('combatant-id')
-          // Foundry v13 code...
-          //   const combatantId = li.dataset.combatantId
-          const turnToActivate = this.viewed.turns.findIndex(t => t.id === combatantId);
-          this.viewed.activateCombatant(turnToActivate);
-        }
-      },
-      ...options
-    ];
-  }
+    // ===========================================================================
+    // ADDITIONS TO THE COMBATANT CONTEXT MENU
+    // ===========================================================================
+
+    _getEntryContextOptions() {
+        const options = super._getEntryContextOptions();
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Context Options: `, options) }
+        return [
+            {
+                name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
+                icon: '<i class="fas fa-star-of-life"></i>',
+                callback: (li) => {
+                    const combatantId = li.data('combatant-id')
+                    const turnToActivate = this.viewed.turns.findIndex(t => t.id === combatantId);
+                    this.viewed.activateCombatant(turnToActivate);
+                }
+            },
+            ...options
+            ];
+    }
 }
