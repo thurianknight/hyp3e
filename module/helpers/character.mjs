@@ -2640,46 +2640,12 @@ export class Hyp3eCharacter {
         let currentSave = this._valueFromTable(this.savingThrows, currLevel)
         let newSave = this._valueFromTable(this.savingThrows, nextLevel)
         if (newSave < currentSave) {
-            // data.saves.death.value = this._valueFromTable(this.savingThrows, nextLevel)
-            if (parseInt(data.saves.death.value) < newSave) {
-                // Calculate the difference & update
-                let diff = 1 + (newSave - parseInt(data.saves.death.value))
-                data.saves.death.value = newSave - diff
-            } else {
-                data.saves.death.value = newSave
-            }
-            // data.saves.device.value = this._valueFromTable(this.savingThrows, nextLevel)
-            if (parseInt(data.saves.device.value) < newSave) {
-                // Calculate the difference & update
-                let diff = 1 + (newSave - parseInt(data.saves.device.value))
-                data.saves.device.value = newSave - diff
-            } else {
-                data.saves.device.value = newSave
-            }
-            // data.saves.transformation.value = this._valueFromTable(this.savingThrows, nextLevel)
-            if (parseInt(data.saves.transformation.value) < newSave) {
-                // Calculate the difference & update
-                let diff = 1 + (newSave - parseInt(data.saves.transformation.value))
-                data.saves.transformation.value = newSave - diff
-            } else {
-                data.saves.transformation.value = newSave
-            }
-            // data.saves.avoidance.value = this._valueFromTable(this.savingThrows, nextLevel)
-            if (parseInt(data.saves.avoidance.value) < newSave) {
-                // Calculate the difference & update
-                let diff = 1 + (newSave - parseInt(data.saves.avoidance.value))
-                data.saves.avoidance.value = newSave - diff
-            } else {
-                data.saves.avoidance.value = newSave
-            }
-            // data.saves.sorcery.value = this._valueFromTable(this.savingThrows, nextLevel)
-            if (parseInt(data.saves.sorcery.value) < newSave) {
-                // Calculate the difference & update
-                let diff = 1 + (newSave - parseInt(data.saves.sorcery.value))
-                data.saves.sorcery.value = newSave - diff
-            } else {
-                data.saves.sorcery.value = newSave
-            }
+            // It's as easy as subtracting 1 from each save...
+            data.saves.death.value -= 1
+            data.saves.device.value -= 1
+            data.saves.transformation.value -= 1
+            data.saves.avoidance.value -= 1
+            data.saves.sorcery.value -= 1
         }
 
         // Use the modified data clone to create a clean update object for the character
