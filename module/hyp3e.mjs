@@ -263,7 +263,7 @@ Hooks.once('init', async function() {
     // Load combat classes
     const { HYP3ECombat } = await import( "./combat/combat.mjs");
     const { HYP3ECombatant } = await import( "./combat/combatant.mjs");
-        const { HYP3EGroupCombat } = await import( "./combat/combat-group.mjs" );
+    const { HYP3EGroupCombat } = await import( "./combat/combat-group.mjs" );
     const { HYP3EGroupCombatant } = await import( "./combat/combatant-group.mjs");
     // Initiative roll is the same d6, regardless of group/individual
     CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
@@ -509,7 +509,7 @@ Hooks.once("ready", async function() {
 
 });
 
-// Insert special damage buttons into attack & damage chats
+// Insert damage, save, effect buttons into chats
 Hooks.on("renderChatMessage", addChatMessageButtons);
 
 Hooks.on("createToken", (document, options, userId) => {
