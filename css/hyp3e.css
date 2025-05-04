@@ -242,25 +242,25 @@
 
 /* Fixes for Mozilla to handle SVGs */
 /* Status effect icon styles */
-.token-effect {
+/* .token-effect {
     width: 32px;
     height: 32px;
     object-fit: contain;
-    -moz-transform: translateZ(0); /* Firefox-specific fix */
+    -moz-transform: translateZ(0);
     transform: translateZ(0);
-}
+} */
 
 /* Ensure SVG icons scale properly */
-img[src$=".svg"] {
+/* img[src$=".svg"] {
     width: 100%;
     height: 100%;
     object-fit: contain;
     -moz-transform: translateZ(0);
     transform: translateZ(0);
-}
+} */
   
 /* Firefox-specific SVG fixes */
-@-moz-document url-prefix() {
+/* @-moz-document url-prefix() {
     .token-effect {
         will-change: transform;
         backface-visibility: hidden;
@@ -269,17 +269,17 @@ img[src$=".svg"] {
         will-change: transform;
         backface-visibility: hidden;
     }
-}
+} */
 
 /* Prevent SVG rendering issues in Firefox */
-.token-effect img, img[src$=".svg"] {
+/* .token-effect img, img[src$=".svg"] {
     -moz-transform: translateZ(0);
     transform: translateZ(0);
     -moz-backface-visibility: hidden;
     backface-visibility: hidden;
     -moz-perspective: 1000;
     perspective: 1000;
-}
+} */
 /* End of Mozilla fixes */
 
 
