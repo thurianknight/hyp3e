@@ -240,8 +240,7 @@
   text-align: center;
 }
 
-/* Fixes for Mozilla to handle SVGs */
-/* Status effect icon styles */
+/* Status effect icon styles for Mozilla Firefox */
 /* .token-effect {
     width: 32px;
     height: 32px;
@@ -280,7 +279,7 @@
     -moz-perspective: 1000;
     perspective: 1000;
 } */
-/* End of Mozilla fixes */
+/* End of Mozilla stuff */
 
 
 /* Default style for input text fields */
