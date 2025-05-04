@@ -116,27 +116,26 @@ export function setupEffectRollHandler() {
 
         // Store all changes for a single batch update at the end
         const updates = [];
+        let updatedChanges = [...effect.changes];  // Start with a shallow copy
+        let didUpdate = false;
 
-        for (const change of effect.changes) {
-            // Check if the value looks like a dice formula
-            // if (/\d+d\d+/.test(change.value)) {
+        for (let i = 0; i < updatedChanges.length; i++) {
+            const change = updatedChanges[i];
             if (Roll.validate(change.value)) {
-                try {
-                    const roll = new Roll(change.value, actor?.getRollData?.());
-                    await roll.evaluate();
-                    if (CONFIG.HYP3E.debugMessages) {
-                        console.log(`createActiveEffect: Rolling effect change ${change.key} = ${change.value} → ${roll.total}`);
-                    }            
-                    // Modify the effect's value with the rolled result
-                    updates.push({ _id: effect.id, changes: [{ ...change, value: roll.total }] });
-                } catch (err) {
-                    console.warn(`createActiveEffect: Failed to roll effect change: ${change.value}`, err);
-                }
+                const roll = new Roll(change.value, actor?.getRollData?.());
+                await roll.evaluate({ evaluateSync: true });
+                updatedChanges[i] = {
+                    ...change,
+                    value: roll.total
+                };
+                didUpdate = true;
             }
         }
-        // Update the active effects with the rolled values
-        if (updates.length > 0) {
-          await effect.parent.updateEmbeddedDocuments("ActiveEffect", updates);
+        // Batch out the updates to the effect
+        if (didUpdate) {
+            await effect.update({
+                changes: updatedChanges
+            });
         }
     });
 }
@@ -198,7 +197,7 @@ export async function applyEffect(itemId, effectId, actorId, disabled = false) {
         // Resolve variables in the damage roll formula
         const roll = new Roll(damageRoll, actor.getRollData());
         if (CONFIG.HYP3E.debugMessages) { console.log(`applyEffect: ${effectData.name} Roll: `, roll) }
-        roll.evaluate({ evaluateSync: true });
+        await roll.evaluate({ evaluateSync: true });
         // Save the resolved roll formula for later use
         damageRoll = roll.formula;
     }
@@ -210,6 +209,7 @@ export async function applyEffect(itemId, effectId, actorId, disabled = false) {
     for (const t of tokens) {
         if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Target Token: ", t) }
         const result = await t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+        if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: result: ", result) }
         const childEffect = result[0];
         console.log("applyEffect: Created Effect: ", childEffect)
         if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Target Actor: ", t.actor) }

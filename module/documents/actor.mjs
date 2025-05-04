@@ -483,7 +483,7 @@ export class Hyp3eActor extends Actor {
                     if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: rolling ${damageRollFormula} ${damageType}`); }
     
                     const roll = new Roll(damageRollFormula);
-                    await roll.evaluate();
+                    await roll.evaluate({ evaluateSync: true });
     
                     if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects roll result:`, roll); }
     
@@ -1918,7 +1918,7 @@ export class Hyp3eActor extends Actor {
     async _executeRoll(rollFormula, actorData) {
         try {
             const atkRoll = new Roll(rollFormula, actorData);
-            await atkRoll.evaluate({ async: true }); // Use evaluate for modern FVTT
+            await atkRoll.evaluate({ evaluateSync: true }); // Use evaluate for modern FVTT
             const d20Die = atkRoll.dice.find(d => d.faces === 20);
             const naturalRoll = d20Die ? d20Die.results[0].result : 0; // Get the first d20 result
 
