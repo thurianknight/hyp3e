@@ -1432,7 +1432,7 @@ export class Hyp3eActor extends Actor {
             console.log(`rollAttackOrSpell: Rolling ${dataset.label}...`, dataset);
         }
 
-        // 1. Gather Initial Information
+        // Gather Initial Information
         const { attacker, attackerPos } = await this._getAttackerDetails(dataset);
         const { item, itemData, itemName, attackTextBase } = this._getItemDetails(dataset.itemId);
         const actorData = this._getActorRollData();
@@ -1451,7 +1451,7 @@ export class Hyp3eActor extends Actor {
             return null;
         }
 
-        // 2. Gather Target Information & Calculate Distance/Range
+        // Gather Target Information & Calculate Distance/Range
         const { target, targetData, gridDistance } = this._getTargetDetails(attacker);
         dataset.rangeUoM = canvas.scene?.grid.units || "ft";
         dataset.gridDistance = gridDistance;
@@ -1459,7 +1459,12 @@ export class Hyp3eActor extends Actor {
         dataset.targetAc = targetData.ac;     // Store for later use
         dataset.targetSize = targetData.size; // Store for later use
 
-        // 3. Prepare Data for Dialog (Range, Ammo, Initial Mods)
+        // Warn if attack or spell requires a target, but no tokens were selected
+        if (item && (item.type === "weapon" || item.type === "spell" && itemData.atkRoll) && !target) {
+            ui.notifications.warn(`No target selected for ${item.name}!`);
+        }
+
+        // Prepare Data for Dialog (Range, Ammo, Initial Mods)
         const { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance);
         rangeMessages.forEach(msg => ui.notifications.warn(msg)); // Show range warnings immediately
         if (isOutOfRange && CONFIG.HYP3E.forceRangeLimit) {
@@ -1488,7 +1493,7 @@ export class Hyp3eActor extends Actor {
             itemName: itemName // Ensure item name is in dialog data
         };
 
-        // 4. Show Dialog and Get User Input
+        // Show Dialog and Get User Input
         let rollResponse;
         try {
             rollResponse = await this._showRollDialog(dialogData, item?.type, carriedAmmo, rangeGroup, ranges, chosenRange);
@@ -1501,7 +1506,7 @@ export class Hyp3eActor extends Actor {
             return null;
         }
 
-        // 5. Handle Spell Slot Consumption (if applicable)
+        // Handle Spell Slot Consumption (if applicable)
         if (item?.type === "spell" && itemData?.quantity?.value > 0) {
             await this._consumeSpellSlot(item);
         }
@@ -1511,7 +1516,7 @@ export class Hyp3eActor extends Actor {
             return null;
         }
 
-        // 6. Process Dialog Response (Ammo, Mods)
+        // Process Dialog Response (Ammo, Mods)
         const { ammoMods, ammoUpdated } = await this._processDialogResponse(rollResponse, item, itemData);
         if (ammoUpdated) {
             // If ammo was used, refresh the actor sheet or relevant UI if needed
@@ -1523,18 +1528,18 @@ export class Hyp3eActor extends Actor {
         dataset.rollMode = rollResponse.rollMode;
         dataset.rangeMod = this._getRangeModifier(rollResponse.rangeGroup); // Calculate range mod based on selection
 
-        // 7. Build Roll Formula
+        // Build Roll Formula
         const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData); // Assuming this exists
         if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Final attack formula:", rollFormula); }
 
-        // 8. Execute the Roll
+        // Execute the Roll
         const { atkRoll, naturalRoll } = await this._executeRoll(rollFormula, actorData);
         if (!atkRoll) {
             console.error("rollAttackOrSpell: Roll execution failed.");
             return null;
         }
 
-        // 9. Determine Hit/Miss Result
+        // Determine Hit/Miss Result
         const { hit, attackTextResult, critFooterHTML } = this._determineHitResult(
             atkRoll,
             naturalRoll,
@@ -1546,7 +1551,7 @@ export class Hyp3eActor extends Actor {
         );
         atkRoll.hit = hit; // Attach hit status to the roll object
 
-        // 10. Prepare Damage Formula (if hit)
+        // Prepare Damage Formula (if hit)
         let damageFormulas = {};
         if (hit && item && Roll.validate(itemData.damage)) {
             damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);
@@ -1557,13 +1562,13 @@ export class Hyp3eActor extends Actor {
             item.debugDmgRollFormula2h = damageFormulas.secondary?.debugFormula;
         }
 
-        // 11. Render Chat Message
+        // Render Chat Message
         const chatLabel = this._createChatLabel(item?.img, itemName);
         const finalAttackText = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
 
         await this.renderCustomChat(atkRoll, item, attacker?.id, chatLabel, debugAtkRollFormula, finalAttackText, critFooterHTML, rollResponse.rollMode); // Assuming this exists
 
-        // 12. Return Roll Result
+        // Return Roll Result
         return atkRoll;
     }
 
@@ -1693,7 +1698,7 @@ export class Hyp3eActor extends Actor {
         } else {
             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_getTargetDetails: No target selected or attacker missing."); }
             // Optionally notify if an attack requires a target but none is selected
-            ui.notifications.info("No target selected!"); // Consider moving this notification logic elsewhere if needed more broadly
+            // ui.notifications.info("No target selected!"); // Consider moving this notification logic elsewhere if needed more broadly
         }
 
         return { target, targetData, gridDistance };
@@ -1783,7 +1788,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Spell Attack Roll Check
-        if (itemData.itemType === "spell" && itemData.atkRoll && itemData.range) {
+        if (itemData.itemType === "spell" && itemData.range) {
             const spellRange = this._parseSpellRange(itemData.range);
             if (gridDistance > spellRange) {
                 const msg = `Target is out of spell range! (${gridDistance} ${canvas.scene.grid.units} > ${spellRange} ${canvas.scene.grid.units})`;
