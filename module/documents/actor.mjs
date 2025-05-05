@@ -368,7 +368,7 @@ export class Hyp3eActor extends Actor {
     async applyHealthChange(amount, applyDr = true) {
         const actorName = this.name ?? 'Unknown Actor'; // Use actor's name for logging
 
-        // --- 1. Input Validation ---
+        // Input Validation
         if (typeof amount !== "number" || isNaN(amount)) {
             const errorMsg = `Invalid health change amount: '${amount}'. Must be a valid number.`;
             console.error(`applyHealthChange Error for ${actorName}: ${errorMsg}`);
@@ -380,14 +380,16 @@ export class Hyp3eActor extends Actor {
             console.log(`applyHealthChange: Processing ${amount} HP change for ${actorName}. Apply DR: ${applyDr}`);
         }
 
-        // --- 2. Get Current State & Define Change Type ---
+        // Get Current State & Define Change Type
         const currentHp = this.system.hp?.value ?? 0;
+        let tempHp = this.system.hp?.tempHp ?? 0; // Temporary HP, if any
+        let newHp = 0; // New HP after applying the change
         const minHp = this.system.hp?.min ?? 0; // Default to 0 if min HP isn't defined
         const maxHp = this.system.hp?.max ?? Infinity; // Default to Infinity if max HP isn't defined
         const isDamage = amount > 0;
         const isHealing = amount < 0;
 
-        // --- 3. Check Early Exit Conditions ---
+        // Check Early Exit Conditions
         // Condition: Trying to damage an already incapacitated/dead actor
         if (isDamage && currentHp <= minHp) {
             if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${actorName} is already incapacitated (HP <= ${minHp}). No damage applied.`); }
@@ -400,7 +402,7 @@ export class Hyp3eActor extends Actor {
             return;
         }
 
-        // --- 4. Calculate Net Change (Applying DR if applicable) ---
+        // Calculate Net Change (Applying DR if applicable)
         let netChange = amount; // This is the raw amount before DR/clamping affects the *final* HP
 
         // Apply Damage Reduction only if it's damage and the flag is set
@@ -422,15 +424,31 @@ export class Hyp3eActor extends Actor {
         }
         // If it was healing (amount < 0), netChange remains negative here.
 
-        // --- 5. Calculate and Clamp New HP ---
-        // We *subtract* the netChange. If netChange is positive (damage), HP decreases.
-        // If netChange is negative (healing), subtracting a negative increases HP.
-        let newHp = currentHp - netChange;
+        // Apply the Net Change.
+        //  We *subtract* the netChange. If netChange is positive (damage), HP decreases.
+        //  If netChange is negative (healing), subtracting a negative increases HP.
+        if (isDamage) {
+            // Subtract from any effect that is adding temporary HP first, then from currentHp
+            if (tempHp > 0) {
+                // Find the effect that is applying temp HP, and update it
+                netChange = await this.updateEffectValue("system.hp.tempHp", netChange, 0, 100);
+                // Lock netChange to zero if it came back negative
+                netChange = netChange < 0 ? 0 : netChange;
+                if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Net change after temp HP: ${netChange}.`); }
+            }
+            // Now apply the remaining damage (if any) to current HP.
+            //  Prevent the new HP from going below the allowed minimum.
+            newHp = Math.max(minHp, currentHp - netChange);
+        } else if (isHealing) {
+            // Healing: Only add to real HP, not temp HP
+            newHp = currentHp - netChange;
+        }
 
         // Clamp the calculated HP between the actor's min and max HP values
         newHp = Math.max(minHp, Math.min(newHp, maxHp));
+        if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: New HP for ${actorName}: ${newHp}.`); }
 
-        // --- 6. Check if Update is Necessary ---
+        // Check if Update is Necessary
         // Avoid updating the actor if the clamped HP is the same as the current HP
         // (e.g., healing when already at max HP, or taking 0 damage after DR)
         if (newHp === currentHp) {
@@ -438,7 +456,7 @@ export class Hyp3eActor extends Actor {
             return; // No update needed
         }
 
-        // --- 7. Perform Actor Update ---
+        // Perform Actor Update
         if (CONFIG.HYP3E.debugMessages) {
             const actualChangeAmount = Math.abs(currentHp - newHp); // How much HP *really* changed
             const changeType = (newHp < currentHp) ? "damage" : "healing";
@@ -455,7 +473,7 @@ export class Hyp3eActor extends Actor {
             // Log the error and notify the user if the update fails
             console.error(`applyHealthChange: Failed to update HP for ${actorName}:`, err);
             ui.notifications?.error(`Failed to update HP for ${actorName}. See console log for details.`);
-            return err; // Return the error object as the original function did
+            return err; // Return the error object
         }
 
         // Implicitly return undefined on successful update or handled early exit
@@ -525,6 +543,48 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) {
             console.log(`processTemporaryEffects: ${this.name} took ${totalDamage} total damage!`);
         }
+    }
+
+    /**
+     * Update the value of an effect's change
+     * @param {*} key // Effect change-key to find
+     * @param {*} updateValue // Value to subtract from the effect's change
+     */
+    async updateEffectValue(key, updateValue, minVal = 0, maxVal = 100) {
+        // Find the effect specified by key
+        const effect = this.effects.find(e => e.changes.some(c => c.key === key));
+        if (!effect) {
+            return updateValue; // No effect found, return same value (no change)
+        }
+
+        // Store all changes for a single batch update at the end
+        let updatedChanges = [...effect.changes];  // Start with a shallow copy
+        let didUpdate = false;
+        let newValue = 0;
+        let excess = 0;
+
+        for (let i = 0; i < updatedChanges.length; i++) {
+            const change = updatedChanges[i];
+            if (change.key === key) {
+                // Update the value of the change
+                newValue = change.value - updateValue;
+                if (newValue < minVal) {
+                    excess = Math.abs(newValue);
+                }
+                // Clamp the value between minVal and maxVal
+                newValue = Math.max(minVal, Math.min(newValue, maxVal));
+                updatedChanges[i] = { ...change, value: newValue };
+                didUpdate = true;
+            }
+        }
+        // Batch out the updates to the effect
+        if (didUpdate) {
+            await effect.update({
+                changes: updatedChanges
+            });
+        }
+        // Return any excess that could not be removed from the effect
+        return excess;
     }
 
     /**
@@ -1572,7 +1632,7 @@ export class Hyp3eActor extends Actor {
         return atkRoll;
     }
 
-    // --- Helper Functions ---
+    // Helper Functions
     /**
      * Gets the attacker token and position.
      * @param {object} dataset - Initial roll dataset, may contain tokenId.
@@ -2048,7 +2108,7 @@ export class Hyp3eActor extends Actor {
             </div>
             <hr class="plain-hr" />`;
     }
-    // --- END Helper Functions for attack rolls & spellcasting ---
+    // END Helper Functions for attack rolls & spellcasting
 
 
     /**

@@ -102,6 +102,7 @@
             "primeAttr": "Prime Attr",
             "hitPoints": "Hit Points",
             "hp": "HP",
+            "tempHp": "Temp HP",
             "race": "Race",
             "gender": "Gender",
             "age": "Age",

@@ -115,7 +115,6 @@ export function setupEffectRollHandler() {
         if (!actor?.isOwner) return;
 
         // Store all changes for a single batch update at the end
-        const updates = [];
         let updatedChanges = [...effect.changes];  // Start with a shallow copy
         let didUpdate = false;
 

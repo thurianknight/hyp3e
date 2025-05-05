@@ -485,7 +485,7 @@ Hooks.once("ready", async function() {
         const currentVersion = game.system.version
         console.log(`System version ${currentVersion}`)
         // No need to migrate if system version is x.x.x or higher
-        const NEEDS_MIGRATION_TO_VERSION = "1.6.3"
+        const NEEDS_MIGRATION_TO_VERSION = "1.8.3"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
             migrateWorld()
@@ -509,6 +509,22 @@ Hooks.once("ready", async function() {
 
 });
 
+// The preMoveToken event is only available in v13+, no need to check for the version
+// Hooks.on("preMoveToken", (token, movement, operation) => {
+//     // if (game.release.generation < 13) return; // Only for v13+
+//     const actor = token.actor;
+//     if (!actor) return;
+//     console.log("Token movement for Actor:", actor);
+//     const speed = actor.system.movement?.base.value ?? 40;
+//     console.log("Movement:", movement)
+//     const totalDistance = movement.passed.distance;
+//     console.log("Total distance:", totalDistance);
+//     if (totalDistance > speed) {
+//         ui.notifications.warn(`${actor.name} can only move ${speed} ft per round!`);
+//         return false; // Prevent the movement
+//     }
+// });
+
 // Insert damage, save, effect buttons into chats
 Hooks.on("renderChatMessage", addChatMessageButtons);
 
@@ -530,6 +546,11 @@ async function migrateWorld() {
         // Migrate NPC data
         if (actor.type == "npc") {
             // do stuff to npcs
+            const tempHp = fixTempHp(actor)
+            if (tempHp) {
+                delete actor.system.hp["tempHp"]
+                await actor.update(tempHp)
+            }
             const tempAtkMod = fixTempAtkMod(actor)
             if (tempAtkMod) {
                 delete actor.system["tempAtkMod"]
@@ -554,6 +575,11 @@ async function migrateWorld() {
         // Migrate PC data
         if (actor.type == "character") {
             // do stuff to characters
+            const tempHp = fixTempHp(actor)
+            if (tempHp) {
+                delete actor.system.hp["tempHp"]
+                await actor.update(tempHp)
+            }
             const tempAtkMod = fixTempAtkMod(actor)
             if (tempAtkMod) {
                 delete actor.system["tempAtkMod"]
@@ -675,6 +701,11 @@ async function migrateWorld() {
                     // Migrate NPC data
                     if (doc.type == "npc") {
                         // do stuff to npcs
+                        const tempHp = fixTempHp(doc)
+                        if (tempHp) {
+                            delete doc.system.hp["tempHp"]
+                            await doc.update(tempHp)
+                        }
                         const tempAtkMod = fixTempAtkMod(doc)
                         if (tempAtkMod) {
                             delete doc.system["tempAtkMod"]
@@ -699,6 +730,11 @@ async function migrateWorld() {
                     // Migrate PC data
                     if (doc.type == "character") {
                         // do stuff to characters
+                        const tempHp = fixTempHp(doc)
+                        if (tempHp) {
+                            delete doc.system.hp["tempHp"]
+                            await doc.update(tempHp)
+                        }
                         const tempAtkMod = fixTempAtkMod(doc)
                         if (tempAtkMod) {
                             delete doc.system["tempAtkMod"]
@@ -793,6 +829,16 @@ async function resizeTokenPrototypes() {
             }
         }
     }
+}
+
+function fixTempHp(doc) {
+    // If tempHp is an object, convert it to zero
+    if (typeof doc.system.hp.tempHp == "object") {
+        console.log(`Fixing temp HP for ${doc.name}...`)
+        const update = {system: {hp: {tempHp: 0}}}
+        return update;
+    }
+    return null
 }
 
 function fixTempAtkMod(doc) {
