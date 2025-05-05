@@ -47,15 +47,15 @@
           </span>
           <input type="text" name="system.hd" value="{{system.hd}}" data-dtype="String"/>
         </div>
+        {{#if system.hp.tempHp}}
         <div class="resource-content flexrow flex-group-center">
-          {{#if system.hp.tempHp}}
           <label style="margin-left: 15px;" for="system.hp.tempHp" class="combat-label">{{localize "HYP3E.details.tempHp"}}</label>
           <input type="text" name="system.hp.tempHp" value="{{numberFormat system.hp.tempHp sign=true}}" data-dtype="Number"/>
-          {{/if}}
           <span></span>
           <span></span>
           <span></span>
         </div>
+        {{/if}}
         <div class="resource-content flexrow flex-group-center">
           <label for="system.ac.value" class="combat-label">{{localize "HYP3E.armor.armorClass"}}</label>
           <input type="text" name="system.ac.value" value="{{system.ac.value}}" data-dtype="Number" />
