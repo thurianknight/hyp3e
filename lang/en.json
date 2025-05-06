@@ -24,6 +24,8 @@
             "initiativeKeep": "Keep same for each round",
             "initiativeReset": "Reset to blank each round",
             "initiativeReroll": "Reroll each round",
+            "limitMovement": "Limit movement to MV speed",
+            "limitMovementHint": "Limit token movement to MV speed for all actors. Disabled by default.",
             "forceRangeLimit": "Force range limit on attacks",
             "forceRangeLimitHint": "For PCs, prevent a weapon or spell attack if it is out of range. Disabled by default.",
             "forceWeaponEquip": "Force weapon equippage to use",

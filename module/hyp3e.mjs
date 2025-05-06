@@ -24,6 +24,12 @@ Hooks.once('init', async function() {
         rollItemMacro
     };
 
+    console.log("Game info:", game)
+    console.log("System info:", game.system)
+    // Check the game version and load the appropriate class for Combat Tracker
+    console.log("Foundry version:", game.version)
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+
     // Register system settings
     // Debug logging & messages
     game.settings.register(game.system.id, "debugMessages", {
@@ -109,6 +115,19 @@ Hooks.once('init', async function() {
             reroll: "HYP3E.settings.initiativeReroll",
         },
     });
+
+    if (majorVersion >= 13) {
+        // Limit token movement to actor MV base
+        game.settings.register(game.system.id, "limitMovement", {
+            name: game.i18n.localize("HYP3E.settings.limitMovement"),
+            hint: game.i18n.localize("HYP3E.settings.limitMovementHint"),
+            default: false,
+            scope: "world",
+            type: Boolean,
+            config: true,
+            requiresReload: true,
+        });
+    }
 
     // Force range limitations on weapon & spell attacks
     game.settings.register(game.system.id, "forceRangeLimit", {
@@ -279,11 +298,6 @@ Hooks.once('init', async function() {
         CONFIG.Combatant.documentClass = HYP3ECombatant;
     }
 
-    console.log("Game info:", game)
-    console.log("System info:", game.system)
-    // Check the game version and load the appropriate class for Combat Tracker
-    console.log("Foundry version:", game.version)
-    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
     if (majorVersion >= 13) {
         // Load v13-specific Combat Tracker class
         const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v13.mjs");
@@ -366,6 +380,9 @@ Hooks.once("ready", async function() {
         return false;
     });
 
+    // Get Foundry major version #
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+
     // Register effects roll handler
     setupEffectRollHandler();
 
@@ -394,6 +411,13 @@ Hooks.once("ready", async function() {
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
     CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
     if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative) }
+
+    // Limit token movement to actor MV base
+    if (majorVersion >= 13) {
+        const limitMovement = game.settings.get(game.system.id, "limitMovement");
+        CONFIG.HYP3E.limitMovement = limitMovement;
+        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Limit token movement to actor MV base:", CONFIG.HYP3E.limitMovement) }
+    }
 
     // Force range limitations on weapon & spell attacks
     const forceRangeLimit = game.settings.get(game.system.id, "forceRangeLimit");
@@ -510,20 +534,22 @@ Hooks.once("ready", async function() {
 });
 
 // The preMoveToken event is only available in v13+, no need to check for the version
-// Hooks.on("preMoveToken", (token, movement, operation) => {
-//     // if (game.release.generation < 13) return; // Only for v13+
-//     const actor = token.actor;
-//     if (!actor) return;
-//     console.log("Token movement for Actor:", actor);
-//     const speed = actor.system.movement?.base.value ?? 40;
-//     console.log("Movement:", movement)
-//     const totalDistance = movement.passed.distance;
-//     console.log("Total distance:", totalDistance);
-//     if (totalDistance > speed) {
-//         ui.notifications.warn(`${actor.name} can only move ${speed} ft per round!`);
-//         return false; // Prevent the movement
-//     }
-// });
+Hooks.on("preMoveToken", (token, movement, operation) => {
+    // if (game.release.generation < 13) return; // Only for v13+
+    const actor = token.actor;
+    if (!actor) return;
+    console.log("Token movement for Actor:", actor);
+    const speed = actor.system.movement?.base.value ?? 40;
+    console.log("Movement:", movement)
+    const totalDistance = movement.passed.distance;
+    console.log("Total distance:", totalDistance);
+    if (totalDistance > speed) {
+        ui.notifications.warn(`${actor.name} can only move ${speed} ft per round!`);
+        if (CONFIG.HYP3E.limitMovement) {
+            return false; // Prevent the movement
+        }
+    }
+});
 
 // Insert damage, save, effect buttons into chats
 Hooks.on("renderChatMessage", addChatMessageButtons);
