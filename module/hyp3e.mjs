@@ -535,13 +535,13 @@ Hooks.once("ready", async function() {
 
 // The preMoveToken event is only available in v13+, no need to check for the version
 Hooks.on("preMoveToken", (token, movement, operation) => {
-    // if (game.release.generation < 13) return; // Only for v13+
     const actor = token.actor;
     if (!actor) return;
     console.log("Token movement for Actor:", actor);
     const speed = actor.system.movement?.base.value ?? 40;
     console.log("Movement:", movement)
-    const totalDistance = movement.passed.distance;
+    // Calculate current move plus all pending waypoints
+    const totalDistance = movement.passed.distance + movement.pending.distance;
     console.log("Total distance:", totalDistance);
     if (totalDistance > speed) {
         ui.notifications.warn(`${actor.name} can only move ${speed} ft per round!`);
