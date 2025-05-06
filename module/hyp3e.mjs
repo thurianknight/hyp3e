@@ -537,12 +537,12 @@ Hooks.once("ready", async function() {
 Hooks.on("preMoveToken", (token, movement, operation) => {
     const actor = token.actor;
     if (!actor) return;
-    console.log("Token movement for Actor:", actor);
+    if (CONFIG.HYP3E.debugMessages) { console.log("Token movement for Actor:", actor); }
     const speed = actor.system.movement?.base.value ?? 40;
-    console.log("Movement:", movement)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Movement:", movement); }
     // Calculate current move plus all pending waypoints
     const totalDistance = movement.passed.distance + movement.pending.distance;
-    console.log("Total distance:", totalDistance);
+    if (CONFIG.HYP3E.debugMessages) { console.log("Total distance:", totalDistance); }
     if (totalDistance > speed) {
         ui.notifications.warn(`${actor.name} can only move ${speed} ft per round!`);
         if (CONFIG.HYP3E.limitMovement) {
