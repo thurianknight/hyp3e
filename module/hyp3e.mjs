@@ -535,6 +535,10 @@ Hooks.once("ready", async function() {
 
 // The preMoveToken event is only available in v13+, no need to check for the version
 Hooks.on("preMoveToken", (token, movement, operation) => {
+    if (CONFIG.HYP3E.debugMessages) { console.log("Token for movement:", token); }
+    // We only enforce this rule in combat
+    if (!token.inCombat) return;
+
     const actor = token.actor;
     if (!actor) return;
     if (CONFIG.HYP3E.debugMessages) { console.log("Token movement for Actor:", actor); }
