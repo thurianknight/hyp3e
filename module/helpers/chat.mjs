@@ -124,7 +124,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     }
                 };
                 if (sourceType === "weapon") {
-                    if (CONFIG.HYP3E.debugMessages) { console.log("Adding ×2/×3 button for weapon") }
+                    if (CONFIG.HYP3E.debugMessages) { console.log("Adding ×2/×3/×4 buttons for weapon") }
                     buttons["two"] = {
                         icon: "<i class='fas fa-check'></i>",
                         label: `×2 Dice Dmg (roll only)`,
