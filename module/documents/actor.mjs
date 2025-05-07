@@ -907,8 +907,8 @@ export class Hyp3eActor extends Actor {
             dataset.rollButtonLabel = "Roll"
         }
 
-        // This is needed for Turn Undead results
-        let turnUndeadHtml = ""
+        // This is needed for Turn Undead & Assassinate results
+        let htmlContent = ""
     
         // Resolve target formula to a number, if necessary
         const targetRoll = new Roll(dataset.rollTarget, rollData)
@@ -943,7 +943,7 @@ export class Hyp3eActor extends Actor {
         let result = await roll.roll()
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
 
-        // We use simple word parsing in the ability name to determine if this is a cleric turning undead
+        // Use simple word parsing in the ability name to determine if this is a cleric turning undead
         let turnUndead = false
         let itemNameLower = itemName.toLowerCase()
         if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
@@ -951,8 +951,15 @@ export class Hyp3eActor extends Actor {
             // If we are turning undead, that resolution is executed separately...
         }
 
-        // Determine success or failure on a simple check, not turning undead
-        if (!turnUndead) {
+        // Use simple word parsing in the ability name to determine if this is an assassin plying her trade
+        let assassinate = false
+        if (itemNameLower.indexOf("assassinate") >= 0) {
+            assassinate = true
+            // If we are assassinating, that resolution is executed separately...
+        }
+
+        // Determine success or failure on a simple check, not turning undead or assassinating
+        if (!turnUndead && !assassinate) {
             if (roll.total <= dataset.rollTarget) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
                 // label += "<br /><b>Success!</b>"
@@ -965,16 +972,27 @@ export class Hyp3eActor extends Actor {
                 checkText += "<b>Fail.</b>"
                 success = false
             }
-        } else {
+        } else if (turnUndead) {
             // Resolve the results of the attempted turning undead
-            turnUndeadHtml = this.resolveTurnUndead(roll.total, rollData)
+            htmlContent = this.resolveTurnUndead(roll.total, rollData)
+            success = true
+        } else if (assassinate) {
+            // Get the first targeted token
+            const userTargets = Array.from(game.user.targets);
+            const targetToken = userTargets.length > 0 ? userTargets[0] : null;
+            if (!targetToken) {
+                ui.notifications.warn("No target token selected!")
+                return false
+            }
+            // Resolve the results of the attempted assassination
+            htmlContent = this.resolveAssassination(targetToken, roll.total, rollData)
             success = true
         }
         // Hit must be false so we don't display any damage buttons
         roll.hit = false
 
         // Construct a custom chat card for the check
-        await this.renderCustomChat(roll, item, tokenId, label, "", checkText, turnUndeadHtml, rollResponse.rollMode)
+        await this.renderCustomChat(roll, item, tokenId, label, "", checkText, htmlContent, rollResponse.rollMode)
 
         return success
     }
@@ -2258,6 +2276,63 @@ export class Hyp3eActor extends Actor {
         }
     }
 
+    // Build the chat message for assassination
+    resolveAssassination(target, rollTotal, rollData) {
+        /*
+        Assassination
+        =============
+        The assassin's chance to kill a target outright is based on the difference between the roll 
+        and the target's AC. The table below shows the results of the roll, and the number of levels 
+        of success (or failure) that result from it.
+        
+        Logic:
+        - If the original attack roll was a natural 19 or 20, the target must make a death save or die.
+        - If the attack roll hit but was not a natural 19 or 20, we roll on the Assassination table.
+        - The table uses an unmodified d20 roll, with a success if we roll the target number or lower.
+        - A natural 17 or higher is an automatic fail, as 16 is the highest target number in the table.
+        - The assassin's damage multiplier is based on his class level, and should be included in the 
+        chat message.
+        - We should be able to grab the previous damage roll and apply the multiplier automatically...
+        need to test this. But it acts like a critical hit, so the code should be similar.
+        */
+        let assassinationHtml = ''
+        let results = []
+        console.log("Assassination roll data: ", rollData)
+        console.log("Assassination target: ", target)
+        const assassinLevel = parseInt(rollData.details.level.value)
+        const baseSuccess = assassinLevel + 4
+        const targetLevel = parseInt(target.actor.type == "npc" ? target.actor.system?.hd.split("d")[0] : target.actor.system?.details.level.value)
+        const targetDifficultyMod = Math.floor(targetLevel/2)
+        const targetIsAssassin = target.actor.type == "character" && target.actor.system?.details.class == "Assassin"
+        const assassinTargetMod = targetIsAssassin && targetLevel > assassinLevel ? (targetLevel - assassinLevel) : 0
+
+        // Was this a complete fail?
+        if (rollTotal > 16) {
+            return '<p>Assassination attempt failed...</p>'
+        }
+
+        // From here on it's mostly some level of success
+        if (rollTotal <= baseSuccess - targetDifficultyMod - assassinTargetMod) {
+            results.push(`<p>Assassination attempt <b>succeeded</b>!</p>`)
+            results.push(`<ul><li>The target must make a <i>death</i> saving throw or die.</li>`)
+            results.push(`<ul><li>However, if the original d20 attack roll was a natural 19 or 20, then no saving throw is allowed.</li></ul>`)
+            let backstabMult = ``
+            if (assassinLevel >= 9) {
+                backstabMult = `<b>×4</b>`
+            } else if (assassinLevel >= 5) {
+                backstabMult = `<b>×3</b>`
+            } else {
+                backstabMult = `<b>×2</b>`
+            }
+            results.push(`<li>If the target makes its <i>death</i> save, it still takes <b>backstab</b> damage. For a level ${assassinLevel} assassin, the backstab multipler is ${backstabMult}.</li>`)
+            results.push(`<li>Other damage modifiers (strength, sorcery, etc.) are added after the dice are totaled.</li></ul>`)
+        } else {
+            return '<p>Assassination attempt failed...</p>'
+        }
+        assassinationHtml = results.join("")
+        return assassinationHtml
+    }
+
     // Build the chat message for turning undead
     resolveTurnUndead(rollTotal, rollData) {
         /*
@@ -2297,7 +2372,7 @@ export class Hyp3eActor extends Actor {
     
         // Was this a complete fail?
         if (rollData.ta <= 1 && rollTotal > 10) {
-            return 'No undead were turned...'
+            return '<p>No undead were turned...</p>'
         }
 
         // From here on it's all some level of success
@@ -2331,7 +2406,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Now we can setup our description output from the results
-        turnUndeadHtml = `Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...<ul>`
+        turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
         for (let i = results.length-1; i >=0; i--) {
             turnUndeadHtml += results[i]
         }
