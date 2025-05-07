@@ -120,7 +120,9 @@ export function setupEffectRollHandler() {
 
         for (let i = 0; i < updatedChanges.length; i++) {
             const change = updatedChanges[i];
+            // Determine whether the change is a roll formula, and resolve it
             if (Roll.validate(change.value)) {
+                if (CONFIG.HYP3E.debugMessages) { console.log("createActiveEffect: Roll formula detected: ", change.value) }
                 const roll = new Roll(change.value, actor?.getRollData?.());
                 await roll.evaluate({ evaluateSync: true });
                 updatedChanges[i] = {
@@ -129,9 +131,23 @@ export function setupEffectRollHandler() {
                 };
                 didUpdate = true;
             }
+            // Determine whether the change is a data path, and resolve it
+            else if (change.value.startsWith("system.")) {
+                if (CONFIG.HYP3E.debugMessages) { console.log("createActiveEffect: Data path detected: ", change.value) }
+                // const path = change.value.split(".").slice(1).join(".");
+                const value = getProperty(actor, change.value);
+                if (value !== undefined) {
+                    updatedChanges[i] = {
+                        ...change,
+                        value: value
+                    };
+                    didUpdate = true;
+                }
+            }
         }
         // Batch out the updates to the effect
         if (didUpdate) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("createActiveEffect: Updated Changes: ", updatedChanges) }
             await effect.update({
                 changes: updatedChanges
             });
