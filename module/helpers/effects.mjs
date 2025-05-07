@@ -120,6 +120,15 @@ export function setupEffectRollHandler() {
 
         for (let i = 0; i < updatedChanges.length; i++) {
             const change = updatedChanges[i];
+            // We really need a more robust string parser for this... so we can handle
+            //  things like a combination of data paths and roll formulas, with spaces, 
+            //  math symbols (+, -, *, /), etc.
+            // I can imagine that we might need to split the string into parts, probably 
+            //  based on spaces and math symbols, then check each part to see if it's a
+            //  roll formula or a data path. Then we can reassemble the string with the
+            //  resolved values.
+            // For now, we'll just check if the value is a roll formula or a data path.
+
             // Determine whether the change is a roll formula, and resolve it
             if (Roll.validate(change.value)) {
                 if (CONFIG.HYP3E.debugMessages) { console.log("createActiveEffect: Roll formula detected: ", change.value) }
