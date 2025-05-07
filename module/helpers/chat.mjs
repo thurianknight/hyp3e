@@ -124,16 +124,21 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     }
                 };
                 if (sourceType === "weapon") {
-                    if (CONFIG.HYP3E.debugMessages) { console.log("Adding 2x/3x button for weapon") }
+                    if (CONFIG.HYP3E.debugMessages) { console.log("Adding ×2/×3 button for weapon") }
                     buttons["two"] = {
                         icon: "<i class='fas fa-check'></i>",
-                        label: `2x Dice Dmg (roll only)`,
+                        label: `×2 Dice Dmg (roll only)`,
                         callback: () => rollCriticalDamage(total, dieFormula, applyDr)
                     };
                     buttons["three"] = {
                         icon: "<i class='fas fa-check'></i>",
-                        label: `3x Dice Dmg (roll only)`,
+                        label: `×3 Dice Dmg (roll only)`,
                         callback: () => rollCriticalDamage(total, `${dieFormula}+${dieFormula}`, applyDr)
+                    };
+                    buttons["four"] = {
+                        icon: "<i class='fas fa-check'></i>",
+                        label: `×4 Dice Dmg (roll only)`,
+                        callback: () => rollCriticalDamage(total, `${dieFormula}+${dieFormula}+${dieFormula}`, applyDr)
                     };
                 }
                 new Dialog({

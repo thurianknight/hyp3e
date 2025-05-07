@@ -2301,6 +2301,7 @@ export class Hyp3eActor extends Actor {
         console.log("Assassination target: ", target)
         const assassinLevel = parseInt(rollData.details.level.value)
         const baseSuccess = assassinLevel + 4
+        const targetName = target.actor.name
         const targetLevel = parseInt(target.actor.type == "npc" ? target.actor.system?.hd.split("d")[0] : target.actor.system?.details.level.value)
         const targetDifficultyMod = Math.floor(targetLevel/2)
         const targetIsAssassin = target.actor.type == "character" && target.actor.system?.details.class == "Assassin"
@@ -2308,12 +2309,12 @@ export class Hyp3eActor extends Actor {
 
         // Was this a complete fail?
         if (rollTotal > 16) {
-            return '<p>Assassination attempt failed...</p>'
+            return `<p>Assassination attempt vs. ${targetName} failed...</p>`
         }
 
         // From here on it's mostly some level of success
         if (rollTotal <= baseSuccess - targetDifficultyMod - assassinTargetMod) {
-            results.push(`<p>Assassination attempt <b>succeeded</b>!</p>`)
+            results.push(`<p>Assassination attempt vs. ${targetName} <b>succeeded</b>!</p>`)
             results.push(`<ul><li>The target must make a <i>death</i> saving throw or die.</li>`)
             results.push(`<ul><li>However, if the original d20 attack roll was a natural 19 or 20, then no saving throw is allowed.</li></ul>`)
             let backstabMult = ``
@@ -2326,8 +2327,9 @@ export class Hyp3eActor extends Actor {
             }
             results.push(`<li>If the target makes its <i>death</i> save, it still takes <b>backstab</b> damage. For a level ${assassinLevel} assassin, the backstab multipler is ${backstabMult}.</li>`)
             results.push(`<li>Other damage modifiers (strength, sorcery, etc.) are added after the dice are totaled.</li></ul>`)
+            results.push(`<div class='save-button' style='padding-top: 5px' data-save='death'></div>`)
         } else {
-            return '<p>Assassination attempt failed...</p>'
+            return `<p>Assassination attempt vs. ${targetName} failed...</p>`
         }
         assassinationHtml = results.join("")
         return assassinationHtml
