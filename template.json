@@ -243,7 +243,7 @@
             "resistances": {}
         },
         "container": {
-            "templates": ["base", "physical"],
+            "templates": ["base", "physical", "equippable"],
             "isContainer": true,
             "itemIds": [],
             "isConsumable": false,

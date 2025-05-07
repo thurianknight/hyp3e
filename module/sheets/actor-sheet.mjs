@@ -212,119 +212,135 @@ export class Hyp3eActorSheet extends ActorSheet {
     
     }
 
-  /**
-   * Organize and classify Items for Character sheets.
-   *
-   * @param {Object} context The actor to prepare.
-   *
-   * @return {undefined}
-   */
-  _prepareItems(context) {
-    // Initialize item types.
-    const containers = [];
-    const gear = [];
-    const features = [];
-    const weapons = [];
-    const armor = [];
-    const spells = {
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: []
-    };
+    /**
+     * Organize and classify Items for Character sheets.
+     *
+     * @param {Object} context The actor to prepare.
+     *
+     * @return {undefined}
+     */
+    _prepareItems(context) {
+        // Initialize item types.
+        const containers = [];
+        const gear = [];
+        const features = [];
+        const weapons = [];
+        const armor = [];
+        const spells = {
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [],
+            6: []
+        };
 
-    let encumbrance = 0
-    // Iterate through items, allocating to tab-groups
-    for (let i of context.items) {
-      i.img = i.img || DEFAULT_TOKEN;
-      // Calculate total weight carried by character
-      // if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
-      if (CONFIG.HYP3E.debugMessages) {
-        if (i.effects.length > 0) {
-            // console.log("Item effects:", i.effects)
-            i.effects.forEach(eff => {
-                // console.log("Effect transfer:", eff.transfer)
-                if (eff.transfer) {
-                    console.log(`Item ${i.name}:`, i)
-                    console.log("Effect to transfer:", eff)
-                    // this.actor.effects.push(eff)
+        let encumbrance = 0
+        // Iterate through items, adding encumbrance and allocating to tab-groups
+        for (let i of context.items) {
+            i.img = i.img || DEFAULT_TOKEN;
+            // if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
+            // Calculate total weight carried by character. For weapons & armor, the equipped
+            //  status is ignored and the item weight is always added to encumbrance.
+            //  For non-weapon items, the equipped status is used to determine if the item
+            //  is carried or not.
+            if (i.system.weight) {
+                if (i.system.quantity.value) {
+                    // Is this a normal item, and is it carried?
+                    if ((i.type === 'item' || i.type === 'container') && i.system.equipped) {
+                        i.system.carriedWt = (i.system.weight * i.system.quantity.value)
+                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
+                        // encumbrance += (i.system.weight * i.system.quantity.value)
+                        encumbrance += i.system.carriedWt
+                    } else if (i.type === 'weapon' || i.type === 'armor') {
+                        i.system.carriedWt = (i.system.weight * i.system.quantity.value)
+                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
+                        // encumbrance += (i.system.weight * i.system.quantity.value)
+                        encumbrance += i.system.carriedWt
+                    } else {
+                        i.system.carriedWt = 0
+                    }
+                // } else { // Assume quantity of 1
+                //     i.system.carriedWt = i.system.weight
+                //     encumbrance += i.system.weight
                 }
-            })
-        }
-      }
-      if (i.system.weight) {
-        if (i.system.quantity.value) {
-          i.system.carriedWt = (i.system.weight * i.system.quantity.value)
-          i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
-          encumbrance += (i.system.weight * i.system.quantity.value)
-        } else {
-          i.system.carriedWt = i.system.weight
-          encumbrance += i.system.weight
-        }
-      }
+            }
 
-      // Append to containers.
-      if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
-        // Get contained items and add to their container
-        i.contents = this.getContents(i._id, context)
-        containers.push(i);
-        // Migrate 'container' type to 'item' & set isContainer flag
-        if (i.type === 'container') {
-          i.type = 'item'
-          i.system.isContainer = true
-          // Update the embedded item document
-          this.actor.updateEmbeddedDocuments("Item", [
-            { _id: i._id, "type": 'item', "system.isContainer": true },
-          ])
+            // Something to do with item effects? I don't remember if this is needed.
+            // if (CONFIG.HYP3E.debugMessages) {
+            //     if (i.effects.length > 0) {
+            //         // console.log("Item effects:", i.effects)
+            //         i.effects.forEach(eff => {
+            //             // console.log("Effect transfer:", eff.transfer)
+            //             if (eff.transfer) {
+            //                 // console.log(`Item ${i.name}:`, i)
+            //                 // console.log("Effect to transfer:", eff)
+            //                 // this.actor.effects.push(eff)
+            //             }
+            //         })
+            //     }
+            // }
+
+            // Append to containers.
+            if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
+                // Get contained items and add to their container
+                i.contents = this.getContents(i._id, context)
+                containers.push(i);
+                // Migrate 'container' type to 'item' & set isContainer flag
+                if (i.type === 'container') {
+                    i.type = 'item'
+                    i.system.isContainer = true
+                    // Update the embedded item document
+                    this.actor.updateEmbeddedDocuments("Item", [
+                        { _id: i._id, "type": 'item', "system.isContainer": true },
+                    ])
+                }
+            }
+            // Append to gear that isn't in a container.
+            if (i.type === 'item' && i.system.containerId == '' && !i.system.isContainer) {
+                gear.push(i);
+            }
+            // Append to features.
+            else if (i.type === 'feature') {
+                features.push(i);
+            }
+            // Append to weapons.
+            if (i.type === 'weapon') {
+                weapons.push(i);
+            }
+            // Append to armor.
+            if (i.type === 'armor') {
+                armor.push(i);
+            }
+            // Append to spells.
+            else if (i.type === 'spell') {
+                if (i.system.spellLevel != undefined && i.system.spellLevel >= 1 && i.system.spellLevel <= 6) {
+                    spells[i.system.spellLevel].push(i);
+                } else if (i.system.spellLevel != undefined && i.system.spellLevel < 1) {
+                    spells[1].push(i);
+                } else if (i.system.spellLevel != undefined && i.system.spellLevel > 6) {
+                    spells[6].push(i);
+                }
+            }
         }
-      }
-      // Append to gear that isn't in a container.
-      if (i.type === 'item' && i.system.containerId == '' && !i.system.isContainer) {
-        gear.push(i);
-      }
-      // Append to features.
-      else if (i.type === 'feature') {
-        features.push(i);
-      }
-      // Append to weapons.
-      if (i.type === 'weapon') {
-        weapons.push(i);
-      }
-      // Append to armor.
-      if (i.type === 'armor') {
-        armor.push(i);
-      }
-      // Append to spells.
-      else if (i.type === 'spell') {
-        if (i.system.spellLevel != undefined && i.system.spellLevel >= 1 && i.system.spellLevel <= 6) {
-          spells[i.system.spellLevel].push(i);
-        } else if (i.system.spellLevel != undefined && i.system.spellLevel < 1) {
-            spells[1].push(i);
-        } else if (i.system.spellLevel != undefined && i.system.spellLevel > 6) {
-            spells[6].push(i);
-        }
-      }
+        encumbrance = Math.round(encumbrance * 10)/10
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Total weight carried: ${encumbrance} pounds`) }
+
+        // Assign and return
+        context.encumbrance = encumbrance;
+        context.gear = gear;
+        context.containers = containers;
+        context.features = features;
+        context.weapons = weapons;
+        context.armor = armor;
+        context.spells = spells;
     }
-    encumbrance = Math.round(encumbrance * 10)/10
-    if (CONFIG.HYP3E.debugMessages) { console.log(`Total weight carried: ${encumbrance} pounds`) }
 
-    // Assign and return
-    context.encumbrance = encumbrance;
-    context.gear = gear;
-    context.containers = containers;
-    context.features = features;
-    context.weapons = weapons;
-    context.armor = armor;
-    context.spells = spells;
-  }
-
-  getContents(id, context) {	
-		return context.items.filter(
-			({system: {containerId}}) => id === containerId
-		);
-  }
+    getContents(id, context) {
+        return context.items.filter(
+            ({system: {containerId}}) => id === containerId
+        );
+    }
 
   /* -------------------------------------------- */
 
@@ -375,7 +391,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       li.slideUp(200, () => this.render(false));
     });
 
-    // Toggle equip/unequip
+    // Toggle equip/unequip or carry/drop item
     html.find(".item-equip").click(async (event) => {
         const li = $(event.currentTarget).closest(".item-entry")
         const item = this.actor.items.get(li.data("itemId"))
@@ -385,9 +401,21 @@ export class Hyp3eActorSheet extends ActorSheet {
                 equipped: !item.system.equipped,
             },
         })
-        // Send a chat message that the item was equipped/unequipped
+        // Send a chat message that the item was equipped/unequipped or carried/dropped
         const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
-        const message = `${this.actor.name} ${(item.system.equipped ? "equipped" : "unequipped")} ${itemName}`
+        let equipText = ""
+        let containerText = ""
+        if (item.type === "armor" || item.type === "weapon") {
+            equipText = item.system.equipped ? "equipped" : "unequipped"
+        } else if (item.type === "item" || item.type === "container") {
+            equipText = item.system.equipped ? "is carrying" : "dropped"
+            // If this is a container, carry or drop the contents too
+            if (item.system.isContainer || item.type === "container") {
+                this._carryOrDropContainer(item)
+                containerText = " and its contents"
+            }
+        }
+        const message = `${this.actor.name} ${equipText} ${itemName}${containerText}.`
         const chatData = {
             author: game.user_id,
             content: message
@@ -410,6 +438,23 @@ export class Hyp3eActorSheet extends ActorSheet {
         li.addEventListener("dragstart", handler, false);
       });
     }
+  }
+
+  /**
+   * Handle settings equipped state of items in a container
+   * @param {*} itemId 
+   */
+  _carryOrDropContainer(container) {
+    // Has the container been carried or dropped?
+    const carrying = container.system.equipped
+    // Find all items in the container
+    const items = this.actor.items.filter(i => i.system.containerId === container.id)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Items in container:", items) }
+    // Batch the updates to the actor
+    this.actor.updateEmbeddedDocuments("Item", items.map(item => ({
+        _id: item.id,
+        "system.equipped": carrying,
+    })))
   }
 
   /**

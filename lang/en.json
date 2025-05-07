@@ -294,8 +294,10 @@
             "edit": "Edit",
             "delete": "Delete",
             "show": "Show",
-            "equip": "Toggle Equip",
+            "equip": "Toggle Equip/Unequip",
             "equipped": "Equipped",
+            "carry": "Toggle Carried/Dropped",
+            "carried": "Carried",
             "consumable": "Consumable",
             "ammunition": "Ammunition",
             "addAmmo": "Add Ammunition",
@@ -310,6 +312,8 @@
             "incr": "Add",
             "decr": "Subtract",
             "attributes": {
+                "equipped": "The Equipped tag allows this item to be equipped and unequipped.",
+                "carried": "The Carried tag allows this item to be carried or dropped.",
                 "isConsumable": "The Consumable tag gives this item the increment/decrement buttons.",
                 "isAmmunition": "The Ammunition tag causes this item to display on the Combat tab.",
                 "isContainer": "The Container tag allows this item to contain other non-container items."
