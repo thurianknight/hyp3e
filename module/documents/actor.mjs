@@ -50,9 +50,21 @@ export class Hyp3eActor extends Actor {
             // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, obj) }
         })
 
+        // If tempHp is an object, convert it to zero
+        if (typeof systemData.hp.tempHp == "object") {
+            systemData.hp.tempHp = 0
+        }
         // If tempAcMod is an object, convert it to zero
         if (typeof systemData.ac.tempAcMod == "object") {
             systemData.ac.tempAcMod = 0
+        }
+        // If tempDrMod is an object, convert it to zero
+        if (typeof systemData.ac.tempDrMod == "object") {
+            systemData.ac.tempDrMod = 0
+        }
+        // If tempMvMod is an object, convert it to zero
+        if (typeof systemData.tempMvMod == "object") {
+            systemData.tempMvMod = 0
         }
 
     }
