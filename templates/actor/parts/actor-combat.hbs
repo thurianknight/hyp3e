@@ -102,93 +102,10 @@
                 </div>
             </div>
         </div>
+        {{!-- Spacer row --}}
         <div class="resource-content flexrow flex-group-center">
-            <div class="resource-content flex-between">
-                {{!-- <label for="system.hp.value" class="combat-label">{{localize "HYP3E.details.hitPoints"}}</label><br />
-                <input type="text" name="system.hp.value" value="{{system.hp.value}}" data-dtype="Number"/>
-                /
-                <input type="text" name="system.hp.max" value="{{system.hp.max}}" data-dtype="Number"/><br />
-                <label for="system.hp.tempHp" class="combat-label-smaller">{{localize "HYP3E.details.tempHp"}}</label>
-                <input type="text" class="input-small" name="system.hp.tempHp" value="{{numberFormat system.hp.tempHp sign=true}}" data-dtype="Number"/><br />
-                <span class="combat-label rollable" data-roll="{{system.hd}}+{{system.attributes.con.hpMod}}" data-roll-type="basic" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.hitDieRoll'}}">
-                    <label for="system.hd">{{localize "HYP3E.details.hitDie"}}</label> <i class="fas fa-dice-d6"></i>
-                </span>
-                <input type="text" name="system.hd" value="{{system.hd}}" data-dtype="String"/> --}}
-            </div>
-            <div class="resource-content flex-between">
-                {{!-- <label for="system.ac.value" class="combat-label">{{localize "HYP3E.armor.armorClass"}}</label>
-                <label for="system.ac.value" class="combat-label">{{localize "HYP3E.armor.ac"}}</label>
-                <input type="text" name="system.ac.value" value="{{system.ac.value}}" data-dtype="Number" /><br /> --}}
-                {{!-- <label for="system.ac.dr" class="combat-label">{{localize "HYP3E.armor.dmgReduct"}}</label> --}}
-                {{!-- <label for="system.ac.dr" class="combat-label">{{localize "HYP3E.armor.dr"}}</label>
-                <input type="text" name="system.ac.dr" value="{{system.ac.dr}}" data-dtype="Number" /><br />
-
-                <label for="system.movement.base.value" class="combat-label" style="text-align: right">{{localize "HYP3E.movement.base.abbrev"}}</label>
-                <input type="text" name="system.movement.base.value" value="{{system.movement.base.value}}" data-dtype="Number"/><br /> --}}
-            </div>
-            <div class="resource-content flex-between">
-                {{!-- <label for="system.ac.tempAcMod" class="combat-label-smaller">Temp AC</label>
-                <input type="text" class="input-small" name="system.ac.tempAcMod" value="{{numberFormat system.ac.tempAcMod sign=true}}" data-dtype="Number"/><br />
-                <label for="system.ac.tempDrMod" class="combat-label-smaller">Temp DR</label>
-                <input type="text" class="input-small" name="system.ac.tempDrMod" value="{{numberFormat system.ac.tempDrMod sign=true}}" data-dtype="Number"/>
-
-                <label for="system.tempMvMod" class="combat-label-smaller">Temp MV</label>
-                <input type="text" class="input-small" name="system.tempMvMod" value="{{numberFormat system.tempMvMod sign=true}}" data-dtype="Number"/><br />
-                <span class="flex-xlarge movement-other">
-                    <label for="system.otherMv.value" class="combat-label">{{localize "HYP3E.otherMv.abbrev"}}</label>
-                    <input type="text" name="system.otherMv.value" value="{{system.otherMv.value}}" data-dtype="String"/>
-                </span> --}}
-            </div>
+            <div></div>
         </div>
-        {{!-- </div>
-          <label for="system.hp.value" class="combat-label">{{localize "HYP3E.details.hitPoints"}}</label>
-          <input type="text" name="system.hp.value" value="{{system.hp.value}}" data-dtype="Number"/>
-          /
-          <input type="text" name="system.hp.max" value="{{system.hp.max}}" data-dtype="Number"/>
-          <span class="combat-label rollable" data-roll="{{system.hd}}+{{system.attributes.con.hpMod}}" data-roll-type="basic" data-roll-target="" data-label="{{localize 'HYP3E.dataLabel.hitDieRoll'}}">
-            <label for="system.hd">{{localize "HYP3E.details.hitDie"}}</label> <i class="fas fa-dice-d6"></i>
-          </span>
-          <input type="text" name="system.hd" value="{{system.hd}}" data-dtype="String"/>
-        </div> --}}
-        {{!-- {{#if system.hp.tempHp}} --}}
-        {{!-- <div class="resource-content flexrow flex-group-center">
-          <label for="system.hp.tempHp" class="combat-label-small">{{localize "HYP3E.details.tempHp"}}</label>
-          <input type="text" name="system.hp.tempHp" value="{{numberFormat system.hp.tempHp sign=true}}" data-dtype="Number"/>
-          <label for="system.ac.tempAcMod" class="combat-label-small">Temp AC</label>
-          <input type="text" name="system.ac.tempAcMod" value="{{numberFormat system.ac.tempAcMod sign=true}}" data-dtype="Number"/>
-          <label for="system.ac.tempDrMod" class="combat-label-small">Temp DR</label>
-          <input type="text" name="system.ac.tempDrMod" value="{{numberFormat system.ac.tempDrMod sign=true}}" data-dtype="Number"/>
-        </div> --}}
-        {{!-- {{/if}} --}}
-        {{!-- <div class="resource-content flexrow flex-group-center">
-          <label for="system.ac.value" class="combat-label">{{localize "HYP3E.armor.armorClass"}}</label>
-          <input type="text" name="system.ac.value" value="{{system.ac.value}}" data-dtype="Number" />
-          <label for="system.ac.dr" class="combat-label">{{localize "HYP3E.armor.dmgReduct"}}</label>
-          <input type="text" name="system.ac.dr" value="{{system.ac.dr}}" data-dtype="Number" />
-        </div> --}}
-        {{!-- <div class="resource-content flexrow flex-group-center">
-          <label for="system.movement.base.value" class="combat-label" style="text-align: right">{{localize "HYP3E.movement.base.abbrev"}}</label>
-          <input type="text" name="system.movement.base.value" value="{{system.movement.base.value}}" data-dtype="Number"/>
-          <label for="system.tempMvMod" class="combat-label-small">Temp MV</label>
-          <input type="text" name="system.tempMvMod" value="{{numberFormat system.tempMvMod sign=true}}" data-dtype="Number"/>
-          <span class="flex-xlarge movement-other">
-            <label for="system.otherMv.value" class="combat-label">{{localize "HYP3E.otherMv.abbrev"}}</label>
-            <input type="text" name="system.otherMv.value" value="{{system.otherMv.value}}" data-dtype="String"/>
-          </span>
-        </div> --}}
-        {{!-- <div class="resource-content flexrow flex-group-center"> --}}
-          {{!-- <span>
-            {{#if isEncumbered}}
-            <div style="margin-left: 15px; color: red;">Encumbered!</div>
-            {{/if}}
-            {{#if isHeavilyEncumbered}}
-            <div style="margin-left: 15px; color: red; font-weight: bold;">Heavily Encumbered!</div>
-            {{/if}}
-          </span> --}}
-        {{!-- </div> --}}
-        {{!-- <div class="resource-content flexrow flex-group-center"> --}}
-          {{!-- This is a cheat row, to shift the upper rows higher. --}}
-        {{!-- </div> --}}
       </section>
     </section>
 
