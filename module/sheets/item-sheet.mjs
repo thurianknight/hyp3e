@@ -30,17 +30,19 @@ export class Hyp3eItemSheet extends ItemSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  getData() {
+  async getData() {
     // Retrieve base data structure.
     const context = super.getData();
     context.isGM = game.user.isGM
+
+    // context.editable = this.isEditable
 
     // Use a safe clone of the item data for further operations.
     const itemData = context.item;
 
     // Retrieve the actor's roll data for TinyMCE editors.
     context.rollData = {};
-    let actor = this.object?.parent ?? null;
+    const actor = this.object?.parent ?? null;
     if (actor) {
       context.rollData = actor.getRollData()
     }
@@ -54,6 +56,17 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Log item context data
     if (CONFIG.HYP3E.debugMessages) { console.log("Item Context Data:", context) }
+
+    // Enrich the description field for TinyMCE editors.
+    context.enrichedDescription = await TextEditor.enrichHTML(
+        context.system.description,
+        { 
+            rollData: context.rollData, 
+            async: true 
+        }
+    );
+    // console.log("Roll Data in ItemSheet:", context.rollData);
+    // console.log("Enriched HTML:", context.enrichedDescription);
 
     // Prepare item data.
     this._prepareItemData(context);
@@ -72,8 +85,8 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Handle weapon types
     if (context.item.type == 'weapon') {
-      context.weaponTypes = CONFIG.HYP3E.weaponTypes
-    //   if (CONFIG.HYP3E.debugMessages) { console.log("Item weapon types:", context.weaponTypes) }
+        context.weaponTypes = CONFIG.HYP3E.weaponTypes
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Item weapon types:", context.weaponTypes) }
     }
 
     // Handle armor types
@@ -119,8 +132,10 @@ export class Hyp3eItemSheet extends ItemSheet {
   activateListeners(html) {
     super.activateListeners(html);
 
-    // Everything below here is only needed if the sheet is editable
+    // If the sheet is not editable, do nothing.
     if (!this.isEditable) return;
+
+    // Everything below here is only needed if the sheet is editable
 
     // Roll handlers, click handlers, etc. would go here.
 
@@ -133,7 +148,7 @@ export class Hyp3eItemSheet extends ItemSheet {
       if (CONFIG.HYP3E.debugMessages) { console.log("Attack Type click: ", attackType) }
       this._updateAtkType(attackType)
     });
-    
+
     // Toggle weapon mastery & grand-mastery true/false
     html.find(".weapon-mastery").click(async (event) => {
       const mastery = $(event.currentTarget).data("mastery")
@@ -145,9 +160,11 @@ export class Hyp3eItemSheet extends ItemSheet {
     html.find('.item-button[data-control="set-annotations"]').click((ev) => {
         Hyp3eItemSheet.ITEM_ANNOTATIONS_APP.render(true, { itemUuid: this.item.uuid, focus: true });
     });
-    
+
     // Active Effect management
     html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.item));
+
+    // console.log("Rendered HTML in sheet:", this.element.find(".editor-content").html());
 
   }
 
@@ -160,19 +177,20 @@ export class Hyp3eItemSheet extends ItemSheet {
     event.preventDefault();
     const element = event.currentTarget;
     const dataset = element.dataset;
+    const formula = element.dataset.formula;
+    const flavor = element.dataset.tooltip;
   
     // Log the element
     console.log("Clicked element: ", element)
     // Log the element dataset
     console.log("Element dataset: ", dataset)
 
-    // Now do some useful stuff!
-    try {
-        // We don't really use rollable buttons or links on the item sheets.
-    } catch(err) {
-      // Log the error
-      console.log(err)
-    }
+    // Perform the roll
+    const roll = new Roll(formula);
+    roll.toMessage({
+        flavor: flavor,
+        speaker: ChatMessage.getSpeaker({ actor: this.item.actor })
+    });
 
   }
 
