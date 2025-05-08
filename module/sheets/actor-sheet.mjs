@@ -28,7 +28,7 @@ export class Hyp3eActorSheet extends ActorSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  getData() {
+  async getData() {
     if (CONFIG.HYP3E.debugMessages) { console.log("Getting actor sheet data...") }
 
     // Retrieve the data structure from the base sheet. You can inspect or log
@@ -74,6 +74,17 @@ export class Hyp3eActorSheet extends ActorSheet {
         // For Foundry v13...
         context.effects = prepareActiveEffectCategories(this.actor._getAllApplicableEffects());
     }
+
+    // Enrich the description field for TinyMCE editors.
+    context.enrichedBiography = await TextEditor.enrichHTML(
+        context.system.biography,
+        { 
+            rollData: context.rollData, 
+            async: true 
+        }
+    );
+    // console.log("Roll Data in ItemSheet:", context.rollData);
+    // console.log("Enriched HTML:", context.enrichedDescription);
 
     // Log the actor's data
     if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet data complete:", context) }
