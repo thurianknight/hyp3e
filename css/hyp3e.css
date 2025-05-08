@@ -285,12 +285,7 @@
 /* Default style for input text fields */
 input[type=text] {
   border: none;
-  /* font-family: "Herculanum", sans-serif; */
-  /* border-bottom: 1px solid black; */
   background-color:#bdbdbd7f;
-  /* background-color: transparent; */
-  /* background-image: url("../assets/blood-swipe-small.png"); */
-  /* background-blend-mode: lighten; */
   margin-bottom: 2px;
 }
 input[type=text]:disabled {
@@ -305,7 +300,6 @@ textarea {
   font-family: "Roboto", sans-serif;
   /* font-family: "Herculanum", sans-serif; */
   background-color:#bdbdbd7f;
-  /* background-color: transparent; */
   resize: none;
 }
 
@@ -461,7 +455,6 @@ textarea {
   font-weight: bold;
   padding: 5px 5px;
   min-width: 60px;
-  /* background-color: darkcyan; */
 }
 .hyp3e .sheet-tabs {
   -webkit-box-flex: 0;
@@ -486,7 +479,6 @@ textarea {
 .hyp3e .character-header-block {
   padding: 0 2px;
   margin-right: 5px;
-  /* background-color: aqua; */
 }
 
 /* Left gutter image */
@@ -511,7 +503,6 @@ textarea {
 }
 .hyp3e .attribute-row {
   padding-bottom: 5px;
-  /* background-color: lightcoral; */
 }
 .hyp3e .attribute-label {
   font-family: "Herculanum", sans-serif;
@@ -524,7 +515,6 @@ textarea {
   min-width: 30px;
   max-width: 50px;
   /* background-image: url("../assets/blood-swipe-small.png"); */
-  /* background-color: orange; */
 }
 
 .hyp3e .attribute-mod {
@@ -532,7 +522,6 @@ textarea {
   margin-right: 2px;
   min-width: 75px;
   /* max-width: 80px; */
-  /* background-color: chartreuse; */
 }
 .hyp3e .mod-label {
   font-size: x-small;
@@ -554,51 +543,100 @@ textarea {
   /* padding: 0 2px; */
   /* margin-right: 5px; */
   margin-bottom: 3px;
-  /* background-color: aqua; */
   input {
     text-align: center;
     min-width: 20px;
     max-width: 50px;
     margin-bottom: 2px;
   }
+  .input-small {
+    text-align: center;
+    max-width: 30px;
+    height: 22px;
+    font-size: small;
+    margin-bottom: 2px;
+  }
+  .fighting-skills {
+    min-width: 200px;
+    max-width: 325px;
+  }
+  .fighting-skills-title {
+    margin-top: 4px;
+  }
+  .fighting-ability {
+    margin-right: 15px;
+  }
+  .class-weapons {
+    text-align: right;
+    input {
+      min-width: 200px;
+      margin-bottom: 2px;
+      margin-right: 15px;
+    }
+  }
+  .weapon-field {
+    text-align: right;
+    input {
+      min-width: 200px;
+      margin-bottom: 2px;
+      margin-right: 15px;
+    }
+  }
+  .combat-stats {
+    min-width: 350px;
+    max-width: 450px;
+  }
+  .combat-stats-title {
+    margin-top: 4px;
+  }
+  .hit-points {
+    min-width: 125px;
+    max-width: 150px;
+  }
+  .armor-class {
+    min-width: 225px;
+    max-width: 300px;
+  }
 }
-.hyp3e .combat-block .class-weapons {
+/* .hyp3e .combat-block .class-weapons {
   text-align: right;
   input {
     min-width: 200px;
     margin-bottom: 2px;
     margin-right: 15px;
   }
-}
-.hyp3e .combat-block .weapon-field {
+} */
+/* .hyp3e .combat-block .weapon-field {
   text-align: right;
   input {
     min-width: 200px;
     margin-bottom: 2px;
     margin-right: 15px;
   }
-}
+} */
 
 .hyp3e .combat-header {
   font-weight: bold;
   font-size: large;
   padding: 5px 5px;
-  /* background-color: blueviolet */
 }
 .hyp3e .combat-label {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
   padding: 5px 10px;
-  /* background-color: dodgerblue; */
 }
 .hyp3e .combat-label-small {
-  font-family: "Herculanum", sans-serif;
-  font-weight: bold;
-  font-size: small;
-  padding: 5px 10px;
-  /* background-color: dodgerblue; */
+    font-family: "Herculanum", sans-serif;
+    font-weight: bold;
+    font-size: small;
+    padding: 5px 10px;
 }
-
+.hyp3e .combat-label-smaller {
+    font-family: "Herculanum", sans-serif;
+    font-size: smaller;
+    padding: 5px 10px;
+}
+    
 .hyp3e .movement-other {
   /* padding: 0 2px;
   margin-right: 5px; */
@@ -612,7 +650,6 @@ textarea {
 .hyp3e .saves-block {
   padding: 2px 2px;
   margin-bottom: 5px;
-  /* background-color: aqua; */
   input {
     text-align: center;
     min-width: 20px;
@@ -624,7 +661,6 @@ textarea {
 .hyp3e .spells-block {
   padding: 0 5px;
   margin-right: 5px;
-  /* background-color: aqua; */
   .spell-list input {
     text-align: center;
     min-width: 100px;
@@ -638,7 +674,6 @@ textarea {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
   padding: 5px 5px;
-  /* background-color: darkcyan; */
 }
 .hyp3e .spell-list input {
   text-align: center;
@@ -656,7 +691,6 @@ textarea {
   padding: 0 2px;
   margin-right: 5px;
   margin-bottom: 3px;
-  /* background-color: aqua; */
 }
 .hyp3e .money-block input {
   text-align: center;
@@ -682,7 +716,6 @@ textarea {
   padding: 5px 5px;
   max-width: 135px;
   font-family: "Herculanum", sans-serif;
-  /* background-color: aliceblue; */
 }
 .hyp3e .description-field input {
   min-width: 85px;
@@ -744,19 +777,16 @@ textarea {
 .hyp3e .resource {
   padding: 0 2px;
   margin-right: 5px;
-  /* background-color: aqua; */
 }
 .hyp3e .resource-header {
   font-weight: bold;
   font-size: large;
   padding: 5px 5px;
-  /* background-color: blueviolet */
 }
 .hyp3e .resource-label {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
   padding: 5px 5px;
-  /* background-color: darkcyan; */
 }
 
 /* Character "Items" includes the Class Abilities list, Weapons & Armor lists, 
@@ -907,7 +937,6 @@ textarea {
   -ms-flex: 0 0 200px;
   flex: 0 0 200px;
   padding: 0 8px;
-  /* vertical-align: top; */
 }
 .hyp3e .item-attributes {
   min-width: 125px;
@@ -916,7 +945,6 @@ textarea {
 }
 .hyp3e .item-description {
   padding: 0 10px;
-  /* vertical-align: top; */
 }
 .hyp3e .effects .item .effect-source,
 .hyp3e .effects .item .effect-duration,

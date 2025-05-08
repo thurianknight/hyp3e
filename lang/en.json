@@ -197,7 +197,7 @@
         "fightingAbility": "Fighting Ability",
         "fa": "FA",
         "unskilled": "Unskilled",
-        "wpnSkills": "Favoured Wpns",
+        "wpnSkills": "Favoured Weapons",
         "level4": "Level 4",
         "level8": "Level 8",
         "level12": "Level 12",
@@ -266,7 +266,7 @@
         },
         "otherMv": {
             "name": "Other Movement",
-            "abbrev": "Other"
+            "abbrev": "Other MV"
         },
         "alignment": "Alignment",
         "size": "Size",
@@ -382,8 +382,8 @@
             "wtClass": "Wt Class",
             "armorClass": "Armour Class",
             "ac": "AC",
-            "dr": "DR",
             "dmgReduct": "Dmg Reduction",
+            "dr": "DR",
             "unarmored": "Unarmoured",
             "acMod": "AC Mod"
         },
