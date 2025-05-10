@@ -26,9 +26,6 @@ Hooks.once('init', async function() {
 
     console.log("Game info:", game)
     console.log("System info:", game.system)
-    // Check the game version and load the appropriate class for Combat Tracker
-    console.log("Foundry version:", game.version)
-    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
     // Register system settings
     // Debug logging & messages
@@ -115,6 +112,10 @@ Hooks.once('init', async function() {
             reroll: "HYP3E.settings.initiativeReroll",
         },
     });
+
+    // Get the Foundry version for conditional options
+    console.log("Foundry version:", game.version)
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
     if (majorVersion >= 13) {
         // Limit token movement to actor MV base
@@ -284,8 +285,10 @@ Hooks.once('init', async function() {
     // Register sheet application classes
     Actors.unregisterSheet("core", ActorSheet);
     Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: true });
+    console.log("Registered Hyp3eActorSheet")
     Items.unregisterSheet("core", ItemSheet);
     Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: true });
+    console.log("Registered Hyp3eItemSheet")
 
 
     // Get initiative mode: group vs. individual
