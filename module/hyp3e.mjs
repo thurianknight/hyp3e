@@ -276,6 +276,18 @@ Hooks.once('init', async function() {
     // Add custom constants for configuration.
     CONFIG.HYP3E = HYP3E;
 
+
+    // Define custom Document classes
+    CONFIG.Actor.documentClass = Hyp3eActor;
+    CONFIG.Item.documentClass = Hyp3eItem;
+
+    // Register sheet application classes
+    Actors.unregisterSheet("core", ActorSheet);
+    Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: true });
+    Items.unregisterSheet("core", ItemSheet);
+    Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: true });
+
+
     // Get initiative mode: group vs. individual
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
 
@@ -308,15 +320,15 @@ Hooks.once('init', async function() {
         CONFIG.ui.combat = HYP3ECombatTracker;
     }
 
-    // Define custom Document classes
-    CONFIG.Actor.documentClass = Hyp3eActor;
-    CONFIG.Item.documentClass = Hyp3eItem;
+    // // Define custom Document classes
+    // CONFIG.Actor.documentClass = Hyp3eActor;
+    // CONFIG.Item.documentClass = Hyp3eItem;
 
-    // Register sheet application classes
-    Actors.unregisterSheet("core", ActorSheet);
-    Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: true });
-    Items.unregisterSheet("core", ItemSheet);
-    Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: true });
+    // // Register sheet application classes
+    // Actors.unregisterSheet("core", ActorSheet);
+    // Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: true });
+    // Items.unregisterSheet("core", ItemSheet);
+    // Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: true });
 
     // Preload Handlebars templates.
     return preloadHandlebarsTemplates();
