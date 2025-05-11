@@ -921,8 +921,37 @@ export class Hyp3eActor extends Actor {
 
         // This is needed for Turn Undead & Assassinate results
         let htmlContent = ""
-    
-        // Resolve target formula to a number, if necessary
+        // Use simple word parsing in the ability name to determine if this is a cleric turning undead
+        let turnUndead = false
+        let itemNameLower = itemName.toLowerCase()
+        if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
+            // This flag is used to determine if we are turning undead
+            turnUndead = true
+            // Special case: if the user forgot to include @cha.turnUndead in the formula,
+            //  we will add it here, so the roll will be correct
+            if (dataset.roll.indexOf("@cha.turnUndead") < 0) {
+                dataset.roll = `${dataset.roll} - @cha.turnUndead`
+            }
+            // Override the roll target in the dataset
+            dataset.rollTarget = 10
+        }
+
+        // Use simple word parsing in the ability name to determine if this is an assassin plying her trade
+        let assassinate = false
+        const userTargets = Array.from(game.user.targets);
+        let targetToken = null
+        if (itemNameLower.indexOf("assassinate") >= 0) {
+            // This flag is used to determine if we are assassinating
+            assassinate = true
+            // Ensure we have a targeted token
+            targetToken = userTargets.length > 0 ? userTargets[0] : null;
+            if (!targetToken) {
+                ui.notifications.warn("No target token selected!")
+                return false
+            }
+        }
+
+        // If the Target has variables like a roll formula, resolve it to a number
         const targetRoll = new Roll(dataset.rollTarget, rollData)
         await targetRoll.roll()
         if (CONFIG.HYP3E.debugMessages) {
@@ -955,21 +984,6 @@ export class Hyp3eActor extends Actor {
         let result = await roll.roll()
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
 
-        // Use simple word parsing in the ability name to determine if this is a cleric turning undead
-        let turnUndead = false
-        let itemNameLower = itemName.toLowerCase()
-        if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
-            turnUndead = true
-            // If we are turning undead, that resolution is executed separately...
-        }
-
-        // Use simple word parsing in the ability name to determine if this is an assassin plying her trade
-        let assassinate = false
-        if (itemNameLower.indexOf("assassinate") >= 0) {
-            assassinate = true
-            // If we are assassinating, that resolution is executed separately...
-        }
-
         // Determine success or failure on a simple check, not turning undead or assassinating
         if (!turnUndead && !assassinate) {
             if (roll.total <= dataset.rollTarget) {
@@ -989,13 +1003,6 @@ export class Hyp3eActor extends Actor {
             htmlContent = this.resolveTurnUndead(roll.total, rollData)
             success = true
         } else if (assassinate) {
-            // Get the first targeted token
-            const userTargets = Array.from(game.user.targets);
-            const targetToken = userTargets.length > 0 ? userTargets[0] : null;
-            if (!targetToken) {
-                ui.notifications.warn("No target token selected!")
-                return false
-            }
             // Resolve the results of the attempted assassination
             htmlContent = this.resolveAssassination(targetToken, roll.total, rollData)
             success = true
@@ -2296,7 +2303,7 @@ export class Hyp3eActor extends Actor {
         The assassin's chance to kill a target outright is based on the difference between the roll 
         and the target's AC. The table below shows the results of the roll, and the number of levels 
         of success (or failure) that result from it.
-        
+
         Logic:
         - If the original attack roll was a natural 19 or 20, the target must make a death save or die.
         - If the attack roll hit but was not a natural 19 or 20, we roll on the Assassination table.
@@ -2356,7 +2363,7 @@ export class Hyp3eActor extends Actor {
         results, and output those to the chat.
         We can just use the actor's TA and dynamically calculate the results row from the Turn Undead table, since the 
         minimum value for success is always a target number of 10, affecting undead at Type [TA - 1].
-        
+
         Logic:
         - If TA is 1, it is possible to completely fail.
         - If TA is 2 or higher, we have the chance for an automatic turn of undead.
@@ -2383,7 +2390,7 @@ export class Hyp3eActor extends Actor {
         let orLess = ''
         let results = []
         let rollAffected = '2d6'
-    
+
         // Was this a complete fail?
         if (rollData.ta <= 1 && rollTotal > 10) {
             return '<p>No undead were turned...</p>'
