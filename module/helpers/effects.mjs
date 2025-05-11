@@ -174,11 +174,19 @@ async function _parseAndResolveChangeValue(changeValue, actor) {
     // Reassemble the resolved parts into a string of additions
     const resolvedString = resolvedParts.join("");
     if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Resolved String: ", resolvedString) }
-    const result = eval(resolvedString)
+    let result = null;
+    try {
+        // Evaluate the resolved string as a math expression
+        result = eval(resolvedString)
+    } catch (e) {
+        // If the string can't be evaluated, log it and return the original changeValue
+        console.info(`_parseAndResolveChangeValue: Cannot evaluate change value "${resolvedString}" to a number:`, e);
+        return changeValue;
+    }
     if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Result: ", result) }
     // Is the result a real number?
     if (isNaN(result)) {
-        ui.notifications?.error(`Apply Effect: Effect change value "${changeValue}" resolved to "${resolvedString}". Could not solve for a final number.`);
+        ui.notifications?.error(`Effect change value "${changeValue}" resolved to "${resolvedString}". Could not solve for a final number.`);
         return changeValue;
     } else {
         // If the result is a decimal, round it down to the nearest integer
