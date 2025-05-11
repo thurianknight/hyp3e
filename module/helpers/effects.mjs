@@ -120,38 +120,14 @@ export function setupEffectRollHandler() {
 
         for (let i = 0; i < updatedChanges.length; i++) {
             const change = updatedChanges[i];
-            // We really need a more robust string parser for this... so we can handle
-            //  things like a combination of data paths and roll formulas, with spaces, 
-            //  math symbols (+, -, *, /), etc.
-            // I can imagine that we might need to split the string into parts, probably 
-            //  based on spaces and math symbols, then check each part to see if it's a
-            //  roll formula or a data path. Then we can reassemble the string with the
-            //  resolved values.
-            // For now, we'll just check if the value is a roll formula or a data path.
-
-            // Determine whether the change is a roll formula, and resolve it
-            if (Roll.validate(change.value)) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("createActiveEffect: Roll formula detected: ", change.value) }
-                const roll = new Roll(change.value, actor?.getRollData?.());
-                await roll.evaluate({ evaluateSync: true });
+            // Parse the change.value string and resolve it into a number if possible
+            const resolvedChange = await _parseAndResolveChangeValue(change.value, actor)
+            if (updatedChanges[i].value !== resolvedChange) {
                 updatedChanges[i] = {
                     ...change,
-                    value: roll.total
+                    value: resolvedChange
                 };
                 didUpdate = true;
-            }
-            // Determine whether the change is a data path, and resolve it
-            else if (change.value.startsWith("system.")) {
-                if (CONFIG.HYP3E.debugMessages) { console.log("createActiveEffect: Data path detected: ", change.value) }
-                // const path = change.value.split(".").slice(1).join(".");
-                const value = getProperty(actor, change.value);
-                if (value !== undefined) {
-                    updatedChanges[i] = {
-                        ...change,
-                        value: value
-                    };
-                    didUpdate = true;
-                }
             }
         }
         // Batch out the updates to the effect
@@ -162,6 +138,52 @@ export function setupEffectRollHandler() {
             });
         }
     });
+}
+
+/**
+ * Split the changeValue string into parts, based on math symbols, then check each 
+ *  part to see if it's a roll formula or a data path. Then we can reassemble the 
+ *  string with the resolved values, and do the math on it.
+ * @param {*} changeValue 
+ * @param {*} actor 
+ * @returns 
+ */
+async function _parseAndResolveChangeValue(changeValue, actor) {
+    if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Change String: ", changeValue) }
+    // Split the string into parts & resolve each part
+    const parts = changeValue.split(/(\+|\-|\*|\/)/).map(part => part.trim());
+    const resolvedParts = await Promise.all(parts.map(async part => {
+        // Check if the part is a roll formula
+        if (Roll.validate(part)) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Roll Detected: ", part) }
+            const roll = new Roll(part, actor?.getRollData?.());
+            await roll.evaluate({ evaluateSync: true });
+            if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Roll Total: ", roll.total) }
+            return roll.total;
+        }
+        // Check if the part is a data path
+        else if (part.startsWith("system.")) {
+            if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Data Path: ", part) }
+            const value = getProperty(actor, part);
+            if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Data Value: ", value) }
+            return value !== undefined ? value : part;
+        }
+        // If it's neither, return the original part
+        return part;
+    }));
+    // Reassemble the resolved parts into a string of additions
+    const resolvedString = resolvedParts.join("");
+    if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Resolved String: ", resolvedString) }
+    const result = eval(resolvedString)
+    if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Result: ", result) }
+    // Is the result a real number?
+    if (isNaN(result)) {
+        ui.notifications?.error(`Apply Effect: Effect change value "${changeValue}" resolved to "${resolvedString}". Could not solve for a final number.`);
+        return changeValue;
+    } else {
+        // If the result is a decimal, round it down to the nearest integer
+        return Math.floor(result);
+    }
 }
 
 /**
