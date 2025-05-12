@@ -253,15 +253,6 @@ export class Hyp3eItem extends Item {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
             }
-            // If the weapon has one or more effects, add an Apply Effects button
-            // if (item.effects.size > 0) {
-            //     content += "<p>Weapon effects:<br/>"
-            //     item.effects.forEach(effect => {
-            //         const effectData = {...effect};
-            //         content += `&nbsp;&nbsp;<i>${effectData.name}</i><br/>`
-            //     });
-            //     content += "</p>"
-            // }
         }
 
         // Spells
@@ -303,19 +294,6 @@ export class Hyp3eItem extends Item {
             } else {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`_displayItemInChat: Damage roll for spell ${item.name}, ${itemData.damage}, is not rollable.`) }
             }
-            // If the spell has one or more effects, add an Apply Effects button
-            // if (item.effects.size > 0) {
-            //     content += "<p>Spell effects:<br/>"
-            //     item.effects.forEach(effect => {
-            //         const effectData = {...effect};
-            //         content += `&nbsp;&nbsp;<i>${effectData.name}</i><br/>`
-            //     });
-            //     content += "</p>"
-            // }
-        }
-        // Both spells and weapons might have a Saving Throw
-        if (itemData.save && itemData.save !== "") {
-            content += `<div class='save-button' data-save='${itemData.save}'></div>`;
         }
 
         // Item
@@ -324,15 +302,15 @@ export class Hyp3eItem extends Item {
                 // Display the item check roll with target number
                 content += `<p>Item Check: ${itemData.formula} equal or under ${itemData.tn}</p>`
             }
-            // If the item has one or more effects, add an Apply Effects button
-            // if (item.effects.size > 0) {
-            //     content += "<p>Item effects:<br/>"
-            //     item.effects.forEach(effect => {
-            //         const effectData = {...effect};
-            //         content += `&nbsp;&nbsp;<i>${effectData.name}</i><br/>`
-            //     });
-            //     content += "</p>"
-            // }
+        }
+
+        // Items might have Effects, but only show the button if item is identified
+        if (item.effects.size > 0 && itemData.identified) {
+            content += `<div class='apply-effects-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
+        }
+        // Items might have a Saving Throw, but only show the button if item is identified
+        if (itemData.save && itemData.save !== "" && itemData.identified) {
+            content += `<div class='save-button' data-save='${itemData.save}'></div>`;
         }
 
         // Setup & display the item in chat
@@ -340,7 +318,7 @@ export class Hyp3eItem extends Item {
             item: item,
             actor: actor,
             user: game.user,
-            hasEffects: item.effects.size > 0,
+            // hasEffects: item.effects.size > 0,
             content: content,
         };
         const template = `${HYP3E.templatePath}/chat/show-item.hbs`;

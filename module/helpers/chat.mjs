@@ -267,6 +267,9 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     console.log(`Apply Effects Button: This is most common with NPCs and monsters, if the GM drags an item or creates a new item directly in the token sheet.`)
                 }
                 return;
+            } else if (!item.system.identified) {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Item ${item.name} has not been identified, so we will not display any buttons.`) }
+                return;
             }
             if (CONFIG.HYP3E.debugMessages) { console.log(`Apply Effects Button item: `, item) }
 

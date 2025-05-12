@@ -216,11 +216,13 @@ export class Hyp3eItemSheet extends ItemSheet {
     const item = this.item
     if (identified) {
         // If identified, set item.name to system.realName and item.system.description to item.system.realDescription
-        const updates = { name: item.system.realName, "system.description": item.system.realDescription }
+        const name = item.system?.realName > "" ? item.system.realName : item.name
+        const updates = { name: name, "system.description": item.system.realDescription }
         await item.update(updates)
     } else {
         // If not identified, set item.name to system.itemAlias and item.system.description to item.system.aliasDescription
-        const updates = { name: item.system.itemAlias, "system.description": item.system.aliasDescription }
+        const name = item.system?.itemAlias > "" ? item.system.itemAlias : item.name
+        const updates = { name: name, "system.description": item.system.aliasDescription }
         await item.update(updates)
     }
   }
