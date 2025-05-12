@@ -65,6 +65,13 @@ export class Hyp3eItemSheet extends ItemSheet {
             async: true 
         }
     );
+    context.enrichedRealDescription = await TextEditor.enrichHTML(
+        context.system.realDescription,
+        { 
+            rollData: context.rollData, 
+            async: true 
+        }
+    );
     // console.log("Roll Data in ItemSheet:", context.rollData);
     // console.log("Enriched HTML:", context.enrichedDescription);
 
@@ -142,6 +149,13 @@ export class Hyp3eItemSheet extends ItemSheet {
     // Rollable elements
     html.find('.rollable').click(this._onRoll.bind(this));
 
+    // Handle item status identified / not identified
+    html.find(".identified").click(async (event) => {
+        const identified = event.target.checked
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Checkbox system.identified clicked! New 'checked' value: ${identified}.`) }
+        this._toggleIdentified(identified)
+    });
+
     // Toggle weapon attack type melee/missile
     html.find(".weapon-type").click(async (event) => {
       const attackType = $(event.currentTarget).data("attackType")
@@ -192,6 +206,23 @@ export class Hyp3eItemSheet extends ItemSheet {
         speaker: ChatMessage.getSpeaker({ actor: this.item.actor })
     });
 
+  }
+
+  /**
+   * Handle toggling an item as 'identified' or 'unidentified'
+   * @param {*} identified 
+   */
+  async _toggleIdentified(identified) {
+    const item = this.item
+    if (identified) {
+        // If identified, set item.name to system.realName and item.system.description to item.system.realDescription
+        const updates = { name: item.system.realName, "system.description": item.system.realDescription }
+        await item.update(updates)
+    } else {
+        // If not identified, set item.name to system.itemAlias and item.system.description to item.system.aliasDescription
+        const updates = { name: item.system.itemAlias, "system.description": item.system.aliasDescription }
+        await item.update(updates)
+    }
   }
 
   /**

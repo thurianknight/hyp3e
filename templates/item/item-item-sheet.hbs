@@ -3,6 +3,18 @@
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
     <div class="header-block">
       <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+      {{#if isGM}}
+      <div class="flexrow">
+        <span class="flexrow">
+            <input name="system.identified" type="checkbox" {{checked system.identified}}>
+            <label class="resource-label">{{localize 'HYP3E.identified'}}</label>
+        </span>
+        <span class="flexrow flexlarge flex-group-center">
+            <label class="resource-label">{{localize 'HYP3E.itemAlias'}}</label>
+            <input type="text" style="text-align: left; min-width: 200px;" name="system.itemAlias" value="{{system.itemAlias}}"/>
+        </span>
+      </div>
+      {{/if}}
       <div class="flexrow">
         <div class="resource flexrow flex-group-center">
           <label class="resource-label">{{localize 'HYP3E.details.xp'}}</label>

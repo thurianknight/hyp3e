@@ -281,6 +281,9 @@
         "xp": "XP Value",
         "treasure": "Treasure Class",
         "tokenAlias": "Token Alias",
+        "itemAlias": "Alias",
+        "aliasDescription": "Description if not Identified",
+        "identified": "Identified",
         "effect": {
             "add": "Add Effect",
             "create": "Create Effect",

@@ -285,8 +285,20 @@
               <a><h4 class="item-drop">{{item.name}}</h4></a>
             </div>
             <div class="item-prop">{{item.system.type}}</div>
-            <div class="item-prop">{{item.system.ac}}</div>
-            <div class="item-prop">{{item.system.dr}}</div>
+            <div class="item-prop">
+                {{#if item.system.identified}}
+                {{item.system.ac}}
+                {{else}}
+                <i>??</i>
+                {{/if}}
+            </div>
+            <div class="item-prop">
+                {{#if item.system.identified}}
+                {{item.system.dr}}
+                {{else}}
+                <i>??</i>
+                {{/if}}
+            </div>
             <div class="item-prop">{{item.system.mv}}</div>
             <div class="item-controls">
               <a class="item-control item-equip{{#unless item.system.equipped}} item-unequipped{{/unless}}" title='{{localize "HYP3E.item.equip"}}'><i class="fas fa-shirt"></i></a>

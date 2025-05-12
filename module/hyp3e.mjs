@@ -677,9 +677,16 @@ async function migrateWorld() {
             }
         }
         // Migrate the actor document's items if any exist
-        /** 
         if (actor.items) {
             for (let item of actor.items) {
+                // Do for all items regardless of type
+                if (item.system.realName == "") {
+                    item.update({ "system.realName": item.name })
+                }
+                if (item.system.realDescription == "") {
+                    item.update({ "system.realDescription": item.system.description })
+                }
+                // Just weapons
                 if (item.type === "weapon") {
                     if (item.system?.annotations > ""){
                         console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
@@ -703,7 +710,6 @@ async function migrateWorld() {
                 }
             }
         }
-        */
     }
 
     // Migrate Items directory
@@ -716,7 +722,14 @@ async function migrateWorld() {
         if (!("tokenAlias" in item.system)) {
             await item.update({ "system.tokenAlias": "" })
         }
-
+        // Do for all items regardless of type
+        if (item.system.realName == "") {
+            item.update({ "system.realName": item.name })
+        }
+        if (item.system.realDescription == "") {
+            item.update({ "system.realDescription": item.system.description })
+        }
+        // Just weapons
         if (item.type === "weapon") {
             if (item.system?.annotations > ""){
                 console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
@@ -850,9 +863,16 @@ async function migrateWorld() {
                         }
                     }
                     // Migrate the actor document's items if any exist
-                    /**
                     if (doc.items) {
                         for (let item of doc.items) {
+                            // Do for all items regardless of type
+                            if (item.system.realName == "") {
+                                item.update({ "system.realName": item.name })
+                            }
+                            if (item.system.realDescription == "") {
+                                item.update({ "system.realDescription": item.system.description })
+                            }
+                            // Just weapons
                             if (item.type === "weapon") {
                                 if (item.system?.annotations > ""){
                                     console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
@@ -872,7 +892,6 @@ async function migrateWorld() {
                             }
                         }
                     }
-                    */
                     break
 
                 case "Item":
@@ -883,6 +902,14 @@ async function migrateWorld() {
                     if (!("tokenAlias" in doc.system)) {
                         doc.update({ "system.tokenAlias": "" })
                     }
+                    // Do for all items regardless of type
+                    if (doc.system.realName == "") {
+                        doc.update({ "system.realName": doc.name })
+                    }
+                    if (doc.system.realDescription == "") {
+                        doc.update({ "system.realDescription": doc.system.description })
+                    }
+                    // Just weapons
                     if (doc.type === "weapon") {
                         if (doc.system?.annotations > ""){
                             console.log(`Could not migrate item ${doc.name} with annotations ${doc.system.annotations}!`)

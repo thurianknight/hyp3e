@@ -2,11 +2,33 @@
   <header class="sheet-header">
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
     <div class="header-block">
-      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+      <h1 class="charname">
+        {{#if isGM}}
+        <input name="system.realName" type="text" value="{{system.realName}}" placeholder="Name"/>
+        {{else}}
+            {{#if system.identified}}
+            <input name="system.realName" type="text" value="{{system.realName}}" placeholder="Name"/>
+            {{else}}
+            <input name="system.itemAlias" type="text" value="{{system.itemAlias}}" disabled/>
+            {{/if}}
+        {{/if}}
+      </h1>
+      {{#if isGM}}
+      <div class="flexrow">
+        <span class="flexrow">
+            <input class="identified" name="system.identified" type="checkbox" {{checked system.identified}}>
+            <label class="resource-label">{{localize 'HYP3E.identified'}}</label>
+        </span>
+        <span class="flexrow flexlarge flex-group-center">
+            <label class="resource-label">{{localize 'HYP3E.itemAlias'}}</label>
+            <input type="text" style="text-align: left; min-width: 200px;" name="system.itemAlias" value="{{system.itemAlias}}"/>
+        </span>
+      </div>
+      {{/if}}
       <div class="flexrow">
         <div class="resource flexrow flex-group-center">
           <label class="resource-label">{{localize 'HYP3E.details.xp'}}</label>
-          <input type="text" name="system.xp" value="{{system.xp}}" >
+          <input type="text" name="system.xp" value="{{system.xp}}"/>
         </div>
         <div class="resource flexrow flex-group-center">
           <label class="resource-label">{{localize 'HYP3E.item.qty'}}</label>
@@ -14,7 +36,7 @@
         </div>
         <div class="resource flexrow flex-group-center">
           <label class="resource-label">{{localize 'HYP3E.item.cost'}}</label>
-          <input type="text" name="system.cost" value="{{system.cost}}" />
+          <input type="text" name="system.cost" value="{{system.cost}}"/>
         </div>
         <div class="resource flexrow flex-group-center">
           <label class="resource-label">{{localize 'HYP3E.item.weight'}}</label>
@@ -47,24 +69,56 @@
               {{selectOptions armorTypes selected=system.type localize=true}}
             </select>
           </div>
-          {{#if system.isShield}}
-          <label class="resource-label">{{localize 'HYP3E.armor.acMod'}}</label>
+          {{#if isGM}}
+            {{#if system.isShield}}
+            <label class="resource-label">{{localize 'HYP3E.armor.acMod'}}</label>
+            {{else}}
+            <label class="resource-label">{{localize 'HYP3E.armor.armorClass'}}</label>
+            {{/if}}
+            <input type="text" name="system.ac" value="{{system.ac}}" data-dtype="Number" />
+            <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
+            <input type="text" name="system.dr" value="{{system.dr}}" data-dtype="Number" />
           {{else}}
-          <label class="resource-label">{{localize 'HYP3E.armor.armorClass'}}</label>
+            {{#if system.identified}}
+                {{#if system.isShield}}
+                <label class="resource-label">{{localize 'HYP3E.armor.acMod'}}</label>
+                {{else}}
+                <label class="resource-label">{{localize 'HYP3E.armor.armorClass'}}</label>
+                {{/if}}
+                <input type="text" name="system.ac" value="{{system.ac}}" data-dtype="Number" />
+                <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
+                <input type="text" name="system.dr" value="{{system.dr}}" data-dtype="Number" />
+            {{else}}
+                {{#if system.isShield}}
+                <label class="resource-label">{{localize 'HYP3E.armor.acMod'}}</label>
+                {{else}}
+                <label class="resource-label">{{localize 'HYP3E.armor.armorClass'}}</label>
+                {{/if}}
+                <input type="text" name="system.ac" value="??" data-dtype="Number" />
+                <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
+                <input type="text" name="system.dr" value="??" data-dtype="Number" />
+            {{/if}}
           {{/if}}
-          <input type="text" name="system.ac" value="{{system.ac}}" data-dtype="Number" />
-          <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
-          <input type="text" name="system.dr" value="{{system.dr}}" data-dtype="Number" />
           <label class="resource-label">{{localize 'HYP3E.movement.base.name'}}</label>
           <input type="text" name="system.mv" value="{{system.mv}}" data-dtype="Number" />
         </div>
 
         {{!-- Description --}}
         <div class="flex item-description">
-          <h3>{{localize 'HYP3E.tabs.description'}}</h3>
           {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
           {{!-- {{editor system.description target="system.description" rollData=rollData button=true owner=owner editable=editable}} --}}
-          {{editor enrichedDescription target="system.description" rollData=rollData button=true owner=owner editable=editable}}
+          <h3>{{localize 'HYP3E.tabs.description'}}</h3>
+          {{#if isGM}}
+          {{editor enrichedRealDescription target="system.realDescription" rollData=rollData button=true owner=owner editable=editable}}
+          <label for="system.aliasDescription" class="resource-label">{{localize 'HYP3E.aliasDescription'}}</label>
+          <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
+          {{else}}
+            {{#if system.identified}}
+            {{editor enrichedRealDescription target="system.realDescription" rollData=rollData button=true owner=owner editable=editable}}          
+            {{else}}
+            <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
+            {{/if}}
+          {{/if}}
         </div>
       </div>
     </div>

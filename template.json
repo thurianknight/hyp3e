@@ -211,7 +211,10 @@
                 "friendlyName": "",
                 "description": "",
                 "identified": true,
-                "tokenAlias": ""
+                "realName": "",
+                "realDescription": "",
+                "itemAlias": "",
+                "aliasDescription": ""
             },
             "equippable": {
                 "equipped": false
