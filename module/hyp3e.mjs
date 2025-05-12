@@ -524,7 +524,7 @@ Hooks.once("ready", async function() {
         const currentVersion = game.system.version
         console.log(`System version ${currentVersion}`)
         // No need to migrate if system version is x.x.x or higher
-        const NEEDS_MIGRATION_TO_VERSION = "1.8.3"
+        const NEEDS_MIGRATION_TO_VERSION = "1.9.0"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
             migrateWorld()
@@ -574,6 +574,24 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
 Hooks.on("renderChatMessage", addChatMessageButtons);
 
 Hooks.on("createToken", (document, options, userId) => {
+    // Replace the actual name with the alias, if it exists
+    console.log(`Token creation:`, document)
+    if (document.actor.system.tokenAlias != "") {
+        let tokenAlias = document.actor.system.tokenAlias
+        if (document.appendNumber) {
+            // Get whatever number was added to the name and keep it
+            const tokenNum = document.name.match(/\(\d{1,2}\)$/);
+            tokenAlias = `${tokenAlias} ${tokenNum[0]}`
+        }
+        if (document.prependAdjective) {
+            // Get whatever adjective was prepended to the name and keep it
+            const adjective = document.name.split(" ")[0];
+            tokenAlias = `${adjective} ${tokenAlias}`
+        }
+        console.log(`Updating token name from ${document.name} to ${tokenAlias}...`)
+        document.update({"name": tokenAlias})
+    }
+    // Roll HD for NPCs & monsters
     if (document.actor?.type == "npc" && document.actor.system.rollHD) {
         document.actor.rollHD()
     }
@@ -591,6 +609,12 @@ async function migrateWorld() {
         // Migrate NPC data
         if (actor.type == "npc") {
             // do stuff to npcs
+            if (!("identified" in actor.system)) {
+                await actor.update({ "system.identified": true })
+            }
+            if (!("tokenAlias" in actor.system)) {
+                await actor.update({ "system.tokenAlias": "" })
+            }
             const tempHp = fixTempHp(actor)
             if (tempHp) {
                 delete actor.system.hp["tempHp"]
@@ -620,6 +644,12 @@ async function migrateWorld() {
         // Migrate PC data
         if (actor.type == "character") {
             // do stuff to characters
+            if (!("identified" in actor.system)) {
+                actor.update({ "system.identified": true })
+            }
+            if (!("tokenAlias" in actor.system)) {
+                actor.update({ "system.tokenAlias": "" })
+            }
             const tempHp = fixTempHp(actor)
             if (tempHp) {
                 delete actor.system.hp["tempHp"]
@@ -677,9 +707,16 @@ async function migrateWorld() {
     }
 
     // Migrate Items directory
-    /**
     console.log(`Correcting data for items in the directory...`)
     for (let item of game.items.contents) {
+        // Do for all items regardless of type
+        if (!("identified" in item.system)) {
+            await item.update({ "system.identified": true })
+        }
+        if (!("tokenAlias" in item.system)) {
+            await item.update({ "system.tokenAlias": "" })
+        }
+
         if (item.type === "weapon") {
             if (item.system?.annotations > ""){
                 console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
@@ -702,7 +739,6 @@ async function migrateWorld() {
             // }
         }
     }
-    */
 
     // Skip out early, no compendium migrations needed
     // return
@@ -717,9 +753,9 @@ async function migrateWorld() {
         // }
 
         // Skip anything that's not an Actor compendium pack
-        if (packType != "Actor") {
-            continue
-        }
+        // if (packType != "Actor") {
+        //     continue
+        // }
 
         // Skip anything that's not an Item compendium pack
         // if (packType != "Item") {
@@ -746,6 +782,12 @@ async function migrateWorld() {
                     // Migrate NPC data
                     if (doc.type == "npc") {
                         // do stuff to npcs
+                        if (!("identified" in doc.system)) {
+                            doc.update({ "system.identified": true })
+                        }
+                        if (!("tokenAlias" in doc.system)) {
+                            doc.update({ "system.tokenAlias": "" })
+                        }
                         const tempHp = fixTempHp(doc)
                         if (tempHp) {
                             delete doc.system.hp["tempHp"]
@@ -775,6 +817,12 @@ async function migrateWorld() {
                     // Migrate PC data
                     if (doc.type == "character") {
                         // do stuff to characters
+                        if (!("identified" in doc.system)) {
+                            doc.update({ "system.identified": true })
+                        }
+                        if (!("tokenAlias" in doc.system)) {
+                            doc.update({ "system.tokenAlias": "" })
+                        }
                         const tempHp = fixTempHp(doc)
                         if (tempHp) {
                             delete doc.system.hp["tempHp"]
@@ -828,6 +876,13 @@ async function migrateWorld() {
                     break
 
                 case "Item":
+                    // Do for all items regardless of type
+                    if (!("identified" in doc.system)) {
+                        doc.update({ "system.identified": true })
+                    }
+                    if (!("tokenAlias" in doc.system)) {
+                        doc.update({ "system.tokenAlias": "" })
+                    }
                     if (doc.type === "weapon") {
                         if (doc.system?.annotations > ""){
                             console.log(`Could not migrate item ${doc.name} with annotations ${doc.system.annotations}!`)

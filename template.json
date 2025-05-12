@@ -59,6 +59,8 @@
                 "alignment": "",
                 "biography": "",
                 "knownLanguages": "",
+                "identified": true,
+                "tokenAlias": "",
                 "tempModifiers": []
             },
             "spellcaster": {
@@ -207,7 +209,9 @@
         "templates": {
             "base": {
                 "friendlyName": "",
-                "description": ""
+                "description": "",
+                "identified": true,
+                "tokenAlias": ""
             },
             "equippable": {
                 "equipped": false

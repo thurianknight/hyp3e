@@ -5,9 +5,15 @@
     <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
     <div class="header-block">
       <div class="character-header-block flexcol">
-        <h1 class="charname">
-          <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
-        </h1>
+        <div class="character-header-block flexrow">
+            <h1 class="charname">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+            </h1>
+            <span class="character-header-block">
+                <label for="system.tokenAlias" class="small-label">{{localize "HYP3E.tokenAlias"}}</label>
+                <input type="text" name="system.tokenAlias" value="{{system.tokenAlias}}"/>
+            </span>
+        </div>
         <div class="character-header-block flexrow">
           <div class="npc-field align-center">
             {{!-- <input type="text" name="system.size" value="{{system.size}}" /> --}}
