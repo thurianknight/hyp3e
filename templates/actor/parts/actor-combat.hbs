@@ -192,8 +192,20 @@
             {{else}}
               <div class="item-prop">{{item.system.range.short}}/{{item.system.range.medium}}/{{item.system.range.long}}</div>
             {{/if}}
-            <div class="item-prop">{{numberFormat item.system.atkMod decimals=0 sign=true}}</div>
-            <div class="item-prop">{{numberFormat item.system.dmgMod decimals=0 sign=true}}</div>
+            <div class="item-prop">
+                {{#if item.system.identified}}
+                {{numberFormat item.system.atkMod decimals=0 sign=true}}
+                {{else}}
+                <i>??</i>
+                {{/if}}
+            </div>
+            <div class="item-prop">
+                {{#if item.system.identified}}
+                {{numberFormat item.system.dmgMod decimals=0 sign=true}}
+                {{else}}
+                <i>??</i>
+                {{/if}}
+            </div>
             <div class="item-prop">{{item.system.damage}}</div>
             <div class="item-controls">
               <a class="item-control item-equip {{#unless item.system.equipped}}item-unequipped{{/unless}}" title='{{localize "HYP3E.item.equip"}}'><i class="fas fa-hand-fist"></i></a>

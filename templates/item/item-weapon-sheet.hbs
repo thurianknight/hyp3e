@@ -2,11 +2,21 @@
   <header class="sheet-header">
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
     <div class="header-block">
-      <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+      <h1 class="charname">
+        {{#if isGM}}
+        <input name="system.realName" type="text" value="{{system.realName}}" placeholder="Name"/>
+        {{else}}
+            {{#if system.identified}}
+            <input name="system.realName" type="text" value="{{system.realName}}" placeholder="Name"/>
+            {{else}}
+            <input name="system.itemAlias" type="text" value="{{system.itemAlias}}" disabled/>
+            {{/if}}
+        {{/if}}
+      </h1>
       {{#if isGM}}
       <div class="flexrow">
         <span class="flexrow">
-            <input name="system.identified" type="checkbox" {{checked system.identified}}>
+            <input class="identified" name="system.identified" type="checkbox" {{checked system.identified}}>
             <label class="resource-label">{{localize 'HYP3E.identified'}}</label>
         </span>
         <span class="flexrow flexlarge flex-group-center">
@@ -18,7 +28,7 @@
       <div class="flexrow">
         <div class="resource flexrow flex-group-center">
           <label class="resource-label">{{localize 'HYP3E.details.xp'}}</label>
-          <input type="text" name="system.xp" value="{{system.xp}}" >
+          <input type="text" name="system.xp" value="{{system.xp}}"/>
         </div>
         <div class="resource flexrow flex-group-center">
           <label class="resource-label">{{localize 'HYP3E.item.qty'}}</label>
@@ -81,29 +91,24 @@
 
         {{!-- Weapon Attributes --}}
         <div class="flexshrink flex-group-center item-attributes">
-          {{!-- <label class="resource-label">{{localize 'HYP3E.headers.atkRate'}}</label>
-          <input type="text" name="system.rof" value="{{system.rof}}" data-dtype="String" />
-          <label class="resource-label">{{localize 'HYP3E.weapon.atkType'}}</label>
-          <div class="flexrow">
-            <a class="weapon-type {{#unless system.melee}}no-bonus{{/unless}}" data-attack-type="melee" title='{{localize "HYP3E.weapon.type.melee"}}'><i class="fas fa-sword"></i></a>
-            <a class="weapon-type {{#unless system.missile}}no-bonus{{/unless}}" data-attack-type="missile" title='{{localize "HYP3E.weapon.type.missile"}}'><i class="fas fa-bow-arrow"></i></a>
-          </div>
-          {{#if system.melee}}
-          <label class="resource-label">{{localize 'HYP3E.headers.wpnClass'}}</label>
-          <input type="text" name="system.wc" value="{{system.wc}}" data-dtype="Number" />
-          {{/if}}
-          {{#if system.missile}}
-          <label class="resource-label">{{localize 'HYP3E.weapon.range'}}</label>
-          <div class="flexrow">
-            <input type="text" name="system.range.short" value="{{system.range.short}}" data-dtype="Number" />
-            <input type="text" name="system.range.medium" value="{{system.range.medium}}" data-dtype="Number" />
-            <input type="text" name="system.range.long" value="{{system.range.long}}" data-dtype="Number" />
-          </div>
-          {{/if}} --}}
+          {{#if isGM}}
           <label class="resource-label">{{localize 'HYP3E.headers.atkMod'}}</label>
           <input type="text" name="system.atkMod" value="{{numberFormat system.atkMod decimals=0 sign=true}}" data-dtype="Number" />
           <label class="resource-label">{{localize 'HYP3E.headers.dmgMod'}}</label>
           <input type="text" name="system.dmgMod" value="{{numberFormat system.dmgMod decimals=0 sign=true}}" data-dtype="Number" />
+          {{else}}
+            {{#if system.identified}}
+            <label class="resource-label">{{localize 'HYP3E.headers.atkMod'}}</label>
+            <input type="text" name="system.atkMod" value="{{numberFormat system.atkMod decimals=0 sign=true}}" data-dtype="Number" />
+            <label class="resource-label">{{localize 'HYP3E.headers.dmgMod'}}</label>
+            <input type="text" name="system.dmgMod" value="{{numberFormat system.dmgMod decimals=0 sign=true}}" data-dtype="Number" />
+            {{else}}
+            <label class="resource-label">{{localize 'HYP3E.headers.atkMod'}}</label>
+            <input type="text" value="??" disabled />
+            <label class="resource-label">{{localize 'HYP3E.headers.dmgMod'}}</label>
+            <input type="text" value="??" disabled />
+            {{/if}}
+          {{/if}}
           <label class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
           <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String" />
           {{#if system.melee}}
@@ -129,7 +134,17 @@
           <h3>{{localize 'HYP3E.tabs.description'}}</h3>
           {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
           {{!-- {{editor system.description target="system.description" rollData=rollData button=true owner=owner editable=editable}} --}}
-          {{editor enrichedDescription target="system.description" rollData=rollData button=true owner=owner editable=editable}}
+          {{#if isGM}}
+          {{editor enrichedRealDescription target="system.realDescription" rollData=rollData button=true owner=owner editable=editable}}
+          <label for="system.aliasDescription" class="resource-label">{{localize 'HYP3E.aliasDescription'}}</label>
+          <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
+          {{else}}
+            {{#if system.identified}}
+            {{editor enrichedRealDescription target="system.realDescription" rollData=rollData button=true owner=owner editable=editable}}          
+            {{else}}
+            <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
+            {{/if}}
+          {{/if}}
         </div>
       </div>
     </div>
@@ -192,7 +207,13 @@
     <div class="tab effects" data-group="primary" data-tab="effects">
       {{!-- As you add new fields, add them in here! --}}
       <div class="flex description-block">
+        {{#if isGM}}
         {{> "item-effects"}}
+        {{else}}
+            {{#if system.identified}}
+            {{> "item-effects"}}
+            {{/if}}
+        {{/if}}
       </div>
     </div>
   </section>

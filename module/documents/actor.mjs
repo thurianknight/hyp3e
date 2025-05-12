@@ -1710,7 +1710,15 @@ export class Hyp3eActor extends Actor {
     _getItemDetails(itemId) {
         const item = this.items.get(itemId) ?? null;
         const itemData = item ? { ...item.system, itemType: item.type } : null; // Include item type
-        let itemName = item ? (item.system.friendlyName || item.name) : "Unknown Action";
+        // itemName should be prioritized as (1) itemAlias [but only if not identified], 
+        //  (2) friendlyName, and (3) realName
+        let itemName = ""
+        if (!item.system.identified && item.system.itemAlias != "") {
+            itemName = item.system.itemAlias
+        } else {
+            itemName = item ? (item.system.friendlyName || item.name) : "Unknown Action";
+        }
+        // Start of the chat message
         let attackTextBase = "Attack";
 
         if (item) {
@@ -1757,7 +1765,8 @@ export class Hyp3eActor extends Actor {
         if (target && target.actor && attacker) {
             const targetActorData = target.actor.system;
             targetData.ac = targetActorData.ac?.value ?? 9;
-            targetData.name = target.actor.name ?? "";
+            // Use token name if possible, otherwise actor name
+            targetData.name = target.name ? target.name : target.actor.name;
             targetData.size = targetActorData.size ?? "M";
             // Get the attacker's actual token size
             const attackerWidth = attacker.document.width ?? 1; // Default to 1 if not found

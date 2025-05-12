@@ -94,9 +94,9 @@
                 {{else}}
                 <label class="resource-label">{{localize 'HYP3E.armor.armorClass'}}</label>
                 {{/if}}
-                <input type="text" name="system.ac" value="??" data-dtype="Number" />
+                <input type="text" value="??" disabled />
                 <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
-                <input type="text" name="system.dr" value="??" data-dtype="Number" />
+                <input type="text" value="??" disabled />
             {{/if}}
           {{/if}}
           <label class="resource-label">{{localize 'HYP3E.movement.base.name'}}</label>
@@ -105,9 +105,9 @@
 
         {{!-- Description --}}
         <div class="flex item-description">
+          <h3>{{localize 'HYP3E.tabs.description'}}</h3>
           {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
           {{!-- {{editor system.description target="system.description" rollData=rollData button=true owner=owner editable=editable}} --}}
-          <h3>{{localize 'HYP3E.tabs.description'}}</h3>
           {{#if isGM}}
           {{editor enrichedRealDescription target="system.realDescription" rollData=rollData button=true owner=owner editable=editable}}
           <label for="system.aliasDescription" class="resource-label">{{localize 'HYP3E.aliasDescription'}}</label>
@@ -149,7 +149,13 @@
     <div class="tab effects" data-group="primary" data-tab="effects">
       {{!-- As you add new fields, add them in here! --}}
       <div class="flex description-block">
+        {{#if isGM}}
         {{> "item-effects"}}
+        {{else}}
+            {{#if system.identified}}
+            {{> "item-effects"}}
+            {{/if}}
+        {{/if}}
       </div>
     </div>
   </section>

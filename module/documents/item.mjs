@@ -191,12 +191,13 @@ export class Hyp3eItem extends Item {
         } else {
             typeLabel = (item.type).capitalize()
         }
-        // Replace names like "Bow, composite, long" with something that looks nicer
+        // itemName should be prioritized as (1) itemAlias [but only if not identified], 
+        //  (2) friendlyName, and (3) realName
         let itemName = ""
-        if (itemData.friendlyName != "") {
-            itemName = itemData.friendlyName
+        if (!itemData.identified && itemData.itemAlias != "") {
+            itemName = itemData.itemAlias
         } else {
-            itemName = item.name
+            itemName = item ? (itemData.friendlyName || item.name) : "Unknown Action";
         }
 
         // Chat message header text
