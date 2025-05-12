@@ -318,7 +318,6 @@ export class Hyp3eItem extends Item {
             item: item,
             actor: actor,
             user: game.user,
-            // hasEffects: item.effects.size > 0,
             content: content,
         };
         const template = `${HYP3E.templatePath}/chat/show-item.hbs`;
