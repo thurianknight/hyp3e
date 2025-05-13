@@ -61,6 +61,7 @@
                 "knownLanguages": "",
                 "identified": true,
                 "tokenAlias": "",
+                "resistances": {},
                 "tempModifiers": []
             },
             "spellcaster": {
@@ -201,7 +202,8 @@
             "xp": "0",
             "treasure": "",
             "dx": 11,
-            "rollHD": true
+            "rollHD": true,
+            "phenotype": ""
         }
     },
     "Item": {
