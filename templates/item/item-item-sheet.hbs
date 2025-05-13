@@ -106,7 +106,8 @@
           <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
           {{else}}
             {{#if system.identified}}
-            {{editor enrichedRealDescription target="system.realDescription" rollData=rollData button=true owner=owner editable=editable}}          
+            {{editor enrichedRealDescription target="system.realDescription" rollData=rollData button=true owner=owner editable=editable}}
+            <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
             {{else}}
             <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
             {{/if}}

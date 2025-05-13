@@ -28,6 +28,14 @@ Hooks.once('init', async function() {
     console.log("System info:", game.system)
 
     // Register system settings
+    game.settings.register(game.system.id, "migration-1.10.0-ran", {
+        name: "Migration Ran",
+        scope: "world",
+        config: false,
+        type: Boolean,
+        default: false,
+    });
+
     // Debug logging & messages
     game.settings.register(game.system.id, "debugMessages", {
         name: game.i18n.localize("HYP3E.settings.debugMessages"),
@@ -524,10 +532,20 @@ Hooks.once("ready", async function() {
         const currentVersion = game.system.version
         console.log(`System version ${currentVersion}`)
         // No need to migrate if system version is x.x.x or higher
-        const NEEDS_MIGRATION_TO_VERSION = "1.9.0"
+        const NEEDS_MIGRATION_TO_VERSION = "1.11.0"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
-            migrateWorld()
+            const alreadyRan = game.settings.get(game.system.id, "migration-1.10.0-ran");
+            if (!alreadyRan) {
+                console.log("Running one-time migration...");
+
+                // Do the world migration
+                await migrateWorld();
+
+                // Set the flag so it doesn't run again
+                await game.settings.set(game.system.id, "migration-1.10.0-ran", true);
+                console.log("Migration complete.");
+            }
         }
     }
 
