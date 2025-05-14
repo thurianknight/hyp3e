@@ -175,6 +175,28 @@ HYP3E.weaponAnnotations = {
 };
 
 /**
+ * Alternate damage types
+ * @type {Object}
+ */
+HYP3E.damageTypes = {
+    "basic": "HYP3E.weapon.damageTypes.basic",
+    "piercing": "HYP3E.weapon.damageTypes.piercing",
+    "slashing": "HYP3E.weapon.damageTypes.slashing",
+    "bludgeoning": "HYP3E.weapon.damageTypes.bludgeoning",
+    "fire": "HYP3E.weapon.damageTypes.fire",
+    "cold": "HYP3E.weapon.damageTypes.cold",
+    "electricity": "HYP3E.weapon.damageTypes.electricity",
+    "acid": "HYP3E.weapon.damageTypes.acid",
+    "negative": "HYP3E.weapon.damageTypes.negative",
+    "positive": "HYP3E.weapon.damageTypes.positive",
+    "sonic": "HYP3E.weapon.damageTypes.sonic",
+    "poison": "HYP3E.weapon.damageTypes.poison",
+    "disease": "HYP3E.weapon.damageTypes.disease",
+    "mental": "HYP3E.weapon.damageTypes.mental",
+    "pain": "HYP3E.weapon.damageTypes.pain"
+}
+
+/**
  * The armor types
  * @type {Object}
  */

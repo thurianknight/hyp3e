@@ -26,10 +26,6 @@
           <label class="resource-label">{{localize 'HYP3E.spell.duration'}}</label>
           <input type="text" name="system.duration" value="{{system.duration}}" />
         </div>
-        {{!-- <div class="resource flexrow flex-group-center flexlarge">
-          <label class="resource-label">{{localize 'HYP3E.spell.numAffected'}}</label>
-          <input type="text" name="system.affected" value="{{system.affected}}" />
-        </div> --}}
       </div>
     </div>
   </header>
@@ -50,10 +46,6 @@
 
         {{!-- Spell Attributes --}}
         <div class="flexshrink flex-group-center item-attributes">
-          {{!-- <label class="resource-label">{{localize 'HYP3E.weapon.range'}}</label>
-          <input type="text" name="system.range" value="{{system.range}}" />
-          <label class="resource-label">{{localize 'HYP3E.spell.duration'}}</label>
-          <input type="text" name="system.duration" value="{{system.duration}}" /> --}}
           <label class="resource-label">{{localize 'HYP3E.spell.numAffected'}}</label>
           <input type="text" name="system.affected" value="{{system.affected}}" />
           <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
@@ -66,7 +58,23 @@
           <label class="resource-label">{{localize 'HYP3E.attackRoll'}}</label>
           <input name="system.atkRoll" type="checkbox" {{checked system.atkRoll}}><br />
           <label for="system.damage" class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
+          <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.damage'}}" role="button" data-tooltip="HYP3E.headers.damage" data-control="set-base-dmg">
+            <i class="fas fa-book" style="font-size: small"></i>
+          </a>
           <input type="text" name="system.damage" value="{{system.damage}}" />
+          <hr class="plain-hr"/>
+          <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
+          <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.altDmg'}}" role="button" data-tooltip="HYP3E.headers.altDmg" data-control="set-alt-dmg">
+            <i class="fas fa-book" style="font-size: small"></i>
+          </a>
+          <ol class="items-list">
+          {{#each system.altDmg as |val key|}}
+            <li class="item-entry item" data-item-id="{{key}}">
+                {{lookup @root.damageTypes key}} {{val}}
+            </li>
+          {{/each}}
+          </ol>
+
         </div>
 
         {{!-- Description --}}

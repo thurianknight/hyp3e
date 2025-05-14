@@ -1023,6 +1023,11 @@ textarea {
     100% {color: black;}
 }
 
+/* Styles for item alternate damage app */
+.item-set-alt-dmg {
+    text-align: left;
+}
+
 /* Styles for item annotations app */
 .item-set-annotations {
     ul {

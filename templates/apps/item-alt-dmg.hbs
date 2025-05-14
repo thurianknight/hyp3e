@@ -1,0 +1,31 @@
+<div class="item-set-alt-dmg">
+    <label class="resource-label">{{item.name}}</label>
+    <input type="hidden" name="itemUuid" value="{{itemUuid}}" />
+    <hr class="plain-hr"/>
+    <div class="item-set-alt-dmg flexrow">
+        <label class="resource-label">Select up to Three Types</label>
+        <label class="resource-label">Damage Roll</label>
+    </div>
+    <div class="form-fields item-set-alt-dmg flexrow">
+        <select name="damageType1">
+            <option value=""></option>
+            {{selectOptions damageTypes selected=@root.damageType1 localize=false}}
+        </select>
+        <input type="text" name="altDmg1" value="{{@root.altDmg1}}" placeholder="Ex.: 1d4" />
+    </div>
+    <div class="form-fields item-set-alt-dmg flexrow">
+        <select name="damageType2">
+            <option value=""></option>
+            {{selectOptions damageTypes selected=@root.damageType2 localize=false}}
+        </select>
+        <input type="text" name="altDmg2" value="{{@root.altDmg2}}" placeholder="Ex.: 1d4" />
+    </div>
+    <div class="form-fields item-set-alt-dmg flexrow">
+        <select name="damageType3">
+            <option value=""></option>
+            {{selectOptions damageTypes selected=@root.damageType3 localize=false}}
+        </select>
+        <input type="text" name="altDmg3" value="{{@root.altDmg3}}" placeholder="Ex.: 1d4" />
+    </div>
+
+</div>

@@ -110,11 +110,43 @@
             {{/if}}
           {{/if}}
           <label class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
+          <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.damage'}}" role="button" data-tooltip="HYP3E.headers.damage" data-control="set-base-dmg">
+            <i class="fas fa-book" style="font-size: small"></i>
+          </a>
           <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String" />
           {{#if system.melee}}
           <label class="resource-label">{{localize 'HYP3E.headers.damage2h'}}</label>
           <input type="text" name="system.damage2h" value="{{system.damage2h}}" data-dtype="String" />
           {{/if}}
+          <hr class="plain-hr"/>
+          {{#if isGM}}
+          <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
+          <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.altDmg'}}" role="button" data-tooltip="HYP3E.headers.altDmg" data-control="set-alt-dmg">
+            <i class="fas fa-book" style="font-size: small"></i>
+          </a>
+          <ol class="items-list">
+          {{#each system.altDmg as |val key|}}
+            <li class="item-entry item" data-item-id="{{key}}">
+                {{lookup @root.damageTypes key}} {{val}}
+            </li>
+          {{/each}}
+          </ol>
+          {{else}}
+            {{#if system.identified}}
+            <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
+            <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.altDmg'}}" role="button" data-tooltip="HYP3E.headers.altDmg" data-control="set-alt-dmg">
+                <i class="fas fa-book" style="font-size: small"></i>
+            </a>
+            <ol class="items-list">
+            {{#each system.altDmg as |val key|}}
+                <li class="item-entry item" data-item-id="{{key}}">
+                    {{lookup @root.damageTypes key}} {{val}}
+                </li>
+            {{/each}}
+            </ol>
+            {{/if}}
+          {{/if}}
+          <hr class="plain-hr"/>
           <label class="resource-label">{{localize 'HYP3E.headers.weaponMastery'}}</label>
           <div class="flexrow">
             <a class="weapon-mastery {{#unless system.wpnMaster}}no-bonus{{/unless}}" data-mastery="master" title='{{localize "HYP3E.weapon.master"}}'><i class="fas fa-sword"></i></a>
@@ -133,8 +165,8 @@
             <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
             <div class="form-fields">
                 <select name="system.save">
-                <option value=""></option>
-                {{selectOptions saveThrows selected=system.save localize=true}}
+                    <option value=""></option>
+                    {{selectOptions saveThrows selected=system.save localize=true}}
                 </select>
             </div>
             {{/if}}

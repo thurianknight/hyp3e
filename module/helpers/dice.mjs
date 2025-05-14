@@ -27,7 +27,7 @@ export class Hyp3eDice {
         //   For grenade-like items, it only includes the DX mod.
         let tmpAtkRollParts = rollData.roll.split("+")
         atkRollParts = tmpAtkRollParts.map(str => str.trim())
-        if (CONFIG.HYP3E.debugMessages) { console.log("Base attack roll parts:", atkRollParts) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("buildAttackFormula: Base attack roll parts:", atkRollParts) }
 
         // If the formula includes a fixed number like +1, integrate that into the base roll.
         //   This is a bit of a hack, but it works.
@@ -39,7 +39,7 @@ export class Hyp3eDice {
                 // Skip the first element, that should always be "1d20"
                 if (index == 0) { return }
                 if (part.match(reNum)) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log("Found a fixed number in the formula: ", part) }
+                    if (CONFIG.HYP3E.debugMessages) { console.log("buildAttackFormula: Found a fixed number in the formula: ", part) }
                     // If we find a match, remove it from the array
                     atkRollParts.splice(index, 1)
                     // Add it to the first element in the array
@@ -53,12 +53,12 @@ export class Hyp3eDice {
         debugAtkRollParts = [...atkRollParts]
         // Take the first element in the debug array and wrap it in the table html
         debugAtkRollParts[0] = `<tr><td>${debugAtkRollParts[0]}</td><td>${atkRollParts[0]}</td></tr>`
-        if (CONFIG.HYP3E.debugMessages) { console.log("Debug attack roll parts:", debugAtkRollParts) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("buildAttackFormula: Debug attack roll parts:", debugAtkRollParts) }
 
         // Strip '@item.atkMod' out since we add it automatically anyway...
         //   Ideally this won't ever happen, but some items might have it in their formula.
         if (atkRollParts.includes("@item.atkMod")) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`DEBUG: ${rollData.itemName} still has @itemData.atkMod in its formula!`) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`buildAttackFormula: DEBUG: ${rollData.itemName} still has @itemData.atkMod in its formula!`) }
             atkRollParts = atkRollParts.filter(part => (part != "@item.atkMod"))
             debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@item.atkMod"))
         }
@@ -185,8 +185,8 @@ export class Hyp3eDice {
 
         // Log the attack roll parts & the constructed formula
         if (CONFIG.HYP3E.debugMessages) { 
-            console.log("Attack roll parts:", atkRollParts)
-            console.log("Debug attack roll parts:", debugAtkRollParts)
+            console.log("buildAttackFormula: Attack roll parts:", atkRollParts)
+            console.log("buildAttackFormula: Debug attack roll parts:", debugAtkRollParts)
         }
         debugAtkRollFormula += debugAtkRollParts.join("") + "</table>"
 
@@ -208,25 +208,27 @@ export class Hyp3eDice {
     static buildDamageFormula(itemData, ammoData = null, actorData = null) {
         let dmgRollParts = []
         let debugDmgRollParts = []
-        // let debugDmgRollFormula = ""
+        if (CONFIG.HYP3E.debugMessages) { console.log(`buildDamageFormula: Item damage type: ${itemData?.dmgType}`) }
+        const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Base"
+        const altDmgTypes =  Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
+        if (CONFIG.HYP3E.debugMessages) { console.log(`buildDamageFormula: Alternate damage types:`, altDmgTypes) }
         // I may regret this, but I'm going to assume we will never have more than 2 damage fields 
         //  and hard-code it into this function.
         let dmgRoll2Parts = []
         let debugDmgRoll2Parts = []
-        // let debugDmgRoll2Formula = ""
 
         // All items start with the base damage formula
         dmgRollParts.push(itemData.damage)
 
         // Add the debug message header and first table row
         debugDmgRollParts.push(`<b>Damage formula elements:</b><table class="chat-table">`)
-        debugDmgRollParts.push(`<tr><td>Base Roll</td><td>${itemData.damage}</td></tr>`)
+        debugDmgRollParts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage}</td></tr>`)
 
         // Do we have 2-handed damage?
         if (itemData.damage2h) {
             dmgRoll2Parts.push(itemData.damage2h)
             debugDmgRoll2Parts.push(`<b>Damage formula elements:</b><table class="chat-table">`)
-            debugDmgRoll2Parts.push(`<tr><td>Base Roll</td><td>${itemData.damage2h}</td></tr>`)
+            debugDmgRoll2Parts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage2h}</td></tr>`)
         }
 
         // Reformat the item damage string for commonly-used variables
@@ -335,16 +337,29 @@ export class Hyp3eDice {
             }
         }
 
+        // Do we have any alternate damage types?
+        if (Object.keys(altDmgTypes).length > 0) {
+            for (let [k, v] of Object.entries(altDmgTypes)) {
+                dmgRollParts.push(v)
+                const dmgType = `${CONFIG.HYP3E.damageTypes[k]} Dmg`
+                debugDmgRollParts.push(`<tr><td>${dmgType}</td><td>${v}</td></tr>`)
+                if (itemData.damage2h) {
+                    dmgRoll2Parts.push(v)
+                    debugDmgRoll2Parts.push(`<tr><td>${dmgType}</td><td>${v}</td></tr>`)
+                }
+            }
+        }
+
         // Finish the debug damage roll table
         debugDmgRollParts.push(`</table>`)
         if (itemData.damage2h) { debugDmgRoll2Parts.push(`</table>`) }
 
         // Log the damage roll parts & the constructed formula
         if (CONFIG.HYP3E.debugMessages) { 
-            console.log("Damage roll parts:", dmgRollParts)
-            console.log("Debug damage parts:", debugDmgRollParts)
-            console.log("Damage 2H roll parts:", dmgRoll2Parts)
-            console.log("Debug damage 2H parts:", debugDmgRoll2Parts)
+            console.log("buildDamageFormula: Damage roll parts:", dmgRollParts)
+            console.log("buildDamageFormula: Debug damage parts:", debugDmgRollParts)
+            console.log("buildDamageFormula: Damage 2H roll parts:", dmgRoll2Parts)
+            console.log("buildDamageFormula: Debug damage 2H parts:", debugDmgRoll2Parts)
         }
 
         // Construct the damage roll formula from parts, and return an object with the formula and debug formula

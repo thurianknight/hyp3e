@@ -238,6 +238,7 @@
                 "save": "",
                 "damage": "",
                 "damage2h": "",
+                "dmgType": "basic",
                 "altDmg": {},
                 "duration": "",
                 "affected": ""
