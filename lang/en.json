@@ -79,6 +79,7 @@
             "dmgMod": "Dmg Mod",
             "damage": "Damage",
             "damage2h": "2-Hand Dmg",
+            "damageType": "Damage Type",
             "altDmg": "Alt Dmg",
             "weaponMastery": "Weapon Mastery",
             "type": "Type",

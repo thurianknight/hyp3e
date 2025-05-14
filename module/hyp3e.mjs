@@ -26,9 +26,11 @@ Hooks.once('init', async function() {
 
     console.log("Game info:", game)
     console.log("System info:", game.system)
+    const currentVersion = game.system.version
+    console.log(`System version ${currentVersion}`)
 
     // Register system settings
-    game.settings.register(game.system.id, "migration-1.10.0-ran", {
+    game.settings.register(game.system.id, `migration-${currentVersion}-ran`, {
         name: "Migration Ran",
         scope: "world",
         config: false,
@@ -420,6 +422,8 @@ Hooks.once("ready", async function() {
 
     // Get Foundry major version #
     const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    // Get Hyperborea system version
+    const currentVersion = game.system.version
 
     // Register effects roll handler
     setupEffectRollHandler();
@@ -552,13 +556,11 @@ Hooks.once("ready", async function() {
 
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
-        const currentVersion = game.system.version
-        console.log(`System version ${currentVersion}`)
         // No need to migrate if system version is x.x.x or higher
         const NEEDS_MIGRATION_TO_VERSION = "1.11.0"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
-            const alreadyRan = game.settings.get(game.system.id, "migration-1.10.0-ran");
+            const alreadyRan = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
             if (!alreadyRan) {
                 console.log("Running one-time migration...");
 
@@ -566,7 +568,7 @@ Hooks.once("ready", async function() {
                 await migrateWorld();
 
                 // Set the flag so it doesn't run again
-                await game.settings.set(game.system.id, "migration-1.10.0-ran", true);
+                await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
                 console.log("Migration complete.");
             }
         }
@@ -645,7 +647,7 @@ async function migrateWorld() {
     console.log(`Migrating world ${game.system.version}...`)
 
     // Migrate Actor directory
-    console.log(`Correcting data for actors in the directory...`)
+    console.log(`Updating data for actors in the directory...`)
     for (let actor of game.actors.contents) {
         // Migrate NPC data
         if (actor.type == "npc") {
@@ -754,7 +756,7 @@ async function migrateWorld() {
     }
 
     // Migrate Items directory
-    console.log(`Correcting data for items in the directory...`)
+    console.log(`Updating data for items in the directory...`)
     for (let item of game.items.contents) {
         // Do for all items regardless of type
         if (!("identified" in item.system)) {
@@ -795,7 +797,7 @@ async function migrateWorld() {
     }
 
     // Skip out early, no compendium migrations needed
-    // return
+    return
 
     // Migrate compendia, one document at a time (time-consuming!)
     for (let pack of game.packs) {

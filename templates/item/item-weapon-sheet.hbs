@@ -110,7 +110,7 @@
             {{/if}}
           {{/if}}
           <label class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
-          <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.damage'}}" role="button" data-tooltip="HYP3E.headers.damage" data-control="set-base-dmg">
+          <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.damageType'}}" role="button" data-tooltip="HYP3E.headers.damageType" data-control="set-base-dmg">
             <i class="fas fa-book" style="font-size: small"></i>
           </a>
           <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String" />
@@ -121,7 +121,7 @@
           <hr class="plain-hr"/>
           {{#if isGM}}
           <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
-          <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.altDmg'}}" role="button" data-tooltip="HYP3E.headers.altDmg" data-control="set-alt-dmg">
+          <a class="item-button item-control" aria-label="{{localize 'HYP3E.dataLabel.altDmg'}}" role="button" data-tooltip="HYP3E.dataLabel.altDmg" data-control="set-alt-dmg">
             <i class="fas fa-book" style="font-size: small"></i>
           </a>
           <ol class="items-list">
@@ -131,6 +131,7 @@
             </li>
           {{/each}}
           </ol>
+          <hr class="plain-hr"/>
           {{else}}
             {{#if system.identified}}
             <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
@@ -144,9 +145,9 @@
                 </li>
             {{/each}}
             </ol>
+            <hr class="plain-hr"/>
             {{/if}}
           {{/if}}
-          <hr class="plain-hr"/>
           <label class="resource-label">{{localize 'HYP3E.headers.weaponMastery'}}</label>
           <div class="flexrow">
             <a class="weapon-mastery {{#unless system.wpnMaster}}no-bonus{{/unless}}" data-mastery="master" title='{{localize "HYP3E.weapon.master"}}'><i class="fas fa-sword"></i></a>
@@ -198,12 +199,17 @@
     <div class="tab attributes" data-group="primary" data-tab="attributes">
       {{!-- As you add new fields, add them in here! --}}
       <div class="resource">
-        {{#if isGM}}
         <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
         <input type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
-        {{/if}}
+        {{#if isGM}}
         <label class="resource-label">{{localize 'HYP3E.dataLabel.friendlyName'}}</label>
         <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
+        {{else}}
+            {{#if system.identified}}
+            <label class="resource-label">{{localize 'HYP3E.dataLabel.friendlyName'}}</label>
+            <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
+            {{/if}}
+        {{/if}}
         <div class="flexrow flexshrink flex-group-left item-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.equipped'}}</label>
           <input name="system.equipped" type="checkbox" {{checked system.equipped}}>

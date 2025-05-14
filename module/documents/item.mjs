@@ -62,6 +62,11 @@ export class Hyp3eItem extends Item {
         const item = this;
         const itemData = item.system;
 
+        // Setup the item's realName to be its name, if realName is blank
+        if (!item.system?.realName || item.system?.realName == "") {
+            item.system.realName = item.name
+        }
+
         // Handle weapon attack roll formula
         if (item.type == "weapon") {
             // For all weapons, atkRoll is obviously true
