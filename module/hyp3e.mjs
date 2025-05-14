@@ -796,8 +796,9 @@ async function migrateWorld() {
         }
     }
 
-    // Skip out early, no compendium migrations needed
-    return
+    // We only migrate the Hyperborea compendium in Dev, never someone else's live compendia!
+    //  Therefore, we exit here, except when I occasionally need to migrate my compendium.
+    return true
 
     // Migrate compendia, one document at a time (time-consuming!)
     for (let pack of game.packs) {
