@@ -312,6 +312,7 @@
             "areaEffect": "Area effect attack",
             "container": "Container",
             "cost": "Cost",
+            "value": "GP Value",
             "qty": "Qty",
             "weight": "Weight",
             "location": "Location",

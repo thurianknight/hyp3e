@@ -246,11 +246,14 @@ export class Hyp3eActorSheet extends ActorSheet {
             6: []
         };
 
+        // Encumbrance is a running sum of all weight carried
         let encumbrance = 0
+        // allTheGold is a running sum of all item gp values
+        let allTheGold = 0.0
+
         // Iterate through items, adding encumbrance and allocating to tab-groups
         for (let i of context.items) {
             i.img = i.img || DEFAULT_TOKEN;
-            // if (CONFIG.HYP3E.debugMessages) { console.log("Item carried:", i) }
             // Calculate total weight carried by character. For weapons & armor, the equipped
             //  status is ignored and the item weight is always added to encumbrance.
             //  For non-weapon items, the equipped status is used to determine if the item
@@ -261,12 +264,10 @@ export class Hyp3eActorSheet extends ActorSheet {
                     if ((i.type === 'item' || i.type === 'container') && i.system.equipped) {
                         i.system.carriedWt = (i.system.weight * i.system.quantity.value)
                         i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
-                        // encumbrance += (i.system.weight * i.system.quantity.value)
                         encumbrance += i.system.carriedWt
                     } else if (i.type === 'weapon' || i.type === 'armor') {
                         i.system.carriedWt = (i.system.weight * i.system.quantity.value)
                         i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
-                        // encumbrance += (i.system.weight * i.system.quantity.value)
                         encumbrance += i.system.carriedWt
                     } else {
                         i.system.carriedWt = 0
@@ -275,6 +276,19 @@ export class Hyp3eActorSheet extends ActorSheet {
                 //     i.system.carriedWt = i.system.weight
                 //     encumbrance += i.system.weight
                 }
+            }
+            // Calculate the gp value of the item, taking qty x cost. If qty is empty, assume 1.
+            //  If cost is empty, assume 0.
+            if (i.system.cost) {
+                const baseGpVal = Hyp3eCharacter.parseGpValue(i.system.cost)
+                if (baseGpVal) {
+                    i.system.value = baseGpVal * (i.system.quantity.value ? i.system.quantity.value : 1)
+                    allTheGold += i.system.value
+                } else {
+                    i.system.value = null
+                }
+            } else {
+                i.system.value = 0
             }
 
             // Something to do with item effects? I don't remember if this is needed.
@@ -336,9 +350,16 @@ export class Hyp3eActorSheet extends ActorSheet {
         }
         encumbrance = Math.round(encumbrance * 10)/10
         if (CONFIG.HYP3E.debugMessages) { console.log(`Total weight carried: ${encumbrance} pounds`) }
+        allTheGold = Math.round(allTheGold * 100)/100
+        // Now convert allTheGold to a string and add " gp" to the end
+        allTheGold = allTheGold.toLocaleString("en-US", {
+                                                    minimumFractionDigits: 0,
+                                                    maximumFractionDigits: 2,
+                                                }) + " gp";
 
         // Assign and return
         context.encumbrance = encumbrance;
+        context.allTheGold = allTheGold;
         context.gear = gear;
         context.containers = containers;
         context.features = features;

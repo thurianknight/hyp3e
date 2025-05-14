@@ -10,6 +10,7 @@
         <div class="item-name">{{localize "HYP3E.headers.items"}}</div>
         <div class="item-prop">{{localize "HYP3E.item.qty"}}</div>
         <div class="item-prop">{{localize "HYP3E.item.weight"}}</div>
+        <div class="item-prop">{{localize "HYP3E.item.value"}}</div>
         <div class="item-prop">{{localize "HYP3E.item.location"}}</div>
         <div class="item-controls">
           <a class="item-control item-create" title="Create item" data-type="item">
@@ -42,6 +43,7 @@
                 / {{container.system.quantity.max}}
               {{/if}}</div>
             <div class="item-prop">{{container.system.carriedWt}}</div>
+            <div class="item-prop">{{container.system.value}}</div>
             <div class="item-prop">{{container.system.location}}</div>
             <div class="item-controls">
               <a class="item-control item-equip {{#unless container.system.equipped}}item-unequipped{{/unless}}" title='{{localize "HYP3E.item.carry"}}'><i class="fas fa-sack"></i></a>
@@ -87,6 +89,7 @@
                 {{/if}}
               </div>
               <div class="item-prop">{{item.system.carriedWt}}</div>
+              <div class="item-prop">{{item.system.value}}</div>
               <div class="item-prop">{{item.system.location}}</div>
               <div class="item-controls">
                 <a class="item-control item-equip {{#unless item.system.equipped}}item-unequipped{{/unless}}" title='{{localize "HYP3E.item.carry"}}'><i class="fas fa-sack"></i></a>
@@ -134,6 +137,7 @@
               {{/if}}
             </div>
             <div class="item-prop">{{item.system.carriedWt}}</div>
+            <div class="item-prop">{{item.system.value}}</div>
             <div class="item-prop">{{item.system.location}}</div>
             <div class="item-controls">
               <a class="item-control item-equip {{#unless item.system.equipped}}item-unequipped{{/unless}}" title='{{localize "HYP3E.item.carry"}}'><i class="fas fa-sack"></i></a>
@@ -171,6 +175,9 @@
         {{#if isHeavilyEncumbered}}
         <br /><span style="color: red; font-weight: bold;">Heavily Encumbered!</span>
         {{/if}}
+        <hr class="plain-hr" />
+        <label for="system.allTheGold" class="exploration-label">Equipment & Items Total Value:</label><br />
+        <span>{{allTheGold}}</span>
       </div>
       <div class="money-block flex-group-center">
         {{#each system.money as |coin key|}}
