@@ -22,7 +22,7 @@ export default class HYP3EItemSetBaseDmg extends HandlebarsApplicationMixin(Appl
         classes: ["item-set-base-dmg", "scrollable"],
         tag: "form",
         window: {
-            title: "HYP3E.dataLabel.damage",
+            title: "HYP3E.headers.damage",
             icon: "fa-book",
             contentClasses: ["standard-form"]
         },
