@@ -360,20 +360,17 @@
             "grandMaster": "Grandmaster",
             "damageTypes": {
                 "basic": "Basic",
+                "bludgeoning": "Bludgeoning",
                 "piercing": "Piercing",
                 "slashing": "Slashing",
-                "bludgeoning": "Bludgeoning",
-                "fire": "Fire",
+                "acid": "Acid",
                 "cold": "Cold",
                 "electricity": "Electricity",
-                "acid": "Acid",
+                "fire": "Fire",
                 "negative": "Negative Energy",
-                "positive": "Positive Energy",
-                "sonic": "Sonic",
+                "pain": "Pain",
                 "poison": "Poison",
-                "disease": "Disease",
-                "mental": "Mental",
-                "pain": "Pain"
+                "positive": "Positive Energy"
             },
             "attributes": {
                 "usesAmmo": "The Uses Ammo tag allows this item to decrement ammunition on attacks.",

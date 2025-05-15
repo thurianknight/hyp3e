@@ -180,20 +180,17 @@ HYP3E.weaponAnnotations = {
  */
 HYP3E.damageTypes = {
     "basic": "HYP3E.weapon.damageTypes.basic",
+    "bludgeoning": "HYP3E.weapon.damageTypes.bludgeoning",
     "piercing": "HYP3E.weapon.damageTypes.piercing",
     "slashing": "HYP3E.weapon.damageTypes.slashing",
-    "bludgeoning": "HYP3E.weapon.damageTypes.bludgeoning",
-    "fire": "HYP3E.weapon.damageTypes.fire",
+    "acid": "HYP3E.weapon.damageTypes.acid",
     "cold": "HYP3E.weapon.damageTypes.cold",
     "electricity": "HYP3E.weapon.damageTypes.electricity",
-    "acid": "HYP3E.weapon.damageTypes.acid",
+    "fire": "HYP3E.weapon.damageTypes.fire",
     "negative": "HYP3E.weapon.damageTypes.negative",
-    "positive": "HYP3E.weapon.damageTypes.positive",
-    "sonic": "HYP3E.weapon.damageTypes.sonic",
+    "pain": "HYP3E.weapon.damageTypes.pain",
     "poison": "HYP3E.weapon.damageTypes.poison",
-    "disease": "HYP3E.weapon.damageTypes.disease",
-    "mental": "HYP3E.weapon.damageTypes.mental",
-    "pain": "HYP3E.weapon.damageTypes.pain"
+    "positive": "HYP3E.weapon.damageTypes.positive",
 }
 
 /**
