@@ -6,7 +6,7 @@ const {
     ApplicationV2
 } = foundry.applications.api;
 
-export default class HYP3EItemSetBaseDmg extends HandlebarsApplicationMixin(ApplicationV2) {
+export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(ApplicationV2) {
     // _highlighted;
     constructor(itemUuid, options={}) {
         super(options);
@@ -18,19 +18,19 @@ export default class HYP3EItemSetBaseDmg extends HandlebarsApplicationMixin(Appl
     // ===========================================================================
     static DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
-        id: "item-set-base-dmg",
-        classes: ["item-set-base-dmg", "scrollable"],
+        id: "item-set-dmg-types",
+        classes: ["item-set-dmg-types", "scrollable"],
         tag: "form",
         window: {
-            title: "HYP3E.headers.damageType",
+            title: "HYP3E.headers.damageTypes",
             icon: "fa-book",
             contentClasses: ["standard-form"]
         },
         actions: {
-            saveChanges: HYP3EItemSetBaseDmg.saveChanges
+            saveChanges: HYP3EItemSetDmgTypes.saveChanges
         },
         form: {
-            handler: HYP3EItemSetBaseDmg.#onSubmit,
+            handler: HYP3EItemSetDmgTypes.#onSubmit,
             submitOnChange: false,
             closeOnSubmit: true
         },
@@ -46,7 +46,7 @@ export default class HYP3EItemSetBaseDmg extends HandlebarsApplicationMixin(Appl
 
     static PARTS = {
         main: {
-            template: `${HYP3E.templatePath}/apps/item-base-dmg.hbs`
+            template: `${HYP3E.templatePath}/apps/item-set-dmg-types.hbs`
         },
         footer: {
             template: "templates/generic/form-footer.hbs",
@@ -86,6 +86,22 @@ export default class HYP3EItemSetBaseDmg extends HandlebarsApplicationMixin(Appl
         context[`dmgType`] = dmgType;
         context[`damage`] = damage;
 
+        // Get the item's alt damage types -- there should be no more than three!
+        const altDmg = item.system.altDmg || {};
+        const altDmgEntries = Object.entries(altDmg);
+        // Unpack up to 3 alt damage pairs into flat fields
+        for (let i = 0; i < 3; i++) {
+            const n = i + 1;
+            if (i < altDmgEntries.length) {
+                const [type, value] = altDmgEntries[i];
+                context[`damageType${n}`] = type;
+                context[`altDmg${n}`] = value;
+            } else {
+                context[`damageType${n}`] = "";
+                context[`altDmg${n}`] = "";
+            }
+        }
+
         if (CONFIG.HYP3E.debugMessages) { console.log(`_prepareContext: return context: `, context) }
         return context;
     }
@@ -117,19 +133,33 @@ export default class HYP3EItemSetBaseDmg extends HandlebarsApplicationMixin(Appl
 
         const dmgType = formDataObj[`dmgType`]?.trim();
 
-        // Skip blank or incomplete value, do not update
-        if (!dmgType || dmgType == "") {
-            return false;
-        }
-
-        // Optional: clean up formData so Foundry doesn’t auto-set these fields elsewhere
+        // Clean up formData so Foundry doesn’t auto-set these fields elsewhere
         delete formDataObj[`dmgType`];
         delete formDataObj[`damage`];
 
+        // Delete the existing altDmg, then recreate it from the form data
+        await this.item.update({ "system.altDmg": null });
+
+        const altDmg = {};
+
+        for (let i = 1; i <= 3; i++) {
+            const type = formDataObj[`damageType${i}`]?.trim();
+            const value = formDataObj[`altDmg${i}`]?.trim();
+
+            // Skip blank or incomplete pairs
+            if (type && value) {
+                altDmg[type] = value;
+            }
+
+            // Clean up formData so Foundry doesn’t auto-set these fields elsewhere
+            delete formDataObj[`damageType${i}`];
+            delete formDataObj[`altDmg${i}`];
+        }
+
         // Log the results and update the item
-        if (CONFIG.HYP3E.debugMessages) { console.log(`onSubmit:`, dmgType) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`onSubmit:`, altDmg) }
         try {
-            await this.item.update({ "system.dmgType": dmgType })
+            await this.item.update({ "system.dmgType": dmgType, "system.altDmg": altDmg })
         } catch(err) {
             console.error(`Item update error!`, err)
         }

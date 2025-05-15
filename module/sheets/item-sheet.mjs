@@ -1,7 +1,6 @@
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 import HYP3EItemSetAnnotations from "../helpers/item-set-annotations.mjs";
-import HYP3EItemSetBaseDmg from "../helpers/item-set-base-dmg.mjs";
-import HYP3EItemSetAltDmg from "../helpers/item-set-alt-dmg.mjs";
+import HYP3EItemSetDmgTypes from "../helpers/item-set-dmg-types.mjs";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -20,8 +19,7 @@ export class Hyp3eItemSheet extends ItemSheet {
   }
 
   static ITEM_ANNOTATIONS_APP = new HYP3EItemSetAnnotations();
-  static ITEM_BASE_DMG_APP = new HYP3EItemSetBaseDmg();
-  static ITEM_ALT_DMG_APP = new HYP3EItemSetAltDmg();
+  static ITEM_SET_DMG_TYPES_APP = new HYP3EItemSetDmgTypes();
 
   /** @override */
   get template() {
@@ -174,13 +172,8 @@ export class Hyp3eItemSheet extends ItemSheet {
     });
 
     // Set weapon base damage
-    html.find('.item-button[data-control="set-base-dmg"]').click((ev) => {
-        Hyp3eItemSheet.ITEM_BASE_DMG_APP.render(true, { itemUuid: this.item.uuid, focus: true });
-    });
-
-    // Set weapon alternate damage
-    html.find('.item-button[data-control="set-alt-dmg"]').click((ev) => {
-        Hyp3eItemSheet.ITEM_ALT_DMG_APP.render(true, { itemUuid: this.item.uuid, focus: true });
+    html.find('.item-button[data-control="set-dmg-types"]').click((ev) => {
+        Hyp3eItemSheet.ITEM_SET_DMG_TYPES_APP.render(true, { itemUuid: this.item.uuid, focus: true });
     });
 
     // Toggle weapon mastery & grand-mastery true/false

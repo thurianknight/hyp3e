@@ -110,7 +110,7 @@
             {{/if}}
           {{/if}}
           <label class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
-          <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.damageType'}}" role="button" data-tooltip="HYP3E.headers.damageType" data-control="set-base-dmg">
+          <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.damageTypes'}}" role="button" data-tooltip="HYP3E.headers.damageTypes" data-control="set-dmg-types">
             <i class="fas fa-book" style="font-size: small"></i>
           </a>
           <input type="text" name="system.damage" value="{{system.damage}}" data-dtype="String" />
@@ -121,13 +121,11 @@
           <hr class="plain-hr"/>
           {{#if isGM}}
           <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
-          <a class="item-button item-control" aria-label="{{localize 'HYP3E.dataLabel.altDmg'}}" role="button" data-tooltip="HYP3E.dataLabel.altDmg" data-control="set-alt-dmg">
-            <i class="fas fa-book" style="font-size: small"></i>
-          </a>
           <ol class="items-list">
           {{#each system.altDmg as |val key|}}
             <li class="item-entry item" data-item-id="{{key}}">
-                {{lookup @root.damageTypes key}} {{val}}
+                {{!-- {{lookup @root.damageTypes key}} {{val}} --}}
+                <input type="text" name="system.altDmgList" value="{{lookup @root.damageTypes key}} {{val}}" disabled />
             </li>
           {{/each}}
           </ol>
@@ -135,13 +133,11 @@
           {{else}}
             {{#if system.identified}}
             <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
-            <a class="item-button item-control" aria-label="{{localize 'HYP3E.headers.altDmg'}}" role="button" data-tooltip="HYP3E.headers.altDmg" data-control="set-alt-dmg">
-                <i class="fas fa-book" style="font-size: small"></i>
-            </a>
             <ol class="items-list">
             {{#each system.altDmg as |val key|}}
                 <li class="item-entry item" data-item-id="{{key}}">
-                    {{lookup @root.damageTypes key}} {{val}}
+                    {{!-- {{lookup @root.damageTypes key}} {{val}} --}}
+                    <input type="text" name="system.altDmgList" value="{{lookup @root.damageTypes key}} {{val}}" disabled />
                 </li>
             {{/each}}
             </ol>

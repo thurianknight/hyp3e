@@ -80,6 +80,7 @@
             "damage": "Damage",
             "damage2h": "2-Hand Dmg",
             "damageType": "Damage Type",
+            "damageTypes": "Damage Types",
             "altDmg": "Alt Dmg",
             "weaponMastery": "Weapon Mastery",
             "type": "Type",
