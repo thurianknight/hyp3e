@@ -236,15 +236,15 @@ Hooks.once('init', async function() {
     });
 
     // Damage types & resistances
-    // game.settings.register(game.system.id, "damageTypes", {
-    //     name: game.i18n.localize("HYP3E.settings.damageTypes"),
-    //     hint: game.i18n.localize("HYP3E.settings.damageTypesHint"),
-    //     default: "physical, piercing, slashing, bludgeoning, fire, cold, electricity, acid, negative, positive, sonic, poison, disease, mental, pain",
-    //     scope: "world",
-    //     type: String,
-    //     config: true,
-    //     requiresReload: true,
-    // });
+    game.settings.register(game.system.id, "addlDamageTypes", {
+        name: game.i18n.localize("HYP3E.settings.damageTypes"),
+        hint: game.i18n.localize("HYP3E.settings.damageTypesHint"),
+        default: "",
+        scope: "world",
+        type: String,
+        config: true,
+        requiresReload: true,
+    });
 
     // Human races
     game.settings.register(game.system.id, "races", {
@@ -544,6 +544,12 @@ Hooks.once("ready", async function() {
             CONFIG.HYP3E.damageTypes[k] = game.i18n.localize(CONFIG.HYP3E.damageTypes[k])
         }
         console.log("CONFIG Damage Types:", CONFIG.HYP3E.damageTypes)
+        // Append additional damage types
+        const addlDamageTypes = (game.settings.get(game.system.id, "addlDamageTypes")).trim();
+        if (addlDamageTypes != "") {
+            const addlDamageTypesArray = addlDamageTypes.split(",");
+            addlDamageTypesArray.forEach((l, i) => (CONFIG.HYP3E.damageTypes[l.trim()] = l.trim()));
+        }
     }
 
     // Load armor types

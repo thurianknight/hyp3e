@@ -209,7 +209,7 @@ export class Hyp3eDice {
         let dmgRollParts = []
         let debugDmgRollParts = []
         if (CONFIG.HYP3E.debugMessages) { console.log(`buildDamageFormula: Item damage type: ${itemData?.dmgType}`) }
-        const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Base"
+        const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Basic"
         const altDmgTypes =  Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
         if (CONFIG.HYP3E.debugMessages) { console.log(`buildDamageFormula: Alternate damage types:`, altDmgTypes) }
         // I may regret this, but I'm going to assume we will never have more than 2 damage fields 

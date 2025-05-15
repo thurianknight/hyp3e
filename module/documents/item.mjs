@@ -67,6 +67,14 @@ export class Hyp3eItem extends Item {
             item.system.realName = item.name
         }
 
+        // Fix weapon & spell missing or invalid damage type
+        if (item.type == "weapon" || item.type == "spell") {
+            if (!itemData.dmgType || itemData.dmgType == "" || CONFIG.HYP3E.damageTypes[itemData.dmgType] == undefined) {
+                console.log("ITEM ERROR: Weapon/spell has missing or invalid damage type! Setting to Basic...")
+                itemData.dmgType = "basic"
+            }
+        }
+
         // Handle weapon attack roll formula
         if (item.type == "weapon") {
             // For all weapons, atkRoll is obviously true
