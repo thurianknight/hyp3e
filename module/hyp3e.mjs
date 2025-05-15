@@ -729,29 +729,35 @@ async function migrateWorld() {
         if (actor.items) {
             for (let item of actor.items) {
                 // Do for all items regardless of type
-                if (item.system.realName == "") {
-                    item.update({ "system.realName": item.name })
+                if (!("identified" in item.system)) {
+                    await item.update({ "system.identified": true })
                 }
-                if (item.system.realDescription == "") {
-                    item.update({ "system.realDescription": item.system.description })
+                if (!("tokenAlias" in item.system)) {
+                    await item.update({ "system.tokenAlias": "" })
+                }
+                if (!("realName" in item.system) || item.system.realName == "") {
+                    await item.update({ "system.realName": item.name })
+                }
+                if (!("realDescription" in item.system) || item.system.realDescription == "") {
+                    await item.update({ "system.realDescription": item.system.description })
                 }
                 // Just weapons
                 if (item.type === "weapon") {
-                    if (item.system?.annotations > ""){
-                        console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
-                        continue
-                    }
-                    // Convert annotations from a string to an array
-                    if (item.system?.annotations == "") {
-                        console.log(`Deleting annotation element from item ${item.name}...`)
-                        delete item.system["annotations"]
-                        await item.update()
-                    }
-                    if (!item.system.annotations) {
-                        console.log(`Adding annotation array to item ${item.name}...`)
-                        item.system.annotations = []
-                        await item.update()    
-                    }
+                    // if (item.system?.annotations > ""){
+                    //     console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
+                    //     continue
+                    // }
+                    // // Convert annotations from a string to an array
+                    // if (item.system?.annotations == "") {
+                    //     console.log(`Deleting annotation element from item ${item.name}...`)
+                    //     delete item.system["annotations"]
+                    //     await item.update()
+                    // }
+                    // if (!item.system.annotations) {
+                    //     console.log(`Adding annotation array to item ${item.name}...`)
+                    //     item.system.annotations = []
+                    //     await item.update()    
+                    // }
                     // const atkFormula = updateWeaponFormula(item)
                     // if (atkFormula) {
                     //     await item.update(atkFormula)
@@ -771,30 +777,29 @@ async function migrateWorld() {
         if (!("tokenAlias" in item.system)) {
             await item.update({ "system.tokenAlias": "" })
         }
-        // Do for all items regardless of type
-        if (item.system.realName == "") {
-            item.update({ "system.realName": item.name })
+        if (!("realName" in item.system) || item.system.realName == "") {
+            await item.update({ "system.realName": item.name })
         }
-        if (item.system.realDescription == "") {
-            item.update({ "system.realDescription": item.system.description })
+        if (!("realDescription" in item.system) || item.system.realDescription == "") {
+            await item.update({ "system.realDescription": item.system.description })
         }
         // Just weapons
         if (item.type === "weapon") {
-            if (item.system?.annotations > ""){
-                console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
-                continue
-            }
-            // Convert annotations from a string to an array
-            if (item.system.annotations == "") {
-                console.log(`Deleting annotation element from item ${item.name}...`)
-                delete item.system["annotations"]
-                await item.update()
-            }
-            if (!item.system.annotations) {
-                console.log(`Adding annotation array to item ${item.name}...`)
-                item.system.annotations = []
-                await item.update()
-            }
+            // if (item.system?.annotations > ""){
+            //     console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
+            //     continue
+            // }
+            // // Convert annotations from a string to an array
+            // if (item.system.annotations == "") {
+            //     console.log(`Deleting annotation element from item ${item.name}...`)
+            //     delete item.system["annotations"]
+            //     await item.update()
+            // }
+            // if (!item.system.annotations) {
+            //     console.log(`Adding annotation array to item ${item.name}...`)
+            //     item.system.annotations = []
+            //     await item.update()
+            // }
             // const atkFormula = updateWeaponFormula(item)
             // if (atkFormula) {
             //     await item.update(atkFormula)
