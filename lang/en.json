@@ -44,7 +44,7 @@
             "critMiss": "Critical Misses / Xathoqqua’s Woe",
             "critMissHint": "Show buttons to roll critical miss on natural 1.",
             "damageTypes": "Additional damage types for weapons and spells",
-            "damageTypesHint": "These will be appended to the existing system list. The current damage types include Basic, Bludgeoning, Piercing, Slashing, Acid, Cold, Electricity, Fire, Negative Energy, Pain, Poison, and Positive Energy."
+            "damageTypesHint": "These will be appended to the existing system list. The current damage types include Basic, Bludgeoning, Piercing, Slashing, Acid, Cold, Electricity, Fire, Gas, Negative Energy, Pain, Poison, and Positive Energy."
         },
         "tabs": {
             "abilities": "Abilities",
@@ -369,6 +369,7 @@
                 "cold": "Cold",
                 "electricity": "Electricity",
                 "fire": "Fire",
+                "gas": "Gas",
                 "negative": "Negative Energy",
                 "pain": "Pain",
                 "poison": "Poison",

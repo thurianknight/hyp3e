@@ -187,6 +187,7 @@ HYP3E.damageTypes = {
     "cold": "HYP3E.weapon.damageTypes.cold",
     "electricity": "HYP3E.weapon.damageTypes.electricity",
     "fire": "HYP3E.weapon.damageTypes.fire",
+    "gas": "HYP3E.weapon.damageTypes.gas",
     "negative": "HYP3E.weapon.damageTypes.negative",
     "pain": "HYP3E.weapon.damageTypes.pain",
     "poison": "HYP3E.weapon.damageTypes.poison",
