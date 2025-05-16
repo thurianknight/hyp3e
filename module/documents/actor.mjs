@@ -1784,8 +1784,6 @@ export class Hyp3eActor extends Actor {
             gridDistance = (distancePixels / canvas.grid.size) * canvas.scene.grid.distance;
             gridDistance = Math.round(gridDistance);
 
-            // Adjust distance for target size (this seems specific, ensure logic is correct)
-            // if (targetData.size === "L") gridDistance -= 5;
             // If either token is larger than 1, reduce the grid distance to account for reach
             if (attackerWidth > 1 || attackerHeight > 1) {
                 gridDistance -= (Math.max(attackerWidth, attackerHeight) - 1) * 5;
