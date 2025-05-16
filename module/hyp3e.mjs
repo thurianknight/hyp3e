@@ -622,27 +622,32 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
 // Insert damage, save, effect buttons into chats
 Hooks.on("renderChatMessage", addChatMessageButtons);
 
-Hooks.on("createToken", (document, options, userId) => {
+Hooks.on("preCreateToken", (token) => {
+    // Debug v13 token rename with appended number
+    console.log("Pre-create Token:", token)
+});
+
+Hooks.on("createToken", (token, options, userId) => {
     // Replace the actual name with the alias, if it exists
-    console.log(`Token creation:`, document)
-    if (document.actor.system.tokenAlias != "") {
-        let tokenAlias = document.actor.system.tokenAlias
-        if (document.appendNumber) {
+    console.log(`Token creation:`, token)
+    if (token.actor.system.tokenAlias != "") {
+        let tokenAlias = token.actor.system.tokenAlias
+        if (token.appendNumber || token.actor.prototypeToken.appendNumber) {
             // Get whatever number was added to the name and keep it
-            const tokenNum = document.name.match(/\(\d{1,2}\)$/);
+            const tokenNum = token.name.match(/\(\d{1,2}\)$/);
             tokenAlias = `${tokenAlias} ${tokenNum[0]}`
         }
-        if (document.prependAdjective) {
+        if (token.prependAdjective || token.actor.prototypeToken.prependAdjective) {
             // Get whatever adjective was prepended to the name and keep it
-            const adjective = document.name.split(" ")[0];
+            const adjective = token.name.split(" ")[0];
             tokenAlias = `${adjective} ${tokenAlias}`
         }
-        console.log(`Updating token name from ${document.name} to ${tokenAlias}...`)
-        document.update({"name": tokenAlias})
+        console.log(`Updating token name from ${token.name} to ${tokenAlias}...`)
+        token.update({"name": tokenAlias})
     }
     // Roll HD for NPCs & monsters
-    if (document.actor?.type == "npc" && document.actor.system.rollHD) {
-        document.actor.rollHD()
+    if (token.actor?.type == "npc" && token.actor.system.rollHD) {
+        token.actor.rollHD()
     }
 });
 
