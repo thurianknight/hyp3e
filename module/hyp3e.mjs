@@ -280,6 +280,17 @@ Hooks.once('init', async function() {
         requiresReload: true,
     });
 
+    // Creature Phenotypes 
+    game.settings.register(game.system.id, "phenotypes", {
+        name: game.i18n.localize("HYP3E.settings.phenotypes"),
+        hint: game.i18n.localize("HYP3E.settings.phenotypesHint"),
+        default: "Animal, Automaton, Dæmon, Elemental, Giant-kind, Humanoid, Insect, Lycanthrope, Otherworldly, Plant, Reptile, Undead",
+        scope: "world",
+        type: String,
+        config: true,
+        requiresReload: true,
+    });
+
     // Add custom statusEffects
     const hasted = {
         id: "hasted",
@@ -506,7 +517,16 @@ Hooks.once("ready", async function() {
         classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
         if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
     }
-    
+
+    // Load Phenotypes list
+    const phenotypes = game.settings.get(game.system.id, "phenotypes");
+    if (phenotypes != "") {
+        CONFIG.HYP3E.phenotypes = {}
+        const phenotypesArray = phenotypes.split(",");
+        phenotypesArray.forEach((l, i) => (CONFIG.HYP3E.phenotypes[l.trim()] = l.trim()));
+        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Phenotypes:", CONFIG.HYP3E.phenotypes) }
+    }
+
     // Load saving throws
     if (CONFIG.HYP3E.saves) {
         for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {

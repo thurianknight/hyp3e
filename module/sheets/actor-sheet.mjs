@@ -219,7 +219,8 @@ export class Hyp3eActorSheet extends ActorSheet {
         
         // Load creature sizes
         context.creatureSizes = CONFIG.HYP3E.creatureSizes
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet sizes:", context.creatureSizes) }
+        // Load Phenotypes
+        context.phenotypes = CONFIG.HYP3E.phenotypes
     
     }
 
