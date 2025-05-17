@@ -633,7 +633,7 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
     if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken Actor:", actor); }
     const speed = actor.system.movement?.base.value ?? 40;
     if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken Movement:", movement); }
-    // Calculate current move plus all pending waypoints
+    // Calculate current move, including completed and pending waypoints
     const totalDistance = movement.history.distance + movement.passed.distance + movement.pending.distance;
     if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken: Total distance:", totalDistance); }
     if (totalDistance > speed) {
