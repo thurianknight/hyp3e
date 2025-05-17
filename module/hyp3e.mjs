@@ -618,20 +618,24 @@ Hooks.once("ready", async function() {
 
 });
 
-// The preMoveToken event is only available in v13+, no need to check for the version
+/**
+ * Before a token can complete its movement during a turn, ensure it has not overstepped 
+ *  its MV speed. Give a warning and possibly cancel the movement if option is configured.
+ *  The "preMoveToken" event is only available in v13+, this won't work in Foundry v12.
+ */
 Hooks.on("preMoveToken", (token, movement, operation) => {
-    if (CONFIG.HYP3E.debugMessages) { console.log("Token for movement:", token); }
+    if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken Token:", token); }
     // We only enforce this rule in combat
     if (!token.inCombat) return;
 
     const actor = token.actor;
     if (!actor) return;
-    if (CONFIG.HYP3E.debugMessages) { console.log("Token movement for Actor:", actor); }
+    if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken Actor:", actor); }
     const speed = actor.system.movement?.base.value ?? 40;
-    if (CONFIG.HYP3E.debugMessages) { console.log("Movement:", movement); }
+    if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken Movement:", movement); }
     // Calculate current move plus all pending waypoints
-    const totalDistance = movement.passed.distance + movement.pending.distance;
-    if (CONFIG.HYP3E.debugMessages) { console.log("Total distance:", totalDistance); }
+    const totalDistance = movement.history.distance + movement.passed.distance + movement.pending.distance;
+    if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken: Total distance:", totalDistance); }
     if (totalDistance > speed) {
         ui.notifications.warn(`${actor.name} can only move ${speed} ft per round!`);
         if (CONFIG.HYP3E.limitMovement) {
@@ -640,14 +644,14 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
     }
 });
 
-// Insert damage, save, effect buttons into chats
+/**
+ * Insert damage, save, and effect buttons into chats
+ */
 Hooks.on("renderChatMessage", addChatMessageButtons);
 
-// Hooks.on("preCreateToken", (token) => {
-//     // Debug v13 token rename with appended number
-//     console.log("Pre-create Token:", token)
-// });
-
+/**
+ * Capture the token creation event to run some extra processes on it
+ */
 Hooks.on("createToken", (token, options, userId) => {
     // Replace the actual name with the alias, if it exists
     console.log(`Token creation:`, token)
