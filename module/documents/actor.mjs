@@ -32,7 +32,7 @@ export class Hyp3eActor extends Actor {
         //  This is an array of modifiers that may be applied to any field in the data template.
         //  However, note that it is better to use effects and apply them to the data template
         //  whenever possible. The known exceptions are AC and MV, as these are auto-calculated
-        //  below and cannot be modified by effects.
+        //  and cannot be modified by effects.
         //
         //  Example tempModifiers entry:
         //      {
@@ -46,10 +46,11 @@ export class Hyp3eActor extends Actor {
         systemData.tempModifiers.forEach((mod, id) => {
             // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, mod) }
             // const obj = JSON.parse(mod)
-            // let obj = JSON.parse('{"templateField": "system.ac.value", "source": "isEncumbered", "modifier": 1}')
+            // EXAMPLE: obj = JSON.parse('{"templateField": "system.ac.value", "source": "isEncumbered", "modifier": 1}')
             // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, obj) }
         })
 
+        // Fix/convert old data types
         // If tempHp is an object, convert it to zero
         if (typeof systemData.hp.tempHp == "object") {
             systemData.hp.tempHp = 0
@@ -120,114 +121,12 @@ export class Hyp3eActor extends Actor {
             systemData.taskResolution[key].hint = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].hint)
         }
 
-        // Auto-calculate AC if configuration is enabled
+        // Auto-calculate AC, DR, MV if configuration is enabled
         if (CONFIG.HYP3E.autoCalcAc) {
-            // systemData.unarmoredAc = 9 - systemData.attributes.dex.defMod
-            // if (CONFIG.HYP3E.debugMessages) { console.log("Unarmored AC: ", systemData.unarmoredAc) }
-
-            // Calculate current AC & DR based on equipped armor, shield, and DX defense mod
-            // Start by resetting base AC and DR
-            systemData.ac.value = 9 - systemData.attributes.dex.defMod
-            systemData.ac.dr = 0
-            let tempAC = 9
-            let tempMV = 40
-            let shieldMod = 0
-            let tempDR = 0
-            // Loop through all inventory item types to find armor
-            for (let itmType of Object.entries(actorData.itemTypes)) {
-                if (itmType[0] == "armor") {
-                    // Armor as an item type can include armor, shields, and some protective magic items
-                    for (let [key, obj] of Object.entries(itmType[1])) {
-                        if (CONFIG.HYP3E.debugMessages) { console.log("Armor data: ", obj) }
-                        // Only count an item if it is equipped... but also note that only 1 suit of armor and
-                        //   1 shield will ever be counted -- no stacking of items.
-                        // The logic here should use the best AC if multiple armor types are equipped, as in 
-                        //   the case where someone is wearing both armor and a ring of protection.
-                        // HOWEVER, this logic is partially broken. Need to map out all possibilities for magical
-                        //   protection items, what stacks & when, then we can fix this logic.
-                        if (obj.system.equipped) {
-                            // DR can be updated by armor or shield (not in core rules, but...)
-                            if (obj.system.dr > tempDR) {
-                                // Only update DR if this equipped item is superior to the current DR
-                                tempDR = obj.system.dr
-                            }
-                            if (obj.system.type != "shield") {
-                                // Armor AC overrides the unarmored AC of 9 (DX mod subtracted later)
-                                if (obj.system.ac < tempAC) {
-                                    // Only update AC if this equipped item is superior to the current AC
-                                    tempAC = obj.system.ac
-                                    tempMV = obj.system.mv
-                                }
-                                if (CONFIG.HYP3E.debugMessages) { 
-                                    console.log(`Armor equipped: ${obj.name}, Base AC: ${tempAC}, Base DR: ${tempDR}, Base MV: ${tempMV}`)
-                                }
-                            } else {
-                                // Shield AC is a modifier subtracted from base AC.
-                                // We allow shield modifiers to stack because many protective magic items give an AC bonus
-                                //  similar to shields, and they should stack.
-                                shieldMod += obj.system.ac
-                                if (CONFIG.HYP3E.debugMessages) {
-                                    console.log("Shield equipped: ", obj.name, ", Shield Mod: ", shieldMod)
-                                }
-                            }
-                        } else {
-                            if (CONFIG.HYP3E.debugMessages) { console.log("Armor not equipped: ", obj.name) }
-                        }
-                    }
-                }
-            }
-            if (game.settings.get(game.system.id, "enableEncumbrance")) {
-                // Encumbered and Heavily Encumbered negatively impact both AC and MV
-                if (this.getFlag(game.system.id, "isEncumbered")) {
-                    tempAC += 1
-                    tempMV -= 10
-                    // These temp modifiers aren't really used yet, but maybe in the future
-                    // this.addTempModifier("ac.value", "isEncumbered", 1)
-                    // this.addTempModifier("movement.base.value", "isEncumbered", -10)
-                    this.deleteTempModifier("ac.value", "isHeavilyEncumbered")
-                    this.deleteTempModifier("movement.base.value", "isHeavilyEncumbered",)
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`Encumbered: AC ${tempAC}, MV ${tempMV}`) }
-                } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
-                    tempAC += 2
-                    tempMV -= 20
-                    // These temp modifiers aren't really used yet, but maybe in the future
-                    // this.addTempModifier("ac.value", "isHeavilyEncumbered", 2)
-                    // this.addTempModifier("movement.base.value", "isHeavilyEncumbered", -20)
-                    this.deleteTempModifier("ac.value", "isEncumbered")
-                    this.deleteTempModifier("movement.base.value", "isEncumbered",)
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`Heavily Encumbered: AC ${tempAC}, MV ${tempMV}`) }
-                } else {
-                    // Not encumbered -- find any instances of encumbrance mods and remove them
-                    // These temp modifiers aren't really used yet, but maybe in the future
-                    this.deleteTempModifier("ac.value", "isEncumbered")
-                    this.deleteTempModifier("movement.base.value", "isEncumbered",)
-                    this.deleteTempModifier("ac.value", "isHeavilyEncumbered")
-                    this.deleteTempModifier("movement.base.value", "isHeavilyEncumbered",)
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`Not Encumbered: AC ${tempAC}, MV ${tempMV}`) }
-                }
-            }
-            // Apply temporary modifiers (typically from effects) to AC and DR
-            if (parseInt(systemData.ac.tempAcMod)) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Temp AC mod: ${systemData.ac.tempAcMod}`) }
-                tempAC -= parseInt(systemData.ac.tempAcMod)
-            }
-            if (parseInt(systemData.ac.tempDrMod)) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Temp DR mod: ${systemData.ac.tempDrMod}`) }
-                tempDR += parseInt(systemData.ac.tempDrMod)
-            }
-            // Apply temporary modifier (typically from effects) to encounter-mode MV
-            if (parseInt(systemData.tempMvMod)) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Temp MV mod: ${systemData.tempMvMod}`) }
-                tempMV += parseInt(systemData.tempMvMod)
-            }
-            // Now calculate & set the final values...
-            systemData.ac.value = tempAC - systemData.attributes.dex.defMod - shieldMod
-            // AC can't be worse (higher) than 9, nor better than -9
-            systemData.ac.value = systemData.ac.value > 9 ? 9 : systemData.ac.value
-            systemData.ac.value = systemData.ac.value < -9 ? -9 : systemData.ac.value
-            // DR & MV
-            systemData.ac.dr = tempDR
-            systemData.movement.base.value = tempMV
+            const acMvObj = this.getCharacterAcAndMv(actorData, systemData)
+            systemData.ac.value = acMvObj["ac"]
+            systemData.ac.dr = acMvObj["dr"]
+            systemData.movement.base.value = acMvObj["mv"]
         }
 
         // Log the prepared data
@@ -322,6 +221,99 @@ export class Hyp3eActor extends Actor {
         if (this.type !== 'npc') return;
         // Anything to load?
 
+    }
+
+    /**
+     * Calculate the character's AC, DR, and MV
+     * @param {*} actorData // The actor data object
+     * @param {*} systemData // The actor's system data object
+     */
+    getCharacterAcAndMv(actorData, systemData) {
+        // Calculate current AC, DR, and MV based on equipped armor, shield, and DX defense mod
+        let tempAC = 9
+        let tempMV = 40
+        let shieldMod = 0
+        let tempDR = 0
+        // Loop through all inventory item types to find armor
+        for (let itmType of Object.entries(actorData.itemTypes)) {
+            if (itmType[0] == "armor") {
+                // Armor as an item type can include armor, shields, and some protective magic items
+                for (let [key, obj] of Object.entries(itmType[1])) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log("Armor data: ", obj) }
+                    // Only count an item if it is equipped... but also note that only 1 suit of armor 
+                    //   will ever be counted -- no stacking of armor.
+                    // The logic here should use the best AC if multiple armor types are equipped, as in 
+                    //   the case where someone is wearing both armor and a ring of protection.
+                    // HOWEVER, this logic is partially broken. Need to map out all possibilities for magical
+                    //   protection items, what stacks & when, then we can fix this logic.
+                    if (obj.system.equipped) {
+                        // DR can be updated by armor or shield (not in core rules, but...)
+                        if (obj.system.dr > tempDR) {
+                            // Only update DR if this equipped item is superior to the current DR
+                            tempDR = obj.system.dr
+                        }
+                        if (obj.system.type != "shield") {
+                            // Armor AC overrides the unarmored AC of 9 (DX mod subtracted later)
+                            if (obj.system.ac < tempAC) {
+                                // Only update AC if this equipped item is superior to the current AC
+                                tempAC = obj.system.ac
+                                tempMV = obj.system.mv
+                            }
+                            if (CONFIG.HYP3E.debugMessages) { 
+                                console.log(`Armor equipped: ${obj.name}, Base AC: ${tempAC}, Base DR: ${tempDR}, Base MV: ${tempMV}`)
+                            }
+                        } else {
+                            // Shield AC is a modifier subtracted from base AC.
+                            // We allow shield modifiers to stack because many protective magic items give an AC bonus
+                            //  similar to shields, and they should stack.
+                            shieldMod += obj.system.ac
+                            if (CONFIG.HYP3E.debugMessages) {
+                                console.log("Shield equipped: ", obj.name, ", Shield Mod: ", shieldMod)
+                            }
+                        }
+                    } else {
+                        if (CONFIG.HYP3E.debugMessages) { console.log("Armor not equipped: ", obj.name) }
+                    }
+                }
+            }
+        }
+        if (game.settings.get(game.system.id, "enableEncumbrance")) {
+            // Encumbered and Heavily Encumbered negatively impact both AC and MV
+            if (this.getFlag(game.system.id, "isEncumbered")) {
+                tempAC += 1
+                tempMV -= 10
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Encumbered: AC ${tempAC}, MV ${tempMV}`) }
+            } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
+                tempAC += 2
+                tempMV -= 20
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Heavily Encumbered: AC ${tempAC}, MV ${tempMV}`) }
+            } else {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Not Encumbered: AC ${tempAC}, MV ${tempMV}`) }
+            }
+        }
+        // Apply temporary modifiers (typically from effects) to AC and DR
+        if (parseInt(systemData.ac.tempAcMod)) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Temp AC mod: ${systemData.ac.tempAcMod}`) }
+            tempAC -= parseInt(systemData.ac.tempAcMod)
+        }
+        if (parseInt(systemData.ac.tempDrMod)) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Temp DR mod: ${systemData.ac.tempDrMod}`) }
+            tempDR += parseInt(systemData.ac.tempDrMod)
+        }
+        // Apply temporary modifier (typically from effects) to encounter-mode MV
+        if (parseInt(systemData.tempMvMod)) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`Temp MV mod: ${systemData.tempMvMod}`) }
+            tempMV += parseInt(systemData.tempMvMod)
+        }
+        // Now calculate & set the final values...
+        tempAC = tempAC - systemData.attributes.dex.defMod - shieldMod
+        // AC can't be worse (higher) than 9, nor better than -9
+        tempAC = Math.max(-9, Math.min(9, tempAC));
+        return {
+            "ac": tempAC,
+            "dr": tempDR,
+            "mv": tempMV
+        }
     }
 
     /**
