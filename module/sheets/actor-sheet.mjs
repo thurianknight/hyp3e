@@ -1,5 +1,5 @@
 import { Hyp3eCharacter } from "../helpers/character.mjs";
-import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
+import {enableAllEffects, disableAllEffects, onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -420,6 +420,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     html.find('.item-delete').click(ev => {
       const li = $(ev.currentTarget).parents(".item");
       const item = this.actor.items.get(li.data("itemId"));
+      // Delete the item (active effects are deleted automatically at the same time)
       item.delete();
       li.slideUp(200, () => this.render(false));
     });
@@ -429,11 +430,20 @@ export class Hyp3eActorSheet extends ActorSheet {
         const li = $(event.currentTarget).closest(".item-entry")
         const item = this.actor.items.get(li.data("itemId"))
         if (CONFIG.HYP3E.debugMessages) { console.log("Actor item-equip toggle:", item) }
+        // Do the equip/unequip
         await item.update({
             system: {
                 equipped: !item.system.equipped,
             },
         })
+        // Disable or enable any active effects coming from the item
+        if (!item.system.equipped) {
+            // Disable effects
+            disableAllEffects(item.id, this.actor.id, true)
+        } else {
+            // Enable effects
+            enableAllEffects(item.id, this.actor.id, true)
+        }
         // Send a chat message that the item was equipped/unequipped or carried/dropped
         const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
         let equipText = ""
