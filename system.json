@@ -43,6 +43,7 @@
   "url": "https://github.com/thurianknight/hyp3e",
   "manifest": "https://github.com/thurianknight/hyp3e/releases/latest/download/system.json",
   "download": "https://github.com/thurianknight/hyp3e/releases/latest/download/hyp3e.zip",
+  "background": "systems/hyp3e/assets/hyperborea.jpg",
   "bugs": "https://github.com/thurianknight/hyp3e/issues",
   "license": "LICENSE.txt",
   "changelog": "CHANGELOG.md"
