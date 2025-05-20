@@ -364,7 +364,7 @@ export async function showValueChange(t, fillColor, total) {
       strokeThickness: 4,
       jitter: 0.3,
     };
-  
+
     canvas?.interface?.createScrollingText(
         t.center,
         `${total * -1}`,
