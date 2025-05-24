@@ -580,8 +580,8 @@ Hooks.once("ready", async function() {
         const NEEDS_MIGRATION_TO_VERSION = "1.11.0"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
-            // const alreadyRan = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
-            const alreadyRan = false
+            const alreadyRan = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
+            // const alreadyRan = false
             if (!alreadyRan) {
                 console.log("Running one-time migration...");
 
