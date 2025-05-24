@@ -21,7 +21,6 @@
                 "tempAtkMod": 0,
                 "tempDmgMod": 0,
                 "tempInitiativeMod": 0,
-                "tempPersistentDmg": "",
                 "ca": null,
                 "ta": null,
                 "saves": {
@@ -50,12 +49,12 @@
                     },
                     "travel": {
                         "value": 24
-                    }
+                    },
+                    "tempMvMod": 0
                 },
                 "otherMv": {
                     "value": ""
                 },
-                "tempMvMod": 0,
                 "alignment": "",
                 "biography": "",
                 "knownLanguages": "",
