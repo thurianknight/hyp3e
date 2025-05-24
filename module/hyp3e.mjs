@@ -8,7 +8,7 @@ import { Hyp3eItemSheet } from "./sheets/item-sheet.mjs";
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./helpers/chat.mjs";
-import { setupEffectRollHandler } from "./helpers/effects.mjs";
+import { parseAndResolveChangeValue, setupEffectHandlers } from "./helpers/effects.mjs";
 import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
 
 /* -------------------------------------------- */
@@ -29,6 +29,9 @@ Hooks.once('init', async function() {
     console.log("System info:", game.system)
     const currentVersion = game.system.version
     console.log(`System version ${currentVersion}`)
+
+    // Disable legacy effect transferral
+    CONFIG.ActiveEffect.legacyTransferral = false;
 
     // Register system settings
     game.settings.register(game.system.id, `migration-${currentVersion}-ran`, {
@@ -356,16 +359,6 @@ Hooks.once('init', async function() {
         CONFIG.ui.combat = HYP3ECombatTracker;
     }
 
-    // // Define custom Document classes
-    // CONFIG.Actor.documentClass = Hyp3eActor;
-    // CONFIG.Item.documentClass = Hyp3eItem;
-
-    // // Register sheet application classes
-    // Actors.unregisterSheet("core", ActorSheet);
-    // Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: true });
-    // Items.unregisterSheet("core", ItemSheet);
-    // Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: true });
-
     // Preload Handlebars templates.
     return preloadHandlebarsTemplates();
 
@@ -437,8 +430,8 @@ Hooks.once("ready", async function() {
     // Get Hyperborea system version
     const currentVersion = game.system.version
 
-    // Register effects roll handler
-    setupEffectRollHandler();
+    // Register effects handlers
+    await setupEffectHandlers();
 
     /**
      * Load system settings
@@ -587,7 +580,8 @@ Hooks.once("ready", async function() {
         const NEEDS_MIGRATION_TO_VERSION = "1.11.0"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
-            const alreadyRan = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
+            // const alreadyRan = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
+            const alreadyRan = false
             if (!alreadyRan) {
                 console.log("Running one-time migration...");
 
@@ -691,161 +685,38 @@ async function migrateWorld() {
     // Migrate Actor directory
     console.log(`Updating data for actors in the directory...`)
     for (let actor of game.actors.contents) {
-        // Migrate NPC data
-        if (actor.type == "npc") {
-            // do stuff to npcs
-            if (!("identified" in actor.system)) {
-                await actor.update({ "system.identified": true })
-            }
-            if (!("tokenAlias" in actor.system)) {
-                await actor.update({ "system.tokenAlias": "" })
-            }
-            const tempHp = fixTempHp(actor)
-            if (tempHp) {
-                delete actor.system.hp["tempHp"]
-                await actor.update(tempHp)
-            }
-            const tempAtkMod = fixTempAtkMod(actor)
-            if (tempAtkMod) {
-                delete actor.system["tempAtkMod"]
-                await actor.update(tempAtkMod)
-            }
-            const tempDmgMod = fixTempDmgMod(actor)
-            if (tempDmgMod) {
-                delete actor.system["tempDmgMod"]
-                await actor.update(tempDmgMod)
-            }
-            const tempAcMod = fixTempAcMod(actor)
-            if (tempAcMod) {
-                delete actor.system.ac["tempAcMod"]
-                await actor.update(tempAcMod)
-            }
-            const tempDrMod = fixTempDrMod(actor)
-            if (tempDrMod) {
-                delete actor.system.ac["tempDrMod"]
-                await actor.update(tempDrMod)
-            }
-        }
-        // Migrate PC data
-        if (actor.type == "character") {
-            // do stuff to characters
-            if (!("identified" in actor.system)) {
-                actor.update({ "system.identified": true })
-            }
-            if (!("tokenAlias" in actor.system)) {
-                actor.update({ "system.tokenAlias": "" })
-            }
-            const tempHp = fixTempHp(actor)
-            if (tempHp) {
-                delete actor.system.hp["tempHp"]
-                await actor.update(tempHp)
-            }
-            const tempAtkMod = fixTempAtkMod(actor)
-            if (tempAtkMod) {
-                delete actor.system["tempAtkMod"]
-                await actor.update(tempAtkMod)
-            }
-            const tempDmgMod = fixTempDmgMod(actor)
-            if (tempDmgMod) {
-                delete actor.system["tempDmgMod"]
-                await actor.update(tempDmgMod)
-            }
-            const tempAcMod = fixTempAcMod(actor)
-            if (tempAcMod) {
-                delete actor.system.ac["tempAcMod"]
-                await actor.update(tempAcMod)
-            }
-            const tempDrMod = fixTempDrMod(actor)
-            if (tempDrMod) {
-                delete actor.system.ac["tempDrMod"]
-                await actor.update(tempDrMod)
-            }
-        }
-        // Migrate the actor document's items if any exist
+        // Migrate actor data
+        const origActor = foundry.utils.deepClone(actor)
+        // const newActor = migrateActorData(origActor)
+        // await actor.update({ ...newActor })
+        const updates = migrateActorData(origActor)
+        if (updates && updates != {}) await actor.update(updates)
+        // Migrate the actor's items
         if (actor.items) {
             for (let item of actor.items) {
-                // Do for all items regardless of type
-                if (!("identified" in item.system)) {
-                    await item.update({ "system.identified": true })
-                }
-                if (!("tokenAlias" in item.system)) {
-                    await item.update({ "system.tokenAlias": "" })
-                }
-                if (!("realName" in item.system) || item.system.realName == "") {
-                    await item.update({ "system.realName": item.name })
-                }
-                if (!("realDescription" in item.system) || item.system.realDescription == "") {
-                    await item.update({ "system.realDescription": item.system.description })
-                }
-                // Just weapons
-                if (item.type === "weapon") {
-                    // if (item.system?.annotations > ""){
-                    //     console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
-                    //     continue
-                    // }
-                    // // Convert annotations from a string to an array
-                    // if (item.system?.annotations == "") {
-                    //     console.log(`Deleting annotation element from item ${item.name}...`)
-                    //     delete item.system["annotations"]
-                    //     await item.update()
-                    // }
-                    // if (!item.system.annotations) {
-                    //     console.log(`Adding annotation array to item ${item.name}...`)
-                    //     item.system.annotations = []
-                    //     await item.update()    
-                    // }
-                    // const atkFormula = updateWeaponFormula(item)
-                    // if (atkFormula) {
-                    //     await item.update(atkFormula)
-                    // }
-                }
+                const origItem = foundry.utils.deepClone(item);
+                // const newItem = migrateItemData(origItem);
+                // await item.update({ ...newItem });
+                const updates = migrateItemData(origItem);
+                if (updates && updates != {}) await item.update(updates);
             }
         }
     }
+
+    // Skip out early
+    // return true;
 
     // Migrate Items directory
     console.log(`Updating data for items in the directory...`)
     for (let item of game.items.contents) {
-        // Do for all items regardless of type
-        if (!("identified" in item.system)) {
-            await item.update({ "system.identified": true })
-        }
-        if (!("tokenAlias" in item.system)) {
-            await item.update({ "system.tokenAlias": "" })
-        }
-        if (!("realName" in item.system) || item.system.realName == "") {
-            await item.update({ "system.realName": item.name })
-        }
-        if (!("realDescription" in item.system) || item.system.realDescription == "") {
-            await item.update({ "system.realDescription": item.system.description })
-        }
-        // Just weapons
-        if (item.type === "weapon") {
-            // if (item.system?.annotations > ""){
-            //     console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
-            //     continue
-            // }
-            // // Convert annotations from a string to an array
-            // if (item.system.annotations == "") {
-            //     console.log(`Deleting annotation element from item ${item.name}...`)
-            //     delete item.system["annotations"]
-            //     await item.update()
-            // }
-            // if (!item.system.annotations) {
-            //     console.log(`Adding annotation array to item ${item.name}...`)
-            //     item.system.annotations = []
-            //     await item.update()
-            // }
-            // const atkFormula = updateWeaponFormula(item)
-            // if (atkFormula) {
-            //     await item.update(atkFormula)
-            // }
-        }
+        const origItem = foundry.utils.deepClone(item);
+        const newItem = migrateItemData(origItem);
+        await item.update({ ...newItem });
     }
 
     // We only migrate the Hyperborea compendium in Dev, never someone else's live compendia!
     //  Therefore, we exit here, except when I occasionally need to migrate my compendium.
-    return true
+    return true;
 
     // Migrate compendia, one document at a time (time-consuming!)
     for (let pack of game.packs) {
@@ -917,6 +788,11 @@ async function migrateWorld() {
                             delete doc.system.ac["tempDrMod"]
                             await doc.update(tempDrMod)
                         }
+                        const tempMvMod = fixTempMvMod(doc)
+                        if (tempMvMod) {
+                            delete doc.system["tempMvMod"]
+                            await doc.update(tempMvMod)
+                        }
                     }
                     // Migrate PC data
                     if (doc.type == "character") {
@@ -952,11 +828,22 @@ async function migrateWorld() {
                             delete doc.system.ac["tempDrMod"]
                             await doc.update(tempDrMod)
                         }
+                        const tempMvMod = fixTempMvMod(doc)
+                        if (tempMvMod) {
+                            delete doc.system["tempMvMod"]
+                            await doc.update(tempMvMod)
+                        }
                     }
                     // Migrate the actor document's items if any exist
                     if (doc.items) {
                         for (let item of doc.items) {
                             // Do for all items regardless of type
+                            if (!("identified" in item.system)) {
+                                item.update({ "system.identified": true })
+                            }
+                            if (!("tokenAlias" in item.system)) {
+                                item.update({ "system.tokenAlias": "" })
+                            }
                             if (item.system.realName == "") {
                                 item.update({ "system.realName": item.name })
                             }
@@ -965,21 +852,7 @@ async function migrateWorld() {
                             }
                             // Just weapons
                             if (item.type === "weapon") {
-                                if (item.system?.annotations > ""){
-                                    console.log(`Could not migrate item ${item.name} with annotations ${item.system.annotations}!`)
-                                    continue
-                                }
-                                // Convert annotations from a string to an array
-                                if (item.system.annotations == "") {
-                                    console.log(`Deleting annotation element from item ${item.name}...`)
-                                    delete item.system["annotations"]
-                                    await item.update()
-                                }
-                                if (!item.system.annotations) {
-                                    console.log(`Adding annotation array to item ${item.name}...`)
-                                    item.system.annotations = []
-                                    await item.update()
-                                }
+                                // Nothing to do at the moment
                             }
                         }
                     }
@@ -993,7 +866,6 @@ async function migrateWorld() {
                     if (!("tokenAlias" in doc.system)) {
                         doc.update({ "system.tokenAlias": "" })
                     }
-                    // Do for all items regardless of type
                     if (doc.system.realName == "") {
                         doc.update({ "system.realName": doc.name })
                     }
@@ -1002,24 +874,10 @@ async function migrateWorld() {
                     }
                     // Just weapons
                     if (doc.type === "weapon") {
-                        if (doc.system?.annotations > ""){
-                            console.log(`Could not migrate item ${doc.name} with annotations ${doc.system.annotations}!`)
-                            continue
-                        }
-                        // Convert annotations from a string to an array
-                        if (doc.system.annotations == "") {
-                            console.log(`Deleting annotation element from item ${doc.name}...`)
-                            delete doc.system["annotations"]
-                            await doc.update()
-                        }
-                        if (!doc.system.annotations) {
-                            console.log(`Adding annotation array to item ${doc.name}...`)
-                            doc.system.annotations = []
-                            await doc.update()
-                        }
+                        // Nothing to do at the moment
                     }
                     break
-        
+
                 default:
                     break
                 }
@@ -1049,146 +907,245 @@ async function resizeTokenPrototypes() {
     }
 }
 
-function fixTempHp(doc) {
+/**
+ * Migrate Actor json data and return an updated json
+ * @param {Object} actor 
+ */
+function migrateActorData(actor) {
+    console.log(`migrateActorData: Original ${actor.name} to migrate:`, actor)
+    // let newActor = {...actor};
+    let updates = {};
+    // Add new default values
+    if (!("identified" in actor.system)) {
+        updates = { ...updates, "system.identified": true };
+    }
+    if (!("tokenAlias" in actor.system)) {
+        updates = { ...updates, "system.tokenAlias": "" };
+    }
+    // Migrate, fix, or delete old data
+    let tempUpdate = {};
+    tempUpdate = fixTempHp(actor);
+    updates = { ...updates, tempUpdate };
+    tempUpdate = fixTempAtkMod(actor);
+    updates = { ...updates, tempUpdate };
+    tempUpdate = fixTempDmgMod(actor);
+    updates = { ...updates, tempUpdate };
+    tempUpdate = fixTempAcMod(actor);
+    updates = { ...updates, tempUpdate };
+    tempUpdate = fixTempDrMod(actor);
+    updates = { ...updates, tempUpdate };
+    tempUpdate = fixTempMvMod(actor);
+    updates = { ...updates, tempUpdate };
+
+    // PCs only
+    if (actor.type === "character") {
+        // Add new default values
+
+        // Migrate, fix, or delete old data
+        if ("explorationSkills" in actor.system) {
+            updates = { ...updates, "system.-=explorationSkills": null };
+        }
+
+    }
+
+    // NPCs only
+    if (actor.type === "npc") {
+        // Add new default values
+
+        // Migrate, fix, or delete old data
+
+    }
+
+    console.log(`migrateActorData: Updated data for ${actor.name}:`, updates)
+    return updates;
+}
+
+/**
+ * Migrate Item json data and return an updated json
+ * @param {Object} item 
+ */
+function migrateItemData(item) {
+    console.log(`migrateItemData: Original ${item.name} to migrate:`, item)
+    // let newItem = {...item};
+    let updates = {};
+    // All item types
+    if (!("identified" in item.system)) {
+        updates = { ...updates, "system.identified": true };
+    }
+    if (!("tokenAlias" in item.system)) {
+        updates = { ...updates, "system.tokenAlias": "" };
+    }
+    if (!("realName" in item.system) || item.system.realName == "") {
+        updates = { ...updates, "system.realName": item.name };
+    }
+    if (!("realDescription" in item.system) || item.system.realDescription == "") {
+        updates = { ...updates, "system.realDescription": item.system.description };
+    }
+
+    // Armor only
+    if (item.type === "armor") {
+
+    }
+    // Features only
+    if (item.type === "feature") {
+
+    }
+    // General items only
+    if (item.type === "item") {
+
+    }
+    // Spells only
+    if (item.type === "spell") {
+
+    }
+    // Weapons only
+    if (item.type === "weapon") {
+
+    }
+
+    console.log(`migrateItemData: Updated data for ${item.name}:`, updates)
+    return updates;
+}
+
+function fixTempHp(actor) {
     // If tempHp is an object, convert it to zero
-    if (typeof doc.system.hp.tempHp == "object") {
-        console.log(`Fixing temp HP for ${doc.name}...`)
-        const update = {system: {hp: {tempHp: 0}}}
-        return update;
+    if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp == "object") {
+        console.log(`Fixing temp HP for ${actor.name}...`);
+        return { "system.hp.tempHp": 0 };
     }
-    return null
+    return null;
 }
 
-function fixTempAtkMod(doc) {
+function fixTempAtkMod(actor) {
     // If tempAcMod is an object, convert it to zero
-    if (typeof doc.system.tempAtkMod == "object") {
-        console.log(`Fixing temp attack mod for ${doc.name}...`)
-        const update = {system: {tempAtkMod: 0}}
-        return update;
+    if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod == "object") {
+        console.log(`Fixing temp attack mod for ${actor.name}...`);
+        return { "system.tempAtkMod": 0 };
     }
-    return null
+    return null;
 }
 
-function fixTempDmgMod(doc) {
+function fixTempDmgMod(actor) {
+    // If tempDmgMod is an object, convert it to zero
+    if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod == "object") {
+        console.log(`Fixing temp damage mod for ${actor.name}...`);
+        return { "system.tempDmgMod": 0 };
+    }
+    return null;
+}
+
+function fixTempAcMod(actor) {
     // If tempAcMod is an object, convert it to zero
-    if (typeof doc.system.tempDmgMod == "object") {
-        console.log(`Fixing temp damage mod for ${doc.name}...`)
-        const update = {system: {tempDmgMod: 0}}
-        return update;
+    if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod == "object") {
+        console.log(`Fixing temp AC mod for ${actor.name}...`);
+        return { "system.ac.tempAcMod": 0 };
     }
-    return null
+    return null;
 }
 
-function fixTempAcMod(doc) {
-    // If tempAcMod is an object, convert it to zero
-    if (typeof doc.system.ac.tempAcMod == "object") {
-        console.log(`Fixing temp AC mod for ${doc.name}...`)
-        const update = {system: {ac: {tempAcMod: 0}}}
-        return update;
-    }
-    return null
-}
-
-function fixTempDrMod(doc) {
+function fixTempDrMod(actor) {
     // If tempDrMod is an object, convert it to zero
-    if (typeof doc.system.ac.tempDrMod == "object") {
-        console.log(`Fixing temp DR mod for ${doc.name}...`)
-        delete doc.system.ac["tempDrMod"]
-        const update = {system: {ac: {tempDrMod: 0}}}
-        return update;
+    if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod == "object") {
+        console.log(`Fixing temp DR mod for ${actor.name}...`);
+        return { "system.ac.tempDrMod": 0 };
     }
-    return null
+    return null;
 }
 
-function fixTokenSize(doc) {
+function fixTempMvMod(actor) {
+    // Only migrate if we haven't already fixed this
+    if ("tempMvMod" in actor.system.movement && !("tempMvMod" in actor.system)) return null;
+    console.log(`fixTempMvMod: Fixing ${actor.name}...`);
+    // Migrate tempMvMod from system.* to system.movement.* in the actor template
+    let updates = {}
+    if (actor.system?.tempMvMod && !("tempMvMod" in actor.system.movement)) {
+        // Reassign tempMvMod to the new property and delete the original
+        updates = {
+            "system.movement.tempMvMod": actor.system.tempMvMod,
+            "system.-=tempMvMod": null
+        };
+    } else if (actor.system?.tempMvMod && actor.system.movement?.tempMvMod) {
+        // Only delete the original
+        updates = { "system.-=tempMvMod": null };
+    } else {
+        // Only assign the new property
+        updates = { "system.movement.tempMvMod": 0 };
+    }
+    console.log(`fixTempMvMod: Updates for ${actor.name}...`, updates);
+    return updates;
+}
+
+function fixTokenSize(actor) {
     // If actor size is Medium, convert prototype token size to 1
-    if (doc.system.size == "M") {
-        console.log(`Fixing token size for ${doc.name}...`)
+    if (actor.system.size == "M") {
+        console.log(`Fixing token size for ${actor.name}...`)
         const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 1, scaleY: 1}}}
         return update
     }
     // If actor size is Large, convert prototype token size to 2
-    if (doc.system.size == "L") {
-        console.log(`Fixing token size for ${doc.name}...`)
+    if (actor.system.size == "L") {
+        console.log(`Fixing token size for ${actor.name}...`)
         const update = {prototypeToken: {width: 2, height: 2, texture: {scaleX: 1, scaleY: 1}}}
         return update
     }
     // If actor size is Huge, convert prototype token size to 3
-    if (doc.system.size == "H") {
-        console.log(`Fixing token size for ${doc.name}...`)
+    if (actor.system.size == "H") {
+        console.log(`Fixing token size for ${actor.name}...`)
         const update = {prototypeToken: {width: 3, height: 3, texture: {scaleX: 1, scaleY: 1}}}
         return update
     }
     // If actor size is Small, convert prototype token scale to 0.5
-    if (doc.system.size == "S") {
-        console.log(`Fixing token size for ${doc.name}...`)
+    if (actor.system.size == "S") {
+        console.log(`Fixing token size for ${actor.name}...`)
         const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 0.5, scaleY: 0.5}}}
         return update
     }
     return null
 }
 
-function updateWeaponFormula(doc) {
-    let newFormula = doc.system.formula
-    if (doc.system.formula.includes("@item.atkMod")) {
-        console.log(`Removing @item.atkMod from ${doc.name} formula...`)
-        // Remove the item atkMod from the formula
-        newFormula = newFormula.replace("+ @item.atkMod", "")
-        newFormula = newFormula.replace("+@item.atkMod", "")
-    }
-    // Only remove @fa from weapons
-    if (doc.type == "weapon" && doc.system.formula.includes("@fa")) {
-        console.log(`Removing @fa from ${doc.name} formula...`)
-        // Also remove fighting ability from the formula
-        newFormula = newFormula.replace("+ @fa", "")
-        newFormula = newFormula.replace("+@fa", "")
-    }
-    // Finally, trim off any extra spaces
-    newFormula = newFormula.trim()
+// function updateWeaponFormula(item) {
+//     let newFormula = item.system.formula
+//     if (item.system.formula.includes("@item.atkMod")) {
+//         console.log(`Removing @item.atkMod from ${item.name} formula...`)
+//         // Remove the item atkMod from the formula
+//         newFormula = newFormula.replace("+ @item.atkMod", "")
+//         newFormula = newFormula.replace("+@item.atkMod", "")
+//     }
+//     // Only remove @fa from weapons
+//     if (item.type == "weapon" && item.system.formula.includes("@fa")) {
+//         console.log(`Removing @fa from ${item.name} formula...`)
+//         // Also remove fighting ability from the formula
+//         newFormula = newFormula.replace("+ @fa", "")
+//         newFormula = newFormula.replace("+@fa", "")
+//     }
+//     // Finally, trim off any extra spaces
+//     newFormula = newFormula.trim()
 
-    // Did we make any changes?
-    if (newFormula != doc.system.formula) {
-        const update = {system: {}}
-        update.system = {formula: newFormula}
-        return update;
-    }
-    // Else...    
-    return null;
-}
+//     // Did we make any changes?
+//     if (newFormula != item.system.formula) {
+//         const update = {system: {}}
+//         update.system = {formula: newFormula}
+//         return update;
+//     }
+//     // Else...    
+//     return null;
+// }
 
-function updateEmpty(doc) {
-    console.log(doc.name)
+function updateEmpty(item) {
+    console.log(item.name)
     const update = {system: {}}
     update.system = {rollMode: "", blindRoll: null}
     return update;
 }
 
-function filterEmpty(doc) {
-    return doc.type === "feature" && (doc.system.formula === "undefined" || doc.system.formula === undefined || doc.system.formula === "")
+function filterEmpty(item) {
+    return item.type === "feature" && (item.system.formula === "undefined" || item.system.formula === undefined || item.system.formula === "")
 }
 
-function updatePublic(doc) {
-    console.log(doc.name)
-    const update = {system: {}}
-    update.system = {rollMode: "publicroll"}
-    return update;
-}
-function filterPublic(doc) {
-    return doc.type === "feature" && (doc.system.blindRoll === "false" || doc.system.blindRoll === false)
-}
-
-function updateBlind(doc) {
-    console.log(doc.name)
-    const update = {system: {}}
-    update.system = {rollMode: "blindroll"}
-    return update;
-}
-function filterBlind(doc) {
-    return doc.type === "feature" && (doc.system.blindRoll === "true" || doc.system.blindRoll === true)
-}
-
+/**
+ * Generate a report on bestiary data
+ */
 async function reportBestiary() {
-    // Generate a report on bestiary data
     // Loop through all compendia to find the bestiary
     for (let pack of game.packs) {
 
@@ -1214,8 +1171,10 @@ async function reportBestiary() {
     }
 }
 
+ /**
+  * Generate a report on item data in the compendium.
+  */
 async function reportItems() {
-    // Generate a report on item data in the compendium.
     // Report on all items with blank weight and zero weight.
 
     for (let pack of game.packs) {

@@ -62,17 +62,16 @@ export class Hyp3eActorSheet extends ActorSheet {
     context.rollData = context.actor.getRollData();
 
     // Prepare active effects
-    // if (CONFIG.HYP3E.debugMessages) { console.log(`Preparing active effects...`) }
-    // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor effects: `, this.actor.effects) }
     if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applied effects: `, this.actor.appliedEffects) }
-    // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor.allApplicableEffects) }
-    if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor._getAllApplicableEffects()) }
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor.allApplicableEffects()) }
+    // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor._getAllApplicableEffects()) }
     if (!foundry.utils.isNewerVersion(game.version, "13")) {
         // For Foundry v12...
         context.effects = prepareActiveEffectCategories(this.actor.effects);
     } else if (foundry.utils.isNewerVersion(game.version, "13")) {
         // For Foundry v13...
-        context.effects = prepareActiveEffectCategories(this.actor._getAllApplicableEffects());
+        context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
+        // context.effects = prepareActiveEffectCategories(this.actor._getAllApplicableEffects());
     }
 
     // Enrich the description field for TinyMCE editors.
@@ -153,6 +152,7 @@ export class Hyp3eActorSheet extends ActorSheet {
 
         // Handle movement types
         for (let [k, v] of Object.entries(context.system.movement)) {
+            if (k == "tempMvMod") continue;
             v.label = game.i18n.localize(CONFIG.HYP3E.movement[k]) ?? k;
             // if (CONFIG.HYP3E.debugMessages) { console.log("Movement Types:", k, v, v.label) }
         }

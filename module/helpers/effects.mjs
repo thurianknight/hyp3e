@@ -108,11 +108,12 @@ export function prepareActiveEffectCategories(effects) {
     return categories;
 }
 
-export function setupEffectRollHandler() {
+export async function setupEffectHandlers() {
     Hooks.on("createActiveEffect", async (effect, options, userId) => {
         // Only process if we're the one who owns this actor
         const actor = effect.parent;
         if (!actor?.isOwner) return;
+        if (CONFIG.HYP3E.debugMessages) { console.log("createActiveEffect: Create event fired", effect) }
 
         // Store all changes for a single batch update at the end
         let updatedChanges = [...effect.changes];  // Start with a shallow copy
@@ -121,7 +122,7 @@ export function setupEffectRollHandler() {
         for (let i = 0; i < updatedChanges.length; i++) {
             const change = updatedChanges[i];
             // Parse the change.value string and resolve it into a number if possible
-            const resolvedChange = await _parseAndResolveChangeValue(change.value, actor)
+            const resolvedChange = await parseAndResolveChangeValue(change.value, actor)
             if (updatedChanges[i].value !== resolvedChange) {
                 updatedChanges[i] = {
                     ...change,
@@ -138,6 +139,13 @@ export function setupEffectRollHandler() {
             });
         }
     });
+    Hooks.on("applyActiveEffect", async(actor, change, current, delta, changes) => {
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log("applyActiveEffect: Actor receiving effect:", actor);
+            console.log("applyActiveEffect: Change:", change);
+            console.log("applyActiveEffect: Other params:", current, delta, changes);
+        }
+    });
 }
 
 /**
@@ -148,24 +156,25 @@ export function setupEffectRollHandler() {
  * @param {*} actor 
  * @returns 
  */
-async function _parseAndResolveChangeValue(changeValue, actor) {
-    if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Change String: ", changeValue) }
+export async function parseAndResolveChangeValue(changeValue, actor) {
+    if (CONFIG.HYP3E.debugMessages) { console.log("parseAndResolveChangeValue: Change String: ", changeValue) }
+    if (!changeValue) return
     // Split the string into parts & resolve each part
     const parts = changeValue.split(/(\+|\-|\*|\/)/).map(part => part.trim());
     const resolvedParts = await Promise.all(parts.map(async part => {
         // Check if the part is a roll formula
         if (Roll.validate(part)) {
-            if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Roll Detected: ", part) }
+            if (CONFIG.HYP3E.debugMessages) { console.log("parseAndResolveChangeValue: Roll Detected: ", part) }
             const roll = new Roll(part, actor?.getRollData?.());
             await roll.evaluate({ evaluateSync: true });
-            if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Roll Total: ", roll.total) }
+            if (CONFIG.HYP3E.debugMessages) { console.log("parseAndResolveChangeValue: Roll Total: ", roll.total) }
             return roll.total;
         }
         // Check if the part is a data path
         else if (part.startsWith("system.")) {
-            if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Data Path: ", part) }
+            if (CONFIG.HYP3E.debugMessages) { console.log("parseAndResolveChangeValue: Data Path: ", part) }
             const value = getProperty(actor, part);
-            if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Data Value: ", value) }
+            if (CONFIG.HYP3E.debugMessages) { console.log("parseAndResolveChangeValue: Data Value: ", value) }
             return value !== undefined ? value : part;
         }
         // If it's neither, return the original part
@@ -173,17 +182,17 @@ async function _parseAndResolveChangeValue(changeValue, actor) {
     }));
     // Reassemble the resolved parts into a string of additions
     const resolvedString = resolvedParts.join("");
-    if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Resolved String: ", resolvedString) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("parseAndResolveChangeValue: Resolved String: ", resolvedString) }
     let result = null;
     try {
         // Evaluate the resolved string as a math expression
         result = eval(resolvedString)
     } catch (e) {
         // If the string can't be evaluated, log it and return the original changeValue
-        console.info(`_parseAndResolveChangeValue: Cannot evaluate change value "${resolvedString}" to a number:`, e);
+        console.info(`parseAndResolveChangeValue: Cannot evaluate change value "${resolvedString}" to a number:`, e);
         return changeValue;
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log("_parseAndResolveChangeValue: Result: ", result) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("parseAndResolveChangeValue: Result: ", result) }
     // Is the result a real number?
     if (isNaN(result)) {
         ui.notifications?.error(`Effect change value "${changeValue}" resolved to "${resolvedString}". Could not solve for a final number.`);
@@ -251,7 +260,7 @@ export async function applyEffect(itemId, effectId, actorId, disabled = false) {
         // Resolve variables in the damage roll formula
         const roll = new Roll(damageRoll, actor.getRollData());
         if (CONFIG.HYP3E.debugMessages) { console.log(`applyEffect: ${effectData.name} Roll: `, roll) }
-        await roll.evaluate({ evaluateSync: true });
+        roll.evaluate({ evaluateSync: true });
         // Save the resolved roll formula for later use
         damageRoll = roll.formula;
     }
@@ -408,7 +417,7 @@ export async function enableEffect(itemId, effectId, actorId) {
  * @param {itemId} string      The item that has the effects to enable
  * @param {actorId} string     The actor that owns the item and will receive/enable the effects
  */
-export async function enableAllEffects(itemId, actorId) {
+export async function enableAllEffects(itemId, actorId, transferOnly = false) {
     // Get the actor & item
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
@@ -428,22 +437,24 @@ export async function enableAllEffects(itemId, actorId) {
 
     // Enable the effects on the actor
     item.effects.forEach(effect => {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`enableAllEffects: Effect to enable: `, effect) }
-        // Update the item effect
-        effect.update({ disabled: false });
-        if (!foundry.utils.isNewerVersion(game.version, "13")) {
-            // For Foundry v12 only...
-            // We updated the effect on the source item. Now, find the matching effect on 
-            //  the actor, so we can toggle that as well.
-            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
-            if (actorEffect) {
-                actorEffect.update({ disabled: false });
-            } else {
-                // If the effect can't be found, we apply the effect to the actor instead.
-                applyAllEffects(itemId, actorId, false);
+        if (!transferOnly || transferOnly && effect.transfer) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`enableAllEffects: Effect to enable: `, effect) }
+            // Update the item effect
+            effect.update({ disabled: false });
+            if (!foundry.utils.isNewerVersion(game.version, "13")) {
+                // For Foundry v12 only...
+                // We updated the effect on the source item. Now, find the matching effect on 
+                //  the actor, so we can toggle that as well.
+                const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+                if (actorEffect) {
+                    // actorEffect.update({ disabled: false });
+                } else {
+                    // If the effect can't be found, we apply the effect to the actor instead.
+                    applyAllEffects(itemId, actorId, false);
+                }
             }
+            chatMsg += `<p><i>${effect.name}</i> enabled on ${actor.name}.</p>`
         }
-        chatMsg += `<p><i>${effect.name}</i> enabled on ${actor.name}.</p>`
     })
     // Send a chat message that the effects were enabled
     const chatData = {
@@ -516,7 +527,7 @@ export async function disableEffect(itemId, effectId, actorId) {
  * @param {itemId} string      The item that has the effects to disable
  * @param {actorId} string     The actor that owns the item and will disable the effects
  */
-export async function disableAllEffects(itemId, actorId) {
+export async function disableAllEffects(itemId, actorId, transferOnly = false) {
     let chatMsg = ""
 
     // Get the actor & item
@@ -534,22 +545,24 @@ export async function disableAllEffects(itemId, actorId) {
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
 
     item.effects.forEach(effect => {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`disableAllEffects: Effect to disable: `, effect) }
-        // Update the item effect
-        effect.update({ disabled: true });
-        if (!foundry.utils.isNewerVersion(game.version, "13")) {
-            // For Foundry v12 only...
-            // We updated the effect on the source item. Now, find the matching effect on 
-            //  the actor, so we can toggle that as well.
-            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
-            if (actorEffect) {
-                actorEffect.update({ disabled: true });
-            } else {
-                // If the effect can't be found, we apply the effect to the actor instead.
-                applyAllEffects(itemId, actorId, true);
+        if (!transferOnly || transferOnly && effect.transfer) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`disableAllEffects: Effect to disable: `, effect) }
+            // Update the item effect
+            effect.update({ disabled: true });
+            if (!foundry.utils.isNewerVersion(game.version, "13")) {
+                // For Foundry v12 only...
+                // We updated the effect on the source item. Now, find the matching effect on 
+                //  the actor, so we can toggle that as well.
+                const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+                if (actorEffect) {
+                    actorEffect.update({ disabled: true });
+                } else {
+                    // If the effect can't be found, we apply the effect to the actor instead.
+                    applyAllEffects(itemId, actorId, true);
+                }
             }
+            chatMsg += `<p><i>${effect.name}</i> disabled on ${actor.name}.</p>`
         }
-        chatMsg += `<p><i>${effect.name}</i> disabled on ${actor.name}.</p>`
     })
     // Send a chat message that the effects were disabled
     const chatData = {
