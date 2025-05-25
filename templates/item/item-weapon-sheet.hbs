@@ -4,10 +4,10 @@
     <div class="header-block">
       <h1 class="charname">
         {{#if isGM}}
-        <input name="system.realName" type="text" value="{{system.realName}}" placeholder="Name"/>
+        <input class="item-name" name="system.realName" type="text" value="{{system.realName}}" placeholder="Name"/>
         {{else}}
             {{#if system.identified}}
-            <input name="system.realName" type="text" value="{{system.realName}}" placeholder="Name"/>
+            <input class="item-name" name="system.realName" type="text" value="{{system.realName}}" placeholder="Name"/>
             {{else}}
             <input name="system.itemAlias" type="text" value="{{system.itemAlias}}" disabled/>
             {{/if}}
@@ -21,7 +21,7 @@
         </span>
         <span class="flexrow flexlarge flex-group-center">
             <label class="resource-label">{{localize 'HYP3E.itemAlias'}}</label>
-            <input type="text" style="text-align: left; min-width: 200px;" name="system.itemAlias" value="{{system.itemAlias}}" placeholder="Name if not identified" />
+            <input class="item-alias" type="text" style="text-align: left; min-width: 200px;" name="system.itemAlias" value="{{system.itemAlias}}" placeholder="Name if not identified" />
         </span>
       </div>
       {{/if}}
