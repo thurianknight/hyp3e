@@ -605,8 +605,8 @@ Hooks.once("ready", async function() {
         // if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
         //     reportBestiary()
         // }
-        // if (foundry.utils.isNewerVersion("1.1.5", game.system.version)) {
-        //     reportItems()
+        // if (foundry.utils.isNewerVersion("1.10.5", game.system.version)) {
+            reportItems()
         // }
     }
 
@@ -1183,22 +1183,38 @@ async function reportItems() {
             continue
         }
 
-        // Skip anything that is not a physical item compendium
-        if (pack.metadata.label == "Armor" || pack.metadata.label == "Weapons" || pack.metadata.label == "Equipment - General" || pack.metadata.label == "Equipment - Provisions" || pack.metadata.label == "Equipment - Religious") {
+        // Report on spells with active effects
+        if (pack.metadata.label == "Spells") {
+            let report = []
+            const title = `SPELL EFFECTS: Beginning report for compendium ${pack.metadata.label}...`
             // Iterate over compendium entries and report
             const documents = await pack.getDocuments()
             for (let doc of documents) {
-                if (!doc.system.weight || doc.system.weight == "") {
-                    console.log(`DEBUG: ${doc.name} has weight ${doc.system.weight}!`)
-                }
-                if (doc.system.formula?.includes("@item.atkMod")) {
-                    console.log(`DEBUG: ${doc.name} has formula ${doc.system.formula}!`)
-                }
-                if (doc.system.formula?.includes("@fa")) {
-                    console.log(`DEBUG: ${doc.name} has formula ${doc.system.formula}!`)
+                // console.log(`SPELL EFFECTS: ${doc.name}...`, doc);
+                for ( const effect of doc.effects ) {
+                    report.push(`${doc.name} has effect ${effect.name}`);
                 }
             }
+            report.sort();
+            console.log(`${title}\n` + report.join("\n"));
         }
+
+        // Skip anything that is not a physical item compendium
+        // if (pack.metadata.label == "Armor" || pack.metadata.label == "Weapons" || pack.metadata.label == "Equipment - General" || pack.metadata.label == "Equipment - Provisions" || pack.metadata.label == "Equipment - Religious") {
+        //     // Iterate over compendium entries and report
+        //     const documents = await pack.getDocuments()
+        //     for (let doc of documents) {
+        //         if (!doc.system.weight || doc.system.weight == "") {
+        //             console.log(`DEBUG: ${doc.name} has weight ${doc.system.weight}!`)
+        //         }
+        //         if (doc.system.formula?.includes("@item.atkMod")) {
+        //             console.log(`DEBUG: ${doc.name} has formula ${doc.system.formula}!`)
+        //         }
+        //         if (doc.system.formula?.includes("@fa")) {
+        //             console.log(`DEBUG: ${doc.name} has formula ${doc.system.formula}!`)
+        //         }
+        //     }
+        // }
     }
 }
 
