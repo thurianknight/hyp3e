@@ -73,8 +73,10 @@ export class HYP3ECombat extends Combat {
         // Log the combatant
         // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
 
-        // Clear the movement history to prevent any movement restrictions on its next turn
-        combatant.clearMovementHistory();
+        if (foundry.utils.isNewerVersion(game.version, "13")) {
+            // Clear the movement history to prevent any movement restrictions on its next turn
+            combatant.clearMovementHistory();
+        }
 
         // Cycle through active effects and update combatant status
         const actor = combatant.actor;
