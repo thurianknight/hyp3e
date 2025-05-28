@@ -342,7 +342,7 @@ export async function applyAllEffects(itemId, actorId, disabled = false) {
             if (disabled) effectData.disabled = true;
             if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Cloned Effect:", effectData) }
             chatMsg += `<p>${actor.name} applied <i>${effectData.name}</i> to ${t.name}.</p>`
-            t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+            // t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
         });
     }
     // Send a chat message that the item was used
@@ -394,10 +394,10 @@ export async function enableEffect(itemId, effectId, actorId) {
         //  the actor, so we can toggle that as well.
         const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
         if (actorEffect) {
-            actorEffect.update({ disabled: false });
+            // actorEffect.update({ disabled: false });
         } else {
             // If the effect can't be found, we apply the effect to the actor instead.
-            applyEffect(itemId, effectId, actorId, false);
+            // applyEffect(itemId, effectId, actorId, false);
         }
     }
     chatMsg += `<p><i>${effect.name}</i> enabled on ${actor.name}.</p>`
@@ -450,7 +450,7 @@ export async function enableAllEffects(itemId, actorId, transferOnly = false) {
                     // actorEffect.update({ disabled: false });
                 } else {
                     // If the effect can't be found, we apply the effect to the actor instead.
-                    applyAllEffects(itemId, actorId, false);
+                    // applyAllEffects(itemId, actorId, false);
                 }
             }
             chatMsg += `<p><i>${effect.name}</i> enabled on ${actor.name}.</p>`
@@ -505,10 +505,10 @@ export async function disableEffect(itemId, effectId, actorId) {
         //  the actor, so we can toggle that as well.
         const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
         if (actorEffect) {
-            actorEffect.update({ disabled: true });
+            // actorEffect.update({ disabled: true });
         } else {
             // If the effect can't be found, we apply the effect to the actor instead.
-            applyEffect(itemId, effectId, actorId, true);
+            // applyEffect(itemId, effectId, actorId, true);
         }
     }
     chatMsg += `<p><i>${effect.name}</i> disabled on ${actor.name}.</p>`
@@ -555,10 +555,10 @@ export async function disableAllEffects(itemId, actorId, transferOnly = false) {
                 //  the actor, so we can toggle that as well.
                 const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
                 if (actorEffect) {
-                    actorEffect.update({ disabled: true });
+                    // actorEffect.update({ disabled: true });
                 } else {
                     // If the effect can't be found, we apply the effect to the actor instead.
-                    applyAllEffects(itemId, actorId, true);
+                    // applyAllEffects(itemId, actorId, true);
                 }
             }
             chatMsg += `<p><i>${effect.name}</i> disabled on ${actor.name}.</p>`

@@ -67,7 +67,8 @@ export class Hyp3eActorSheet extends ActorSheet {
     // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor._getAllApplicableEffects()) }
     if (!foundry.utils.isNewerVersion(game.version, "13")) {
         // For Foundry v12...
-        context.effects = prepareActiveEffectCategories(this.actor.effects);
+        // context.effects = prepareActiveEffectCategories(this.actor.effects);
+        context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
     } else if (foundry.utils.isNewerVersion(game.version, "13")) {
         // For Foundry v13...
         context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
