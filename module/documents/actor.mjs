@@ -2420,114 +2420,12 @@ export class Hyp3eActor extends Actor {
      * @param {Bool} val The true or false value to be assigned
      */
     async updateBonusSpell(spellLvl, val) {
-        switch (spellLvl) {
-        case "intLvl1":
-            await this.update({
-                system: {
-                    attributes: {
-                        int: {
-                            bonusSpells: {
-                                lvl1: val,
-                            }
-                        }
-                    }
-                }
-            })
-            break
-        case "intLvl2":
-            await this.update({
-                system: {
-                    attributes: {
-                        int: {
-                            bonusSpells: {
-                                lvl2: val,
-                            }
-                        }
-                    }
-                }
-            })
-            break
-        case "intLvl3":
-            await this.update({
-                system: {
-                    attributes: {
-                        int: {
-                            bonusSpells: {
-                                lvl3: val,
-                            }
-                        }
-                    }
-                }
-            })
-            break
-        case "intLvl4":
-            await this.update({
-                system: {
-                    attributes: {
-                        int: {
-                            bonusSpells: {
-                                lvl4: val,
-                            }
-                        }
-                    }
-                }
-            })
-            break
-        case "wisLvl1":
-            await this.update({
-                system: {
-                    attributes: {
-                        wis: {
-                            bonusSpells: {
-                                lvl1: val,
-                            }
-                        }
-                    }
-                }
-            })
-            break
-        case "wisLvl2":
-            await this.update({
-                system: {
-                    attributes: {
-                        wis: {
-                            bonusSpells: {
-                                lvl2: val,
-                            }
-                        }
-                    }
-                }
-            })
-            break
-        case "wisLvl3":
-            await this.update({
-                system: {
-                    attributes: {
-                        wis: {
-                            bonusSpells: {
-                                lvl3: val,
-                            }
-                        }
-                    }
-                }
-            })
-            break
-        case "wisLvl4":
-            await this.update({
-                system: {
-                    attributes: {
-                        wis: {
-                            bonusSpells: {
-                                lvl4: val,
-                            }
-                        }
-                    }
-                }
-            })
-            break
-        }
+        const attr = spellLvl.substring(0,3) // Get the attribute name (int or wis)
+        const spellLevel = spellLvl.substring(3).toLowerCase() // Get the spell level (Lvl1, Lvl2, etc.)
+        const key = `system.attributes.${attr}.bonusSpells.${spellLevel}`;
+        await this.update({ [key]: val });
         // this.render(true)
-        if (CONFIG.HYP3E.debugMessages) { console.log("Bonus spell update:", this.system) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("updateBonusSpell update:", key, val) }
     }
 
 }
