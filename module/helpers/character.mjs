@@ -2560,7 +2560,7 @@ export class Hyp3eCharacter {
 
     static _valueFromTable(table, val) {
         let output;
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_valueFromTable: ${table}, ${val}`) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`_valueFromTable:`, table, val) }
         for (let i = 0; i <= val; i++) {
             if (table[i] != undefined) {
                 output = table[i];
@@ -2570,10 +2570,79 @@ export class Hyp3eCharacter {
     }
 
     static _stringFromTable(table, val) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_stringFromTable: ${table}, ${val}`) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`_stringFromTable:`, table, val) }
         let output = ""
         output = table[val]
         return output
+    }
+
+    /**
+     * Quick create a character of the given class
+     * @param {string} actor - The actor object to create the character for
+     * @param {object} dataset - The dataset containing character creation data
+     * @returns {boolean} - Returns true if the character was created successfully
+     */
+    static async quickCreate(actor, dataset) {
+        const charClass = actor.system.details.class;
+        console.log(`quickCreate: class to create:`, charClass);
+        // Get the class attribute requirements
+        let classData = this.classData[charClass];
+        if (!classData) {
+            console.error(`quickCreate: Class data not found for class ${charClass}!`);
+            return false;
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`quickCreate: Creating character of class ${charClass}, starting with class data:`, classData) }
+
+        // Roll attributes down the line, retry until we get a set that meets the class requirements
+        if (CONFIG.HYP3E.debugMessages) { console.log(`quickCreate: Rolling attributes for class ${charClass}`) }
+        let metReqs = false;
+        let attributes = {};
+        while (!metReqs) {
+            attributes = await this._rollAttributes(actor);
+            metReqs = await this._checkAttrRequirements(charClass, attributes);
+            if (metReqs) {
+                console.log(`quickCreate: Character meets class requirements for ${charClass}, attributes rolled:`, attributes);
+            } else {
+                console.warn(`quickCreate: Character does not meet class requirements for ${charClass}, rolling again...`)
+            }
+        }
+        // If we reach here, we have a character that meets the class requirements
+        return attributes;
+    }
+
+    static async _rollAttributes(actor) {
+        const rollFormula = game.settings.get(game.system.id, "quickCreateChars")
+        console.log(`_rollAttributes: Rolling attributes using formula ${rollFormula} down the line...`);
+        // Just roll and return the attributes
+        let attributes = {};
+        for (const attr of Object.keys(actor.system.attributes)) {
+            // Roll 2d6+6 for each attribute
+            let roll = new Roll(rollFormula);
+            await roll.roll();
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_rollAttributes: Rolled ${roll.total} for attribute ${attr}`) }
+            attributes[attr] = roll.total;
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_rollAttributes: Rolled attributes:`, attributes) }
+        return attributes;
+    }
+
+    static async _checkAttrRequirements(charClass, attributes) {
+        const classData = this.classData[charClass];
+        if (!classData) {
+            console.error(`_checkAttrRequirements: Class data not found for class ${charClass}!`);
+            return false;
+        }
+        console.log(`_checkAttrRequirements: Checking attribute list:`, attributes);
+
+        // Check if the character meets the attribute requirements
+        for (const [attr, minValue] of Object.entries(classData.attrReqs)) {
+            console.log(`_checkAttrRequirements: Checking ${attr} requirement for class ${charClass}: Required: ${minValue}, Rolled: ${attributes[attr]}`);
+            if (attributes[attr] < minValue) {
+                console.warn(`_checkAttrRequirements: Character does not meet ${attr} requirement for class ${charClass}. Required: ${minValue}, Rolled: ${attributes[attr]}`);
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -2733,7 +2802,7 @@ export class Hyp3eCharacter {
             flavor: label,
             content: content
         });
-        return true
+        return true;
 
     }
 
@@ -2741,7 +2810,7 @@ export class Hyp3eCharacter {
      * Set or reset all attribute modifiers
      * @param {*} dataset 
      */
-    static async setAttributeMods(dataset) {
+    static async setAttributeMods(dataset, skipPrompt = false) {
         console.log("setAttributeMods: Setting attribute modifiers...")
 
         let actor = game.actors.get(dataset.actorId)
@@ -2752,12 +2821,14 @@ export class Hyp3eCharacter {
         // Log the dataset before the dialog renders
         if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: ${actor.name} dataset: `, dataset) }
 
-        // Display the confirmation dialog, and exit if the user cancels this action
-        try {
-            let rollResponse = await Hyp3eDialog.ShowSetModifiersDialog(dataset)
-        } catch(err) {
-            console.log(`setAttributeMods: Dialog error ${err}`)
-            return false
+        if (!skipPrompt) {
+            // Display the confirmation dialog, and exit if the user cancels this action
+            try {
+                let rollResponse = await Hyp3eDialog.ShowSetModifiersDialog(dataset)
+            } catch(err) {
+                console.log(`setAttributeMods: Dialog error ${err}`)
+                return false
+            }
         }
 
         // Initialize some vars
@@ -3201,7 +3272,7 @@ export class Hyp3eCharacter {
                 content: content ?? ''
             })
         }
-        return true
+        return true;
     }
 
     /**

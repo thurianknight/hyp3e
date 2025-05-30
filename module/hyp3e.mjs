@@ -64,6 +64,23 @@ Hooks.once('init', async function() {
         requiresReload: true,
     });
 
+    // Enable quick-create characters by selecting a roll method
+    game.settings.register(game.system.id, "quickCreateChars", {
+        name: game.i18n.localize("HYP3E.settings.quickCreateChars"),
+        hint: game.i18n.localize("HYP3E.settings.quickCreateCharsHint"),
+        default: "3d6",
+        scope: "world",
+        type: String,
+        choices: {
+            "": "Disabled",
+            "3d6": "Method I: 3d6",
+            "4d6dl": "Method III: 4d6 drop lowest",
+            "2d6+6": "Method V: 2d6+6"
+        },
+        config: true,
+        requiresReload: true,
+    });
+
     // Enable basic attribute checks
     game.settings.register(game.system.id, "enableAttrChecks", {
         name: game.i18n.localize("HYP3E.settings.enableAttrChecks"),

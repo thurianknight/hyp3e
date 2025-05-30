@@ -161,10 +161,10 @@ export class Hyp3eItemSheet extends ItemSheet {
     html.find('.item-name').change(async (event) => {
         const name = event.target.value.trim();
         if (this.item.system.identified) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Item name changed to: ${name}`) }
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`Item name changed to: ${name}`) }
             if (name !== this.item.name) {
                 await this.item.update({ name: name });
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Item name updated to: ${name}`) }
+                // if (CONFIG.HYP3E.debugMessages) { console.log(`Item name updated to: ${name}`) }
             }
         }
     });
@@ -172,10 +172,10 @@ export class Hyp3eItemSheet extends ItemSheet {
     html.find('.item-alias').change(async (event) => {
         const alias = event.target.value.trim();
         if (!this.item.system.identified) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Item alias changed to: ${alias}`) }
+            // if (CONFIG.HYP3E.debugMessages) { console.log(`Item alias changed to: ${alias}`) }
             if (alias !== this.item.name) {
                 await this.item.update({ name: alias });
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Item alias updated to: ${alias}`) }
+                // if (CONFIG.HYP3E.debugMessages) { console.log(`Item alias updated to: ${alias}`) }
             }
         }
     });
@@ -183,7 +183,7 @@ export class Hyp3eItemSheet extends ItemSheet {
     // Handle item status identified / not identified
     html.find(".identified").click(async (event) => {
         const identified = event.target.checked
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Checkbox system.identified clicked! New 'checked' value: ${identified}.`) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`Checkbox system.identified clicked! New 'checked' value: ${identified}.`) }
         this._toggleIdentified(identified)
     });
 

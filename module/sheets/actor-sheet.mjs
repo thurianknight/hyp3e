@@ -61,6 +61,13 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Add roll data for TinyMCE editors.
     context.rollData = context.actor.getRollData();
 
+    // Enable/disable character quick-create button
+    if (game.settings.get(game.system.id, "quickCreateChars") != "" && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
+        context.enableQuickCreate = true;
+    } else {
+        context.enableQuickCreate = false;
+    };
+
     // Prepare active effects
     if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applied effects: `, this.actor.appliedEffects) }
     if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor.allApplicableEffects()) }
@@ -148,6 +155,11 @@ export class Hyp3eActorSheet extends ActorSheet {
                     default:
                         break
                 }
+            }
+            // If the attribute is NOT at its default 10, set disableQuickCreate to true
+            if (v.value != 10 && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
+                this.actor.setFlag(game.system.id, "disableQuickCreate", true)
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Attribute ${k} is not at default 10, disabling quick-create!`) }
             }
         }
 
@@ -738,45 +750,84 @@ export class Hyp3eActorSheet extends ActorSheet {
 
       switch (dataset.rollType) {
         case "item":
-          const itemId = element.closest('.item').dataset.itemId
-          // Set item ID in roll dataset
-          dataset.itemId = itemId
-          this.actor.rollItem(dataset)
-          break
+            const itemId = element.closest('.item').dataset.itemId
+            // Set item ID in roll dataset
+            dataset.itemId = itemId
+            this.actor.rollItem(dataset)
+            break
   
         case "check":
-          this.actor.rollCheck(dataset)
-          break
+            this.actor.rollCheck(dataset)
+            break
 
         case "attack":
-          this.actor.rollAttackOrSpell(dataset)
-          break
+            this.actor.rollAttackOrSpell(dataset)
+            break
 
         case "save":
-          this.actor.rollSave(dataset)
-          break
+            this.actor.rollSave(dataset)
+            break
 
         case "basic":
-          this.actor.rollBasic(dataset)
-          break
+            this.actor.rollBasic(dataset)
+            break
 
         case "reaction":
-          this.actor.rollReaction(dataset)
-          break
+            this.actor.rollReaction(dataset)
+            break
   
+        case "quick-create":
+            if (!this.actor.system.details.class) {
+                ui.notifications.warn("Please select a character class!");
+                return;
+            }
+            let attributes = await Hyp3eCharacter.quickCreate(this.actor, dataset)
+            console.log("Quick Create Attributes:", attributes);
+            if (attributes) {
+                ui.notifications.info("Character created!")
+                // Set the attributes in the actor
+                for (let [k, v] of Object.entries(attributes)) {
+                    await this.actor.update({ system: { attributes: { [k]: { value: v } } } })
+                    this.actor.system.attributes[k].value = v
+                }
+                let setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset, true)
+                if (setAttrOk) {
+                    const roll = new Roll(`${this.actor.system.hd} + ${this.actor.system.attributes.con.hpMod}`);
+                    await roll.roll();
+                    if (CONFIG.HYP3E.debugMessages) { console.log("Quick Create HP roll result: ", roll) }
+                    if (roll != undefined && roll.total != undefined) {
+                        await this.actor.update({
+                            system: {
+                                hp: {
+                                    value: roll.total,
+                                    max: roll.total
+                                }
+                            }
+                        });
+                        // Set the HP values in the actor
+                        this.actor.system.hp.value = roll.total;
+                        this.actor.system.hp.max = roll.total;
+                    }
+                    this.render()
+                    this.actor.setFlag(game.system.id, "disableQuickCreate", true)
+                }
+            }
+            break;
+
         case "setAttr":
-          // Take the attribute scores and class, and lookup/calculate modifiers
-          let setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset)
-          if (setAttrOk) {
-            this.render()
-          }
-          break
+            // Take the attribute scores and class, and lookup/calculate modifiers
+            let setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset, false)
+            if (setAttrOk) {
+                this.render()
+                this.actor.setFlag(game.system.id, "disableQuickCreate", true)
+            }
+            break;
 
         case "levelUp":
             // Check current XP, and level up if possible
             let levelUpOk = await Hyp3eCharacter.levelUp(dataset)
             if (levelUpOk) {
-              this.render()
+                this.render()
             }
             break
 
