@@ -210,6 +210,69 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
+     * Quickly create a character actor from a basic dataset.
+     * @param {Object} dataset - The dataset from the actor sheet.
+     * @return {boolean} Success or failure of the character creation.
+     */
+    async quickCreateCharacter(dataset) {
+        if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: dataset:", dataset) };
+        const attributes = await Hyp3eCharacter.rollAttributesForClass(this, dataset);
+        if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: Attributes:", attributes) };
+        if (attributes) {
+            // Set the attributes in the actor
+            for (let [k, v] of Object.entries(attributes)) {
+                await this.update({ system: { attributes: { [k]: { value: v } } } })
+                this.system.attributes[k].value = v
+            }
+            const setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset, true)
+            if (!setAttrOk) return false; // If setting attribute mods failed, exit early
+
+            const roll = new Roll(`${this.system.hd} + ${this.system.attributes.con.hpMod}`);
+            await roll.evaluate({ evaluateSync: true });
+            if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: HP roll result: ", roll) }
+            if (roll != undefined && roll.total != undefined) {
+                await this.update({
+                    system: {
+                        hp: {
+                            value: roll.total,
+                            max: roll.total
+                        }
+                    }
+                });
+                // Set the HP values in the actor
+                this.system.hp.value = roll.total;
+                this.system.hp.max = roll.total;
+            } else {
+                console.error("quickCreateCharacter: HP roll failed to evaluate properly.");
+                return false;
+            }
+        } else {
+            console.error("quickCreateCharacter: Attributes roll failed.");
+            return false;
+        }
+        // Now we check to see if the Items directory has the folders & items we need.
+        // Alternatively, we can also check for compendia with the items we need.
+        // Start with armor...
+        const armor = await Hyp3eCharacter.getDefaultArmorForClass(this);
+        // Add the armor to the actor's inventory
+        this.createEmbeddedDocuments("Item", armor);
+
+        // Next we do weapons...
+        const weapons = await Hyp3eCharacter.getDefaultWeaponsForClass(this);
+        // Add the armor to the actor's inventory
+        this.createEmbeddedDocuments("Item", weapons);
+
+        // Finally, all the equipment items...
+        const items = await Hyp3eCharacter.getDefaultItemsForClass(this);
+        // Add the items to the actor's inventory
+        this.createEmbeddedDocuments("Item", items);
+
+        // All good? Disable the quick-create button so it can't be used again.
+        this.setFlag(game.system.id, "disableQuickCreate", true)
+        return true;
+    }
+
+    /**
      * @override
      * Overrides the core system applyActiveEffects method on the actor.
      * Capture change values that include roll formulas or data paths, and resolve them
@@ -1662,9 +1725,9 @@ export class Hyp3eActor extends Actor {
     async _executeRoll(rollFormula, actorData) {
         try {
             const atkRoll = new Roll(rollFormula, actorData);
-            await atkRoll.evaluate({ evaluateSync: true }); // Use evaluate for modern FVTT
+            await atkRoll.evaluate({ evaluateSync: true });
             const d20Die = atkRoll.dice.find(d => d.faces === 20);
-            const naturalRoll = d20Die ? d20Die.results[0].result : 0; // Get the first d20 result
+            const naturalRoll = d20Die ? d20Die.results[0].result : 0;
 
             if (CONFIG.HYP3E.debugMessages) {
                 console.log("rollAttackOrSpell/_executeRoll: Attack Roll:", atkRoll);

@@ -781,36 +781,13 @@ export class Hyp3eActorSheet extends ActorSheet {
                 ui.notifications.warn("Please select a character class!");
                 return;
             }
-            let attributes = await Hyp3eCharacter.quickCreate(this.actor, dataset)
-            console.log("Quick Create Attributes:", attributes);
-            if (attributes) {
+            // Quickly roll up a character of the selected class
+            let createOk = await this.actor.quickCreateCharacter(dataset);
+            if (createOk) {
                 ui.notifications.info("Character created!")
-                // Set the attributes in the actor
-                for (let [k, v] of Object.entries(attributes)) {
-                    await this.actor.update({ system: { attributes: { [k]: { value: v } } } })
-                    this.actor.system.attributes[k].value = v
-                }
-                let setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset, true)
-                if (setAttrOk) {
-                    const roll = new Roll(`${this.actor.system.hd} + ${this.actor.system.attributes.con.hpMod}`);
-                    await roll.roll();
-                    if (CONFIG.HYP3E.debugMessages) { console.log("Quick Create HP roll result: ", roll) }
-                    if (roll != undefined && roll.total != undefined) {
-                        await this.actor.update({
-                            system: {
-                                hp: {
-                                    value: roll.total,
-                                    max: roll.total
-                                }
-                            }
-                        });
-                        // Set the HP values in the actor
-                        this.actor.system.hp.value = roll.total;
-                        this.actor.system.hp.max = roll.total;
-                    }
-                    this.render()
-                    this.actor.setFlag(game.system.id, "disableQuickCreate", true)
-                }
+                this.render()
+            } else {
+                ui.notifications.error("Character creation failed. Please check the console for errors.")
             }
             break;
 

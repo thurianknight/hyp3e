@@ -10,6 +10,2948 @@ import {Hyp3eDialog} from "./dialog.mjs";
 export class Hyp3eCharacter {
 
     /**
+     * Class-specific data
+     * Classes:
+     *   Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, 
+     *   Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, 
+     *   Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch
+     */
+    static classData = {
+        "Assassin": {
+            "baseClass": "thief",
+            "hitDie": "1d6",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": -2,
+            "attrReqs": {
+                "str": 9,
+                "dex": 9,
+                "int": 9,
+            },
+            "xpBonusReq": {
+                "dex": 16,
+                "int": 16,
+            },
+            "featBonus": {
+                "dex": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 14,
+                "transformation": 16,
+                "avoidance": 14,
+                "sorcery": 16
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                },
+                2: {
+                    "xp": 1750,
+                    "fa": 1,
+                },
+                3: {
+                    "xp": 3500,
+                    "fa": 2,
+                },
+                4: {
+                    "xp": 7000,
+                    "fa": 3,
+                },
+                5: {
+                    "xp": 14000,
+                    "fa": 3,
+                },
+                6: {
+                    "xp": 28000,
+                    "fa": 4,
+                },
+                7: {
+                    "xp": 56000,
+                    "fa": 5,
+                },
+                8: {
+                    "xp": 112000,
+                    "fa": 5,
+                },
+                9: {
+                    "xp": 224000,
+                    "fa": 6,
+                },
+                10: {
+                    "xp": 336000,
+                    "fa": 7,
+                },
+                11: {
+                    "xp": 448000,
+                    "fa": 7,
+                },
+                12: {
+                    "xp": 560000,
+                    "fa": 8,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Sword, short", "quantity": 1 },
+                    { "name": "Crossbow, light", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Bolt case", "quantity": 1 },
+                    { "name": "Bolts, light (x20)", "quantity": 20 },
+                    { "name": "Clothing, disguise", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Thieves' tools", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+        },
+        "Barbarian": {
+            "baseClass": "fighter",
+            "hitDie": "1d12",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 13,
+                "dex": 13,
+                "con": 13,
+            },
+            "xpBonusReq": {
+                "str": 16,
+                "dex": 16,
+            },
+            "featBonus": {
+                "str": 8,
+                "dex": 8,
+            },
+            "saves": {
+                "death": 14,
+                "device": 14,
+                "transformation": 14,
+                "avoidance": 14,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                },
+                2: {
+                    "xp": 3000,
+                    "fa": 2,
+                },
+                3: {
+                    "xp": 6000,
+                    "fa": 3,
+                },
+                4: {
+                    "xp": 12000,
+                    "fa": 4,
+                },
+                5: {
+                    "xp": 24000,
+                    "fa": 5,
+                },
+                6: {
+                    "xp": 48000,
+                    "fa": 6,
+                },
+                7: {
+                    "xp": 96000,
+                    "fa": 7,
+                },
+                8: {
+                    "xp": 192000,
+                    "fa": 8,
+                },
+                9: {
+                    "xp": 384000,
+                    "fa": 9,
+                },
+                10: {
+                    "xp": 576000,
+                    "fa": 10,
+                },
+                11: {
+                    "xp": 768000,
+                    "fa": 11,
+                },
+                12: {
+                    "xp": 960000,
+                    "fa": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Studded armour", "quantity": 1 },
+                    { "name": "Shield, small", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Bow, short", "quantity": 1 },
+                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Sword, bastard", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Arrows (x12)", "quantity": 12 },
+                    { "name": "Arrow quiver", "quantity": 1 },
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Fishing net", "quantity": 1 },
+                    { "name": "Horn, hunting", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Sack, large", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, standard", "quantity": 7 },
+                ],
+            },
+        },
+        "Bard": {
+            "baseClass": "thief",
+            "hitDie": "1d8",
+            "fa": 1,
+            "ca": 1,
+            "spellLists": ["Druid", "Illusionist"],
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 9,
+                "dex": 9,
+                "int": 9,
+                "wis": 9,
+                "cha": 15,
+            },
+            "xpBonusReq": {
+                "dex": 16,
+                "cha": 16,
+            },
+            "featBonus": {
+                "dex": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 14,
+                "transformation": 16,
+                "avoidance": 14,
+                "sorcery": 16
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 1,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 2,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 3,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 3,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 4,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 5,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 5,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 6,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 7,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 7,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 8,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Studded armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Bow, short", "quantity": 1 },
+                    { "name": "Dagger", "quantity": 2 },
+                    { "name": "Mace, footman's", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Arrows (x12)", "quantity": 12 },
+                    { "name": "Arrow quiver", "quantity": 1 },
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Book, blank", "quantity": 1 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Flute", "quantity": 1 },
+                    { "name": "Ink and quill", "quantity": 1 },
+                    { "name": "Parchment", "quantity": 3 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, large", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 2 },
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+        },
+        "Berserker": {
+            "baseClass": "fighter",
+            "hitDie": "1d12",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 15,
+                "con": 15,
+            },
+            "xpBonusReq": {
+                "str": 16,
+                "con": 16,
+            },
+            "featBonus": {
+                "str": 8,
+                "con": 8,
+            },
+            "saves": {
+                "death": 14,
+                "device": 14,
+                "transformation": 14,
+                "avoidance": 14,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 2,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 3,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 4,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 5,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 6,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 7,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 8,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 9,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 10,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 11,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Scale mail", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Axe, battle", "quantity": 1 },
+                    { "name": "Axe, hand", "quantity": 2 },
+                    { "name": "Sword, broad", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Sack, large", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+        },
+        "Cataphract": {
+            "baseClass": "fighter",
+            "hitDie": "1d10",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 9,
+                "dex": 9,
+                "wis": 9,
+                "cha": 9,
+            },
+            "xpBonusReq": {
+                "str": 16,
+                "cha": 16,
+            },
+            "featBonus": {
+                "str": 8,
+            },
+            "saves": {
+                "death": 14,
+                "device": 16,
+                "transformation": 14,
+                "avoidance": 16,
+                "sorcery": 16
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                },
+                2: {
+                    "xp": 2250,
+                    "fa": 2,
+                },
+                3: {
+                    "xp": 4500,
+                    "fa": 3,
+                },
+                4: {
+                    "xp": 9000,
+                    "fa": 4,
+                },
+                5: {
+                    "xp": 18000,
+                    "fa": 5,
+                },
+                6: {
+                    "xp": 36000,
+                    "fa": 6,
+                },
+                7: {
+                    "xp": 72000,
+                    "fa": 7,
+                },
+                8: {
+                    "xp": 144000,
+                    "fa": 8,
+                },
+                9: {
+                    "xp": 288000,
+                    "fa": 9,
+                },
+                10: {
+                    "xp": 432000,
+                    "fa": 10,
+                },
+                11: {
+                    "xp": 576000,
+                    "fa": 11,
+                },
+                12: {
+                    "xp": 720000,
+                    "fa": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Scale mail", "quantity": 1 },
+                    { "name": "Shield, small", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Flail, horseman's", "quantity": 1 },
+                    { "name": "Sword, long", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Lantern, hooded", "quantity": 1 },
+                    { "name": "Oil, lamp", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Sack, large", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+        },
+        "Cleric": {
+            "baseClass": "cleric",
+            "fa": 1,
+            "ca": 1,
+            "spellLists": ["Cleric"],
+            "ta": 1,
+            "unskilled": -2,
+            "hitDie": "1d8",
+            "attrReqs": {
+                "wis": 9,
+            },
+            "xpBonusReq": {
+                "wis": 16,
+            },
+            "saves": {
+                "death": 14,
+                "device": 16,
+                "transformation": 16,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                    "ca": 1,
+                    "ta": 1,
+                },
+                2: {
+                    "xp": 2000,
+                    "fa": 1,
+                    "ca": 2,
+                    "ta": 2,
+                },
+                3: {
+                    "xp": 4000,
+                    "fa": 2,
+                    "ca": 3,
+                    "ta": 3,
+                },
+                4: {
+                    "xp": 8000,
+                    "fa": 3,
+                    "ca": 4,
+                    "ta": 4,
+                },
+                5: {
+                    "xp": 16000,
+                    "fa": 3,
+                    "ca": 5,
+                    "ta": 5,
+                },
+                6: {
+                    "xp": 32000,
+                    "fa": 4,
+                    "ca": 6,
+                    "ta": 6,
+                },
+                7: {
+                    "xp": 64000,
+                    "fa": 5,
+                    "ca": 7,
+                    "ta": 7,
+                },
+                8: {
+                    "xp": 128000,
+                    "fa": 5,
+                    "ca": 8,
+                    "ta": 8,
+                },
+                9: {
+                    "xp": 256000,
+                    "fa": 6,
+                    "ca": 9,
+                    "ta": 9,
+                },
+                10: {
+                    "xp": 384000,
+                    "fa": 7,
+                    "ca": 10,
+                    "ta": 10,
+                },
+                11: {
+                    "xp": 512000,
+                    "fa": 7,
+                    "ca": 11,
+                    "ta": 11,
+                },
+                12: {
+                    "xp": 640000,
+                    "fa": 8,
+                    "ca": 12,
+                    "ta": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Studded armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Hammer, war", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+                "equipment - religious": [
+                    { "name": "Holy symbol, silver", "quantity": 1 },
+                    { "name": "Holy oil/water", "quantity": 1 },
+                ],
+            },
+        },
+        "Cryomancer": {
+            "baseClass": "magician",
+            "hitDie": "1d4",
+            "fa": 0,
+            "ca": 1,
+            "spellLists": ["Cryomancer"],
+            "ta": null,
+            "unskilled": -4,
+            "attrReqs": {
+                "int": 9,
+                "wis": 9,
+            },
+            "xpBonusReq": {
+                "int": 16,
+                "wis": 16,
+            },
+            "saves": {
+                "death": 16,
+                "device": 14,
+                "transformation": 16,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 0,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 0,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 1,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 1,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 2,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 2,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 3,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 3,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 4,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 4,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 5,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 5,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "weapons": [
+                    { "name": "Axe, hand", "quantity": 2 },
+                    { "name": "Dagger, silver", "quantity": 1 },
+                    { "name": "Spear, short", "quantity": 1 },
+                    { "name": "Spear, short, thrown", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Book, blank", "quantity": 1 },
+                    { "name": "Candle, beeswax", "quantity": 3 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Crampons", "quantity": 1 },
+                    { "name": "Hammer, small", "quantity": 1 },
+                    { "name": "Ink and quill", "quantity": 1 },
+                    { "name": "Lantern, bullseye", "quantity": 1 },
+                    { "name": "Oil, lamp", "quantity": 2 },
+                    { "name": "Parchment", "quantity": 3 },
+                    { "name": "Pouch, hard leather (large)", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, silk", "quantity": 1 },
+                    { "name": "Sack, large", "quantity": 1 },
+                    { "name": "Spikes, iron", "quantity": 12 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+        },
+        "Druid": {
+            "baseClass": "cleric",
+            "hitDie": "1d8",
+            "fa": 1,
+            "ca": 1,
+            "spellLists": ["Druid"],
+            "ta": null,
+            "unskilled": -2,
+            "attrReqs": {
+                "wis": 9,
+                "cha": 12,
+            },
+            "xpBonusReq": {
+                "wis": 16,
+                "cha": 16,
+            },
+            "saves": {
+                "death": 14,
+                "device": 16,
+                "transformation": 16,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 2000,
+                    "fa": 1,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 4000,
+                    "fa": 2,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 8000,
+                    "fa": 3,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 16000,
+                    "fa": 3,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 32000,
+                    "fa": 4,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 64000,
+                    "fa": 5,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 128000,
+                    "fa": 5,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 256000,
+                    "fa": 6,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 384000,
+                    "fa": 7,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 512000,
+                    "fa": 7,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 640000,
+                    "fa": 8,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Studded armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Bow, short", "quantity": 1 },
+                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Spear, short", "quantity": 1 },
+                    { "name": "Spear, short, thrown", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Arrows (x12)", "quantity": 12 },
+                    { "name": "Arrow quiver", "quantity": 1 },
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Parchment", "quantity": 3 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Wolfsbane", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+                "equipment - religious": [
+                    { "name": "Holy symbol, wooden", "quantity": 1 },
+                    { "name": "Paint, body", "quantity": 1 },
+                ],
+            },
+        },
+        "Fighter": {
+            "baseClass": "fighter",
+            "hitDie": "1d10",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 9,
+            },
+            "xpBonusReq": {
+                "str": 16,
+            },
+            "featBonus": {
+                "str": 8,
+            },
+            "saves": {
+                "death": 14,
+                "device": 16,
+                "transformation": 14,
+                "avoidance": 16,
+                "sorcery": 16
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                },
+                2: {
+                    "xp": 2000,
+                    "fa": 2,
+                },
+                3: {
+                    "xp": 4000,
+                    "fa": 3,
+                },
+                4: {
+                    "xp": 8000,
+                    "fa": 4,
+                },
+                5: {
+                    "xp": 16000,
+                    "fa": 5,
+                },
+                6: {
+                    "xp": 32000,
+                    "fa": 6,
+                },
+                7: {
+                    "xp": 64000,
+                    "fa": 7,
+                },
+                8: {
+                    "xp": 128000,
+                    "fa": 8,
+                },
+                9: {
+                    "xp": 256000,
+                    "fa": 9,
+                },
+                10: {
+                    "xp": 384000,
+                    "fa": 10,
+                },
+                11: {
+                    "xp": 512000,
+                    "fa": 11,
+                },
+                12: {
+                    "xp": 640000,
+                    "fa": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Studded armour, large shield, short bow, arrows ×12, broad sword, arrow quiver, backpack, bandages, winter
+// blanket, soft leather pouch, iron rations (1 week), hemp rope (50-ft.), large sack, one-person canvas tent, tin-
+// derbox, torches ×2, wineskin (full)
+        },
+        "Huntsman": {
+            "baseClass": "fighter",
+            "hitDie": "1d10",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 9,
+                "dex": 9,
+                "wis": 9,
+                "cha": 12
+            },
+            "xpBonusReq": {
+                "str": 16,
+                "wis": 16,
+            },
+            "featBonus": {
+                "str": 8,
+            },
+            "saves": {
+                "death": 14,
+                "device": 16,
+                "transformation": 14,
+                "avoidance": 16,
+                "sorcery": 16
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                },
+                2: {
+                    "xp": 2250,
+                    "fa": 2,
+                },
+                3: {
+                    "xp": 4500,
+                    "fa": 3,
+                },
+                4: {
+                    "xp": 9000,
+                    "fa": 4,
+                },
+                5: {
+                    "xp": 18000,
+                    "fa": 5,
+                },
+                6: {
+                    "xp": 36000,
+                    "fa": 6,
+                },
+                7: {
+                    "xp": 72000,
+                    "fa": 7,
+                },
+                8: {
+                    "xp": 144000,
+                    "fa": 8,
+                },
+                9: {
+                    "xp": 288000,
+                    "fa": 9,
+                },
+                10: {
+                    "xp": 432000,
+                    "fa": 10,
+                },
+                11: {
+                    "xp": 576000,
+                    "fa": 11,
+                },
+                12: {
+                    "xp": 720000,
+                    "fa": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Leather armour, hand axe, fighting net, longbow, arrows ×12, silver arrows ×2, short spear, arrow quiver,
+// backpack, sinew cord (100-ft. ball), hunting horn, soft leather pouch, standard rations (1 week), torches ×2,
+// wineskin (full),
+        },
+        "Illusionist": {
+            "baseClass": "magician",
+            "hitDie": "1d4",
+            "fa": 0,
+            "ca": 1,
+            "spellLists": ["Illusionist"],
+            "ta": null,
+            "unskilled": -4,
+            "attrReqs": {
+                "dex": 9,
+                "int": 9,
+            },
+            "xpBonusReq": {
+                "dex": 16,
+                "int": 16,
+            },
+            "featBonus": {
+                "dex": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 14,
+                "transformation": 16,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 0,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 0,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 1,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 1,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 2,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 2,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 3,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 3,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 4,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 4,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 5,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 5,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Silver dagger, quarterstaff, sling, bullets ×20, backpack, bandages, winter blanket, chalk (piece), ink and quill,
+// hooded lantern, silver mirror, lamp oil ×2, parchment ×3, soft leather pouch, iron rations (1 week), silk rope
+// (50-ft.), small sack, tinderbox, wineskin (full), writing stick, spell book
+        },
+        "Legerdemainist": {
+            "baseClass": "thief",
+            "hitDie": "1d6",
+            "fa": 1,
+            "ca": 1,
+            "spellLists": ["Magician"],
+            "ta": null,
+            "unskilled": -2,
+            "attrReqs": {
+                "dex": 12,
+                "int": 12,
+            },
+            "xpBonusReq": {
+                "dex": 16,
+                "int": 16,
+            },
+            "featBonus": {
+                "dex": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 16,
+                "transformation": 16,
+                "avoidance": 14,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 2750,
+                    "fa": 1,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 5500,
+                    "fa": 2,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 11000,
+                    "fa": 3,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 22000,
+                    "fa": 3,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 44000,
+                    "fa": 4,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 88000,
+                    "fa": 5,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 176000,
+                    "fa": 5,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 352000,
+                    "fa": 6,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 528000,
+                    "fa": 7,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 704000,
+                    "fa": 7,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 880000,
+                    "fa": 8,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Studded armour, small shield, daggers ×2,
+// falcata, sling, bullets ×20, backpack, bandages,
+// winter blanket, ink and quill, parchment, soft
+// leather pouch, iron rations (1 week), hemp rope
+// (50-ft.), small sack, thieves’ tools, tinderbox,
+// torches ×2, wineskin (full), spell book
+        },
+        "Magician": {
+            "baseClass": "magician",
+            "hitDie": "1d4",
+            "fa": 0,
+            "ca": 1,
+            "spellLists": ["Magician"],
+            "ta": null,
+            "unskilled": -4,
+            "attrReqs": {
+                "int": 9,
+            },
+            "xpBonusReq": {
+                "int": 16,
+            },
+            "saves": {
+                "death": 16,
+                "device": 14,
+                "transformation": 16,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 0,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 0,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 1,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 1,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 2,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 2,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 3,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 3,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 4,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 4,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 5,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 5,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Silver dagger, quarterstaff, sling, bullets ×20, backpack, bandages, winter blanket, chalk (piece),
+// ink and quill, incendiary oil, parchment ×2, soft leather pouch, standard rations (1 week), silk rope
+// (50-ft.), small sack, tinderbox, torches ×3, wineskin (full), writing stick, spell book,
+        },
+        "Monk": {
+            "baseClass": "cleric",
+            "hitDie": "1d8",
+            "fa": 0,
+            "ca": null,
+            "ta": null,
+            "unskilled": -2,
+            "attrReqs": {
+                "str": 9,
+                "dex": 9,
+                "wis": 9,
+            },
+            "xpBonusReq": {
+                "dex": 16,
+                "wis": 16,
+            },
+            "featBonus": {
+                "dex": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 16,
+                "transformation": 14,
+                "avoidance": 14,
+                "sorcery": 16
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 0,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 1,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 2,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 3,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 4,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 5,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 6,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 7,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 8,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 9,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 10,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 11,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Cæstuses, silver dagger, halberd, hooked throwing knife, backpack, bandages, winter blanket, fishing hooks ×12,
+// fishing string, incense sticks ×12, soft leather pouch, iron rations (1 week), silk rope (50-ft.), small sack, tinder-
+// box, torches ×3, wineskin (full), writing stick
+        },
+        "Necromancer": {
+            "baseClass": "magician",
+            "hitDie": "1d4",
+            "fa": 0,
+            "ca": 1,
+            "spellLists": ["Necromancer"],
+            "ta": null,
+            "unskilled": -4,
+            "attrReqs": {
+                "int": 9,
+                "wis": 9,
+            },
+            "xpBonusReq": {
+                "int": 16,
+                "wis": 16,
+            },
+            "saves": {
+                "death": 14,
+                "device": 16,
+                "transformation": 16,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 0,
+                    "ca": 1,
+                    "ta": null,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 0,
+                    "ca": 2,
+                    "ta": null,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 1,
+                    "ca": 3,
+                    "ta": 1,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 1,
+                    "ca": 4,
+                    "ta": 2,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 2,
+                    "ca": 5,
+                    "ta": 3,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 2,
+                    "ca": 6,
+                    "ta": 4,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 3,
+                    "ca": 7,
+                    "ta": 5,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 3,
+                    "ca": 8,
+                    "ta": 6,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 4,
+                    "ca": 9,
+                    "ta": 7,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 4,
+                    "ca": 10,
+                    "ta": 8,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 5,
+                    "ca": 11,
+                    "ta": 9,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 5,
+                    "ca": 12,
+                    "ta": 10,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Sickle, sling, bullets ×20, whip, backpack, winter blanket, chalk (piece), wooden holy symbol, ink and quill,
+// hooded lantern, polished steel mirror, incendiary oil, lamp oil ×2, parchment ×3, hard leather pouch, soft
+// leather pouch, iron rations (1 week), silk rope (50-ft.), small sack, tinderbox, wineskin (full), writing stick, spell
+// book
+        },
+        "Paladin": {
+            "baseClass": "fighter",
+            "hitDie": "1d10",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 9,
+                "dex": 9,
+                "wis": 9,
+                "cha": 15,
+            },
+            "xpBonusReq": {
+                "str": 16,
+                "cha": 16,
+            },
+            "featBonus": {
+                "str": 8,
+            },
+            "saves": {
+                "death": 14,
+                "device": 14,
+                "transformation": 14,
+                "avoidance": 14,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                    "ca": null,
+                    "ta": null,
+                },
+                2: {
+                    "xp": 2750,
+                    "fa": 2,
+                    "ca": null,
+                    "ta": null,
+                },
+                3: {
+                    "xp": 5500,
+                    "fa": 3,
+                    "ca": null,
+                    "ta": null,
+                },
+                4: {
+                    "xp": 11000,
+                    "fa": 4,
+                    "ca": null,
+                    "ta": null,
+                },
+                5: {
+                    "xp": 22000,
+                    "fa": 5,
+                    "ca": null,
+                    "ta": 1,
+                },
+                6: {
+                    "xp": 44000,
+                    "fa": 6,
+                    "ca": null,
+                    "ta": 2,
+                },
+                7: {
+                    "xp": 88000,
+                    "fa": 7,
+                    "ca": 1,
+                    "ta": 3,
+                },
+                8: {
+                    "xp": 176000,
+                    "fa": 8,
+                    "ca": 2,
+                    "ta": 4,
+                },
+                9: {
+                    "xp": 352000,
+                    "fa": 9,
+                    "ca": 3,
+                    "ta": 5,
+                },
+                10: {
+                    "xp": 528000,
+                    "fa": 10,
+                    "ca": 4,
+                    "ta": 6,
+                },
+                11: {
+                    "xp": 704000,
+                    "fa": 11,
+                    "ca": 5,
+                    "ta": 7,
+                },
+                12: {
+                    "xp": 880000,
+                    "fa": 12,
+                    "ca": 6,
+                    "ta": 8,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Scale mail, large shield, dagger, footman’s mace,
+// long sword, backpack, wooden holy symbol, soft
+// leather pouch, iron rations (1 week), tinderbox,
+// torches ×2, wineskin (full)
+        },
+        "Priest": {
+            "baseClass": "cleric",
+            "hitDie": "1d4",
+            "fa": 0,
+            "ca": 1,
+            "spellLists": ["Cleric"],
+            "ta": 1,
+            "unskilled": -4,
+            "attrReqs": {
+                "wis": 9,
+                "cha": 9,
+            },
+            "xpBonusReq": {
+                "wis": 16,
+                "cha": 16,
+            },
+            "saves": {
+                "death": 14,
+                "device": 16,
+                "transformation": 16,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 0,
+                    "ca": 1,
+                    "ta": 1,
+                },
+                2: {
+                    "xp": 2000,
+                    "fa": 0,
+                    "ca": 2,
+                    "ta": 2,
+                },
+                3: {
+                    "xp": 4000,
+                    "fa": 1,
+                    "ca": 3,
+                    "ta": 3,
+                },
+                4: {
+                    "xp": 8000,
+                    "fa": 1,
+                    "ca": 4,
+                    "ta": 4,
+                },
+                5: {
+                    "xp": 16000,
+                    "fa": 2,
+                    "ca": 5,
+                    "ta": 5,
+                },
+                6: {
+                    "xp": 32000,
+                    "fa": 2,
+                    "ca": 6,
+                    "ta": 6,
+                },
+                7: {
+                    "xp": 64000,
+                    "fa": 3,
+                    "ca": 7,
+                    "ta": 7,
+                },
+                8: {
+                    "xp": 128000,
+                    "fa": 3,
+                    "ca": 8,
+                    "ta": 8,
+                },
+                9: {
+                    "xp": 256000,
+                    "fa": 4,
+                    "ca": 9,
+                    "ta": 9,
+                },
+                10: {
+                    "xp": 384000,
+                    "fa": 4,
+                    "ca": 10,
+                    "ta": 10,
+                },
+                11: {
+                    "xp": 512000,
+                    "fa": 5,
+                    "ca": 11,
+                    "ta": 11,
+                },
+                12: {
+                    "xp": 640000,
+                    "fa": 5,
+                    "ca": 12,
+                    "ta": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Silver dagger, quarterstaff, whip, backpack, bandages, winter blanket, religious clothing, silver holy symbol,
+// holy water, soft leather pouch, wooden prayer beads, iron rations (1 week), small sack, tinderbox, torches ×3,
+// wineskin (full), writing stick
+        },
+        "Purloiner": {
+            "baseClass": "thief",
+            "hitDie": "1d6",
+            "fa": 1,
+            "ca": 1,
+            "spellLists": ["Cleric"],
+            "ta": null,
+            "unskilled": -2,
+            "attrReqs": {
+                "dex": 12,
+                "wis": 12,
+            },
+            "xpBonusReq": {
+                "dex": 16,
+                "wis": 16,
+            },
+            "featBonus": {
+                "dex": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 16,
+                "transformation": 16,
+                "avoidance": 14,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                    "ca": 1,
+                    "ta": null,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 1,
+                    "ca": 2,
+                    "ta": null,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 2,
+                    "ca": 3,
+                    "ta": 1,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 3,
+                    "ca": 4,
+                    "ta": 2,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 3,
+                    "ca": 5,
+                    "ta": 3,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 4,
+                    "ca": 6,
+                    "ta": 4,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 5,
+                    "ca": 7,
+                    "ta": 5,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 5,
+                    "ca": 8,
+                    "ta": 6,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 6,
+                    "ca": 9,
+                    "ta": 7,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 7,
+                    "ca": 10,
+                    "ta": 8,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 7,
+                    "ca": 11,
+                    "ta": 9,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 8,
+                    "ca": 12,
+                    "ta": 10,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Leather armour, dagger, morning star, sling, bullets ×20, backpack, bandages, winter blanket, dice, wood-
+// en holy symbol, holy water, soft leather pouch, iron rations (1 week), small sack, thieves’ tools, tinderbox,
+// torches ×2, wineskin (full), writing stick
+        },
+        "Pyromancer": {
+            "baseClass": "magician",
+            "hitDie": "1d4",
+            "fa": 0,
+            "ca": 1,
+            "spellLists": ["Pyromancer"],
+            "ta": null,
+            "unskilled": -4,
+            "attrReqs": {
+                "int": 9,
+                "wis": 9,
+            },
+            "xpBonusReq": {
+                "int": 16,
+                "wis": 16,
+            },
+            "saves": {
+                "death": 16,
+                "device": 14,
+                "transformation": 16,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 0,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 0,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 1,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 1,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 2,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 2,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 3,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 3,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 4,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 4,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 5,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 5,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Darts ×4, quarterstaff, long scimitar, backpack, bandages, winter blanket, chalk (piece), ink and quill, incendi-
+// ary oil, parchment ×5, hard leather pouch, soft leather pouch, iron rations (1 week), hemp rope (50-ft.), small
+// sack, tinderbox, torches ×3, wineskin (full), writing stick, spell book
+        },
+        "Ranger": {
+            "baseClass": "fighter",
+            "hitDie": "1d10",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 9,
+                "dex": 9,
+                "int": 9,
+                "wis": 9,
+            },
+            "xpBonusReq": {
+                "str": 16,
+                "wis": 16,
+            },
+            "featBonus": {
+                "str": 8,
+            },
+            "saves": {
+                "death": 14,
+                "device": 16,
+                "transformation": 14,
+                "avoidance": 16,
+                "sorcery": 16
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                    "ca": null,
+                },
+                2: {
+                    "xp": 2250,
+                    "fa": 2,
+                    "ca": null,
+                },
+                3: {
+                    "xp": 4500,
+                    "fa": 3,
+                    "ca": null,
+                },
+                4: {
+                    "xp": 9000,
+                    "fa": 4,
+                    "ca": null,
+                },
+                5: {
+                    "xp": 18000,
+                    "fa": 5,
+                    "ca": null,
+                },
+                6: {
+                    "xp": 36000,
+                    "fa": 6,
+                    "ca": null,
+                },
+                7: {
+                    "xp": 72000,
+                    "fa": 7,
+                    "ca": 1,
+                },
+                8: {
+                    "xp": 144000,
+                    "fa": 8,
+                    "ca": 2,
+                },
+                9: {
+                    "xp": 288000,
+                    "fa": 9,
+                    "ca": 3,
+                },
+                10: {
+                    "xp": 432000,
+                    "fa": 10,
+                    "ca": 4,
+                },
+                11: {
+                    "xp": 576000,
+                    "fa": 11,
+                    "ca": 5,
+                },
+                12: {
+                    "xp": 720000,
+                    "fa": 12,
+                    "ca": 6,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Studded armour, dagger, long sword, longbow,
+// arrows ×12, arrow quiver, backpack, bandages,
+// winter blanket, standard rations (1 week), hemp
+// rope (50-ft.), large sack, torches ×3, wineskin
+// (full)
+        },
+        "Runegraver": {
+            "baseClass": "cleric",
+            "hitDie": "1d8",
+            "fa": 1,
+            "ca": 1,
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 9,
+                "wis": 12,
+            },
+            "xpBonusReq": {
+                "str": 16,
+                "wis": 16,
+            },
+            "featBonus": {
+                "str": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 16,
+                "transformation": 14,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 3000,
+                    "fa": 2,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 6000,
+                    "fa": 3,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 12000,
+                    "fa": 4,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 24000,
+                    "fa": 5,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 48000,
+                    "fa": 6,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 96000,
+                    "fa": 7,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 192000,
+                    "fa": 8,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 384000,
+                    "fa": 9,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 576000,
+                    "fa": 10,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 768000,
+                    "fa": 11,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 960000,
+                    "fa": 12,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Studded armour, battle axe, short bow, arrows ×12, silver arrows ×2, dagger, arrow quiver, backpack, ban-
+// dages, chalk (piece), dice, wooden holy symbol, drinking horn (full), soft leather pouch, iron rations (1 week),
+// tinderbox, torches ×2, waterskin, writing stick
+        },
+        "Scout": {
+            "baseClass": "thief",
+            "hitDie": "1d6",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": -2,
+            "attrReqs": {
+                "dex": 9,
+                "int": 9,
+            },
+            "xpBonusReq": {
+                "dex": 16,
+                "int": 16,
+            },
+            "featBonus": {
+                "dex": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 14,
+                "transformation": 16,
+                "avoidance": 14,
+                "sorcery": 16
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                },
+                2: {
+                    "xp": 1750,
+                    "fa": 1,
+                },
+                3: {
+                    "xp": 3500,
+                    "fa": 2,
+                },
+                4: {
+                    "xp": 7000,
+                    "fa": 3,
+                },
+                5: {
+                    "xp": 14000,
+                    "fa": 3,
+                },
+                6: {
+                    "xp": 28000,
+                    "fa": 4,
+                },
+                7: {
+                    "xp": 56000,
+                    "fa": 5,
+                },
+                8: {
+                    "xp": 112000,
+                    "fa": 5,
+                },
+                9: {
+                    "xp": 224000,
+                    "fa": 6,
+                },
+                10: {
+                    "xp": 336000,
+                    "fa": 7,
+                },
+                11: {
+                    "xp": 448000,
+                    "fa": 7,
+                },
+                12: {
+                    "xp": 560000,
+                    "fa": 8,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Padded armour, small shield, hand axes ×2, darts ×4, backpack, bandages, winter blanket, chalk (piece), dis-
+// guise clothing, grappling hook, grease, marbles ×20, parchment, wooden pole (10-ft.), soft leather pouch, iron
+// rations (1 week), hemp rope (50-ft.), small sack, thieves’ tools, tinderbox, torches ×3, wineskin (full), writing
+// stick
+        },
+        "Shaman": {
+            "baseClass": "cleric",
+            "hitDie": "1d6",
+            "fa": 0,
+            "ca": 1,
+            "spellLists": ["Cleric", "Magician"],
+            "ta": null,
+            "unskilled": -4,
+            "attrReqs": {
+                "int": 9,
+                "wis": 12
+            },
+            "xpBonusReq": {
+                "int": 16,
+                "wis": 16,
+            },
+            "saves": {
+                "death": 14,
+                "device": 16,
+                "transformation": 16,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 0,
+                    "ca": 1,
+                    "ta": null,
+                },
+                2: {
+                    "xp": 2500,
+                    "fa": 0,
+                    "ca": 2,
+                    "ta": null,
+                },
+                3: {
+                    "xp": 5000,
+                    "fa": 1,
+                    "ca": 3,
+                    "ta": 1,
+                },
+                4: {
+                    "xp": 10000,
+                    "fa": 2,
+                    "ca": 4,
+                    "ta": 2,
+                },
+                5: {
+                    "xp": 20000,
+                    "fa": 2,
+                    "ca": 5,
+                    "ta": 3,
+                },
+                6: {
+                    "xp": 40000,
+                    "fa": 3,
+                    "ca": 6,
+                    "ta": 4,
+                },
+                7: {
+                    "xp": 80000,
+                    "fa": 4,
+                    "ca": 7,
+                    "ta": 5,
+                },
+                8: {
+                    "xp": 160000,
+                    "fa": 4,
+                    "ca": 8,
+                    "ta": 6,
+                },
+                9: {
+                    "xp": 320000,
+                    "fa": 5,
+                    "ca": 9,
+                    "ta": 7,
+                },
+                10: {
+                    "xp": 480000,
+                    "fa": 6,
+                    "ca": 10,
+                    "ta": 8,
+                },
+                11: {
+                    "xp": 640000,
+                    "fa": 6,
+                    "ca": 11,
+                    "ta": 9,
+                },
+                12: {
+                    "xp": 800000,
+                    "fa": 7,
+                    "ca": 12,
+                    "ta": 10,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Studded armour, war club, dagger, backpack, bandages, belladonna, brass censer, wooden holy symbol (totem),
+// incense sticks ×12, wooden mask, soft leather pouch, wooden rattle, iron rations (1 week), hemp rope (50-ft.),
+// small sack, tinderbox, torches ×3, wineskin (full), bark sheet spell book
+        },
+        "Thief": {
+            "baseClass": "thief",
+            "hitDie": "1d6",
+            "fa": 1,
+            "ca": null,
+            "ta": null,
+            "unskilled": -2,
+            "attrReqs": {
+                "dex": 9,
+            },
+            "xpBonusReq": {
+                "dex": 16,
+            },
+            "featBonus": {
+                "dex": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 14,
+                "transformation": 16,
+                "avoidance": 14,
+                "sorcery": 16
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                },
+                2: {
+                    "xp": 1500,
+                    "fa": 1,
+                },
+                3: {
+                    "xp": 3000,
+                    "fa": 2,
+                },
+                4: {
+                    "xp": 6000,
+                    "fa": 3,
+                },
+                5: {
+                    "xp": 12000,
+                    "fa": 3,
+                },
+                6: {
+                    "xp": 24000,
+                    "fa": 4,
+                },
+                7: {
+                    "xp": 48000,
+                    "fa": 5,
+                },
+                8: {
+                    "xp": 96000,
+                    "fa": 5,
+                },
+                9: {
+                    "xp": 192000,
+                    "fa": 6,
+                },
+                10: {
+                    "xp": 288000,
+                    "fa": 7,
+                },
+                11: {
+                    "xp": 384000,
+                    "fa": 7,
+                },
+                12: {
+                    "xp": 480000,
+                    "fa": 8,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Leather armour, darts ×2, short sword, backpack, bandages, chalk (piece), dice, fishing hooks ×12, fishing
+// string, grappling hook, soft leather pouch, iron rations (1 week), silk rope (50-ft.), large sack, thieves’ tools,
+// tinderbox, torches ×2, wineskin (full), spool of wire, writing stick
+        },
+        "Warlock": {
+            "baseClass": "fighter",
+            "hitDie": "1d8",
+            "fa": 1,
+            "ca": 1,
+            "spellLists": ["Magician"],
+            "ta": null,
+            "unskilled": 0,
+            "attrReqs": {
+                "str": 12,
+                "int": 12,
+            },
+            "xpBonusReq": {
+                "str": 16,
+                "int": 16,
+            },
+            "featBonus": {
+                "str": 8,
+            },
+            "saves": {
+                "death": 16,
+                "device": 16,
+                "transformation": 14,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 1,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 3000,
+                    "fa": 2,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 6000,
+                    "fa": 3,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 12000,
+                    "fa": 4,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 24000,
+                    "fa": 5,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 48000,
+                    "fa": 6,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 96000,
+                    "fa": 7,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 192000,
+                    "fa": 8,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 384000,
+                    "fa": 9,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 576000,
+                    "fa": 10,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 768000,
+                    "fa": 11,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 960000,
+                    "fa": 12,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Scale mail, battle axe, light crossbow, light bolts ×20, backpack, bandages, bolt case, ink and quill, soft
+// leather pouch, iron rations (1 week), hemp rope (50-ft.), tinderbox, torches ×2, wineskin (full), spell book
+        },
+        "Witch": {
+            "baseClass": "magician",
+            "hitDie": "1d4",
+            "fa": 0,
+            "ca": 1,
+            "spellLists": ["Witch"],
+            "ta": null,
+            "unskilled": -4,
+            "attrReqs": {
+                "int": 9,
+                "wis": 9,
+                "cha": 12,
+            },
+            "xpBonusReq": {
+                "int": 16,
+                "cha": 16,
+            },
+            "saves": {
+                "death": 16,
+                "device": 16,
+                "transformation": 14,
+                "avoidance": 16,
+                "sorcery": 14
+            },
+            "levelAdvancement": {
+                1: {
+                    "xp": 0,
+                    "fa": 0,
+                    "ca": 1,
+                },
+                2: {
+                    "xp": 3000,
+                    "fa": 0,
+                    "ca": 2,
+                },
+                3: {
+                    "xp": 6000,
+                    "fa": 1,
+                    "ca": 3,
+                },
+                4: {
+                    "xp": 12000,
+                    "fa": 1,
+                    "ca": 4,
+                },
+                5: {
+                    "xp": 24000,
+                    "fa": 2,
+                    "ca": 5,
+                },
+                6: {
+                    "xp": 48000,
+                    "fa": 2,
+                    "ca": 6,
+                },
+                7: {
+                    "xp": 96000,
+                    "fa": 3,
+                    "ca": 7,
+                },
+                8: {
+                    "xp": 192000,
+                    "fa": 3,
+                    "ca": 8,
+                },
+                9: {
+                    "xp": 384000,
+                    "fa": 4,
+                    "ca": 9,
+                },
+                10: {
+                    "xp": 576000,
+                    "fa": 4,
+                    "ca": 10,
+                },
+                11: {
+                    "xp": 768000,
+                    "fa": 5,
+                    "ca": 11,
+                },
+                12: {
+                    "xp": 960000,
+                    "fa": 5,
+                    "ca": 12,
+                },
+            },
+            "startingPack": {
+                "gold": "1d4+1",
+                "armour": [
+                    { "name": "Leather armour", "quantity": 1 },
+                ],
+                "weapons": [
+                    { "name": "Dagger", "quantity": 1 },
+                ],
+                "equipment - general": [
+                    { "name": "Backpack", "quantity": 1 },
+                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
+                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Water-/wineskin", "quantity": 1 }
+                ],
+                "equipment - provisions": [
+                    { "name": "Rations, iron", "quantity": 7 },
+                ],
+            },
+// Blowgun, blowgun needles ×10, silver dagger, backpack, bandages, winter blanket, beeswax candles ×2, brass
+// censer, chalk (piece), incense sticks ×12, ink and quill, body paint (crock), parchment ×2, soft leather pouch, iron
+// rations (1 week), wooden rattle, hemp rope (50-ft.), small sack, tinderbox, torches ×3, wineskin (full), wolfsbane,
+// writing stick, spell book,
+        },
+    }
+
+    /**
      * Str attack mods, from -2 to +2.
      * 
      * Applied to:
@@ -300,2264 +3242,6 @@ export class Hyp3eCharacter {
         13: "Small (under 4 ft.)"
     }
 
-    /**
-     * Class-specific data
-     * Classes:
-     *   Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, 
-     *   Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, 
-     *   Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch
-     */
-    static classData = {
-        "Assassin": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "int": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                },
-                2: {
-                    "xp": 1750,
-                    "fa": 1,
-                },
-                3: {
-                    "xp": 3500,
-                    "fa": 2,
-                },
-                4: {
-                    "xp": 7000,
-                    "fa": 3,
-                },
-                5: {
-                    "xp": 14000,
-                    "fa": 3,
-                },
-                6: {
-                    "xp": 28000,
-                    "fa": 4,
-                },
-                7: {
-                    "xp": 56000,
-                    "fa": 5,
-                },
-                8: {
-                    "xp": 112000,
-                    "fa": 5,
-                },
-                9: {
-                    "xp": 224000,
-                    "fa": 6,
-                },
-                10: {
-                    "xp": 336000,
-                    "fa": 7,
-                },
-                11: {
-                    "xp": 448000,
-                    "fa": 7,
-                },
-                12: {
-                    "xp": 560000,
-                    "fa": 8,
-                },
-            },
-        },
-        "Barbarian": {
-            "baseClass": "fighter",
-            "hitDie": "1d12",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 13,
-                "dex": 13,
-                "con": 13,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "dex": 16,
-            },
-            "featBonus": {
-                "str": 8,
-                "dex": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 14,
-                "transformation": 14,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                },
-                2: {
-                    "xp": 3000,
-                    "fa": 2,
-                },
-                3: {
-                    "xp": 6000,
-                    "fa": 3,
-                },
-                4: {
-                    "xp": 12000,
-                    "fa": 4,
-                },
-                5: {
-                    "xp": 24000,
-                    "fa": 5,
-                },
-                6: {
-                    "xp": 48000,
-                    "fa": 6,
-                },
-                7: {
-                    "xp": 96000,
-                    "fa": 7,
-                },
-                8: {
-                    "xp": 192000,
-                    "fa": 8,
-                },
-                9: {
-                    "xp": 384000,
-                    "fa": 9,
-                },
-                10: {
-                    "xp": 576000,
-                    "fa": 10,
-                },
-                11: {
-                    "xp": 768000,
-                    "fa": 11,
-                },
-                12: {
-                    "xp": 960000,
-                    "fa": 12,
-                },
-            },
-        },
-        "Bard": {
-            "baseClass": "thief",
-            "hitDie": "1d8",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Druid", "Illusionist"],
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "int": 9,
-                "wis": 9,
-                "cha": 15,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "cha": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 1,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 2,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 3,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 3,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 4,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 5,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 5,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 6,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 7,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 7,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 8,
-                    "ca": 12,
-                },
-            },
-        },
-        "Berserker": {
-            "baseClass": "fighter",
-            "hitDie": "1d12",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 15,
-                "con": 15,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "con": 16,
-            },
-            "featBonus": {
-                "str": 8,
-                "con": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 14,
-                "transformation": 14,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 2,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 3,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 4,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 5,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 6,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 7,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 8,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 9,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 10,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 11,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 12,
-                },
-            },
-        },
-        "Cataphract": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "wis": 9,
-                "cha": 9,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "cha": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 16
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                },
-                2: {
-                    "xp": 2250,
-                    "fa": 2,
-                },
-                3: {
-                    "xp": 4500,
-                    "fa": 3,
-                },
-                4: {
-                    "xp": 9000,
-                    "fa": 4,
-                },
-                5: {
-                    "xp": 18000,
-                    "fa": 5,
-                },
-                6: {
-                    "xp": 36000,
-                    "fa": 6,
-                },
-                7: {
-                    "xp": 72000,
-                    "fa": 7,
-                },
-                8: {
-                    "xp": 144000,
-                    "fa": 8,
-                },
-                9: {
-                    "xp": 288000,
-                    "fa": 9,
-                },
-                10: {
-                    "xp": 432000,
-                    "fa": 10,
-                },
-                11: {
-                    "xp": 576000,
-                    "fa": 11,
-                },
-                12: {
-                    "xp": 720000,
-                    "fa": 12,
-                },
-            },
-        },
-        "Cleric": {
-            "baseClass": "cleric",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Cleric"],
-            "ta": 1,
-            "unskilled": -2,
-            "hitDie": "1d8",
-            "attrReqs": {
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "wis": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                    "ca": 1,
-                    "ta": 1,
-                },
-                2: {
-                    "xp": 2000,
-                    "fa": 1,
-                    "ca": 2,
-                    "ta": 2,
-                },
-                3: {
-                    "xp": 4000,
-                    "fa": 2,
-                    "ca": 3,
-                    "ta": 3,
-                },
-                4: {
-                    "xp": 8000,
-                    "fa": 3,
-                    "ca": 4,
-                    "ta": 4,
-                },
-                5: {
-                    "xp": 16000,
-                    "fa": 3,
-                    "ca": 5,
-                    "ta": 5,
-                },
-                6: {
-                    "xp": 32000,
-                    "fa": 4,
-                    "ca": 6,
-                    "ta": 6,
-                },
-                7: {
-                    "xp": 64000,
-                    "fa": 5,
-                    "ca": 7,
-                    "ta": 7,
-                },
-                8: {
-                    "xp": 128000,
-                    "fa": 5,
-                    "ca": 8,
-                    "ta": 8,
-                },
-                9: {
-                    "xp": 256000,
-                    "fa": 6,
-                    "ca": 9,
-                    "ta": 9,
-                },
-                10: {
-                    "xp": 384000,
-                    "fa": 7,
-                    "ca": 10,
-                    "ta": 10,
-                },
-                11: {
-                    "xp": 512000,
-                    "fa": 7,
-                    "ca": 11,
-                    "ta": 11,
-                },
-                12: {
-                    "xp": 640000,
-                    "fa": 8,
-                    "ca": 12,
-                    "ta": 12,
-                },
-            },
-        },
-        "Cryomancer": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Cryomancer"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "wis": 16,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 0,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 0,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 1,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 1,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 2,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 2,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 3,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 3,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 4,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 4,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 5,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 5,
-                    "ca": 12,
-                },
-            },
-        },
-        "Druid": {
-            "baseClass": "cleric",
-            "hitDie": "1d8",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Druid"],
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "wis": 9,
-                "cha": 12,
-            },
-            "xpBonusReq": {
-                "wis": 16,
-                "cha": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 2000,
-                    "fa": 1,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 4000,
-                    "fa": 2,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 8000,
-                    "fa": 3,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 16000,
-                    "fa": 3,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 32000,
-                    "fa": 4,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 64000,
-                    "fa": 5,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 128000,
-                    "fa": 5,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 256000,
-                    "fa": 6,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 384000,
-                    "fa": 7,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 512000,
-                    "fa": 7,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 640000,
-                    "fa": 8,
-                    "ca": 12,
-                },
-            },
-        },
-        "Fighter": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-            },
-            "xpBonusReq": {
-                "str": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 16
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                },
-                2: {
-                    "xp": 2000,
-                    "fa": 2,
-                },
-                3: {
-                    "xp": 4000,
-                    "fa": 3,
-                },
-                4: {
-                    "xp": 8000,
-                    "fa": 4,
-                },
-                5: {
-                    "xp": 16000,
-                    "fa": 5,
-                },
-                6: {
-                    "xp": 32000,
-                    "fa": 6,
-                },
-                7: {
-                    "xp": 64000,
-                    "fa": 7,
-                },
-                8: {
-                    "xp": 128000,
-                    "fa": 8,
-                },
-                9: {
-                    "xp": 256000,
-                    "fa": 9,
-                },
-                10: {
-                    "xp": 384000,
-                    "fa": 10,
-                },
-                11: {
-                    "xp": 512000,
-                    "fa": 11,
-                },
-                12: {
-                    "xp": 640000,
-                    "fa": 12,
-                },
-            },
-        },
-        "Huntsman": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "wis": 9,
-                "cha": 12
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 16
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                },
-                2: {
-                    "xp": 2250,
-                    "fa": 2,
-                },
-                3: {
-                    "xp": 4500,
-                    "fa": 3,
-                },
-                4: {
-                    "xp": 9000,
-                    "fa": 4,
-                },
-                5: {
-                    "xp": 18000,
-                    "fa": 5,
-                },
-                6: {
-                    "xp": 36000,
-                    "fa": 6,
-                },
-                7: {
-                    "xp": 72000,
-                    "fa": 7,
-                },
-                8: {
-                    "xp": 144000,
-                    "fa": 8,
-                },
-                9: {
-                    "xp": 288000,
-                    "fa": 9,
-                },
-                10: {
-                    "xp": 432000,
-                    "fa": 10,
-                },
-                11: {
-                    "xp": 576000,
-                    "fa": 11,
-                },
-                12: {
-                    "xp": 720000,
-                    "fa": 12,
-                },
-            },
-        },
-        "Illusionist": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Illusionist"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "dex": 9,
-                "int": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 0,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 0,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 1,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 1,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 2,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 2,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 3,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 3,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 4,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 4,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 5,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 5,
-                    "ca": 12,
-                },
-            },
-        },
-        "Legerdemainist": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Magician"],
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "dex": 12,
-                "int": 12,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 2750,
-                    "fa": 1,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 5500,
-                    "fa": 2,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 11000,
-                    "fa": 3,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 22000,
-                    "fa": 3,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 44000,
-                    "fa": 4,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 88000,
-                    "fa": 5,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 176000,
-                    "fa": 5,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 352000,
-                    "fa": 6,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 528000,
-                    "fa": 7,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 704000,
-                    "fa": 7,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 880000,
-                    "fa": 8,
-                    "ca": 12,
-                },
-            },
-        },
-        "Magician": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Magician"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-            },
-            "xpBonusReq": {
-                "int": 16,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 0,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 0,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 1,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 1,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 2,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 2,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 3,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 3,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 4,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 4,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 5,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 5,
-                    "ca": 12,
-                },
-            },
-        },
-        "Monk": {
-            "baseClass": "cleric",
-            "hitDie": "1d8",
-            "fa": 0,
-            "ca": null,
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 0,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 1,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 2,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 3,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 4,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 5,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 6,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 7,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 8,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 9,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 10,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 11,
-                },
-            },
-        },
-        "Necromancer": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Necromancer"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "wis": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 0,
-                    "ca": 1,
-                    "ta": null,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 0,
-                    "ca": 2,
-                    "ta": null,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 1,
-                    "ca": 3,
-                    "ta": 1,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 1,
-                    "ca": 4,
-                    "ta": 2,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 2,
-                    "ca": 5,
-                    "ta": 3,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 2,
-                    "ca": 6,
-                    "ta": 4,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 3,
-                    "ca": 7,
-                    "ta": 5,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 3,
-                    "ca": 8,
-                    "ta": 6,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 4,
-                    "ca": 9,
-                    "ta": 7,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 4,
-                    "ca": 10,
-                    "ta": 8,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 5,
-                    "ca": 11,
-                    "ta": 9,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 5,
-                    "ca": 12,
-                    "ta": 10,
-                },
-            },
-        },
-        "Paladin": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "wis": 9,
-                "cha": 15,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "cha": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 14,
-                "transformation": 14,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                    "ca": null,
-                    "ta": null,
-                },
-                2: {
-                    "xp": 2750,
-                    "fa": 2,
-                    "ca": null,
-                    "ta": null,
-                },
-                3: {
-                    "xp": 5500,
-                    "fa": 3,
-                    "ca": null,
-                    "ta": null,
-                },
-                4: {
-                    "xp": 11000,
-                    "fa": 4,
-                    "ca": null,
-                    "ta": null,
-                },
-                5: {
-                    "xp": 22000,
-                    "fa": 5,
-                    "ca": null,
-                    "ta": 1,
-                },
-                6: {
-                    "xp": 44000,
-                    "fa": 6,
-                    "ca": null,
-                    "ta": 2,
-                },
-                7: {
-                    "xp": 88000,
-                    "fa": 7,
-                    "ca": 1,
-                    "ta": 3,
-                },
-                8: {
-                    "xp": 176000,
-                    "fa": 8,
-                    "ca": 2,
-                    "ta": 4,
-                },
-                9: {
-                    "xp": 352000,
-                    "fa": 9,
-                    "ca": 3,
-                    "ta": 5,
-                },
-                10: {
-                    "xp": 528000,
-                    "fa": 10,
-                    "ca": 4,
-                    "ta": 6,
-                },
-                11: {
-                    "xp": 704000,
-                    "fa": 11,
-                    "ca": 5,
-                    "ta": 7,
-                },
-                12: {
-                    "xp": 880000,
-                    "fa": 12,
-                    "ca": 6,
-                    "ta": 8,
-                },
-            },
-        },
-        "Priest": {
-            "baseClass": "cleric",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Cleric"],
-            "ta": 1,
-            "unskilled": -4,
-            "attrReqs": {
-                "wis": 9,
-                "cha": 9,
-            },
-            "xpBonusReq": {
-                "wis": 16,
-                "cha": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 0,
-                    "ca": 1,
-                    "ta": 1,
-                },
-                2: {
-                    "xp": 2000,
-                    "fa": 0,
-                    "ca": 2,
-                    "ta": 2,
-                },
-                3: {
-                    "xp": 4000,
-                    "fa": 1,
-                    "ca": 3,
-                    "ta": 3,
-                },
-                4: {
-                    "xp": 8000,
-                    "fa": 1,
-                    "ca": 4,
-                    "ta": 4,
-                },
-                5: {
-                    "xp": 16000,
-                    "fa": 2,
-                    "ca": 5,
-                    "ta": 5,
-                },
-                6: {
-                    "xp": 32000,
-                    "fa": 2,
-                    "ca": 6,
-                    "ta": 6,
-                },
-                7: {
-                    "xp": 64000,
-                    "fa": 3,
-                    "ca": 7,
-                    "ta": 7,
-                },
-                8: {
-                    "xp": 128000,
-                    "fa": 3,
-                    "ca": 8,
-                    "ta": 8,
-                },
-                9: {
-                    "xp": 256000,
-                    "fa": 4,
-                    "ca": 9,
-                    "ta": 9,
-                },
-                10: {
-                    "xp": 384000,
-                    "fa": 4,
-                    "ca": 10,
-                    "ta": 10,
-                },
-                11: {
-                    "xp": 512000,
-                    "fa": 5,
-                    "ca": 11,
-                    "ta": 11,
-                },
-                12: {
-                    "xp": 640000,
-                    "fa": 5,
-                    "ca": 12,
-                    "ta": 12,
-                },
-            },
-        },
-        "Purloiner": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Cleric"],
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "dex": 12,
-                "wis": 12,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                    "ca": 1,
-                    "ta": null,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 1,
-                    "ca": 2,
-                    "ta": null,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 2,
-                    "ca": 3,
-                    "ta": 1,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 3,
-                    "ca": 4,
-                    "ta": 2,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 3,
-                    "ca": 5,
-                    "ta": 3,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 4,
-                    "ca": 6,
-                    "ta": 4,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 5,
-                    "ca": 7,
-                    "ta": 5,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 5,
-                    "ca": 8,
-                    "ta": 6,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 6,
-                    "ca": 9,
-                    "ta": 7,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 7,
-                    "ca": 10,
-                    "ta": 8,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 7,
-                    "ca": 11,
-                    "ta": 9,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 8,
-                    "ca": 12,
-                    "ta": 10,
-                },
-            },
-        },
-        "Pyromancer": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Pyromancer"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "wis": 16,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 0,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 0,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 1,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 1,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 2,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 2,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 3,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 3,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 4,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 4,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 5,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 5,
-                    "ca": 12,
-                },
-            },
-        },
-        "Ranger": {
-            "baseClass": "fighter",
-            "hitDie": "1d10",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "dex": 9,
-                "int": 9,
-                "wis": 9,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 16
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                    "ca": null,
-                },
-                2: {
-                    "xp": 2250,
-                    "fa": 2,
-                    "ca": null,
-                },
-                3: {
-                    "xp": 4500,
-                    "fa": 3,
-                    "ca": null,
-                },
-                4: {
-                    "xp": 9000,
-                    "fa": 4,
-                    "ca": null,
-                },
-                5: {
-                    "xp": 18000,
-                    "fa": 5,
-                    "ca": null,
-                },
-                6: {
-                    "xp": 36000,
-                    "fa": 6,
-                    "ca": null,
-                },
-                7: {
-                    "xp": 72000,
-                    "fa": 7,
-                    "ca": 1,
-                },
-                8: {
-                    "xp": 144000,
-                    "fa": 8,
-                    "ca": 2,
-                },
-                9: {
-                    "xp": 288000,
-                    "fa": 9,
-                    "ca": 3,
-                },
-                10: {
-                    "xp": 432000,
-                    "fa": 10,
-                    "ca": 4,
-                },
-                11: {
-                    "xp": 576000,
-                    "fa": 11,
-                    "ca": 5,
-                },
-                12: {
-                    "xp": 720000,
-                    "fa": 12,
-                    "ca": 6,
-                },
-            },
-        },
-        "Runegraver": {
-            "baseClass": "cleric",
-            "hitDie": "1d8",
-            "fa": 1,
-            "ca": 1,
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 9,
-                "wis": 12,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "wis": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 3000,
-                    "fa": 2,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 6000,
-                    "fa": 3,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 12000,
-                    "fa": 4,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 24000,
-                    "fa": 5,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 48000,
-                    "fa": 6,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 96000,
-                    "fa": 7,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 192000,
-                    "fa": 8,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 384000,
-                    "fa": 9,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 576000,
-                    "fa": 10,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 768000,
-                    "fa": 11,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 960000,
-                    "fa": 12,
-                    "ca": 12,
-                },
-            },
-        },
-        "Scout": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "dex": 9,
-                "int": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                },
-                2: {
-                    "xp": 1750,
-                    "fa": 1,
-                },
-                3: {
-                    "xp": 3500,
-                    "fa": 2,
-                },
-                4: {
-                    "xp": 7000,
-                    "fa": 3,
-                },
-                5: {
-                    "xp": 14000,
-                    "fa": 3,
-                },
-                6: {
-                    "xp": 28000,
-                    "fa": 4,
-                },
-                7: {
-                    "xp": 56000,
-                    "fa": 5,
-                },
-                8: {
-                    "xp": 112000,
-                    "fa": 5,
-                },
-                9: {
-                    "xp": 224000,
-                    "fa": 6,
-                },
-                10: {
-                    "xp": 336000,
-                    "fa": 7,
-                },
-                11: {
-                    "xp": 448000,
-                    "fa": 7,
-                },
-                12: {
-                    "xp": 560000,
-                    "fa": 8,
-                },
-            },
-        },
-        "Shaman": {
-            "baseClass": "cleric",
-            "hitDie": "1d6",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Cleric", "Magician"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 12
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "wis": 16,
-            },
-            "saves": {
-                "death": 14,
-                "device": 16,
-                "transformation": 16,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 0,
-                    "ca": 1,
-                    "ta": null,
-                },
-                2: {
-                    "xp": 2500,
-                    "fa": 0,
-                    "ca": 2,
-                    "ta": null,
-                },
-                3: {
-                    "xp": 5000,
-                    "fa": 1,
-                    "ca": 3,
-                    "ta": 1,
-                },
-                4: {
-                    "xp": 10000,
-                    "fa": 2,
-                    "ca": 4,
-                    "ta": 2,
-                },
-                5: {
-                    "xp": 20000,
-                    "fa": 2,
-                    "ca": 5,
-                    "ta": 3,
-                },
-                6: {
-                    "xp": 40000,
-                    "fa": 3,
-                    "ca": 6,
-                    "ta": 4,
-                },
-                7: {
-                    "xp": 80000,
-                    "fa": 4,
-                    "ca": 7,
-                    "ta": 5,
-                },
-                8: {
-                    "xp": 160000,
-                    "fa": 4,
-                    "ca": 8,
-                    "ta": 6,
-                },
-                9: {
-                    "xp": 320000,
-                    "fa": 5,
-                    "ca": 9,
-                    "ta": 7,
-                },
-                10: {
-                    "xp": 480000,
-                    "fa": 6,
-                    "ca": 10,
-                    "ta": 8,
-                },
-                11: {
-                    "xp": 640000,
-                    "fa": 6,
-                    "ca": 11,
-                    "ta": 9,
-                },
-                12: {
-                    "xp": 800000,
-                    "fa": 7,
-                    "ca": 12,
-                    "ta": 10,
-                },
-            },
-        },
-        "Thief": {
-            "baseClass": "thief",
-            "hitDie": "1d6",
-            "fa": 1,
-            "ca": null,
-            "ta": null,
-            "unskilled": -2,
-            "attrReqs": {
-                "dex": 9,
-            },
-            "xpBonusReq": {
-                "dex": 16,
-            },
-            "featBonus": {
-                "dex": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 14,
-                "transformation": 16,
-                "avoidance": 14,
-                "sorcery": 16
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                },
-                2: {
-                    "xp": 1500,
-                    "fa": 1,
-                },
-                3: {
-                    "xp": 3000,
-                    "fa": 2,
-                },
-                4: {
-                    "xp": 6000,
-                    "fa": 3,
-                },
-                5: {
-                    "xp": 12000,
-                    "fa": 3,
-                },
-                6: {
-                    "xp": 24000,
-                    "fa": 4,
-                },
-                7: {
-                    "xp": 48000,
-                    "fa": 5,
-                },
-                8: {
-                    "xp": 96000,
-                    "fa": 5,
-                },
-                9: {
-                    "xp": 192000,
-                    "fa": 6,
-                },
-                10: {
-                    "xp": 288000,
-                    "fa": 7,
-                },
-                11: {
-                    "xp": 384000,
-                    "fa": 7,
-                },
-                12: {
-                    "xp": 480000,
-                    "fa": 8,
-                },
-            },
-        },
-        "Warlock": {
-            "baseClass": "fighter",
-            "hitDie": "1d8",
-            "fa": 1,
-            "ca": 1,
-            "spellLists": ["Magician"],
-            "ta": null,
-            "unskilled": 0,
-            "attrReqs": {
-                "str": 12,
-                "int": 12,
-            },
-            "xpBonusReq": {
-                "str": 16,
-                "int": 16,
-            },
-            "featBonus": {
-                "str": 8,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 1,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 3000,
-                    "fa": 2,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 6000,
-                    "fa": 3,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 12000,
-                    "fa": 4,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 24000,
-                    "fa": 5,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 48000,
-                    "fa": 6,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 96000,
-                    "fa": 7,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 192000,
-                    "fa": 8,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 384000,
-                    "fa": 9,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 576000,
-                    "fa": 10,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 768000,
-                    "fa": 11,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 960000,
-                    "fa": 12,
-                    "ca": 12,
-                },
-            },
-        },
-        "Witch": {
-            "baseClass": "magician",
-            "hitDie": "1d4",
-            "fa": 0,
-            "ca": 1,
-            "spellLists": ["Witch"],
-            "ta": null,
-            "unskilled": -4,
-            "attrReqs": {
-                "int": 9,
-                "wis": 9,
-                "cha": 12,
-            },
-            "xpBonusReq": {
-                "int": 16,
-                "cha": 16,
-            },
-            "saves": {
-                "death": 16,
-                "device": 16,
-                "transformation": 14,
-                "avoidance": 16,
-                "sorcery": 14
-            },
-            "levelAdvancement": {
-                1: {
-                    "xp": 0,
-                    "fa": 0,
-                    "ca": 1,
-                },
-                2: {
-                    "xp": 3000,
-                    "fa": 0,
-                    "ca": 2,
-                },
-                3: {
-                    "xp": 6000,
-                    "fa": 1,
-                    "ca": 3,
-                },
-                4: {
-                    "xp": 12000,
-                    "fa": 1,
-                    "ca": 4,
-                },
-                5: {
-                    "xp": 24000,
-                    "fa": 2,
-                    "ca": 5,
-                },
-                6: {
-                    "xp": 48000,
-                    "fa": 2,
-                    "ca": 6,
-                },
-                7: {
-                    "xp": 96000,
-                    "fa": 3,
-                    "ca": 7,
-                },
-                8: {
-                    "xp": 192000,
-                    "fa": 3,
-                    "ca": 8,
-                },
-                9: {
-                    "xp": 384000,
-                    "fa": 4,
-                    "ca": 9,
-                },
-                10: {
-                    "xp": 576000,
-                    "fa": 4,
-                    "ca": 10,
-                },
-                11: {
-                    "xp": 768000,
-                    "fa": 5,
-                    "ca": 11,
-                },
-                12: {
-                    "xp": 960000,
-                    "fa": 5,
-                    "ca": 12,
-                },
-            },
-        },
-    }
-
     static _valueFromTable(table, val) {
         let output;
         // if (CONFIG.HYP3E.debugMessages) { console.log(`_valueFromTable:`, table, val) }
@@ -2577,36 +3261,36 @@ export class Hyp3eCharacter {
     }
 
     /**
-     * Quick create a character of the given class
+     * Roll attributes for a character of the given class
      * @param {string} actor - The actor object to create the character for
      * @param {object} dataset - The dataset containing character creation data
-     * @returns {boolean} - Returns true if the character was created successfully
+     * @returns {Object} - Returns an object with the rolled attributes
      */
-    static async quickCreate(actor, dataset) {
+    static async rollAttributesForClass(actor, dataset) {
         const charClass = actor.system.details.class;
-        console.log(`quickCreate: class to create:`, charClass);
+        console.log(`rollAttributesForClass: class to roll:`, charClass);
         // Get the class attribute requirements
         let classData = this.classData[charClass];
         if (!classData) {
-            console.error(`quickCreate: Class data not found for class ${charClass}!`);
-            return false;
+            console.error(`rollAttributesForClass: Class data not found for class ${charClass}!`);
+            return null;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`quickCreate: Creating character of class ${charClass}, starting with class data:`, classData) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttributesForClass: Creating character of class ${charClass}, starting with class data:`, classData) }
 
         // Roll attributes down the line, retry until we get a set that meets the class requirements
-        if (CONFIG.HYP3E.debugMessages) { console.log(`quickCreate: Rolling attributes for class ${charClass}`) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttributesForClass: Rolling attributes for class ${charClass}`) }
         let metReqs = false;
         let attributes = {};
         while (!metReqs) {
             attributes = await this._rollAttributes(actor);
             metReqs = await this._checkAttrRequirements(charClass, attributes);
             if (metReqs) {
-                console.log(`quickCreate: Character meets class requirements for ${charClass}, attributes rolled:`, attributes);
+                console.log(`rollAttributesForClass: Character meets class requirements for ${charClass}, attributes rolled:`, attributes);
             } else {
-                console.warn(`quickCreate: Character does not meet class requirements for ${charClass}, rolling again...`)
+                console.warn(`rollAttributesForClass: Character does not meet class requirements for ${charClass}, rolling again...`)
             }
         }
-        // If we reach here, we have a character that meets the class requirements
+        // If we reach here, we have a set of attributes that meets the class requirements
         return attributes;
     }
 
@@ -2643,6 +3327,172 @@ export class Hyp3eCharacter {
             }
         }
         return true;
+    }
+
+    static async getDefaultArmorForClass(actor) {
+        const charClass = actor.system.details.class;
+        const classData = this.classData[charClass];
+        if (!classData) {
+            console.error(`getDefaultArmorForClass: Class data not found for class ${charClass}!`);
+            return [];
+        }
+        console.log(`getDefaultArmorForClass: Getting default armor for class ${charClass}:`, classData.startingPack.armour);
+
+        // Do we have an Armour folder in the item directory? Look for different spellings...
+        let armorFolder
+        if (game.folders) {
+            armorFolder = game.folders.find(f => f.name.toLowerCase() === "armor" || f.name.toLowerCase() === "armour");
+        }
+        if (!armorFolder) {
+            // Do we have a compendium named "Armor" or "Armour"?
+            armorFolder = game.packs.find(p => p.metadata.name.toLowerCase() === "armor" || p.metadata.name.toLowerCase() === "armour");
+        }
+        // If we still don't have an armor folder, we will just create empty armor items
+        console.log(`getDefaultArmorForClass: Armor folder found?`, armorFolder);
+
+        // Create an array of armor items based on the starting pack
+        let armor = [];
+        let newItem;
+        for (const item of classData.startingPack.armour) {
+            console.log(`getDefaultArmorForClass: Adding armor ${item.name} with quantity ${item.quantity}`);
+            if (armorFolder) {
+                // Find the matching armor item in the folder or compendium, and copy it
+                newItem = armorFolder.contents.find(i => i.name.toLowerCase() === item.name.toLowerCase());
+                if (!newItem) {
+                    console.warn(`getDefaultArmorForClass: Armor item ${item.name} not found in folder/compendium, creating new item...`);
+                    // Create a new armor item object
+                    newItem = {
+                        name: item.name,
+                        type: "armor",
+                        img: "icons/svg/shield.svg", // Default image if not found
+                        system: {
+                            "quantity.value": item.quantity || 1,
+                            "quantity.max": item.quantity > 1 ? item.quantity : 0,
+                        }
+                    };
+                }
+            } else {
+                // Create a new armor item object
+                newItem = {
+                    name: item.name,
+                    type: "armor",
+                    img: "icons/svg/shield.svg",
+                    system: {
+                        "quantity.value": item.quantity || 1,
+                        "quantity.max": item.quantity > 1 ? item.quantity : 0,
+                    }
+                };
+            }
+            // Add the item to the items array
+            armor.push(newItem);
+        }
+        return armor;
+    }
+
+    static async getDefaultWeaponsForClass(actor) {
+        const charClass = actor.system.details.class;
+        const classData = this.classData[charClass];
+        if (!classData) {
+            console.error(`getDefaultWeaponsForClass: Class data not found for class ${charClass}!`);
+            return [];
+        }
+        console.log(`getDefaultWeaponsForClass: Getting default weapons for class ${charClass}:`, classData.startingPack.weapons);
+
+        // Do we have a compendium named "Weapons"?
+        const weaponCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "weapons");
+
+        // Create an array of weapon items based on the starting pack
+        let weapons = [];
+        for (const item of classData.startingPack.weapons) {
+            console.log(`getDefaultWeaponsForClass: Adding weapon ${item.name} with quantity ${item.quantity}`);
+            let newItem;
+            // Find the matching weapon item in the item directory, and copy it
+            const matches = game.items.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+            for (let item of matches) {
+                const folder = item.folder ? item.folder.name : "(no folder)";
+                console.log(`getDefaultWeaponsForClass: Item: ${item.name}, Folder: ${folder}`);
+                if (folder.toLowerCase() === "weapons" || folder.toLowerCase() === "melee" || folder.toLowerCase() === "missile") {
+                    newItem = item;
+                    break; // Found the item, no need to continue searching
+                }
+            }
+            if (!newItem) {
+                console.warn(`getDefaultWeaponsForClass: Weapon item ${item.name} not found in folders, trying compendium next...`);
+                if (weaponCompendium) {
+                    // Try to find the item in the compendium
+                    const matches = weaponCompendium.index.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+                    for (let entry of matches) {
+                        console.log(`getDefaultWeaponsForClass: Item: ${item.name}, Compendium:`, weaponCompendium.metadata.label);
+                        newItem = await weaponCompendium.getDocument(entry._id); // fully load the item
+                        break; // Found the item, no need to continue searching
+                    }
+                } else {
+                    console.warn(`getDefaultWeaponsForClass: No weapons compendium found, creating new item...`);
+                    // Create a new weapon item object
+                    newItem = {
+                        name: item.name,
+                        type: "weapon",
+                        img: "icons/svg/combat.svg", // Default image if not found
+                        system: {
+                            "quantity.value": item.quantity || 1,
+                            "quantity.max": item.quantity > 1 ? item.quantity : 0,
+                        }
+                    };
+                }
+            }
+            // Add the item to the items array
+            weapons.push(newItem);
+        }
+        return weapons;
+    }
+
+    static async getDefaultItemsForClass(actor) {
+        const charClass = actor.system.details.class;
+        const classData = this.classData[charClass];
+        if (!classData) {
+            console.error(`getDefaultItemsForClass: Class data not found for class ${charClass}!`);
+            return [];
+        }
+        // Create an array of items based on the starting pack
+        let items = [];
+        let itemType = ""; // This is set below
+        for (const [folder, itemsList] of Object.entries(classData.startingPack)) {
+            if (folder.substring(0, 9) !== "equipment") {
+                continue; // Skip folders that are not equipment
+            }
+            switch (folder) {
+                case "equipment - general":
+                    itemType = "general equipment";
+                    break;
+                case "equipment - provisions":
+                    itemType = "provisions";
+                    break;
+                case "equipment - religious":
+                    itemType = "religious items";
+                    break;
+                default:
+                    itemType = "default items"; // Default to item for other folders
+            }
+            // Log the folder and items being processed
+            console.log(`getDefaultItemsForClass: Getting ${itemType} for class ${charClass}:`, itemsList);
+            
+            for (const item of itemsList) {
+                console.log(`getDefaultItemsForClass: Adding item ${item.name} with quantity ${item.quantity}`);
+                // Create a new item object
+                let newItem = {
+                    name: item.name,
+                    type: "item",
+                    img: "icons/svg/item-bag.svg",
+                    system: {
+                        "quantity.value": item.quantity || 1,
+                        "quantity.max": item.quantity > 1 ? item.quantity : 0,
+                    }
+                };
+                // Add the item to the items array
+                items.push(newItem);
+            }
+        }
+        return items;
     }
 
     /**
