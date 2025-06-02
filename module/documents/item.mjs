@@ -63,7 +63,7 @@ export class Hyp3eItem extends Item {
         const itemData = item.system;
 
         // Setup the item's realName to be its name, if realName is blank
-        if (!item.system?.realName || item.system?.realName == "") {
+        if (!item.system?.realName || item.system?.realName.trim() === "") {
             item.system.realName = item.name
         }
 

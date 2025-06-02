@@ -140,7 +140,41 @@ export class Hyp3eItemSheet extends ItemSheet {
     // if (CONFIG.HYP3E.debugMessages) { console.log("Item saves:", context.saveThrows) }
 
   }
-  
+
+  async _updateObject(event, formData) {
+    // Only applies to weapons, armor, and physical items.
+    if (!["weapon", "armor", "item"].includes(this.object.type)) {
+        // If the item is not a weapon, armor, or physical item, we don't need to update the name and description.
+        return super._updateObject(event, formData);
+    }
+
+    const isIdentified = foundry.utils.getProperty(formData, "system.identified");
+
+    // Apply name and description based on identification state.
+    if (isIdentified) {
+        const realName = foundry.utils.getProperty(formData, "system.realName") || this.object.system.realName;
+        const realDesc = foundry.utils.getProperty(formData, "system.realDescription") || this.object.system.realDescription;
+
+        formData["name"] = realName;
+        formData["system.description"] = realDesc;
+    } else {
+        let aliasName = foundry.utils.getProperty(formData, "system.itemAlias") || this.object.system.itemAlias;
+        const aliasDesc = foundry.utils.getProperty(formData, "system.aliasDescription") || this.object.system.aliasDescription;
+
+        // Ensure aliasName is not empty or just whitespace
+        if (!aliasName || aliasName.trim() === "") {
+            aliasName = "Unidentified Item";
+            formData["system.itemAlias"] = aliasName;
+        }
+
+        formData["name"] = aliasName?.trim();
+        formData["system.description"] = aliasDesc;
+    }
+
+    return super._updateObject(event, formData);
+  }
+
+
   /* -------------------------------------------- */
 
   /** @override */
