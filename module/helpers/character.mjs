@@ -333,7 +333,7 @@ export class Hyp3eCharacter {
                     { "name": "Arrow quiver", "quantity": 1 },
                     { "name": "Backpack", "quantity": 1 },
                     { "name": "Bandages, gauze", "quantity": 1 },
-                    { "name": "Book, blank", "quantity": 1 },
+                    { "name": "Book, spell", "quantity": 1 },
                     { "name": "Chalk", "quantity": 1 },
                     { "name": "Flute", "quantity": 1 },
                     { "name": "Ink and quill", "quantity": 1 },
@@ -771,7 +771,7 @@ export class Hyp3eCharacter {
                     { "name": "Backpack", "quantity": 1 },
                     { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
-                    { "name": "Book, blank", "quantity": 1 },
+                    { "name": "Book, spell", "quantity": 1 },
                     { "name": "Candle, beeswax", "quantity": 3 },
                     { "name": "Chalk", "quantity": 1 },
                     { "name": "Crampons", "quantity": 1 },
@@ -989,28 +989,31 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
+                    { "name": "Studded armour", "quantity": 1 },
+                    { "name": "Shield, large", "quantity": 1 },
                 ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Bow, short", "quantity": 1 },
+                    { "name": "Sword, broad", "quantity": 1 },
                 ],
                 "equipment - general": [
+                    { "name": "Arrows (x12)", "quantity": 12 },
+                    { "name": "Arrow quiver", "quantity": 1 },
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
-                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Sack, large", "quantity": 1 },
+                    { "name": "Tent, 1-person", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Torch", "quantity": 2 },
                     { "name": "Water-/wineskin", "quantity": 1 }
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
             },
-// Studded armour, large shield, short bow, arrows ×12, broad sword, arrow quiver, backpack, bandages, winter
-// blanket, soft leather pouch, iron rations (1 week), hemp rope (50-ft.), large sack, one-person canvas tent, tin-
-// derbox, torches ×2, wineskin (full)
         },
         "Huntsman": {
             "baseClass": "fighter",
@@ -1095,25 +1098,27 @@ export class Hyp3eCharacter {
                     { "name": "Leather armour", "quantity": 1 },
                 ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Axe, hand", "quantity": 1 },
+                    { "name": "Bow, long", "quantity": 1 },
+                    { "name": "Net, fighting", "quantity": 1 },
+                    { "name": "Spear, short", "quantity": 1 },
+                    { "name": "Spear, short, thrown", "quantity": 1 },
                 ],
                 "equipment - general": [
+                    { "name": "Arrows (x12)", "quantity": 12 },
+                    { "name": "Arrow, silver-tipped (x1)", "quantity": 2 },
+                    { "name": "Arrow quiver", "quantity": 1 },
                     { "name": "Backpack", "quantity": 1 },
-                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Cord, sinew", "quantity": 1 },
+                    { "name": "Horn, hunting", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
-                    { "name": "Sack, small", "quantity": 1 },
-                    { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Torch", "quantity": 2 },
                     { "name": "Water-/wineskin", "quantity": 1 }
                 ],
                 "equipment - provisions": [
-                    { "name": "Rations, iron", "quantity": 7 },
+                    { "name": "Rations, standard", "quantity": 7 },
                 ],
             },
-// Leather armour, hand axe, fighting net, longbow, arrows ×12, silver arrows ×2, short spear, arrow quiver,
-// backpack, sinew cord (100-ft. ball), hunting horn, soft leather pouch, standard rations (1 week), torches ×2,
-// wineskin (full),
         },
         "Illusionist": {
             "baseClass": "magician",
@@ -1205,29 +1210,35 @@ export class Hyp3eCharacter {
             },
             "startingPack": {
                 "gold": "1d4+1",
-                "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
-                ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Dagger, silver", "quantity": 1 },
+                    { "name": "Dagger, silver, thrown", "quantity": 1 },
+                    { "name": "Quarterstaff", "quantity": 1 },
+                    { "name": "Sling", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Book, spell", "quantity": 1 },
+                    { "name": "Bullets, sling, lead (x20)", "quantity": 20 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Ink and quill", "quantity": 1 },
+                    { "name": "Lantern, hooded", "quantity": 1 },
+                    { "name": "Mirror, silver", "quantity": 1 },
+                    { "name": "Oil, lamp", "quantity": 2 },
+                    { "name": "Parchment", "quantity": 3 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Rope, silk", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
             },
-// Silver dagger, quarterstaff, sling, bullets ×20, backpack, bandages, winter blanket, chalk (piece), ink and quill,
-// hooded lantern, silver mirror, lamp oil ×2, parchment ×3, soft leather pouch, iron rations (1 week), silk rope
-// (50-ft.), small sack, tinderbox, wineskin (full), writing stick, spell book
         },
         "Legerdemainist": {
             "baseClass": "thief",
@@ -1320,31 +1331,34 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
+                    { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Dagger", "quantity": 2 },
+                    { "name": "Dagger, thrown", "quantity": 2 },
+                    { "name": "Falcata", "quantity": 1 },
+                    { "name": "Sling", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Book, spell", "quantity": 1 },
+                    { "name": "Bullets, sling, lead (x20)", "quantity": 20 },
+                    { "name": "Ink and quill", "quantity": 1 },
+                    { "name": "Parchment", "quantity": 3 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Thieves’ tools", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Torch", "quantity": 2 },
                     { "name": "Water-/wineskin", "quantity": 1 }
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
             },
-// Studded armour, small shield, daggers ×2,
-// falcata, sling, bullets ×20, backpack, bandages,
-// winter blanket, ink and quill, parchment, soft
-// leather pouch, iron rations (1 week), hemp rope
-// (50-ft.), small sack, thieves’ tools, tinderbox,
-// torches ×2, wineskin (full), spell book
         },
         "Magician": {
             "baseClass": "magician",
@@ -1431,29 +1445,34 @@ export class Hyp3eCharacter {
             },
             "startingPack": {
                 "gold": "1d4+1",
-                "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
-                ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Dagger, silver", "quantity": 1 },
+                    { "name": "Dagger, silver, thrown", "quantity": 1 },
+                    { "name": "Quarterstaff", "quantity": 1 },
+                    { "name": "Sling", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Book, spell", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Bullets, sling, lead (x20)", "quantity": 20 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Ink and quill", "quantity": 1 },
+                    { "name": "Oil, incendiary", "quantity": 1 },
+                    { "name": "Parchment", "quantity": 2 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Rope, silk", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
-                    { "name": "Rations, iron", "quantity": 7 },
+                    { "name": "Rations, standard", "quantity": 7 },
                 ],
             },
-// Silver dagger, quarterstaff, sling, bullets ×20, backpack, bandages, winter blanket, chalk (piece),
-// ink and quill, incendiary oil, parchment ×2, soft leather pouch, standard rations (1 week), silk rope
-// (50-ft.), small sack, tinderbox, torches ×3, wineskin (full), writing stick, spell book,
         },
         "Monk": {
             "baseClass": "cleric",
@@ -1534,28 +1553,35 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
+                    { "name": "Monk's Defensive Ability", "quantity": 1 },
                 ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Cæstuses", "quantity": 1 },
+                    { "name": "Dagger, silver", "quantity": 1 },
+                    { "name": "Halberd", "quantity": 1 },
+                    { "name": "Hooked throwing knife", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Fishing hooks", "quantity": 12 },
+                    { "name": "Fishing string", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Rope, silk", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
+                "equipment - religious": [
+                    { "name": "Incense sticks, 12", "quantity": 12 },
+                ],
             },
-// Cæstuses, silver dagger, halberd, hooked throwing knife, backpack, bandages, winter blanket, fishing hooks ×12,
-// fishing string, incense sticks ×12, soft leather pouch, iron rations (1 week), silk rope (50-ft.), small sack, tinder-
-// box, torches ×3, wineskin (full), writing stick
         },
         "Necromancer": {
             "baseClass": "magician",
@@ -1656,30 +1682,38 @@ export class Hyp3eCharacter {
             },
             "startingPack": {
                 "gold": "1d4+1",
-                "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
-                ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Sickle", "quantity": 1 },
+                    { "name": "Sling", "quantity": 1 },
+                    { "name": "Whip", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Book, spell", "quantity": 1 },
+                    { "name": "Bullets, sling, lead (x20)", "quantity": 20 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Ink and quill", "quantity": 1 },
+                    { "name": "Lantern, hooded", "quantity": 1 },
+                    { "name": "Mirror, steel or copper", "quantity": 1 },
+                    { "name": "Oil, incendiary", "quantity": 1 },
+                    { "name": "Oil, lamp", "quantity": 2 },
+                    { "name": "Parchment", "quantity": 3 },
+                    { "name": "Pouch, hard leather (large)", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
+                    { "name": "Rope, silk", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
+                "equipment - religious": [
+                    { "name": "Holy symbol, wooden", "quantity": 1 },
+                ],
             },
-// Sickle, sling, bullets ×20, whip, backpack, winter blanket, chalk (piece), wooden holy symbol, ink and quill,
-// hooded lantern, polished steel mirror, incendiary oil, lamp oil ×2, parchment ×3, hard leather pouch, soft
-// leather pouch, iron rations (1 week), silk rope (50-ft.), small sack, tinderbox, wineskin (full), writing stick, spell
-// book
         },
         "Paladin": {
             "baseClass": "fighter",
@@ -1785,29 +1819,29 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
+                    { "name": "Scale mail", "quantity": 1 },
+                    { "name": "Shield, large", "quantity": 1 },
                 ],
                 "weapons": [
                     { "name": "Dagger", "quantity": 1 },
+                    { "name": "Dagger, thrown", "quantity": 1 },
+                    { "name": "Mace, footman’s", "quantity": 1 },
+                    { "name": "Sword, long", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
-                    { "name": "Blanket, winter", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
-                    { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Torch", "quantity": 2 },
                     { "name": "Water-/wineskin", "quantity": 1 }
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
+                "equipment - religious": [
+                    { "name": "Holy symbol, wooden", "quantity": 1 },
+                ],
             },
-// Scale mail, large shield, dagger, footman’s mace,
-// long sword, backpack, wooden holy symbol, soft
-// leather pouch, iron rations (1 week), tinderbox,
-// torches ×2, wineskin (full)
         },
         "Priest": {
             "baseClass": "cleric",
@@ -1908,29 +1942,33 @@ export class Hyp3eCharacter {
             },
             "startingPack": {
                 "gold": "1d4+1",
-                "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
-                ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Dagger, silver", "quantity": 1 },
+                    { "name": "Dagger, silver, thrown", "quantity": 1 },
+                    { "name": "Quarterstaff", "quantity": 1 },
+                    { "name": "Whip", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Clothing, religious", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
+                "equipment - religious": [
+                    { "name": "Holy oil/water", "quantity": 1 },
+                    { "name": "Holy symbol, silver", "quantity": 1 },
+                    { "name": "Prayer beads, wooden", "quantity": 1 },
+                ],
             },
-// Silver dagger, quarterstaff, whip, backpack, bandages, winter blanket, religious clothing, silver holy symbol,
-// holy water, soft leather pouch, wooden prayer beads, iron rations (1 week), small sack, tinderbox, torches ×3,
-// wineskin (full), writing stick
         },
         "Purloiner": {
             "baseClass": "thief",
@@ -2039,24 +2077,32 @@ export class Hyp3eCharacter {
                 ],
                 "weapons": [
                     { "name": "Dagger", "quantity": 1 },
+                    { "name": "Dagger, thrown", "quantity": 1 },
+                    { "name": "Morning star", "quantity": 1 },
+                    { "name": "Sling", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Bullets, sling, lead", "quantity": 20 },
+                    { "name": "Dice, ivory", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Thieves’ tools", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Torch", "quantity": 2 },
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
+                "equipment - religious": [
+                    { "name": "Holy oil/water", "quantity": 1 },
+                    { "name": "Holy symbol, wooden", "quantity": 1 },
+                ],
             },
-// Leather armour, dagger, morning star, sling, bullets ×20, backpack, bandages, winter blanket, dice, wood-
-// en holy symbol, holy water, soft leather pouch, iron rations (1 week), small sack, thieves’ tools, tinderbox,
-// torches ×2, wineskin (full), writing stick
         },
         "Pyromancer": {
             "baseClass": "magician",
@@ -2145,29 +2191,33 @@ export class Hyp3eCharacter {
             },
             "startingPack": {
                 "gold": "1d4+1",
-                "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
-                ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Dart", "quantity": 4 },
+                    { "name": "Quarterstaff", "quantity": 1 },
+                    { "name": "Scimitar, long", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Book, spell", "quantity": 1 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Ink and quill", "quantity": 1 },
+                    { "name": "Oil, incendiary", "quantity": 1 },
+                    { "name": "Parchment", "quantity": 5 },
+                    { "name": "Pouch, hard leather (large)", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
             },
-// Darts ×4, quarterstaff, long scimitar, backpack, bandages, winter blanket, chalk (piece), ink and quill, incendi-
-// ary oil, parchment ×5, hard leather pouch, soft leather pouch, iron rations (1 week), hemp rope (50-ft.), small
-// sack, tinderbox, torches ×3, wineskin (full), writing stick, spell book
         },
         "Ranger": {
             "baseClass": "fighter",
@@ -2261,30 +2311,28 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
+                    { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Bow, long", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
+                    { "name": "Sword, long", "quantity": 1 },
                 ],
                 "equipment - general": [
+                    { "name": "Arrows (x12)", "quantity": 12 },
+                    { "name": "Arrow quiver", "quantity": 1 },
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
-                    { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
-                    { "name": "Sack, small", "quantity": 1 },
-                    { "name": "Tinderbox", "quantity": 1 },
+                    { "name": "Sack, large", "quantity": 1 },
                     { "name": "Torch", "quantity": 3 },
                     { "name": "Water-/wineskin", "quantity": 1 }
                 ],
                 "equipment - provisions": [
-                    { "name": "Rations, iron", "quantity": 7 },
+                    { "name": "Rations, standard", "quantity": 7 },
                 ],
             },
-// Studded armour, dagger, long sword, longbow,
-// arrows ×12, arrow quiver, backpack, bandages,
-// winter blanket, standard rations (1 week), hemp
-// rope (50-ft.), large sack, torches ×3, wineskin
-// (full)
         },
         "Runegraver": {
             "baseClass": "cleric",
@@ -2376,28 +2424,35 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
+                    { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Axe, battle", "quantity": 1 },
+                    { "name": "Bow, short", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
                 ],
                 "equipment - general": [
+                    { "name": "Arrow quiver", "quantity": 1 },
+                    { "name": "Arrow, silver-tipped (x1)", "quantity": 2 },
+                    { "name": "Arrows (x12)", "quantity": 12 },
                     { "name": "Backpack", "quantity": 1 },
-                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Dice, ivory", "quantity": 1 },
+                    { "name": "Horn, drinking", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
-                    { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Torch", "quantity": 2 },
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
+                "equipment - religious": [
+                    { "name": "Holy symbol, wooden", "quantity": 1 },
+                ],
             },
-// Studded armour, battle axe, short bow, arrows ×12, silver arrows ×2, dagger, arrow quiver, backpack, ban-
-// dages, chalk (piece), dice, wooden holy symbol, drinking horn (full), soft leather pouch, iron rations (1 week),
-// tinderbox, torches ×2, waterskin, writing stick
         },
         "Scout": {
             "baseClass": "thief",
@@ -2477,29 +2532,37 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
+                    { "name": "Padded armour", "quantity": 1 },
+                    { "name": "Shield, small", "quantity": 1 },
                 ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Axe, hand", "quantity": 2 },
+                    { "name": "Dart", "quantity": 4 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Disguise clothing", "quantity": 1 },
+                    { "name": "Grappling hook", "quantity": 1 },
+                    { "name": "Grease", "quantity": 1 },
+                    { "name": "Marbles", "quantity": 20 },
+                    { "name": "Parchment", "quantity": 1 },
+                    { "name": "Pole", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Thieves’ tools", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
             },
-// Padded armour, small shield, hand axes ×2, darts ×4, backpack, bandages, winter blanket, chalk (piece), dis-
-// guise clothing, grappling hook, grease, marbles ×20, parchment, wooden pole (10-ft.), soft leather pouch, iron
-// rations (1 week), hemp rope (50-ft.), small sack, thieves’ tools, tinderbox, torches ×3, wineskin (full), writing
-// stick
         },
         "Shaman": {
             "baseClass": "cleric",
@@ -2601,14 +2664,18 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
+                    { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Club, war", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
+                    { "name": "Dagger, thrown", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
-                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Belladonna", "quantity": 1 },
+                    { "name": "Book, spell", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
@@ -2619,10 +2686,14 @@ export class Hyp3eCharacter {
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
+                "equipment - religious": [
+                    { "name": "Censer", "quantity": 1 },
+                    { "name": "Holy symbol, wooden", "quantity": 1 },
+                    { "name": "Incense sticks, 12", "quantity": 12 },
+                    { "name": "Mask, wooden", "quantity": 1 },
+                    { "name": "Rattle", "quantity": 1 },
+                ],
             },
-// Studded armour, war club, dagger, backpack, bandages, belladonna, brass censer, wooden holy symbol (totem),
-// incense sticks ×12, wooden mask, soft leather pouch, wooden rattle, iron rations (1 week), hemp rope (50-ft.),
-// small sack, tinderbox, torches ×3, wineskin (full), bark sheet spell book
         },
         "Thief": {
             "baseClass": "thief",
@@ -2703,25 +2774,31 @@ export class Hyp3eCharacter {
                     { "name": "Leather armour", "quantity": 1 },
                 ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Dart", "quantity": 2 },
+                    { "name": "Sword, short", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
-                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Dice, ivory", "quantity": 1 },
+                    { "name": "Fishing hooks", "quantity": 12 },
+                    { "name": "Fishing string", "quantity": 1 },
+                    { "name": "Grappling hook", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
-                    { "name": "Rope, hemp", "quantity": 1 },
-                    { "name": "Sack, small", "quantity": 1 },
+                    { "name": "Rope, silk", "quantity": 1 },
+                    { "name": "Sack, large", "quantity": 1 },
+                    { "name": "Thieves' tools", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Torch", "quantity": 2 },
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Wire, spool", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
             },
-// Leather armour, darts ×2, short sword, backpack, bandages, chalk (piece), dice, fishing hooks ×12, fishing
-// string, grappling hook, soft leather pouch, iron rations (1 week), silk rope (50-ft.), large sack, thieves’ tools,
-// tinderbox, torches ×2, wineskin (full), spool of wire, writing stick
         },
         "Warlock": {
             "baseClass": "fighter",
@@ -2814,27 +2891,29 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
+                    { "name": "Scale mail", "quantity": 1 },
                 ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Axe, battle", "quantity": 1 },
+                    { "name": "Crossbow, light", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
-                    { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
+                    { "name": "Bolt case", "quantity": 1 },
+                    { "name": "Bolts, light (x20)", "quantity": 20 },
+                    { "name": "Book, spell", "quantity": 1 },
+                    { "name": "Ink and quill", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
-                    { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
-                    { "name": "Torch", "quantity": 3 },
+                    { "name": "Torch", "quantity": 2 },
                     { "name": "Water-/wineskin", "quantity": 1 }
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
             },
-// Scale mail, battle axe, light crossbow, light bolts ×20, backpack, bandages, bolt case, ink and quill, soft
-// leather pouch, iron rations (1 week), hemp rope (50-ft.), tinderbox, torches ×2, wineskin (full), spell book
         },
         "Witch": {
             "baseClass": "magician",
@@ -2924,30 +3003,39 @@ export class Hyp3eCharacter {
             },
             "startingPack": {
                 "gold": "1d4+1",
-                "armour": [
-                    { "name": "Leather armour", "quantity": 1 },
-                ],
                 "weapons": [
-                    { "name": "Dagger", "quantity": 1 },
+                    { "name": "Blowgun", "quantity": 1 },
+                    { "name": "Dagger, silver", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
+                    { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
+                    { "name": "Book, spell", "quantity": 1 },
+                    { "name": "Candle, beeswax", "quantity": 2 },
+                    { "name": "Chalk", "quantity": 1 },
+                    { "name": "Ink and quill", "quantity": 1 },
+                    { "name": "Needle, blowgun", "quantity": 10 },
+                    { "name": "Parchment", "quantity": 2 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Torch", "quantity": 3 },
-                    { "name": "Water-/wineskin", "quantity": 1 }
+                    { "name": "Water-/wineskin", "quantity": 1 },
+                    { "name": "Wolfsbane", "quantity": 1 },
+                    { "name": "Writing stick", "quantity": 1 },
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
+                "equipment - religious": [
+                    { "name": "Censer", "quantity": 1 },
+                    { "name": "Incense sticks, 12", "quantity": 12 },
+                    { "name": "Paint, body", "quantity": 1 },
+                    { "name": "Rattle", "quantity": 1 },
+                ],
             },
-// Blowgun, blowgun needles ×10, silver dagger, backpack, bandages, winter blanket, beeswax candles ×2, brass
-// censer, chalk (piece), incense sticks ×12, ink and quill, body paint (crock), parchment ×2, soft leather pouch, iron
-// rations (1 week), wooden rattle, hemp rope (50-ft.), small sack, tinderbox, torches ×3, wineskin (full), wolfsbane,
-// writing stick, spell book,
         },
     }
 
@@ -3336,30 +3424,46 @@ export class Hyp3eCharacter {
             console.error(`getDefaultArmorForClass: Class data not found for class ${charClass}!`);
             return [];
         }
+        if (classData.startingPack.armour === undefined || classData.startingPack.armour.length === 0) {
+            console.warn(`getDefaultArmorForClass: No default armor defined for class ${charClass}. Returning empty array.`);
+            return [];
+        }
+        // Log the class and the armor items being added
         console.log(`getDefaultArmorForClass: Getting default armor for class ${charClass}:`, classData.startingPack.armour);
 
-        // Do we have an Armour folder in the item directory? Look for different spellings...
-        let armorFolder
-        if (game.folders) {
-            armorFolder = game.folders.find(f => f.name.toLowerCase() === "armor" || f.name.toLowerCase() === "armour");
-        }
-        if (!armorFolder) {
-            // Do we have a compendium named "Armor" or "Armour"?
-            armorFolder = game.packs.find(p => p.metadata.name.toLowerCase() === "armor" || p.metadata.name.toLowerCase() === "armour");
-        }
-        // If we still don't have an armor folder, we will just create empty armor items
-        console.log(`getDefaultArmorForClass: Armor folder found?`, armorFolder);
+        // Do we have a compendium named "Armour" or "Armor"?
+        const armorCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "armour" || p.metadata.name.toLowerCase() === "armor");
 
         // Create an array of armor items based on the starting pack
         let armor = [];
-        let newItem;
         for (const item of classData.startingPack.armour) {
             console.log(`getDefaultArmorForClass: Adding armor ${item.name} with quantity ${item.quantity}`);
-            if (armorFolder) {
-                // Find the matching armor item in the folder or compendium, and copy it
-                newItem = armorFolder.contents.find(i => i.name.toLowerCase() === item.name.toLowerCase());
+            let newItem;
+            // Find the matching armor item in the items directory, and copy it
+            const matches = game.items.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+            for (let item of matches) {
+                const folder = item.folder ? item.folder.name : "(no folder)";
+                console.log(`getDefaultArmorForClass: Item: ${item.name}, Folder: ${folder}`);
+                if (folder.toLowerCase() === "armour" || folder.toLowerCase() === "armor") {
+                    newItem = item;
+                    break; // Found the item, no need to continue searching
+                }
+            }
+            if (!newItem) {
+                console.warn(`getDefaultArmorForClass: Armor item ${item.name} not found in folders, trying compendium next...`);
+                if (armorCompendium) {
+                    // Try to find the item in the compendium
+                    const matches = armorCompendium.index.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+                    for (let entry of matches) {
+                        console.log(`getDefaultArmorForClass: Item: ${item.name}, Compendium:`, armorCompendium.metadata.label);
+                        newItem = await armorCompendium.getDocument(entry._id); // fully load the item
+                        break; // Found the item, no need to continue searching
+                    }
+                }
                 if (!newItem) {
-                    console.warn(`getDefaultArmorForClass: Armor item ${item.name} not found in folder/compendium, creating new item...`);
+                    // If we still don't have a new item, create a new armor, basically blank
+                    // This is a fallback if the item is not found in the compendium or items directory
+                    console.warn(`getDefaultArmorForClass: No compendium found, or armor not found in compendium. Creating new blank item...`);
                     // Create a new armor item object
                     newItem = {
                         name: item.name,
@@ -3371,17 +3475,6 @@ export class Hyp3eCharacter {
                         }
                     };
                 }
-            } else {
-                // Create a new armor item object
-                newItem = {
-                    name: item.name,
-                    type: "armor",
-                    img: "icons/svg/shield.svg",
-                    system: {
-                        "quantity.value": item.quantity || 1,
-                        "quantity.max": item.quantity > 1 ? item.quantity : 0,
-                    }
-                };
             }
             // Add the item to the items array
             armor.push(newItem);
@@ -3406,7 +3499,7 @@ export class Hyp3eCharacter {
         for (const item of classData.startingPack.weapons) {
             console.log(`getDefaultWeaponsForClass: Adding weapon ${item.name} with quantity ${item.quantity}`);
             let newItem;
-            // Find the matching weapon item in the item directory, and copy it
+            // Find the matching weapon item in the items directory, and copy it
             const matches = game.items.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
             for (let item of matches) {
                 const folder = item.folder ? item.folder.name : "(no folder)";
@@ -3426,9 +3519,11 @@ export class Hyp3eCharacter {
                         newItem = await weaponCompendium.getDocument(entry._id); // fully load the item
                         break; // Found the item, no need to continue searching
                     }
-                } else {
-                    console.warn(`getDefaultWeaponsForClass: No weapons compendium found, creating new item...`);
-                    // Create a new weapon item object
+                }
+                if (!newItem) {
+                    // If we still don't have a new item, create a new weapon, basically blank
+                    // This is a fallback if the item is not found in the compendium or items directory
+                    console.warn(`getDefaultWeaponsForClass: No compendium found, or weapon not found in compendium. Creating new blank item...`);
                     newItem = {
                         name: item.name,
                         type: "weapon",
@@ -3453,6 +3548,13 @@ export class Hyp3eCharacter {
             console.error(`getDefaultItemsForClass: Class data not found for class ${charClass}!`);
             return [];
         }
+        console.log(`getDefaultArmorForClass: Getting default armor for class ${charClass}:`, classData.startingPack.armour);
+
+        // Do we have the compendia for Equipment?
+        const generalCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "equipment - general");
+        const provisionCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "equipment - provisions");
+        const religiousCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "equipment - religious");
+
         // Create an array of items based on the starting pack
         let items = [];
         let itemType = ""; // This is set below
@@ -3460,6 +3562,7 @@ export class Hyp3eCharacter {
             if (folder.substring(0, 9) !== "equipment") {
                 continue; // Skip folders that are not equipment
             }
+            // Determine the item type based on the folder name
             switch (folder) {
                 case "equipment - general":
                     itemType = "general equipment";
@@ -3471,23 +3574,60 @@ export class Hyp3eCharacter {
                     itemType = "religious items";
                     break;
                 default:
-                    itemType = "default items"; // Default to item for other folders
+                    itemType = "default items"; // Should never happen, but just in case
             }
             // Log the folder and items being processed
             console.log(`getDefaultItemsForClass: Getting ${itemType} for class ${charClass}:`, itemsList);
-            
+
             for (const item of itemsList) {
                 console.log(`getDefaultItemsForClass: Adding item ${item.name} with quantity ${item.quantity}`);
-                // Create a new item object
-                let newItem = {
-                    name: item.name,
-                    type: "item",
-                    img: "icons/svg/item-bag.svg",
-                    system: {
-                        "quantity.value": item.quantity || 1,
-                        "quantity.max": item.quantity > 1 ? item.quantity : 0,
+                let newItem;
+                // Find the matching item in the items directory, and copy it
+                const matches = game.items.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+                for (let item of matches) {
+                    const folder = item.folder ? item.folder.name : "(no folder)";
+                    console.log(`getDefaultItemsForClass: Item: ${item.name}, Folder: ${folder}`);
+                    if (folder.toLowerCase().includes("equipment")) {
+                        newItem = item;
+                        break; // Found the item, no need to continue searching
                     }
-                };
+                }
+                if (!newItem) {
+                    console.warn(`getDefaultItemsForClass: Item ${item.name} not found in folders, trying compendium next...`);
+                    if (generalCompendium || provisionCompendium || religiousCompendium) {
+                        // Determine which compendium to use based on the item type
+                        let searchCompendium;
+                        if (folder === "equipment - general") {
+                            searchCompendium = generalCompendium;
+                        } else if (folder === "equipment - provisions") {
+                            searchCompendium = provisionCompendium;
+                        } else if (folder === "equipment - religious") {
+                            searchCompendium = religiousCompendium;
+                        }
+                        // Try to find the item in the search compendium
+                        const matches = searchCompendium.index.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+                        for (let entry of matches) {
+                            console.log(`getDefaultItemsForClass: Item: ${item.name}, Compendium:`, searchCompendium.metadata.label);
+                            newItem = await searchCompendium.getDocument(entry._id); // fully load the item
+                            break; // Found the item, no need to continue searching
+                        }
+                    } 
+                    if (!newItem) {
+                        // If we still don't have a new item, create a new item, basically blank
+                        // This is a fallback if the item is not found in the compendium or items directory
+                        console.warn(`getDefaultItemsForClass: No compendium found, creating new item...`);
+                        // Create a new item object
+                        newItem = {
+                            name: item.name,
+                            type: "item",
+                            img: "icons/svg/item-bag.svg",
+                            system: {
+                                "quantity.value": item.quantity || 1,
+                                "quantity.max": item.quantity > 1 ? item.quantity : 0,
+                            }
+                        };
+                    }
+                }
                 // Add the item to the items array
                 items.push(newItem);
             }

@@ -254,8 +254,10 @@ export class Hyp3eActor extends Actor {
         // Alternatively, we can also check for compendia with the items we need.
         // Start with armor...
         const armor = await Hyp3eCharacter.getDefaultArmorForClass(this);
-        // Add the armor to the actor's inventory
-        this.createEmbeddedDocuments("Item", armor);
+        if (armor && armor.length > 0) {
+            // Add the armor to the actor's inventory
+            this.createEmbeddedDocuments("Item", armor);
+        }
 
         // Next we do weapons...
         const weapons = await Hyp3eCharacter.getDefaultWeaponsForClass(this);
