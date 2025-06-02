@@ -67,6 +67,11 @@ export class Hyp3eItem extends Item {
             item.system.realName = item.name
         }
 
+        // If the item is identified but has no realDescription, set it to the description
+        if (itemData.identified && (!itemData.realDescription || itemData.realDescription.trim() === "")) {
+            itemData.realDescription = itemData.description
+        }
+
         // Fix weapon & spell missing or invalid damage type
         if (item.type == "weapon" || item.type == "spell") {
             if (!itemData.dmgType || itemData.dmgType == "" || CONFIG.HYP3E.damageTypes[itemData.dmgType] == undefined) {
