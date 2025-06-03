@@ -3455,7 +3455,8 @@ export class Hyp3eCharacter {
                     // Try to find the item in the compendium
                     const matches = armorCompendium.index.filter(i => i.name.toLowerCase() === armorItem.name.toLowerCase());
                     for (let entry of matches) {
-                        newItem = await armorCompendium.getDocument(entry._id); // fully load the item
+                        const compendiumItem = await armorCompendium.getDocument(entry._id); // fully load the item
+                        newItem = compendiumItem.toObject(); // Create a copy of the item
                         newItem.system.quantity = {
                             value: armorItem.quantity,
                             max: armorItem.quantity
@@ -3523,7 +3524,8 @@ export class Hyp3eCharacter {
                     // Try to find the weapon in the compendium
                     const matches = weaponCompendium.index.filter(i => i.name.toLowerCase() === weapon.name.toLowerCase());
                     for (let entry of matches) {
-                        newItem = await weaponCompendium.getDocument(entry._id); // fully load the item
+                        const compendiumItem = await weaponCompendium.getDocument(entry._id); // fully load the item
+                        newItem = compendiumItem.toObject(); // Create a copy of the item
                         newItem.system.quantity = {
                             value: weapon.quantity,
                             max: weapon.quantity
@@ -3626,7 +3628,8 @@ export class Hyp3eCharacter {
                         // Try to find the equipment in the search compendium
                         const matches = searchCompendium.index.filter(i => i.name.toLowerCase() === equipment.name.toLowerCase());
                         for (let entry of matches) {
-                            newItem = await searchCompendium.getDocument(entry._id); // fully load the item
+                            const compendiumItem = await searchCompendium.getDocument(entry._id); // fully load the item
+                            newItem = compendiumItem.toObject(); // Create a copy of the item
                             newItem.system.quantity = {
                                 value: equipment.quantity,
                                 max: equipment.quantity
