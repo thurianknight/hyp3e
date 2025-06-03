@@ -787,16 +787,16 @@ async function migrateWorld() {
 
                 case "Item":
                     // Do for all items regardless of type
-                    const origItem = foundry.utils.deepClone(item);
+                    const origItem = foundry.utils.deepClone(doc);
                     const itemUpdates = migrateItemData(origItem);
-                    if (itemUpdates && itemUpdates != {}) await item.update(itemUpdates);
+                    if (itemUpdates && itemUpdates != {}) await doc.update(itemUpdates);
                     break
 
                 default:
                     break
                 }
             } catch (err) {
-                errMsg = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}: ${err.message}`;
+                const errMsg = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}: ${err.message}`;
                 console.error(errMsg);
             }
         }
