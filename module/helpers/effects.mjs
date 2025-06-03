@@ -328,6 +328,12 @@ export async function applyAllEffects(itemId, actorId, disabled = false) {
     if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Item: ", item) }
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
 
+    // Check if the item has any effects to enable
+    if (item.effects.contents.length === 0) {
+        console.log(`applyAllEffects: Item ${itemName} has no effects to apply.`);
+        return;
+    }
+
     // Initialize the chat string
     let chatMsg = ""
 
@@ -431,6 +437,12 @@ export async function enableAllEffects(itemId, actorId, transferOnly = false) {
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("enableAllEffects: Item: ", item) }
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+
+    // Check if the item has any effects to enable
+    if (item.effects.contents.length === 0) {
+        console.log(`enableAllEffects: Item ${itemName} has no effects to enable.`);
+        return;
+    }
 
     // Initialize the chat string
     let chatMsg = ""
@@ -543,6 +555,12 @@ export async function disableAllEffects(itemId, actorId, transferOnly = false) {
     }
     if (CONFIG.HYP3E.debugMessages) { console.log("disableAllEffects: Item: ", item) }
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+
+    // Check if the item has any effects to disable
+    if (item.effects.contents.length === 0) {
+        console.log(`disableAllEffects: Item ${itemName} has no effects to disable.`);
+        return;
+    }
 
     item.effects.forEach(effect => {
         if (!transferOnly || transferOnly && effect.transfer) {
