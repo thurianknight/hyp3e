@@ -42,6 +42,17 @@ Hooks.once('init', async function() {
         default: false,
     });
 
+    // Migrate compendia data, if desired (default false)
+    game.settings.register(game.system.id, "migrateCompendia", {
+        name: game.i18n.localize("HYP3E.settings.migrateCompendia"),
+        hint: game.i18n.localize("HYP3E.settings.migrateCompendiaHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
+
     // Debug logging & messages
     game.settings.register(game.system.id, "debugMessages", {
         name: game.i18n.localize("HYP3E.settings.debugMessages"),
@@ -594,7 +605,7 @@ Hooks.once("ready", async function() {
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
         // No need to migrate if system version is x.x.x or higher
-        const NEEDS_MIGRATION_TO_VERSION = "1.11.0"
+        const NEEDS_MIGRATION_TO_VERSION = "1.12.0"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
             const alreadyRan = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
@@ -704,18 +715,14 @@ async function migrateWorld() {
     for (let actor of game.actors.contents) {
         // Migrate actor data
         const origActor = foundry.utils.deepClone(actor)
-        // const newActor = migrateActorData(origActor)
-        // await actor.update({ ...newActor })
-        const updates = migrateActorData(origActor)
-        if (updates && updates != {}) await actor.update(updates)
+        const actorUpdates = migrateActorData(origActor)
+        if (actorUpdates && actorUpdates != {}) await actor.update(actorUpdates)
         // Migrate the actor's items
         if (actor.items) {
             for (let item of actor.items) {
                 const origItem = foundry.utils.deepClone(item);
-                // const newItem = migrateItemData(origItem);
-                // await item.update({ ...newItem });
-                const updates = migrateItemData(origItem);
-                if (updates && updates != {}) await item.update(updates);
+                const itemUpdates = migrateItemData(origItem);
+                if (itemUpdates && itemUpdates != {}) await item.update(itemUpdates);
             }
         }
     }
@@ -727,32 +734,21 @@ async function migrateWorld() {
     console.log(`Updating data for items in the directory...`)
     for (let item of game.items.contents) {
         const origItem = foundry.utils.deepClone(item);
-        const newItem = migrateItemData(origItem);
-        await item.update({ ...newItem });
+        const itemUpdates = migrateItemData(origItem);
+        if (itemUpdates && itemUpdates != {}) await item.update(itemUpdates);
     }
 
-    // We only migrate the Hyperborea compendium in Dev, never someone else's live compendia!
-    //  Therefore, we exit here, except when I occasionally need to migrate my compendium.
-    return true;
+    // We only migrate the Hyperborea compendium if the GM requests it.
+    // We don't want to migrate compendia every time the game is loaded, as it takes a long time.
+    // Also, there may be some risk of data loss in personal or third party compendia.
+    if (!game.settings.get(game.system.id, "migrateCompendia")) {
+        return true;
+    }
 
     // Migrate compendia, one document at a time (time-consuming!)
     for (let pack of game.packs) {
 
         const packType = pack.metadata.type
-        // Skip anything that's not an Item or Actor compendium pack
-        // if (packType != "Item" && packType != "Actor") {
-        //     continue
-        // }
-
-        // Skip anything that's not an Actor compendium pack
-        // if (packType != "Actor") {
-        //     continue
-        // }
-
-        // Skip anything that's not an Item compendium pack
-        // if (packType != "Item") {
-        //     continue
-        // }
 
         console.log(`Compendium pack ${pack.metadata.label}:`, pack)
         const documentName = pack.documentName;
@@ -771,128 +767,29 @@ async function migrateWorld() {
             try {
                 switch(packType) {
                 case "Actor":
-                    // Migrate NPC data
-                    if (doc.type == "npc") {
-                        // do stuff to npcs
-                        if (!("identified" in doc.system)) {
-                            doc.update({ "system.identified": true })
-                        }
-                        if (!("tokenAlias" in doc.system)) {
-                            doc.update({ "system.tokenAlias": "" })
-                        }
-                        const tempHp = fixTempHp(doc)
-                        if (tempHp) {
-                            delete doc.system.hp["tempHp"]
-                            await doc.update(tempHp)
-                        }
-                        const tempAtkMod = fixTempAtkMod(doc)
-                        if (tempAtkMod) {
-                            delete doc.system["tempAtkMod"]
-                            await doc.update(tempAtkMod)
-                        }
-                        const tempDmgMod = fixTempDmgMod(doc)
-                        if (tempDmgMod) {
-                            delete doc.system["tempDmgMod"]
-                            await doc.update(tempDmgMod)
-                        }
-                        const tempAcMod = fixTempAcMod(doc)
-                        if (tempAcMod) {
-                            delete doc.system.ac["tempAcMod"]
-                            await doc.update(tempAcMod)
-                        }
-                        const tempDrMod = fixTempDrMod(doc)
-                        if (tempDrMod) {
-                            delete doc.system.ac["tempDrMod"]
-                            await doc.update(tempDrMod)
-                        }
-                        const tempMvMod = fixTempMvMod(doc)
-                        if (tempMvMod) {
-                            delete doc.system["tempMvMod"]
-                            await doc.update(tempMvMod)
-                        }
-                    }
-                    // Migrate PC data
-                    if (doc.type == "character") {
-                        // do stuff to characters
-                        if (!("identified" in doc.system)) {
-                            doc.update({ "system.identified": true })
-                        }
-                        if (!("tokenAlias" in doc.system)) {
-                            doc.update({ "system.tokenAlias": "" })
-                        }
-                        const tempHp = fixTempHp(doc)
-                        if (tempHp) {
-                            delete doc.system.hp["tempHp"]
-                            await doc.update(tempHp)
-                        }
-                        const tempAtkMod = fixTempAtkMod(doc)
-                        if (tempAtkMod) {
-                            delete doc.system["tempAtkMod"]
-                            await doc.update(tempAtkMod)
-                        }
-                        const tempDmgMod = fixTempDmgMod(doc)
-                        if (tempDmgMod) {
-                            delete doc.system["tempDmgMod"]
-                            await doc.update(tempDmgMod)
-                        }
-                        const tempAcMod = fixTempAcMod(doc)
-                        if (tempAcMod) {
-                            delete doc.system.ac["tempAcMod"]
-                            await doc.update(tempAcMod)
-                        }
-                        const tempDrMod = fixTempDrMod(doc)
-                        if (tempDrMod) {
-                            delete doc.system.ac["tempDrMod"]
-                            await doc.update(tempDrMod)
-                        }
-                        const tempMvMod = fixTempMvMod(doc)
-                        if (tempMvMod) {
-                            delete doc.system["tempMvMod"]
-                            await doc.update(tempMvMod)
-                        }
-                    }
-                    // Migrate the actor document's items if any exist
+                    // Migrate actor data
+                    const origActor = foundry.utils.deepClone(doc)
+                    // const newActor = migrateActorData(origActor)
+                    // await actor.update({ ...newActor })
+                    const actorUpdates = migrateActorData(origActor)
+                    if (actorUpdates && actorUpdates != {}) await doc.update(actorUpdates)
+                    // Migrate the actor's items
                     if (doc.items) {
                         for (let item of doc.items) {
-                            // Do for all items regardless of type
-                            if (!("identified" in item.system)) {
-                                item.update({ "system.identified": true })
-                            }
-                            if (!("tokenAlias" in item.system)) {
-                                item.update({ "system.tokenAlias": "" })
-                            }
-                            if (item.system.realName == "") {
-                                item.update({ "system.realName": item.name })
-                            }
-                            if (item.system.realDescription == "") {
-                                item.update({ "system.realDescription": item.system.description })
-                            }
-                            // Just weapons
-                            if (item.type === "weapon") {
-                                // Nothing to do at the moment
-                            }
+                            const origItem = foundry.utils.deepClone(item);
+                            // const newItem = migrateItemData(origItem);
+                            // await item.update({ ...newItem });
+                            const itemUpdates = migrateItemData(origItem);
+                            if (itemUpdates && itemUpdates != {}) await item.update(itemUpdates);
                         }
                     }
                     break
 
                 case "Item":
                     // Do for all items regardless of type
-                    if (!("identified" in doc.system)) {
-                        doc.update({ "system.identified": true })
-                    }
-                    if (!("tokenAlias" in doc.system)) {
-                        doc.update({ "system.tokenAlias": "" })
-                    }
-                    if (doc.system.realName == "") {
-                        doc.update({ "system.realName": doc.name })
-                    }
-                    if (doc.system.realDescription == "") {
-                        doc.update({ "system.realDescription": doc.system.description })
-                    }
-                    // Just weapons
-                    if (doc.type === "weapon") {
-                        // Nothing to do at the moment
-                    }
+                    const origItem = foundry.utils.deepClone(item);
+                    const itemUpdates = migrateItemData(origItem);
+                    if (itemUpdates && itemUpdates != {}) await item.update(itemUpdates);
                     break
 
                 default:
@@ -909,6 +806,7 @@ async function migrateWorld() {
         console.log(`Migrated all ${documentName} documents from Compendium ${pack.collection}`);
 
     }
+    return true;
 }
 
 async function resizeTokenPrototypes() {
@@ -1001,7 +899,7 @@ function migrateItemData(item) {
 
     // Armor only
     if (item.type === "armor") {
-
+        updates = { ...updates, "system.equipped": true };
     }
     // Features only
     if (item.type === "feature") {
@@ -1009,7 +907,7 @@ function migrateItemData(item) {
     }
     // General items only
     if (item.type === "item") {
-
+        updates = { ...updates, "system.equipped": true };
     }
     // Spells only
     if (item.type === "spell") {
@@ -1017,7 +915,7 @@ function migrateItemData(item) {
     }
     // Weapons only
     if (item.type === "weapon") {
-
+        updates = { ...updates, "system.equipped": false };
     }
 
     console.log(`migrateItemData: Updated data for ${item.name}:`, updates)

@@ -1,6 +1,8 @@
 {
     "HYP3E": {
         "settings": {
+            "migrateCompendia": "Migrate Compendia",
+            "migrateCompendiaHint": "Migrate the compendium data to the latest version. This is only needed when updating from a previous version of the system. N.B.: Be sure to backup your world before running this migration!",
             "debugMessages": "Debug Messages",
             "debugMessagesHint": "Enable additional debug logging and messages.",
             "races": "Races",
