@@ -335,7 +335,6 @@ export class Hyp3eCharacter {
                     { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Book, spell", "quantity": 1 },
                     { "name": "Chalk", "quantity": 1 },
-                    { "name": "Flute", "quantity": 1 },
                     { "name": "Ink and quill", "quantity": 1 },
                     { "name": "Parchment", "quantity": 3 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
@@ -347,6 +346,9 @@ export class Hyp3eCharacter {
                 ],
                 "equipment - provisions": [
                     { "name": "Rations, iron", "quantity": 7 },
+                ],
+                "equipment - religious": [
+                    { "name": "Flute", "quantity": 1 }, 
                 ],
             },
         },
@@ -3437,7 +3439,6 @@ export class Hyp3eCharacter {
             const matches = game.items.filter(i => i.name.toLowerCase() === armorItem.name.toLowerCase());
             for (let item of matches) {
                 const folder = item.folder ? item.folder.name : "(no folder)";
-                console.log(`getDefaultArmorForClass: Item: ${item.name}, Folder: ${folder}`);
                 if (folder.toLowerCase() === "armour" || folder.toLowerCase() === "armor") {
                     newItem = item.toObject();
                     newItem.system.quantity = {
@@ -3454,13 +3455,12 @@ export class Hyp3eCharacter {
                     // Try to find the item in the compendium
                     const matches = armorCompendium.index.filter(i => i.name.toLowerCase() === armorItem.name.toLowerCase());
                     for (let entry of matches) {
-                        console.log(`getDefaultArmorForClass: Item: ${entry.name}, Compendium:`, armorCompendium.metadata.label);
                         newItem = await armorCompendium.getDocument(entry._id); // fully load the item
                         newItem.system.quantity = {
                             value: armorItem.quantity,
                             max: armorItem.quantity
                         };
-                        console.log(`getDefaultArmorForClass: Found item in folder: ${folder}`, newItem);
+                        console.log(`getDefaultArmorForClass: Found item in compendium: ${armorCompendium.metadata.label}`, newItem);
                         break; // Found the item, no need to continue searching
                     }
                 }
@@ -3507,7 +3507,6 @@ export class Hyp3eCharacter {
             const matches = game.items.filter(i => i.name.toLowerCase() === weapon.name.toLowerCase());
             for (let item of matches) {
                 const folder = item.folder ? item.folder.name : "(no folder)";
-                console.log(`getDefaultWeaponsForClass: Item: ${item.name}, Folder: ${folder}`);
                 if (folder.toLowerCase() === "weapons" || folder.toLowerCase() === "melee" || folder.toLowerCase() === "missile") {
                     newItem = item.toObject();
                     newItem.system.quantity = {
@@ -3524,13 +3523,12 @@ export class Hyp3eCharacter {
                     // Try to find the weapon in the compendium
                     const matches = weaponCompendium.index.filter(i => i.name.toLowerCase() === weapon.name.toLowerCase());
                     for (let entry of matches) {
-                        console.log(`getDefaultWeaponsForClass: Item: ${entry.name}, Compendium:`, weaponCompendium.metadata.label);
                         newItem = await weaponCompendium.getDocument(entry._id); // fully load the item
                         newItem.system.quantity = {
                             value: weapon.quantity,
                             max: weapon.quantity
                         };
-                        console.log(`getDefaultWeaponsForClass: Found weapon in folder: ${folder}`, newItem);
+                        console.log(`getDefaultWeaponsForClass: Found weapon in compendium: ${weaponCompendium.metadata.label}`, newItem);
                         break; // Found the item, no need to continue searching
                     }
                 }
@@ -3600,7 +3598,6 @@ export class Hyp3eCharacter {
                 const matches = game.items.filter(i => i.name.toLowerCase() === equipment.name.toLowerCase());
                 for (let item of matches) {
                     const folder = item.folder ? item.folder.name : "(no folder)";
-                    console.log(`getDefaultItemsForClass: Item: ${item.name}, Folder: ${folder}`);
                     if (folder.toLowerCase().includes("equipment")) {
                         newItem = item.toObject(); // Create a copy of the item
                         newItem.system.quantity = {
@@ -3629,13 +3626,12 @@ export class Hyp3eCharacter {
                         // Try to find the equipment in the search compendium
                         const matches = searchCompendium.index.filter(i => i.name.toLowerCase() === equipment.name.toLowerCase());
                         for (let entry of matches) {
-                            console.log(`getDefaultItemsForClass: Item: ${entry.name}, Compendium:`, searchCompendium.metadata.label);
                             newItem = await searchCompendium.getDocument(entry._id); // fully load the item
                             newItem.system.quantity = {
                                 value: equipment.quantity,
                                 max: equipment.quantity
                             };
-                            console.log(`getDefaultItemsForClass: Found equipment in folder: ${folder}`, newItem);
+                            console.log(`getDefaultItemsForClass: Found equipment in compendium: ${searchCompendium.metadata.label}`, newItem);
                             break; // Found the equipment, no need to continue searching
                         }
                     }
