@@ -256,18 +256,26 @@ export class Hyp3eActor extends Actor {
         const armor = await Hyp3eCharacter.getDefaultArmorForClass(this);
         if (armor && armor.length > 0) {
             // Add the armor to the actor's inventory
-            this.createEmbeddedDocuments("Item", armor);
+            await this.createEmbeddedDocuments("Item", armor);
         }
 
         // Next we do weapons...
         const weapons = await Hyp3eCharacter.getDefaultWeaponsForClass(this);
         // Add the armor to the actor's inventory
-        this.createEmbeddedDocuments("Item", weapons);
+        await this.createEmbeddedDocuments("Item", weapons);
 
-        // Finally, all the equipment items...
+        // Next we do all the equipment items...
         const items = await Hyp3eCharacter.getDefaultItemsForClass(this);
         // Add the items to the actor's inventory
-        this.createEmbeddedDocuments("Item", items);
+        await this.createEmbeddedDocuments("Item", items);
+
+        // Get starting gold
+        const gold = await Hyp3eCharacter.getStartingGoldForClass(this);
+        if (gold && gold > 0) {
+            // Add the gold to the actor's inventory
+            await this.update({"system.money.gp.value": gold});
+            this.system.money.gp.value = gold;
+        }
 
         // All good? Disable the quick-create button so it can't be used again.
         this.setFlag(game.system.id, "disableQuickCreate", true)

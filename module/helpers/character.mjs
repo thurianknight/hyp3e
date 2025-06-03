@@ -1212,7 +1212,6 @@ export class Hyp3eCharacter {
                 "gold": "1d4+1",
                 "weapons": [
                     { "name": "Dagger, silver", "quantity": 1 },
-                    { "name": "Dagger, silver, thrown", "quantity": 1 },
                     { "name": "Quarterstaff", "quantity": 1 },
                     { "name": "Sling", "quantity": 1 },
                 ],
@@ -1332,10 +1331,10 @@ export class Hyp3eCharacter {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Studded armour", "quantity": 1 },
+                    { "name": "Shield, small", "quantity": 1 },
                 ],
                 "weapons": [
                     { "name": "Dagger", "quantity": 2 },
-                    { "name": "Dagger, thrown", "quantity": 2 },
                     { "name": "Falcata", "quantity": 1 },
                     { "name": "Sling", "quantity": 1 },
                 ],
@@ -1350,7 +1349,7 @@ export class Hyp3eCharacter {
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
-                    { "name": "Thieves’ tools", "quantity": 1 },
+                    { "name": "Thieves' tools", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Torch", "quantity": 2 },
                     { "name": "Water-/wineskin", "quantity": 1 }
@@ -1447,7 +1446,6 @@ export class Hyp3eCharacter {
                 "gold": "1d4+1",
                 "weapons": [
                     { "name": "Dagger, silver", "quantity": 1 },
-                    { "name": "Dagger, silver, thrown", "quantity": 1 },
                     { "name": "Quarterstaff", "quantity": 1 },
                     { "name": "Sling", "quantity": 1 },
                 ],
@@ -1579,7 +1577,7 @@ export class Hyp3eCharacter {
                     { "name": "Rations, iron", "quantity": 7 },
                 ],
                 "equipment - religious": [
-                    { "name": "Incense sticks, 12", "quantity": 12 },
+                    { "name": "Incense sticks (x12)", "quantity": 12 },
                 ],
             },
         },
@@ -1824,8 +1822,7 @@ export class Hyp3eCharacter {
                 ],
                 "weapons": [
                     { "name": "Dagger", "quantity": 1 },
-                    { "name": "Dagger, thrown", "quantity": 1 },
-                    { "name": "Mace, footman’s", "quantity": 1 },
+                    { "name": "Mace, footman's", "quantity": 1 },
                     { "name": "Sword, long", "quantity": 1 },
                 ],
                 "equipment - general": [
@@ -1944,7 +1941,6 @@ export class Hyp3eCharacter {
                 "gold": "1d4+1",
                 "weapons": [
                     { "name": "Dagger, silver", "quantity": 1 },
-                    { "name": "Dagger, silver, thrown", "quantity": 1 },
                     { "name": "Quarterstaff", "quantity": 1 },
                     { "name": "Whip", "quantity": 1 },
                 ],
@@ -2077,7 +2073,6 @@ export class Hyp3eCharacter {
                 ],
                 "weapons": [
                     { "name": "Dagger", "quantity": 1 },
-                    { "name": "Dagger, thrown", "quantity": 1 },
                     { "name": "Morning star", "quantity": 1 },
                     { "name": "Sling", "quantity": 1 },
                 ],
@@ -2085,11 +2080,11 @@ export class Hyp3eCharacter {
                     { "name": "Backpack", "quantity": 1 },
                     { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
-                    { "name": "Bullets, sling, lead", "quantity": 20 },
+                    { "name": "Bullets, sling, lead (x20)", "quantity": 20 },
                     { "name": "Dice, ivory", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
-                    { "name": "Thieves’ tools", "quantity": 1 },
+                    { "name": "Thieves' tools", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Torch", "quantity": 2 },
                     { "name": "Water-/wineskin", "quantity": 1 },
@@ -2532,7 +2527,7 @@ export class Hyp3eCharacter {
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
-                    { "name": "Padded armour", "quantity": 1 },
+                    { "name": "Padded (quilted) armour", "quantity": 1 },
                     { "name": "Shield, small", "quantity": 1 },
                 ],
                 "weapons": [
@@ -2547,13 +2542,13 @@ export class Hyp3eCharacter {
                     { "name": "Disguise clothing", "quantity": 1 },
                     { "name": "Grappling hook", "quantity": 1 },
                     { "name": "Grease", "quantity": 1 },
-                    { "name": "Marbles", "quantity": 20 },
+                    { "name": "Marbles (x20)", "quantity": 20 },
                     { "name": "Parchment", "quantity": 1 },
                     { "name": "Pole", "quantity": 1 },
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, hemp", "quantity": 1 },
                     { "name": "Sack, small", "quantity": 1 },
-                    { "name": "Thieves’ tools", "quantity": 1 },
+                    { "name": "Thieves' tools", "quantity": 1 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Torch", "quantity": 3 },
                     { "name": "Water-/wineskin", "quantity": 1 },
@@ -2669,7 +2664,6 @@ export class Hyp3eCharacter {
                 "weapons": [
                     { "name": "Club, war", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
-                    { "name": "Dagger, thrown", "quantity": 1 },
                 ],
                 "equipment - general": [
                     { "name": "Backpack", "quantity": 1 },
@@ -2689,7 +2683,7 @@ export class Hyp3eCharacter {
                 "equipment - religious": [
                     { "name": "Censer", "quantity": 1 },
                     { "name": "Holy symbol, wooden", "quantity": 1 },
-                    { "name": "Incense sticks, 12", "quantity": 12 },
+                    { "name": "Incense sticks (x12)", "quantity": 12 },
                     { "name": "Mask, wooden", "quantity": 1 },
                     { "name": "Rattle", "quantity": 1 },
                 ],
@@ -3031,7 +3025,7 @@ export class Hyp3eCharacter {
                 ],
                 "equipment - religious": [
                     { "name": "Censer", "quantity": 1 },
-                    { "name": "Incense sticks, 12", "quantity": 12 },
+                    { "name": "Incense sticks (x12)", "quantity": 12 },
                     { "name": "Paint, body", "quantity": 1 },
                     { "name": "Rattle", "quantity": 1 },
                 ],
@@ -3432,31 +3426,41 @@ export class Hyp3eCharacter {
         console.log(`getDefaultArmorForClass: Getting default armor for class ${charClass}:`, classData.startingPack.armour);
 
         // Do we have a compendium named "Armour" or "Armor"?
-        const armorCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "armour" || p.metadata.name.toLowerCase() === "armor");
+        const armorCompendium = game.packs.find(p => p.metadata.label.toLowerCase() === "armour" || p.metadata.label.toLowerCase() === "armor");
 
         // Create an array of armor items based on the starting pack
         let armor = [];
-        for (const item of classData.startingPack.armour) {
-            console.log(`getDefaultArmorForClass: Adding armor ${item.name} with quantity ${item.quantity}`);
+        for (const armorItem of classData.startingPack.armour) {
+            console.log(`getDefaultArmorForClass: Adding armor ${armorItem.name} with quantity ${armorItem.quantity}`);
             let newItem;
             // Find the matching armor item in the items directory, and copy it
-            const matches = game.items.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+            const matches = game.items.filter(i => i.name.toLowerCase() === armorItem.name.toLowerCase());
             for (let item of matches) {
                 const folder = item.folder ? item.folder.name : "(no folder)";
                 console.log(`getDefaultArmorForClass: Item: ${item.name}, Folder: ${folder}`);
                 if (folder.toLowerCase() === "armour" || folder.toLowerCase() === "armor") {
-                    newItem = item;
+                    newItem = item.toObject();
+                    newItem.system.quantity = {
+                        value: armorItem.quantity,
+                        max: armorItem.quantity
+                    };
+                    console.log(`getDefaultArmorForClass: Found item in folder: ${folder}`, newItem);
                     break; // Found the item, no need to continue searching
                 }
             }
             if (!newItem) {
-                console.warn(`getDefaultArmorForClass: Armor item ${item.name} not found in folders, trying compendium next...`);
+                console.warn(`getDefaultArmorForClass: Armor item ${armorItem.name} not found in folders, trying compendium next...`);
                 if (armorCompendium) {
                     // Try to find the item in the compendium
-                    const matches = armorCompendium.index.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+                    const matches = armorCompendium.index.filter(i => i.name.toLowerCase() === armorItem.name.toLowerCase());
                     for (let entry of matches) {
-                        console.log(`getDefaultArmorForClass: Item: ${item.name}, Compendium:`, armorCompendium.metadata.label);
+                        console.log(`getDefaultArmorForClass: Item: ${entry.name}, Compendium:`, armorCompendium.metadata.label);
                         newItem = await armorCompendium.getDocument(entry._id); // fully load the item
+                        newItem.system.quantity = {
+                            value: armorItem.quantity,
+                            max: armorItem.quantity
+                        };
+                        console.log(`getDefaultArmorForClass: Found item in folder: ${folder}`, newItem);
                         break; // Found the item, no need to continue searching
                     }
                 }
@@ -3466,12 +3470,12 @@ export class Hyp3eCharacter {
                     console.warn(`getDefaultArmorForClass: No compendium found, or armor not found in compendium. Creating new blank item...`);
                     // Create a new armor item object
                     newItem = {
-                        name: item.name,
+                        name: armorItem.name,
                         type: "armor",
                         img: "icons/svg/shield.svg", // Default image if not found
                         system: {
-                            "quantity.value": item.quantity || 1,
-                            "quantity.max": item.quantity > 1 ? item.quantity : 0,
+                            "quantity.value": armorItem.quantity,
+                            "quantity.max": armorItem.quantity,
                         }
                     };
                 }
@@ -3492,31 +3496,41 @@ export class Hyp3eCharacter {
         console.log(`getDefaultWeaponsForClass: Getting default weapons for class ${charClass}:`, classData.startingPack.weapons);
 
         // Do we have a compendium named "Weapons"?
-        const weaponCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "weapons");
+        const weaponCompendium = game.packs.find(p => p.metadata.label.toLowerCase() === "weapons");
 
         // Create an array of weapon items based on the starting pack
         let weapons = [];
-        for (const item of classData.startingPack.weapons) {
-            console.log(`getDefaultWeaponsForClass: Adding weapon ${item.name} with quantity ${item.quantity}`);
+        for (const weapon of classData.startingPack.weapons) {
+            console.log(`getDefaultWeaponsForClass: Adding weapon ${weapon.name} with quantity ${weapon.quantity}`);
             let newItem;
-            // Find the matching weapon item in the items directory, and copy it
-            const matches = game.items.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+            // Find the matching weapon in the items directory, and copy it
+            const matches = game.items.filter(i => i.name.toLowerCase() === weapon.name.toLowerCase());
             for (let item of matches) {
                 const folder = item.folder ? item.folder.name : "(no folder)";
                 console.log(`getDefaultWeaponsForClass: Item: ${item.name}, Folder: ${folder}`);
                 if (folder.toLowerCase() === "weapons" || folder.toLowerCase() === "melee" || folder.toLowerCase() === "missile") {
-                    newItem = item;
+                    newItem = item.toObject();
+                    newItem.system.quantity = {
+                        value: weapon.quantity,
+                        max: weapon.quantity
+                    };
+                    console.log(`getDefaultWeaponsForClass: Found item in folder: ${folder}`, newItem);
                     break; // Found the item, no need to continue searching
                 }
             }
             if (!newItem) {
-                console.warn(`getDefaultWeaponsForClass: Weapon item ${item.name} not found in folders, trying compendium next...`);
+                console.warn(`getDefaultWeaponsForClass: Weapon item ${weapon.name} not found in folders, trying compendium next...`);
                 if (weaponCompendium) {
-                    // Try to find the item in the compendium
-                    const matches = weaponCompendium.index.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+                    // Try to find the weapon in the compendium
+                    const matches = weaponCompendium.index.filter(i => i.name.toLowerCase() === weapon.name.toLowerCase());
                     for (let entry of matches) {
-                        console.log(`getDefaultWeaponsForClass: Item: ${item.name}, Compendium:`, weaponCompendium.metadata.label);
+                        console.log(`getDefaultWeaponsForClass: Item: ${entry.name}, Compendium:`, weaponCompendium.metadata.label);
                         newItem = await weaponCompendium.getDocument(entry._id); // fully load the item
+                        newItem.system.quantity = {
+                            value: weapon.quantity,
+                            max: weapon.quantity
+                        };
+                        console.log(`getDefaultWeaponsForClass: Found weapon in folder: ${folder}`, newItem);
                         break; // Found the item, no need to continue searching
                     }
                 }
@@ -3525,17 +3539,17 @@ export class Hyp3eCharacter {
                     // This is a fallback if the item is not found in the compendium or items directory
                     console.warn(`getDefaultWeaponsForClass: No compendium found, or weapon not found in compendium. Creating new blank item...`);
                     newItem = {
-                        name: item.name,
+                        name: weapon.name,
                         type: "weapon",
                         img: "icons/svg/combat.svg", // Default image if not found
                         system: {
-                            "quantity.value": item.quantity || 1,
-                            "quantity.max": item.quantity > 1 ? item.quantity : 0,
+                            "quantity.value": weapon.quantity,
+                            "quantity.max": weapon.quantity,
                         }
                     };
                 }
             }
-            // Add the item to the items array
+            // Add the weapon to the weapons array
             weapons.push(newItem);
         }
         return weapons;
@@ -3551,9 +3565,9 @@ export class Hyp3eCharacter {
         console.log(`getDefaultArmorForClass: Getting default armor for class ${charClass}:`, classData.startingPack.armour);
 
         // Do we have the compendia for Equipment?
-        const generalCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "equipment - general");
-        const provisionCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "equipment - provisions");
-        const religiousCompendium = game.packs.find(p => p.metadata.name.toLowerCase() === "equipment - religious");
+        const generalCompendium = game.packs.find(p => p.metadata.label.toLowerCase() === "equipment - general");
+        const provisionCompendium = game.packs.find(p => p.metadata.label.toLowerCase() === "equipment - provisions");
+        const religiousCompendium = game.packs.find(p => p.metadata.label.toLowerCase() === "equipment - religious");
 
         // Create an array of items based on the starting pack
         let items = [];
@@ -3579,60 +3593,93 @@ export class Hyp3eCharacter {
             // Log the folder and items being processed
             console.log(`getDefaultItemsForClass: Getting ${itemType} for class ${charClass}:`, itemsList);
 
-            for (const item of itemsList) {
-                console.log(`getDefaultItemsForClass: Adding item ${item.name} with quantity ${item.quantity}`);
+            for (const equipment of itemsList) {
+                console.log(`getDefaultItemsForClass: Adding item ${equipment.name} with quantity ${equipment.quantity}`);
                 let newItem;
-                // Find the matching item in the items directory, and copy it
-                const matches = game.items.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+                // Find the matching equipment in the items directory, and copy it
+                const matches = game.items.filter(i => i.name.toLowerCase() === equipment.name.toLowerCase());
                 for (let item of matches) {
                     const folder = item.folder ? item.folder.name : "(no folder)";
                     console.log(`getDefaultItemsForClass: Item: ${item.name}, Folder: ${folder}`);
                     if (folder.toLowerCase().includes("equipment")) {
-                        newItem = item;
+                        newItem = item.toObject(); // Create a copy of the item
+                        newItem.system.quantity = {
+                            value: equipment.quantity,
+                            max: equipment.quantity
+                        };
+                        console.log(`getDefaultItemsForClass: Found equipment in folder: ${folder}`, newItem);
                         break; // Found the item, no need to continue searching
                     }
                 }
                 if (!newItem) {
-                    console.warn(`getDefaultItemsForClass: Item ${item.name} not found in folders, trying compendium next...`);
-                    if (generalCompendium || provisionCompendium || religiousCompendium) {
-                        // Determine which compendium to use based on the item type
-                        let searchCompendium;
-                        if (folder === "equipment - general") {
-                            searchCompendium = generalCompendium;
-                        } else if (folder === "equipment - provisions") {
-                            searchCompendium = provisionCompendium;
-                        } else if (folder === "equipment - religious") {
-                            searchCompendium = religiousCompendium;
-                        }
-                        // Try to find the item in the search compendium
-                        const matches = searchCompendium.index.filter(i => i.name.toLowerCase() === item.name.toLowerCase());
+                    console.warn(`getDefaultItemsForClass: Item ${equipment.name} not found in folders, trying compendium next...`);
+                    // Determine which compendium to use based on the equipment type
+                    let searchCompendium;
+                    if (folder === "equipment - general") {
+                        searchCompendium = generalCompendium;
+                        console.log(`getDefaultItemsForClass: Using general equipment compendium:`, searchCompendium);
+                    } else if (folder === "equipment - provisions") {
+                        searchCompendium = provisionCompendium;
+                        console.log(`getDefaultItemsForClass: Using provisions compendium:`, searchCompendium);
+                    } else if (folder === "equipment - religious") {
+                        searchCompendium = religiousCompendium;
+                        console.log(`getDefaultItemsForClass: Using religious items compendium:`, searchCompendium);
+                    }
+                    if (searchCompendium) {
+                        // Try to find the equipment in the search compendium
+                        const matches = searchCompendium.index.filter(i => i.name.toLowerCase() === equipment.name.toLowerCase());
                         for (let entry of matches) {
-                            console.log(`getDefaultItemsForClass: Item: ${item.name}, Compendium:`, searchCompendium.metadata.label);
+                            console.log(`getDefaultItemsForClass: Item: ${entry.name}, Compendium:`, searchCompendium.metadata.label);
                             newItem = await searchCompendium.getDocument(entry._id); // fully load the item
-                            break; // Found the item, no need to continue searching
+                            newItem.system.quantity = {
+                                value: equipment.quantity,
+                                max: equipment.quantity
+                            };
+                            console.log(`getDefaultItemsForClass: Found equipment in folder: ${folder}`, newItem);
+                            break; // Found the equipment, no need to continue searching
                         }
-                    } 
+                    }
                     if (!newItem) {
-                        // If we still don't have a new item, create a new item, basically blank
+                        // If we still don't have a new item, create a new equipment, basically blank
                         // This is a fallback if the item is not found in the compendium or items directory
                         console.warn(`getDefaultItemsForClass: No compendium found, creating new item...`);
                         // Create a new item object
                         newItem = {
-                            name: item.name,
+                            name: equipment.name,
                             type: "item",
                             img: "icons/svg/item-bag.svg",
                             system: {
-                                "quantity.value": item.quantity || 1,
-                                "quantity.max": item.quantity > 1 ? item.quantity : 0,
+                                "quantity.value": equipment.quantity,
+                                "quantity.max": equipment.quantity,
                             }
                         };
                     }
                 }
-                // Add the item to the items array
+                // Add the equipment to the items array
                 items.push(newItem);
             }
         }
+        // Log the final items array
+        console.log(`getDefaultItemsForClass: Final items array for class ${charClass}:`, items);
+        // Return the array of items
         return items;
+    }
+
+    static async getStartingGoldForClass(actor) {
+        const charClass = actor.system.details.class;
+        const classData = this.classData[charClass];
+        if (!classData) {
+            console.error(`getStartingGoldForClass: Class data not found for class ${charClass}!`);
+            return 0;
+        }
+        console.log(`getStartingGoldForClass: Getting starting gold for class ${charClass}:`, classData.startingPack.gold);
+        // Roll the starting gold using the defined formula
+        const rollFormula = classData.startingPack.gold;
+        const roll = new Roll(rollFormula);
+        await roll.roll();
+        if (CONFIG.HYP3E.debugMessages) { console.log(`getStartingGoldForClass: Rolled ${roll.total} gold for class ${charClass}`) }
+        // Return the rolled gold amount
+        return roll.total;
     }
 
     /**
