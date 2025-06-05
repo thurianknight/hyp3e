@@ -253,21 +253,63 @@ export class Hyp3eActor extends Actor {
         // Now we check to see if the Items directory has the folders & items we need.
         // Alternatively, we can also check for compendia with the items we need.
         // Start with armor...
-        const armor = await Hyp3eCharacter.getDefaultArmorForClass(this);
-        if (armor && armor.length > 0) {
+        // const armorItems = await Hyp3eCharacter.getDefaultArmorForClass(this);
+        const armorItems = await Hyp3eCharacter.getDefaultItemsForClass({
+            actor: this,
+            itemType: "armor",
+            folderNames: ["armor", "armour"],
+            packKey: "armour"
+        });
+        if (armorItems && armorItems.length > 0) {
             // Add the armor to the actor's inventory
-            await this.createEmbeddedDocuments("Item", armor);
+            await this.createEmbeddedDocuments("Item", armorItems);
         }
 
         // Next we do weapons...
-        const weapons = await Hyp3eCharacter.getDefaultWeaponsForClass(this);
-        // Add the armor to the actor's inventory
-        await this.createEmbeddedDocuments("Item", weapons);
+        // const weaponItems = await Hyp3eCharacter.getDefaultWeaponsForClass(this);
+        const weaponItems = await Hyp3eCharacter.getDefaultItemsForClass({
+            actor: this,
+            itemType: "weapon",
+            folderNames: ["weapons"],
+            packKey: "weapons"
+        });
+        if (weaponItems && weaponItems.length > 0) {
+            // Add the weapons to the actor's inventory
+            await this.createEmbeddedDocuments("Item", weaponItems);
+        }
 
         // Next we do all the equipment items...
-        const items = await Hyp3eCharacter.getDefaultItemsForClass(this);
-        // Add the items to the actor's inventory
-        await this.createEmbeddedDocuments("Item", items);
+        // const items = await Hyp3eCharacter.getDefaultItemsForClass(this);
+        const generalItems = await Hyp3eCharacter.getDefaultItemsForClass({
+            actor: this,
+            itemType: "item",
+            folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items"],
+            packKey: "equipment - general"
+        });
+        if (generalItems && generalItems.length > 0) {
+            // Add the items to the actor's inventory
+            await this.createEmbeddedDocuments("Item", generalItems);
+        }
+        const provisionItems = await Hyp3eCharacter.getDefaultItemsForClass({
+            actor: this,
+            itemType: "item",
+            folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
+            packKey: "equipment - provisions"
+        });
+        if (provisionItems && provisionItems.length > 0) {
+            // Add the items to the actor's inventory
+            await this.createEmbeddedDocuments("Item", provisionItems);
+        }
+        const religiousItems = await Hyp3eCharacter.getDefaultItemsForClass({
+            actor: this,
+            itemType: "item",
+            folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
+            packKey: "equipment - religious"
+        });
+        if (religiousItems && religiousItems.length > 0) {
+            // Add the items to the actor's inventory
+            await this.createEmbeddedDocuments("Item", religiousItems);
+        }
 
         // Get starting gold
         const gold = await Hyp3eCharacter.getStartingGoldForClass(this);

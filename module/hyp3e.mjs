@@ -92,6 +92,17 @@ Hooks.once('init', async function() {
         requiresReload: true,
     });
 
+    // Custom compendium names to search for arms & equipment when creating characters
+    game.settings.register(game.system.id, "customCompendia", {
+        name: game.i18n.localize("HYP3E.settings.customCompendia"),
+        hint: game.i18n.localize("HYP3E.settings.customCompendiaHint"),
+        default: "",
+        scope: "world",
+        type: String,
+        config: true,
+        requiresReload: true,
+    });
+
     // Enable basic attribute checks
     game.settings.register(game.system.id, "enableAttrChecks", {
         name: game.i18n.localize("HYP3E.settings.enableAttrChecks"),
@@ -638,6 +649,14 @@ Hooks.once("ready", async function() {
         // }
     }
 
+});
+
+Hooks.once("renderSettingsConfig", (app, htmlElement, data) => {
+    const html = $(htmlElement); // Wrap in jQuery
+    const input = html.find('input[name="hyp3e.customCompendia"]');
+    if (input.length) {
+        input.attr("placeholder", "e.g., My Armor, My Equipment, My Weapons");
+    }
 });
 
 /**

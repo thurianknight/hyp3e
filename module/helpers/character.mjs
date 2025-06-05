@@ -2541,7 +2541,7 @@ export class Hyp3eCharacter {
                     { "name": "Bandages, gauze", "quantity": 1 },
                     { "name": "Blanket, winter", "quantity": 1 },
                     { "name": "Chalk", "quantity": 1 },
-                    { "name": "Disguise clothing", "quantity": 1 },
+                    { "name": "Clothing, disguise", "quantity": 1 },
                     { "name": "Grappling hook", "quantity": 1 },
                     { "name": "Grease", "quantity": 1 },
                     { "name": "Marbles (x20)", "quantity": 20 },
@@ -3413,6 +3413,108 @@ export class Hyp3eCharacter {
         return true;
     }
 
+    /**
+     * Get the default armor for a class, based on the starting pack defined in the class data.
+     * @param {Actor} actor - The actor object to get the default items for
+     * @param {string} itemType - The type of item to get (e.g., "armour", "weapons")
+     * @param {Array<string>} folderNames - The names of the folders to search for items in
+     * @param {string} packKey - The key for the starting pack in the class data
+     * @returns {Promise<Array>} - Returns a promise that resolves to an array of armor items
+     */
+    static async getDefaultItemsForClass({ actor, itemType, folderNames, packKey }) {
+        const charClass = actor.system.details.class;
+        const classData = this.classData[charClass];
+
+        if (!classData) {
+            console.error(`getDefaultItemsForClass: Class data not found for class ${charClass}!`);
+            return [];
+        }
+
+        const startingItems = classData.startingPack?.[packKey];
+        if (!Array.isArray(startingItems) || startingItems.length === 0) {
+            console.warn(`getDefaultItemsForClass: No starting ${itemType} defined for class ${charClass}.`);
+            return [];
+        }
+
+        console.log(`getDefaultItemsForClass: Getting default ${itemType} for ${charClass}:`, startingItems);
+
+        // Build compendium list
+        let compendiaList = [];
+        // const builtInCompendium = game.packs.find(p =>
+        //     folderNames.includes(p.metadata.label.toLowerCase())
+        // );
+        const builtInCompendia = game.packs.filter(p => 
+            folderNames.includes(p.metadata.label.toLowerCase())
+        );
+        if (builtInCompendia) compendiaList.push(...builtInCompendia);
+
+        const customList = game.settings.get(game.system.id, "customCompendia");
+        if (customList) {
+            const customNames = customList.split(",").map(s => s.trim().toLowerCase());
+            const matchingPacks = game.packs.filter(p =>
+                customNames.includes(p.metadata.label.toLowerCase())
+            );
+            compendiaList.push(...matchingPacks);
+        }
+        console.log(`getDefaultItemsForClass: Compendium list for ${itemType}:`, compendiaList.map(p => p.metadata.label));
+
+        const results = [];
+
+        for (const entry of startingItems) {
+            const itemName = entry.name.toLowerCase();
+            const quantity = entry.quantity ?? 1;
+            let newItem;
+
+            // Search in world Items directory
+            const matches = game.items.filter(i => i.name.toLowerCase() === itemName);
+            for (let item of matches) {
+            const folder = item.folder?.name?.toLowerCase() ?? "";
+            if (folderNames.includes(folder)) {
+                newItem = item.toObject();
+                newItem.system.quantity = { value: quantity, max: quantity };
+                console.log(`Found ${itemType} in folder: ${folder}`, newItem);
+                break;
+            }
+            }
+
+            // Search in compendia if not found
+            if (!newItem && compendiaList.length) {
+            for (const pack of compendiaList) {
+                await pack.getIndex(); // Ensure index is loaded
+                const compMatch = pack.index.find(i => i.name.toLowerCase() === itemName);
+                if (compMatch) {
+                const doc = await pack.getDocument(compMatch._id);
+                newItem = doc.toObject();
+                newItem.system.quantity = { value: quantity, max: quantity };
+                console.log(`Found ${itemType} in compendium: ${pack.metadata.label}`, newItem);
+                break;
+                }
+            }
+            }
+
+            // Fallback item
+            if (!newItem) {
+            console.warn(`Item ${entry.name} not found. Creating fallback.`);
+            newItem = {
+                name: entry.name,
+                type: itemType,
+                img: "icons/svg/item-bag.svg",
+                system: {
+                quantity: {
+                    value: quantity,
+                    max: quantity
+                }
+                }
+            };
+            }
+
+            results.push(newItem);
+        }
+
+        return results;
+    }
+
+    /**
     static async getDefaultArmorForClass(actor) {
         const charClass = actor.system.details.class;
         const classData = this.classData[charClass];
@@ -3427,8 +3529,17 @@ export class Hyp3eCharacter {
         // Log the class and the armor items being added
         console.log(`getDefaultArmorForClass: Getting default armor for class ${charClass}:`, classData.startingPack.armour);
 
+        let compendiaList = [];
         // Do we have a compendium named "Armour" or "Armor"?
         const armorCompendium = game.packs.find(p => p.metadata.label.toLowerCase() === "armour" || p.metadata.label.toLowerCase() === "armor");
+        if (armorCompendium) { compendiaList.push(armorCompendium.metadata.label.toLowerCase()); }
+        // Do we have any custom compendia listed in the settings?
+        if (game.settings.get(game.system.id, "customCompendia")) {
+            const customCompendia = game.settings.get(game.system.id, "customCompendia").split(",");
+            for (const compendium of customCompendia) {
+                compendiaList.push(compendium.trim().toLowerCase());
+            }
+        }
 
         // Create an array of armor items based on the starting pack
         let armor = [];
@@ -3451,18 +3562,21 @@ export class Hyp3eCharacter {
             }
             if (!newItem) {
                 console.warn(`getDefaultArmorForClass: Armor item ${armorItem.name} not found in folders, trying compendium next...`);
-                if (armorCompendium) {
-                    // Try to find the item in the compendium
-                    const matches = armorCompendium.index.filter(i => i.name.toLowerCase() === armorItem.name.toLowerCase());
-                    for (let entry of matches) {
-                        const compendiumItem = await armorCompendium.getDocument(entry._id); // fully load the item
-                        newItem = compendiumItem.toObject(); // Create a copy of the item
-                        newItem.system.quantity = {
-                            value: armorItem.quantity,
-                            max: armorItem.quantity
-                        };
-                        console.log(`getDefaultArmorForClass: Found item in compendium: ${armorCompendium.metadata.label}`, newItem);
-                        break; // Found the item, no need to continue searching
+                if (compendiaList.length > 0) {
+                // if (armorCompendium) {
+                    for (const compendium of compendiaList) {
+                        // Try to find the item in the compendium
+                        const matches = compendium.index.filter(i => i.name.toLowerCase() === armorItem.name.toLowerCase());
+                        for (let entry of matches) {
+                            const compendiumItem = await compendium.getDocument(entry._id); // fully load the item
+                            newItem = compendiumItem.toObject(); // Create a copy of the item
+                            newItem.system.quantity = {
+                                value: armorItem.quantity,
+                                max: armorItem.quantity
+                            };
+                            console.log(`getDefaultArmorForClass: Found item in compendium: ${compendium.metadata.label}`, newItem);
+                            break; // Found the item, no need to continue searching
+                        }
                     }
                 }
                 if (!newItem) {
@@ -3486,7 +3600,8 @@ export class Hyp3eCharacter {
         }
         return armor;
     }
-
+    */
+    /**
     static async getDefaultWeaponsForClass(actor) {
         const charClass = actor.system.details.class;
         const classData = this.classData[charClass];
@@ -3554,7 +3669,8 @@ export class Hyp3eCharacter {
         }
         return weapons;
     }
-
+    */
+    /**
     static async getDefaultItemsForClass(actor) {
         const charClass = actor.system.details.class;
         const classData = this.classData[charClass];
@@ -3562,7 +3678,7 @@ export class Hyp3eCharacter {
             console.error(`getDefaultItemsForClass: Class data not found for class ${charClass}!`);
             return [];
         }
-        console.log(`getDefaultArmorForClass: Getting default armor for class ${charClass}:`, classData.startingPack.armour);
+        console.log(`getDefaultItemsForClass: Getting default equipment for class ${charClass}:`, classData.startingPack);
 
         // Do we have the compendia for Equipment?
         const generalCompendium = game.packs.find(p => p.metadata.label.toLowerCase() === "equipment - general");
@@ -3574,7 +3690,7 @@ export class Hyp3eCharacter {
         let itemType = ""; // This is set below
         for (const [folder, itemsList] of Object.entries(classData.startingPack)) {
             if (folder.substring(0, 9) !== "equipment") {
-                continue; // Skip folders that are not equipment
+                continue; // Skip entries that do not start with 'equipment' in the name
             }
             // Determine the item type based on the folder name
             switch (folder) {
@@ -3663,6 +3779,7 @@ export class Hyp3eCharacter {
         // Return the array of items
         return items;
     }
+    */
 
     static async getStartingGoldForClass(actor) {
         const charClass = actor.system.details.class;

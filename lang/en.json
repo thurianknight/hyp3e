@@ -17,6 +17,8 @@
             "autoCalcAcHint": "Use 'equipped' status of armour and shields to calculate AC & MV. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
             "quickCreateChars": "Enable Quick-Create Characters",
             "quickCreateCharsHint": "Enable the Quick Create Characters button on the Character sheet by selecting a Method. All stats are rolled down-the-line, and the system will re-roll until it gets a set that meets class requirements.",
+            "customCompendia": "Search Compendia",
+            "customCompendiaHint": "Comma-separated list of your compendia for armor, equipment, and weapons. This allows you to use your own compendia with the character quick-create feature.",
             "enableAttrChecks": "Enable IN & WS concentration checks",
             "enableAttrChecksHint": "This option allows players to click an attribute name to do a 3d6 concentration (roll-under) check. N.B.: This is an optional rule, and is disabled by default.",
             "flipRollUnderMods": "Reverse situational modifiers on roll-under checks",
