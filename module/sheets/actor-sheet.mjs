@@ -305,21 +305,6 @@ export class Hyp3eActorSheet extends ActorSheet {
                 i.system.value = 0
             }
 
-            // Something to do with item effects? I don't remember if this is needed.
-            // if (CONFIG.HYP3E.debugMessages) {
-            //     if (i.effects.length > 0) {
-            //         // console.log("Item effects:", i.effects)
-            //         i.effects.forEach(eff => {
-            //             // console.log("Effect transfer:", eff.transfer)
-            //             if (eff.transfer) {
-            //                 // console.log(`Item ${i.name}:`, i)
-            //                 // console.log("Effect to transfer:", eff)
-            //                 // this.actor.effects.push(eff)
-            //             }
-            //         })
-            //     }
-            // }
-
             // Append to containers.
             if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
                 // Get contained items and add to their container
