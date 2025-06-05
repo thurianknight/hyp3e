@@ -3472,7 +3472,7 @@ export class Hyp3eCharacter {
             if (folderNames.includes(folder)) {
                 newItem = item.toObject();
                 newItem.system.quantity = { value: quantity, max: quantity };
-                console.log(`Found ${itemType} in folder: ${folder}`, newItem);
+                console.log(`getDefaultItemsForClass: Found ${itemType} in folder: ${folder}`, newItem);
                 break;
             }
             }
@@ -3486,7 +3486,7 @@ export class Hyp3eCharacter {
                 const doc = await pack.getDocument(compMatch._id);
                 newItem = doc.toObject();
                 newItem.system.quantity = { value: quantity, max: quantity };
-                console.log(`Found ${itemType} in compendium: ${pack.metadata.label}`, newItem);
+                console.log(`getDefaultItemsForClass: Found ${itemType} in compendium: ${pack.metadata.label}`, newItem);
                 break;
                 }
             }
