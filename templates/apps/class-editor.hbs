@@ -1,0 +1,110 @@
+{{!-- templates/apps/class-editor.hbs --}}
+<form autocomplete="off">
+  <div class="form-group">
+    <label for="name">Class Name</label>
+    <input type="text" name="name" value="{{name}}" />
+  </div>
+
+  <div class="form-group">
+    <label for="baseClass">Base Class</label>
+    <input type="text" name="baseClass" value="{{baseClass}}" />
+  </div>
+
+  <div class="form-group">
+    <label for="hitDie">Hit Die</label>
+    <input type="text" name="hitDie" value="{{hitDie}}" />
+  </div>
+
+  <div class="form-group">
+    <label for="fa">FA</label>
+    <input type="number" name="fa" value="{{fa}}" />
+  </div>
+
+  <div class="form-group">
+    <label for="ca">CA</label>
+    <input type="number" name="ca" value="{{ca}}" />
+  </div>
+
+  <div class="form-group">
+    <label for="ta">TA</label>
+    <input type="number" name="ta" value="{{ta}}" />
+  </div>
+
+  <fieldset>
+    <legend>Attribute Requirements</legend>
+    {{#each attrReqs}}
+      <div class="form-group">
+        <label>{{@key}}</label>
+        <input type="number" name="attrReqs.{{@key}}" value="{{this}}" />
+      </div>
+    {{/each}}
+  </fieldset>
+
+  <fieldset>
+    <legend>XP Bonus Requirements</legend>
+    {{#each xpBonusReq}}
+      <div class="form-group">
+        <label>{{@key}}</label>
+        <input type="number" name="xpBonusReq.{{@key}}" value="{{this}}" />
+      </div>
+    {{/each}}
+  </fieldset>
+
+  <fieldset>
+    <legend>Feat Bonuses</legend>
+    {{#each featBonus}}
+      <div class="form-group">
+        <label>{{@key}}</label>
+        <input type="number" name="featBonus.{{@key}}" value="{{this}}" />
+      </div>
+    {{/each}}
+  </fieldset>
+
+  <fieldset>
+    <legend>Saves</legend>
+    {{#each saves}}
+      <div class="form-group">
+        <label>{{@key}}</label>
+        <input type="number" name="saves.{{@key}}" value="{{this}}" />
+      </div>
+    {{/each}}
+  </fieldset>
+
+  <fieldset>
+    <legend>Level Advancement</legend>
+    {{#each levelAdvancement}}
+      <div class="form-group">
+        <label>Level {{@key}} XP</label>
+        <input type="number" name="levelAdvancement.{{@key}}.xp" value="{{this.xp}}" />
+        <label>FA</label>
+        <input type="number" name="levelAdvancement.{{@key}}.fa" value="{{this.fa}}" />
+        <label>CA</label>
+        <input type="number" name="levelAdvancement.{{@key}}.ca" value="{{this.ca}}" />
+      </div>
+    {{/each}}
+  </fieldset>
+
+  <fieldset>
+    <legend>Starting Pack</legend>
+    <div class="form-group">
+      <label for="startingPack.gold">Starting Gold</label>
+      <input type="text" name="startingPack.gold" value="{{startingPack.gold}}" />
+    </div>
+
+    {{#each startingPack}}
+      {{#unless (eq @key "gold")}}
+        <div class="form-group">
+          <label>{{@key}}</label>
+          {{#each this}}
+            <div>
+              <input type="text" name="startingPack.{{@../key}}.{{@index}}.name" value="{{this.name}}" placeholder="Item Name" />
+              <input type="number" name="startingPack.{{@../key}}.{{@index}}.quantity" value="{{this.quantity}}" placeholder="Qty" />
+            </div>
+          {{/each}}
+        </div>
+      {{/unless}}
+    {{/each}}
+  </fieldset>
+
+  <button type="submit">Save Class</button>
+</form>

@@ -10,6 +10,8 @@ import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./helpers/chat.mjs";
 import { parseAndResolveChangeValue, setupEffectHandlers } from "./helpers/effects.mjs";
 import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
+import { HYP3EClassEditor } from "./apps/class-editor.mjs";
+
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -101,6 +103,24 @@ Hooks.once('init', async function() {
         type: String,
         config: true,
         requiresReload: true,
+    });
+
+    // Register a world setting to store custom class data
+    game.settings.register(game.system.id, "customClasses", {
+        name: "Custom Classes",
+        scope: "world",
+        config: false,
+        type: Object,
+        default: {},
+    });
+
+    game.settings.register("hyp3e", "openClassEditor", {
+        name: "Manage Custom Classes",
+        hint: "Open the class editor interface to create or modify custom classes.",
+        scope: "world",
+        config: true,
+        type: String, // Doesn't matter since we're intercepting the render
+        default: "",
     });
 
     // Enable basic attribute checks
@@ -657,6 +677,23 @@ Hooks.once("renderSettingsConfig", (app, htmlElement, data) => {
     if (input.length) {
         input.attr("placeholder", "e.g., My Armor, My Equipment, My Weapons");
     }
+});
+
+Hooks.on("renderSettingsConfig", (app, html, data) => {
+  const settingRow = html.find(`.form-group:has([name="hyp3e.openClassEditor"])`);
+
+  if (settingRow.length) {
+    const button = $(`
+        <button type="button" style="margin-left: 1em; min-width: 200px; padding: 4px 8px;">
+            <i class="fas fa-edit"></i> Open Class Editor
+        </button>`);
+    
+    button.on("click", () => {
+      new HYP3EClassEditor().render(true);
+    });
+
+    settingRow.find("input").replaceWith(button);
+  }
 });
 
 /**
