@@ -1,81 +1,125 @@
 {{!-- templates/apps/class-editor.hbs --}}
 <form autocomplete="off">
-  <div class="form-group">
-    <label for="name">Class Name</label>
-    <input type="text" name="name" value="{{name}}" />
-  </div>
-
-  <div class="form-group">
-    <label for="baseClass">Base Class</label>
-    <select name="baseClass">
-        <option value=""></option>
-        {{selectOptions baseClasses selected=@root.baseClass localize=false}}
-    </select>
-  </div>
-
-  <div class="form-group">
-    <label for="hitDie">Hit Die</label>
-    <input type="text" name="hitDie" value="{{hitDie}}" placeholder="e.g., 1d6, 1d8" />
-  </div>
-
-  <div class="form-group">
-    <label for="fa">FA at Level 1</label>
-    <input type="number" name="fa" value="{{fa}}" placeholder="usually 0 or 1" />
-  </div>
-
-  <div class="form-group">
-    <label for="ca">CA at Level 1</label>
-    <input type="number" name="ca" value="{{ca}}" placeholder="leave empty if not applicable" />
-  </div>
-
-  <div class="form-group">
-    <label for="ta">TA at Level 1</label>
-    <input type="number" name="ta" value="{{ta}}" placeholder="leave empty if not applicable" />
-  </div>
-
   <fieldset>
-    <legend>Attribute Requirements</legend>
-    {{#each attrReqs}}
+    <legend>Class Info</legend>
+        <div class="form-group flex flexrow flex-group-center">
+            <span class="flex-item">
+                <input type="text" name="name" value="{{classKey}}" /><br />
+                <label for="name">Class Name</label>
+            </span>
+            <span class="flex-item">
+                <select name="classData.baseClass">
+                    <option value=""></option>
+                    {{selectOptions baseClasses selected=classData.baseClass localize=false}}
+                </select><br />
+                <label for="classData.baseClass">Base Class</label>        
+            </span>
+            <span class="flex-item">
+                <input type="text" name="classData.hitDie" value="{{classData.hitDie}}" placeholder="e.g., 1d6, 1d8" /><br />
+                <label for="classData.hitDie">Hit Die</label>
+            </span>
+        </div>
+    </legend>
+  </fieldset>
+  
+  <fieldset>
+    <legend>Attribute Requirements / Minimums</legend>
+      <div class="flex flexrow flex-group-center form-group">
+        {{#each attrReqs}}
+        <span>
+            <input type="number" class="input-small" name="classData.attrReqs.{{@key}}" value="{{this}}" /><br />
+            <label for="classData.attrReqs.{{@key}}">{{localize this}}</label>
+        </span>
+        {{/each}}
+      </div>
+    {{!-- {{#each classData.attrReqs}}
       <div class="form-group">
         <label>{{@key}}</label>
-        <input type="number" name="attrReqs.{{@key}}" value="{{this}}" />
+        <input type="number" name="classData.attrReqs.{{@key}}" value="{{this}}" />
       </div>
-    {{/each}}
+    {{/each}} --}}
   </fieldset>
 
   <fieldset>
     <legend>XP Bonus Requirements</legend>
-    {{#each xpBonusReq}}
-      <div class="form-group">
-        <label>{{@key}}</label>
-        <input type="number" name="xpBonusReq.{{@key}}" value="{{this}}" />
+      <div class="flex flexrow flex-group-center form-group">
+        {{#each xpBonusReqs}}
+        <span>
+            <input type="number" class="input-small" name="classData.xpBonusReq.{{@key}}" value="{{this}}" /><br />
+            <label for="classData.xpBonusReq.{{@key}}">{{localize this}}</label>
+        </span>
+        {{/each}}
       </div>
-    {{/each}}
+      {{!-- {{#each classData.xpBonusReq}}
+        <div class="form-group">
+            <label>{{@key}}</label>
+            <input type="number" name="xpBonusReq.{{@key}}" value="{{this}}" />
+        </div>
+      {{/each}} --}}
   </fieldset>
 
   <fieldset>
     <legend>Feat Bonuses</legend>
-    {{#each featBonus}}
-      <div class="form-group">
-        <label>{{@key}}</label>
-        <input type="number" name="featBonus.{{@key}}" value="{{this}}" />
-      </div>
-    {{/each}}
+        <div class="flex flexrow flex-group-center form-group">
+            <span>
+                <input type="number" class="input-small" name="featBonus.str" value="{{classData.featBonus.str}}" /><br />
+                <label>{{localize 'HYP3E.attributes.str.feat'}}</label>
+            </span>
+            <span>
+                <input type="number" class="input-small" name="featBonus.dex" value="{{classData.featBonus.dex}}" /><br />
+                <label>{{localize 'HYP3E.attributes.dex.feat'}}</label>
+            </span>
+            <span>
+                <input type="number" class="input-small" name="featBonus.con" value="{{classData.featBonus.con}}" /><br />
+                <label>{{localize 'HYP3E.attributes.con.feat'}}</label>
+            </span>
+        </div>
+        {{!-- {{#each classData.featBonus}}
+        <div class="form-group">
+            <label>{{@key}}</label>
+            <input type="number" name="featBonus.{{@key}}" value="{{this}}" />
+        </div>
+        {{/each}} --}}
   </fieldset>
 
   <fieldset>
     <legend>Save Modifiers</legend>
-    {{#each saves}}
-      <div class="form-group">
-        <label>{{@key}}</label>
-        <input type="number" name="saves.{{@key}}" value="{{this}}" />
+      <div class="flex flexrow flex-group-center form-group">
+        {{#each saves}}
+        <span>
+            <input type="number" class="input-small" name="saves.{{@key}}" value="{{this}}" /><br />
+            <label>{{this}}</label>
+            {{!-- {{@root.classData.saves[@key]}} --}}
+        </span>
+        {{/each}}
       </div>
-    {{/each}}
   </fieldset>
 
   <fieldset>
     <legend>Level Advancement</legend>
-    {{#each levelAdvancement}}
+    <table>
+      <thead>
+        <tr class="level-advancement">
+          <th>Level</th>
+          <th>XP</th>
+          <th>FA</th>
+          <th>CA</th>
+          <th>TA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each classData.levelAdvancement}}
+          <tr class="level-advancement">
+            <td>{{@key}}</td>
+            <td><input type="number" name="levelAdvancement.{{@key}}.xp" value="{{this.xp}}" /></td>
+            <td><input class="input-small" type="number" name="levelAdvancement.{{@key}}.fa" value="{{this.fa}}" /></td>
+            <td><input class="input-small" type="number" name="levelAdvancement.{{@key}}.ca" value="{{this.ca}}" /></td>
+            <td><input class="input-small" type="number" name="levelAdvancement.{{@key}}.ta" value="{{this.ta}}" /></td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{!-- {{#each classData.levelAdvancement}}
       <div class="form-group">
         <label>Level {{@key}} XP</label>
         <input type="number" name="levelAdvancement.{{@key}}.xp" value="{{this.xp}}" />
@@ -83,18 +127,20 @@
         <input type="number" name="levelAdvancement.{{@key}}.fa" value="{{this.fa}}" />
         <label>CA</label>
         <input type="number" name="levelAdvancement.{{@key}}.ca" value="{{this.ca}}" />
+        <label>TA</label>
+        <input type="number" name="levelAdvancement.{{@key}}.ta" value="{{this.ta}}" />
       </div>
-    {{/each}}
+    {{/each}} --}}
   </fieldset>
 
   <fieldset>
     <legend>Starting Pack</legend>
     <div class="form-group">
       <label for="startingPack.gold">Starting Gold</label>
-      <input type="text" name="startingPack.gold" value="{{startingPack.gold}}" placeholder="1d4+1" />
+      <input type="text" name="startingPack.gold" value="{{classData.startingPack.gold}}" placeholder="1d4+1" />
     </div>
 
-    {{#each startingPack}}
+    {{#each classData.startingPack}}
       {{#unless (eq @key "gold")}}
         <div class="form-group">
           <label>{{@key}}</label>

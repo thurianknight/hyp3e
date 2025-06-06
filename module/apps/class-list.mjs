@@ -4,7 +4,7 @@ import { HYP3EClassEditor } from "./class-editor.mjs";
 
 export class HYP3ECustomClassList extends Application {
     static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             id: "hyp3e-class-list",
             title: "Custom Class List",
             template: `${HYP3E.templatePath}/apps/class-list.hbs`,

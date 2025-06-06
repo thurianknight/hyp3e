@@ -1,13 +1,17 @@
 <ul class="class-list">
   {{#each classes as |data name|}}
     <li>
-      <strong>{{name}}</strong>
-      <button class="edit-class" data-class="{{name}}">Edit</button>
-      <button class="delete-class" data-class="{{name}}">Delete</button>
+        <span class="flex flexrow">
+            <span class="class-name">{{name}}</span>
+            <button class="edit-class" data-class="{{name}}">Edit</button>
+            <button class="delete-class" data-class="{{name}}">Delete</button>
+        </span>
     </li>
   {{/each}}
   <li>
-    <button class="new-class">New Class</button>
+    <span class="flex flexrow">
+        <span class="class-name">Create New Class</span>
+        <button class="new-class">Create</button>
+    </span>
   </li>
 </ul>
-<hr>

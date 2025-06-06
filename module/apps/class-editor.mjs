@@ -3,6 +3,7 @@ import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 
 export class HYP3EClassEditor extends Application {
+    /** @param {string|null} [classKey] - Class key for editing, or null for new class */
     /** @param {Object} [classData] - Existing class data if editing */
     constructor(classKey = null, classData = {}) {
         super();
@@ -26,10 +27,63 @@ export class HYP3EClassEditor extends Application {
     }
 
     getData() {
+        // Prepare data for the template
+        const baseClassNames = ["cleric", "fighter", "magician", "thief"];
+        const baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
+
+        const spellcasters = ["Cleric", "Druid", "Magician", "Cryomancer", "Illusionist", "Necromancer", "Pyromancer", "Witch"];
+        const spellLists = Object.fromEntries(baseClassNames.map(n => [n, n]));
+
+        const attributes = CONFIG.HYP3E.attributes;
+        console.log("All attributes:", attributes);
+
+        const attrReqs = {};
+        const attributeKeys = Object.keys(attributes);
+        for (const attr of attributeKeys) {
+            attrReqs[attr] = this.classData.attrReqs?.[attr] ?? "";
+        }
+        console.log("Attribute requirements:", attrReqs);
+
+        const xpBonusReqs = {};
+        for (const attr of attributeKeys) {
+            xpBonusReqs[attr] = this.classData.xpBonusReq?.[attr] ?? "";
+        }
+        console.log("Attribute requirements:", xpBonusReqs);
+
+
+        const saves = CONFIG.HYP3E.saves;
+        console.log("Available saves:", saves);
+
+        // If no classData provided, initialize with empty structure
+        if (Object.keys(this.classData).length === 0) {
+            this.classData = {
+                name: "New Class",
+                description: "",
+                baseClass: "",
+                attributes: CONFIG.HYP3E.attributes,
+                attrReqs: attrReqs,
+                xpBonusReqs: xpBonusReqs,
+                levelAdvancement: this.buildEmptyLevelAdvancement(),
+                spellLists: spellLists,
+                saves: saves,
+                startingPack: {},
+            };
+        }
+
+        console.log("Class Editor Data:", {
+            classKey: this.classKey,
+            classData: this.classData,
+            baseClasses: baseClasses,
+        });
+
+        // Return data for the template
         return {
             classKey: this.classKey,
             classData: this.classData,
-            baseClasses: ["cleric", "fighter", "magician", "thief"],
+            baseClasses: baseClasses,
+            attributes: CONFIG.HYP3E.attributes,
+            attrReqs: attrReqs,
+            spellLists: spellLists,
             saves: CONFIG.HYP3E.saves,
         };
     }
@@ -100,6 +154,19 @@ export class HYP3EClassEditor extends Application {
         await game.settings.set(game.system.id, "customClassData", allClasses);
         ui.notifications.info(`Class "${key}" saved.`);
         this.close();
+    }
+
+    buildEmptyLevelAdvancement() {
+        let levelAdvancement = {};
+        for (let i = 1; i <= 12; i++) {
+            levelAdvancement[i] = {
+                xp: null,
+                fa: null,
+                ca: null,
+                ta: null,
+            };
+        }
+        return levelAdvancement;
     }
 
 }

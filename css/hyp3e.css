@@ -281,7 +281,6 @@
 } */
 /* End of Mozilla stuff */
 
-
 /* Default style for input text fields */
 input[type=text] {
   border: none;
@@ -1026,8 +1025,42 @@ textarea {
 /* Styles for custom classes app */
 .class-list {
     list-style-type: none;
-    /* margin: 0;
-    padding: 0; */
+    margin: 0;
+    padding: 0;
+    li {
+        align-items: center;
+        padding: 5px 10px;
+        border-bottom: 1px solid #ccc;
+    };
+    .class-name {
+        font-weight: bold;
+        padding-top: 8px;
+    }
+}
+.class-editor {
+    /* display: flex;
+    flex-direction: column;
+    gap: 10px; */
+    padding: 5px;
+    select {
+        width: 100%;
+        max-width: 150px;
+        /* margin-bottom: 10px; */
+    };
+    input {
+        text-align: center;
+        min-width: 50px;
+        max-width: 150px;
+        /* margin-bottom: 5px; */
+    };
+    .input-small {
+        text-align: center;
+        max-width: 40px;
+        /* margin-bottom: 2px; */
+    };
+    .level-advancement {
+        text-align: center;
+    }
 }
 
 /* Styles for item alternate damage app */
