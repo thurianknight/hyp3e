@@ -1023,6 +1023,13 @@ textarea {
     100% {color: black;}
 }
 
+/* Styles for custom classes app */
+.class-list {
+    list-style-type: none;
+    /* margin: 0;
+    padding: 0; */
+}
+
 /* Styles for item alternate damage app */
 .item-set-alt-dmg {
     text-align: left;

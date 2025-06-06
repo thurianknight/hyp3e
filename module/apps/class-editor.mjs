@@ -29,6 +29,8 @@ export class HYP3EClassEditor extends Application {
         return {
             classKey: this.classKey,
             classData: this.classData,
+            baseClasses: ["cleric", "fighter", "magician", "thief"],
+            saves: CONFIG.HYP3E.saves,
         };
     }
 
@@ -38,10 +40,10 @@ export class HYP3EClassEditor extends Application {
         const data = form.classData;
 
         // Save to world settings
-        const settings = game.settings.get("hyp3e", "customClassData") || {};
+        const settings = game.settings.get(game.system.id, "customClassData") || {};
         const className = data.name || "Unnamed-Class";
         settings[className] = data;
-        await game.settings.set("hyp3e", "customClassData", settings);
+        await game.settings.set(game.system.id, "customClassData", settings);
 
         ui.notifications.info(`Saved class data for ${className}`);
     }
@@ -76,6 +78,7 @@ export class HYP3EClassEditor extends Application {
         const form = this.element.find("form")[0];
         const formData = new FormData(form);
         const data = {};
+        console.log("Saving new class with form data:", formData);
 
         for (let [key, value] of formData.entries()) {
             // Convert string numbers to actual numbers if needed
@@ -91,10 +94,10 @@ export class HYP3EClassEditor extends Application {
             return;
         }
 
-        const allClasses = foundry.utils.deepClone(game.settings.get("hyp3e", "customClasses") || {});
+        const allClasses = foundry.utils.deepClone(game.settings.get(game.system.id, "customClassData") || {});
         allClasses[key] = data;
 
-        await game.settings.set("hyp3e", "customClasses", allClasses);
+        await game.settings.set(game.system.id, "customClassData", allClasses);
         ui.notifications.info(`Class "${key}" saved.`);
         this.close();
     }

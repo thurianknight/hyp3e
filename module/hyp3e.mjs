@@ -10,7 +10,8 @@ import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./helpers/chat.mjs";
 import { parseAndResolveChangeValue, setupEffectHandlers } from "./helpers/effects.mjs";
 import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
-import { HYP3EClassEditor } from "./apps/class-editor.mjs";
+// import { HYP3EClassEditor } from "./apps/class-editor.mjs";
+import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 
 
 /* -------------------------------------------- */
@@ -106,7 +107,7 @@ Hooks.once('init', async function() {
     });
 
     // Register a world setting to store custom class data
-    game.settings.register(game.system.id, "customClasses", {
+    game.settings.register(game.system.id, "customClassData", {
         name: "Custom Classes",
         scope: "world",
         config: false,
@@ -567,8 +568,15 @@ Hooks.once("ready", async function() {
         CONFIG.HYP3E.characterClasses = {}
         const classArray = characterClasses.split(",");
         classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
-        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
+        // if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
     }
+    // Load custom classes
+    CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
+    for (const [className, classData] of Object.entries(CONFIG.HYP3E.customClassData)) {
+        // Append the class to characterClasses
+        CONFIG.HYP3E.characterClasses[className] = classData.name || className;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
 
     // Load Phenotypes list
     const phenotypes = game.settings.get(game.system.id, "phenotypes");
@@ -673,27 +681,26 @@ Hooks.once("ready", async function() {
 
 Hooks.once("renderSettingsConfig", (app, htmlElement, data) => {
     const html = $(htmlElement); // Wrap in jQuery
+
+    // GM's custom compendia list
     const input = html.find('input[name="hyp3e.customCompendia"]');
     if (input.length) {
         input.attr("placeholder", "e.g., My Armor, My Equipment, My Weapons");
     }
-});
 
-Hooks.on("renderSettingsConfig", (app, html, data) => {
-  const settingRow = html.find(`.form-group:has([name="hyp3e.openClassEditor"])`);
-
-  if (settingRow.length) {
-    const button = $(`
-        <button type="button" style="margin-left: 1em; min-width: 200px; padding: 4px 8px;">
-            <i class="fas fa-edit"></i> Open Class Editor
-        </button>`);
-    
-    button.on("click", () => {
-      new HYP3EClassEditor().render(true);
-    });
-
-    settingRow.find("input").replaceWith(button);
-  }
+    // Custom class editor button
+    const settingRow = html.find(`.form-group:has([name="hyp3e.openClassEditor"])`);
+    if (settingRow.length) {
+        const button = $(`
+            <button type="button" style="margin-left: 1em; min-width: 200px; padding: 4px 8px;">
+                <i class="fas fa-edit"></i> Open Class Editor
+            </button>`
+        );
+        button.on("click", () => {
+            new HYP3ECustomClassList().render(true);
+        });
+        settingRow.find("input").replaceWith(button);
+    }
 });
 
 /**

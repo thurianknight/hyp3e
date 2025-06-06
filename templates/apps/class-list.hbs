@@ -1,0 +1,13 @@
+<ul class="class-list">
+  {{#each classes as |data name|}}
+    <li>
+      <strong>{{name}}</strong>
+      <button class="edit-class" data-class="{{name}}">Edit</button>
+      <button class="delete-class" data-class="{{name}}">Delete</button>
+    </li>
+  {{/each}}
+  <li>
+    <button class="new-class">New Class</button>
+  </li>
+</ul>
+<hr>

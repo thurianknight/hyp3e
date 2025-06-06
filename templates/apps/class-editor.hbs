@@ -7,27 +7,30 @@
 
   <div class="form-group">
     <label for="baseClass">Base Class</label>
-    <input type="text" name="baseClass" value="{{baseClass}}" />
+    <select name="baseClass">
+        <option value=""></option>
+        {{selectOptions baseClasses selected=@root.baseClass localize=false}}
+    </select>
   </div>
 
   <div class="form-group">
     <label for="hitDie">Hit Die</label>
-    <input type="text" name="hitDie" value="{{hitDie}}" />
+    <input type="text" name="hitDie" value="{{hitDie}}" placeholder="e.g., 1d6, 1d8" />
   </div>
 
   <div class="form-group">
-    <label for="fa">FA</label>
-    <input type="number" name="fa" value="{{fa}}" />
+    <label for="fa">FA at Level 1</label>
+    <input type="number" name="fa" value="{{fa}}" placeholder="usually 0 or 1" />
   </div>
 
   <div class="form-group">
-    <label for="ca">CA</label>
-    <input type="number" name="ca" value="{{ca}}" />
+    <label for="ca">CA at Level 1</label>
+    <input type="number" name="ca" value="{{ca}}" placeholder="leave empty if not applicable" />
   </div>
 
   <div class="form-group">
-    <label for="ta">TA</label>
-    <input type="number" name="ta" value="{{ta}}" />
+    <label for="ta">TA at Level 1</label>
+    <input type="number" name="ta" value="{{ta}}" placeholder="leave empty if not applicable" />
   </div>
 
   <fieldset>
@@ -61,7 +64,7 @@
   </fieldset>
 
   <fieldset>
-    <legend>Saves</legend>
+    <legend>Save Modifiers</legend>
     {{#each saves}}
       <div class="form-group">
         <label>{{@key}}</label>
@@ -88,7 +91,7 @@
     <legend>Starting Pack</legend>
     <div class="form-group">
       <label for="startingPack.gold">Starting Gold</label>
-      <input type="text" name="startingPack.gold" value="{{startingPack.gold}}" />
+      <input type="text" name="startingPack.gold" value="{{startingPack.gold}}" placeholder="1d4+1" />
     </div>
 
     {{#each startingPack}}
