@@ -29,7 +29,6 @@
               <div class="item-prop">{{effect.sourceName}}</div>
               <div class="item-prop">{{effect.duration.label}}</div>
               <div class="item-controls effect-controls flexrow">
-                {{!-- {{#ifEq effect.sourceName target.name}} --}}
                 <a class="effect-control" data-action="toggle" title="{{localize 'HYP3E.effect.toggle'}}">
                   <i class="fas {{#if effect.disabled}}fa-check{{else}}fa-times{{/if}}"></i>
                 </a>
@@ -39,7 +38,6 @@
                 <a class="effect-control" data-action="delete" title="{{localize 'HYP3E.item.delete'}}">
                   <i class="fas fa-trash"></i>
                 </a>
-                {{!-- {{/ifEq}} --}}
               </div>
             </div>
           </li>
