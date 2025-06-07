@@ -37,36 +37,52 @@ export class HYP3EClassEditor extends Application {
         const attributes = CONFIG.HYP3E.attributes;
         console.log("All attributes:", attributes);
 
+        // Attribute requirements
         const attrReqs = {};
         const attributeKeys = Object.keys(attributes);
         for (const attr of attributeKeys) {
-            attrReqs[attr] = this.classData.attrReqs?.[attr] ?? "";
+            attrReqs[attr] = {
+                label: game.i18n.localize(`HYP3E.attributes.${attr}.name`),
+                value: this.classData.attrReqs?.[attr] ?? "",
+            };
         }
         console.log("Attribute requirements:", attrReqs);
 
+        // XP Bonus requirements
         const xpBonusReqs = {};
         for (const attr of attributeKeys) {
-            xpBonusReqs[attr] = this.classData.xpBonusReq?.[attr] ?? "";
+            xpBonusReqs[attr] = {
+                label: game.i18n.localize(`HYP3E.attributes.${attr}.name`),
+                value: this.classData.xpBonusReq?.[attr] ?? "",
+            };
         }
-        console.log("Attribute requirements:", xpBonusReqs);
+        console.log("XP Bonus requirements:", xpBonusReqs);
 
+        // Starting packs
+        const startingPacks = { gold: "", armour: {}, weapons: {}, "equipment - general": {}, "equipment - provisions": {}, "equipment - religious": {} };
 
+        // Saving throws
+        const savingThrows = {};
         const saves = CONFIG.HYP3E.saves;
-        console.log("Available saves:", saves);
+        const saveKeys = Object.keys(saves);
+        for (const save of saveKeys) {
+            savingThrows[save] = {
+                label: game.i18n.localize(`HYP3E.saves.${save}.name`),
+                value: this.classData.saves?.[save] ?? 16, // Default to 16 if not set
+            };
+        }
+        console.log("Saving throws:", savingThrows);
 
         // If no classData provided, initialize with empty structure
         if (Object.keys(this.classData).length === 0) {
             this.classData = {
                 name: "New Class",
-                description: "",
                 baseClass: "",
-                attributes: CONFIG.HYP3E.attributes,
                 attrReqs: attrReqs,
                 xpBonusReqs: xpBonusReqs,
-                levelAdvancement: this.buildEmptyLevelAdvancement(),
-                spellLists: spellLists,
                 saves: saves,
-                startingPack: {},
+                levelAdvancement: this.buildEmptyLevelAdvancement(),
+                startingPack: this.buildEmptyStartingPack(),
             };
         }
 
@@ -83,46 +99,32 @@ export class HYP3EClassEditor extends Application {
             baseClasses: baseClasses,
             attributes: CONFIG.HYP3E.attributes,
             attrReqs: attrReqs,
+            xpBonusReqs: xpBonusReqs,
+            saves: savingThrows,
             spellLists: spellLists,
-            saves: CONFIG.HYP3E.saves,
+            startingPacks: startingPacks,
         };
     }
 
-    async _updateObject(event, formData) {
-        // Flattened formData to structured object
-        const form = expandObject(formData);
-        const data = form.classData;
+    // async _updateObject(event, formData) {
+    //     // Flattened formData to structured object
+    //     const form = expandObject(formData);
+    //     const data = form.classData;
 
-        // Save to world settings
-        const settings = game.settings.get(game.system.id, "customClassData") || {};
-        const className = data.name || "Unnamed-Class";
-        settings[className] = data;
-        await game.settings.set(game.system.id, "customClassData", settings);
+    //     // Save to world settings
+    //     const settings = game.settings.get(game.system.id, "customClassData") || {};
+    //     const className = data.name || "Unnamed-Class";
+    //     settings[className] = data;
+    //     await game.settings.set(game.system.id, "customClassData", settings);
 
-        ui.notifications.info(`Saved class data for ${className}`);
-    }
+    //     ui.notifications.info(`Saved class data for ${className}`);
+    // }
 
     activateListeners(html) {
         super.activateListeners(html);
 
-        html.find(".add-level").on("click", (event) => {
-            const levels = this.classData.levelAdvancement || {};
-            const maxLevel = Math.max(0, ...Object.keys(levels).map(Number));
-            levels[maxLevel + 1] = { xp: 0, fa: 0, ca: 0 };
-            this.render();
-        });
-
-        html.find(".remove-level").on("click", (event) => {
-            const level = Number(event.currentTarget.dataset.level);
-            delete this.classData.levelAdvancement[level];
-            this.render();
-        });
-
         // Handle Save button
-        html.find("button.save").on("click", (event) => this._onSave(event));
-        
-        // Handle Cancel button
-        html.find("button.cancel").on("click", () => this.close());
+        html.find(".save-class").on("click", (event) => this._onSave(event));
 
     }
 
@@ -139,10 +141,16 @@ export class HYP3EClassEditor extends Application {
             if (!isNaN(value) && value.trim() !== "") {
                 value = Number(value);
             }
+            // Log the key-value pairs for debugging
+            console.log(`Form data: ${key} = ${value}`);
+            // Handle nested properties
+            if (key.startsWith("classData.")) {
+                key = key.replace("classData.", "");
+            }
             foundry.utils.setProperty(data, key, value);
         }
 
-        const key = this.classKey || data["newClassName"]?.trim();
+        const key = this.classKey || data["name"]?.trim();
         if (!key) {
             ui.notifications.error("You must provide a class name.");
             return;
@@ -151,6 +159,9 @@ export class HYP3EClassEditor extends Application {
         const allClasses = foundry.utils.deepClone(game.settings.get(game.system.id, "customClassData") || {});
         allClasses[key] = data;
 
+        // For testing purposes, log the class data
+        console.log("Saving class data:", key, data);
+        // Save the class data to game settings
         await game.settings.set(game.system.id, "customClassData", allClasses);
         ui.notifications.info(`Class "${key}" saved.`);
         this.close();
@@ -167,6 +178,17 @@ export class HYP3EClassEditor extends Application {
             };
         }
         return levelAdvancement;
+    }
+
+    buildEmptyStartingPack() {
+        return {
+            gold: "1d4+1",
+            armour: { name: "", quantity: null },
+            weapons: { name: "", quantity: null },
+            "equipment - general": { name: "", quantity: null },
+            "equipment - provisions": { name: "", quantity: null },
+            "equipment - religious": { name: "", quantity: null },
+        };
     }
 
 }

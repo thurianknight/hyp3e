@@ -459,10 +459,6 @@ Handlebars.registerHelper('isMax', function(val, maxVal) {
     return val == maxVal ? "max" : ""
 });
 
-Handlebars.registerHelper('ifEq', function(arg1, arg2, options) {
-    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
-});
-
 Handlebars.registerHelper('ifInList', function(str, arr, options) {
     if (arr.includes(str)) {
         return options.fn(this)
@@ -573,10 +569,10 @@ Hooks.once("ready", async function() {
     // Load custom classes
     CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
     // For testing only...
-    console.log("No custom class data found, creating Chronomancer test data.");
-    const chronomancer = {"Chronomancer": { "baseClass": "magician", "hitDie": "1d4", "fa": 0, "ca": 1, "spellLists": ["Magician"], "ta": null,}}
-    CONFIG.HYP3E.customClassData = game.settings.set(game.system.id, "customClassData", chronomancer);
-    CONFIG.HYP3E.customClassData = chronomancer;
+    // console.log("No custom class data found, creating Chronomancer test data.");
+    // const chronomancer = { "Chronomancer": { "baseClass": "magician", "hitDie": "1d4", "fa": 0, "ca": 1, "spellLists": ["Magician"], "ta": null, "startingPack": { "gold": "1d4+1" } } }
+    // CONFIG.HYP3E.customClassData = game.settings.set(game.system.id, "customClassData", chronomancer);
+    // CONFIG.HYP3E.customClassData = chronomancer;
     // End testing
     for (const [className, classData] of Object.entries(CONFIG.HYP3E.customClassData)) {
         // Append the class name to characterClasses
