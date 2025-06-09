@@ -24,32 +24,30 @@ export class HYP3ECustomClassList extends Application {
         console.log("activateListeners called.");
         const html = $(htmlData); // Wrap in jQuery
 
-        // console.log("Found edit buttons:", html.find(".edit-class").length);
-        // console.log("Found new button:", html.find(".new-class").length);
-        // console.log("Found delete buttons:", html.find(".delete-class").length);
-
         html.find(".edit-class").on("click", ev => {
             const className = ev.currentTarget.dataset.class;
             const classData = game.settings.get(game.system.id, "customClassData")[className];
             console.log(`Editing class: ${className}`, classData);
             // Open the class editor with the existing class data
             new HYP3EClassEditor(className, classData).render(true);
+            this.close();
         });
 
         html.find(".new-class").on("click", () => {
             console.log("Creating new class");
             // Open the class editor with no class data
             new HYP3EClassEditor(null, {}).render(true);
+            this.close();
         });
 
-        html.find(".delete-class").on("click", ev => {
+        html.find(".delete-class").on("click", async ev => {
             const className = ev.currentTarget.dataset.class;
             const confirmed = confirm(`Are you sure you want to delete the class "${className}"?`);
             if (!confirmed) return;
 
             const allClasses = duplicate(game.settings.get(game.system.id, "customClassData"));
             delete allClasses[className];
-            game.settings.set(game.system.id, "customClassData", allClasses);
+            await game.settings.set(game.system.id, "customClassData", allClasses);
 
             // Re-render the list app to update the UI
             this.render(true);

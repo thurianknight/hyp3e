@@ -1042,10 +1042,18 @@ textarea {
     flex-direction: column;
     gap: 10px; */
     padding: 5px;
+    .equipment-container {
+        align-items: flex-start;
+    };
     select {
         width: 100%;
         max-width: 150px;
         /* margin-bottom: 10px; */
+    };
+    .equipment-select {
+        width: 100%;
+        min-width: 225px;
+        max-width: 250px;
     };
     input {
         text-align: center;
@@ -1060,7 +1068,10 @@ textarea {
     };
     .level-advancement {
         text-align: center;
-    }
+    };
+    .button-narrow {
+        width: 40px;
+    };
 }
 
 /* Styles for item alternate damage app */

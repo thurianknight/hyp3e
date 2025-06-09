@@ -100,40 +100,74 @@
         {{/each}}
       </tbody>
     </table>
-    {{!-- {{#each classData.levelAdvancement}}
-      <div class="form-group">
-        <label>Level {{@key}} XP</label>
-        <input type="number" name="levelAdvancement.{{@key}}.xp" value="{{this.xp}}" />
-        <label>FA</label>
-        <input type="number" name="levelAdvancement.{{@key}}.fa" value="{{this.fa}}" />
-        <label>CA</label>
-        <input type="number" name="levelAdvancement.{{@key}}.ca" value="{{this.ca}}" />
-        <label>TA</label>
-        <input type="number" name="levelAdvancement.{{@key}}.ta" value="{{this.ta}}" />
-      </div>
-    {{/each}} --}}
   </fieldset>
 
   <fieldset>
     <legend>Starting Pack</legend>
-    <div class="form-group">
-      <label for="classData.startingPack.gold">Starting Gold</label>
-      <input type="text" name="classData.startingPack.gold" value="{{classData.startingPack.gold}}" placeholder="1d4+1" />
+    <p>Define the starting equipment pack for this class.</p>
+    <div class="flex flexrow flex-group-center form-group equipment-container">
+        <div class="flex">
+            {{!-- General Equipment --}}
+            {{#each equipmentPack}}
+            <div class="flex">
+                <label class="dialog-label">{{capitalizeWords @key}}</label>
+                {{#each this}}
+                <div class="flex flexrow flex-group-center">
+                    {{!-- <input type="text" name="classData.startingPack.{{@../key}}.{{@index}}.name" value="{{this.name}}" placeholder="Item Name" /> --}}
+                    <select class="equipment-select" name="classData.startingPack.{{@../key}}.{{@index}}.name">
+                        <option value=""></option>
+                        {{#if (eq @../key "equipment - general")}}
+                            {{selectOptions @root.gearOptions selected=this.name localize=false}}
+                        {{else if (eq @../key "equipment - provisions")}}
+                            {{selectOptions @root.provisionOptions selected=this.name localize=false}}
+                        {{else if (eq @../key "equipment - religious")}}
+                            {{selectOptions @root.religiousOptions selected=this.name localize=false}}
+                        {{/if}}
+                    </select>
+                    <input type="number" class="input-small" name="classData.startingPack.{{@../key}}.{{@index}}.quantity" value="{{this.quantity}}" placeholder="Qty" />
+                    <button type="button" class="delete-item button-narrow" data-pack="{{@../key}}" data-index="{{@index}}"><i class="fas fa-trash"></i></button>
+                </div>
+                {{/each}}
+                <button type="button" class="add-item" data-pack="{{@key}}"><i class="fas fa-plus"></i> Add</button>
+            </div>
+            <hr />
+            {{/each}}
+        </div>
+        <div class="flex">
+            {{!-- Other categories: gold, armour, weapons, provisions, religious items --}}
+            {{#each corePack}}
+            <div class="flex">
+                <label class="dialog-label">{{capitalizeWords @key}}</label>
+                {{#if (eq @key "gold")}}
+                <input type="text" name="classData.startingPack.gold" value="{{this}}" placeholder="Gold Amount" />
+                {{else}}
+                {{#each this}}
+                <div class="flex flexrow flex-group-center">
+                    {{!-- <input type="text" name="classData.startingPack.{{@../key}}.{{@index}}.name" value="{{this.name}}" placeholder="Item Name" /> --}}
+                    <select class="equipment-select" name="classData.startingPack.{{@../key}}.{{@index}}.name">
+                        <option value=""></option>
+                        {{#if (eq @../key "armour")}}
+                            {{selectOptions @root.armorOptions selected=this.name localize=false}}
+                        {{else if (eq @../key "weapons")}}
+                            {{selectOptions @root.weaponOptions selected=this.name localize=false}}
+                        {{else if (eq @../key "equipment - provisions")}}
+                            {{selectOptions @root.provisionOptions selected=this.name localize=false}}
+                        {{else if (eq @../key "equipment - religious")}}
+                            {{selectOptions @root.religiousOptions selected=this.name localize=false}}
+                        {{/if}}
+                    </select>
+                    <input type="number" class="input-small" name="classData.startingPack.{{@../key}}.{{@index}}.quantity" value="{{this.quantity}}" placeholder="Qty" />
+                    <button type="button" class="delete-item button-narrow" data-pack="{{@../key}}" data-index="{{@index}}"><i class="fas fa-trash"></i></button>
+                </div>
+                {{/each}}
+                <button type="button" class="add-item" data-pack="{{@key}}"><i class="fas fa-plus"></i> Add</button>
+                {{/if}}
+                <hr />
+            </div>
+            {{/each}}
+        </div>
     </div>
 
-    {{#each classData.startingPack}}
-      {{#unless (eq @key "gold")}}
-        <div class="form-group">
-          <label>{{@key}}</label>
-          {{#each this}}
-            <div>
-              <input type="text" name="classData.startingPack.{{@../key}}.{{@index}}.name" value="{{this.name}}" placeholder="Item Name" />
-              <input type="number" name="classData.startingPack.{{@../key}}.{{@index}}.quantity" value="{{this.quantity}}" placeholder="Qty" />
-            </div>
-          {{/each}}
-        </div>
-      {{/unless}}
-    {{/each}}
   </fieldset>
 
   <button class="save-class">Save Class</button>

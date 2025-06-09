@@ -12,7 +12,7 @@ import { parseAndResolveChangeValue, setupEffectHandlers } from "./helpers/effec
 import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
 // import { HYP3EClassEditor } from "./apps/class-editor.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
-
+import { Hyp3eCharacter } from "./helpers/character.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -470,6 +470,12 @@ Handlebars.registerHelper('lookup', function(obj, key) {
     return obj?.[key];
 });
 
+Handlebars.registerHelper("capitalizeWords", function (str) {
+  if (typeof str !== "string") return "";
+  return str.replace(/\b\w/g, c => c.toUpperCase());
+});
+
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
@@ -569,10 +575,15 @@ Hooks.once("ready", async function() {
     // Load custom classes
     CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
     // For testing only...
-    // console.log("No custom class data found, creating Chronomancer test data.");
-    // const chronomancer = { "Chronomancer": { "baseClass": "magician", "hitDie": "1d4", "fa": 0, "ca": 1, "spellLists": ["Magician"], "ta": null, "startingPack": { "gold": "1d4+1" } } }
-    // CONFIG.HYP3E.customClassData = game.settings.set(game.system.id, "customClassData", chronomancer);
-    // CONFIG.HYP3E.customClassData = chronomancer;
+    if (!CONFIG.HYP3E.customClassData || CONFIG.HYP3E.customClassData == {}) {
+        console.log("No custom class data found, creating Chronomancer test data.");
+        const magician = Hyp3eCharacter.classData["Magician"]
+        const chronomancer = {}
+        chronomancer["Chronomancer"] = foundry.utils.duplicate(magician)
+        CONFIG.HYP3E.customClassData = game.settings.set(game.system.id, "customClassData", chronomancer);
+        CONFIG.HYP3E.customClassData = chronomancer;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Custom Classes:", CONFIG.HYP3E.customClassData) }
     // End testing
     for (const [className, classData] of Object.entries(CONFIG.HYP3E.customClassData)) {
         // Append the class name to characterClasses
@@ -681,7 +692,7 @@ Hooks.once("ready", async function() {
 
 });
 
-Hooks.once("renderSettingsConfig", (app, htmlElement, data) => {
+Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
     const html = $(htmlElement); // Wrap in jQuery
 
     // GM's custom compendia list
