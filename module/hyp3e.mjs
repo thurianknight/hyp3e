@@ -815,8 +815,8 @@ async function migrateWorld() {
     }
 
     // We only migrate the Hyperborea compendium if the GM requests it.
-    // We don't want to migrate compendia every time the game is loaded, as it takes a long time.
-    // Also, there may be some risk of data loss in personal or third party compendia.
+    // We don't want to migrate compendia every time the game is loaded, as it may take a long time.
+    // Also, there may be some risk of data loss in personal or third-party compendia.
     if (!game.settings.get(game.system.id, "migrateCompendia")) {
         return true;
     }
