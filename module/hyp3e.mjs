@@ -657,7 +657,7 @@ Hooks.once("ready", async function() {
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
         // No need to migrate if system version is x.x.x or higher
-        const NEEDS_MIGRATION_TO_VERSION = "1.12.0"
+        const NEEDS_MIGRATION_TO_VERSION = "1.13.0"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
             const alreadyRan = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
