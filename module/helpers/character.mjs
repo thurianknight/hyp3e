@@ -3825,7 +3825,7 @@ export class Hyp3eCharacter {
         let data = foundry.utils.deepClone(actor.system)
 
         // Get the class & level data we need
-        let thisClass = this.classData[data.details.class]
+        let thisClass = this.classData[data.details.class] || CONFIG.HYP3E.customClassData[data.details.class];
         let currLevel = data.details.level.value ? parseInt(data.details.level.value) : 1
         let nextLevel = currLevel + 1
         let requiredXp = thisClass.levelAdvancement[nextLevel].xp
