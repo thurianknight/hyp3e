@@ -992,6 +992,10 @@ function migrateItemData(item) {
     // Weapons only
     if (item.type === "weapon") {
         updates = { ...updates, "system.equipped": false };
+        let friendlyName = fixFriendlyName(item);
+        if (friendlyName) {
+            updates = { ...updates, "system.friendlyName": friendlyName };
+        }
     }
 
     console.log(`migrateItemData: Updated data for ${item.name}:`, updates)
@@ -1094,6 +1098,13 @@ function fixTokenSize(actor) {
     return null
 }
 
+function fixFriendlyName(item) {
+    const friendlyName = item.system.friendlyName;
+    // Use a regex to replace (1h) or (2h) with null
+    const output = friendlyName.replace(/\s?\((1h|2h)\)/g, "");
+    return output;
+}
+
 // function updateWeaponFormula(item) {
 //     let newFormula = item.system.formula
 //     if (item.system.formula.includes("@item.atkMod")) {
@@ -1149,7 +1160,7 @@ async function reportBestiary() {
         if (pack.metadata.label !== "Bestiary") {
             continue
         }
-        
+
         // OK, we have the bestiary compendium... generate the report
 
         // Iterate over compendium entries and report
@@ -1190,22 +1201,24 @@ async function reportItems() {
             console.log(`${title}\n` + report.join("\n"));
         }
 
-        // Skip anything that is not a physical item compendium
-        // if (pack.metadata.label == "Armor" || pack.metadata.label == "Weapons" || pack.metadata.label == "Equipment - General" || pack.metadata.label == "Equipment - Provisions" || pack.metadata.label == "Equipment - Religious") {
-        //     // Iterate over compendium entries and report
-        //     const documents = await pack.getDocuments()
-        //     for (let doc of documents) {
-        //         if (!doc.system.weight || doc.system.weight == "") {
-        //             console.log(`DEBUG: ${doc.name} has weight ${doc.system.weight}!`)
-        //         }
-        //         if (doc.system.formula?.includes("@item.atkMod")) {
-        //             console.log(`DEBUG: ${doc.name} has formula ${doc.system.formula}!`)
-        //         }
-        //         if (doc.system.formula?.includes("@fa")) {
-        //             console.log(`DEBUG: ${doc.name} has formula ${doc.system.formula}!`)
-        //         }
-        //     }
-        // }
+        // Report on weapons with (1h) or (2h) in the name or friendlyName
+        if (pack.metadata.label == "Weapons") {
+            let report = []
+            const title = `WEAPON NAMES: Beginning report for compendium ${pack.metadata.label}...`
+            // Iterate over compendium entries and report
+            const documents = await pack.getDocuments()
+            for (let doc of documents) {
+                if (doc.name.indexOf("(1h)") > 0 || doc.name.indexOf("(2h)") > 0) {
+                    report.push(`${doc.name} includes 1h or 2h in name.`);
+                }
+                if (doc.system.friendlyName.indexOf("(1h)") || doc.system.friendlyName.indexOf("(2h)")) {
+                    report.push(`${doc.name} includes 1h or 2h in friendlyName.`);
+                }
+            }
+            report.sort();
+            console.log(`${title}\n` + report.join("\n"));
+        }
+
     }
 }
 
