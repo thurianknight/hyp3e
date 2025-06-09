@@ -3760,6 +3760,8 @@ export class Hyp3eCharacter {
             content += `<li>Turning Ability: ${thisClass.ta}</li>`
             data.unskilled = thisClass.unskilled
             content += `<li>Unskilled Weapon Penalty: ${thisClass.unskilled}</li>`
+            data.details.xp.value = 0
+            data.details.xp.toNextLvl = thisClass.levelAdvancement[2].xp
             data.details.xp.primeAttr = ""
             content += `<li>Saving Throws vs:</li><ul>`
             content += `<li>Death: ${thisClass.saves.death}</li>`
@@ -4092,6 +4094,8 @@ export class Hyp3eCharacter {
                     },
                     details: {
                         xp: {
+                            value: 0,
+                            toNextLvl: data.details.xp.toNextLvl,
                             bonus: data.details.xp.bonus,
                             primeAttr: data.details.xp.primeAttr
                         }

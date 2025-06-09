@@ -1208,11 +1208,13 @@ async function reportItems() {
             // Iterate over compendium entries and report
             const documents = await pack.getDocuments()
             for (let doc of documents) {
-                if (doc.name.indexOf("(1h)") > 0 || doc.name.indexOf("(2h)") > 0) {
-                    report.push(`${doc.name} includes 1h or 2h in name.`);
+                const matches = doc.name.match(/\((1h|2h)\)/g);
+                if (matches && matches.length > 0) {
+                    report.push(`${doc.name} includes 1h or 2h in name:`, matches);
                 }
-                if (doc.system.friendlyName.indexOf("(1h)") || doc.system.friendlyName.indexOf("(2h)")) {
-                    report.push(`${doc.name} includes 1h or 2h in friendlyName.`);
+                const friendlyMatches = doc.system.friendlyName.match(/\((1h|2h)\)/g);
+                if (friendlyMatches && friendlyMatches.length > 0) {
+                    report.push(`${doc.name} includes 1h or 2h in friendlyName:`, friendlyMatches);
                 }
             }
             report.sort();
