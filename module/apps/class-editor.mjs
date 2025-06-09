@@ -135,16 +135,13 @@ export class HYP3EClassEditor extends FormApplication {
 
         html.find(".add-item").on("click", async ev => {
             const pack = ev.currentTarget.dataset.pack;
-            const newItem = { name: "", quantity: null };
+            const newItem = { name: "", quantity: 1 };
 
             // Get current form state
             const formData = this._getSubmitData(); // Already expanded
 
             // Save any other changes in process first
             await this._updateObject(new Event("submit"), formData);
-
-            // Now refresh the updated data from settings
-            // this.classData = duplicate(game.settings.get(game.system.id, "customClassData"));
 
             // Now we can merge those same changes in memory
             console.log("Current form data:", formData)
@@ -207,6 +204,10 @@ export class HYP3EClassEditor extends FormApplication {
         await game.settings.set(game.system.id, "customClassData", allClasses);
 
         // ui.notifications.info(`Class "${key}" saved.`);
+
+        // Reload custom classes
+        CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
+
     }
 
     buildEmptyLevelAdvancement() {
