@@ -221,11 +221,11 @@ export class HYP3EClassEditor extends FormApplication {
     buildEmptyStartingPack() {
         return {
             gold: "1d4+1",
-            armour: [{ name: "", quantity: null }],
-            weapons: [{ name: "", quantity: null }],
-            "equipment - general": [{ name: "", quantity: null }],
-            "equipment - provisions": [{ name: "", quantity: null }],
-            "equipment - religious": [{ name: "", quantity: null }],
+            armour: [{ name: "", quantity: 1 }],
+            weapons: [{ name: "", quantity: 1 }],
+            "equipment - general": [{ name: "", quantity: 1 }],
+            "equipment - provisions": [{ name: "", quantity: 1 }],
+            "equipment - religious": [{ name: "", quantity: 1 }],
         };
     }
 }
