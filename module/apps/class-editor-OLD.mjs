@@ -171,7 +171,7 @@ export class HYP3EClassEditor extends Application {
             // Get the current DOM state and save it, so we don't lose any changes in progress
             const formData = this._getFormData(html);
             const expanded = foundry.utils.expandObject(formData); // optional but good practice
-            this.classData = mergeObject(this.classData, expanded.classData || {}, {inplace: false});
+            this.classData = foundry.utils.mergeObject(this.classData, expanded.classData || {}, {inplace: false});
 
             // Now we can add the new item
             if (!Array.isArray(this.classData.startingPack[pack])) {

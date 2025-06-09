@@ -136,7 +136,7 @@ export class Hyp3eActor extends Actor {
         try {
             systemData.actorType = actorData.type
             // systemData.baseClass = this.classData[systemData.details.class].baseClass
-            systemData.baseClass = Hyp3eCharacter.classData[systemData.details.class].baseClass
+            systemData.baseClass = Hyp3eCharacter.classData[systemData.details.class].baseClass || CONFIG.HYP3E.customClassData[charClass].baseClass;
         } catch (err) {
             // No match found (happens with custom classes), use "npc"
             systemData.baseClass = "npc"
@@ -2519,7 +2519,7 @@ export class Hyp3eActor extends Actor {
     isAttributeLow(attr) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Checking ${attr} attribute for ${this.system.details.class}...`) }
         // const attrReqs = this.classData[this.system.details.class]?.attrReqs
-        const attrReqs = Hyp3eCharacter.classData[this.system.details.class]?.attrReqs
+        const attrReqs = Hyp3eCharacter.classData[this.system.details.class]?.attrReqs || CONFIG.HYP3E.customClassData[this.system.details.class];
         // if (CONFIG.HYP3E.debugMessages) { console.log(`Attribute requirements: `, attrReqs) }
         if (attrReqs[attr]) {
             if (this.system.attributes[attr].value < attrReqs[attr]) {

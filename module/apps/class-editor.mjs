@@ -18,7 +18,7 @@ export class HYP3EClassEditor extends FormApplication {
             title: "Class Editor",
             template: `${HYP3E.templatePath}/apps/class-editor.hbs`,
             classes: ["hyp3e", "sheet", "class-editor"],
-            width: 800,
+            width: 700,
             height: "auto",
             resizable: true,
             submitOnChange: false,
@@ -33,7 +33,7 @@ export class HYP3EClassEditor extends FormApplication {
         const baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
 
         const spellcasters = ["Cleric", "Druid", "Magician", "Cryomancer", "Illusionist", "Necromancer", "Pyromancer", "Witch"];
-        const spellLists = Object.fromEntries(baseClassNames.map(n => [n, n]));
+        const spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
 
         const attributes = CONFIG.HYP3E.attributes;
         // Attribute requirements
@@ -70,6 +70,7 @@ export class HYP3EClassEditor extends FormApplication {
                 baseClass: "",
                 attrReqs: attrReqs,
                 xpBonusReqs: xpBonusReqs,
+                spellLists: ["", ""],
                 saves: saves,
                 levelAdvancement: this.buildEmptyLevelAdvancement(),
                 startingPack: this.buildEmptyStartingPack(),
@@ -147,7 +148,7 @@ export class HYP3EClassEditor extends FormApplication {
 
             // Now we can merge those same changes in memory
             console.log("Current form data:", formData)
-            this.classData = mergeObject(this.classData, formData.classData || {}, { inplace: false });
+            this.classData = foundry.utils.mergeObject(this.classData, formData.classData || {}, { inplace: false });
             console.log("Merged class data:", this.classData);
 
             // Add the new item to the correct pack
@@ -164,15 +165,28 @@ export class HYP3EClassEditor extends FormApplication {
         const data = foundry.utils.expandObject(formData);
         console.log("Saving class with form data:", data);
         this.name = data.name?.trim() || this.classKey;
-        this.classData = mergeObject(this.classData, data.classData || {}, { inplace: false });
+        this.classData = foundry.utils.mergeObject(this.classData, data.classData || {}, { inplace: false });
         console.log("Merged class data:", this.classKey, this.name, this.classData);
 
-        // If the class has been renamed, tag it here
+        // If the class has been renamed, flag it here
         let renameClass = false;
         if (this.classKey && this.name != this.classKey) {
             renameClass = true;
-            console.log(`Renaming class from ${this.classKey} to ${this.name}...`)
+            console.log(`Renaming class from ${this.classKey} to ${this.name}...`);
+        } else if (!this.classKey && this.name != "") {
+            // This is not renaming, it is giving a name to a new (unnamed) class
+            this.classKey = this.name;
         }
+
+        // Don't forget these fields, they are not on the form itself
+        const level1 = this.classData.levelAdvancement["1"]
+        this.classData.fa = level1.fa;
+        this.classData.ca = level1.ca;
+        this.classData.ta = level1.ta;
+
+        // spellLists must be stored as an array, but it comes from the form as an indexed object
+        this.classData.spellLists = Object.values(this.classData.spellLists);
+
         let { startingPack } = this.classData;
         const result = {
             gold: startingPack.gold,

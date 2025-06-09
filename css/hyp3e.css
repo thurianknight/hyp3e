@@ -1042,7 +1042,7 @@ textarea {
     flex-direction: column;
     gap: 10px; */
     padding: 5px;
-    .equipment-container {
+    .container {
         align-items: flex-start;
     };
     select {

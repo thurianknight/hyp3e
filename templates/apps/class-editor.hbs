@@ -2,53 +2,55 @@
 <form autocomplete="off">
   <fieldset>
     <legend>Class Info</legend>
-        <div class="form-group flex flexrow flex-group-center">
-            <span class="flex-item">
-                <input type="text" name="name" value="{{classKey}}" /><br />
-                <label for="name">Class Name</label>
-            </span>
-            <span class="flex-item">
-                <select name="classData.baseClass">
-                    <option value=""></option>
-                    {{selectOptions baseClasses selected=classData.baseClass localize=false}}
-                </select><br />
-                <label for="classData.baseClass">Base Class</label>        
-            </span>
-            <span class="flex-item">
-                <input type="text" name="classData.hitDie" value="{{classData.hitDie}}" placeholder="e.g., 1d6, 1d8" /><br />
-                <label for="classData.hitDie">Hit Die</label>
-            </span>
-        </div>
-    </legend>
+    <div class="form-group flex flexrow flex-group-center container">
+        <span class="flex-item">
+            <input type="text" name="name" value="{{classKey}}" /><br />
+            <label for="name">Class Name</label>
+        </span>
+        <span class="flex-item">
+            <input type="text" name="classData.hitDie" value="{{classData.hitDie}}" placeholder="e.g., 1d6, 1d8" /><br />
+            <label for="classData.hitDie">Hit Die</label>
+        </span>
+        <span class="flex-item">
+            <select name="classData.baseClass">
+                <option value=""></option>
+                {{selectOptions baseClasses selected=classData.baseClass localize=false}}
+            </select><br />
+            <label for="classData.baseClass">Base Class</label>
+            <p style="font-style: italic;">Determines the critical hit & miss columns to use.</p>
+        </span>
+    </div>
   </fieldset>
   
   <fieldset>
     <legend>Attribute Requirements / Minimums</legend>
-      <div class="flex flexrow flex-group-center form-group">
-        {{#each attrReqs}}
-        <span>
-            <input type="number" class="input-small" name="classData.attrReqs.{{@key}}" value="{{this.value}}" /><br />
-            <label for="classData.attrReqs.{{@key}}">{{this.label}}</label>
-        </span>
-        {{/each}}
-      </div>
+        <div class="flex flexrow flex-group-center form-group container">
+            {{#each attrReqs}}
+            <span>
+                <input type="number" class="input-small" name="classData.attrReqs.{{@key}}" value="{{this.value}}" /><br />
+                <label for="classData.attrReqs.{{@key}}">{{this.label}}</label>
+            </span>
+            {{/each}}
+        </div>
   </fieldset>
 
   <fieldset>
     <legend>XP Bonus Requirements</legend>
-      <div class="flex flexrow flex-group-center form-group">
-        {{#each xpBonusReqs}}
-        <span>
-            <input type="number" class="input-small" name="classData.xpBonusReq.{{@key}}" value="{{this.value}}" /><br />
-            <label for="classData.xpBonusReq.{{@key}}">{{this.label}}</label>
-        </span>
-        {{/each}}
-      </div>
+        <p>Minimum attribute scores required to earn a 10% bonus to XP.</p>
+        <div class="flex flexrow flex-group-center form-group container">
+            {{#each xpBonusReqs}}
+            <span>
+                <input type="number" class="input-small" name="classData.xpBonusReq.{{@key}}" value="{{this.value}}" /><br />
+                <label for="classData.xpBonusReq.{{@key}}">{{this.label}}</label>
+            </span>
+            {{/each}}
+        </div>
   </fieldset>
 
   <fieldset>
     <legend>Extraordinary Feat Bonus %</legend>
-        <div class="flex flexrow flex-group-center form-group">
+        <p>Some classes get a +8% bonus on one or two physical feats.</p>
+        <div class="flex flexrow flex-group-center form-group container">
             <span>
                 <input type="number" class="input-small" name="classData.featBonus.str" value="{{classData.featBonus.str}}" /><br />
                 <label for="classData.featBonus.str">{{localize 'HYP3E.attributes.str.feat'}}</label>
@@ -65,55 +67,73 @@
   </fieldset>
 
   <fieldset>
-    <legend>Save Modifiers</legend>
-      <div class="flex flexrow flex-group-center form-group">
-        {{#each saves}}
-        <span>
-            <input type="number" class="input-small" name="classData.saves.{{@key}}" value="{{this.value}}" /><br />
-            <label for="classData.saves.{{@key}}">{{this.label}}</label>
-        </span>
-        {{/each}}
-      </div>
+    <legend>Spell Lists</legend>
+        <p>If the class can cast spells, make one or two selections here.</p>
+        <div class="flex flexrow flex-group-center form-group container">
+            {{#each classData.spellLists}}
+            <span class="flex-item">
+                {{!-- <input type="text" name="classData.spellLists.{{@index}}" value="{{this}}"> --}}
+                <select name="classData.spellLists.{{@index}}">
+                    <option value=""></option>
+                    {{selectOptions @root.spellLists selected=this localize=false}}
+                </select>
+                <br />
+                <label for="classData.spellLists.{{@index}}">Spell List {{add @index 1}}</label>        
+            </span>
+            {{/each}}
+        </div>
   </fieldset>
 
   <fieldset>
-    <legend>Level Advancement</legend>
-    <table>
-      <thead>
-        <tr class="level-advancement">
-          <th>Level</th>
-          <th>XP</th>
-          <th>FA</th>
-          <th>CA</th>
-          <th>TA</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each classData.levelAdvancement}}
-          <tr class="level-advancement">
-            <td>{{@key}}</td>
-            <td><input type="number" name="classData.levelAdvancement.{{@key}}.xp" value="{{this.xp}}" /></td>
-            <td><input class="input-small" type="number" name="classData.levelAdvancement.{{@key}}.fa" value="{{this.fa}}" /></td>
-            <td><input class="input-small" type="number" name="classData.levelAdvancement.{{@key}}.ca" value="{{this.ca}}" /></td>
-            <td><input class="input-small" type="number" name="classData.levelAdvancement.{{@key}}.ta" value="{{this.ta}}" /></td>
-          </tr>
-        {{/each}}
-      </tbody>
-    </table>
+    <legend>Save Modifiers</legend>
+        <p>Most classes get a +2 bonus on two of their saving throws.</p>
+        <div class="flex flexrow flex-group-center form-group container">
+            {{#each saves}}
+            <span>
+                <input type="number" class="input-small" name="classData.saves.{{@key}}" value="{{this.value}}" /><br />
+                <label for="classData.saves.{{@key}}">{{this.label}}</label>
+            </span>
+            {{/each}}
+        </div>
+  </fieldset>
+
+  <fieldset>
+        <legend>Level Advancement</legend>
+        <table>
+            <thead>
+                <tr class="level-advancement">
+                    <th>Level</th>
+                    <th>XP</th>
+                    <th>FA</th>
+                    <th>CA</th>
+                    <th>TA</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each classData.levelAdvancement}}
+                <tr class="level-advancement">
+                    <td>{{@key}}</td>
+                    <td><input type="number" name="classData.levelAdvancement.{{@key}}.xp" value="{{this.xp}}" /></td>
+                    <td><input class="input-small" type="number" name="classData.levelAdvancement.{{@key}}.fa" value="{{this.fa}}" /></td>
+                    <td><input class="input-small" type="number" name="classData.levelAdvancement.{{@key}}.ca" value="{{this.ca}}" /></td>
+                    <td><input class="input-small" type="number" name="classData.levelAdvancement.{{@key}}.ta" value="{{this.ta}}" /></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
   </fieldset>
 
   <fieldset>
     <legend>Starting Pack</legend>
     <p>Define the starting equipment pack for this class.</p>
-    <div class="flex flexrow flex-group-center form-group equipment-container">
-        <div class="flex">
+    <div class="flex flexrow flex-group-center form-group container">
+        <div class="flex" style="margin-right: 2px;">
             {{!-- General Equipment --}}
             {{#each equipmentPack}}
             <div class="flex">
                 <label class="dialog-label">{{capitalizeWords @key}}</label>
                 {{#each this}}
                 <div class="flex flexrow flex-group-center">
-                    {{!-- <input type="text" name="classData.startingPack.{{@../key}}.{{@index}}.name" value="{{this.name}}" placeholder="Item Name" /> --}}
                     <select class="equipment-select" name="classData.startingPack.{{@../key}}.{{@index}}.name">
                         <option value=""></option>
                         {{#if (eq @../key "equipment - general")}}
@@ -136,14 +156,13 @@
         <div class="flex">
             {{!-- Other categories: gold, armour, weapons, provisions, religious items --}}
             {{#each corePack}}
-            <div class="flex">
+            <div class="flex" style="margin-left: 2px;">
                 <label class="dialog-label">{{capitalizeWords @key}}</label>
                 {{#if (eq @key "gold")}}
                 <input type="text" name="classData.startingPack.gold" value="{{this}}" placeholder="Gold Amount" />
                 {{else}}
                 {{#each this}}
                 <div class="flex flexrow flex-group-center">
-                    {{!-- <input type="text" name="classData.startingPack.{{@../key}}.{{@index}}.name" value="{{this.name}}" placeholder="Item Name" /> --}}
                     <select class="equipment-select" name="classData.startingPack.{{@../key}}.{{@index}}.name">
                         <option value=""></option>
                         {{#if (eq @../key "armour")}}
@@ -167,7 +186,6 @@
             {{/each}}
         </div>
     </div>
-
   </fieldset>
 
   <button class="save-class">Save Class</button>

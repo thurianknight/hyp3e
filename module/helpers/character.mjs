@@ -3354,7 +3354,7 @@ export class Hyp3eCharacter {
         const charClass = actor.system.details.class;
         console.log(`rollAttributesForClass: class to roll:`, charClass);
         // Get the class attribute requirements
-        let classData = this.classData[charClass];
+        let classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
         if (!classData) {
             console.error(`rollAttributesForClass: Class data not found for class ${charClass}!`);
             return null;
@@ -3384,7 +3384,7 @@ export class Hyp3eCharacter {
         // Just roll and return the attributes
         let attributes = {};
         for (const attr of Object.keys(actor.system.attributes)) {
-            // Roll 2d6+6 for each attribute
+            // Roll specified formula for each attribute
             let roll = new Roll(rollFormula);
             await roll.roll();
             if (CONFIG.HYP3E.debugMessages) { console.log(`_rollAttributes: Rolled ${roll.total} for attribute ${attr}`) }
@@ -3395,7 +3395,7 @@ export class Hyp3eCharacter {
     }
 
     static async _checkAttrRequirements(charClass, attributes) {
-        const classData = this.classData[charClass];
+        const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
         if (!classData) {
             console.error(`_checkAttrRequirements: Class data not found for class ${charClass}!`);
             return false;
@@ -3423,7 +3423,7 @@ export class Hyp3eCharacter {
      */
     static async getDefaultItemsForClass({ actor, itemType, folderNames, packKey }) {
         const charClass = actor.system.details.class;
-        const classData = this.classData[charClass];
+        const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
 
         if (!classData) {
             console.error(`getDefaultItemsForClass: Class data not found for class ${charClass}!`);
@@ -3783,7 +3783,7 @@ export class Hyp3eCharacter {
 
     static async getStartingGoldForClass(actor) {
         const charClass = actor.system.details.class;
-        const classData = this.classData[charClass];
+        const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
         if (!classData) {
             console.error(`getStartingGoldForClass: Class data not found for class ${charClass}!`);
             return 0;
@@ -4000,7 +4000,7 @@ export class Hyp3eCharacter {
             // Override label if character class selected
             label = `<div class='medium-bold'>Values for ${data.details.class} updated...</div>`
             if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${data.details.class} hit die...`) }
-            thisClass = this.classData[data.details.class]
+            thisClass = this.classData[data.details.class] || CONFIG.HYP3E.customClassData[data.details.class];
             if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Class Data for ${data.details.class}: `, thisClass) }
             data.hd = thisClass.hitDie
             content += `<li>Hit Die: ${thisClass.hitDie}</li>`
@@ -4008,11 +4008,15 @@ export class Hyp3eCharacter {
             content += `<li>Fighting Ability: ${thisClass.fa}</li>`
             data.ca = thisClass.ca
             content += `<li>Casting Ability: ${thisClass.ca}</li>`
-            if (thisClass.spellLists) {
+            if (thisClass?.spellLists && thisClass.spellLists.length > 0) {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${data.details.class} spell lists...`) }
                 data.spellList = thisClass.spellLists[0]
                 data.spellList2 = thisClass.spellLists.length > 1 ? thisClass.spellLists[1] : null
-                content += `<li>Spell List(s): ${thisClass.spellLists.join(", ")}</li>`
+                if (data.spellList2 && data.spellList2 != "") {
+                    content += `<li>Spell List(s): ${thisClass.spellLists.join(", ")}</li>`
+                } else {
+                    content += `<li>Spell List(s): ${data.spellList}</li>`
+                }
             }
             data.ta = thisClass.ta
             content += `<li>Turning Ability: ${thisClass.ta}</li>`
