@@ -46,50 +46,62 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d6",
                     "fa": 1,
                 },
                 2: {
                     "xp": 1750,
+                    "hpRoll": "1d6",
                     "fa": 1,
                 },
                 3: {
                     "xp": 3500,
+                    "hpRoll": "1d6",
                     "fa": 2,
                 },
                 4: {
                     "xp": 7000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                 },
                 5: {
                     "xp": 14000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                 },
                 6: {
                     "xp": 28000,
+                    "hpRoll": "1d6",
                     "fa": 4,
                 },
                 7: {
                     "xp": 56000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                 },
                 8: {
                     "xp": 112000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                 },
                 9: {
                     "xp": 224000,
+                    "hpRoll": "1d6",
                     "fa": 6,
                 },
                 10: {
                     "xp": 336000,
+                    "hpRoll": "2",
                     "fa": 7,
                 },
                 11: {
                     "xp": 448000,
+                    "hpRoll": "2",
                     "fa": 7,
                 },
                 12: {
                     "xp": 560000,
+                    "hpRoll": "2",
                     "fa": 8,
                 },
             },
@@ -152,50 +164,62 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d12",
                     "fa": 1,
                 },
                 2: {
                     "xp": 3000,
+                    "hpRoll": "1d12",
                     "fa": 2,
                 },
                 3: {
                     "xp": 6000,
+                    "hpRoll": "1d12",
                     "fa": 3,
                 },
                 4: {
                     "xp": 12000,
+                    "hpRoll": "1d12",
                     "fa": 4,
                 },
                 5: {
                     "xp": 24000,
+                    "hpRoll": "1d12",
                     "fa": 5,
                 },
                 6: {
                     "xp": 48000,
+                    "hpRoll": "1d12",
                     "fa": 6,
                 },
                 7: {
                     "xp": 96000,
+                    "hpRoll": "1d12",
                     "fa": 7,
                 },
                 8: {
                     "xp": 192000,
+                    "hpRoll": "1d12",
                     "fa": 8,
                 },
                 9: {
                     "xp": 384000,
+                    "hpRoll": "1d12",
                     "fa": 9,
                 },
                 10: {
                     "xp": 576000,
+                    "hpRoll": "4",
                     "fa": 10,
                 },
                 11: {
                     "xp": 768000,
+                    "hpRoll": "4",
                     "fa": 11,
                 },
                 12: {
                     "xp": 960000,
+                    "hpRoll": "4",
                     "fa": 12,
                 },
             },
@@ -259,61 +283,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d8",
                     "fa": 1,
                     "ca": 1,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d8",
                     "fa": 1,
                     "ca": 2,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d8",
                     "fa": 2,
                     "ca": 3,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d8",
                     "fa": 3,
                     "ca": 4,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d8",
                     "fa": 3,
                     "ca": 5,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d8",
                     "fa": 4,
                     "ca": 6,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d8",
                     "fa": 5,
                     "ca": 7,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d8",
                     "fa": 5,
                     "ca": 8,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d8",
                     "fa": 6,
                     "ca": 9,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 10,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 11,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "2",
                     "fa": 8,
                     "ca": 12,
                 },
@@ -381,50 +417,62 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d12",
                     "fa": 1,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d12",
                     "fa": 2,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d12",
                     "fa": 3,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d12",
                     "fa": 4,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d12",
                     "fa": 5,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d12",
                     "fa": 6,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d12",
                     "fa": 7,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d12",
                     "fa": 8,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d12",
                     "fa": 9,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "4",
                     "fa": 10,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "4",
                     "fa": 11,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "4",
                     "fa": 12,
                 },
             },
@@ -481,50 +529,62 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d10",
                     "fa": 1,
                 },
                 2: {
                     "xp": 2250,
+                    "hpRoll": "1d10",
                     "fa": 2,
                 },
                 3: {
                     "xp": 4500,
+                    "hpRoll": "1d10",
                     "fa": 3,
                 },
                 4: {
                     "xp": 9000,
+                    "hpRoll": "1d10",
                     "fa": 4,
                 },
                 5: {
                     "xp": 18000,
+                    "hpRoll": "1d10",
                     "fa": 5,
                 },
                 6: {
                     "xp": 36000,
+                    "hpRoll": "1d10",
                     "fa": 6,
                 },
                 7: {
                     "xp": 72000,
+                    "hpRoll": "1d10",
                     "fa": 7,
                 },
                 8: {
                     "xp": 144000,
+                    "hpRoll": "1d10",
                     "fa": 8,
                 },
                 9: {
                     "xp": 288000,
+                    "hpRoll": "1d10",
                     "fa": 9,
                 },
                 10: {
                     "xp": 432000,
+                    "hpRoll": "3",
                     "fa": 10,
                 },
                 11: {
                     "xp": 576000,
+                    "hpRoll": "3",
                     "fa": 11,
                 },
                 12: {
                     "xp": 720000,
+                    "hpRoll": "3",
                     "fa": 12,
                 },
             },
@@ -577,72 +637,84 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d8",
                     "fa": 1,
                     "ca": 1,
                     "ta": 1,
                 },
                 2: {
                     "xp": 2000,
+                    "hpRoll": "1d8",
                     "fa": 1,
                     "ca": 2,
                     "ta": 2,
                 },
                 3: {
                     "xp": 4000,
+                    "hpRoll": "1d8",
                     "fa": 2,
                     "ca": 3,
                     "ta": 3,
                 },
                 4: {
                     "xp": 8000,
+                    "hpRoll": "1d8",
                     "fa": 3,
                     "ca": 4,
                     "ta": 4,
                 },
                 5: {
                     "xp": 16000,
+                    "hpRoll": "1d8",
                     "fa": 3,
                     "ca": 5,
                     "ta": 5,
                 },
                 6: {
                     "xp": 32000,
+                    "hpRoll": "1d8",
                     "fa": 4,
                     "ca": 6,
                     "ta": 6,
                 },
                 7: {
                     "xp": 64000,
+                    "hpRoll": "1d8",
                     "fa": 5,
                     "ca": 7,
                     "ta": 7,
                 },
                 8: {
                     "xp": 128000,
+                    "hpRoll": "1d8",
                     "fa": 5,
                     "ca": 8,
                     "ta": 8,
                 },
                 9: {
                     "xp": 256000,
+                    "hpRoll": "1d8",
                     "fa": 6,
                     "ca": 9,
                     "ta": 9,
                 },
                 10: {
                     "xp": 384000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 10,
                     "ta": 10,
                 },
                 11: {
                     "xp": 512000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 11,
                     "ta": 11,
                 },
                 12: {
                     "xp": 640000,
+                    "hpRoll": "2",
                     "fa": 8,
                     "ca": 12,
                     "ta": 12,
@@ -702,61 +774,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 1,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 2,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 3,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 4,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 5,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 6,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 7,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 8,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d4",
                     "fa": 4,
                     "ca": 9,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "1",
                     "fa": 4,
                     "ca": 10,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 11,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 12,
                 },
@@ -822,61 +906,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d8",
                     "fa": 1,
                     "ca": 1,
                 },
                 2: {
                     "xp": 2000,
+                    "hpRoll": "1d8",
                     "fa": 1,
                     "ca": 2,
                 },
                 3: {
                     "xp": 4000,
+                    "hpRoll": "1d8",
                     "fa": 2,
                     "ca": 3,
                 },
                 4: {
                     "xp": 8000,
+                    "hpRoll": "1d8",
                     "fa": 3,
                     "ca": 4,
                 },
                 5: {
                     "xp": 16000,
+                    "hpRoll": "1d8",
                     "fa": 3,
                     "ca": 5,
                 },
                 6: {
                     "xp": 32000,
+                    "hpRoll": "1d8",
                     "fa": 4,
                     "ca": 6,
                 },
                 7: {
                     "xp": 64000,
+                    "hpRoll": "1d8",
                     "fa": 5,
                     "ca": 7,
                 },
                 8: {
                     "xp": 128000,
+                    "hpRoll": "1d8",
                     "fa": 5,
                     "ca": 8,
                 },
                 9: {
                     "xp": 256000,
+                    "hpRoll": "1d8",
                     "fa": 6,
                     "ca": 9,
                 },
                 10: {
                     "xp": 384000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 10,
                 },
                 11: {
                     "xp": 512000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 11,
                 },
                 12: {
                     "xp": 640000,
+                    "hpRoll": "2",
                     "fa": 8,
                     "ca": 12,
                 },
@@ -941,50 +1037,62 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d10",
                     "fa": 1,
                 },
                 2: {
                     "xp": 2000,
+                    "hpRoll": "1d10",
                     "fa": 2,
                 },
                 3: {
                     "xp": 4000,
+                    "hpRoll": "1d10",
                     "fa": 3,
                 },
                 4: {
                     "xp": 8000,
+                    "hpRoll": "1d10",
                     "fa": 4,
                 },
                 5: {
                     "xp": 16000,
+                    "hpRoll": "1d10",
                     "fa": 5,
                 },
                 6: {
                     "xp": 32000,
+                    "hpRoll": "1d10",
                     "fa": 6,
                 },
                 7: {
                     "xp": 64000,
+                    "hpRoll": "1d10",
                     "fa": 7,
                 },
                 8: {
                     "xp": 128000,
+                    "hpRoll": "1d10",
                     "fa": 8,
                 },
                 9: {
                     "xp": 256000,
+                    "hpRoll": "1d10",
                     "fa": 9,
                 },
                 10: {
                     "xp": 384000,
+                    "hpRoll": "3",
                     "fa": 10,
                 },
                 11: {
                     "xp": 512000,
+                    "hpRoll": "3",
                     "fa": 11,
                 },
                 12: {
                     "xp": 640000,
+                    "hpRoll": "3",
                     "fa": 12,
                 },
             },
@@ -1047,50 +1155,62 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d10",
                     "fa": 1,
                 },
                 2: {
                     "xp": 2250,
+                    "hpRoll": "1d10",
                     "fa": 2,
                 },
                 3: {
                     "xp": 4500,
+                    "hpRoll": "1d10",
                     "fa": 3,
                 },
                 4: {
                     "xp": 9000,
+                    "hpRoll": "1d10",
                     "fa": 4,
                 },
                 5: {
                     "xp": 18000,
+                    "hpRoll": "1d10",
                     "fa": 5,
                 },
                 6: {
                     "xp": 36000,
+                    "hpRoll": "1d10",
                     "fa": 6,
                 },
                 7: {
                     "xp": 72000,
+                    "hpRoll": "1d10",
                     "fa": 7,
                 },
                 8: {
                     "xp": 144000,
+                    "hpRoll": "1d10",
                     "fa": 8,
                 },
                 9: {
                     "xp": 288000,
+                    "hpRoll": "1d10",
                     "fa": 9,
                 },
                 10: {
                     "xp": 432000,
+                    "hpRoll": "3",
                     "fa": 10,
                 },
                 11: {
                     "xp": 576000,
+                    "hpRoll": "3",
                     "fa": 11,
                 },
                 12: {
                     "xp": 720000,
+                    "hpRoll": "3",
                     "fa": 12,
                 },
             },
@@ -1151,61 +1271,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 1,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 2,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 3,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 4,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 5,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 6,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 7,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 8,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d4",
                     "fa": 4,
                     "ca": 9,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "1",
                     "fa": 4,
                     "ca": 10,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 11,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 12,
                 },
@@ -1270,61 +1402,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d6",
                     "fa": 1,
                     "ca": 1,
                 },
                 2: {
                     "xp": 2750,
+                    "hpRoll": "1d6",
                     "fa": 1,
                     "ca": 2,
                 },
                 3: {
                     "xp": 5500,
+                    "hpRoll": "1d6",
                     "fa": 2,
                     "ca": 3,
                 },
                 4: {
                     "xp": 11000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                     "ca": 4,
                 },
                 5: {
                     "xp": 22000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                     "ca": 5,
                 },
                 6: {
                     "xp": 44000,
+                    "hpRoll": "1d6",
                     "fa": 4,
                     "ca": 6,
                 },
                 7: {
                     "xp": 88000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                     "ca": 7,
                 },
                 8: {
                     "xp": 176000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                     "ca": 8,
                 },
                 9: {
                     "xp": 352000,
+                    "hpRoll": "1d6",
                     "fa": 6,
                     "ca": 9,
                 },
                 10: {
                     "xp": 528000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 10,
                 },
                 11: {
                     "xp": 704000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 11,
                 },
                 12: {
                     "xp": 880000,
+                    "hpRoll": "2",
                     "fa": 8,
                     "ca": 12,
                 },
@@ -1385,61 +1529,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 1,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 2,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 3,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 4,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 5,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 6,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 7,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 8,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d4",
                     "fa": 4,
                     "ca": 9,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "1",
                     "fa": 4,
                     "ca": 10,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 11,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 12,
                 },
@@ -1503,50 +1659,62 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d8",
                     "fa": 0,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d8",
                     "fa": 1,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d8",
                     "fa": 2,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d8",
                     "fa": 3,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d8",
                     "fa": 4,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d8",
                     "fa": 5,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d8",
                     "fa": 6,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d8",
                     "fa": 7,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d8",
                     "fa": 8,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "2",
                     "fa": 9,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "2",
                     "fa": 10,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "2",
                     "fa": 11,
                 },
             },
@@ -1609,72 +1777,84 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 1,
                     "ta": null,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 2,
                     "ta": null,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 3,
                     "ta": 1,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 4,
                     "ta": 2,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 5,
                     "ta": 3,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 6,
                     "ta": 4,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 7,
                     "ta": 5,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 8,
                     "ta": 6,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d4",
                     "fa": 4,
                     "ca": 9,
                     "ta": 7,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "1",
                     "fa": 4,
                     "ca": 10,
                     "ta": 8,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 11,
                     "ta": 9,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 12,
                     "ta": 10,
@@ -1745,72 +1925,84 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d10",
                     "fa": 1,
                     "ca": null,
                     "ta": null,
                 },
                 2: {
                     "xp": 2750,
+                    "hpRoll": "1d10",
                     "fa": 2,
                     "ca": null,
                     "ta": null,
                 },
                 3: {
                     "xp": 5500,
+                    "hpRoll": "1d10",
                     "fa": 3,
                     "ca": null,
                     "ta": null,
                 },
                 4: {
                     "xp": 11000,
+                    "hpRoll": "1d10",
                     "fa": 4,
                     "ca": null,
                     "ta": null,
                 },
                 5: {
                     "xp": 22000,
+                    "hpRoll": "1d10",
                     "fa": 5,
                     "ca": null,
                     "ta": 1,
                 },
                 6: {
                     "xp": 44000,
+                    "hpRoll": "1d10",
                     "fa": 6,
                     "ca": null,
                     "ta": 2,
                 },
                 7: {
                     "xp": 88000,
+                    "hpRoll": "1d10",
                     "fa": 7,
                     "ca": 1,
                     "ta": 3,
                 },
                 8: {
                     "xp": 176000,
+                    "hpRoll": "1d10",
                     "fa": 8,
                     "ca": 2,
                     "ta": 4,
                 },
                 9: {
                     "xp": 352000,
+                    "hpRoll": "1d10",
                     "fa": 9,
                     "ca": 3,
                     "ta": 5,
                 },
                 10: {
                     "xp": 528000,
+                    "hpRoll": "3",
                     "fa": 10,
                     "ca": 4,
                     "ta": 6,
                 },
                 11: {
                     "xp": 704000,
+                    "hpRoll": "3",
                     "fa": 11,
                     "ca": 5,
                     "ta": 7,
                 },
                 12: {
                     "xp": 880000,
+                    "hpRoll": "3",
                     "fa": 12,
                     "ca": 6,
                     "ta": 8,
@@ -1868,72 +2060,84 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 1,
                     "ta": 1,
                 },
                 2: {
                     "xp": 2000,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 2,
                     "ta": 2,
                 },
                 3: {
                     "xp": 4000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 3,
                     "ta": 3,
                 },
                 4: {
                     "xp": 8000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 4,
                     "ta": 4,
                 },
                 5: {
                     "xp": 16000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 5,
                     "ta": 5,
                 },
                 6: {
                     "xp": 32000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 6,
                     "ta": 6,
                 },
                 7: {
                     "xp": 64000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 7,
                     "ta": 7,
                 },
                 8: {
                     "xp": 128000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 8,
                     "ta": 8,
                 },
                 9: {
                     "xp": 256000,
+                    "hpRoll": "1d4",
                     "fa": 4,
                     "ca": 9,
                     "ta": 9,
                 },
                 10: {
                     "xp": 384000,
+                    "hpRoll": "1",
                     "fa": 4,
                     "ca": 10,
                     "ta": 10,
                 },
                 11: {
                     "xp": 512000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 11,
                     "ta": 11,
                 },
                 12: {
                     "xp": 640000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 12,
                     "ta": 12,
@@ -1997,72 +2201,84 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d6",
                     "fa": 1,
                     "ca": 1,
                     "ta": null,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d6",
                     "fa": 1,
                     "ca": 2,
                     "ta": null,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d6",
                     "fa": 2,
                     "ca": 3,
                     "ta": 1,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                     "ca": 4,
                     "ta": 2,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                     "ca": 5,
                     "ta": 3,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d6",
                     "fa": 4,
                     "ca": 6,
                     "ta": 4,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                     "ca": 7,
                     "ta": 5,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                     "ca": 8,
                     "ta": 6,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d6",
                     "fa": 6,
                     "ca": 9,
                     "ta": 7,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 10,
                     "ta": 8,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 11,
                     "ta": 9,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "2",
                     "fa": 8,
                     "ca": 12,
                     "ta": 10,
@@ -2127,61 +2343,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 1,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 2,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 3,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 4,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 5,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 6,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 7,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 8,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d4",
                     "fa": 4,
                     "ca": 9,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "1",
                     "fa": 4,
                     "ca": 10,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 11,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 12,
                 },
@@ -2246,61 +2474,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d10",
                     "fa": 1,
                     "ca": null,
                 },
                 2: {
                     "xp": 2250,
+                    "hpRoll": "1d10",
                     "fa": 2,
                     "ca": null,
                 },
                 3: {
                     "xp": 4500,
+                    "hpRoll": "1d10",
                     "fa": 3,
                     "ca": null,
                 },
                 4: {
                     "xp": 9000,
+                    "hpRoll": "1d10",
                     "fa": 4,
                     "ca": null,
                 },
                 5: {
                     "xp": 18000,
+                    "hpRoll": "1d10",
                     "fa": 5,
                     "ca": null,
                 },
                 6: {
                     "xp": 36000,
+                    "hpRoll": "1d10",
                     "fa": 6,
                     "ca": null,
                 },
                 7: {
                     "xp": 72000,
+                    "hpRoll": "1d10",
                     "fa": 7,
                     "ca": 1,
                 },
                 8: {
                     "xp": 144000,
+                    "hpRoll": "1d10",
                     "fa": 8,
                     "ca": 2,
                 },
                 9: {
                     "xp": 288000,
+                    "hpRoll": "1d10",
                     "fa": 9,
                     "ca": 3,
                 },
                 10: {
                     "xp": 432000,
+                    "hpRoll": "3",
                     "fa": 10,
                     "ca": 4,
                 },
                 11: {
                     "xp": 576000,
+                    "hpRoll": "3",
                     "fa": 11,
                     "ca": 5,
                 },
                 12: {
                     "xp": 720000,
+                    "hpRoll": "3",
                     "fa": 12,
                     "ca": 6,
                 },
@@ -2359,61 +2599,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d8",
                     "fa": 1,
                     "ca": 1,
                 },
                 2: {
                     "xp": 3000,
+                    "hpRoll": "1d8",
                     "fa": 2,
                     "ca": 2,
                 },
                 3: {
                     "xp": 6000,
+                    "hpRoll": "1d8",
                     "fa": 3,
                     "ca": 3,
                 },
                 4: {
                     "xp": 12000,
+                    "hpRoll": "1d8",
                     "fa": 4,
                     "ca": 4,
                 },
                 5: {
                     "xp": 24000,
+                    "hpRoll": "1d8",
                     "fa": 5,
                     "ca": 5,
                 },
                 6: {
                     "xp": 48000,
+                    "hpRoll": "1d8",
                     "fa": 6,
                     "ca": 6,
                 },
                 7: {
                     "xp": 96000,
+                    "hpRoll": "1d8",
                     "fa": 7,
                     "ca": 7,
                 },
                 8: {
                     "xp": 192000,
+                    "hpRoll": "1d8",
                     "fa": 8,
                     "ca": 8,
                 },
                 9: {
                     "xp": 384000,
+                    "hpRoll": "1d8",
                     "fa": 9,
                     "ca": 9,
                 },
                 10: {
                     "xp": 576000,
+                    "hpRoll": "2",
                     "fa": 10,
                     "ca": 10,
                 },
                 11: {
                     "xp": 768000,
+                    "hpRoll": "2",
                     "fa": 11,
                     "ca": 11,
                 },
                 12: {
                     "xp": 960000,
+                    "hpRoll": "2",
                     "fa": 12,
                     "ca": 12,
                 },
@@ -2479,50 +2731,62 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d6",
                     "fa": 1,
                 },
                 2: {
                     "xp": 1750,
+                    "hpRoll": "1d6",
                     "fa": 1,
                 },
                 3: {
                     "xp": 3500,
+                    "hpRoll": "1d6",
                     "fa": 2,
                 },
                 4: {
                     "xp": 7000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                 },
                 5: {
                     "xp": 14000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                 },
                 6: {
                     "xp": 28000,
+                    "hpRoll": "1d6",
                     "fa": 4,
                 },
                 7: {
                     "xp": 56000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                 },
                 8: {
                     "xp": 112000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                 },
                 9: {
                     "xp": 224000,
+                    "hpRoll": "1d6",
                     "fa": 6,
                 },
                 10: {
                     "xp": 336000,
+                    "hpRoll": "2",
                     "fa": 7,
                 },
                 11: {
                     "xp": 448000,
+                    "hpRoll": "2",
                     "fa": 7,
                 },
                 12: {
                     "xp": 560000,
+                    "hpRoll": "2",
                     "fa": 8,
                 },
             },
@@ -2587,72 +2851,84 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d6",
                     "fa": 0,
                     "ca": 1,
                     "ta": null,
                 },
                 2: {
                     "xp": 2500,
+                    "hpRoll": "1d6",
                     "fa": 0,
                     "ca": 2,
                     "ta": null,
                 },
                 3: {
                     "xp": 5000,
+                    "hpRoll": "1d6",
                     "fa": 1,
                     "ca": 3,
                     "ta": 1,
                 },
                 4: {
                     "xp": 10000,
+                    "hpRoll": "1d6",
                     "fa": 2,
                     "ca": 4,
                     "ta": 2,
                 },
                 5: {
                     "xp": 20000,
+                    "hpRoll": "1d6",
                     "fa": 2,
                     "ca": 5,
                     "ta": 3,
                 },
                 6: {
                     "xp": 40000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                     "ca": 6,
                     "ta": 4,
                 },
                 7: {
                     "xp": 80000,
+                    "hpRoll": "1d6",
                     "fa": 4,
                     "ca": 7,
                     "ta": 5,
                 },
                 8: {
                     "xp": 160000,
+                    "hpRoll": "1d6",
                     "fa": 4,
                     "ca": 8,
                     "ta": 6,
                 },
                 9: {
                     "xp": 320000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                     "ca": 9,
                     "ta": 7,
                 },
                 10: {
                     "xp": 480000,
+                    "hpRoll": "2",
                     "fa": 6,
                     "ca": 10,
                     "ta": 8,
                 },
                 11: {
                     "xp": 640000,
+                    "hpRoll": "2",
                     "fa": 6,
                     "ca": 11,
                     "ta": 9,
                 },
                 12: {
                     "xp": 800000,
+                    "hpRoll": "2",
                     "fa": 7,
                     "ca": 12,
                     "ta": 10,
@@ -2717,50 +2993,62 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d6",
                     "fa": 1,
                 },
                 2: {
                     "xp": 1500,
+                    "hpRoll": "1d6",
                     "fa": 1,
                 },
                 3: {
                     "xp": 3000,
+                    "hpRoll": "1d6",
                     "fa": 2,
                 },
                 4: {
                     "xp": 6000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                 },
                 5: {
                     "xp": 12000,
+                    "hpRoll": "1d6",
                     "fa": 3,
                 },
                 6: {
                     "xp": 24000,
+                    "hpRoll": "1d6",
                     "fa": 4,
                 },
                 7: {
                     "xp": 48000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                 },
                 8: {
                     "xp": 96000,
+                    "hpRoll": "1d6",
                     "fa": 5,
                 },
                 9: {
                     "xp": 192000,
+                    "hpRoll": "1d6",
                     "fa": 6,
                 },
                 10: {
                     "xp": 288000,
+                    "hpRoll": "2",
                     "fa": 7,
                 },
                 11: {
                     "xp": 384000,
+                    "hpRoll": "2",
                     "fa": 7,
                 },
                 12: {
                     "xp": 480000,
+                    "hpRoll": "2",
                     "fa": 8,
                 },
             },
@@ -2825,61 +3113,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d8",
                     "fa": 1,
                     "ca": 1,
                 },
                 2: {
                     "xp": 3000,
+                    "hpRoll": "1d8",
                     "fa": 2,
                     "ca": 2,
                 },
                 3: {
                     "xp": 6000,
+                    "hpRoll": "1d8",
                     "fa": 3,
                     "ca": 3,
                 },
                 4: {
                     "xp": 12000,
+                    "hpRoll": "1d8",
                     "fa": 4,
                     "ca": 4,
                 },
                 5: {
                     "xp": 24000,
+                    "hpRoll": "1d8",
                     "fa": 5,
                     "ca": 5,
                 },
                 6: {
                     "xp": 48000,
+                    "hpRoll": "1d8",
                     "fa": 6,
                     "ca": 6,
                 },
                 7: {
                     "xp": 96000,
+                    "hpRoll": "1d8",
                     "fa": 7,
                     "ca": 7,
                 },
                 8: {
                     "xp": 192000,
+                    "hpRoll": "1d8",
                     "fa": 8,
                     "ca": 8,
                 },
                 9: {
                     "xp": 384000,
+                    "hpRoll": "1d8",
                     "fa": 9,
                     "ca": 9,
                 },
                 10: {
                     "xp": 576000,
+                    "hpRoll": "2",
                     "fa": 10,
                     "ca": 10,
                 },
                 11: {
                     "xp": 768000,
+                    "hpRoll": "2",
                     "fa": 11,
                     "ca": 11,
                 },
                 12: {
                     "xp": 960000,
+                    "hpRoll": "2",
                     "fa": 12,
                     "ca": 12,
                 },
@@ -2938,61 +3238,73 @@ export class Hyp3eCharacter {
             "levelAdvancement": {
                 1: {
                     "xp": 0,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 1,
                 },
                 2: {
                     "xp": 3000,
+                    "hpRoll": "1d4",
                     "fa": 0,
                     "ca": 2,
                 },
                 3: {
                     "xp": 6000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 3,
                 },
                 4: {
                     "xp": 12000,
+                    "hpRoll": "1d4",
                     "fa": 1,
                     "ca": 4,
                 },
                 5: {
                     "xp": 24000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 5,
                 },
                 6: {
                     "xp": 48000,
+                    "hpRoll": "1d4",
                     "fa": 2,
                     "ca": 6,
                 },
                 7: {
                     "xp": 96000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 7,
                 },
                 8: {
                     "xp": 192000,
+                    "hpRoll": "1d4",
                     "fa": 3,
                     "ca": 8,
                 },
                 9: {
                     "xp": 384000,
+                    "hpRoll": "1d4",
                     "fa": 4,
                     "ca": 9,
                 },
                 10: {
                     "xp": 576000,
+                    "hpRoll": "1",
                     "fa": 4,
                     "ca": 10,
                 },
                 11: {
                     "xp": 768000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 11,
                 },
                 12: {
                     "xp": 960000,
+                    "hpRoll": "1",
                     "fa": 5,
                     "ca": 12,
                 },
@@ -3545,29 +3857,42 @@ export class Hyp3eCharacter {
 
         let actor = game.actors.get(dataset.actorId)
         if (!actor) {
-            console.error(`levelUp: Actor not found for id ${dataset.actorId}`)
-            return false
+            console.error(`levelUp: Actor not found for id ${dataset.actorId}`);
+            return false;
         }
         // Log the dataset before the dialog renders
         if (CONFIG.HYP3E.debugMessages) { console.log(`levelUp: ${actor.name} dataset: `, dataset) }
+
+        // Get the class & level data
+        let thisClass = this.classData[actor.system.details.class] || CONFIG.HYP3E.customClassData[actor.system.details.class];
+        let currLevel = actor.system.details.level.value ? parseInt(actor.system.details.level.value) : 1
+
+        // Is the character already level 12? Then exit...
+        if (currLevel >= 12) {
+            ui.notifications.warn("Characters cannot be auto-leveled beyond 12.");
+            return false;
+        }
 
         // Display the confirmation dialog, and exit if the user cancels this action
         try {
             let rollResponse = await Hyp3eDialog.ShowLevelUpDialog(dataset)
         } catch(err) {
-            console.log(`levelUp: Dialog error ${err}`)
-            return false
+            console.log(`levelUp: Dialog error ${err}`);
+            return false;
         }
 
         // Initialize character data
         let data = foundry.utils.deepClone(actor.system)
 
-        // Get the class & level data we need
-        let thisClass = this.classData[data.details.class] || CONFIG.HYP3E.customClassData[data.details.class];
-        let currLevel = data.details.level.value ? parseInt(data.details.level.value) : 1
         let nextLevel = currLevel + 1
         let requiredXp = thisClass.levelAdvancement[nextLevel].xp
-        let nextLevelXp = thisClass.levelAdvancement[nextLevel+1].xp
+        let nextLevelXp
+        if (nextLevel <= 11) {
+            nextLevelXp = thisClass.levelAdvancement[nextLevel+1].xp
+        } else {
+            // No more "Next Level XP" after level 12
+            nextLevelXp = thisClass.levelAdvancement[12].xp
+        }
 
         // Do we have enough XP to level up?
         let currentXp = parseInt((data.details.xp.value).replace(/,|\./g, ""))
@@ -3584,7 +3909,8 @@ export class Hyp3eCharacter {
         data.details.xp.toNextLvl = nextLevelXp
         // Increase current & max hit points
         let hpIncrease = 0
-        const roll = new Roll(`${data.hd} + ${data.attributes.con.hpMod}`);
+        const hpRoll = thisClass.levelAdvancement[nextLevel].hpRoll
+        const roll = new Roll(`${hpRoll} + ${data.attributes.con.hpMod}`);
         await roll.roll();
         if (CONFIG.HYP3E.debugMessages) { console.log("levelUp: HP roll result: ", roll) }
         if (roll != undefined && roll.total != undefined) {

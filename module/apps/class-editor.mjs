@@ -196,7 +196,7 @@ export class HYP3EClassEditor extends FormApplication {
         this.classData.startingPack = result;
 
         const key = this.name?.trim() || this.classKey;
-        if (!key) return ui.notifications.error("Nameless class not saved.");
+        if (!key) return ui.notifications.warn("Nameless class not saved.");
 
         const allClasses = foundry.utils.deepClone(game.settings.get(game.system.id, "customClassData") || {});
         allClasses[key] = this.classData;
@@ -221,11 +221,11 @@ export class HYP3EClassEditor extends FormApplication {
     buildEmptyStartingPack() {
         return {
             gold: "1d4+1",
-            armour: [{ name: "", quantity: 1 }],
-            weapons: [{ name: "", quantity: 1 }],
-            "equipment - general": [{ name: "", quantity: 1 }],
-            "equipment - provisions": [{ name: "", quantity: 1 }],
-            "equipment - religious": [{ name: "", quantity: 1 }],
+            armour: [],
+            weapons: [],
+            "equipment - general": [],
+            "equipment - provisions": [],
+            "equipment - religious": [],
         };
     }
 }
