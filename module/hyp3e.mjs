@@ -495,6 +495,19 @@ Hooks.once("ready", async function() {
     // Register effects handlers
     await setupEffectHandlers();
 
+    // Cleanup old settings
+    // for (const [namespace, settingsMap] of game.settings.storage.entries()) {
+    //     if (namespace === 'world') {
+    //         for (const [key, setting] of settingsMap.entries()) {
+    //             if (setting.key.startsWith("hyp3e.migration")) {
+    //                 console.log(`Game Settings: Migration ${key}:`, setting);
+    //                 console.log(`Deleting setting: ${namespace}.${key}`);
+    //                 await settingsMap.delete(key);
+    //             }
+    //         }
+    //     }
+    // }
+
     /**
      * Load system settings
      */
@@ -910,19 +923,37 @@ function migrateActorData(actor) {
         updates = { ...updates, "system.tokenAlias": "" };
     }
     // Migrate, fix, or delete old data
+    if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp == "object") {
+        console.log(`Fixing temp HP for ${actor.name}...`);
+        updates = { ...updates, "system.hp.tempHp": 0 };
+    }
+
     let tempUpdate = {};
-    tempUpdate = fixTempHp(actor);
-    updates = { ...updates, tempUpdate };
     tempUpdate = fixTempAtkMod(actor);
-    updates = { ...updates, tempUpdate };
+    if (tempUpdate) {
+        updates = { ...updates, tempUpdate };
+        console.log("Incremental update fixTempAtkMod:", updates)
+    }
     tempUpdate = fixTempDmgMod(actor);
-    updates = { ...updates, tempUpdate };
+    if (tempUpdate) {
+        updates = { ...updates, tempUpdate };
+        console.log("Incremental update fixTempDmgMod:", updates)
+    }
     tempUpdate = fixTempAcMod(actor);
-    updates = { ...updates, tempUpdate };
+    if (tempUpdate) {
+        updates = { ...updates, tempUpdate };
+        console.log("Incremental update fixTempAcMod:", updates)
+    }
     tempUpdate = fixTempDrMod(actor);
-    updates = { ...updates, tempUpdate };
+    if (tempUpdate) {
+        updates = { ...updates, tempUpdate };
+        console.log("Incremental update fixTempDrMod:", updates)
+    }
     tempUpdate = fixTempMvMod(actor);
-    updates = { ...updates, tempUpdate };
+    if (tempUpdate) {
+        updates = { ...updates, tempUpdate };
+        console.log("Incremental update fixTempMvMod:", updates)
+    }
 
     // PCs only
     if (actor.type === "character") {
