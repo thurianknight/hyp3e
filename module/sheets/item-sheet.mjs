@@ -153,8 +153,9 @@ export class Hyp3eItemSheet extends ItemSheet {
         console.log("Form data identified:", foundry.utils.getProperty(formData, "system.identified"))
         console.log("Object data identified:", this.object.system.identified)
     }
-    // const isIdentified = foundry.utils.getProperty(formData, "system.identified");
-    const isIdentified = this.object.system.identified;
+    const isIdentified = foundry.utils.getProperty(formData, "system.identified") || this.object.system.identified;
+    // const isIdentified = this.object.system.identified;
+    console.log("Item identified:", isIdentified)
 
     // Apply name and description based on identification state.
     if (isIdentified) {
