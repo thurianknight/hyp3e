@@ -845,16 +845,12 @@ async function migrateWorld() {
                 case "Actor":
                     // Migrate actor data
                     const origActor = foundry.utils.deepClone(doc)
-                    // const newActor = migrateActorData(origActor)
-                    // await actor.update({ ...newActor })
                     const actorUpdates = migrateActorData(origActor)
                     if (actorUpdates && actorUpdates != {}) await doc.update(actorUpdates)
                     // Migrate the actor's items
                     if (doc.items) {
                         for (let item of doc.items) {
                             const origItem = foundry.utils.deepClone(item);
-                            // const newItem = migrateItemData(origItem);
-                            // await item.update({ ...newItem });
                             const itemUpdates = migrateItemData(origItem);
                             if (itemUpdates && itemUpdates != {}) await item.update(itemUpdates);
                         }
