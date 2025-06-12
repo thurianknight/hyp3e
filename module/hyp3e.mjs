@@ -927,32 +927,45 @@ function migrateActorData(actor) {
         console.log(`Fixing temp HP for ${actor.name}...`);
         updates = { ...updates, "system.hp.tempHp": 0 };
     }
-
-    let tempUpdate = {};
-    tempUpdate = fixTempAtkMod(actor);
-    if (tempUpdate) {
-        updates = { ...updates, tempUpdate };
-        console.log("Incremental update fixTempAtkMod:", updates)
+    // If tempAcMod is an object, convert it to zero
+    if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod == "object") {
+        console.log(`Fixing temp attack mod for ${actor.name}...`);
+        updates = { ...updates, "system.tempAtkMod": 0 };
     }
-    tempUpdate = fixTempDmgMod(actor);
-    if (tempUpdate) {
-        updates = { ...updates, tempUpdate };
-        console.log("Incremental update fixTempDmgMod:", updates)
+    // If tempDmgMod is an object, convert it to zero
+    if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod == "object") {
+        console.log(`Fixing temp damage mod for ${actor.name}...`);
+        updates = { ...updates, "system.tempDmgMod": 0 };
     }
-    tempUpdate = fixTempAcMod(actor);
-    if (tempUpdate) {
-        updates = { ...updates, tempUpdate };
-        console.log("Incremental update fixTempAcMod:", updates)
+    // If tempAcMod is an object, convert it to zero
+    if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod == "object") {
+        console.log(`Fixing temp AC mod for ${actor.name}...`);
+        updates = { ...updates, "system.ac.tempAcMod": 0 };
     }
-    tempUpdate = fixTempDrMod(actor);
-    if (tempUpdate) {
-        updates = { ...updates, tempUpdate };
-        console.log("Incremental update fixTempDrMod:", updates)
+    // If tempDrMod is an object, convert it to zero
+    if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod == "object") {
+        console.log(`Fixing temp DR mod for ${actor.name}...`);
+        updates = { ...updates, "system.ac.tempDrMod": 0 };
     }
-    tempUpdate = fixTempMvMod(actor);
-    if (tempUpdate) {
-        updates = { ...updates, tempUpdate };
-        console.log("Incremental update fixTempMvMod:", updates)
+    // Only migrate tempMvMod if we haven't already fixed this
+    if (!("tempMvMod" in actor.system.movement) && "tempMvMod" in actor.system) {
+        console.log(`fixTempMvMod: Fixing ${actor.name}...`);
+        // Migrate tempMvMod from system.* to system.movement.* in the actor template
+        let tempMvUpdate = {}
+        if (actor.system?.tempMvMod && !("tempMvMod" in actor.system.movement)) {
+            // Reassign tempMvMod to the new property and delete the original
+            tempMvUpdate = {
+                "system.movement.tempMvMod": actor.system.tempMvMod,
+                "system.-=tempMvMod": null
+            };
+        } else if (actor.system?.tempMvMod && actor.system.movement?.tempMvMod) {
+            // Both exist? Only delete the original
+            tempMvUpdate = { "system.-=tempMvMod": null };
+        } else {
+            // Only assign the new property
+            tempMvUpdate = { "system.movement.tempMvMod": 0 };
+        }
+        updates = { ...updates, tempMvUpdate };
     }
 
     // PCs only
@@ -1029,73 +1042,73 @@ function migrateItemData(item) {
     return updates;
 }
 
-function fixTempHp(actor) {
-    // If tempHp is an object, convert it to zero
-    if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp == "object") {
-        console.log(`Fixing temp HP for ${actor.name}...`);
-        return { "system.hp.tempHp": 0 };
-    }
-    return null;
-}
+// function fixTempHp(actor) {
+//     // If tempHp is an object, convert it to zero
+//     if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp == "object") {
+//         console.log(`Fixing temp HP for ${actor.name}...`);
+//         return { "system.hp.tempHp": 0 };
+//     }
+//     return null;
+// }
 
-function fixTempAtkMod(actor) {
-    // If tempAcMod is an object, convert it to zero
-    if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod == "object") {
-        console.log(`Fixing temp attack mod for ${actor.name}...`);
-        return { "system.tempAtkMod": 0 };
-    }
-    return null;
-}
+// function fixTempAtkMod(actor) {
+//     // If tempAcMod is an object, convert it to zero
+//     if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod == "object") {
+//         console.log(`Fixing temp attack mod for ${actor.name}...`);
+//         return { "system.tempAtkMod": 0 };
+//     }
+//     return null;
+// }
 
-function fixTempDmgMod(actor) {
-    // If tempDmgMod is an object, convert it to zero
-    if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod == "object") {
-        console.log(`Fixing temp damage mod for ${actor.name}...`);
-        return { "system.tempDmgMod": 0 };
-    }
-    return null;
-}
+// function fixTempDmgMod(actor) {
+//     // If tempDmgMod is an object, convert it to zero
+//     if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod == "object") {
+//         console.log(`Fixing temp damage mod for ${actor.name}...`);
+//         return { "system.tempDmgMod": 0 };
+//     }
+//     return null;
+// }
 
-function fixTempAcMod(actor) {
-    // If tempAcMod is an object, convert it to zero
-    if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod == "object") {
-        console.log(`Fixing temp AC mod for ${actor.name}...`);
-        return { "system.ac.tempAcMod": 0 };
-    }
-    return null;
-}
+// function fixTempAcMod(actor) {
+//     // If tempAcMod is an object, convert it to zero
+//     if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod == "object") {
+//         console.log(`Fixing temp AC mod for ${actor.name}...`);
+//         return { "system.ac.tempAcMod": 0 };
+//     }
+//     return null;
+// }
 
-function fixTempDrMod(actor) {
-    // If tempDrMod is an object, convert it to zero
-    if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod == "object") {
-        console.log(`Fixing temp DR mod for ${actor.name}...`);
-        return { "system.ac.tempDrMod": 0 };
-    }
-    return null;
-}
+// function fixTempDrMod(actor) {
+//     // If tempDrMod is an object, convert it to zero
+//     if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod == "object") {
+//         console.log(`Fixing temp DR mod for ${actor.name}...`);
+//         return { "system.ac.tempDrMod": 0 };
+//     }
+//     return null;
+// }
 
-function fixTempMvMod(actor) {
-    // Only migrate if we haven't already fixed this
-    if ("tempMvMod" in actor.system.movement && !("tempMvMod" in actor.system)) return null;
-    console.log(`fixTempMvMod: Fixing ${actor.name}...`);
-    // Migrate tempMvMod from system.* to system.movement.* in the actor template
-    let updates = {}
-    if (actor.system?.tempMvMod && !("tempMvMod" in actor.system.movement)) {
-        // Reassign tempMvMod to the new property and delete the original
-        updates = {
-            "system.movement.tempMvMod": actor.system.tempMvMod,
-            "system.-=tempMvMod": null
-        };
-    } else if (actor.system?.tempMvMod && actor.system.movement?.tempMvMod) {
-        // Only delete the original
-        updates = { "system.-=tempMvMod": null };
-    } else {
-        // Only assign the new property
-        updates = { "system.movement.tempMvMod": 0 };
-    }
-    console.log(`fixTempMvMod: Updates for ${actor.name}...`, updates);
-    return updates;
-}
+// function fixTempMvMod(actor) {
+//     // Only migrate if we haven't already fixed this
+//     if ("tempMvMod" in actor.system.movement && !("tempMvMod" in actor.system)) return null;
+//     console.log(`fixTempMvMod: Fixing ${actor.name}...`);
+//     // Migrate tempMvMod from system.* to system.movement.* in the actor template
+//     let updates = {}
+//     if (actor.system?.tempMvMod && !("tempMvMod" in actor.system.movement)) {
+//         // Reassign tempMvMod to the new property and delete the original
+//         updates = {
+//             "system.movement.tempMvMod": actor.system.tempMvMod,
+//             "system.-=tempMvMod": null
+//         };
+//     } else if (actor.system?.tempMvMod && actor.system.movement?.tempMvMod) {
+//         // Only delete the original
+//         updates = { "system.-=tempMvMod": null };
+//     } else {
+//         // Only assign the new property
+//         updates = { "system.movement.tempMvMod": 0 };
+//     }
+//     console.log(`fixTempMvMod: Updates for ${actor.name}...`, updates);
+//     return updates;
+// }
 
 function fixTokenSize(actor) {
     // If actor size is Medium, convert prototype token size to 1
