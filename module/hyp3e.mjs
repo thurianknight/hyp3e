@@ -13,6 +13,7 @@ import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
 // import { HYP3EClassEditor } from "./apps/class-editor.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { Hyp3eCharacter } from "./helpers/character.mjs";
+import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -908,283 +909,6 @@ async function resizeTokenPrototypes() {
 }
 
 /**
- * Migrate Actor json data and return an updated json
- * @param {Object} actor 
- */
-function migrateActorData(actor) {
-    console.log(`migrateActorData: Original ${actor.name} to migrate:`, actor)
-    // let newActor = {...actor};
-    let updates = {};
-    // Add new default values
-    if (!("identified" in actor.system)) {
-        updates = { ...updates, "system.identified": true };
-    }
-    if (!("tokenAlias" in actor.system)) {
-        updates = { ...updates, "system.tokenAlias": "" };
-    }
-    // Migrate, fix, or delete old data
-    if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp == "object") {
-        console.log(`Fixing temp HP for ${actor.name}...`);
-        updates = { ...updates, "system.hp.tempHp": 0 };
-    }
-    // If tempAcMod is an object, convert it to zero
-    if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod == "object") {
-        console.log(`Fixing temp attack mod for ${actor.name}...`);
-        updates = { ...updates, "system.tempAtkMod": 0 };
-    }
-    // If tempDmgMod is an object, convert it to zero
-    if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod == "object") {
-        console.log(`Fixing temp damage mod for ${actor.name}...`);
-        updates = { ...updates, "system.tempDmgMod": 0 };
-    }
-    // If tempAcMod is an object, convert it to zero
-    if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod == "object") {
-        console.log(`Fixing temp AC mod for ${actor.name}...`);
-        updates = { ...updates, "system.ac.tempAcMod": 0 };
-    }
-    // If tempDrMod is an object, convert it to zero
-    if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod == "object") {
-        console.log(`Fixing temp DR mod for ${actor.name}...`);
-        updates = { ...updates, "system.ac.tempDrMod": 0 };
-    }
-    // Only migrate tempMvMod if we haven't already fixed this
-    if (!("tempMvMod" in actor.system.movement) && "tempMvMod" in actor.system) {
-        console.log(`fixTempMvMod: Fixing ${actor.name}...`);
-        // Migrate tempMvMod from system.* to system.movement.* in the actor template
-        let tempMvUpdate = {}
-        if (actor.system?.tempMvMod && !("tempMvMod" in actor.system.movement)) {
-            // Reassign tempMvMod to the new property and delete the original
-            tempMvUpdate = {
-                "system.movement.tempMvMod": actor.system.tempMvMod,
-                "system.-=tempMvMod": null
-            };
-        } else if (actor.system?.tempMvMod && actor.system.movement?.tempMvMod) {
-            // Both exist? Only delete the original
-            tempMvUpdate = { "system.-=tempMvMod": null };
-        } else {
-            // Only assign the new property
-            tempMvUpdate = { "system.movement.tempMvMod": 0 };
-        }
-        updates = { ...updates, tempMvUpdate };
-    }
-
-    // PCs only
-    if (actor.type === "character") {
-        // Add new default values
-
-        // Migrate, fix, or delete old data
-        if ("explorationSkills" in actor.system) {
-            updates = { ...updates, "system.-=explorationSkills": null };
-        }
-
-    }
-
-    // NPCs only
-    if (actor.type === "npc") {
-        // Add new default values
-
-        // Migrate, fix, or delete old data
-
-    }
-
-    console.log(`migrateActorData: Updated data for ${actor.name}:`, updates)
-    return updates;
-}
-
-/**
- * Migrate Item json data and return an updated json
- * @param {Object} item 
- */
-function migrateItemData(item) {
-    console.log(`migrateItemData: Original ${item.name} to migrate:`, item)
-    // let newItem = {...item};
-    let updates = {};
-    // All item types
-    if (!("identified" in item.system)) {
-        updates = { ...updates, "system.identified": true };
-    }
-    if (!("tokenAlias" in item.system)) {
-        updates = { ...updates, "system.tokenAlias": "" };
-    }
-    if (!("realName" in item.system) || item.system.realName == "") {
-        updates = { ...updates, "system.realName": item.name };
-    }
-    if (!("realDescription" in item.system) || item.system.realDescription == "") {
-        updates = { ...updates, "system.realDescription": item.system.description };
-    }
-
-    // Armor only
-    if (item.type === "armor") {
-        updates = { ...updates, "system.equipped": true };
-    }
-    // Features only
-    if (item.type === "feature") {
-
-    }
-    // General items only
-    if (item.type === "item") {
-        updates = { ...updates, "system.equipped": true };
-    }
-    // Spells only
-    if (item.type === "spell") {
-
-    }
-    // Weapons only
-    if (item.type === "weapon") {
-        updates = { ...updates, "system.equipped": false };
-        let friendlyName = fixFriendlyName(item);
-        if (friendlyName) {
-            updates = { ...updates, "system.friendlyName": friendlyName };
-        }
-    }
-
-    console.log(`migrateItemData: Updated data for ${item.name}:`, updates)
-    return updates;
-}
-
-// function fixTempHp(actor) {
-//     // If tempHp is an object, convert it to zero
-//     if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp == "object") {
-//         console.log(`Fixing temp HP for ${actor.name}...`);
-//         return { "system.hp.tempHp": 0 };
-//     }
-//     return null;
-// }
-
-// function fixTempAtkMod(actor) {
-//     // If tempAcMod is an object, convert it to zero
-//     if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod == "object") {
-//         console.log(`Fixing temp attack mod for ${actor.name}...`);
-//         return { "system.tempAtkMod": 0 };
-//     }
-//     return null;
-// }
-
-// function fixTempDmgMod(actor) {
-//     // If tempDmgMod is an object, convert it to zero
-//     if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod == "object") {
-//         console.log(`Fixing temp damage mod for ${actor.name}...`);
-//         return { "system.tempDmgMod": 0 };
-//     }
-//     return null;
-// }
-
-// function fixTempAcMod(actor) {
-//     // If tempAcMod is an object, convert it to zero
-//     if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod == "object") {
-//         console.log(`Fixing temp AC mod for ${actor.name}...`);
-//         return { "system.ac.tempAcMod": 0 };
-//     }
-//     return null;
-// }
-
-// function fixTempDrMod(actor) {
-//     // If tempDrMod is an object, convert it to zero
-//     if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod == "object") {
-//         console.log(`Fixing temp DR mod for ${actor.name}...`);
-//         return { "system.ac.tempDrMod": 0 };
-//     }
-//     return null;
-// }
-
-// function fixTempMvMod(actor) {
-//     // Only migrate if we haven't already fixed this
-//     if ("tempMvMod" in actor.system.movement && !("tempMvMod" in actor.system)) return null;
-//     console.log(`fixTempMvMod: Fixing ${actor.name}...`);
-//     // Migrate tempMvMod from system.* to system.movement.* in the actor template
-//     let updates = {}
-//     if (actor.system?.tempMvMod && !("tempMvMod" in actor.system.movement)) {
-//         // Reassign tempMvMod to the new property and delete the original
-//         updates = {
-//             "system.movement.tempMvMod": actor.system.tempMvMod,
-//             "system.-=tempMvMod": null
-//         };
-//     } else if (actor.system?.tempMvMod && actor.system.movement?.tempMvMod) {
-//         // Only delete the original
-//         updates = { "system.-=tempMvMod": null };
-//     } else {
-//         // Only assign the new property
-//         updates = { "system.movement.tempMvMod": 0 };
-//     }
-//     console.log(`fixTempMvMod: Updates for ${actor.name}...`, updates);
-//     return updates;
-// }
-
-function fixTokenSize(actor) {
-    // If actor size is Medium, convert prototype token size to 1
-    if (actor.system.size == "M") {
-        console.log(`Fixing token size for ${actor.name}...`)
-        const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 1, scaleY: 1}}}
-        return update
-    }
-    // If actor size is Large, convert prototype token size to 2
-    if (actor.system.size == "L") {
-        console.log(`Fixing token size for ${actor.name}...`)
-        const update = {prototypeToken: {width: 2, height: 2, texture: {scaleX: 1, scaleY: 1}}}
-        return update
-    }
-    // If actor size is Huge, convert prototype token size to 3
-    if (actor.system.size == "H") {
-        console.log(`Fixing token size for ${actor.name}...`)
-        const update = {prototypeToken: {width: 3, height: 3, texture: {scaleX: 1, scaleY: 1}}}
-        return update
-    }
-    // If actor size is Small, convert prototype token scale to 0.5
-    if (actor.system.size == "S") {
-        console.log(`Fixing token size for ${actor.name}...`)
-        const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 0.5, scaleY: 0.5}}}
-        return update
-    }
-    return null
-}
-
-function fixFriendlyName(item) {
-    const friendlyName = item.system.friendlyName;
-    // Use a regex to replace (1h) or (2h) with null
-    const output = friendlyName.replace(/\s?\((1h|2h)\)/g, "");
-    return output;
-}
-
-// function updateWeaponFormula(item) {
-//     let newFormula = item.system.formula
-//     if (item.system.formula.includes("@item.atkMod")) {
-//         console.log(`Removing @item.atkMod from ${item.name} formula...`)
-//         // Remove the item atkMod from the formula
-//         newFormula = newFormula.replace("+ @item.atkMod", "")
-//         newFormula = newFormula.replace("+@item.atkMod", "")
-//     }
-//     // Only remove @fa from weapons
-//     if (item.type == "weapon" && item.system.formula.includes("@fa")) {
-//         console.log(`Removing @fa from ${item.name} formula...`)
-//         // Also remove fighting ability from the formula
-//         newFormula = newFormula.replace("+ @fa", "")
-//         newFormula = newFormula.replace("+@fa", "")
-//     }
-//     // Finally, trim off any extra spaces
-//     newFormula = newFormula.trim()
-
-//     // Did we make any changes?
-//     if (newFormula != item.system.formula) {
-//         const update = {system: {}}
-//         update.system = {formula: newFormula}
-//         return update;
-//     }
-//     // Else...    
-//     return null;
-// }
-
-function updateEmpty(item) {
-    console.log(item.name)
-    const update = {system: {}}
-    update.system = {rollMode: "", blindRoll: null}
-    return update;
-}
-
-function filterEmpty(item) {
-    return item.type === "feature" && (item.system.formula === "undefined" || item.system.formula === undefined || item.system.formula === "")
-}
-
-/**
  * Generate a report on bestiary data
  */
 async function reportBestiary() {
@@ -1228,17 +952,25 @@ async function reportItems() {
         // Report on spells with active effects
         if (pack.metadata.label == "Spells") {
             let report = []
-            const title = `SPELL EFFECTS: Beginning report for compendium ${pack.metadata.label}...`
+            let report2 = []
+            const title = `SPELLS: Beginning report for compendium ${pack.metadata.label}...`
             // Iterate over compendium entries and report
             const documents = await pack.getDocuments()
             for (let doc of documents) {
-                // console.log(`SPELL EFFECTS: ${doc.name}...`, doc);
+                // if (doc.system.range == "self") {
+                //     report.push(`${doc.name} has range self.`);
+                // }
+                if (doc.system.atkRoll) {
+                    report2.push(`${doc.name} has an attack roll with formula ${doc.system.formula}.`);
+                }
                 for ( const effect of doc.effects ) {
                     report.push(`${doc.name} has effect ${effect.name}`);
                 }
             }
             report.sort();
+            report2.sort();
             console.log(`${title}\n` + report.join("\n"));
+            console.log(`${title}\n` + report2.join("\n"));
         }
 
         // Report on weapons with (1h) or (2h) in the name or friendlyName
