@@ -1591,8 +1591,11 @@ export class Hyp3eActor extends Actor {
             // Convert other units to feet if necessary, assuming base grid is feet
             if (unit === 'yd' || unit === 'yards') value *= 3;
             if (unit === 'm' || unit === 'meters') value *= 3.28084;
+            if (unit === 'mi' || unit === 'miles') value *= 5280;
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_parseSpellRange: Spell range: ${rangeStr} = ${value} feet`) }
             return Math.round(value);
         }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`_parseSpellRange: Spell range ${rangeStr} could not be determined!`) }
         return Infinity; // Unknown range format
     }
 
@@ -2423,29 +2426,6 @@ export class Hyp3eActor extends Actor {
             effectsArray.push(effect.name)
         })
         return effectsArray
-    }
-
-    // Parse spell range to get distance in feet
-    _parseSpellRange(range) {
-        let distance = 0
-        if (range.includes("ft") || range.includes("feet") || range.includes("foot")) {
-            distance = parseInt(range.split(" ")[0])
-        } else if (range.includes("yd") || range.includes("yard")) {
-            distance = parseInt(range.split(" ")[0]) * 3
-        } else if (range.includes("in")) {
-            distance = parseInt(range.split(" ")[0]) / 12
-        } else if (range.includes("mi")) {
-            distance = parseInt(range.split(" ")[0]) * 5280
-        } else if (range.includes("touch")) {
-            distance = 7
-        } else if (range.includes("m") || range.includes("meter")) {
-            // Hopefully this is a unusual, the game is built around empirical units
-            distance = parseInt(range.split(" ")[0]) * 3
-        }
-        // Log original range and calculated distance
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Spell range: ${range} = ${distance} feet`) }
-
-        return distance
     }
 
     // Parse item name to see if it has an attack/damage modifier
