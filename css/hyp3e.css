@@ -997,6 +997,15 @@ textarea {
         max-width: 90px;
     }
   }
+  .range {
+    min-width: 110px;
+    max-width: 125px;
+    input {
+        text-align: center;
+        min-width: 30px;
+        max-width: 40px;
+    }
+  }
 }
 
 /* Horizontal rule plain style */
