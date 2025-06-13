@@ -746,12 +746,12 @@ textarea {
   margin-right: 5px;
   margin-bottom: 3px;
   min-width: 150px;
-}
-.hyp3e .npc-stat-block input {
-  text-align: center;
-  min-width: 50px;
-  max-width: 75px;
-  margin-bottom: 2px;
+  input {
+    text-align: center;
+    min-width: 50px;
+    max-width: 75px;
+    margin-bottom: 2px;
+  }
 }
 .hyp3e .npc-description-block {
   padding: 0 2px;
@@ -965,6 +965,38 @@ textarea {
 .hyp3e .item-form {
   font-family: "Roboto", sans-serif;
   /* font-family: "Herculanum", sans-serif; */
+}
+/* Item header-block styles */
+.hyp3e .item-header-block {
+  padding: 0 2px;
+  margin-right: 5px;
+  .xp {
+    min-width: 75px;
+    max-width: 100px;
+    input {
+        text-align: center;
+        min-width: 50px;
+        max-width: 75px;
+    }
+  }
+  .qty-wt {
+    min-width: 140px;
+    max-width: 160px;
+    input {
+        text-align: center;
+        min-width: 22px;
+        max-width: 35px;
+    }
+  }
+  .gp-cost {
+    min-width: 90px;
+    max-width: 125px;
+    input {
+        text-align: center;
+        min-width: 75px;
+        max-width: 90px;
+    }
+  }
 }
 
 /* Horizontal rule plain style */

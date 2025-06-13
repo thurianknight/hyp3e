@@ -88,7 +88,7 @@ export function migrateActorData(actor) {
  * @param {*} item - Item document to process for data migrations
  * @returns {Object} - JSON of update data
  */
-export function migrateItemData(actor) {
+export function migrateItemData(item) {
     console.log(`migrateItemData: Original ${item.name} to migrate:`, item)
     // let newItem = {...item};
     let updates = {};

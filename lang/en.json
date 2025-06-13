@@ -327,6 +327,7 @@
             "value": "GP Value",
             "qty": "Qty",
             "weight": "Weight",
+            "wt": "Wt",
             "location": "Location",
             "incr": "Add",
             "decr": "Subtract",
