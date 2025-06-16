@@ -225,6 +225,7 @@
                     "value": 1,
                     "max": 0
                 },
+                "isConsumable": false,
                 "location": "",
                 "weight": 0,
                 "cost": 0,
@@ -255,7 +256,6 @@
             "templates": ["base", "physical", "equippable"],
             "isContainer": true,
             "itemIds": [],
-            "isConsumable": false,
             "isAmmunition": false
         },
         "feature": {
@@ -269,7 +269,6 @@
             "templates": ["base", "physical", "equippable", "rollable"],
             "isContainer": false,
             "itemIds": [],
-            "isConsumable": false,
             "isAmmunition": false
         },
         "spell": {
