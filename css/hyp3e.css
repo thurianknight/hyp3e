@@ -984,7 +984,7 @@ textarea {
     max-width: 160px;
     input {
         text-align: center;
-        min-width: 22px;
+        min-width: 25px;
         max-width: 35px;
     }
   }

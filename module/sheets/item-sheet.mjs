@@ -12,7 +12,7 @@ export class Hyp3eItemSheet extends ItemSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["hyp3e", "sheet", "item"],
-      width: 520,
+      width: 540,
       height: 500,
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }]
     });
