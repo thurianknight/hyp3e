@@ -380,6 +380,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     super.activateListeners(html);
 
     // Render the item sheet for viewing/editing prior to the editable check.
+
     html.find('.item-show').click(event => {
       this._displayItemInChat(event);
     });
@@ -437,10 +438,10 @@ export class Hyp3eActorSheet extends ActorSheet {
         // Disable or enable any active effects coming from the item
         if (!item.system.equipped) {
             // Disable effects
-            disableAllEffects(item.id, this.actor.id, true)
+            disableAllEffects(item, this.actor.id, true)
         } else {
             // Enable effects
-            enableAllEffects(item.id, this.actor.id, true)
+            enableAllEffects(item, this.actor.id, true)
         }
         // Send a chat message that the item was equipped/unequipped or carried/dropped
         const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
@@ -469,6 +470,45 @@ export class Hyp3eActorSheet extends ActorSheet {
 
     // Rollable abilities.
     html.find('.rollable').click(this._onRoll.bind(this));
+
+    // Items that have their own spells or features to use
+    html.find(".item-cast-spell").on("click", async ev => {
+        const itemId = ev.currentTarget.closest(".item")?.dataset?.itemId;
+        const item = this.actor.items.get(itemId);
+
+        // Select spell (if multiple)
+        const spellRefs = item.system?.spellcasting?.spellRefs ?? [];
+        console.log(`item-cast-spell: spells:`, spellRefs)
+        if (spellRefs.length === 1) {
+            this.actor.useItemSpell(item, spellRefs[0]);
+        } else {
+            // Prompt to select which spell
+            const options = await Promise.all(spellRefs.map(async ref => {
+                const doc = await fromUuid(ref);
+                const label = doc?.name ?? ref;
+                return `<option value="${ref}">${label}</option>`;
+            }));
+            const optionsHtml = options.join("");
+
+            new Dialog({
+                title: "Choose Spell or Feature",
+                content: `<form><div class="form-group">
+                            <label>Spell</label>
+                            <select id="spell-choice">${optionsHtml}</select>
+                            </div></form>`,
+                buttons: {
+                    cast: {
+                        label: "Cast",
+                        callback: html => {
+                            const spellUuid = html.find("#spell-choice").val();
+                            this.actor.useItemSpell(item, spellUuid);
+                        }
+                    },
+                    cancel: { label: "Cancel" }
+                }
+            }).render(true);
+        }
+    });
 
     // Drag events for macros.
     if (this.actor.isOwner) {
@@ -622,7 +662,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
     // Use the item's display function to do it
-    item._displayItemInChat()
+    item._displayItemInChat(this.actor)
   }
 
   _onSortItem(event, itemData) {

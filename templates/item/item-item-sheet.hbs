@@ -55,6 +55,9 @@
   <nav class="sheet-tabs tabs" data-group="primary">
     <a class="item" data-tab="description">{{localize 'HYP3E.tabs.details'}}</a>
     <a class="item" data-tab="attributes">{{localize 'HYP3E.tabs.attributes'}}</a>
+    {{#if system.spellcasting.hasSpells}}
+    <a class="item" data-tab="spells">{{localize 'HYP3E.tabs.spells'}}</a>
+    {{/if}}
     <a class="item" data-tab="effects">{{localize 'HYP3E.tabs.effects'}}</a>
   </nav>
 
@@ -147,6 +150,11 @@
           <input name="system.isAmmunition" type="checkbox" {{checked system.isAmmunition}}>
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isAmmunition'}}</div>
         </div>
+        <div class="flexrow flexshrink flex-group-left item-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.hasSpells'}}</label>
+          <input name="system.spellcasting.hasSpells" type="checkbox" {{checked system.spellcasting.hasSpells}}>
+          <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.hasSpells'}}</div>
+        </div>
         <label class="resource-label">{{localize 'HYP3E.dataLabel.itemId'}}</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>
         {{#unless system.isContainer}}
@@ -158,6 +166,19 @@
           <input id="system.isContainer" name="system.isContainer" type="checkbox" {{checked system.isContainer}}>
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isContainer'}}</div>
         </div>
+      </div>
+    </div>
+
+    {{!-- Spells Tab --}}
+    <div class="tab spells" data-group="primary" data-tab="spells">
+      <div class="description-block">
+        {{#if isGM}}
+        {{> "item-spells"}}
+        {{else}}
+            {{#if system.identified}}
+            {{> "item-spells"}}
+            {{/if}}
+        {{/if}}
       </div>
     </div>
 

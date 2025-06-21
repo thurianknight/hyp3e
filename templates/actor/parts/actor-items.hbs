@@ -36,6 +36,14 @@
                 <img src="{{container.img}}" title="{{container.name}}" width="24" height="24"/>
                 {{/if}}
               </div>
+              <!-- New cast spell button (only shown if item has spells) -->
+              {{#if item.system.identified}}
+              {{#if item.system.spellcasting.spellRefs.length}}
+              <div class="item-prop" style="margin-right: 5px;">
+                <a class="item-cast-spell" data-item-id="{{item.id}}" data-roll-mode="publicroll" title='{{localize "Use Spell"}}'><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+              </div>
+              {{/if}}
+              {{/if}}
               <a><h4 class="item-drop">{{container.name}}</h4></a>
             </div>
             <div class="item-prop">{{container.system.quantity.value}}
@@ -76,6 +84,14 @@
                   <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                   {{/if}}
                 </div>
+                <!-- New cast spell button (only shown if item has spells) -->
+                {{#if item.system.identified}}
+                {{#if item.system.spellcasting.spellRefs.length}}
+                <div class="item-prop" style="margin-right: 5px;">
+                    <a class="item-cast-spell" data-item-id="{{item.id}}" data-roll-mode="publicroll" title='{{localize "Use Spell"}}'><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+                </div>
+                {{/if}}
+                {{/if}}
                 <a><h4 class="item-drop">{{item.name}}</h4></a>
               </div>
               <div class="item-prop">
@@ -124,6 +140,14 @@
                 <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                 {{/if}}
               </div>
+              <!-- New cast spell button (only shown if item has spells) -->
+              {{#if item.system.identified}}
+              {{#if item.system.spellcasting.spellRefs.length}}
+              <div class="item-prop" style="margin-right: 5px;">
+                <a class="item-cast-spell" data-item-id="{{item.id}}" data-roll-mode="publicroll" title='{{localize "Use Spell"}}'><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+              </div>
+              {{/if}}
+              {{/if}}
               <a><h4 class="item-drop">{{item.name}}</h4></a>
             </div>
             <div class="item-prop">

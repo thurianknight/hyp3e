@@ -208,7 +208,10 @@ export class Hyp3eDice {
     static buildDamageFormula(itemData, ammoData = null, actorData = null) {
         let dmgRollParts = []
         let debugDmgRollParts = []
-        if (CONFIG.HYP3E.debugMessages) { console.log(`buildDamageFormula: Item damage type: ${itemData?.dmgType}`) }
+        if (CONFIG.HYP3E.debugMessages) { 
+            console.log(`buildDamageFormula: Item damage type: ${itemData?.dmgType}`) 
+            console.log(`buildDamageFormula: Actor data:`, actorData)
+        }
         const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Basic"
         const altDmgTypes =  Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
         if (CONFIG.HYP3E.debugMessages) { console.log(`buildDamageFormula: Alternate damage types:`, altDmgTypes) }
@@ -263,6 +266,10 @@ export class Hyp3eDice {
         // Casting Ability
         const caRegex = /\+\s*@ca/g
         if (debugDmgRollParts[1].match(caRegex) > "") {
+            // This is where we override the actor's CA if the spell is being cast from an item
+
+            // Temp fix if CA is null
+            if (actorData.ca == null) actorData.ca = 0
             dmgRollParts[0] = dmgRollParts[0].replace(caRegex, `+ ${actorData.ca}`)
             debugDmgRollParts[1] = debugDmgRollParts[1].replace(caRegex, "")
             debugDmgRollParts.push(`<tr><td>Casting Ability</td><td>${actorData.ca}</td></tr>`)

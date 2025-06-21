@@ -165,6 +165,34 @@ export class Hyp3eItem extends Item {
     }
 
     /**
+     * This is used by items that cast their own spells and need an "actor" for getRollData()
+     * @returns JSON data for pseudo-Actor
+     */
+    createPseudoActorForItem() {
+        // Debug log
+        console.log(`createPseudoActorForItem: Item:`, this)
+        const ca = this.system?.spellcasting?.ca ?? 0;
+
+        return {
+            getRollData() {
+                return {
+                    fa: Math.floor(ca / 2),
+                    ca: ca,
+                    attributes: {
+                        str: {
+                            atkMod: 0,
+                            dmgMod: 0,
+                        },
+                        dex: {
+                            atkMod: 0,
+                        },
+                    },
+                };
+            }
+        };
+    }
+
+    /**
      * Prepare a data object which is passed to any Roll formulas which are created related to this Item
      * @private
      */
@@ -195,11 +223,11 @@ export class Hyp3eItem extends Item {
      * Handle displaying an Item description in the chat.
      * @private
      */
-    async _displayItemInChat() {
+    async _displayItemInChat(actor) {
         // const item = this
         const item = foundry.utils.deepClone(this)
         const itemData = item.system
-        const actor = item.actor
+        // const actor = item.actor
         const actorData = actor.system
         
         // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
@@ -266,7 +294,7 @@ export class Hyp3eItem extends Item {
                     // const roll = new Roll(`${itemData.damage} + ${itemData.dmgMod}`, actorData)
                     const roll = new Roll(dmgFormula, actorData)
                     console.log("_displayItemInChat: Damage roll: ", roll)
-                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-actor-id='${actor.id}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}' data-source-type='${item.type}'></div>`;
+                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' data-actor-id='${actor.id}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}' data-source-type='${item.type}'></div>`;
                 } else {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
@@ -305,7 +333,7 @@ export class Hyp3eItem extends Item {
                     // Resolve damage string & variables to a rollable formula
                     // const roll = new Roll(itemData.damage, actorData)
                     const roll = new Roll(dmgFormula, actorData)
-                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-actor-id='${actor.id}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}' data-source-type='${item.type}'></div>`;
+                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' data-actor-id='${actor.id}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}' data-source-type='${item.type}'></div>`;
                 } else {
                     content += `<p>Damage: ${itemData.damage}</p>`
                 }
@@ -324,7 +352,7 @@ export class Hyp3eItem extends Item {
 
         // Items might have Effects, but only show the button if item is identified
         if (item.effects.size > 0 && itemData.identified) {
-            content += `<div class='apply-effects-button' data-item-id='${item.id}' data-actor-id='${actor.id}'></div>`;
+            content += `<div class='apply-effects-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' data-actor-id='${actor.id}'></div>`;
         }
         // Items might have a Saving Throw, but only show the button if item is identified
         if (itemData.save && itemData.save !== "" && itemData.identified) {

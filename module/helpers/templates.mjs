@@ -20,6 +20,7 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/actor/parts/npc-abilities.hbs`,
 
         // Item partials
+        `${HYP3E.templatePath}/item/parts/item-spells.hbs`,
         `${HYP3E.templatePath}/item/parts/item-effects.hbs`,
 
         // Combat Tab

@@ -695,13 +695,6 @@ Hooks.once("ready", async function() {
         if (game.settings.get(game.system.id, "resizeTokens")) {
             resizeTokenPrototypes()
         }
-        // Data reports for analysis & troubleshooting
-        // if (foundry.utils.isNewerVersion("0.9.38", game.system.version)) {
-        //     reportBestiary()
-        // }
-        // if (foundry.utils.isNewerVersion("1.10.5", game.system.version)) {
-            reportItems()
-        // }
     }
 
 });
@@ -905,94 +898,6 @@ async function resizeTokenPrototypes() {
                 await actor.update(tokenSize)
             }
         }
-    }
-}
-
-/**
- * Generate a report on bestiary data
- */
-async function reportBestiary() {
-    // Loop through all compendia to find the bestiary
-    for (let pack of game.packs) {
-
-        // Skip anything that's not an Actor compendium pack
-        if (pack.metadata.type != "Actor") {
-            continue
-        }
-
-        // We only need to do the Bestiary compendium for this specific migration
-        if (pack.metadata.label !== "Bestiary") {
-            continue
-        }
-
-        // OK, we have the bestiary compendium... generate the report
-
-        // Iterate over compendium entries and report
-        const documents = await pack.getDocuments()
-        for (let doc of documents) {
-            if (doc.name != doc.prototypeToken.name) {
-                console.log(`Compendium Bestiary error: ${doc.name} is not the same as token ${doc.prototypeToken.name}!`)
-            }
-        }
-    }
-}
-
- /**
-  * Generate a report on item data in the compendium.
-  */
-async function reportItems() {
-    // Report on all items with blank weight and zero weight.
-
-    for (let pack of game.packs) {
-        // Skip anything that's not an Item compendium pack
-        if (pack.metadata.type != "Item") {
-            continue
-        }
-
-        // Report on spells with active effects
-        if (pack.metadata.label == "Spells") {
-            let report = []
-            let report2 = []
-            const title = `SPELLS: Beginning report for compendium ${pack.metadata.label}...`
-            // Iterate over compendium entries and report
-            const documents = await pack.getDocuments()
-            for (let doc of documents) {
-                // if (doc.system.range == "self") {
-                //     report.push(`${doc.name} has range self.`);
-                // }
-                if (doc.system.atkRoll) {
-                    report2.push(`${doc.name} has an attack roll with formula ${doc.system.formula}.`);
-                }
-                for ( const effect of doc.effects ) {
-                    report.push(`${doc.name} has effect ${effect.name}`);
-                }
-            }
-            report.sort();
-            report2.sort();
-            console.log(`${title}\n` + report.join("\n"));
-            console.log(`${title}\n` + report2.join("\n"));
-        }
-
-        // Report on weapons with (1h) or (2h) in the name or friendlyName
-        if (pack.metadata.label == "Weapons") {
-            let report = []
-            const title = `WEAPON NAMES: Beginning report for compendium ${pack.metadata.label}...`
-            // Iterate over compendium entries and report
-            const documents = await pack.getDocuments()
-            for (let doc of documents) {
-                const matches = doc.name.match(/\((1h|2h)\)/g);
-                if (matches && matches.length > 0) {
-                    report.push(`${doc.name} includes 1h or 2h in name:`, matches);
-                }
-                const friendlyMatches = doc.system.friendlyName.match(/\((1h|2h)\)/g);
-                if (friendlyMatches && friendlyMatches.length > 0) {
-                    report.push(`${doc.name} includes 1h or 2h in friendlyName:`, friendlyMatches);
-                }
-            }
-            report.sort();
-            console.log(`${title}\n` + report.join("\n"));
-        }
-
     }
 }
 

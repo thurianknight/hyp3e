@@ -232,6 +232,17 @@
                 "xp": "",
                 "containerId": ""
             },
+            "canHaveSpells": {
+                "spellcasting": {
+                    "hasSpells": false,
+                    "ca": null,
+                    "charges": {
+                        "value": null,
+                        "max": null
+                    },
+                    "spellRefs": []
+                }
+            },
             "rollable": {
                 "atkRoll": false,
                 "tn": "",
@@ -245,7 +256,7 @@
             }
         },
         "armor": {
-            "templates": ["base", "physical", "equippable"],
+            "templates": ["base", "physical", "equippable", "canHaveSpells"],
             "type": "unarmored",
             "ac": 9,
             "dr": 0,
@@ -266,7 +277,7 @@
             "rollMode": ""
         },
         "item": {
-            "templates": ["base", "physical", "equippable", "rollable"],
+            "templates": ["base", "physical", "equippable", "rollable", "canHaveSpells"],
             "isContainer": false,
             "itemIds": [],
             "isAmmunition": false
@@ -284,7 +295,7 @@
             "isConsumable": true
         },
         "weapon": {
-            "templates": ["base", "physical", "equippable", "rollable"],
+            "templates": ["base", "physical", "equippable", "rollable", "canHaveSpells"],
             "type": "melee",
             "melee": true,
             "missile": false,

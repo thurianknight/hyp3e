@@ -47,7 +47,16 @@ export class Hyp3eItemSheet extends ItemSheet {
     const actor = this.object?.parent ?? null;
     if (actor) {
       context.rollData = actor.getRollData()
+    } else {
+      context.rollData = itemData.createPseudoActorForItem()
     }
+
+    // Prepare spell list
+    const spellRefs = this.item.system?.spellcasting?.spellRefs ?? [];
+    const resolvedSpells = await Promise.all(
+        spellRefs.map(uuid => fromUuid(uuid))
+    );
+    context.spells = resolvedSpells.filter(s => s instanceof Item); // Filter out any nulls
 
     // Prepare active effects
     context.effects = prepareActiveEffectCategories(this.item.effects);
@@ -74,7 +83,7 @@ export class Hyp3eItemSheet extends ItemSheet {
             async: true 
         }
     );
-    // console.log("Roll Data in ItemSheet:", context.rollData);
+    console.log("getData: Roll Data in ItemSheet:", context.rollData);
     // console.log("Enriched HTML:", context.enrichedDescription);
 
     // Prepare item data.
@@ -195,8 +204,21 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Roll handlers, click handlers, etc. would go here.
 
+    // Enable drop functionality
+    this.element[0].addEventListener("drop", this._onDrop.bind(this));
+
     // Rollable elements
     html.find('.rollable').click(this._onRoll.bind(this));
+
+    // Handle displaying item description in the chat log
+    html.find('.item-show').click(event => {
+      this._openItemSheet(event);
+    });
+
+    // Handle toggling spell description as drop-down text
+    html.find(".item-drop").click((event) => {
+        this._toggleItemSummary(event);
+    });
 
     // Handle item name/realName changes, only if the item is identified
     html.find('.item-name').change(async (event) => {
@@ -252,6 +274,19 @@ export class Hyp3eItemSheet extends ItemSheet {
         Hyp3eItemSheet.ITEM_ANNOTATIONS_APP.render(true, { itemUuid: this.item.uuid, focus: true });
     });
 
+    // Handle removing a spell from the item
+    html.find(".item-delete-spell").on("click", async ev => {
+        ev.preventDefault();
+
+        const li = $(ev.currentTarget).closest("[data-spell-id]");
+        const uuid = li.data("spellId");
+
+        const spellRefs = this.item.system.spellcasting.spellRefs ?? [];
+        const updated = spellRefs.filter(ref => ref !== uuid);
+
+        await this.item.update({ "system.spellcasting.spellRefs": updated });
+    });
+
     // Active Effect management
     html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.item));
 
@@ -284,6 +319,72 @@ export class Hyp3eItemSheet extends ItemSheet {
     });
 
   }
+
+  async _onDrop(event) {
+    event.preventDefault();
+
+    // Read dropped data
+    const dataTransfer = event.dataTransfer?.getData("text/plain");
+    if (!dataTransfer) return;
+
+    const dropData = JSON.parse(dataTransfer);
+
+    // Check if it's a spell Item
+    if (dropData.type !== "Item") return;
+    
+    const droppedItem = await fromUuid(dropData.uuid ?? dropData.data?.uuid);
+    if (!droppedItem || droppedItem.type !== "spell") {
+        ui.notifications.warn("Only spells can be added to this item.");
+        return;
+    }
+
+    // Grab the UUID
+    const uuid = droppedItem.uuid;
+
+    // Avoid duplicates
+    const currentRefs = this.item.system.spellcasting?.spellRefs ?? [];
+    if (currentRefs.includes(uuid)) {
+        ui.notifications.info("That spell is already linked to this item.");
+        return;
+    }
+
+    // Add the UUID to the item's spellRefs
+    await this.item.update({
+        "system.spellcasting.spellRefs": [...currentRefs, uuid]
+    });
+
+    ui.notifications.info(`Added spell "${droppedItem.name}" to item.`);
+  }
+
+  /**
+   * Handle toggling an Item description in the character sheet.
+   * @param {Event} event   The originating click event
+   * @private
+   */
+  _toggleItemSummary(event) {
+    event.preventDefault()
+    const itemSummary = event.currentTarget
+      .closest(".item-entry.item")
+      .querySelector(".item-summary");
+    if (itemSummary.style.display === "") {
+      itemSummary.style.display = "block"
+    } else {
+      itemSummary.style.display = ""
+    }
+  }
+
+  /**
+   * Handle displaying an Item description in the chat.
+   * @param {Event} event   The originating click event
+   * @private
+   */
+  async _openItemSheet(event) {
+    const li = $(event.currentTarget).closest(".item-entry")
+    const item = await fromUuid(li.data("spellId"))
+    if (item && item.sheet) {
+        item.sheet.render(true);
+    }
+}
 
   /**
    * Handle toggling an item as 'identified' or 'unidentified'

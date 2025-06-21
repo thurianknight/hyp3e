@@ -15,6 +15,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const debugDmgRollFormula = $(b).data('debugFormula');
             const sourceType = $(b).data('sourceType');
             const itemId = $(b).data('itemId');
+            const itemUuid = $(b).data('itemUuid');
             const actorId = $(b).data('actorId');
             const tokenId = $(b).data('tokenId');
             let dmgButton = $(
@@ -25,7 +26,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, tokenId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, itemUuid, tokenId, sourceType);
             });
         });
     }
@@ -40,6 +41,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const applyDr = $(b).data('applyDr');
             const sourceType = $(b).data('sourceType');
             const itemId = $(b).data('itemId');
+            const itemUuid = $(b).data('itemUuid');
             const actorId = $(b).data('actorId');
             const tokenId = $(b).data('tokenId');
             let dmgButton = $(
@@ -50,7 +52,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll2h.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, tokenId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, itemUuid, tokenId, sourceType);
             });
         });
     }
@@ -245,9 +247,10 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     // Apply/Enable/Disable Effect buttons
     let effectApply = html.find(".apply-effects-button");
     if (effectApply.length > 0) {
-        effectApply.each((_i, b) => {
+        effectApply.each(async (_i, b) => {
             if (CONFIG.HYP3E.debugMessages) { console.log(`Apply Effects html: `, b) }
             let itemId = $(b).data('itemId');
+            let itemUuid = $(b).data('itemUuid');
             let actorId = $(b).data('actorId');
             // Get the actor
             let actor = game.actors.get(actorId);
@@ -257,8 +260,8 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 return;
             }
             if (CONFIG.HYP3E.debugMessages) { console.log(`Apply Effects Button actor: `, actor) }
-            // Get the actor's item
-            let item = actor.items.get(itemId);
+            // Get the actor's item or global item
+            let item = actor.items.get(itemId) ?? await fromUuid(itemUuid);
             if (!item) {
                 ui.notifications?.error(`Apply Effects Button: Item ${itemId} not found! See console log for details.`);
                 if (CONFIG.HYP3E.debugMessages) {
@@ -311,8 +314,8 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                         // effectApply.on("click", (ev) => {
                         effectDisableButton.on("click", (ev) => {
                             ev.stopPropagation();
-                            // disableAllEffects(itemId, actorId);
-                            disableEffect(itemId, effect.id, actorId);
+                            // disableAllEffects(item, actorId);
+                            disableEffect(item, effect.id, actorId);
                         });
                     } else {
                         // Effect is disabled, so create a button to enable it
@@ -325,8 +328,8 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                         // effectApply.on("click", (ev) => {
                         effectEnableButton.on("click", (ev) => {
                             ev.stopPropagation();
-                            // enableAllEffects(itemId, actorId);
-                            enableEffect(itemId, effect.id, actorId);
+                            // enableAllEffects(item, actorId);
+                            enableEffect(item, effect.id, actorId);
                         });
                     }
                 } else {
@@ -340,8 +343,8 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     // effectApply.on("click", (ev) => {
                     effectApplyButton.on("click", (ev) => {
                         ev.stopPropagation();
-                        // applyAllEffects(itemId, actorId);
-                        applyEffect(itemId, effect.id, actorId);
+                        // applyAllEffects(item, actorId);
+                        applyEffect(item, effect.id, actorId);
                     });
                 }
             });
@@ -373,8 +376,14 @@ export async function showValueChange(t, fillColor, total) {
 }
 
 // Roll damage button and display in chat
-async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, tokenId, sourceType) {
-    if (formula == "") { return } // Exit on empty formula
+async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, itemUuid, tokenId, sourceType) {
+    // if (formula == "") { return } // Exit on empty formula
+    // Fix invalid formulae if possible
+    if (formula == "" || formula == null || formula == "0") {
+        formula = "0d0"
+    } else if (/^\d+$/.test(formula)) {
+        formula = `${formula}d1`
+    }
 
     let actor = {}
 
@@ -394,7 +403,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actor
     }
     if (CONFIG.HYP3E.debugMessages) { console.log(`rollDmgButton: Actor: `, actor) }
 
-    const item = actor.items.get(itemId)
+    const item = actor.items.get(itemId) ?? await fromUuid(itemUuid)
     if (!item) {
         ui.notifications?.error(`Roll Damage: Item ${itemId} not found!`);
         return;
@@ -411,7 +420,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actor
     let dmgRoll = new Roll(formula);
     if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll object: `, dmgRoll) }
     // Resolve the roll
-    await dmgRoll.roll()
+    await dmgRoll.evaluate({ evaluateSync: true });
 
     let naturalDmgRoll = 0
     if (dmgRoll.dice[0]?.total) {
@@ -428,6 +437,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actor
         naturalDmgRoll: naturalDmgRoll,
         dmgBaseRoll: baseDmgFormula,
         itemId: itemId,
+        itemUuid: itemUuid,
         actorId: actorId,
         sourceType: item.type,
         applyDr: applyDr,

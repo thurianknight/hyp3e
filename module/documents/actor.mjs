@@ -30,24 +30,6 @@ export class Hyp3eActor extends Actor {
         const actorData = this;
         const systemData = actorData.system;
 
-        // Fix/convert old data types
-        // // If tempHp is an object, convert it to zero
-        // if (typeof systemData.hp.tempHp == "object") {
-        //     systemData.hp.tempHp = 0
-        // }
-        // // If tempAcMod is an object, convert it to zero
-        // if (typeof systemData.ac.tempAcMod == "object") {
-        //     systemData.ac.tempAcMod = 0
-        // }
-        // // If tempDrMod is an object, convert it to zero
-        // if (typeof systemData.ac.tempDrMod == "object") {
-        //     systemData.ac.tempDrMod = 0
-        // }
-        // // If tempMvMod is an object, convert it to zero
-        // if (typeof systemData.movement.tempMvMod == "object") {
-        //     systemData.movement.tempMvMod = 0
-        // }
-
         // for (const effect of this.allApplicableEffects()) {
         //     for (const change of effect.changes) {
         //         if (CONFIG.HYP3E.debugMessages) { console.log(`Processing change ${change.key} of effect ${effect.name}...`) }
@@ -875,7 +857,7 @@ export class Hyp3eActor extends Actor {
      */
     async rollItem(dataset) {
         // Get item info to execute a standard roll
-        const { item, itemData, itemName, attackTextBase } = this._getItemDetails(dataset.itemId);
+        const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
         // const item = this.items.get(dataset.itemId)
         dataset.roll = item.system.formula
         // let itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
@@ -900,7 +882,7 @@ export class Hyp3eActor extends Actor {
             this.rollAttackOrSpell(dataset)
         } else if (item.type == "spell") {
             // Are we enforcing the spell memorization rule for PCs?
-            if (CONFIG.HYP3E.forceSpellMemorize && this.type == "character") {
+            if (!dataset.isItemSpell && CONFIG.HYP3E.forceSpellMemorize && this.type == "character") {
                 // Check if the spell is memorized
                 if (item.system.quantity.value <= 0) {
                     ui.notifications.warn(`${itemName} is not memorized!`)
@@ -913,6 +895,8 @@ export class Hyp3eActor extends Actor {
                 dataset.details = `No attack roll required to cast ${itemName}.`
                 dataset.noRoll = true
             }
+            // Log the dataset
+            console.log(`Spellcasting dataset:`, dataset)
             this.rollAttackOrSpell(dataset)
         } else {  // ==> Neither a weapon nor a spell
             // The default for other item types (i.e. class abilities and actual items) is a check,
@@ -933,7 +917,7 @@ export class Hyp3eActor extends Actor {
                         this.useItem(item.id)
                     }
                     if (item.effects.size > 0) {
-                        item._displayItemInChat()
+                        item._displayItemInChat(this)
                     }
                 } else {
                     // No item check, so we will popup a basic dialog to confirm use
@@ -956,7 +940,7 @@ export class Hyp3eActor extends Actor {
                         }
                         // Since we don't need to roll anything, just display the item in chat.
                         if (CONFIG.HYP3E.debugMessages) { console.log(`Roll response: `, rollResponse) }
-                        item._displayItemInChat()
+                        item._displayItemInChat(this)
                     } catch(err) {
                         return
                     }
@@ -1268,11 +1252,10 @@ export class Hyp3eActor extends Actor {
             let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
             // Since we don't need to roll anything, just display the item in chat.
             if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: roll response: `, rollResponse) }
-            item._displayItemInChat()
+            item._displayItemInChat(this)
         } catch(err) {
             return
         }
-
     }
 
     /**
@@ -1286,7 +1269,7 @@ export class Hyp3eActor extends Actor {
 
         // Gather Initial Information
         const { attacker, attackerPos } = await this._getAttackerDetails(dataset);
-        const { item, itemData, itemName, attackTextBase } = this._getItemDetails(dataset.itemId);
+        const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
         const actorData = this._getActorRollData();
 
         if (!item && !dataset.formula) { // If there's no item and no predefined formula (e.g., basic attack removed)
@@ -1299,7 +1282,7 @@ export class Hyp3eActor extends Actor {
         // Early exit if item requires a roll but has no formula (data setup errors)
         if (item && !itemData.formula && (item.type === "weapon" || (item.type === "spell" && itemData.atkRoll))) {
             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item has no roll formula, displaying description instead."); }
-            item._displayItemInChat();
+            item._displayItemInChat(this);
             return null;
         }
 
@@ -1358,13 +1341,17 @@ export class Hyp3eActor extends Actor {
             return null;
         }
 
+        // Temporarily override the actor's CA
+        if (dataset.isItemSpell) {
+            actorData.ca = dataset.itemCa
+        }
         // Handle Spell Slot Consumption (if applicable)
-        if (item?.type === "spell" && itemData?.quantity?.value > 0) {
+        if (!dataset.isItemSpell && item?.type === "spell" && itemData?.quantity?.value > 0) {
             await this._consumeSpellSlot(item);
         }
         // If there's no item roll formula (typically a spell), send a chat message and exit
         if (!itemData.formula) {
-            item._displayItemInChat();
+            item._displayItemInChat(this);
             return null;
         }
 
@@ -1462,9 +1449,14 @@ export class Hyp3eActor extends Actor {
      * @param {string} itemId - The ID of the item to retrieve.
      * @returns {{item: Item|null, itemData: object|null, itemName: string, attackTextBase: string}}
      */
-    _getItemDetails(itemId) {
-        const item = this.items.get(itemId) ?? null;
+    async _getItemDetails(itemId) {
+        const item = this.items.get(itemId) ?? await fromUuid(itemId);
         const itemData = item ? { ...item.system, itemType: item.type } : null; // Include item type
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log("rollAttackOrSpell/_getItemDetails: Item:", item);
+            console.log("rollAttackOrSpell/_getItemDetails: Item Data:", itemData);
+        }
+
         // itemName should be prioritized as (1) itemAlias [but only if not identified], 
         //  (2) friendlyName, and (3) realName
         let itemName = ""
@@ -1482,11 +1474,6 @@ export class Hyp3eActor extends Actor {
             } else if (item.type === "spell") {
                 attackTextBase = "Cast spell";
             }
-        }
-
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log("rollAttackOrSpell/_getItemDetails: Item:", item);
-            console.log("rollAttackOrSpell/_getItemDetails: Item Data:", itemData);
         }
         return { item, itemData, itemName, attackTextBase };
     }
@@ -1873,7 +1860,7 @@ export class Hyp3eActor extends Actor {
     _prepareDamageFormulas(itemData, ammoMods, actorData) {
         const dmgFormulas = {};
         // Build primary damage formula
-        const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData); // Assuming this exists
+        const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData);
         dmgFormulas.primary = {
             formula: dmgObj.formula,
             debugFormula: dmgObj.debugFormula
@@ -1881,9 +1868,9 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_prepareDamageFormulas: Damage formula:", dmgObj.formula); }
 
         // Build secondary (e.g., 2-handed) damage formula if applicable
-        if (itemData.damage2h) { // Check if damage2h field has content
+        if (itemData.damage2h) {
             dmgFormulas.secondary = {
-                formula: dmgObj.formula2h, // Assuming buildDamageFormula handles this
+                formula: dmgObj.formula2h,
                 debugFormula: dmgObj.debugFormula2h
             };
             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_prepareDamageFormulas: Damage formula 2H:", dmgObj.formula2h); }
@@ -2057,6 +2044,49 @@ export class Hyp3eActor extends Actor {
             });
         } else {
             if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll failed, no total value!") }
+        }
+    }
+
+    async useItemSpell(item, spellUuid) {
+        // Ensure item has spellcasting data
+        const spellcasting = item.system?.spellcasting;
+        if (!spellcasting?.hasSpells) {
+            ui.notifications.warn(`${item.name} has no spells to cast.`);
+            return;
+        }
+
+        // Check charges
+        if (spellcasting.charges?.value === 0) {
+            ui.notifications.warn(`${item.name} is out of charges.`);
+            return;
+        }
+
+        // Load the spell
+        const spell = await fromUuid(spellUuid);
+        if (!spell || !(spell instanceof Item)) {
+            ui.notifications.error(`Failed to load spell: ${spellUuid}`);
+            return;
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log("useItemSpell spell:", spell) };
+
+        const dataset = {
+            "rollType": "item",
+            "rollMode": "publicroll",
+            "label": `Cast spell ${spell.name}`,
+            "itemId": spellUuid,
+            "actorId": this.id,
+            "baseClass": this.system.baseClass,
+            "tokenId": this?.sheet?.token.id,
+            "isItemSpell": true,
+            "itemCa": item.system.spellcasting.ca
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log("useItemSpell dataset:", dataset) };
+        // Cast the spell as if from the actor, but override CA from item
+        await this.rollItem(dataset)
+
+        // Deduct charges
+        if (spellcasting.charges?.value != null) {
+            item.update({ "system.spellcasting.charges.value": spellcasting.charges.value - 1 });
         }
     }
 
