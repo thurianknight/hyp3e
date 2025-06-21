@@ -137,6 +137,10 @@ export class Hyp3eDice {
 
         } else if (itemData.itemType == "spell") {
             // Spell attack formulas are so bespoke, we need to handle each variable separately
+            if (atkRollParts.includes("@ca")) {
+                atkRollParts[atkRollParts.indexOf("@ca")] = actorData.ca
+                debugAtkRollParts[debugAtkRollParts.indexOf("@ca")] = `<tr><td>Casting Ability</td><td>${actorData.ca}</td></tr>`
+            }
             if (atkRollParts.includes("@fa")) {
                 atkRollParts[atkRollParts.indexOf("@fa")] = actorData.fa
                 debugAtkRollParts[debugAtkRollParts.indexOf("@fa")] = `<tr><td>Fighting Ability</td><td>${actorData.fa}</td></tr>`

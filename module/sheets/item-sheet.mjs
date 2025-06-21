@@ -53,10 +53,28 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Prepare spell list
     const spellRefs = this.item.system?.spellcasting?.spellRefs ?? [];
+    // const resolvedSpells = await Promise.all(
+    //     // spellRefs.map(uuid => fromUuid(uuid))
+    //     spellRefs.map(async ref => {
+    //         const spell = await fromUuid(ref.uuid);
+    //         if (!spell) return null;
+    //         return {
+    //             spell,
+    //             charges: ref.charges
+    //         };
+    //     })
+    // );
     const resolvedSpells = await Promise.all(
-        spellRefs.map(uuid => fromUuid(uuid))
+        spellRefs.map(async (ref, i) => ({
+            spell: await fromUuid(ref.uuid),
+            charges: ref.charges,
+            uuid: ref.uuid,
+            index: i
+        }))
     );
-    context.spells = resolvedSpells.filter(s => s instanceof Item); // Filter out any nulls
+
+    // context.spells = resolvedSpells.filter(s => s instanceof Item); // Filter out any nulls
+    context.spells = resolvedSpells.filter(Boolean)
 
     // Prepare active effects
     context.effects = prepareActiveEffectCategories(this.item.effects);
@@ -164,7 +182,7 @@ export class Hyp3eItemSheet extends ItemSheet {
     }
     const isIdentified = foundry.utils.getProperty(formData, "system.identified") || this.object.system.identified;
     // const isIdentified = this.object.system.identified;
-    console.log("Item identified:", isIdentified)
+    if (CONFIG.HYP3E.debugMessages) { console.log("Item identified:", isIdentified) }
 
     // Apply name and description based on identification state.
     if (isIdentified) {
@@ -187,7 +205,16 @@ export class Hyp3eItemSheet extends ItemSheet {
         formData["system.description"] = aliasDesc;
     }
 
-    return super._updateObject(event, formData);
+    // Spell references must be converted from a keyed object to an array.
+    //  Need to expand the formData first.
+    const data = expandObject(formData);
+    const refs = getProperty(data, "system.spellcasting.spellRefs");
+    if (refs && !Array.isArray(refs)) {
+        data.system.spellcasting.spellRefs = Object.values(refs);
+    }
+
+    if (CONFIG.HYP3E.debugMessages) { console.log(`Updated item data:`, data) }
+    return super._updateObject(event, data);
   }
 
 
@@ -282,7 +309,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         const uuid = li.data("spellId");
 
         const spellRefs = this.item.system.spellcasting.spellRefs ?? [];
-        const updated = spellRefs.filter(ref => ref !== uuid);
+        const updated = spellRefs.filter(ref => ref.uuid !== uuid);
 
         await this.item.update({ "system.spellcasting.spellRefs": updated });
     });
@@ -350,7 +377,7 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Add the UUID to the item's spellRefs
     await this.item.update({
-        "system.spellcasting.spellRefs": [...currentRefs, uuid]
+        "system.spellcasting.spellRefs": [...currentRefs, { uuid: uuid, charges: 1 }]
     });
 
     ui.notifications.info(`Added spell "${droppedItem.name}" to item.`);

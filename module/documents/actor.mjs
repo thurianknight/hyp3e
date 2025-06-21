@@ -2055,7 +2055,7 @@ export class Hyp3eActor extends Actor {
             return;
         }
 
-        // Check charges
+        // Check item charges
         if (spellcasting.charges?.value === 0) {
             ui.notifications.warn(`${item.name} is out of charges.`);
             return;
@@ -2068,6 +2068,10 @@ export class Hyp3eActor extends Actor {
             return;
         }
         if (CONFIG.HYP3E.debugMessages) { console.log("useItemSpell spell:", spell) };
+
+        // Get spell charges to use
+        const spellEntry = item.system.spellcasting.spellRefs.find(spell => spell.uuid === spellUuid)
+        const spellCharges = spellEntry.charges
 
         const dataset = {
             "rollType": "item",
@@ -2086,7 +2090,7 @@ export class Hyp3eActor extends Actor {
 
         // Deduct charges
         if (spellcasting.charges?.value != null) {
-            item.update({ "system.spellcasting.charges.value": spellcasting.charges.value - 1 });
+            item.update({ "system.spellcasting.charges.value": spellcasting.charges.value - spellCharges });
         }
     }
 

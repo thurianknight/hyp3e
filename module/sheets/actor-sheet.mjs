@@ -480,13 +480,14 @@ export class Hyp3eActorSheet extends ActorSheet {
         const spellRefs = item.system?.spellcasting?.spellRefs ?? [];
         console.log(`item-cast-spell: spells:`, spellRefs)
         if (spellRefs.length === 1) {
-            this.actor.useItemSpell(item, spellRefs[0]);
+            this.actor.useItemSpell(item, spellRefs[0].uuid);
         } else {
             // Prompt to select which spell
             const options = await Promise.all(spellRefs.map(async ref => {
-                const doc = await fromUuid(ref);
+                const doc = await fromUuid(ref.uuid);
+                const charges = ref.charges;
                 const label = doc?.name ?? ref;
-                return `<option value="${ref}">${label}</option>`;
+                return `<option value="${ref.uuid}">${label}</option>`;
             }));
             const optionsHtml = options.join("");
 
@@ -695,7 +696,6 @@ export class Hyp3eActorSheet extends ActorSheet {
         if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot move container (${source.name}) into another container (${target.name})!`) }
         return 
       }
-
       // Update the container info on the item
       this.actor.updateEmbeddedDocuments("Item", [
         { _id: source.id, "system.containerId": target.id, "system.location": target.name },
