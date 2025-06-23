@@ -46,28 +46,6 @@ Hooks.once('init', async function() {
         default: false,
     });
 
-    // Migrate compendia data, if desired (default false)
-    game.settings.register(game.system.id, "migrateCompendia", {
-        name: game.i18n.localize("HYP3E.settings.migrateCompendia"),
-        hint: game.i18n.localize("HYP3E.settings.migrateCompendiaHint"),
-        default: false,
-        scope: "world",
-        type: Boolean,
-        config: true,
-        requiresReload: true,
-    });
-
-    // Debug logging & messages
-    game.settings.register(game.system.id, "debugMessages", {
-        name: game.i18n.localize("HYP3E.settings.debugMessages"),
-        hint: game.i18n.localize("HYP3E.settings.debugMessagesHint"),
-        default: false,
-        scope: "world",
-        type: Boolean,
-        config: true,
-        requiresReload: true,
-    });
-
     // Automatic Armor Class calculation
     game.settings.register(game.system.id, "autoCalcAc", {
         name: game.i18n.localize("HYP3E.settings.autoCalcAc"),
@@ -355,6 +333,28 @@ Hooks.once('init', async function() {
         requiresReload: true,
     });
 
+    // Debug logging & messages
+    game.settings.register(game.system.id, "debugMessages", {
+        name: game.i18n.localize("HYP3E.settings.debugMessages"),
+        hint: game.i18n.localize("HYP3E.settings.debugMessagesHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
+
+    // Migrate compendia data, if desired (default false)
+    game.settings.register(game.system.id, "migrateCompendia", {
+        name: game.i18n.localize("HYP3E.settings.migrateCompendia"),
+        hint: game.i18n.localize("HYP3E.settings.migrateCompendiaHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
+
     // Add custom statusEffects
     const hasted = {
         id: "hasted",
@@ -550,7 +550,7 @@ Hooks.once("ready", async function() {
     // Force weapon equippage to use
     const forceWeaponEquip = game.settings.get(game.system.id, "forceWeaponEquip");
     CONFIG.HYP3E.forceWeaponEquip = forceWeaponEquip;
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Force weapon equippage to use:", CONFIG.HYP3E.forceWeaponEquip) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Force item equippage to use:", CONFIG.HYP3E.forceWeaponEquip) }
 
     // Force spell memorization to cast
     const forceSpellMemorize = game.settings.get(game.system.id, "forceSpellMemorize");
@@ -671,7 +671,7 @@ Hooks.once("ready", async function() {
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
         // No need to migrate if system version is x.x.x or higher
-        const NEEDS_MIGRATION_TO_VERSION = "1.13.0"
+        const NEEDS_MIGRATION_TO_VERSION = "1.14.0"
         const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
         if (needsMigration) {
             const alreadyRan = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
