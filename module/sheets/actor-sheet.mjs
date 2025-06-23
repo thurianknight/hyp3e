@@ -475,6 +475,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     html.find(".item-cast-spell").on("click", async ev => {
         const itemId = ev.currentTarget.closest(".item")?.dataset?.itemId;
         const item = this.actor.items.get(itemId);
+        const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
 
         // Are we enforcing the weapon equippage rule for PCs?
         if (CONFIG.HYP3E.forceWeaponEquip && this.actor.type === "character") {
