@@ -864,9 +864,9 @@ export class Hyp3eActor extends Actor {
         // let itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
 
         if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
-        if (item.type == "weapon") {
+        if (item.type === "weapon") {
             // Are we enforcing the weapon equippage rule for PCs?
-            if (CONFIG.HYP3E.forceWeaponEquip && this.type == "character") {
+            if (CONFIG.HYP3E.forceWeaponEquip && this.type === "character") {
                 // Check if the weapon is equipped
                 if (!item.system.equipped) {
                     ui.notifications.warn(`${itemName} is not equipped!`)
@@ -881,9 +881,9 @@ export class Hyp3eActor extends Actor {
                 dataset.noRoll = true
             }
             this.rollAttackOrSpell(dataset)
-        } else if (item.type == "spell") {
+        } else if (item.type === "spell") {
             // Are we enforcing the spell memorization rule for PCs?
-            if (!dataset.isItemSpell && CONFIG.HYP3E.forceSpellMemorize && this.type == "character") {
+            if (!dataset.isItemSpell && CONFIG.HYP3E.forceSpellMemorize && this.type === "character") {
                 // Check if the spell is memorized
                 if (item.system.quantity.value <= 0) {
                     ui.notifications.warn(`${itemName} is not memorized!`)
@@ -899,10 +899,20 @@ export class Hyp3eActor extends Actor {
             // Log the dataset
             console.log(`Spellcasting dataset:`, dataset)
             this.rollAttackOrSpell(dataset)
-        } else {  // ==> Neither a weapon nor a spell
+        } else {  // ==> Neither a weapon nor a spell (armor, feature, item)
             // The default for other item types (i.e. class abilities and actual items) is a check,
             //  followed by using inventory and applying applicable effects if the check succeeded
             //  or no check was required to proceed.
+
+            // Are we enforcing the item equippage rule for PCs? Only apply to armor & items
+            if (CONFIG.HYP3E.forceWeaponEquip && (item.type === "item" || item.type === "armor") && this.type === "character") {
+                // Check if the item is equipped
+                if (!item.system.equipped) {
+                    ui.notifications.warn(`${itemName} is not equipped!`)
+                    return
+                }
+            }
+
             let proceed = true
             let ranCheck = false
             dataset.label = `Using ${itemName}`
@@ -2061,10 +2071,10 @@ export class Hyp3eActor extends Actor {
         }
 
         // Check item charges
-        if (spellcasting.charges?.value === 0) {
-            ui.notifications.warn(`${item.name} is out of charges.`);
-            return;
-        }
+        // if (spellcasting.charges?.value === 0) {
+        //     ui.notifications.warn(`${item.name} is out of charges.`);
+        //     return;
+        // }
 
         // Load the spell
         const spell = await fromUuid(spellUuid);
@@ -2077,6 +2087,12 @@ export class Hyp3eActor extends Actor {
         // Get spell charges to use
         const spellEntry = item.system.spellcasting.spellRefs.find(spell => spell.uuid === spellUuid)
         const spellCharges = spellEntry.charges
+
+        // Check item has enough charges (if applicable) for the spell
+        if (spellcasting.charges.value >= 0 && spellcasting.charges.value < spellCharges) {
+            ui.notifications.warn(`${item.name} does not have enough charges.`);
+            return;
+        }
 
         const dataset = {
             "rollType": "item",
