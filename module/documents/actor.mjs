@@ -373,11 +373,12 @@ export class Hyp3eActor extends Actor {
      */
     getRollData() {
         const data = super.getRollData();
-
-        // Prepare character roll data.
+        data.actorId = this.id
+        data.actorType = this.type;
+        // Prepare character/npc roll data.
         this._getCharacterRollData(data);
         this._getNpcRollData(data);
-
+        if (CONFIG.HYP3E.debugMessages) { console.log(`getRollData: Actor ${this.name} `, data) }
         return data;
     }
 
@@ -912,8 +913,7 @@ export class Hyp3eActor extends Actor {
             }
             if (proceed) {
                 // Use actor's system data to pass to item._displayItemInChat()
-                const actorData = this.system
-                actorData.actorId = this.id
+                const actorData = this.getRollData()
                 // If a check was done, proceed immediately
                 if (ranCheck) {
                     if (item.system.isConsumable) {
@@ -1254,8 +1254,7 @@ export class Hyp3eActor extends Actor {
         try {
             let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
             // Use actor's system data to pass to item._displayItemInChat()
-            const actorData = this.system
-            actorData.actorId = this.id
+            const actorData = this.getRollData()
             // Since we don't need to roll anything, just display the item in chat.
             if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: roll response: `, rollResponse) }
             item._displayItemInChat(actorData)
@@ -1276,8 +1275,7 @@ export class Hyp3eActor extends Actor {
         // Gather Initial Information
         const { attacker, attackerPos } = await this._getAttackerDetails(dataset);
         const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
-        const actorData = this._getActorRollData();
-        actorData.actorId = this.id // Simplifies using actorData so we don't need the actor object
+        const actorData = this.getRollData();
 
         if (!item && !dataset.formula) { // If there's no item and no predefined formula (e.g., basic attack removed)
             console.warn("rollAttackOrSpell: No item or formula provided for the roll.");
@@ -1489,16 +1487,16 @@ export class Hyp3eActor extends Actor {
      * Retrieves actor roll data.
      * @returns {object} Actor's roll data.
      */
-    _getActorRollData() {
-        const actorData = this.getRollData(); // Assuming this method exists on the actor
-        if (actorData) {
-            actorData.actorType = this.type;
-        }
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log("rollAttackOrSpell/_getActorRollData: Actor roll data:", actorData);
-        }
-        return actorData;
-    }
+    // _getActorRollData() {
+    //     const actorData = this.getRollData(); // Assuming this method exists on the actor
+    //     if (actorData) {
+    //         actorData.actorType = this.type;
+    //     }
+    //     if (CONFIG.HYP3E.debugMessages) {
+    //         console.log("rollAttackOrSpell/_getActorRollData: Actor roll data:", actorData);
+    //     }
+    //     return actorData;
+    // }
 
     /**
      * Gets details of the primary targeted token.

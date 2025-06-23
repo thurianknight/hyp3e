@@ -663,8 +663,7 @@ export class Hyp3eActorSheet extends ActorSheet {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
     // Use actor's system data to pass to item._displayItemInChat()
-    const actorData = this.actor.system
-    actorData.actorId = this.actor.id
+    const actorData = this.actor.getRollData()
     // Use the item's display function to do it
     item._displayItemInChat(actorData)
   }

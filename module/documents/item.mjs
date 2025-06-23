@@ -165,34 +165,6 @@ export class Hyp3eItem extends Item {
     }
 
     /**
-     * This is used by items that cast their own spells and need an "actor" for getRollData()
-     * @returns JSON data for pseudo-Actor
-     */
-    // createPseudoActorForItem() {
-    //     // Debug log
-    //     console.log(`createPseudoActorForItem: Item:`, this)
-    //     const ca = this.system?.spellcasting?.ca ?? 0;
-
-    //     return {
-    //         getRollData() {
-    //             return {
-    //                 fa: Math.floor(ca / 2),
-    //                 ca: ca,
-    //                 attributes: {
-    //                     str: {
-    //                         atkMod: 0,
-    //                         dmgMod: 0,
-    //                     },
-    //                     dex: {
-    //                         atkMod: 0,
-    //                     },
-    //                 },
-    //             };
-    //         }
-    //     };
-    // }
-
-    /**
      * Prepare a data object which is passed to any Roll formulas which are created related to this Item
      * @private
      */
