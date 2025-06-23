@@ -2,6 +2,9 @@ import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/ef
 import HYP3EItemSetAnnotations from "../helpers/item-set-annotations.mjs";
 import HYP3EItemSetDmgTypes from "../helpers/item-set-dmg-types.mjs";
 
+// At the top of your item sheet class or module scope:
+const _recentSpellDrops = new Set();
+
 /**
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
@@ -47,8 +50,8 @@ export class Hyp3eItemSheet extends ItemSheet {
     const actor = this.object?.parent ?? null;
     if (actor) {
       context.rollData = actor.getRollData()
-    } else {
-      context.rollData = itemData.createPseudoActorForItem()
+    // } else {
+    //   context.rollData = itemData.createPseudoActorForItem()
     }
 
     // Prepare spell list
@@ -355,6 +358,7 @@ export class Hyp3eItemSheet extends ItemSheet {
     if (!dataTransfer) return;
 
     const dropData = JSON.parse(dataTransfer);
+    if (CONFIG.HYP3E.debugMessages) { console.log("_onDrop data: ", dropData) }
 
     // Check if it's a spell Item
     if (dropData.type !== "Item") return;
@@ -367,6 +371,13 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Grab the UUID
     const uuid = droppedItem.uuid;
+
+    // Prevent rapid duplicate adds
+    if (_recentSpellDrops.has(uuid)) return;
+
+    // Add to set and clear after short delay
+    _recentSpellDrops.add(uuid);
+    setTimeout(() => _recentSpellDrops.delete(uuid), 200); // 200ms delay
 
     // Avoid duplicates
     const currentRefs = this.item.system.spellcasting?.spellRefs ?? [];

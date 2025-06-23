@@ -911,13 +911,16 @@ export class Hyp3eActor extends Actor {
                 ranCheck = true
             }
             if (proceed) {
+                // Use actor's system data to pass to item._displayItemInChat()
+                const actorData = this.system
+                actorData.actorId = this.id
                 // If a check was done, proceed immediately
                 if (ranCheck) {
                     if (item.system.isConsumable) {
                         this.useItem(item.id)
                     }
                     if (item.effects.size > 0) {
-                        item._displayItemInChat(this)
+                        item._displayItemInChat(actorData)
                     }
                 } else {
                     // No item check, so we will popup a basic dialog to confirm use
@@ -940,7 +943,7 @@ export class Hyp3eActor extends Actor {
                         }
                         // Since we don't need to roll anything, just display the item in chat.
                         if (CONFIG.HYP3E.debugMessages) { console.log(`Roll response: `, rollResponse) }
-                        item._displayItemInChat(this)
+                        item._displayItemInChat(actorData)
                     } catch(err) {
                         return
                     }
@@ -1250,9 +1253,12 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: ${dataset.label} dataset: `, dataset) }
         try {
             let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
+            // Use actor's system data to pass to item._displayItemInChat()
+            const actorData = this.system
+            actorData.actorId = this.id
             // Since we don't need to roll anything, just display the item in chat.
             if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: roll response: `, rollResponse) }
-            item._displayItemInChat(this)
+            item._displayItemInChat(actorData)
         } catch(err) {
             return
         }
@@ -1271,6 +1277,7 @@ export class Hyp3eActor extends Actor {
         const { attacker, attackerPos } = await this._getAttackerDetails(dataset);
         const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
         const actorData = this._getActorRollData();
+        actorData.actorId = this.id // Simplifies using actorData so we don't need the actor object
 
         if (!item && !dataset.formula) { // If there's no item and no predefined formula (e.g., basic attack removed)
             console.warn("rollAttackOrSpell: No item or formula provided for the roll.");
@@ -1282,7 +1289,7 @@ export class Hyp3eActor extends Actor {
         // Early exit if item requires a roll but has no formula (data setup errors)
         if (item && !itemData.formula && (item.type === "weapon" || (item.type === "spell" && itemData.atkRoll))) {
             if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item has no roll formula, displaying description instead."); }
-            item._displayItemInChat(this);
+            item._displayItemInChat(actorData);
             return null;
         }
 
@@ -1351,7 +1358,7 @@ export class Hyp3eActor extends Actor {
         }
         // If there's no item roll formula (typically a spell), send a chat message and exit
         if (!itemData.formula) {
-            item._displayItemInChat(this);
+            item._displayItemInChat(actorData);
             return null;
         }
 

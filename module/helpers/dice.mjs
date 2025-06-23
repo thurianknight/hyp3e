@@ -271,6 +271,7 @@ export class Hyp3eDice {
         const caRegex = /\+\s*@ca/g
         if (debugDmgRollParts[1].match(caRegex) > "") {
             // This is where we override the actor's CA if the spell is being cast from an item
+            
 
             // Temp fix if CA is null
             if (actorData.ca == null) actorData.ca = 0

@@ -662,8 +662,11 @@ export class Hyp3eActorSheet extends ActorSheet {
   async _displayItemInChat(event) {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
+    // Use actor's system data to pass to item._displayItemInChat()
+    const actorData = this.actor.system
+    actorData.actorId = this.actor.id
     // Use the item's display function to do it
-    item._displayItemInChat(this.actor)
+    item._displayItemInChat(actorData)
   }
 
   _onSortItem(event, itemData) {
