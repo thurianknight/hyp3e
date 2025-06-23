@@ -859,20 +859,26 @@ export class Hyp3eActor extends Actor {
     async rollItem(dataset) {
         // Get item info to execute a standard roll
         const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
-        // const item = this.items.get(dataset.itemId)
+        if (!item) {
+            ui.notifications.warn(`Item ${dataset.itemId} was not found!`)
+            return
+        }
         dataset.roll = item.system.formula
-        // let itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
 
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
-        if (item.type === "weapon") {
-            // Are we enforcing the weapon equippage rule for PCs?
-            if (CONFIG.HYP3E.forceWeaponEquip && this.type === "character") {
-                // Check if the weapon is equipped
+        // Are we enforcing the item equippage rule for PCs?
+        if (CONFIG.HYP3E.forceWeaponEquip && this.type === "character") {
+            // Only apply to physical items: armor, items, weapons
+            if (["armor", "item", "weapon"].includes(item.type)) {
+                // Check if the item is equipped
                 if (!item.system.equipped) {
                     ui.notifications.warn(`${itemName} is not equipped!`)
                     return
                 }
             }
+        }
+
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
+        if (item.type === "weapon") {
             dataset.isGrenade = item.system.isGrenade
             dataset.isAreaEffect = item.system.isAreaEffect
             dataset.label = `${attackTextBase} with ${itemName}`;
@@ -883,7 +889,7 @@ export class Hyp3eActor extends Actor {
             this.rollAttackOrSpell(dataset)
         } else if (item.type === "spell") {
             // Are we enforcing the spell memorization rule for PCs?
-            if (!dataset.isItemSpell && CONFIG.HYP3E.forceSpellMemorize && this.type === "character") {
+            if (CONFIG.HYP3E.forceSpellMemorize && this.type === "character" && !dataset.isItemSpell) {
                 // Check if the spell is memorized
                 if (item.system.quantity.value <= 0) {
                     ui.notifications.warn(`${itemName} is not memorized!`)
@@ -903,16 +909,6 @@ export class Hyp3eActor extends Actor {
             // The default for other item types (i.e. class abilities and actual items) is a check,
             //  followed by using inventory and applying applicable effects if the check succeeded
             //  or no check was required to proceed.
-
-            // Are we enforcing the item equippage rule for PCs? Only apply to armor & items
-            if (CONFIG.HYP3E.forceWeaponEquip && (item.type === "item" || item.type === "armor") && this.type === "character") {
-                // Check if the item is equipped
-                if (!item.system.equipped) {
-                    ui.notifications.warn(`${itemName} is not equipped!`)
-                    return
-                }
-            }
-
             let proceed = true
             let ranCheck = false
             dataset.label = `Using ${itemName}`

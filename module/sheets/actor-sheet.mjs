@@ -476,6 +476,15 @@ export class Hyp3eActorSheet extends ActorSheet {
         const itemId = ev.currentTarget.closest(".item")?.dataset?.itemId;
         const item = this.actor.items.get(itemId);
 
+        // Are we enforcing the weapon equippage rule for PCs?
+        if (CONFIG.HYP3E.forceWeaponEquip && this.actor.type === "character") {
+            // Check if the item is equipped
+            if (!item.system.equipped) {
+                ui.notifications.warn(`${itemName} is not equipped!`)
+                return
+            }
+        }
+
         // Select spell (if multiple)
         const spellRefs = item.system?.spellcasting?.spellRefs ?? [];
         console.log(`item-cast-spell: spells:`, spellRefs)
