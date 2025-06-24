@@ -304,6 +304,38 @@ export class Hyp3eItemSheet extends ItemSheet {
         Hyp3eItemSheet.ITEM_ANNOTATIONS_APP.render(true, { itemUuid: this.item.uuid, focus: true });
     });
 
+    // Make spell list sortable
+    const list = html.find(".item-spells");
+
+    // Drag start: store the dragged spell's index
+    list.find(".spell-entry").on("dragstart", ev => {
+        ev.originalEvent.dataTransfer.setData("text/plain", ev.currentTarget.dataset.index);
+    });
+
+    // Drag over: allow drop
+    list.on("dragover", ev => {
+        ev.preventDefault();
+    });
+
+    // Drop: reorder spellRefs array
+    list.on("drop", async ev => {
+        ev.preventDefault();
+        const fromIndex = Number(ev.originalEvent.dataTransfer.getData("text/plain"));
+        const toElement = ev.target.closest(".spell-entry");
+        if (!toElement) return;
+
+        const toIndex = Number(toElement.dataset.index);
+        if (isNaN(fromIndex) || isNaN(toIndex) || fromIndex === toIndex) return;
+
+        const spellRefs = foundry.utils.deepClone(this.item.system.spellcasting.spellRefs ?? []);
+
+        const [moved] = spellRefs.splice(fromIndex, 1);
+        spellRefs.splice(toIndex, 0, moved);
+
+        await this.item.update({ "system.spellcasting.spellRefs": spellRefs });
+        this.render(); // Rerender to reflect the new order
+    });
+
     // Handle removing a spell from the item
     html.find(".item-delete-spell").on("click", async ev => {
         ev.preventDefault();
@@ -348,6 +380,16 @@ export class Hyp3eItemSheet extends ItemSheet {
         speaker: ChatMessage.getSpeaker({ actor: this.item.actor })
     });
 
+  }
+
+  _onSortSpells(evt) {
+    const refs = this.item.system.spellcasting.spellRefs;
+    if (!Array.isArray(refs)) return;
+
+    const [moved] = refs.splice(evt.oldIndex, 1);
+    refs.splice(evt.newIndex, 0, moved);
+
+    this.item.update({ "system.spellcasting.spellRefs": refs });
   }
 
   async _onDrop(event) {

@@ -714,6 +714,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       ]);
       return;
     }
+
     // Dragging an item out over a non-container resets its containerId and location to blank
     if (source?.system.containerId !== "") {
       this.actor.updateEmbeddedDocuments("Item", [

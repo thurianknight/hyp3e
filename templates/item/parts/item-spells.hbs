@@ -19,15 +19,15 @@
     </div>
 
     {{!-- Spells appear here --}}
-    <ul class="items-list">
+    <ul class="items-list item-spells">
         <li class="item flexrow items-header">
             <div class="item-name">{{localize 'Spells/Abilities'}}</div>
             <div class="item-prop">{{localize 'Charges'}}</div>
             <div class="item-prop">{{localize 'HYP3E.details.level'}}</div>
             <div class="item-prop">{{localize 'Controls'}}</div>
         </li>
-        {{#each spells as |entry id|}}
-        <li class="item-entry item" data-spell-id="{{entry.spell.uuid}}">
+        {{#each spells as |entry idx|}}
+        <li class="item-entry item spell-entry" data-index="{{idx}}" data-spell-id="{{entry.spell.uuid}}" draggable="true">
             <div class="item-header flexrow">
                 <div class="item-name">
                     <div class="item-image">
@@ -37,10 +37,10 @@
                 </div>
                 <div class="item-prop">
                     <input type="hidden"
-                        name="system.spellcasting.spellRefs.{{id}}.uuid"
+                        name="system.spellcasting.spellRefs.{{idx}}.uuid"
                         value="{{entry.uuid}}" />
                     <input type="number" class="spells" 
-                        name="system.spellcasting.spellRefs.{{id}}.charges" 
+                        name="system.spellcasting.spellRefs.{{idx}}.charges" 
                         value="{{entry.charges}}" 
                         data-dtype="Number"
                     />
