@@ -496,19 +496,6 @@ Hooks.once("ready", async function() {
     // Register effects handlers
     await setupEffectHandlers();
 
-    // Cleanup old settings
-    // for (const [namespace, settingsMap] of game.settings.storage.entries()) {
-    //     if (namespace === 'world') {
-    //         for (const [key, setting] of settingsMap.entries()) {
-    //             if (setting.key.startsWith("hyp3e.migration")) {
-    //                 console.log(`Game Settings: Migration ${key}:`, setting);
-    //                 console.log(`Deleting setting: ${namespace}.${key}`);
-    //                 await settingsMap.delete(key);
-    //             }
-    //         }
-    //     }
-    // }
-
     /**
      * Load system settings
      */
