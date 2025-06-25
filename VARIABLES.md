@@ -7,6 +7,10 @@ When creating roll formulas and macros, it is common to use variables for actor 
   - Damage Reduction on actor from equipped armor
 - @ac.value
   - Armor Class of actor including equipped armor, DX mod, and other factors
+- @ac.tempAcMod
+  - Temporary AC modifier
+- @ac.tempDrMod
+  - Temporary DR modifier
 - @ca
   - Casting Ability
 - @cha.turnUndead
@@ -31,8 +35,14 @@ When creating roll formulas and macros, it is common to use variables for actor 
   - Hit Dice used to roll Hit Points for any actor
 - @hp.value
   - Current Hit Points
+- @hp.tempHp
+  - Temporary Hit Points
 - @lvl
   - Character Level
+- @movement.base.value
+  - Calculated MV per round
+- @movement.tempMvMod
+  - Temporary MV modifier
 - @str.atkMod
   - Melee Attack Modifier
 - @str.dmgMod
@@ -43,6 +53,10 @@ When creating roll formulas and macros, it is common to use variables for actor 
   - Test of ST
 - @ta
   - Turning Ability
+- @tempAtkMod
+  - Temporary attack modifier
+- @tempDmgMod
+  - Temporary damage modifier
 
 ## Item Variables
 - @ac

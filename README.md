@@ -11,12 +11,13 @@
 Requires the _Hyperborea 3rd Edition_ role-playing game ruleset.<!-- END TEXT REQUIRED BY LICENSE --> Find the game at the [North Wind Adventures website](https://www.hyperborea.tv/).
 
 <!-- FOUNDRY-COMPATIBILITY-BADGE:START - Do not remove or modify this section -->
+![Foundry v13](https://img.shields.io/badge/foundry-v13-green)  
 ![Foundry v12](https://img.shields.io/badge/foundry-v12-green)  
 ![Foundry v11](https://img.shields.io/badge/foundry-v11-green) (up to release 1.0.5)
 <!-- FOUNDRY-COMPATIBILITY-BADGE:END -->
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fhyp3e&colorB=4aa94a)](https://forge-vtt.com/bazaar#package=hyp3e)
@@ -49,7 +50,7 @@ It's always appreciated when users [submit an issue](https://github.com/thuriank
 
 - The **#hyperborea-vtt** channel in the [official North Wind Adventures Discord server](https://discord.com/channels/688093166208811100/1274767991371857970)
 - The [/r/FoundryVTT community on Reddit](https://reddit.com/r/FoundryVTT) may also have answers to your Foundry VTT questions, but it is a general Foundry VTT user community that may not have many users with specific knowledge about HYPERBOREA. Be sure to write `[HYPERBOREA]` in your post subject and select `FVTT Question` from the "Flair" menu.
-- The [ThurianKnight](https://www.youtube.com/@thurianknight) channel on YouTube has a bunch of videos to help you get up and running quickly!
+- The [ThurianKnight](https://www.youtube.com/@thurianknight) channel on YouTube has a bunch of videos to help you get up and running quickly! Most new releases also get a new video highlighted both new features and bug fixes.
 
 **We do not offer user support via email. Sorry for the inconvenience.**
 
