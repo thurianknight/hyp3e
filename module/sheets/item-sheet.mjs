@@ -304,7 +304,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         Hyp3eItemSheet.ITEM_ANNOTATIONS_APP.render(true, { itemUuid: this.item.uuid, focus: true });
     });
 
-    // Make spell list sortable
+    // Make item-spell list sortable
     const list = html.find(".item-spells");
 
     // Drag start: store the dragged spell's index
