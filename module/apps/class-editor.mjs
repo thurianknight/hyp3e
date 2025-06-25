@@ -92,10 +92,10 @@ export class HYP3EClassEditor extends FormApplication {
         }
 
         const armorNames = await findItemsByFolderOrCompendiumName("armor, armour", "armor");
-        const weaponNames = await findItemsByFolderOrCompendiumName("weapons, melee, missile", "weapon");
-        const gearNames = await findItemsByFolderOrCompendiumName("equipment, gear, ammunition", "item", "religion, religious, provision, provisions");
-        const provisionNames = await findItemsByFolderOrCompendiumName("provision, provisions, food, supplies", "item");
-        const religiousNames = await findItemsByFolderOrCompendiumName("religious, religion", "item");
+        const weaponNames = await findItemsByFolderOrCompendiumName("weapons, melee, missile, ammunition", "weapon");
+        const gearNames = await findItemsByFolderOrCompendiumName("equipment, gear, general, clothing, weapons, ammunition", "item", "religious, religion, provisions, provision, food, supplies");
+        const provisionNames = await findItemsByFolderOrCompendiumName("equipment, provision, provisions, food, supplies", "item", "clothing, gear, general, religious, religion");
+        const religiousNames = await findItemsByFolderOrCompendiumName("equipment, religious, religion", "item", "clothing, gear, general, provisions, provision, food, supplies");
 
         return {
             classKey: this.classKey,
