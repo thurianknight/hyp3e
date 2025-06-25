@@ -108,7 +108,7 @@ export function migrateItemData(item) {
 
     // Armor only
     if (item.type === "armor") {
-        updates = { ...updates, "system.equipped": true };
+        // updates = { ...updates, "system.equipped": true };
     }
     // Features only
     if (item.type === "feature") {
@@ -116,7 +116,7 @@ export function migrateItemData(item) {
     }
     // General items only
     if (item.type === "item") {
-        updates = { ...updates, "system.equipped": true };
+        // updates = { ...updates, "system.equipped": true };
     }
     // Spells only
     if (item.type === "spell") {
@@ -124,7 +124,7 @@ export function migrateItemData(item) {
     }
     // Weapons only
     if (item.type === "weapon") {
-        updates = { ...updates, "system.equipped": false };
+        // updates = { ...updates, "system.equipped": false };
         let friendlyName = fixFriendlyName(item);
         if (friendlyName) {
             updates = { ...updates, "system.friendlyName": friendlyName };

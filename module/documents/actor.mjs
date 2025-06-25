@@ -874,6 +874,11 @@ export class Hyp3eActor extends Actor {
                     ui.notifications.warn(`${itemName} is not equipped!`)
                     return
                 }
+                // Check if the item has a quantity
+                if (item.system.quantity.value <= 0) {
+                    ui.notifications.warn(`${itemName} qty is zero, you must resupply.`)
+                    return
+                }
             }
         }
 
@@ -1718,7 +1723,6 @@ export class Hyp3eActor extends Actor {
         let ammoUpdated = false;
 
         // Decrement ammunition if selected
-        // if (item?.type === "weapon" && itemData?.usesAmmo && rollResponse.ammunition) { // Check usesAmmo flag too?
         if (item?.type === "weapon" && rollResponse.ammunition) {
             const ammo = this.items.get(rollResponse.ammunition);
             if (ammo && ammo.system.quantity?.value > 0) {
@@ -1734,6 +1738,15 @@ export class Hyp3eActor extends Actor {
                 }
             } else if (rollResponse.ammunition && CONFIG.HYP3E.debugMessages) {
                 console.warn(`rollAttackOrSpell/_processDialogResponse: Selected ammo ${rollResponse.ammunition} not found or has 0 quantity.`);
+            }
+        } else if (item?.type === "weapon" && item.system.isConsumable) {
+            // If the weapon itself is consumable (like a grenade), decrement its qty
+            try {
+                await this.updateEmbeddedDocuments("Item", [
+                    { _id: item.id, "system.quantity.value": item.system.quantity.value - 1 },
+                ]);
+            } catch (err) {
+                console.error(`rollAttackOrSpell/_processDialogResponse: Failed to update quantity for ${item.name}:`, err);
             }
         }
         return { ammoMods, ammoUpdated };
