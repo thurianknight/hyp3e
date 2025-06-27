@@ -10,7 +10,6 @@ import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./helpers/chat.mjs";
 import { parseAndResolveChangeValue, setupEffectHandlers } from "./helpers/effects.mjs";
 import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
-// import { HYP3EClassEditor } from "./apps/class-editor.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { Hyp3eCharacter } from "./helpers/character.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
