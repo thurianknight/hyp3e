@@ -3,15 +3,15 @@
     <li>
         <span class="flex flexrow">
             <span class="class-name">{{name}}</span>
-            <button class="edit-class" data-class="{{name}}">Edit</button>
-            <button class="delete-class" data-class="{{name}}">Delete</button>
+            <button class="edit-class" data-class="{{name}}">{{localize 'HYP3E.dataLabel.edit'}}</button>
+            <button class="delete-class" data-class="{{name}}">{{localize 'HYP3E.dataLabel.delete'}}</button>
         </span>
     </li>
   {{/each}}
   <li>
     <span class="flex flexrow">
-        <span class="class-name">Create New Class</span>
-        <button class="new-class">Create</button>
+        <span class="class-name">{{localize 'HYP3E.dataLabel.createClass'}}</span>
+        <button class="new-class">{{localize 'HYP3E.dataLabel.create'}}</button>
     </span>
   </li>
 </ul>

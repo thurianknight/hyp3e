@@ -15,7 +15,7 @@ export class HYP3EClassEditor extends FormApplication {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             id: "hyp3e-class-editor",
-            title: "Class Editor",
+            title: game.i18n.localize(`HYP3E.classEditor.title`),
             template: `${HYP3E.templatePath}/apps/class-editor.hbs`,
             classes: ["hyp3e", "sheet", "class-editor"],
             width: 700,
@@ -65,7 +65,7 @@ export class HYP3EClassEditor extends FormApplication {
 
         // If no classData provided, initialize with an empty structure
         if (Object.keys(this.classData).length === 0) {
-            this.name = "New Class";
+            this.name = game.i18n.localize(`HYP3E.classEditor.defaultName`);
             this.classData = {
                 baseClass: "",
                 attrReqs: attrReqs,

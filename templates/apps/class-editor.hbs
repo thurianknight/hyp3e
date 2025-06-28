@@ -1,29 +1,29 @@
 {{!-- templates/apps/class-editor.hbs --}}
 <form autocomplete="off">
   <fieldset>
-    <legend>Class Info</legend>
+    <legend>{{localize 'HYP3E.classEditor.classInfo'}}</legend>
     <div class="form-group flex flexrow flex-group-center container">
         <span class="flex-item">
             <input type="text" name="name" value="{{classKey}}" /><br />
-            <label for="name">Class Name</label>
+            <label for="name">{{localize 'HYP3E.classEditor.className'}}</label>
         </span>
         <span class="flex-item">
             <input type="text" name="classData.hitDie" value="{{classData.hitDie}}" placeholder="e.g., 1d6, 1d8" /><br />
-            <label for="classData.hitDie">Hit Die</label>
+            <label for="classData.hitDie">{{localize 'HYP3E.details.hitDie'}}</label>
         </span>
         <span class="flex-item">
             <select name="classData.baseClass">
                 <option value=""></option>
                 {{selectOptions baseClasses selected=classData.baseClass localize=false}}
             </select><br />
-            <label for="classData.baseClass">Base Class</label>
-            <p style="font-style: italic;">Determines the critical hit & miss columns to use.</p>
+            <label for="classData.baseClass">{{localize 'HYP3E.classEditor.baseClass'}}</label>
+            <p style="font-style: italic;">{{localize 'HYP3E.classEditor.baseClassNote'}}</p>
         </span>
     </div>
   </fieldset>
   
   <fieldset>
-    <legend>Attribute Requirements / Minimums</legend>
+    <legend>{{localize 'HYP3E.classEditor.attrReqs'}}</legend>
         <div class="flex flexrow flex-group-center form-group container">
             {{#each attrReqs}}
             <span>
@@ -35,8 +35,8 @@
   </fieldset>
 
   <fieldset>
-    <legend>XP Bonus Requirements</legend>
-        <p>Minimum attribute scores required to earn a 10% bonus to XP.</p>
+    <legend>{{localize 'HYP3E.classEditor.xpBonusReqs'}}</legend>
+        <p>{{localize 'HYP3E.classEditor.xpBonusReqsNote'}}</p>
         <div class="flex flexrow flex-group-center form-group container">
             {{#each xpBonusReqs}}
             <span>
@@ -48,8 +48,8 @@
   </fieldset>
 
   <fieldset>
-    <legend>Extraordinary Feat Bonus %</legend>
-        <p>Some classes get a +8% bonus on one or two physical feats.</p>
+    <legend>{{localize 'HYP3E.classEditor.extrFeatReqs'}}</legend>
+        <p>{{localize 'HYP3E.classEditor.extrFeatReqsNote'}}</p>
         <div class="flex flexrow flex-group-center form-group container">
             <span>
                 <input type="number" class="input-small" name="classData.featBonus.str" value="{{classData.featBonus.str}}" /><br />
@@ -67,8 +67,8 @@
   </fieldset>
 
   <fieldset>
-    <legend>Spell Lists</legend>
-        <p>If the class can cast spells, make one or two selections here.</p>
+    <legend>{{localize 'HYP3E.classEditor.spellLists'}}</legend>
+        <p>{{localize 'HYP3E.classEditor.spellListsNote'}}</p>
         <div class="flex flexrow flex-group-center form-group container">
             {{#each classData.spellLists}}
             <span class="flex-item">
@@ -78,15 +78,15 @@
                     {{selectOptions @root.spellLists selected=this localize=false}}
                 </select>
                 <br />
-                <label for="classData.spellLists.{{@index}}">Spell List {{add @index 1}}</label>        
+                <label for="classData.spellLists.{{@index}}">{{localize 'HYP3E.classEditor.spellList'}} {{add @index 1}}</label>        
             </span>
             {{/each}}
         </div>
   </fieldset>
 
   <fieldset>
-    <legend>Saving Throws at 1st Level</legend>
-        <p>Note: Most classes get a +2 bonus on two of their saving throws.</p>
+    <legend>{{localize 'HYP3E.classEditor.saveThrows'}}</legend>
+        <p>{{localize 'HYP3E.classEditor.saveThrowsNote'}}</p>
         <div class="flex flexrow flex-group-center form-group container">
             {{#each saves}}
             <span>
@@ -98,16 +98,16 @@
   </fieldset>
 
   <fieldset>
-        <legend>Level Advancement</legend>
+        <legend>{{localize 'HYP3E.classEditor.levelAdvancement'}}</legend>
         <table>
             <thead>
                 <tr class="level-advancement">
-                    <th>Level</th>
-                    <th>XP</th>
-                    <th>HP Roll</th>
-                    <th>FA</th>
-                    <th>CA</th>
-                    <th>TA</th>
+                    <th>{{localize 'HYP3E.details.level'}}</th>
+                    <th>{{localize 'HYP3E.details.xp'}}</th>
+                    <th>{{localize 'HYP3E.classEditor.hpRoll'}}</th>
+                    <th>{{localize 'HYP3E.fa'}}</th>
+                    <th>{{localize 'HYP3E.ca'}}</th>
+                    <th>{{localize 'HYP3E.ta'}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -126,8 +126,8 @@
   </fieldset>
 
   <fieldset>
-    <legend>Starting Pack</legend>
-    <p>Define the starting equipment pack for this class.</p>
+    <legend>{{localize 'HYP3E.classEditor.startingPack'}}</legend>
+    <p>{{localize 'HYP3E.classEditor.startingPackNote'}}</p>
     <div class="flex flexrow flex-group-center form-group container">
         <div class="flex" style="margin-right: 2px;">
             {{!-- General Equipment --}}
@@ -190,5 +190,5 @@
     </div>
   </fieldset>
 
-  <button class="save-class">Save Class</button>
+  <button class="save-class">{{localize 'HYP3E.classEditor.saveClass'}}</button>
 </form>

@@ -8,23 +8,23 @@
         <input type="text" class="spells" name="system.spellcasting.ca" value="{{system.spellcasting.ca}}" data-dtype="Number"/>
       </div>
       <div class="item flexlarge">
-        <span class="spells-label">{{localize "Charges"}}</span>
+        <span class="spells-label">{{localize "HYP3E.item.charges"}}</span>
         <input type="text" class="spells" name="system.spellcasting.charges.value" value="{{system.spellcasting.charges.value}}" data-dtype="Number"/>
         /
         <input type="text" class="spells" name="system.spellcasting.charges.max" value="{{system.spellcasting.charges.max}}" data-dtype="Number"/>
       {{!-- </div>
       <div class="item"> --}}
-        <span class="spells-label">{{localize "(Leave blank if not used)"}}</span>
+        <span class="spells-label">({{localize "HYP3E.dataLabel.leaveBlank"}})</span>
       </div>
     </div>
 
     {{!-- Spells appear here --}}
     <ul class="items-list item-spells">
         <li class="item flexrow items-header">
-            <div class="item-name">{{localize 'Spells/Abilities'}}</div>
-            <div class="item-prop">{{localize 'Charges'}}</div>
+            <div class="item-name">{{localize 'HYP3E.item.spellsAbilities'}}</div>
+            <div class="item-prop">{{localize 'HYP3E.item.charges'}}</div>
             <div class="item-prop">{{localize 'HYP3E.details.level'}}</div>
-            <div class="item-prop">{{localize 'Controls'}}</div>
+            <div class="item-prop">{{localize 'HYP3E.dataLabel.viewRemove'}}</div>
         </li>
         {{#each spells as |entry idx|}}
         <li class="item-entry item spell-entry" data-index="{{idx}}" data-spell-id="{{entry.spell.uuid}}" draggable="true">
