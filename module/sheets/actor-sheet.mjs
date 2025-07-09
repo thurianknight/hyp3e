@@ -411,11 +411,11 @@ export class Hyp3eActorSheet extends ActorSheet {
         // Bind inline rolls after enrichment
         html.find("a.inline-roll").on("click", ev => {
             ev.preventDefault();
-
-            const roll = ev.currentTarget.dataset.roll;
+            console.log("Inline dataset:", ev.currentTarget.dataset);
+            const roll = ev.currentTarget.dataset.formula || ev.currentTarget.dataset.roll;
             const label = ev.currentTarget.dataset.label || "";
             const rollData = this.actor.getRollData();
-
+            console.log("Inline roll & data:", roll, rollData);
             new Roll(roll, rollData).roll({ async: true }).then(r =>
                 r.toMessage({
                     speaker: ChatMessage.getSpeaker({ actor: this.actor }),
