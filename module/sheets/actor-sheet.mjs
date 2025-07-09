@@ -376,7 +376,7 @@ export class Hyp3eActorSheet extends ActorSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  activateListeners(html) {
+  async activateListeners(html) {
     super.activateListeners(html);
 
     // Render the item sheet for viewing/editing prior to the editable check.
@@ -393,6 +393,37 @@ export class Hyp3eActorSheet extends ActorSheet {
     html.find(".item-drop").click((event) => {
       this._toggleItemSummary(event);
     });
+
+    // Enrich all .item-description fields (adjust selector as needed)
+    // Wrap async logic in an IIFE
+    (async () => {
+        const descriptions = html.find(".item-description");
+        for (const el of descriptions) {
+            const raw = el.innerHTML;
+            const enriched = await TextEditor.enrichHTML(raw, {
+                async: true,
+                secrets: false,
+                rollData: this.actor?.getRollData?.() ?? {},
+            });
+            el.innerHTML = enriched;
+        }
+
+        // Bind inline rolls after enrichment
+        html.find("a.inline-roll").on("click", ev => {
+            ev.preventDefault();
+
+            const roll = ev.currentTarget.dataset.roll;
+            const label = ev.currentTarget.dataset.label || "";
+            const rollData = this.actor?.getRollData?.() ?? {};
+
+            new Roll(roll, rollData).roll({ async: true }).then(r =>
+                r.toMessage({
+                    speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+                    flavor: label,
+                })
+            );
+        });
+    })();
 
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
