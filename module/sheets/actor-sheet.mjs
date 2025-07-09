@@ -400,6 +400,9 @@ export class Hyp3eActorSheet extends ActorSheet {
         const descriptions = html.find(".item-description");
         for (const el of descriptions) {
             const raw = el.innerHTML;
+            // Skip if no inline roll expressions are present
+            if (!/\[\[\/(r|gmr|pr)/i.test(raw)) continue;
+
             const enriched = await TextEditor.enrichHTML(raw, {
                 async: true,
                 secrets: false,
@@ -407,22 +410,6 @@ export class Hyp3eActorSheet extends ActorSheet {
             });
             el.innerHTML = enriched;
         }
-
-        // Bind inline rolls after enrichment
-        html.find("a.inline-roll").on("click", ev => {
-            ev.preventDefault();
-            console.log("Inline dataset:", ev.currentTarget.dataset);
-            const roll = ev.currentTarget.dataset.formula || ev.currentTarget.dataset.roll;
-            const label = ev.currentTarget.dataset.label || "";
-            const rollData = this.actor.getRollData();
-            console.log("Inline roll & data:", roll, rollData);
-            new Roll(roll, rollData).roll({ async: true }).then(r =>
-                r.toMessage({
-                    speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-                    flavor: label,
-                })
-            );
-        });
     })();
 
     // -------------------------------------------------------------
