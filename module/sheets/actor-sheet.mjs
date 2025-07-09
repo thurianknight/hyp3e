@@ -376,7 +376,7 @@ export class Hyp3eActorSheet extends ActorSheet {
   /* -------------------------------------------- */
 
   /** @override */
-  async activateListeners(html) {
+  activateListeners(html) {
     super.activateListeners(html);
 
     // Render the item sheet for viewing/editing prior to the editable check.
@@ -394,7 +394,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       this._toggleItemSummary(event);
     });
 
-    // Enrich all .item-description fields (adjust selector as needed)
+    // Enrich all .item-description fields
     // Wrap async logic in an IIFE
     (async () => {
         const descriptions = html.find(".item-description");
@@ -403,7 +403,7 @@ export class Hyp3eActorSheet extends ActorSheet {
             const enriched = await TextEditor.enrichHTML(raw, {
                 async: true,
                 secrets: false,
-                rollData: this.actor?.getRollData?.() ?? {},
+                rollData: this.actor.getRollData(),
             });
             el.innerHTML = enriched;
         }
@@ -414,7 +414,7 @@ export class Hyp3eActorSheet extends ActorSheet {
 
             const roll = ev.currentTarget.dataset.roll;
             const label = ev.currentTarget.dataset.label || "";
-            const rollData = this.actor?.getRollData?.() ?? {};
+            const rollData = this.actor.getRollData();
 
             new Roll(roll, rollData).roll({ async: true }).then(r =>
                 r.toMessage({
