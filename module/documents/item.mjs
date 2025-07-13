@@ -14,8 +14,9 @@ export class Hyp3eItem extends Item {
     // Override the base Item _preCreate function
     async _preCreate(data, options, user) {
         await super._preCreate(data, options, user);
-        // console.log("Hyp3eItem _preCreate: data", data);
-        // Replace default image for items, but if an image is defined, leave it be
+        const updateData = {};
+
+        // Replace default image for new items, but if an image is defined, leave it be
         const TYPE_IMAGES = {
             spell: "icons/svg/book.svg",
             feature: "icons/svg/target.svg",
@@ -24,21 +25,21 @@ export class Hyp3eItem extends Item {
             item: "icons/svg/item-bag.svg",
             container: "icons/svg/item-bag.svg"
         };
-        data.img = data.img || TYPE_IMAGES[this.type] || "icons/svg/item-bag.svg";
+        if (!data.img || data.img === "") {
+            updateData.img = TYPE_IMAGES[this.type] || "icons/svg/item-bag.svg";
+        }
 
-        // A newly-created item won't have the system attribute (or any child attributes) yet,
-        //  but cloned items will.
-        if (data.system?.ammunition === "true") { data.system.isAmmunition = true }
-        if (data.system?.consumable === "true") { data.system.isConsumable = true }
-        if (data.system?.containerId) {
-            // If an item is copied from one actor to another, blank out the containerId & location
-            if (data.system.containerId != "") {
-                data.system.containerId = ""
-                data.system.location = ""
+        // A newly-created item won't have the system attribute yet, but cloned items will
+        if (data.system) {
+            if (data.system?.ammunition === "true") { updateData["system.isAmmunition"] = true }
+            if (data.system?.consumable === "true") { updateData["system.isConsumable"] = true }
+            if (data.system.containerId) {
+                updateData["system.containerId"] = "";
+                updateData["system.location"] = "";
             }
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Hyp3eItem _preCreate: data", data) }
-        return this.updateSource(data)
+        if (CONFIG.HYP3E.debugMessages) { console.log("Hyp3eItem _preCreate: updateData", updateData) }
+        this.updateSource(updateData);
     }
 
     prepareData() {
