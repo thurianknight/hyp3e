@@ -14,34 +14,22 @@ export class Hyp3eItem extends Item {
     // Override the base Item _preCreate function
     async _preCreate(data, options, user) {
         await super._preCreate(data, options, user);
+        // console.log("Hyp3eItem _preCreate: data", data);
         // Replace default image for items, but if an image is defined, leave it be
-        if (!data.img || data.img == "") {
-            switch(data.type) {
-                case "spell":
-                data.img = `icons/svg/book.svg`
-                break
-                case "feature":
-                data.img = `icons/svg/target.svg`
-                break
-                case "armor":
-                data.img = `icons/svg/shield.svg`
-                break
-                case "weapon":
-                data.img = `icons/svg/combat.svg`
-                break
-                case "item":
-                data.img = `icons/svg/item-bag.svg`
-                break
-                case "container":
-                data.img = `icons/svg/item-bag.svg`
-                break
-                default:
-                data.img = `icons/svg/item-bag.svg`
-            }      
-        }
-        // A newly-created item won't have the system attribute (or any child attributes) yet
-        if (data.system?.ammunition == "true") { data.system.isAmmunition = true }
-        if (data.system?.consumable == "true") { data.system.isConsumable = true }
+        const TYPE_IMAGES = {
+            spell: "icons/svg/book.svg",
+            feature: "icons/svg/target.svg",
+            armor: "icons/svg/shield.svg",
+            weapon: "icons/svg/combat.svg",
+            item: "icons/svg/item-bag.svg",
+            container: "icons/svg/item-bag.svg"
+        };
+        data.img = data.img || TYPE_IMAGES[this.type] || "icons/svg/item-bag.svg";
+
+        // A newly-created item won't have the system attribute (or any child attributes) yet,
+        //  but cloned items will.
+        if (data.system?.ammunition === "true") { data.system.isAmmunition = true }
+        if (data.system?.consumable === "true") { data.system.isConsumable = true }
         if (data.system?.containerId) {
             // If an item is copied from one actor to another, blank out the containerId & location
             if (data.system.containerId != "") {
@@ -49,7 +37,7 @@ export class Hyp3eItem extends Item {
                 data.system.location = ""
             }
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Pre-created item data", data) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Hyp3eItem _preCreate: data", data) }
         return this.updateSource(data)
     }
 
@@ -181,26 +169,16 @@ export class Hyp3eItem extends Item {
 
     // Get the names of effects applied to the item, and return an array
     _getEffectNames() {
-        let effects = this.effects
-        let effectsArray = []
-        effects.forEach(effect => {
-            // Log the effect
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_getEffectNames: Effect ${effect.name}:`, effect) }
-            effectsArray.push(effect.name)
-        })
-        return effectsArray
+        return this.effects.map(e => e.name);
     }
-    
+
     /**
      * Handle displaying an Item description in the chat.
      * @private
      */
     async _displayItemInChat(actorData) {
-        // const item = this
         const item = foundry.utils.deepClone(this)
         const itemData = item.system
-        // const actor = item.actor
-        // const actorData = actor.system
         
         // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
         let typeLabel = ""
