@@ -30,13 +30,9 @@ export class Hyp3eItem extends Item {
         }
 
         // A newly-created item won't have the system attribute yet, but cloned items will
-        if (data.system) {
-            if (data.system?.ammunition === "true") { updateData["system.isAmmunition"] = true }
-            if (data.system?.consumable === "true") { updateData["system.isConsumable"] = true }
-            if (data.system.containerId) {
-                updateData["system.containerId"] = "";
-                updateData["system.location"] = "";
-            }
+        if (data.system?.containerId) {
+            updateData["system.containerId"] = "";
+            updateData["system.location"] = "";
         }
         if (CONFIG.HYP3E.debugMessages) { console.log("Hyp3eItem _preCreate: updateData", updateData) }
         this.updateSource(updateData);
@@ -48,108 +44,32 @@ export class Hyp3eItem extends Item {
         super.prepareData();
 
         // Get the Item's data
-        const item = this;
-        const itemData = item.system;
+        const itemData = this.system;
 
         // Setup the item's realName to be its name, if realName is blank
-        if (!item.system?.realName || item.system?.realName.trim() === "") {
-            item.system.realName = item.name
-        }
-
+        if (!itemData.realName?.trim()) itemData.realName = this.name;
         // If the item is identified but has no realDescription, set it to the description
-        if (itemData.identified && (!itemData.realDescription || itemData.realDescription.trim() === "")) {
-            itemData.realDescription = itemData.description
+        if (itemData.identified && !itemData.realDescription?.trim()) {
+            itemData.realDescription = itemData.description;
         }
 
         // Fix weapon & spell missing or invalid damage type
-        if (item.type == "weapon" || item.type == "spell") {
-            if (!itemData.dmgType || itemData.dmgType == "" || CONFIG.HYP3E.damageTypes[itemData.dmgType] == undefined) {
-                console.log("ITEM ERROR: Weapon/spell has missing or invalid damage type! Setting to Basic...")
+        if (["weapon", "spell"].includes(this.type)) {
+            if (!CONFIG.HYP3E.damageTypes[itemData.dmgType]) {
+                console.log(`ITEM ERROR: Invalid damage type on ${this.name}. Setting to Basic...`)
                 itemData.dmgType = "basic"
             }
         }
 
-        // Handle weapon attack roll formula
-        if (item.type == "weapon") {
-            // For all weapons, atkRoll is obviously true
-            itemData.atkRoll = true
-            // Set melee & missile flags and attack formulas
-            if (itemData.type == "melee") {
-                itemData.melee = true
-                itemData.missile = false
-                // Area effects do not require an attack roll, all else does
-                if (!itemData.isAreaEffect) {
-                    // Set attack formula if it doesn't already exist, else leave it alone
-                    if (!itemData.formula || itemData.formula == '') {
-                        itemData.formula = '1d20 + @str.atkMod'
-                    }
-                } else {
-                    // Clear the attack roll if this is an area effect attack
-                    itemData.formula = ""
-                }
-            } else if (itemData.type == "missile") {
-                itemData.melee = false
-                itemData.missile = true
-                // Area effects do not require an attack roll, all else does
-                if (!itemData.isAreaEffect) {
-                    // Set attack formula if it doesn't already exist, else leave it alone
-                    if (!itemData.formula || itemData.formula == '') {
-                        if (!itemData.isGrenade) {
-                            // Standard missile weapons. We handle grenades further down.
-                            itemData.formula = '1d20 + @dex.atkMod'
-                        }
-                    }
-                } else {
-                    // Clear the attack roll if this is an area effect attack
-                    itemData.formula = ""
-                }
-                // If weapon launches ammo, set the usesAmmo property
-                if (item.name.toLowerCase().includes("bow") || item.name.toLowerCase().includes("sling") || item.name.toLowerCase().includes("gun")) {
-                    itemData.usesAmmo = true
-                }
-            } else {
-                // This should never happen, unless an item is imported with missing data
-                console.log("ITEM ERROR: Weapon has neither melee nor missile property set! Setting to melee...")
-                itemData.type = "melee"
-                itemData.melee = true
-                itemData.missile = false
-                itemData.isGrenade = false
-                itemData.isAreaEffect = false
-                // Set attack formula if it doesn't already exist, else leave it alone
-                if (itemData.formula == '') {
-                    itemData.formula = '1d20 + @str.atkMod'
-                }
-            }
-            // The grenade and area effect checkboxes override standard attack formulas
-            if (itemData.isGrenade) {
-                itemData.melee = false
-                itemData.missile = true
-                itemData.isAreaEffect = false
-                itemData.formula = '1d20 + @dex.atkMod'
-            }
-            if (itemData.isAreaEffect) {
-                itemData.melee = false
-                itemData.missile = true
-                itemData.isGrenade = false
-                itemData.formula = ''
-            }
-
-        } else { // ==> Anything else...
-            // For non-weapons (like spells), is the Attack Roll checkbox selected?
-            if (itemData.atkRoll) {
-                // Set attack formula if it doesn't already exist, else leave it alone
-                if (itemData.formula == '') {
-                    itemData.formula = '1d20 + @fa'
-                }
-            } else {
-                // Handle item check roll formula
-                if (itemData.formula == '' && itemData.check != '') {
-                    itemData.formula = itemData.check
-                }
-            }
+        // Apply attack formula logic if weapon or atkRoll
+        if (this.type === "weapon" || itemData.atkRoll) {
+            this.applyAttackFormula();
         }
-        // Log the item data
-        //console.log("Item Data:", item)
+
+        // Ammo usage flag
+        if (this.type === "weapon" && itemData.type === "missile") {
+            itemData.usesAmmo = /(bow|sling|gun)/i.test(this.name);
+        }
 
     }
 
@@ -171,6 +91,51 @@ export class Hyp3eItem extends Item {
     // Get the names of effects applied to the item, and return an array
     _getEffectNames() {
         return this.effects.map(e => e.name);
+    }
+
+    applyAttackFormula() {
+        const itemData = this.system;
+
+        // If this is not a weapon, but has an atkRoll, set the formula to 1d20 + @fa
+        if (this.type !== "weapon") {
+            if (itemData.atkRoll && !itemData.formula?.trim()) {
+                itemData.formula = "1d20 + @fa";
+            }
+            return;
+        }
+
+        // Area effects and grenades override all variables
+        if (itemData.isAreaEffect) {
+            itemData.formula = "";
+            itemData.melee = false;
+            itemData.missile = true;
+            itemData.isGrenade = false;
+            return;
+        }
+        if (itemData.isGrenade) {
+            itemData.formula = "1d20 + @dex.atkMod";
+            itemData.melee = false;
+            itemData.missile = true;
+            itemData.isAreaEffect = false;
+            return;
+        }
+
+        // If this is a weapon, set the attack formula based on type
+        if (itemData.type === "melee") {
+            itemData.formula ||= "1d20 + @str.atkMod";
+            itemData.melee = true;
+            itemData.missile = false;
+        } else if (itemData.type === "missile") {
+            itemData.formula ||= "1d20 + @dex.atkMod";
+            itemData.melee = false;
+            itemData.missile = true;
+        } else {
+            console.warn(`ITEM ERROR: Weapon ${this.name} has invalid type. Defaulting to melee.`);
+            itemData.type = "melee";
+            itemData.formula = "1d20 + @str.atkMod";
+            itemData.melee = true;
+            itemData.missile = false;
+        }
     }
 
     /**

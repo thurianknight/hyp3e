@@ -287,6 +287,10 @@ export class Hyp3eItemSheet extends ItemSheet {
       this._updateAtkType(attackType)
     });
 
+    // Handle isGrenade and isAreaEffect checkboxes
+    html.find('input[name="system.isGrenade"]').on("change", this._onTypeRelatedChange.bind(this));
+    html.find('input[name="system.isAreaEffect"]').on("change", this._onTypeRelatedChange.bind(this));
+
     // Set weapon base damage
     html.find('.item-button[data-control="set-dmg-types"]').click((ev) => {
         Hyp3eItemSheet.ITEM_SET_DMG_TYPES_APP.render(true, { itemUuid: this.item.uuid, focus: true });
@@ -510,8 +514,29 @@ export class Hyp3eItemSheet extends ItemSheet {
         })
         break
     }
+    // Update the attack formula based on the new type
+    this.item.applyAttackFormula()
     if (CONFIG.HYP3E.debugMessages) { console.log("Weapon after update:", result) }
   }  
+
+  /**
+   * Handle checkbox changes related to attack type (e.g., isGrenade, isAreaEffect)
+   * @param {*} event 
+   * @private
+   */
+  async _onTypeRelatedChange(event) {
+    event.preventDefault();
+
+    const formData = this._getSubmitData();
+    // Merge or update item data as needed
+    await this.object.update(formData);
+
+    // Apply attack formula logic
+    this.object.applyAttackFormula();
+
+    // Optionally re-render to show changes live
+    this.render(false);
+  }
 
   /**
    * Handle weapon mastery and grand-mastery
