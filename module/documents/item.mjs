@@ -88,11 +88,6 @@ export class Hyp3eItem extends Item {
         return rollData;
     }
 
-    // Get the names of effects applied to the item, and return an array
-    _getEffectNames() {
-        return this.effects.map(e => e.name);
-    }
-
     applyAttackFormula() {
         const itemData = this.system;
 
@@ -138,6 +133,11 @@ export class Hyp3eItem extends Item {
         }
     }
 
+    // Get the names of effects applied to the item, and return an array
+    _getEffectNames() {
+        return this.effects.map(e => e.name);
+    }
+
     /**
      * Handle displaying an Item description in the chat.
      * @private
@@ -145,125 +145,20 @@ export class Hyp3eItem extends Item {
     async _displayItemInChat(actorData) {
         const item = foundry.utils.deepClone(this)
         const itemData = item.system
-        
+        // if (CONFIG.HYP3E.debugMessages) { console.log("_displayItemInChat: Item clicked:", item) }
+
         // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
-        let typeLabel = ""
-        if (item.type == 'feature') {
-            typeLabel = 'Ability'
-        } else {
-            typeLabel = (item.type).capitalize()
-        }
+        const typeLabel = item.type === 'feature' ? 'Ability' : item.type.capitalize();
+
         // itemName should be prioritized as (1) itemAlias [but only if not identified], 
         //  (2) friendlyName, and (3) realName
-        let itemName = ""
-        if (!itemData.identified && itemData.itemAlias != "") {
-            itemName = itemData.itemAlias
-        } else {
-            itemName = item ? (itemData.friendlyName || item.name) : "Unknown Action";
-        }
+        const itemName = (!itemData.identified && itemData.itemAlias) ? itemData.itemAlias : (itemData.friendlyName || item.name);
 
         // Chat message header text
-        const label = `
-        <hr class="plain-hr" />
-        <div style="margin: 10px 0;">
-            <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
-            <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
-                ${typeLabel}: ${itemName}
-            </span>
-        </div>
-        <hr class="plain-hr" />`
+        const label = this._renderItemHeader(typeLabel, itemName, item.img);
 
-        if (CONFIG.HYP3E.debugMessages) { console.log("_displayItemInChat: Item clicked:", item) }
-        let content = itemData.description
-
-        // Setup clickable buttons for item properties if they have a roll macro,
-        //  otherwise just display the value.
-
-        // Features/Abilities
-        if (item.type == 'feature') {
-            if (itemData.formula && itemData.tn) {
-                // Display the ability check roll with target number
-                content += `<p>Ability Check: ${itemData.formula} equal or under ${itemData.tn}</p>`
-            }
-        }
-
-        // Weapons
-        if (item.type == 'weapon') {
-            if (itemData.rof) {
-                // Display missile rate of fire or melee attack rate
-                content += `<p>Atk Rate: ${itemData.rof}</p>`
-            }
-            if (itemData.type == 'missile') {
-                // For a missile weapon we display the range increments
-                content += `<p>Range: ${itemData.range.short} / ${itemData.range.medium} / ${itemData.range.long}</p>`
-            } else {
-                // For melee weapons we display the weapon class
-                content += `<p>Wpn Class: ${itemData.wc}</p>`
-            }
-            if (itemData.damage) {
-                if (Roll.validate(itemData.damage)) {
-                    // Build our damage roll formula, including actor and weapon mods
-                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData)
-                    const dmgFormula = dmgObj.formula
-                    const debugDmgRollFormula = dmgObj.debugFormula
-                    // Resolve damage string & variables to a rollable formula
-                    const roll = new Roll(dmgFormula, actorData)
-                    // if (CONFIG.HYP3E.debugMessages) { console.log("_displayItemInChat: Damage roll: ", roll) }
-                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' data-actor-id='${actorData.actorId}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}' data-source-type='${item.type}'></div>`;
-                } else {
-                    content += `<p>Damage: ${itemData.damage}</p>`
-                }
-            }
-        }
-
-        // Spells
-        if (item.type == 'spell') {
-            if (itemData.range) {
-                // Display the range
-                content += `<p>Range: ${itemData.range}</p>`
-            }
-            if (itemData.duration) {
-                if ((itemData.duration).match(/.*d[1-9].*/) && Roll.validate(itemData.duration)) {
-                    // Add a duration roll macro
-                    content += `<p>Duration: [[/r ${itemData.duration}]]</p>`
-                } else {
-                    // If duration is not variable, simply display the value
-                    content += `<p>Duration: ${itemData.duration}</p>`
-                }
-            }
-            if (itemData.affected) {
-                if ((itemData.affected).match(/.*d[1-9].*/) && Roll.validate(itemData.affected)) {
-                    // Add a number affected roll macro
-                    content += `<p># Affected: [[/r ${itemData.affected}</p>`
-                } else {
-                    content += `<p># Affected: ${itemData.affected}</p>`
-                }
-            }
-            if (itemData.damage) {
-                if (Roll.validate(itemData.damage)) {
-                    // Build our damage roll formula, including actor and weapon mods
-                    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData)
-                    const dmgFormula = dmgObj.formula
-                    const debugDmgRollFormula = dmgObj.debugFormula
-                    // Resolve damage string & variables to a rollable formula
-                    const roll = new Roll(dmgFormula, actorData)
-                    // if (CONFIG.HYP3E.debugMessages) { console.log("_displayItemInChat: Damage roll: ", roll) }
-                    content += `<div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' data-actor-id='${actorData.actorId}' data-formula='${roll.formula}' data-debug-formula='${debugDmgRollFormula}' data-source-type='${item.type}'></div>`;
-                } else {
-                    content += `<p>Damage: ${itemData.damage}</p>`
-                }
-            } else {
-                if (CONFIG.HYP3E.debugMessages) { console.warn(`_displayItemInChat: Damage roll for spell ${item.name}, ${itemData.damage}, is not rollable.`) }
-            }
-        }
-
-        // Item
-        if (item.type == 'item') {
-            if (itemData.formula && itemData.tn) {
-                // Display the item check roll with target number
-                content += `<p>Item Check: ${itemData.formula} equal or under ${itemData.tn}</p>`
-            }
-        }
+        let content = itemData.description || "";
+        content += this._renderItemProperties(item, itemData, actorData);
 
         // Items might have Effects, but only show the button if item is identified
         if (item.effects.size > 0 && itemData.identified) {
@@ -275,14 +170,10 @@ export class Hyp3eItem extends Item {
         }
 
         // Setup & display the item in chat
-        const templateData = {
-            // item: item,
-            // actor: actor,
-            // user: game.user,
-            content: content,
-        };
+        const templateData = { content };
+
         const template = `${HYP3E.templatePath}/chat/show-item.hbs`;
-        let itemChat = await renderTemplate(template, templateData);
+        const itemChat = await renderTemplate(template, templateData);
         // Log the rendered chat message
         ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: actorData.actorId }),
@@ -290,4 +181,77 @@ export class Hyp3eItem extends Item {
             content: itemChat
         });
     }
+
+    _renderItemHeader(typeLabel, itemName, imgSrc) {
+        return `
+            <hr class="plain-hr" />
+            <div style="margin: 10px 0;">
+                <img src="${imgSrc}" style="border: none; float: left;" width="24px" height="24px">
+                <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
+                    ${typeLabel}: ${itemName}
+                </span>
+            </div>
+            <hr class="plain-hr" />`;
+    }
+
+    _renderItemProperties(item, itemData, actorData) {
+        const parts = [];
+
+        if (item.type === 'feature') parts.push(this._renderFeatureSection(itemData));
+        if (item.type === 'weapon') parts.push(this._renderWeaponSection(itemData, item, actorData));
+        if (item.type === 'spell') parts.push(this._renderSpellSection(itemData, item, actorData));
+        if (item.type === 'item') parts.push(this._renderItemCheckSection(itemData));
+
+        return parts.join("");
+    }
+
+    _renderFeatureSection(itemData) {
+        if (itemData.formula && itemData.tn) {
+            return `<p>Ability Check: ${itemData.formula} equal or under ${itemData.tn}</p>`;
+        }
+        return "";
+    }
+
+    _renderWeaponSection(itemData, item, actorData) {
+        const parts = [];
+        if (itemData.rof) parts.push(`<p>Atk Rate: ${itemData.rof}</p>`);
+        if (itemData.type === 'missile') {
+            parts.push(`<p>Range: ${itemData.range.short} / ${itemData.range.medium} / ${itemData.range.long}</p>`);
+        } else {
+            parts.push(`<p>Wpn Class: ${itemData.wc}</p>`);
+        }
+        parts.push(this._renderDamageRoll(itemData, item, actorData));
+        return parts.join("");
+    }
+
+    _renderSpellSection(itemData, item, actorData) {
+        const parts = [];
+        if (itemData.range) parts.push(`<p>Range: ${itemData.range}</p>`);
+        if (itemData.duration) {
+            parts.push(itemData.duration.match(/.*d[1-9].*/) && Roll.validate(itemData.duration) ?
+                `<p>Duration: [[/r ${itemData.duration}]]</p>` : `<p>Duration: ${itemData.duration}</p>`);
+        }
+        if (itemData.affected) {
+            parts.push(itemData.affected.match(/.*d[1-9].*/) && Roll.validate(itemData.affected) ?
+                `<p># Affected: [[/r ${itemData.affected}]]</p>` : `<p># Affected: ${itemData.affected}</p>`);
+        }
+        parts.push(this._renderDamageRoll(itemData, item, actorData));
+        return parts.join("");
+    }
+
+    _renderDamageRoll(itemData, item, actorData) {
+        if (!itemData.damage || !Roll.validate(itemData.damage)) return `<p>Damage: ${itemData.damage || ""}</p>`;
+
+        const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData);
+        const roll = new Roll(dmgObj.formula, actorData);
+        return `<div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' data-actor-id='${actorData.actorId}' data-formula='${roll.formula}' data-debug-formula='${dmgObj.debugFormula}' data-source-type='${item.type}'></div>`;
+    }
+
+    _renderItemCheckSection(itemData) {
+        if (itemData.formula && itemData.tn) {
+            return `<p>Item Check: ${itemData.formula} equal or under ${itemData.tn}</p>`;
+        }
+        return "";
+    }
+
 }
