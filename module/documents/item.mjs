@@ -133,6 +133,44 @@ export class Hyp3eItem extends Item {
         }
     }
 
+    /**
+     * Handle weapon mastery and grand-mastery
+     * @param {String} mastery The mastery level to be updated
+     * @public
+     */
+    async updateWeaponMastery(mastery) {
+        const isMaster = this.system.wpnMaster;
+        const isGrandmaster = this.system.wpnGrandmaster;
+
+        let updateData = {};
+
+        // Enabling a mastery level should disable the other one. However, disabling a mastery
+        //  level does not need to enable the other one -- they can both be false.
+        switch (mastery) {
+            case "master":
+                updateData = {
+                    wpnMaster: !isMaster,
+                    wpnGrandmaster: isGrandmaster && !isMaster ? false : isGrandmaster
+                };
+                break;
+            case "grandMaster":
+                updateData = {
+                    wpnMaster: isMaster && !isGrandmaster ? false : isMaster,
+                    wpnGrandmaster: !isGrandmaster
+                };
+                break;
+            default:
+                console.warn(`Invalid mastery type: ${mastery}`);
+                return;
+        }
+
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log(`Updating Weapon Mastery:`, updateData);
+        }
+
+        return await this.update({ system: updateData });
+    }
+
     // Get the names of effects applied to the item, and return an array
     _getEffectNames() {
         return this.effects.map(e => e.name);

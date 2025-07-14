@@ -282,9 +282,9 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Toggle weapon attack type melee/missile
     html.find(".weapon-type").click(async (event) => {
-      const attackType = $(event.currentTarget).data("attackType")
-      if (CONFIG.HYP3E.debugMessages) { console.log("Attack Type click: ", attackType) }
-      this._updateAtkType(attackType)
+        const attackType = $(event.currentTarget).data("attackType")
+        if (CONFIG.HYP3E.debugMessages) { console.log("Attack Type click: ", attackType) }
+        this._updateAtkType(attackType)
     });
 
     // Handle isGrenade and isAreaEffect checkboxes
@@ -298,9 +298,9 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     // Toggle weapon mastery & grand-mastery true/false
     html.find(".weapon-mastery").click(async (event) => {
-      const mastery = $(event.currentTarget).data("mastery")
-      if (CONFIG.HYP3E.debugMessages) { console.log("Weapon Mastery click: ", mastery) }
-      this._updateWpnMastery(mastery)
+        const mastery = $(event.currentTarget).data("mastery")
+        if (CONFIG.HYP3E.debugMessages) { console.log("Weapon Mastery click: ", mastery) }
+        this.item.updateWeaponMastery(mastery)
     });
 
     // Set item annotations
@@ -537,65 +537,5 @@ export class Hyp3eItemSheet extends ItemSheet {
     // Optionally re-render to show changes live
     this.render(false);
   }
-
-  /**
-   * Handle weapon mastery and grand-mastery
-   * @param {String} mastery The mastery level to be updated
-   * @private
-   */
-  async _updateWpnMastery(mastery) {
-    let result
-    let isMaster = this.item.system.wpnMaster
-    let isGrandmaster = this.item.system.wpnGrandmaster
-    if (CONFIG.HYP3E.debugMessages) {
-      console.log(`Weapon Mastery: ${isMaster}`)
-      console.log(`Weapon Grandmastery: ${isGrandmaster}`)
-    }
-    // Enabling a mastery level should disable the other one. However, disabling a mastery
-    //  level does not need to enable the other one -- they can both be false.
-    switch (mastery) {
-      case "master":
-        if (isGrandmaster && !isMaster) {
-          // Disable the Grandmastery flag
-          if (CONFIG.HYP3E.debugMessages) { console.log(`Enabling Master and disabling Grandmaster.`) }
-          result = await this.item.update({
-            system: {
-              wpnMaster: !isMaster,
-              wpnGrandmaster: false,
-            }
-          })  
-        } else {
-          // Only update Mastery flag
-          if (CONFIG.HYP3E.debugMessages) { console.log(`Flipping Master to ${!isMaster}.`) }
-          result = await this.item.update({
-            system: {
-              wpnMaster: !isMaster,
-            }
-          })
-        }
-        break
-      case "grandMaster":
-        if (!isGrandmaster && isMaster) {
-          // Disable the Mastery flag
-          if (CONFIG.HYP3E.debugMessages) { console.log(`Enabling Grandmaster and disabling Master.`) }
-          result = await this.item.update({
-            system: {
-              wpnMaster: false,
-              wpnGrandmaster: !isGrandmaster,
-            }
-          })
-        } else {
-          // Only update Grandmastery flag
-          if (CONFIG.HYP3E.debugMessages) { console.log(`Flipping Grandmaster to ${!isGrandmaster}.`) }
-          result = await this.item.update({
-            system: {
-              wpnGrandmaster: !isGrandmaster,
-            }
-          })
-        }
-        break
-    }
-    if (CONFIG.HYP3E.debugMessages) { console.log("Weapon after update:", result) }
-  }  
 
 }
