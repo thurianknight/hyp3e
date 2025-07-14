@@ -2487,13 +2487,14 @@ export class Hyp3eActor extends Actor {
             // effects = this._getAllApplicableEffects()
             effects = this.allApplicableEffects()
         }
-        let effectsArray = []
-        effects.forEach(effect => {
-            // Log the effect
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.name}, effect ${effect.name}:`, effect) }
-            effectsArray.push(effect.name)
-        })
-        return effectsArray
+        return this.effects.map(e => e.name);
+        // let effectsArray = []
+        // effects.forEach(effect => {
+        //     // Log the effect
+        //     if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.name}, effect ${effect.name}:`, effect) }
+        //     effectsArray.push(effect.name)
+        // })
+        // return effectsArray
     }
 
     // Parse item name to see if it has an attack/damage modifier

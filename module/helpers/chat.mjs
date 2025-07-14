@@ -278,11 +278,6 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
 
             // Is the owner/actor targeted by this effect?
             let actorTargeted = false
-            // let effect = item.effects.find(e => e.transfer === true);
-            // This just grabbed the first match, if there are multiple effects coming from the item.
-            //  The first effect will act as a proxy for the others, as we assume that all effects are
-            //  either enabled or disabled. If not, we can add logic to handle that later.
-            // if (effect) actorTargeted = true
 
             // The logic we need here will do the following:
             // Check to see if the item applies effect(s) to the actor (the actor is targeted).
@@ -295,10 +290,6 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             //      - If enabled, create a button to disable the effect on the actor.
             //  If the actor is not targeted, create a button to apply the effect to the selected token(s).
 
-            // Get an array of effects (if any) provided by the item, and use it for the button label
-            // let effects = item?._getEffectNames()
-            // let btnLabel = effects.length > 1 ? "Multiple Effects" : effects[0];
-
             // Loop through the effects and create a separate button for each one
             item.effects.forEach(effect => {
                 // Check if the actor is targeted by the item/effect
@@ -306,44 +297,35 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     if (!effect.disabled) {
                         // The effect is enabled, so create a button to disable it
                         let effectDisableButton = $(
-                            // `<button class="chat-btn-full-width" title="Click to disable ${effects.join(", ")} on ${actor.name}."><i class="fas fa-user-slash"></i>Disable ${btnLabel}</button>`
                             `<button class="chat-btn-full-width" title="Click to disable ${effect.name} on ${actor.name}."><i class="fas fa-user-slash"></i>Disable ${effect.name}</button>`
                         );
                         effectApply.append(effectDisableButton);
                         // Handle button clicks
-                        // effectApply.on("click", (ev) => {
                         effectDisableButton.on("click", (ev) => {
                             ev.stopPropagation();
-                            // disableAllEffects(item, actorId);
                             disableEffect(item, effect.id, actorId);
                         });
                     } else {
                         // Effect is disabled, so create a button to enable it
                         let effectEnableButton = $(
-                            // `<button class="chat-btn-full-width" title="Click to enable ${effects.join(", ")} on ${actor.name}."><i class="fas fa-user-check"></i>Enable ${btnLabel}</button>`
                             `<button class="chat-btn-full-width" title="Click to enable ${effect.name} on ${actor.name}."><i class="fas fa-user-check"></i>Enable ${effect.name}</button>`
                         );
                         effectApply.append(effectEnableButton);
                         // Handle button clicks
-                        // effectApply.on("click", (ev) => {
                         effectEnableButton.on("click", (ev) => {
                             ev.stopPropagation();
-                            // enableAllEffects(item, actorId);
                             enableEffect(item, effect.id, actorId);
                         });
                     }
                 } else {
                     // The actor is not targeted, so create a button to apply the effect to selected token(s)
                     let effectApplyButton = $(
-                        // `<button class="chat-btn-full-width" title="Click to apply ${effects.join(", ")} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${btnLabel}</button>`
                         `<button class="chat-btn-full-width" title="Click to apply ${effect.name} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${effect.name}</button>`
                     );
                     effectApply.append(effectApplyButton);
                     // Handle button clicks
-                    // effectApply.on("click", (ev) => {
                     effectApplyButton.on("click", (ev) => {
                         ev.stopPropagation();
-                        // applyAllEffects(item, actorId);
                         applyEffect(item, effect.id, actorId);
                     });
                 }
