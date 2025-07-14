@@ -2,7 +2,7 @@ import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/ef
 import HYP3EItemSetAnnotations from "../helpers/item-set-annotations.mjs";
 import HYP3EItemSetDmgTypes from "../helpers/item-set-dmg-types.mjs";
 
-// At the top of your item sheet class or module scope:
+// Note: this must be declared outside the class to avoid re-initialization on each instance creation
 const _recentSpellDrops = new Set();
 
 /**
@@ -11,319 +11,257 @@ const _recentSpellDrops = new Set();
  */
 export class Hyp3eItemSheet extends ItemSheet {
 
-  /** @override */
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["hyp3e", "sheet", "item"],
-      width: 540,
-      height: 500,
-      tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }]
-    });
-  }
-
-  static ITEM_ANNOTATIONS_APP = new HYP3EItemSetAnnotations();
-  static ITEM_SET_DMG_TYPES_APP = new HYP3EItemSetDmgTypes();
-
-  /** @override */
-  get template() {
-    const path = `${CONFIG.HYP3E.templatePath}/item`;
-    // Use the following return statement to get a unique item sheet by type, 
-    // like `item-weapon-sheet.hbs`.
-    return `${path}/item-${this.item.type}-sheet.hbs`;
-  }
-
-  /* -------------------------------------------- */
-
-  /** @override */
-  async getData() {
-    // Retrieve base data structure.
-    const context = super.getData();
-    context.isGM = game.user.isGM
-
-    // context.editable = this.isEditable
-
-    // Use a safe clone of the item data for further operations.
-    const itemData = context.item;
-
-    // Retrieve the actor's roll data for TinyMCE editors.
-    context.rollData = {};
-    const actor = this.object?.parent ?? null;
-    if (actor) {
-      context.rollData = actor.getRollData()
-    // } else {
-    //   context.rollData = itemData.createPseudoActorForItem()
+    /** @override */
+    static get defaultOptions() {
+        return foundry.utils.mergeObject(super.defaultOptions, {
+            classes: ["hyp3e", "sheet", "item"],
+            width: 540,
+            height: 500,
+            tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }]
+        });
     }
 
-    // Prepare spell list
-    const spellRefs = this.item.system?.spellcasting?.spellRefs ?? [];
-    // const resolvedSpells = await Promise.all(
-    //     // spellRefs.map(uuid => fromUuid(uuid))
-    //     spellRefs.map(async ref => {
-    //         const spell = await fromUuid(ref.uuid);
-    //         if (!spell) return null;
-    //         return {
-    //             spell,
-    //             charges: ref.charges
-    //         };
-    //     })
-    // );
-    const resolvedSpells = await Promise.all(
-        spellRefs.map(async (ref, i) => ({
+    static ITEM_ANNOTATIONS_APP = new HYP3EItemSetAnnotations();
+    static ITEM_SET_DMG_TYPES_APP = new HYP3EItemSetDmgTypes();
+
+    /** @override */
+    get template() {
+        return `${CONFIG.HYP3E.templatePath}/item/item-${this.item.type}-sheet.hbs`;
+    }
+
+    /* -------------------------------------------- */
+
+    /** @override */
+    async getData() {
+        // Retrieve base data structure.
+        const context = super.getData();
+        context.isGM = game.user.isGM
+
+        // Retrieve the actor's roll data for TinyMCE editors.
+        context.rollData = {};
+        const actor = this.object?.parent ?? null;
+        if (actor) {
+            context.rollData = actor.getRollData()
+        }
+        console.log("getData: Roll Data in ItemSheet:", context.rollData);
+
+        // Prepare item-spell list
+        const spellRefs = this.item.system?.spellcasting?.spellRefs ?? [];
+        context.spells = (await Promise.all(spellRefs.map(async (ref, i) => ({
             spell: await fromUuid(ref.uuid),
             charges: ref.charges,
             uuid: ref.uuid,
             index: i
-        }))
-    );
+        })))).filter(Boolean);
 
-    // context.spells = resolvedSpells.filter(s => s instanceof Item); // Filter out any nulls
-    context.spells = resolvedSpells.filter(Boolean)
+        // Prepare active effects
+        context.effects = prepareActiveEffectCategories(this.item.effects);
+        // Add the item's data to context.data for easier access, as well as flags.
+        context.system = context.item.system;
+        context.flags = context.item.flags;
 
-    // Prepare active effects
-    context.effects = prepareActiveEffectCategories(this.item.effects);
+        // Log item context data
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item Context Data:", context) }
 
-    // Add the item's data to context.data for easier access, as well as flags.
-    context.system = itemData.system;
-    context.flags = itemData.flags;
+        // Enrich the description field for TinyMCE editors
+        context.enrichedDescription = await TextEditor.enrichHTML(
+            context.system.description,
+            { 
+                rollData: context.rollData, 
+                async: true 
+            }
+        );
+        context.enrichedRealDescription = await TextEditor.enrichHTML(
+            context.system.realDescription,
+            { 
+                rollData: context.rollData, 
+                async: true 
+            }
+        );
 
-    // Log item context data
-    if (CONFIG.HYP3E.debugMessages) { console.log("Item Context Data:", context) }
-
-    // Enrich the description field for TinyMCE editors.
-    context.enrichedDescription = await TextEditor.enrichHTML(
-        context.system.description,
-        { 
-            rollData: context.rollData, 
-            async: true 
-        }
-    );
-    context.enrichedRealDescription = await TextEditor.enrichHTML(
-        context.system.realDescription,
-        { 
-            rollData: context.rollData, 
-            async: true 
-        }
-    );
-    console.log("getData: Roll Data in ItemSheet:", context.rollData);
-    // console.log("Enriched HTML:", context.enrichedDescription);
-
-    // Prepare item data.
-    this._prepareItemData(context);
-    
-    return context;
-  }
-
-  /**
-   * Organize and classify data for Item sheets.
-   *
-   * @param {Object} actorData The actor to prepare.
-   *
-   * @return {undefined}
-   */
-  _prepareItemData(context) {
-
-    // Handle weapon types
-    if (context.item.type == 'weapon') {
-        context.weaponTypes = CONFIG.HYP3E.weaponTypes
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Item weapon types:", context.weaponTypes) }
+        // Prepare item data & return context
+        this._prepareItemData(context);
+        return context;
     }
 
-    // Handle armor types
-    if (context.item.type == 'armor') {
-      context.armorTypes = CONFIG.HYP3E.armorTypes
-    //   if (CONFIG.HYP3E.debugMessages) { console.log("Item armor types:", context.armorTypes) }
-      context.system.isShield = context.system.type == "shield" ? true : false
-    //   if (CONFIG.HYP3E.debugMessages) { console.log(`Shield: ${context.system.isShield}`) }
-    }
+    /**
+     * Organize and classify data for Item sheets.
+     * @param {Object} context The item to prepare.
+     * @return {undefined}
+     */
+    _prepareItemData(context) {
+        // All item sheets get the same basic data
+        context.weaponTypes = CONFIG.HYP3E.weaponTypes;
+        context.armorTypes = CONFIG.HYP3E.armorTypes;
+        context.weaponAnnotations = CONFIG.HYP3E.weaponAnnotations;
+        context.damageTypes = CONFIG.HYP3E.damageTypes;
+        context.blindRollOpts = CONFIG.HYP3E.blindRollOpts;
+        context.rollModes = CONFIG.Dice.rollModes;
+        context.saveThrows = CONFIG.HYP3E.saves;
 
-    // Handle weapon annotations
-    if (context.item.type == 'weapon') {
-        context.weaponAnnotations = CONFIG.HYP3E.weaponAnnotations
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item weapon annotations:", context.weaponAnnotations) }
-        // Refresh the annotations list for the item sheet
-        context.annotList = []
-        try {
-            context.system.annotations.forEach(annot => {
-                context.annotList.push(context.weaponAnnotations[annot])
-            })
-        } catch (err) {
-            console.log("Error loading weapon annotations:", err)
-        }
-    }
-
-    // Handle weapon & spell alternate damage types
-    if (context.item.type == 'weapon' || context.item.type == 'spell') {
-        context.damageTypes = CONFIG.HYP3E.damageTypes
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item alt dmg types:", context.damageTypes) }
-    }
-
-    // Handle blind roll true/false for any item types
-    context.blindRollOpts = CONFIG.HYP3E.blindRollOpts
-    // if (CONFIG.HYP3E.debugMessages) { console.log("Item blind roll options:", context.blindRollOpts) }
-
-    // Handle system roll modes
-    context.rollModes = CONFIG.Dice.rollModes
-    // if (CONFIG.HYP3E.debugMessages) { console.log("Item roll modes:", context.rollModes) }
-
-    // Handle saving throws for any item types
-    context.saveThrows = CONFIG.HYP3E.saves
-    // if (CONFIG.HYP3E.debugMessages) { console.log("Item saves:", context.saveThrows) }
-
-  }
-
-  async _updateObject(event, formData) {
-    // Only applies to weapons, armor, and physical items.
-    if (!["weapon", "armor", "item"].includes(this.object.type)) {
-        // If the item is not a weapon, armor, or physical item, we don't need to update the name and description.
-        return super._updateObject(event, formData);
-    }
-
-    if (CONFIG.HYP3E.debugMessages) {
-        // Log current identified state
-        console.log("Form data identified:", foundry.utils.getProperty(formData, "system.identified"))
-        console.log("Object data identified:", this.object.system.identified)
-    }
-    const isIdentified = foundry.utils.getProperty(formData, "system.identified") || this.object.system.identified;
-    // const isIdentified = this.object.system.identified;
-    if (CONFIG.HYP3E.debugMessages) { console.log("Item identified:", isIdentified) }
-
-    // Apply name and description based on identification state.
-    if (isIdentified) {
-        const realName = foundry.utils.getProperty(formData, "system.realName") || this.object.system.realName;
-        const realDesc = foundry.utils.getProperty(formData, "system.realDescription") || this.object.system.realDescription;
-
-        formData["name"] = realName;
-        formData["system.description"] = realDesc;
-    } else {
-        let aliasName = foundry.utils.getProperty(formData, "system.itemAlias") || this.object.system.itemAlias;
-        const aliasDesc = foundry.utils.getProperty(formData, "system.aliasDescription") || this.object.system.aliasDescription;
-
-        // Ensure aliasName is not empty or just whitespace
-        if (!aliasName || aliasName.trim() === "") {
-            aliasName = "Unidentified Item";
-            formData["system.itemAlias"] = aliasName;
+        // Set isShield flag for armor items
+        if (context.item.type === 'armor') {
+            context.system.isShield = context.system.type === "shield" ? true : false
         }
 
-        formData["name"] = aliasName?.trim();
-        formData["system.description"] = aliasDesc;
-    }
-
-    // Spell references must be converted from a keyed object to an array.
-    //  Need to expand the formData first.
-    const data = expandObject(formData);
-    const refs = getProperty(data, "system.spellcasting.spellRefs");
-    if (refs && !Array.isArray(refs)) {
-        data.system.spellcasting.spellRefs = Object.values(refs);
-    }
-
-    if (CONFIG.HYP3E.debugMessages) { console.log(`Updated item data:`, data) }
-    return super._updateObject(event, data);
-  }
-
-
-  /* -------------------------------------------- */
-
-  /** @override */
-  activateListeners(html) {
-    super.activateListeners(html);
-
-    // If the sheet is not editable, do nothing.
-    if (!this.isEditable) return;
-
-    // Everything below here is only needed if the sheet is editable
-
-    // Roll handlers, click handlers, etc. would go here.
-
-    // Enable drop functionality
-    this.element[0].addEventListener("drop", this._onDrop.bind(this));
-
-    // Rollable elements
-    html.find('.rollable').click(this._onRoll.bind(this));
-
-    // Handle displaying item description in the chat log
-    html.find('.item-show').click(event => {
-      this._openItemSheet(event);
-    });
-
-    // Handle toggling spell description as drop-down text
-    html.find(".item-drop").click((event) => {
-        this._toggleItemSummary(event);
-    });
-
-    // Handle item name/realName changes, only if the item is identified
-    html.find('.item-name').change(async (event) => {
-        const name = event.target.value.trim();
-        if (this.item.system.identified) {
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Item name changed to: ${name}`) }
-            if (name !== this.item.name) {
-                await this.item.update({ name: name });
-                // if (CONFIG.HYP3E.debugMessages) { console.log(`Item name updated to: ${name}`) }
+        // Refresh the annotations list for weapons
+        if (context.item.type === 'weapon') {
+            context.annotList = []
+            try {
+                context.system.annotations.forEach(annot => {
+                    context.annotList.push(context.weaponAnnotations[annot])
+                })
+            } catch (err) {
+                console.log("Error loading weapon annotations:", err)
             }
         }
-    });
-    // Handle item name/itemAlias changes, only if the item is not identified
-    html.find('.item-alias').change(async (event) => {
-        const alias = event.target.value.trim();
-        if (!this.item.system.identified) {
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Item alias changed to: ${alias}`) }
-            if (alias !== this.item.name) {
-                await this.item.update({ name: alias });
-                // if (CONFIG.HYP3E.debugMessages) { console.log(`Item alias updated to: ${alias}`) }
-            }
+    }
+
+    async _updateObject(event, formData) {
+        // Only applies to weapons, armor, and physical items.
+        if (!["weapon", "armor", "item"].includes(this.object.type)) {
+            // If the item is not a weapon, armor, or physical item, we don't need to update the name and description.
+            return super._updateObject(event, formData);
         }
-    });
 
-    // Handle item status identified / not identified
-    html.find(".identified").click(async (event) => {
-        const identified = event.target.checked
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Checkbox system.identified clicked! New 'checked' value: ${identified}.`) }
-        this._toggleIdentified(identified)
-    });
+        if (CONFIG.HYP3E.debugMessages) {
+            // Log current identified state
+            console.log("Form data identified:", foundry.utils.getProperty(formData, "system.identified"))
+            console.log("Object data identified:", this.object.system.identified)
+        }
+        const isIdentified = foundry.utils.getProperty(formData, "system.identified") || this.object.system.identified;
+        // const isIdentified = this.object.system.identified;
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item identified:", isIdentified) }
 
-    // Toggle weapon attack type melee/missile
-    html.find(".weapon-type").click(async (event) => {
-        const attackType = $(event.currentTarget).data("attackType")
-        if (CONFIG.HYP3E.debugMessages) { console.log("Attack Type click: ", attackType) }
-        this._updateAtkType(attackType)
-    });
+        // Apply name and description based on identification state.
+        if (isIdentified) {
+            const realName = foundry.utils.getProperty(formData, "system.realName") || this.object.system.realName;
+            const realDesc = foundry.utils.getProperty(formData, "system.realDescription") || this.object.system.realDescription;
 
-    // Handle isGrenade and isAreaEffect checkboxes
-    html.find('input[name="system.isGrenade"]').on("change", this._onTypeRelatedChange.bind(this));
-    html.find('input[name="system.isAreaEffect"]').on("change", this._onTypeRelatedChange.bind(this));
+            formData["name"] = realName;
+            formData["system.description"] = realDesc;
+        } else {
+            let aliasName = foundry.utils.getProperty(formData, "system.itemAlias") || this.object.system.itemAlias;
+            const aliasDesc = foundry.utils.getProperty(formData, "system.aliasDescription") || this.object.system.aliasDescription;
 
-    // Set weapon base damage
-    html.find('.item-button[data-control="set-dmg-types"]').click((ev) => {
-        Hyp3eItemSheet.ITEM_SET_DMG_TYPES_APP.render(true, { itemUuid: this.item.uuid, focus: true });
-    });
+            // Ensure aliasName is not empty or just whitespace
+            if (!aliasName || aliasName.trim() === "") {
+                aliasName = "Unidentified Item";
+                formData["system.itemAlias"] = aliasName;
+            }
 
-    // Toggle weapon mastery & grand-mastery true/false
-    html.find(".weapon-mastery").click(async (event) => {
-        const mastery = $(event.currentTarget).data("mastery")
-        if (CONFIG.HYP3E.debugMessages) { console.log("Weapon Mastery click: ", mastery) }
-        this.item.updateWeaponMastery(mastery)
-    });
+            formData["name"] = aliasName?.trim();
+            formData["system.description"] = aliasDesc;
+        }
 
-    // Set item annotations
-    html.find('.item-button[data-control="set-annotations"]').click((ev) => {
-        Hyp3eItemSheet.ITEM_ANNOTATIONS_APP.render(true, { itemUuid: this.item.uuid, focus: true });
-    });
+        // Spell references must be converted from a keyed object to an array.
+        //  Need to expand the formData first.
+        const data = expandObject(formData);
+        const refs = getProperty(data, "system.spellcasting.spellRefs");
+        if (refs && !Array.isArray(refs)) {
+            data.system.spellcasting.spellRefs = Object.values(refs);
+        }
 
-    // Make item-spell list sortable
-    const list = html.find(".item-spells");
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Updated item data:`, data) }
+        return super._updateObject(event, data);
+    }
 
-    // Drag start: store the dragged spell's index
-    list.find(".spell-entry").on("dragstart", ev => {
+    /* -------------------------------------------- */
+
+    /** @override */
+    activateListeners(html) {
+        super.activateListeners(html);
+
+        // If the sheet is not editable, do nothing.
+        if (!this.isEditable) return;
+
+        // Everything below here is only needed if the sheet is editable
+        // Roll handlers, click handlers, etc. would go here.
+
+        // Enable drop functionality on item sheets
+        this.element[0].addEventListener("drop", this._onDrop.bind(this));
+
+        // Rollable elements
+        html.find('.rollable').click(this._onRoll.bind(this));
+
+        // Handle displaying item description in the chat log
+        html.find('.item-show').click(event => this._openItemSheet(event));
+
+        // Toggle spell description as pop-down text
+        html.find(".item-drop").click(event => this._toggleItemSummary(event));
+
+        // Toggle weapon melee/missile attack type
+        html.find('.weapon-type').click(event => this._handleWeaponType(event));
+
+        // Toggle weapon mastery & grand-mastery true/false
+        html.find('.weapon-mastery').click(event => this._handleWeaponMastery(event));
+
+        // Handle isGrenade and isAreaEffect checkboxes
+        html.find('input[name="system.isGrenade"]').on("change", this._onTypeRelatedChange.bind(this));
+        html.find('input[name="system.isAreaEffect"]').on("change", this._onTypeRelatedChange.bind(this));
+
+        // Set weapon base & alternate damage types
+        html.find('.item-button[data-control="set-dmg-types"]').click((ev) => {
+            Hyp3eItemSheet.ITEM_SET_DMG_TYPES_APP.render(true, { itemUuid: this.item.uuid, focus: true });
+        });
+
+        // Set item annotations
+        html.find('.item-button[data-control="set-annotations"]').click((ev) => {
+            Hyp3eItemSheet.ITEM_ANNOTATIONS_APP.render(true, { itemUuid: this.item.uuid, focus: true });
+        });
+
+        // Handle item name/realName changes, only if the item IS identified
+        html.find('.item-name').change(async (event) => {
+            const name = event.target.value.trim();
+            if (this.item.system.identified) {
+                if (name !== this.item.name) {
+                    await this.item.update({ name: name });
+                }
+            }
+        });
+        // Handle item name/itemAlias changes, only if the item IS NOT identified
+        html.find('.item-alias').change(async (event) => {
+            const alias = event.target.value.trim();
+            if (!this.item.system.identified) {
+                if (alias !== this.item.name) {
+                    await this.item.update({ name: alias });
+                }
+            }
+        });
+
+        // Toggle item status identified / not identified
+        html.find(".identified").click(async (event) => {
+            const identified = event.target.checked
+            this._toggleIdentified(identified)
+        });
+
+        // Handle item spell functionality
+        html.find(".item-spells .spell-entry").on("dragstart", this._handleSpellDrag.bind(this));
+        html.find(".item-spells").on("dragover", ev => ev.preventDefault());
+        html.find(".item-spells").on("drop", this._handleSpellDrop.bind(this));
+        html.find(".item-delete-spell").click(this._handleSpellDelete.bind(this));
+
+        // Active Effect management
+        html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.item));
+
+    }
+
+    _handleWeaponType(event) {
+        const attackType = $(event.currentTarget).data("attackType");
+        this.item.updateWeaponType(attackType);
+        this.item.applyAttackFormula();
+    }
+
+    _handleWeaponMastery(event) {
+        const mastery = $(event.currentTarget).data("mastery");
+        this.item.updateWeaponMastery(mastery);
+    }
+
+    _handleSpellDrag(ev) {
         ev.originalEvent.dataTransfer.setData("text/plain", ev.currentTarget.dataset.index);
-    });
+    }
 
-    // Drag over: allow drop
-    list.on("dragover", ev => {
-        ev.preventDefault();
-    });
-
-    // Drop: reorder spellRefs array
-    list.on("drop", async ev => {
-        ev.preventDefault();
+    async _handleSpellDrop(ev) {
         const fromIndex = Number(ev.originalEvent.dataTransfer.getData("text/plain"));
         const toElement = ev.target.closest(".spell-entry");
         if (!toElement) return;
@@ -331,70 +269,41 @@ export class Hyp3eItemSheet extends ItemSheet {
         const toIndex = Number(toElement.dataset.index);
         if (isNaN(fromIndex) || isNaN(toIndex) || fromIndex === toIndex) return;
 
-        const spellRefs = foundry.utils.deepClone(this.item.system.spellcasting.spellRefs ?? []);
+        await this.item.reorderSpell(fromIndex, toIndex);
+        this.render();
+    }
 
-        const [moved] = spellRefs.splice(fromIndex, 1);
-        spellRefs.splice(toIndex, 0, moved);
+    async _handleSpellDelete(ev) {
+        const uuid = $(ev.currentTarget).closest("[data-spell-id]").data("spellId");
+        await this.item.removeSpell(uuid);
+        this.render();
+    }
 
-        await this.item.update({ "system.spellcasting.spellRefs": spellRefs });
-        this.render(); // Rerender to reflect the new order
-    });
+    /**
+     * Handle clickable rolls.
+     * @param {Event} event   The originating click event
+     * @private
+     */
+    async _onRoll(event) {
+        event.preventDefault();
+        const element = event.currentTarget;
+        const dataset = element.dataset;
+        const formula = element.dataset.formula;
+        const flavor = element.dataset.tooltip;
+    
+        // Log the element
+        console.log("_onRoll: Clicked element: ", element)
+        // Log the element dataset
+        console.log("_onRoll: Element dataset: ", dataset)
 
-    // Handle removing a spell from the item
-    html.find(".item-delete-spell").on("click", async ev => {
-        ev.preventDefault();
+        // Perform the roll
+        const roll = new Roll(formula);
+        roll.toMessage({
+            flavor: flavor,
+            speaker: ChatMessage.getSpeaker({ actor: this.item.actor })
+        });
 
-        const li = $(ev.currentTarget).closest("[data-spell-id]");
-        const uuid = li.data("spellId");
-
-        const spellRefs = this.item.system.spellcasting.spellRefs ?? [];
-        const updated = spellRefs.filter(ref => ref.uuid !== uuid);
-
-        await this.item.update({ "system.spellcasting.spellRefs": updated });
-    });
-
-    // Active Effect management
-    html.find(".effect-control").click(ev => onManageActiveEffect(ev, this.item));
-
-    // console.log("Rendered HTML in sheet:", this.element.find(".editor-content").html());
-
-  }
-
-  /**
-   * Handle clickable rolls.
-   * @param {Event} event   The originating click event
-   * @private
-   */
-  async _onRoll(event) {
-    event.preventDefault();
-    const element = event.currentTarget;
-    const dataset = element.dataset;
-    const formula = element.dataset.formula;
-    const flavor = element.dataset.tooltip;
-  
-    // Log the element
-    console.log("Clicked element: ", element)
-    // Log the element dataset
-    console.log("Element dataset: ", dataset)
-
-    // Perform the roll
-    const roll = new Roll(formula);
-    roll.toMessage({
-        flavor: flavor,
-        speaker: ChatMessage.getSpeaker({ actor: this.item.actor })
-    });
-
-  }
-
-  _onSortSpells(evt) {
-    const refs = this.item.system.spellcasting.spellRefs;
-    if (!Array.isArray(refs)) return;
-
-    const [moved] = refs.splice(evt.oldIndex, 1);
-    refs.splice(evt.newIndex, 0, moved);
-
-    this.item.update({ "system.spellcasting.spellRefs": refs });
-  }
+    }
 
   async _onDrop(event) {
     event.preventDefault();
@@ -440,35 +349,26 @@ export class Hyp3eItemSheet extends ItemSheet {
     ui.notifications.info(`Added spell "${droppedItem.name}" to item.`);
   }
 
-  /**
-   * Handle toggling an Item description in the character sheet.
-   * @param {Event} event   The originating click event
-   * @private
-   */
-  _toggleItemSummary(event) {
-    event.preventDefault()
-    const itemSummary = event.currentTarget
-      .closest(".item-entry.item")
-      .querySelector(".item-summary");
-    if (itemSummary.style.display === "") {
-      itemSummary.style.display = "block"
-    } else {
-      itemSummary.style.display = ""
+    /**
+     * Handle toggling an Item description in the character sheet.
+     * @param {Event} event   The originating click event
+     * @private
+     */
+    _toggleItemSummary(event) {
+        // event.preventDefault()
+        const summary = event.currentTarget.closest(".item-entry.item").querySelector(".item-summary");
+        summary.style.display = summary.style.display === "block" ? "" : "block";
     }
-  }
 
-  /**
-   * Handle displaying an Item description in the chat.
-   * @param {Event} event   The originating click event
-   * @private
-   */
-  async _openItemSheet(event) {
-    const li = $(event.currentTarget).closest(".item-entry")
-    const item = await fromUuid(li.data("spellId"))
-    if (item && item.sheet) {
-        item.sheet.render(true);
+    /**
+     * Handle displaying an Item description in the chat.
+     * @param {Event} event   The originating click event
+     * @private
+     */
+    async _openItemSheet(event) {
+        const item = await fromUuid($(event.currentTarget).closest(".item-entry").data("spellId"));
+        if (item?.sheet) item.sheet.render(true);
     }
-}
 
   /**
    * Handle toggling an item as 'identified' or 'unidentified'
@@ -490,36 +390,6 @@ export class Hyp3eItemSheet extends ItemSheet {
   }
 
   /**
-   * Handle weapon attack type, melee vs. missile
-   * @param {String} atkType The type of attack
-   * @private
-   */
-  async _updateAtkType(atkType) {
-    let result
-    switch (atkType) {
-      case "melee":
-        result = await this.item.update({
-          system: {
-            melee: !this.item.system.melee,
-            type: "melee"
-          }
-        })
-        break
-      case "missile":
-        result = await this.item.update({
-          system: {
-            missile: !this.item.system.missile,
-            type: "missile"
-          }
-        })
-        break
-    }
-    // Update the attack formula based on the new type
-    this.item.applyAttackFormula()
-    if (CONFIG.HYP3E.debugMessages) { console.log("Weapon after update:", result) }
-  }  
-
-  /**
    * Handle checkbox changes related to attack type (e.g., isGrenade, isAreaEffect)
    * @param {*} event 
    * @private
@@ -529,13 +399,13 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     const formData = this._getSubmitData();
     // Merge or update item data as needed
-    await this.object.update(formData);
+    await this.item.update(formData);
 
     // Apply attack formula logic
-    this.object.applyAttackFormula();
+    this.item.applyAttackFormula();
 
     // Optionally re-render to show changes live
-    this.render(false);
+    this.render(true);
   }
 
 }

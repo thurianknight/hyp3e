@@ -88,8 +88,29 @@ export class Hyp3eItem extends Item {
         return rollData;
     }
 
-    applyAttackFormula() {
+    async updateWeaponType(attackType) {
+        const updates = {};
+        switch (attackType) {
+            case "melee":
+                updates["system.melee"] = true;
+                updates["system.missile"] = false;
+                updates["system.isGrenade"] = false;
+                updates["system.isAreaEffect"] = false;
+                updates["system.type"] = "melee";
+                break;
+            case "missile":
+                updates["system.melee"] = false;
+                updates["system.missile"] = true;
+                updates["system.type"] = "missile";
+                break;
+        }
+        await this.update(updates);
+    }
+
+    async applyAttackFormula() {
         const itemData = this.system;
+
+        let updateData = {};
 
         // If this is not a weapon, but has an atkRoll, set the formula to 1d20 + @fa
         if (this.type !== "weapon") {
@@ -101,36 +122,78 @@ export class Hyp3eItem extends Item {
 
         // Area effects and grenades override all variables
         if (itemData.isAreaEffect) {
-            itemData.formula = "";
-            itemData.melee = false;
-            itemData.missile = true;
-            itemData.isGrenade = false;
-            return;
+            updateData = {
+                melee: false,
+                missile: true,
+                isGrenade: false,
+                formula: "",
+                type: "missile"
+            }
+            return await this.update({ system: updateData });
+            // itemData.formula = "";
+            // itemData.melee = false;
+            // itemData.missile = true;
+            // itemData.isGrenade = false;
+            // return;
         }
         if (itemData.isGrenade) {
-            itemData.formula = "1d20 + @dex.atkMod";
-            itemData.melee = false;
-            itemData.missile = true;
-            itemData.isAreaEffect = false;
-            return;
+            updateData = {
+                melee: false,
+                missile: true,
+                isAreaEffect: false,
+                formula: "1d20 + @dex.atkMod",
+                type: "missile"
+            }
+            return await this.update({ system: updateData });
+            // itemData.formula = "1d20 + @dex.atkMod";
+            // itemData.melee = false;
+            // itemData.missile = true;
+            // itemData.isAreaEffect = false;
+            // return;
         }
 
         // If this is a weapon, set the attack formula based on type
         if (itemData.type === "melee") {
-            itemData.formula ||= "1d20 + @str.atkMod";
-            itemData.melee = true;
-            itemData.missile = false;
-        } else if (itemData.type === "missile") {
-            itemData.formula ||= "1d20 + @dex.atkMod";
-            itemData.melee = false;
-            itemData.missile = true;
-        } else {
-            console.warn(`ITEM ERROR: Weapon ${this.name} has invalid type. Defaulting to melee.`);
-            itemData.type = "melee";
-            itemData.formula = "1d20 + @str.atkMod";
-            itemData.melee = true;
-            itemData.missile = false;
+            updateData = {
+                melee: true,
+                missile: false,
+                isGrenade: false,
+                isAreaEffect: false,
+                formula: itemData.formula || "1d20 + @str.atkMod",
+                type: "melee"
+            }
+            return await this.update({ system: updateData });
+            // itemData.formula ||= "1d20 + @str.atkMod";
+            // itemData.melee = true;
+            // itemData.missile = false;
         }
+        if (itemData.type === "missile") {
+            updateData = {
+                melee: false,
+                missile: true,
+                formula: itemData.formula || "1d20 + @dex.atkMod",
+                type: "missile"
+            }
+            return await this.update({ system: updateData });
+            // itemData.formula ||= "1d20 + @dex.atkMod";
+            // itemData.melee = false;
+            // itemData.missile = true;
+        }
+        // Default if invalid weapon type
+        console.warn(`ITEM ERROR: Weapon ${this.name} has invalid type. Defaulting to melee.`);
+        updateData = {
+            melee: true,
+            missile: false,
+            isGrenade: false,
+            isAreaEffect: false,
+            formula: "1d20 + @str.atkMod",
+            type: "melee"
+        }
+        return await this.update({ system: updateData });
+        // itemData.type = "melee";
+        // itemData.formula = "1d20 + @str.atkMod";
+        // itemData.melee = true;
+        // itemData.missile = false;
     }
 
     /**
@@ -169,6 +232,23 @@ export class Hyp3eItem extends Item {
         }
 
         return await this.update({ system: updateData });
+    }
+
+    reorderSpell(fromIndex, toIndex) {
+        const refs = foundry.utils.deepClone(this.system.spellcasting?.spellRefs ?? []);
+        if (!Array.isArray(refs)) return;
+
+        const [moved] = refs.splice(fromIndex, 1);
+        refs.splice(toIndex, 0, moved);
+
+        return this.update({ "system.spellcasting.spellRefs": refs });
+    }
+
+    removeSpell(uuid) {
+        const spellRefs = foundry.utils.deepClone(this.system.spellcasting?.spellRefs ?? []);
+        const updatedRefs = spellRefs.filter(ref => ref.uuid !== uuid);
+
+        return this.update({ "system.spellcasting.spellRefs": updatedRefs });
     }
 
     // Get the names of effects applied to the item, and return an array
