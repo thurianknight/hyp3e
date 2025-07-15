@@ -88,6 +88,21 @@ export class Hyp3eItem extends Item {
         return rollData;
     }
 
+    async toggleIdentified(identified) {
+        const item = this
+        if (identified) {
+            // If identified, set item.name to system.realName and item.system.description to item.system.realDescription
+            const name = this.system?.realName > "" ? this.system.realName : this.name
+            const updates = { name: name, "system.description": this.system.realDescription }
+            await this.update(updates)
+        } else {
+            // If not identified, set item.name to system.itemAlias and item.system.description to item.system.aliasDescription
+            const name = this.system?.itemAlias > "" ? this.system.itemAlias : this.name
+            const updates = { name: name, "system.description": this.system.aliasDescription }
+            await this.update(updates)
+        }
+    }
+
     async updateWeaponType(attackType) {
         const updates = {};
         switch (attackType) {
@@ -130,11 +145,6 @@ export class Hyp3eItem extends Item {
                 type: "missile"
             }
             return await this.update({ system: updateData });
-            // itemData.formula = "";
-            // itemData.melee = false;
-            // itemData.missile = true;
-            // itemData.isGrenade = false;
-            // return;
         }
         if (itemData.isGrenade) {
             updateData = {
@@ -145,11 +155,6 @@ export class Hyp3eItem extends Item {
                 type: "missile"
             }
             return await this.update({ system: updateData });
-            // itemData.formula = "1d20 + @dex.atkMod";
-            // itemData.melee = false;
-            // itemData.missile = true;
-            // itemData.isAreaEffect = false;
-            // return;
         }
 
         // If this is a weapon, set the attack formula based on type
@@ -163,9 +168,6 @@ export class Hyp3eItem extends Item {
                 type: "melee"
             }
             return await this.update({ system: updateData });
-            // itemData.formula ||= "1d20 + @str.atkMod";
-            // itemData.melee = true;
-            // itemData.missile = false;
         }
         if (itemData.type === "missile") {
             updateData = {
@@ -175,9 +177,6 @@ export class Hyp3eItem extends Item {
                 type: "missile"
             }
             return await this.update({ system: updateData });
-            // itemData.formula ||= "1d20 + @dex.atkMod";
-            // itemData.melee = false;
-            // itemData.missile = true;
         }
         // Default if invalid weapon type
         console.warn(`ITEM ERROR: Weapon ${this.name} has invalid type. Defaulting to melee.`);
@@ -190,10 +189,6 @@ export class Hyp3eItem extends Item {
             type: "melee"
         }
         return await this.update({ system: updateData });
-        // itemData.type = "melee";
-        // itemData.formula = "1d20 + @str.atkMod";
-        // itemData.melee = true;
-        // itemData.missile = false;
     }
 
     /**
@@ -234,7 +229,33 @@ export class Hyp3eItem extends Item {
         return await this.update({ system: updateData });
     }
 
-    reorderSpell(fromIndex, toIndex) {
+    /**
+     * Add a spell reference to this item's spellcasting list.
+     * Prevents duplicates and handles charges initialization.
+     * @param {Item} droppedItem - The spell item being added.
+     */
+    async addSpell(droppedItem) {
+        if (!droppedItem || droppedItem.type !== "spell") {
+            ui.notifications.warn("Only spells can be added to this item.");
+            return;
+        }
+
+        const uuid = droppedItem.uuid;
+        const spellRefs = foundry.utils.deepClone(this.system.spellcasting?.spellRefs ?? []);
+
+        // Check for duplicates
+        if (spellRefs.some(ref => ref.uuid === uuid)) {
+            ui.notifications.info("That spell is already linked to this item.");
+            return;
+        }
+
+        spellRefs.push({ uuid, charges: 1 });
+
+        await this.update({ "system.spellcasting.spellRefs": spellRefs });
+        ui.notifications.info(`Added spell "${droppedItem.name}" to item.`);
+    }
+
+    async reorderSpell(fromIndex, toIndex) {
         const refs = foundry.utils.deepClone(this.system.spellcasting?.spellRefs ?? []);
         if (!Array.isArray(refs)) return;
 
@@ -244,7 +265,7 @@ export class Hyp3eItem extends Item {
         return this.update({ "system.spellcasting.spellRefs": refs });
     }
 
-    removeSpell(uuid) {
+    async removeSpell(uuid) {
         const spellRefs = foundry.utils.deepClone(this.system.spellcasting?.spellRefs ?? []);
         const updatedRefs = spellRefs.filter(ref => ref.uuid !== uuid);
 

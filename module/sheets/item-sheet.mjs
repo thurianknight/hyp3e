@@ -39,11 +39,9 @@ export class Hyp3eItemSheet extends ItemSheet {
 
         // Retrieve the actor's roll data for TinyMCE editors.
         context.rollData = {};
-        const actor = this.object?.parent ?? null;
-        if (actor) {
-            context.rollData = actor.getRollData()
-        }
-        console.log("getData: Roll Data in ItemSheet:", context.rollData);
+        const actor = this.actor;
+        context.rollData = this.actor?.getRollData();
+        if (CONFIG.HYP3E.debugMessages) { console.log("getData: Roll Data in ItemSheet:", context.rollData); }
 
         // Prepare item-spell list
         const spellRefs = this.item.system?.spellcasting?.spellRefs ?? [];
@@ -232,7 +230,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         // Toggle item status identified / not identified
         html.find(".identified").click(async (event) => {
             const identified = event.target.checked
-            this._toggleIdentified(identified)
+            await this.item.toggleIdentified(identified)
         });
 
         // Handle item spell functionality
@@ -246,15 +244,15 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     }
 
-    _handleWeaponType(event) {
+    async _handleWeaponType(event) {
         const attackType = $(event.currentTarget).data("attackType");
-        this.item.updateWeaponType(attackType);
-        this.item.applyAttackFormula();
+        await this.item.updateWeaponType(attackType);
+        await this.item.applyAttackFormula();
     }
 
-    _handleWeaponMastery(event) {
+    async _handleWeaponMastery(event) {
         const mastery = $(event.currentTarget).data("mastery");
-        this.item.updateWeaponMastery(mastery);
+        await this.item.updateWeaponMastery(mastery);
     }
 
     _handleSpellDrag(ev) {
@@ -305,49 +303,30 @@ export class Hyp3eItemSheet extends ItemSheet {
 
     }
 
-  async _onDrop(event) {
-    event.preventDefault();
+    async _onDrop(event) {
+        event.preventDefault();
 
-    // Read dropped data
-    const dataTransfer = event.dataTransfer?.getData("text/plain");
-    if (!dataTransfer) return;
+        // Read dropped data
+        const dataTransfer = event.dataTransfer?.getData("text/plain");
+        if (!dataTransfer) return;
 
-    const dropData = JSON.parse(dataTransfer);
-    if (CONFIG.HYP3E.debugMessages) { console.log("_onDrop data: ", dropData) }
+        let dropData;
+        try {
+            dropData = JSON.parse(dataTransfer);
+        } catch {
+            return;
+        }
 
-    // Check if it's a spell Item
-    if (dropData.type !== "Item") return;
-    
-    const droppedItem = await fromUuid(dropData.uuid ?? dropData.data?.uuid);
-    if (!droppedItem || droppedItem.type !== "spell") {
-        ui.notifications.warn("Only spells can be added to this item.");
-        return;
+        // Check if it's an Item
+        if (dropData.type !== "Item") return;
+        
+        const droppedItem = await fromUuid(dropData.uuid ?? dropData.data?.uuid);
+        if (!droppedItem) return;
+
+        // Add the spell to the item
+        await this.item.addSpell(droppedItem);
+        this.render();
     }
-
-    // Grab the UUID
-    const uuid = droppedItem.uuid;
-
-    // Prevent rapid duplicate adds
-    if (_recentSpellDrops.has(uuid)) return;
-
-    // Add to set and clear after short delay
-    _recentSpellDrops.add(uuid);
-    setTimeout(() => _recentSpellDrops.delete(uuid), 200); // 200ms delay
-
-    // Avoid duplicates
-    const currentRefs = this.item.system.spellcasting?.spellRefs ?? [];
-    if (currentRefs.includes(uuid)) {
-        ui.notifications.info("That spell is already linked to this item.");
-        return;
-    }
-
-    // Add the UUID to the item's spellRefs
-    await this.item.update({
-        "system.spellcasting.spellRefs": [...currentRefs, { uuid: uuid, charges: 1 }]
-    });
-
-    ui.notifications.info(`Added spell "${droppedItem.name}" to item.`);
-  }
 
     /**
      * Handle toggling an Item description in the character sheet.
@@ -371,25 +350,6 @@ export class Hyp3eItemSheet extends ItemSheet {
     }
 
   /**
-   * Handle toggling an item as 'identified' or 'unidentified'
-   * @param {*} identified 
-   */
-  async _toggleIdentified(identified) {
-    const item = this.item
-    if (identified) {
-        // If identified, set item.name to system.realName and item.system.description to item.system.realDescription
-        const name = item.system?.realName > "" ? item.system.realName : item.name
-        const updates = { name: name, "system.description": item.system.realDescription }
-        await item.update(updates)
-    } else {
-        // If not identified, set item.name to system.itemAlias and item.system.description to item.system.aliasDescription
-        const name = item.system?.itemAlias > "" ? item.system.itemAlias : item.name
-        const updates = { name: name, "system.description": item.system.aliasDescription }
-        await item.update(updates)
-    }
-  }
-
-  /**
    * Handle checkbox changes related to attack type (e.g., isGrenade, isAreaEffect)
    * @param {*} event 
    * @private
@@ -402,7 +362,7 @@ export class Hyp3eItemSheet extends ItemSheet {
     await this.item.update(formData);
 
     // Apply attack formula logic
-    this.item.applyAttackFormula();
+    await this.item.applyAttackFormula();
 
     // Optionally re-render to show changes live
     this.render(true);
