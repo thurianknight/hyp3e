@@ -1469,21 +1469,6 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Retrieves actor roll data.
-     * @returns {object} Actor's roll data.
-     */
-    // _getActorRollData() {
-    //     const actorData = this.getRollData(); // Assuming this method exists on the actor
-    //     if (actorData) {
-    //         actorData.actorType = this.type;
-    //     }
-    //     if (CONFIG.HYP3E.debugMessages) {
-    //         console.log("rollAttackOrSpell/_getActorRollData: Actor roll data:", actorData);
-    //     }
-    //     return actorData;
-    // }
-
-    /**
      * Gets details of the primary targeted token.
      * @param {Token|null} attacker - The attacking token (used for distance calculation).
      * @returns {{target: Token|null, targetData: {ac: number, name: string, size: string}, gridDistance: number}}
@@ -1999,14 +1984,7 @@ export class Hyp3eActor extends Actor {
         await roll.roll();
         if (roll != undefined && roll.total != undefined) {
             const newHealth = roll.total;
-            await this.update({
-                system: {
-                hp: {
-                    value: newHealth,
-                    max: newHealth
-                }
-                }
-            });
+            await this.update({ system: { hp: { value: newHealth, max: newHealth } } });
         } else {
             if (CONFIG.HYP3E.debugMessages) { console.log("rollHD: Roll failed, no total value!") }
         }
@@ -2033,12 +2011,7 @@ export class Hyp3eActor extends Actor {
             // Log the update
             if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Updated HP:", newHealth, "Max HP:", newMax) }
             await this.update({
-                system: {
-                    hp: {
-                        value: newHealth,
-                        max: newMax
-                    }
-                }
+                system: { hp: { value: newHealth, max: newMax } }
             });
         } else {
             if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll failed, no total value!") }
@@ -2052,12 +2025,6 @@ export class Hyp3eActor extends Actor {
             ui.notifications.warn(`${item.name} has no spells to cast.`);
             return;
         }
-
-        // Check item charges
-        // if (spellcasting.charges?.value === 0) {
-        //     ui.notifications.warn(`${item.name} is out of charges.`);
-        //     return;
-        // }
 
         // Load the spell
         const spell = await fromUuid(spellUuid);
@@ -2431,21 +2398,6 @@ export class Hyp3eActor extends Actor {
         return sitModObj
     }
 
-    // Return an array of applicable effects
-    // _getAllApplicableEffects() {
-    //     let effects = []
-    //     // Get all effects from the actor
-    //     for ( const effect of this.effects ) {
-    //         effects.push(effect);
-    //     }
-    //     for ( const item of this.items ) {
-    //         for ( const effect of item.effects ) {
-    //             if ( effect.transfer ) effects.push(effect);
-    //         }
-    //     }
-    //     return effects;
-    // }
-
     // Get the names of effects applied to the actor, and return an array
     _getEffectNames() {
         let effects
@@ -2458,13 +2410,6 @@ export class Hyp3eActor extends Actor {
             effects = this.allApplicableEffects()
         }
         return this.effects.map(e => e.name);
-        // let effectsArray = []
-        // effects.forEach(effect => {
-        //     // Log the effect
-        //     if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.name}, effect ${effect.name}:`, effect) }
-        //     effectsArray.push(effect.name)
-        // })
-        // return effectsArray
     }
 
     // Parse item name to see if it has an attack/damage modifier
