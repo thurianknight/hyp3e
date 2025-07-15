@@ -1,6 +1,5 @@
 import {Hyp3eDice} from "../helpers/dice.mjs";
 import { HYP3E } from "../helpers/config.mjs"
-// import {Hyp3eDialog} from "../helpers/dialog.mjs";
 
 /**
  * Extend the basic Item with some very simple modifications.
@@ -420,5 +419,4 @@ export class Hyp3eItem extends Item {
         }
         return "";
     }
-
 }
