@@ -61,7 +61,7 @@ export class Hyp3eItem extends Item {
         }
 
         // Apply attack formula logic if weapon or atkRoll
-        if (this.type === "weapon" || itemData.atkRoll) {
+        if ((this.type === "weapon" || itemData.atkRoll) && !itemData.formula?.trim()) {
             this.applyAttackFormula();
         }
 
@@ -183,7 +183,7 @@ export class Hyp3eItem extends Item {
                 missile: false,
                 isGrenade: false,
                 isAreaEffect: false,
-                formula: itemData.formula || "1d20 + @str.atkMod",
+                formula: "1d20 + @str.atkMod", //formula: itemData.formula || "1d20 + @str.atkMod",
                 type: "melee"
             }
             return await this.update({ system: updateData });
@@ -192,7 +192,7 @@ export class Hyp3eItem extends Item {
             updateData = {
                 melee: false,
                 missile: true,
-                formula: itemData.formula || "1d20 + @dex.atkMod",
+                formula: "1d20 + @dex.atkMod", //formula: itemData.formula || "1d20 + @dex.atkMod",
                 type: "missile"
             }
             return await this.update({ system: updateData });
