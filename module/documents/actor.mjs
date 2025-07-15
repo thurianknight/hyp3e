@@ -27,35 +27,8 @@ export class Hyp3eActor extends Actor {
     async prepareBaseData() {
         // Data modifications in this step occur before processing embedded
         // documents or derived data.
-        const actorData = this;
-        const systemData = actorData.system;
-
-        // for (const effect of this.allApplicableEffects()) {
-        //     for (const change of effect.changes) {
-        //         if (CONFIG.HYP3E.debugMessages) { console.log(`Processing change ${change.key} of effect ${effect.name}...`) }
-        //         let value = change.value;
-        //         const newValue = await parseAndResolveChangeValue(value, this)
-        //         if (newValue != value) {
-        //             if (CONFIG.HYP3E.debugMessages) { console.log(`Change ${value} will be replaced with ${newValue}.`) }
-        //             value = newValue
-        //         } else {
-        //             if (CONFIG.HYP3E.debugMessages) { console.log(`No change required for ${value}.`) }
-        //         }
-        //         // Update the change on the actor
-        //         await foundry.utils.setProperty(this, change.key, value);
-        //         if (CONFIG.HYP3E.debugMessages) { console.log(`Updated actor:`, this) }
-        //     }
-        // }
-
-        // Auto-calculate AC, DR, MV if configuration is enabled -- for characters only
-        // if (actorData.type == 'character') {
-        //     if (CONFIG.HYP3E.autoCalcAc) {
-        //         const acMvObj = this.getCharacterAcAndMv(actorData, systemData)
-        //         systemData.ac.value = acMvObj["ac"]
-        //         systemData.ac.dr = acMvObj["dr"]
-        //         systemData.movement.base.value = acMvObj["mv"]
-        //     }
-        // }
+        // const actorData = this;
+        // const systemData = this.system;
 
     }
 
@@ -69,9 +42,8 @@ export class Hyp3eActor extends Actor {
      * is queried and has a roll executed directly from it).
      */
     prepareDerivedData() {
-        const actorData = this;
-        const systemData = actorData.system;
-        const flags = actorData.flags.hyp3e || {};
+        const systemData = this.system;
+        const flags = this.flags.hyp3e || {};
         systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
         // systemData.hp.percentage = Math.min(Math.max((systemData.hp.value * 100) / systemData.hp.max, 0), 100);
 
@@ -99,25 +71,24 @@ export class Hyp3eActor extends Actor {
 
         // Make separate methods for each Actor type (character vs. npc) to keep
         // things organized.
-        this._prepareCharacterData(actorData);
-        this._prepareNpcData(actorData);
+        this._prepareCharacterData();
+        this._prepareNpcData();
     }
 
     /**
      * Prepare Character type specific data
      */
-    _prepareCharacterData(actorData) {
-        if (actorData.type !== 'character') return;
+    _prepareCharacterData() {
+        if (this.type !== 'character') return;
 
         // Make modifications to data here. For example:
-        const systemData = actorData.system;
+        const systemData = this.system;
 
         // Calculated fields go here...
 
         // Add actor type & base class, used for crit hit & crit miss tables
         try {
-            systemData.actorType = actorData.type
-            // systemData.baseClass = this.classData[systemData.details.class].baseClass
+            systemData.actorType = this.type
             systemData.baseClass = Hyp3eCharacter.classData[systemData.details.class].baseClass || CONFIG.HYP3E.customClassData[charClass].baseClass;
         } catch (err) {
             // No match found (happens with custom classes), use "npc"
@@ -125,33 +96,19 @@ export class Hyp3eActor extends Actor {
         }
 
         // Add task resolution
-        systemData.taskResolution = {}
-        for (let [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
-            systemData.taskResolution[key] = value
-            systemData.taskResolution[key].name = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].name)
-            systemData.taskResolution[key].hint = game.i18n.localize(CONFIG.HYP3E.taskResolution[key].hint)
+        this._setupTaskResolution(systemData);
+
+        // // Auto-calculate AC, DR, MV if configuration is enabled
+        if (CONFIG.HYP3E.autoCalcAc) {
+            // const acMvObj = this.getCharacterAcAndMv(this, systemData)
+            this.getCharacterAcAndMv(this, systemData)
+            // systemData.ac.value = acMvObj.ac
+            // systemData.ac.dr = acMvObj.dr
+            // systemData.movement.base.value = acMvObj.mv
         }
 
-        // Auto-calculate AC, DR, MV if configuration is enabled
-        if (CONFIG.HYP3E.autoCalcAc) {
-            const acMvObj = this.getCharacterAcAndMv(actorData, systemData)
-            systemData.ac.value = acMvObj["ac"]
-            systemData.ac.dr = acMvObj["dr"]
-            systemData.movement.base.value = acMvObj["mv"]
-        }
-        // Apply temp AC, DR, and MV modifiers here
-        if (parseInt(systemData.ac.tempAcMod)) {
-            console.log(`Updated tempAcMod: ${systemData.ac.tempAcMod}`)
-            systemData.ac.value -= parseInt(systemData.ac.tempAcMod)
-        }
-        if (parseInt(systemData.ac.tempDrMod)) {
-            console.log(`Updated tempDrMod: ${systemData.ac.tempDrMod}`)
-            systemData.ac.dr += parseInt(systemData.ac.tempDrMod)
-        }
-        if (parseInt(systemData.movement.tempMvMod)) {
-            console.log(`Updated tempMvMod: ${systemData.movement.tempMvMod}`)
-            systemData.movement.base.value += parseInt(systemData.movement.tempMvMod)
-        }
+        // Apply temp AC, DR, and MV modifiers
+        this._applyTempModifiers(systemData);
 
         // Log the prepared data
         // if (CONFIG.HYP3E.debugMessages) { 
@@ -163,32 +120,122 @@ export class Hyp3eActor extends Actor {
     /**
      * Prepare NPC type specific data.
      */
-    _prepareNpcData(actorData) {
-        if (actorData.type !== 'npc') return;
+    _prepareNpcData() {
+        if (this.type !== 'npc') return;
 
         // Make modifications to data here
-        const systemData = actorData.system
+        const systemData = this.system
         // NPCs and monsters don't get the -10 hp benefit that PCs do
         systemData.hp.min = 0
 
         // Calculated fields go here...
 
-        // Apply temporary modifiers (typically from effects) to AC and DR
-        if (parseInt(systemData.ac.tempAcMod)) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Temp AC mod: ${systemData.ac.tempAcMod}`) }
-            systemData.ac.value -= parseInt(systemData.ac.tempAcMod)
-            // AC can't be worse (higher) than 9, nor better than -9
-            systemData.ac.value = systemData.ac.value > 9 ? 9 : systemData.ac.value
-            systemData.ac.value = systemData.ac.value < -9 ? -9 : systemData.ac.value
-        }
-        if (parseInt(systemData.ac.tempDrMod)) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Temp DR mod: ${systemData.ac.tempDrMod}`) }
-            systemData.ac.dr += parseInt(systemData.ac.tempDrMod)
-        }
+        // Apply temp AC, DR, and MV modifiers
+        this._applyTempModifiers(systemData);
 
         // Add actor type & base class, used for crit hit & crit miss tables
-        systemData.actorType = actorData.type
+        systemData.actorType = this.type
         systemData.baseClass = "npc"
+    }
+
+    /**
+     * Set token defaults when actor is created
+     */
+    async _preCreate(data, options, user) {
+        await super._preCreate(data, options, user);
+        if (data.type === "character") {
+            this.updateSource({
+                "prototypeToken.actorLink": true,
+                "prototypeToken.sight.enabled": true,
+                "prototypeToken.disposition": 0
+            });
+        }
+        // POSSIBLE FUTURE USE
+        // if (data.type === "npc") {
+            // Do nothing for now
+        // }
+    }
+
+    /**
+     * Override getRollData() that's supplied to rolls.
+     */
+    getRollData() {
+        const data = super.getRollData();
+        data.actorId = this.id
+        data.actorType = this.type;
+        // Prepare character/npc roll data.
+        this._getCharacterRollData(data);
+        // this._getNpcRollData(data);  // POSSIBLE FUTURE USE
+        if (CONFIG.HYP3E.debugMessages) { console.log(`getRollData: Actor ${this.name}`, data) }
+        return data;
+    }
+
+    /**
+     * Prepare character roll data.
+     */
+    _getCharacterRollData(data) {
+        if (this.type !== 'character') return;
+
+        // Copy the attribute scores to the top level, so that rolls can use
+        //   formulas like `@str.atkMod`.
+        if (data.attributes) {
+            for (let [k, v] of Object.entries(data.attributes)) {
+                data[k] = foundry.utils.deepClone(v);
+            }
+        }
+        // Add character's class to top level of data
+        if (data.details.class) {
+            data.class = data.details.class ?? "npc";
+        }
+        // Add character's level to top level of data
+        if (data.details.level) {
+            data.lvl = data.details.level.value ?? 0;
+        }
+    }
+
+    /**
+     * Prepare NPC roll data.
+     */
+    _getNpcRollData(data) {
+        if (this.type !== 'npc') return;
+        // Anything to load?
+    }
+
+    /**
+     * Apply temporary AC, DR, and MV modifiers to the actor's system data.
+     * Centralized helper used by both character and NPC preparation functions.
+     * @param {Object} systemData
+     */
+    _applyTempModifiers(systemData) {
+        const tempAcMod = parseInt(systemData.ac?.tempAcMod) || 0;
+        const tempDrMod = parseInt(systemData.ac?.tempDrMod) || 0;
+        const tempMvMod = parseInt(systemData.movement?.tempMvMod) || 0;
+
+        if (tempAcMod) {
+            if (CONFIG.HYP3E.debugMessages) console.log(`Applying temp AC mod: ${tempAcMod}`);
+            systemData.ac.value = Math.clamp(systemData.ac.value - tempAcMod, -9, 9);
+        }
+
+        if (tempDrMod) {
+            if (CONFIG.HYP3E.debugMessages) console.log(`Applying temp DR mod: ${tempDrMod}`);
+            systemData.ac.dr += tempDrMod;
+        }
+
+        if (tempMvMod) {
+            if (CONFIG.HYP3E.debugMessages) console.log(`Applying temp MV mod: ${tempMvMod}`);
+            systemData.movement.base.value += tempMvMod;
+        }
+    }
+
+    _setupTaskResolution(systemData) {
+        systemData.taskResolution = {};
+        for (const [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
+            systemData.taskResolution[key] = {
+                ...value,
+                name: game.i18n.localize(value.name),
+                hint: game.i18n.localize(value.hint)
+            };
+        }
     }
 
     /**
@@ -352,69 +399,6 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Set token defaults when actor is created
-     */
-    async _preCreate(data, options, user) {
-        await super._preCreate(data, options, user);
-        if (data.type == "character") {
-            this.updateSource({
-                "prototypeToken.actorLink": true,
-                "prototypeToken.sight.enabled": true,
-                "prototypeToken.disposition": 0
-            });
-        }
-        if (data.type == "npc") {
-            // Do nothing for now
-        }
-    }
-
-    /**
-     * Override getRollData() that's supplied to rolls.
-     */
-    getRollData() {
-        const data = super.getRollData();
-        data.actorId = this.id
-        data.actorType = this.type;
-        // Prepare character/npc roll data.
-        this._getCharacterRollData(data);
-        this._getNpcRollData(data);
-        if (CONFIG.HYP3E.debugMessages) { console.log(`getRollData: Actor ${this.name} `, data) }
-        return data;
-    }
-
-    /**
-     * Prepare character roll data.
-     */
-    _getCharacterRollData(data) {
-        if (this.type !== 'character') return;
-
-        // Copy the attribute scores to the top level, so that rolls can use
-        //   formulas like `@str.atkMod`.
-        if (data.attributes) {
-            for (let [k, v] of Object.entries(data.attributes)) {
-                data[k] = foundry.utils.deepClone(v);
-            }
-        }
-        // Add character's class to top level of data
-        if (data.details.class) {
-            data.class = data.details.class ?? "npc";
-        }
-        // Add character's level to top level of data
-        if (data.details.level) {
-            data.lvl = data.details.level.value ?? 0;
-        }
-    }
-
-    /**
-     * Prepare NPC roll data.
-     */
-    _getNpcRollData(data) {
-        if (this.type !== 'npc') return;
-        // Anything to load?
-
-    }
-
-    /**
      * Calculate the character's AC, DR, and MV
      * @param {*} actorData // The actor data object
      * @param {*} systemData // The actor's system data object
@@ -482,29 +466,15 @@ export class Hyp3eActor extends Actor {
                 if (CONFIG.HYP3E.debugMessages) { console.log(`Not Encumbered: AC ${tempAC}, MV ${tempMV}`) }
             }
         }
-        // Apply temporary modifiers (typically from effects) to AC and DR
-        // if (parseInt(systemData.ac.tempAcMod)) {
-        //     if (CONFIG.HYP3E.debugMessages) { console.log(`Temp AC mod: ${systemData.ac.tempAcMod}`) }
-        //     tempAC -= parseInt(systemData.ac.tempAcMod)
-        // }
-        // if (parseInt(systemData.ac.tempDrMod)) {
-        //     if (CONFIG.HYP3E.debugMessages) { console.log(`Temp DR mod: ${systemData.ac.tempDrMod}`) }
-        //     tempDR += parseInt(systemData.ac.tempDrMod)
-        // }
-        // // Apply temporary modifier (typically from effects) to encounter-mode MV
-        // if (parseInt(systemData.movement.tempMvMod)) {
-        //     if (CONFIG.HYP3E.debugMessages) { console.log(`Temp MV mod: ${systemData.movement.tempMvMod}`) }
-        //     tempMV += parseInt(systemData.movement.tempMvMod)
-        // }
+
         // Now calculate & set the final values...
         tempAC = tempAC - systemData.attributes.dex.defMod - shieldMod
-        // AC can't be worse (higher) than 9, nor better than -9
-        tempAC = Math.max(-9, Math.min(9, tempAC));
-        return {
-            "ac": tempAC,
-            "dr": tempDR,
-            "mv": tempMV
-        }
+        // tempAC = Math.max(-9, Math.min(9, tempAC));
+
+        // AC must be between 9 and -9, regardless of modifiers
+        systemData.ac.value = Math.clamp(tempAC, -9, 9);
+        systemData.ac.dr = tempDR
+        systemData.movement.base.value = tempMV
     }
 
     /**
