@@ -66,10 +66,11 @@ export class Hyp3eItem extends Item {
         }
 
         // Ammo usage flag
-        if (this.type === "weapon" && itemData.type === "missile") {
-            itemData.usesAmmo = /(bow|sling|gun)/i.test(this.name);
+        if (this.type === "weapon" && itemData.type === "missile" && (itemData.usesAmmo === false || typeof itemData.usesAmmo === "undefined")) {
+            if (/(bow|sling|gun)/i.test(this.name)) {
+                itemData.usesAmmo = true;
+            }
         }
-
     }
 
     /**
