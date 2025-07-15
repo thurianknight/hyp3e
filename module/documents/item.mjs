@@ -88,6 +88,13 @@ export class Hyp3eItem extends Item {
         return rollData;
     }
 
+    /**
+     * Toggle the identified state of the item.
+     * If identified, set item.name to system.realName and item.system.description to item.system.realDescription.
+     * If not identified, set item.name to system.itemAlias and item.system.description to item.system.aliasDescription.
+     * @param {Boolean} identified - Whether the item is identified or not.
+     * @public
+     */
     async toggleIdentified(identified) {
         const item = this
         if (identified) {
@@ -103,6 +110,12 @@ export class Hyp3eItem extends Item {
         }
     }
 
+    /**
+     * Update the weapon type based on the attackType.
+     * This method sets the appropriate flags and type for the item based on whether it is a melee or missile weapon.
+     * @param {String} attackType - The type of attack, either "melee" or "missile".
+     * @public
+     */
     async updateWeaponType(attackType) {
         const updates = {};
         switch (attackType) {
@@ -122,6 +135,12 @@ export class Hyp3eItem extends Item {
         await this.update(updates);
     }
 
+    /**
+     * Apply the attack formula based on the item type and properties.
+     * This method sets the formula for attack rolls based on whether the item is a weapon,
+     * grenade, area effect, or other item type.
+     * @public
+     */
     async applyAttackFormula() {
         const itemData = this.system;
 
@@ -192,7 +211,7 @@ export class Hyp3eItem extends Item {
     }
 
     /**
-     * Handle weapon mastery and grand-mastery
+     * Toggle weapon mastery and grand-mastery
      * @param {String} mastery The mastery level to be updated
      * @public
      */
@@ -255,6 +274,11 @@ export class Hyp3eItem extends Item {
         ui.notifications.info(`Added spell "${droppedItem.name}" to item.`);
     }
 
+    /**
+     * Reorder a spell reference in the item's spellcasting list.
+     * @param {number} fromIndex - The current index of the spell.
+     * @param {number} toIndex - The new index for the spell.
+     */
     async reorderSpell(fromIndex, toIndex) {
         const refs = foundry.utils.deepClone(this.system.spellcasting?.spellRefs ?? []);
         if (!Array.isArray(refs)) return;
@@ -265,6 +289,10 @@ export class Hyp3eItem extends Item {
         return this.update({ "system.spellcasting.spellRefs": refs });
     }
 
+    /**
+     * Remove a spell reference from the item's spellcasting list.
+     * @param {string} uuid - The UUID of the spell to remove.
+     */
     async removeSpell(uuid) {
         const spellRefs = foundry.utils.deepClone(this.system.spellcasting?.spellRefs ?? []);
         const updatedRefs = spellRefs.filter(ref => ref.uuid !== uuid);
