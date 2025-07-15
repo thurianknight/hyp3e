@@ -283,6 +283,7 @@ export class Hyp3eItemSheet extends ItemSheet {
      * @private
      */
     async _onRoll(event) {
+        // Currently, no item sheets support clickable rolls, so this is a no-op.
         event.preventDefault();
         const element = event.currentTarget;
         const dataset = element.dataset;
@@ -290,9 +291,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         const flavor = element.dataset.tooltip;
     
         // Log the element
-        console.log("_onRoll: Clicked element: ", element)
-        // Log the element dataset
-        console.log("_onRoll: Element dataset: ", dataset)
+        console.log("Item _onRoll: Clicked element: ", element)
 
         // Perform the roll
         const roll = new Roll(formula);
@@ -300,7 +299,6 @@ export class Hyp3eItemSheet extends ItemSheet {
             flavor: flavor,
             speaker: ChatMessage.getSpeaker({ actor: this.item.actor })
         });
-
     }
 
     async _onDrop(event) {
