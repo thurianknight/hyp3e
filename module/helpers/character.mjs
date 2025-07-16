@@ -3657,6 +3657,124 @@ export class Hyp3eCharacter {
     }
 
     /**
+     * Quickly create a character actor from a basic dataset.
+     * @param {Object} dataset - The dataset from the actor.
+     * @return {boolean} Success or failure of the character creation.
+     */
+    static async quickCreateCharacter(dataset) {
+        if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: dataset:", dataset) };
+        let actor = game.actors.get(dataset.actorId)
+        if (!actor) {
+            console.error(`levelUp: Actor not found for id ${dataset.actorId}`);
+            return false;
+        }
+
+        const attributes = await this.rollAttributesForClass(actor, dataset);
+        if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: Attributes:", attributes) };
+        if (attributes) {
+            // Set the attributes in the actor
+            for (let [k, v] of Object.entries(attributes)) {
+                await actor.update({ system: { attributes: { [k]: { value: v } } } })
+                actor.system.attributes[k].value = v
+            }
+            const setAttrOk = await this.setAttributeMods(dataset, true)
+            if (!setAttrOk) return false; // If setting attribute mods failed, exit early
+
+            const roll = new Roll(`${actor.system.hd} + ${actor.system.attributes.con.hpMod}`);
+            await roll.evaluate({ evaluateSync: true });
+            if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: HP roll result: ", roll) }
+            if (roll != undefined && roll.total != undefined) {
+                await actor.update({
+                    system: {
+                        hp: {
+                            value: roll.total,
+                            max: roll.total
+                        }
+                    }
+                });
+                // Set the HP values in the actor
+                actor.system.hp.value = roll.total;
+                actor.system.hp.max = roll.total;
+            } else {
+                console.error("quickCreateCharacter: HP roll failed to evaluate properly.");
+                return false;
+            }
+        } else {
+            console.error("quickCreateCharacter: Attributes roll failed.");
+            return false;
+        }
+        // Now we check to see if the Items directory has the folders & items we need.
+        // Alternatively, we can also check for compendia with the items we need.
+        // Start with armor...
+        const armorItems = await this.getDefaultItemsForClass({
+            actor: actor,
+            itemType: "armor",
+            folderNames: ["armor", "armour"],
+            packKey: "armour"
+        });
+        if (armorItems && armorItems.length > 0) {
+            // Add the armor to the actor's inventory
+            await actor.createEmbeddedDocuments("Item", armorItems);
+        }
+
+        // Next we do weapons...
+        const weaponItems = await this.getDefaultItemsForClass({
+            actor: actor,
+            itemType: "weapon",
+            folderNames: ["weapons"],
+            packKey: "weapons"
+        });
+        if (weaponItems && weaponItems.length > 0) {
+            // Add the weapons to the actor's inventory
+            await actor.createEmbeddedDocuments("Item", weaponItems);
+        }
+
+        // Next we do all the equipment items...
+        const generalItems = await this.getDefaultItemsForClass({
+            actor: actor,
+            itemType: "item",
+            folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items", "weapons"],
+            packKey: "equipment - general"
+        });
+        if (generalItems && generalItems.length > 0) {
+            // Add the items to the actor's inventory
+            await actor.createEmbeddedDocuments("Item", generalItems);
+        }
+        const provisionItems = await this.getDefaultItemsForClass({
+            actor: actor,
+            itemType: "item",
+            folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
+            packKey: "equipment - provisions"
+        });
+        if (provisionItems && provisionItems.length > 0) {
+            // Add the items to the actor's inventory
+            await actor.createEmbeddedDocuments("Item", provisionItems);
+        }
+        const religiousItems = await this.getDefaultItemsForClass({
+            actor: actor,
+            itemType: "item",
+            folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
+            packKey: "equipment - religious"
+        });
+        if (religiousItems && religiousItems.length > 0) {
+            // Add the items to the actor's inventory
+            await actor.createEmbeddedDocuments("Item", religiousItems);
+        }
+
+        // Get starting gold
+        const gold = await this.getStartingGoldForClass(actor);
+        if (gold && gold > 0) {
+            // Add the gold to the actor's inventory
+            await actor.update({"system.money.gp.value": gold});
+            actor.system.money.gp.value = gold;
+        }
+
+        // All good? Disable the quick-create button so it can't be used again.
+        actor.setFlag(game.system.id, "disableQuickCreate", true)
+        return true;
+    }
+
+    /**
      * Roll attributes for a character of the given class
      * @param {string} actor - The actor object to create the character for
      * @param {object} dataset - The dataset containing character creation data
@@ -3780,28 +3898,28 @@ export class Hyp3eCharacter {
             // Search in world Items directory
             const matches = game.items.filter(i => i.name.toLowerCase() === itemName);
             for (let item of matches) {
-            const folder = item.folder?.name?.toLowerCase() ?? "";
-            if (folderNames.includes(folder)) {
-                newItem = item.toObject();
-                newItem.system.quantity = { value: quantity, max: quantity };
-                console.log(`getDefaultItemsForClass: Found ${itemType} in folder: ${folder}`, newItem);
-                break;
-            }
-            }
-
-            // Search in compendia if not found
-            if (!newItem && compendiaList.length) {
-            for (const pack of compendiaList) {
-                await pack.getIndex(); // Ensure index is loaded
-                const compMatch = pack.index.find(i => i.name.toLowerCase() === itemName);
-                if (compMatch) {
-                const doc = await pack.getDocument(compMatch._id);
-                newItem = doc.toObject();
-                newItem.system.quantity = { value: quantity, max: quantity };
-                console.log(`getDefaultItemsForClass: Found ${itemType} in compendium: ${pack.metadata.label}`, newItem);
-                break;
+                const folder = item.folder?.name?.toLowerCase() ?? "";
+                if (folderNames.includes(folder)) {
+                    newItem = item.toObject();
+                    newItem.system.quantity = { value: quantity, max: quantity };
+                    console.log(`getDefaultItemsForClass: Found ${itemType} in folder: ${folder}`, newItem);
+                    break;
                 }
             }
+
+            // Search through all compendia if not found in directory
+            if (!newItem && compendiaList.length) {
+                for (const pack of compendiaList) {
+                    await pack.getIndex(); // Ensure index is loaded
+                    const compMatch = pack.index.find(i => i.name.toLowerCase() === itemName);
+                    if (compMatch) {
+                        const doc = await pack.getDocument(compMatch._id);
+                        newItem = doc.toObject();
+                        newItem.system.quantity = { value: quantity, max: quantity };
+                        console.log(`getDefaultItemsForClass: Found ${itemType} in compendium: ${pack.metadata.label}`, newItem);
+                        break;
+                    }
+                }
             }
 
             // Fallback item

@@ -243,115 +243,115 @@ export class Hyp3eActor extends Actor {
      * @param {Object} dataset - The dataset from the actor sheet.
      * @return {boolean} Success or failure of the character creation.
      */
-    async quickCreateCharacter(dataset) {
-        if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: dataset:", dataset) };
-        const attributes = await Hyp3eCharacter.rollAttributesForClass(this, dataset);
-        if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: Attributes:", attributes) };
-        if (attributes) {
-            // Set the attributes in the actor
-            for (let [k, v] of Object.entries(attributes)) {
-                await this.update({ system: { attributes: { [k]: { value: v } } } })
-                this.system.attributes[k].value = v
-            }
-            const setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset, true)
-            if (!setAttrOk) return false; // If setting attribute mods failed, exit early
+    // async quickCreateCharacter(dataset) {
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: dataset:", dataset) };
+    //     const attributes = await Hyp3eCharacter.rollAttributesForClass(this, dataset);
+    //     if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: Attributes:", attributes) };
+    //     if (attributes) {
+    //         // Set the attributes in the actor
+    //         for (let [k, v] of Object.entries(attributes)) {
+    //             await this.update({ system: { attributes: { [k]: { value: v } } } })
+    //             this.system.attributes[k].value = v
+    //         }
+    //         const setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset, true)
+    //         if (!setAttrOk) return false; // If setting attribute mods failed, exit early
 
-            const roll = new Roll(`${this.system.hd} + ${this.system.attributes.con.hpMod}`);
-            await roll.evaluate({ evaluateSync: true });
-            if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: HP roll result: ", roll) }
-            if (roll != undefined && roll.total != undefined) {
-                await this.update({
-                    system: {
-                        hp: {
-                            value: roll.total,
-                            max: roll.total
-                        }
-                    }
-                });
-                // Set the HP values in the actor
-                this.system.hp.value = roll.total;
-                this.system.hp.max = roll.total;
-            } else {
-                console.error("quickCreateCharacter: HP roll failed to evaluate properly.");
-                return false;
-            }
-        } else {
-            console.error("quickCreateCharacter: Attributes roll failed.");
-            return false;
-        }
-        // Now we check to see if the Items directory has the folders & items we need.
-        // Alternatively, we can also check for compendia with the items we need.
-        // Start with armor...
-        // const armorItems = await Hyp3eCharacter.getDefaultArmorForClass(this);
-        const armorItems = await Hyp3eCharacter.getDefaultItemsForClass({
-            actor: this,
-            itemType: "armor",
-            folderNames: ["armor", "armour"],
-            packKey: "armour"
-        });
-        if (armorItems && armorItems.length > 0) {
-            // Add the armor to the actor's inventory
-            await this.createEmbeddedDocuments("Item", armorItems);
-        }
+    //         const roll = new Roll(`${this.system.hd} + ${this.system.attributes.con.hpMod}`);
+    //         await roll.evaluate({ evaluateSync: true });
+    //         if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: HP roll result: ", roll) }
+    //         if (roll != undefined && roll.total != undefined) {
+    //             await this.update({
+    //                 system: {
+    //                     hp: {
+    //                         value: roll.total,
+    //                         max: roll.total
+    //                     }
+    //                 }
+    //             });
+    //             // Set the HP values in the actor
+    //             this.system.hp.value = roll.total;
+    //             this.system.hp.max = roll.total;
+    //         } else {
+    //             console.error("quickCreateCharacter: HP roll failed to evaluate properly.");
+    //             return false;
+    //         }
+    //     } else {
+    //         console.error("quickCreateCharacter: Attributes roll failed.");
+    //         return false;
+    //     }
+    //     // Now we check to see if the Items directory has the folders & items we need.
+    //     // Alternatively, we can also check for compendia with the items we need.
+    //     // Start with armor...
+    //     // const armorItems = await Hyp3eCharacter.getDefaultArmorForClass(this);
+    //     const armorItems = await Hyp3eCharacter.getDefaultItemsForClass({
+    //         actor: this,
+    //         itemType: "armor",
+    //         folderNames: ["armor", "armour"],
+    //         packKey: "armour"
+    //     });
+    //     if (armorItems && armorItems.length > 0) {
+    //         // Add the armor to the actor's inventory
+    //         await this.createEmbeddedDocuments("Item", armorItems);
+    //     }
 
-        // Next we do weapons...
-        // const weaponItems = await Hyp3eCharacter.getDefaultWeaponsForClass(this);
-        const weaponItems = await Hyp3eCharacter.getDefaultItemsForClass({
-            actor: this,
-            itemType: "weapon",
-            folderNames: ["weapons"],
-            packKey: "weapons"
-        });
-        if (weaponItems && weaponItems.length > 0) {
-            // Add the weapons to the actor's inventory
-            await this.createEmbeddedDocuments("Item", weaponItems);
-        }
+    //     // Next we do weapons...
+    //     // const weaponItems = await Hyp3eCharacter.getDefaultWeaponsForClass(this);
+    //     const weaponItems = await Hyp3eCharacter.getDefaultItemsForClass({
+    //         actor: this,
+    //         itemType: "weapon",
+    //         folderNames: ["weapons"],
+    //         packKey: "weapons"
+    //     });
+    //     if (weaponItems && weaponItems.length > 0) {
+    //         // Add the weapons to the actor's inventory
+    //         await this.createEmbeddedDocuments("Item", weaponItems);
+    //     }
 
-        // Next we do all the equipment items...
-        // const items = await Hyp3eCharacter.getDefaultItemsForClass(this);
-        const generalItems = await Hyp3eCharacter.getDefaultItemsForClass({
-            actor: this,
-            itemType: "item",
-            folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items"],
-            packKey: "equipment - general"
-        });
-        if (generalItems && generalItems.length > 0) {
-            // Add the items to the actor's inventory
-            await this.createEmbeddedDocuments("Item", generalItems);
-        }
-        const provisionItems = await Hyp3eCharacter.getDefaultItemsForClass({
-            actor: this,
-            itemType: "item",
-            folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
-            packKey: "equipment - provisions"
-        });
-        if (provisionItems && provisionItems.length > 0) {
-            // Add the items to the actor's inventory
-            await this.createEmbeddedDocuments("Item", provisionItems);
-        }
-        const religiousItems = await Hyp3eCharacter.getDefaultItemsForClass({
-            actor: this,
-            itemType: "item",
-            folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
-            packKey: "equipment - religious"
-        });
-        if (religiousItems && religiousItems.length > 0) {
-            // Add the items to the actor's inventory
-            await this.createEmbeddedDocuments("Item", religiousItems);
-        }
+    //     // Next we do all the equipment items...
+    //     // const items = await Hyp3eCharacter.getDefaultItemsForClass(this);
+    //     const generalItems = await Hyp3eCharacter.getDefaultItemsForClass({
+    //         actor: this,
+    //         itemType: "item",
+    //         folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items"],
+    //         packKey: "equipment - general"
+    //     });
+    //     if (generalItems && generalItems.length > 0) {
+    //         // Add the items to the actor's inventory
+    //         await this.createEmbeddedDocuments("Item", generalItems);
+    //     }
+    //     const provisionItems = await Hyp3eCharacter.getDefaultItemsForClass({
+    //         actor: this,
+    //         itemType: "item",
+    //         folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
+    //         packKey: "equipment - provisions"
+    //     });
+    //     if (provisionItems && provisionItems.length > 0) {
+    //         // Add the items to the actor's inventory
+    //         await this.createEmbeddedDocuments("Item", provisionItems);
+    //     }
+    //     const religiousItems = await Hyp3eCharacter.getDefaultItemsForClass({
+    //         actor: this,
+    //         itemType: "item",
+    //         folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
+    //         packKey: "equipment - religious"
+    //     });
+    //     if (religiousItems && religiousItems.length > 0) {
+    //         // Add the items to the actor's inventory
+    //         await this.createEmbeddedDocuments("Item", religiousItems);
+    //     }
 
-        // Get starting gold
-        const gold = await Hyp3eCharacter.getStartingGoldForClass(this);
-        if (gold && gold > 0) {
-            // Add the gold to the actor's inventory
-            await this.update({"system.money.gp.value": gold});
-            this.system.money.gp.value = gold;
-        }
+    //     // Get starting gold
+    //     const gold = await Hyp3eCharacter.getStartingGoldForClass(this);
+    //     if (gold && gold > 0) {
+    //         // Add the gold to the actor's inventory
+    //         await this.update({"system.money.gp.value": gold});
+    //         this.system.money.gp.value = gold;
+    //     }
 
-        // All good? Disable the quick-create button so it can't be used again.
-        this.setFlag(game.system.id, "disableQuickCreate", true)
-        return true;
-    }
+    //     // All good? Disable the quick-create button so it can't be used again.
+    //     this.setFlag(game.system.id, "disableQuickCreate", true)
+    //     return true;
+    // }
 
     /**
      * @override

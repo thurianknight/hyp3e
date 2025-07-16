@@ -838,7 +838,7 @@ export class Hyp3eActorSheet extends ActorSheet {
                 return;
             }
             // Quickly roll up a character of the selected class
-            let createOk = await this.actor.quickCreateCharacter(dataset);
+            let createOk = await Hyp3eCharacter.quickCreateCharacter(dataset);
             if (createOk) {
                 ui.notifications.info("Character created!")
                 this.render()
