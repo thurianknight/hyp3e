@@ -827,117 +827,6 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Execute an item check or attack roll
-     * @param {*} dataset 
-     */
-    async rollItem(dataset) {
-        // Get item info to execute a standard roll
-        const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
-        if (!item) {
-            ui.notifications.warn(`Item ${dataset.itemId} was not found!`)
-            return
-        }
-        dataset.roll = item.system.formula
-
-        // Are we enforcing the item equippage rule for PCs?
-        if (CONFIG.HYP3E.forceWeaponEquip && this.type === "character") {
-            // Only apply to physical items: armor, items, weapons
-            if (["armor", "item", "weapon"].includes(item.type)) {
-                // Check if the item is equipped
-                if (!item.system.equipped) {
-                    ui.notifications.warn(`${itemName} is not equipped!`)
-                    return
-                }
-                // Check if the item has a quantity
-                if (item.system.quantity.value <= 0) {
-                    ui.notifications.warn(`${itemName} qty is zero, you must resupply.`)
-                    return
-                }
-            }
-        }
-
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${item.type} ${itemName}:`, item) }
-        if (item.type === "weapon") {
-            dataset.isGrenade = item.system.isGrenade
-            dataset.isAreaEffect = item.system.isAreaEffect
-            dataset.label = `${attackTextBase} with ${itemName}`;
-            if (item.system.isAreaEffect) {
-                dataset.details = `No attack roll required to use ${itemName}.`
-                dataset.noRoll = true
-            }
-            this.rollAttackOrSpell(dataset)
-        } else if (item.type === "spell") {
-            // Are we enforcing the spell memorization rule for PCs?
-            if (CONFIG.HYP3E.forceSpellMemorize && this.type === "character" && !dataset.isItemSpell) {
-                // Check if the spell is memorized
-                if (item.system.quantity.value <= 0) {
-                    ui.notifications.warn(`${itemName} is not memorized!`)
-                    return
-                }
-            }
-            // The default for spells is to cast
-            dataset.label = `${attackTextBase} ${itemName}`
-            if (item.system.formula == "" || item.system.formula == undefined) {
-                dataset.details = `No attack roll required to cast ${itemName}.`
-                dataset.noRoll = true
-            }
-            // Log the dataset
-            console.log(`Spellcasting dataset:`, dataset)
-            this.rollAttackOrSpell(dataset)
-        } else {  // ==> Neither a weapon nor a spell (armor, feature, item)
-            // The default for other item types (i.e. class abilities and actual items) is a check,
-            //  followed by using inventory and applying applicable effects if the check succeeded
-            //  or no check was required to proceed.
-            let proceed = true
-            let ranCheck = false
-            dataset.label = `Using ${itemName}`
-            if (item.system.formula && item.system.formula != "") {
-                dataset.rollTarget = item.system.tn
-                proceed = this.rollCheck(dataset)
-                ranCheck = true
-            }
-            if (proceed) {
-                // Use actor's system data to pass to item._displayItemInChat()
-                const actorData = this.getRollData()
-                // If a check was done, proceed immediately
-                if (ranCheck) {
-                    if (item.system.isConsumable) {
-                        this.useItem(item.id)
-                    }
-                    if (item.effects.size > 0) {
-                        item._displayItemInChat(actorData)
-                    }
-                } else {
-                    // No item check, so we will popup a basic dialog to confirm use
-                    if (item.effects.size > 0) {
-                        let effectList = []
-                        item.effects.forEach(effect => {
-                            effectList.push(effect.name)
-                        });
-                        dataset.details = `Using ${itemName} applies the following: ${effectList.join(", ")}.`
-                        dataset.noRoll = true
-                    }
-                    // let label = `${dataset.label}...`
-                    dataset.rollButtonLabel = "Use Item"
-                    // Log the dataset before the dialog renders
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
-                    try {
-                        let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
-                        if (item.system.isConsumable) {
-                            this.useItem(item.id)
-                        }
-                        // Since we don't need to roll anything, just display the item in chat.
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`Roll response: `, rollResponse) }
-                        item._displayItemInChat(actorData)
-                    } catch(err) {
-                        return
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Execute an item macro
      * @param {*} itemUuid 
      */
@@ -1046,6 +935,119 @@ export class Hyp3eActor extends Actor {
         this.sendRollToChat(roll, label, "", rollResponse.rollMode)
         
         return roll
+    }
+
+    /**
+     * Use an item to apply its effects to the owner or another target
+     * @param {*} dataset 
+     */
+    // async rollApplyEffects(dataset) {
+    //     if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: ${dataset.label}...`) }
+
+    //     const item = this.items.get(dataset.itemId)
+    //     let label = `${dataset.label}...`
+    //     dataset.rollButtonLabel = "Use Item"
+
+    //     // Log the dataset before the dialog renders
+    //     if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: ${dataset.label} dataset: `, dataset) }
+    //     try {
+    //         let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
+    //         // Use actor's system data to pass to item._displayItemInChat()
+    //         const actorData = this.getRollData()
+    //         // Since we don't need to roll anything, just display the item in chat.
+    //         if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: roll response: `, rollResponse) }
+    //         item._displayItemInChat(actorData)
+    //     } catch(err) {
+    //         return
+    //     }
+    // }
+
+    /**
+     * Execute an item check or attack roll
+     * @param {*} dataset 
+     */
+    async rollItem(dataset) {
+        // Get item info to execute a standard roll
+        const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
+        if (!item) {
+            ui.notifications.warn(`Item ${dataset.itemId} was not found!`)
+            return
+        }
+        // dataset.roll = item.system.formula
+        dataset.attackTextBase = attackTextBase
+
+        // Are we enforcing the item equippage rule for PCs?
+        if (CONFIG.HYP3E.forceWeaponEquip && this.type === "character") {
+            // Only apply to physical items: armor, items, weapons
+            if (["armor", "item", "weapon"].includes(item.type)) {
+                // Check if the item is equipped & has available quantity
+                if (!this._checkItemPreconditions(item, { checkEquipped: true, checkQuantity: true })) return;
+            }
+        }
+
+        // Gather dataset properties from the item and actor
+        dataset = await this._prepareRollDataset(dataset.itemId, dataset);
+        if (!dataset) return;
+
+        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label}:`, item) }
+        if (item.type === "weapon") {
+            // Attack with the weapon
+            this.rollAttackOrSpell(dataset)
+        } else if (item.type === "spell") {
+            // Are we enforcing the spell memorization rule for PCs?
+            if (CONFIG.HYP3E.forceSpellMemorize && this.type === "character" && !dataset.isItemSpell) {
+                // Check if the spell is memorized
+                if (!this._checkItemPreconditions(item, { checkMemorized: true })) return;
+            }
+            // Cast the spell
+            this.rollAttackOrSpell(dataset)
+        } else {  // ==> Neither a weapon nor a spell (armor, feature, item)
+            // The default for other item types (i.e. class abilities and actual items) is a check,
+            //  followed by using inventory and applying applicable effects if the check succeeded
+            //  or no check was required to proceed.
+            let proceed = true
+            let ranCheck = false
+            if (item.system.formula && item.system.formula != "") {
+                // Roll the item or ability check
+                proceed = this.rollCheck(dataset)
+                ranCheck = true
+            }
+            if (proceed) {
+                // If a check was done, proceed immediately
+                if (ranCheck) {
+                    if (item.system.isConsumable) {
+                        this.useItem(item.id)
+                    }
+                    if (item.effects.size > 0) {
+                        item._displayItemInChat(dataset.actorData)
+                    }
+                } else {
+                    // No item check, so we will popup a basic dialog to confirm use
+                    if (item.effects.size > 0) {
+                        let effectList = []
+                        item.effects.forEach(effect => {
+                            effectList.push(effect.name)
+                        });
+                        dataset.details = `Using ${itemName} applies the following: ${effectList.join(", ")}.`
+                        dataset.noRoll = true
+                    }
+                    dataset.rollButtonLabel = "Use Item"
+                    // Log the dataset before the dialog renders
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+                    try {
+                        let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
+                        if (item.system.isConsumable) {
+                            this.useItem(item.id)
+                        }
+                        // Since we don't need to roll anything, just display the item in chat.
+                        if (CONFIG.HYP3E.debugMessages) { console.log(`Roll response: `, rollResponse) }
+                        item._displayItemInChat(dataset.actorData)
+                    } catch(err) {
+                        return
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -1224,31 +1226,6 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Use an item to apply its effects to the owner or another target
-     * @param {*} dataset 
-     */
-    async rollApplyEffects(dataset) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: ${dataset.label}...`) }
-
-        const item = this.items.get(dataset.itemId)
-        let label = `${dataset.label}...`
-        dataset.rollButtonLabel = "Use Item"
-
-        // Log the dataset before the dialog renders
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: ${dataset.label} dataset: `, dataset) }
-        try {
-            let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
-            // Use actor's system data to pass to item._displayItemInChat()
-            const actorData = this.getRollData()
-            // Since we don't need to roll anything, just display the item in chat.
-            if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: roll response: `, rollResponse) }
-            item._displayItemInChat(actorData)
-        } catch(err) {
-            return
-        }
-    }
-
-    /**
      * Main orchestrator for executing an attack roll or casting a spell.
      * @param {object} dataset - Initial data for the roll (label, itemId, tokenId, etc.).
      */
@@ -1401,6 +1378,97 @@ export class Hyp3eActor extends Actor {
         return atkRoll;
     }
 
+    /**
+     * Validate item state before performing an action.
+     * @param {Item} item
+     * @param {Object} options
+     * @param {boolean} [options.checkEquipped=false] - Require the item to be equipped.
+     * @param {boolean} [options.checkQuantity=false] - Require the item quantity > 0.
+     * @param {boolean} [options.checkMemorized=false] - Require spell memorization (quantity > 0).
+     * @returns {boolean} - True if all checks pass, false if any check fails (also shows notification).
+     */
+    _checkItemPreconditions(item, { checkEquipped = false, checkQuantity = false, checkMemorized = false } = {}) {
+        if (!item) {
+            ui.notifications.warn("No item provided.");
+            return false;
+        }
+
+        const itemName = item.system?.friendlyName || item.name || "Item";
+
+        if (checkEquipped && !item.system?.equipped) {
+            ui.notifications.warn(`${itemName} is not equipped!`);
+            return false;
+        }
+
+        if (checkQuantity && (item.system?.quantity?.value ?? 0) <= 0) {
+            ui.notifications.warn(`${itemName} quantity is zero, you must resupply.`);
+            return false;
+        }
+
+        if (checkMemorized && (item.system?.quantity?.value ?? 0) <= 0) {
+            ui.notifications.warn(`${itemName} is not memorized!`);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Prepare a standardized dataset for rolling, resolving the item and basic metadata.
+     * @param {string} itemId - The ID of the item to roll.
+     * @param {object} [dataset={}] - Optional initial dataset values.
+     * @returns {object|null} - Returns dataset with populated defaults or null if item not found.
+     */
+    async _prepareRollDataset(itemId, dataset = {}) {
+        const item = this.items.get(itemId) ?? await fromUuid(itemId);
+        if (!item) {
+            ui.notifications.warn(`Item with ID ${itemId} not found.`);
+            return null;
+        }
+
+        const itemData = item.system;
+        const itemName = itemData?.friendlyName?.trim() || item.name;
+        const actorData = this.getRollData();
+
+        dataset.itemType = item.type;
+        dataset.itemName = itemName;
+        dataset.roll = itemData.formula || "";
+        dataset.actorId = this.id;
+
+        if (item.type === "weapon") {
+            dataset.label = `${dataset.attackTextBase} with ${itemName}`;
+            dataset.isGrenade = itemData.isGrenade;
+            dataset.isAreaEffect = itemData.isAreaEffect;
+            if (itemData.isAreaEffect) {
+                dataset.details = `No attack roll required to use ${itemName}.`
+                dataset.noRoll = true
+            }
+        }
+
+        if (item.type === "spell") {
+            dataset.isMemorized = (itemData.quantity?.value ?? 0) > 0;
+            dataset.label = `${dataset.attackTextBase} ${itemName}`
+            if (item.system.formula == "" || item.system.formula == undefined) {
+                dataset.details = `No attack roll required to cast ${itemName}.`
+                dataset.noRoll = true
+            }
+        }
+
+        if (item.type === "item" || item.type === "feature") {
+            dataset.label = `Using ${itemName}`;
+            dataset.rollTarget = item.system.tn
+        }
+
+        // Optionally inject rollData reference for later convenience
+        dataset.actorData = actorData;
+
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log("_prepareRollDataset: Prepared dataset:", dataset);
+        }
+
+        return dataset;
+    }
+
     // Helper Functions
     /**
      * Gets the attacker token and position.
@@ -1441,9 +1509,9 @@ export class Hyp3eActor extends Actor {
      */
     async _getItemDetails(itemId) {
         const item = this.items.get(itemId) ?? await fromUuid(itemId);
-        const itemData = item ? { ...item.system, itemType: item.type } : null; // Include item type
+        const itemData = item ? { ...item.system, itemType: item.type } : null;
         if (CONFIG.HYP3E.debugMessages) {
-            console.log("rollAttackOrSpell/_getItemDetails: Item:", item);
+            console.log(`rollAttackOrSpell/_getItemDetails: Item ${itemId}:`, item);
             console.log("rollAttackOrSpell/_getItemDetails: Item Data:", itemData);
         }
 
