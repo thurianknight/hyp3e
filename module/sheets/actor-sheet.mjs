@@ -751,18 +751,19 @@ export class Hyp3eActorSheet extends ActorSheet {
   async _onRoll(event) {
     event.preventDefault()
     const element = event.currentTarget
-    const dataset = element.dataset
+    // const dataset = element.dataset
+    const dataset = { ...event.currentTarget.dataset };
 
     // Log the element
     if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Clicked element: ", element) }
     // Log the element dataset
     if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Element dataset: ", dataset) }
     // Log the sheet data
-    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Actor-Sheet Data:", this) }
+    // if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Actor-Sheet Data:", this) }
     // Log the actor
-    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Actor:", this.actor) }
+    // if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Actor:", this.actor) }
     // Log the token
-    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Token:", this.token) }
+    // if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Token:", this.token) }
 
     // How many different roll types do we have?
     //  Test of Attribute: d6 roll-under target

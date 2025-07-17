@@ -239,121 +239,6 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Quickly create a character actor from a basic dataset.
-     * @param {Object} dataset - The dataset from the actor sheet.
-     * @return {boolean} Success or failure of the character creation.
-     */
-    // async quickCreateCharacter(dataset) {
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: dataset:", dataset) };
-    //     const attributes = await Hyp3eCharacter.rollAttributesForClass(this, dataset);
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: Attributes:", attributes) };
-    //     if (attributes) {
-    //         // Set the attributes in the actor
-    //         for (let [k, v] of Object.entries(attributes)) {
-    //             await this.update({ system: { attributes: { [k]: { value: v } } } })
-    //             this.system.attributes[k].value = v
-    //         }
-    //         const setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset, true)
-    //         if (!setAttrOk) return false; // If setting attribute mods failed, exit early
-
-    //         const roll = new Roll(`${this.system.hd} + ${this.system.attributes.con.hpMod}`);
-    //         await roll.evaluate({ evaluateSync: true });
-    //         if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: HP roll result: ", roll) }
-    //         if (roll != undefined && roll.total != undefined) {
-    //             await this.update({
-    //                 system: {
-    //                     hp: {
-    //                         value: roll.total,
-    //                         max: roll.total
-    //                     }
-    //                 }
-    //             });
-    //             // Set the HP values in the actor
-    //             this.system.hp.value = roll.total;
-    //             this.system.hp.max = roll.total;
-    //         } else {
-    //             console.error("quickCreateCharacter: HP roll failed to evaluate properly.");
-    //             return false;
-    //         }
-    //     } else {
-    //         console.error("quickCreateCharacter: Attributes roll failed.");
-    //         return false;
-    //     }
-    //     // Now we check to see if the Items directory has the folders & items we need.
-    //     // Alternatively, we can also check for compendia with the items we need.
-    //     // Start with armor...
-    //     // const armorItems = await Hyp3eCharacter.getDefaultArmorForClass(this);
-    //     const armorItems = await Hyp3eCharacter.getDefaultItemsForClass({
-    //         actor: this,
-    //         itemType: "armor",
-    //         folderNames: ["armor", "armour"],
-    //         packKey: "armour"
-    //     });
-    //     if (armorItems && armorItems.length > 0) {
-    //         // Add the armor to the actor's inventory
-    //         await this.createEmbeddedDocuments("Item", armorItems);
-    //     }
-
-    //     // Next we do weapons...
-    //     // const weaponItems = await Hyp3eCharacter.getDefaultWeaponsForClass(this);
-    //     const weaponItems = await Hyp3eCharacter.getDefaultItemsForClass({
-    //         actor: this,
-    //         itemType: "weapon",
-    //         folderNames: ["weapons"],
-    //         packKey: "weapons"
-    //     });
-    //     if (weaponItems && weaponItems.length > 0) {
-    //         // Add the weapons to the actor's inventory
-    //         await this.createEmbeddedDocuments("Item", weaponItems);
-    //     }
-
-    //     // Next we do all the equipment items...
-    //     // const items = await Hyp3eCharacter.getDefaultItemsForClass(this);
-    //     const generalItems = await Hyp3eCharacter.getDefaultItemsForClass({
-    //         actor: this,
-    //         itemType: "item",
-    //         folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items"],
-    //         packKey: "equipment - general"
-    //     });
-    //     if (generalItems && generalItems.length > 0) {
-    //         // Add the items to the actor's inventory
-    //         await this.createEmbeddedDocuments("Item", generalItems);
-    //     }
-    //     const provisionItems = await Hyp3eCharacter.getDefaultItemsForClass({
-    //         actor: this,
-    //         itemType: "item",
-    //         folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
-    //         packKey: "equipment - provisions"
-    //     });
-    //     if (provisionItems && provisionItems.length > 0) {
-    //         // Add the items to the actor's inventory
-    //         await this.createEmbeddedDocuments("Item", provisionItems);
-    //     }
-    //     const religiousItems = await Hyp3eCharacter.getDefaultItemsForClass({
-    //         actor: this,
-    //         itemType: "item",
-    //         folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
-    //         packKey: "equipment - religious"
-    //     });
-    //     if (religiousItems && religiousItems.length > 0) {
-    //         // Add the items to the actor's inventory
-    //         await this.createEmbeddedDocuments("Item", religiousItems);
-    //     }
-
-    //     // Get starting gold
-    //     const gold = await Hyp3eCharacter.getStartingGoldForClass(this);
-    //     if (gold && gold > 0) {
-    //         // Add the gold to the actor's inventory
-    //         await this.update({"system.money.gp.value": gold});
-    //         this.system.money.gp.value = gold;
-    //     }
-
-    //     // All good? Disable the quick-create button so it can't be used again.
-    //     this.setFlag(game.system.id, "disableQuickCreate", true)
-    //     return true;
-    // }
-
-    /**
      * @override
      * Overrides the core system applyActiveEffects method on the actor.
      * Capture change values that include roll formulas or data paths, and resolve them
@@ -1065,7 +950,7 @@ export class Hyp3eActor extends Actor {
         let checkText = dataset.label
         let rollFormula = ""
         let rollResponse
-        let success = true
+        // let success = true
 
         // Did we get a token ID?
         if (dataset.tokenId) {
@@ -1188,33 +1073,26 @@ export class Hyp3eActor extends Actor {
         }
 
         // Roll the dice!
-        let roll = new Roll(rollFormula, rollData)
-        // Resolve the roll
-        let result = await roll.roll()
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
+        const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, rollData, dataset.rollTarget, "le");
+        // let roll = new Roll(rollFormula, rollData)
+        // // Resolve the roll
+        // let result = await roll.roll()
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
 
         // Determine success or failure on a simple check, not turning undead or assassinating
         if (!turnUndead && !assassinate) {
-            if (roll.total <= dataset.rollTarget) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than or equal to " + dataset.rollTarget + "!") }
-                // label += "<br /><b>Success!</b>"
+            // if (roll.total <= dataset.rollTarget) {
+            if (success) {
                 checkText += "<b>Success!</b>"
-                success = true
-        
             } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than " + dataset.rollTarget + "!") }
-                // label += "<br /><b>Fail.</b>"
                 checkText += "<b>Fail.</b>"
-                success = false
             }
         } else if (turnUndead) {
             // Resolve the results of the attempted turning undead
             htmlContent = this.resolveTurnUndead(roll.total, rollData)
-            success = true
         } else if (assassinate) {
             // Resolve the results of the attempted assassination
             htmlContent = this.resolveAssassination(targetToken, roll.total, rollData)
-            success = true
         }
         // Hit must be false so we don't display any damage buttons
         roll.hit = false
@@ -1222,7 +1100,7 @@ export class Hyp3eActor extends Actor {
         // Construct a custom chat card for the check
         await this.renderCustomChat(roll, item, tokenId, label, "", checkText, htmlContent, rollResponse.rollMode)
 
-        return success
+        return true
     }
 
     /**
@@ -1463,6 +1341,7 @@ export class Hyp3eActor extends Actor {
         dataset.actorData = actorData;
 
         if (CONFIG.HYP3E.debugMessages) {
+            console.log("_prepareRollDataset: Actor roll data:", actorData);
             console.log("_prepareRollDataset: Prepared dataset:", dataset);
         }
 
@@ -1511,8 +1390,8 @@ export class Hyp3eActor extends Actor {
         const item = this.items.get(itemId) ?? await fromUuid(itemId);
         const itemData = item ? { ...item.system, itemType: item.type } : null;
         if (CONFIG.HYP3E.debugMessages) {
-            console.log(`rollAttackOrSpell/_getItemDetails: Item ${itemId}:`, item);
-            console.log("rollAttackOrSpell/_getItemDetails: Item Data:", itemData);
+            console.log(`_getItemDetails: Item ${itemId}:`, item);
+            console.log("_getItemDetails: Item Data:", itemData);
         }
 
         // itemName should be prioritized as (1) itemAlias [but only if not identified], 
@@ -2231,7 +2110,7 @@ export class Hyp3eActor extends Actor {
 
         // Was this a complete fail?
         if (rollData.ta <= 1 && rollTotal > 10) {
-            return '<p>No undead were turned...</p>'
+            return '<p>No undead were turned...</p>';
         }
 
         // From here on it's all some level of success
@@ -2272,7 +2151,7 @@ export class Hyp3eActor extends Actor {
         turnUndeadHtml += `</ul>`
 
         if (CONFIG.HYP3E.debugMessages) { console.log("Turn Undead: ", turnUndeadHtml) }
-        return turnUndeadHtml
+        return turnUndeadHtml;
     }
 
     // Send roll results to the chat window

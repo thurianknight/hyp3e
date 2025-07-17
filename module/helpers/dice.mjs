@@ -383,4 +383,47 @@ export class Hyp3eDice {
         }
         return dmgObj
     }
+
+    /**
+     * Roll a formula, resolve it using provided roll data, and check if it succeeds.
+     * @param {string} formula - The roll formula string (e.g., "1d20 + @str.atkMod").
+     * @param {object} rollData - Actor or item roll data context.
+     * @param {number} target - The target number to compare against.
+     * @param {string} [comparison="le"] - Comparison type: "le" (≤) or "ge" (≥).
+     * @returns {Promise<object>} An object containing: roll, total, success (boolean).
+     */
+    static async rollFormulaAndEvaluateSuccess(formula, rollData, target, comparison = "ge") {
+        if (!formula || typeof target !== "number") {
+            console.warn("Hyp3eDice.rollFormulaAndEvaluateSuccess: Missing formula or target number.");
+            return { roll: null, total: null, success: false };
+        }
+
+        let roll;
+        try {
+            roll = new Roll(formula, rollData);
+            await roll.roll();
+        } catch (error) {
+            console.error("Hyp3eDice.rollFormulaAndEvaluateSuccess: Error evaluating roll formula:", error);
+            return { roll: null, total: null, success: false };
+        }
+
+        const total = roll.total;
+        let success;
+
+        switch (comparison) {
+            case "ge":
+            success = total >= target;
+            break;
+            case "le":
+            default:
+            success = total <= target;
+            break;
+        }
+
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log(`rollFormulaAndEvaluateSuccess: ${roll.formula} = ${total} vs. ${comparison} ${target}: ${success ? "Success" : "Failure"}`);
+        }
+
+        return { roll, total, success };
+    }
 }
