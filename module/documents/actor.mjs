@@ -890,48 +890,41 @@ export class Hyp3eActor extends Actor {
             // The default for other item types (i.e. class abilities and actual items) is a check,
             //  followed by using inventory and applying applicable effects if the check succeeded
             //  or no check was required to proceed.
-            let proceed = true
-            let ranCheck = false
-            if (item.system.formula && item.system.formula != "") {
-                // Roll the item or ability check
-                proceed = this.rollCheck(dataset)
-                ranCheck = true
-            }
-            if (proceed) {
-                // If a check was done, proceed immediately
-                if (ranCheck) {
-                    if (item.system.isConsumable) {
-                        this.useItem(item.id)
-                    }
-                    if (item.effects.size > 0) {
-                        item._displayItemInChat(dataset.actorData)
-                    }
-                } else {
-                    // No item check, so we will popup a basic dialog to confirm use
-                    if (item.effects.size > 0) {
-                        let effectList = []
-                        item.effects.forEach(effect => {
-                            effectList.push(effect.name)
-                        });
-                        dataset.details = `Using ${itemName} applies the following: ${effectList.join(", ")}.`
-                        dataset.noRoll = true
-                    }
-                    dataset.rollButtonLabel = "Use Item"
-                    // Log the dataset before the dialog renders
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
-                    try {
-                        let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
-                        if (item.system.isConsumable) {
-                            this.useItem(item.id)
-                        }
-                        // Since we don't need to roll anything, just display the item in chat.
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`Roll response: `, rollResponse) }
-                        item._displayItemInChat(dataset.actorData)
-                    } catch(err) {
-                        return
-                    }
+            let okToContinue = true;
+            const hasFormula = item.system.formula?.trim() !== "";
+            if (hasFormula) {
+                // Roll the item or ability check and display the result in chat
+                okToContinue = this.rollCheck(dataset)
+                if (!okToContinue) return;
+
+                if (item.system.isConsumable) {
+                    this.useItem(item.id)
                 }
+                if (item.effects.size > 0) {
+                    // Only give this (secondary) chat if there are effects to apply
+                    item._displayItemInChat(dataset.actorData)
+                }
+                return
             }
+
+            // No item check, so we will popup a basic dialog to confirm use
+            if (item.effects.size > 0) {
+                const effectList = Array.from(item.effects).map(e => e.name).join(", ");
+                dataset.details = `Using ${itemName} applies the following: ${effectList}.`
+                dataset.noRoll = true
+            }
+            dataset.rollButtonLabel = "Use Item"
+            try {
+                await Hyp3eDialog.ShowBasicRollDialog(dataset)
+            } catch(err) {
+                // This usually just means the dialog was canceled
+                return
+            }
+            if (item.system.isConsumable) {
+                this.useItem(item.id)
+            }
+            // No roll chats were needed, so we show this one chat message
+            item._displayItemInChat(dataset.actorData)
         }
     }
 
@@ -1054,7 +1047,6 @@ export class Hyp3eActor extends Actor {
         }
         // Override rollTarget, even if it has the same value
         dataset.rollTarget = targetRoll.total
-        // label += ` (target ${targetRoll.total})`
         checkText += ` (target ${targetRoll.total})... `
 
         // Log the dataset before the dialog renders
@@ -1897,16 +1889,16 @@ export class Hyp3eActor extends Actor {
         }
 
         // Roll the dice!
-        let roll = new Roll(rollFormula, this.getRollData())
+        const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, this.getRollData(), dataset.rollTarget, "ge");
+        // let roll = new Roll(rollFormula, this.getRollData())
         // Resolve the roll
-        let result = await roll.roll()
-        if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
+        // let result = await roll.roll()
+        // if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
         // Determine success or failure
-        if (roll.total >= dataset.rollTarget) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is greater than or equal to " + dataset.rollTarget + "!") }
+        // if (roll.total >= dataset.rollTarget) {
+        if (success) {
             label += "<br /><b>Success!</b>"
         } else {
-            if (CONFIG.HYP3E.debugMessages) { console.log(roll.total + " is less than " + dataset.rollTarget + "!") }
             label += "<br /><b>Fail.</b>"
         }
 
@@ -2157,7 +2149,6 @@ export class Hyp3eActor extends Actor {
     // Send roll results to the chat window
     sendRollToChat(roll, label, content, rollMode) {
         // Prettify label
-        // label = "<h3>" + label + "</h3>"
         label = "<div class='medium'>" + label + "</div>"
 
         // Send to chat

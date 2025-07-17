@@ -393,7 +393,7 @@ export class Hyp3eDice {
      * @returns {Promise<object>} An object containing: roll, total, success (boolean).
      */
     static async rollFormulaAndEvaluateSuccess(formula, rollData, target, comparison = "ge") {
-        if (!formula || typeof target !== "number") {
+        if (!formula || typeof parseInt(target) !== "number") {
             console.warn("Hyp3eDice.rollFormulaAndEvaluateSuccess: Missing formula or target number.");
             return { roll: null, total: null, success: false };
         }
