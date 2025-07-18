@@ -3,6 +3,7 @@ import { Hyp3eDice } from "../helpers/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 import { parseAndResolveChangeValue, setupEffectHandlers } from "../helpers/effects.mjs";
+import { sendRollToChat, renderCustomChat } from "../helpers/chat.mjs"
 
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
@@ -776,7 +777,7 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
 
         // Output roll result to a chat message
-        this.sendRollToChat(roll, label, "", rollResponse.rollMode)
+        sendRollToChat(roll, this, label, "", rollResponse.rollMode)
         
         return roll
     }
@@ -817,7 +818,7 @@ export class Hyp3eActor extends Actor {
         label += `<br /><b>${reaction}</b>`
 
         // Output roll result to a chat message
-        this.sendRollToChat(roll, label, "", rollResponse.rollMode)
+        sendRollToChat(roll, this, label, "", rollResponse.rollMode)
         
         return roll
     }
@@ -943,7 +944,6 @@ export class Hyp3eActor extends Actor {
         let checkText = dataset.label
         let rollFormula = ""
         let rollResponse
-        // let success = true
 
         // Did we get a token ID?
         if (dataset.tokenId) {
@@ -964,8 +964,6 @@ export class Hyp3eActor extends Actor {
         if (item) {
             itemId = item.id
             itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
-            // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${dataset.label}...</span>`
-            // let label = `<img src="${item.img}" style="border: none; float: left; padding: 3px 0;" width="24px"> <span style="padding: 3px 3px;">${itemName}</span>`
             label = `
             <hr class="plain-hr" />
             <div style="margin: 10px 0;">
@@ -1066,10 +1064,6 @@ export class Hyp3eActor extends Actor {
 
         // Roll the dice!
         const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, rollData, dataset.rollTarget, "le");
-        // let roll = new Roll(rollFormula, rollData)
-        // // Resolve the roll
-        // let result = await roll.roll()
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
 
         // Determine success or failure on a simple check, not turning undead or assassinating
         if (!turnUndead && !assassinate) {
@@ -1090,7 +1084,7 @@ export class Hyp3eActor extends Actor {
         roll.hit = false
 
         // Construct a custom chat card for the check
-        await this.renderCustomChat(roll, item, tokenId, label, "", checkText, htmlContent, rollResponse.rollMode)
+        await renderCustomChat(roll, item, this, tokenId, label, "", checkText, htmlContent, rollResponse.rollMode)
 
         return true
     }
@@ -1193,7 +1187,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Process Dialog Response (Ammo, Mods)
-        const { ammoMods, ammoUpdated } = await this._processDialogResponse(rollResponse, item, itemData);
+        const { ammoMods, ammoUpdated } = await this._consumeAmmoOrItem(rollResponse, item, itemData);
         if (ammoUpdated) {
             // If ammo was used, refresh the actor sheet or relevant UI if needed
             // this.sheet.render(false); // Example
@@ -1242,7 +1236,7 @@ export class Hyp3eActor extends Actor {
         const chatLabel = this._createChatLabel(item?.img, itemName);
         const finalAttackText = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
 
-        await this.renderCustomChat(atkRoll, item, attacker?.id, chatLabel, debugAtkRollFormula, finalAttackText, critFooterHTML, rollResponse.rollMode); // Assuming this exists
+        await renderCustomChat(atkRoll, item, this, attacker?.id, chatLabel, debugAtkRollFormula, finalAttackText, critFooterHTML, rollResponse.rollMode); // Assuming this exists
 
         // Return Roll Result
         return atkRoll;
@@ -1616,7 +1610,7 @@ export class Hyp3eActor extends Actor {
      * @param {object|null} itemData - The system data for the item.
      * @returns {Promise<{ammoMods: object, ammoUpdated: boolean}>} Object containing ammo modifiers and whether ammo was updated.
      */
-    async _processDialogResponse(rollResponse, item, itemData) {
+    async _consumeAmmoOrItem(rollResponse, item, itemData) {
         let ammoMods = {};
         let ammoUpdated = false;
 
@@ -1625,17 +1619,17 @@ export class Hyp3eActor extends Actor {
             const ammo = this.items.get(rollResponse.ammunition);
             if (ammo && ammo.system.quantity?.value > 0) {
                 ammoMods = this._parseItemMod(ammo.name); // Assuming this helper exists
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_processDialogResponse: Using ammo: ${ammo.name}`, ammo.system); }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeAmmoOrItem: Using ammo: ${ammo.name}`, ammo.system); }
                 try {
                     await this.updateEmbeddedDocuments("Item", [
                         { _id: ammo.id, "system.quantity.value": ammo.system.quantity.value - 1 },
                     ]);
                     ammoUpdated = true;
                 } catch (err) {
-                    console.error(`rollAttackOrSpell/_processDialogResponse: Failed to update ammo quantity for ${ammo.name}:`, err);
+                    console.error(`rollAttackOrSpell/_consumeAmmoOrItem: Failed to update ammo quantity for ${ammo.name}:`, err);
                 }
             } else if (rollResponse.ammunition && CONFIG.HYP3E.debugMessages) {
-                console.warn(`rollAttackOrSpell/_processDialogResponse: Selected ammo ${rollResponse.ammunition} not found or has 0 quantity.`);
+                console.warn(`rollAttackOrSpell/_consumeAmmoOrItem: Selected ammo ${rollResponse.ammunition} not found or has 0 quantity.`);
             }
         } else if (item?.type === "weapon" && item.system.isConsumable) {
             // If the weapon itself is consumable (like a grenade), decrement its qty
@@ -1644,7 +1638,7 @@ export class Hyp3eActor extends Actor {
                     { _id: item.id, "system.quantity.value": item.system.quantity.value - 1 },
                 ]);
             } catch (err) {
-                console.error(`rollAttackOrSpell/_processDialogResponse: Failed to update quantity for ${item.name}:`, err);
+                console.error(`rollAttackOrSpell/_consumeAmmoOrItem: Failed to update quantity for ${item.name}:`, err);
             }
         }
         return { ammoMods, ammoUpdated };
@@ -1890,12 +1884,6 @@ export class Hyp3eActor extends Actor {
 
         // Roll the dice!
         const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, this.getRollData(), dataset.rollTarget, "ge");
-        // let roll = new Roll(rollFormula, this.getRollData())
-        // Resolve the roll
-        // let result = await roll.roll()
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Roll result: ", result) }
-        // Determine success or failure
-        // if (roll.total >= dataset.rollTarget) {
         if (success) {
             label += "<br /><b>Success!</b>"
         } else {
@@ -1903,7 +1891,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Output roll result to a chat message
-        this.sendRollToChat(roll, label, "", rollResponse.rollMode)
+        sendRollToChat(roll, this, label, "", rollResponse.rollMode)
 
         return roll
     }
@@ -2144,54 +2132,6 @@ export class Hyp3eActor extends Actor {
 
         if (CONFIG.HYP3E.debugMessages) { console.log("Turn Undead: ", turnUndeadHtml) }
         return turnUndeadHtml;
-    }
-
-    // Send roll results to the chat window
-    sendRollToChat(roll, label, content, rollMode) {
-        // Prettify label
-        label = "<div class='medium'>" + label + "</div>"
-
-        // Send to chat
-        roll.toMessage({
-            author: game.user_id,
-            speaker: ChatMessage.getSpeaker({ actor: this }),
-            flavor: label,
-            content: content
-        },{
-            rollMode: rollMode
-        })
-    }
-
-    // Render custom html for attacks and turning undead
-    async renderCustomChat(roll, item, tokenId, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
-        // Prettify label
-        // label = "<h3>" + label + "</h3>"
-        label = "<div class='medium'>" + label + "</div>"
-        headerHTML = "<div class='medium'>" + headerHTML + "</div>"
-        footerHTML = "<div class='medium'>" + footerHTML + "</div>"
-
-        const templateData = {
-            roll: roll,
-            headerHTML: headerHTML,
-            debugRollFormula: debugRollFormula,
-            item: item,
-            actorId: this.id,
-            tokenId: tokenId,
-            footerHTML: footerHTML,
-        };
-
-        const template = `${HYP3E.templatePath}/chat/attack-roll.hbs`;
-        let customChat = await renderTemplate(template, templateData);
-
-        // Send to chat
-        roll.toMessage({
-            author: game.user_id,
-            speaker: ChatMessage.getSpeaker({ actor: this }),
-            flavor: label,
-            content: customChat
-        },{
-            rollMode: rollMode
-        })
     }
 
     _getCombatantSitMods(attacker, target) {
