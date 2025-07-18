@@ -296,7 +296,7 @@ export class Hyp3eActorSheet extends ActorSheet {
             if (i.system.cost) {
                 const baseGpVal = Hyp3eCharacter.parseGpValue(i.system.cost)
                 if (baseGpVal) {
-                    i.system.value = baseGpVal * (i.system.quantity.value ? i.system.quantity.value : 1)
+                    i.system.value = Math.round((baseGpVal * (i.system.quantity.value ? i.system.quantity.value : 1))*100)/100
                     allTheGold += i.system.value
                 } else {
                     i.system.value = null
