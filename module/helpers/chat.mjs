@@ -3,6 +3,21 @@ import {applyEffect, enableEffect, disableEffect} from "./effects.mjs";
 
 
 /**
+ * Send a simple chat message, no dice roll info
+ * @param {*} actor - The actor sending the chat
+ * @param {*} label - Chat message header
+ * @param {*} content - The main HTML of the message
+ */
+export function sendSimpleChat(actor, label, content) {
+    ChatMessage.create({
+        author: game.user.id,
+        speaker: ChatMessage.getSpeaker({ actor: this }),
+        label: label,
+        content: content
+    });
+}
+
+/**
  * Send roll results to the chat window
  * @param {*} roll - The roll object to display
  * @param {*} actor - The actor doing the action

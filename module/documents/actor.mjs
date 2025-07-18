@@ -3,7 +3,7 @@ import { Hyp3eDice } from "../helpers/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 import { parseAndResolveChangeValue, setupEffectHandlers } from "../helpers/effects.mjs";
-import { sendRollToChat, renderCustomChat } from "../helpers/chat.mjs"
+import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../helpers/chat.mjs"
 
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
@@ -612,11 +612,7 @@ export class Hyp3eActor extends Actor {
 
             // Post all the damage messages together
             const chatContent = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
-            await ChatMessage.create({
-                author: game.user.id,
-                speaker: ChatMessage.getSpeaker({ actor: this }),
-                content: chatContent
-            });
+            sendSimpleChat(this, "", chatContent)
         }
 
         // Update all expired effects
@@ -705,11 +701,7 @@ export class Hyp3eActor extends Actor {
             ]);
         }
         // Send a chat message that the item was used
-        const chatData = {
-            author: game.user_id,
-            content: message
-        };
-        ChatMessage.create(chatData, {});
+        sendSimpleChat(this, "", message)
     }
 
     /**
@@ -1232,7 +1224,7 @@ export class Hyp3eActor extends Actor {
             item.debugDmgRollFormula2h = damageFormulas.secondary?.debugFormula;
         }
 
-        // Render Chat Message
+        // Render chat message
         const chatLabel = this._createChatLabel(item?.img, itemName);
         const finalAttackText = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
 
