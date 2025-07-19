@@ -1062,7 +1062,7 @@ export class Hyp3eActor extends Actor {
 
         // Declare vars
         let tokenId = ""
-        let itemId = ""
+        let itemId = dataset.itemId
         let itemName = ""
         let label = ""
         let checkText = dataset.label
@@ -1088,15 +1088,7 @@ export class Hyp3eActor extends Actor {
         if (item) {
             itemId = item.id
             itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
-            label = `
-            <hr class="plain-hr" />
-            <div style="margin: 10px 0;">
-                <img src="${item.img}" style="border: none; float: left;" width="24px" height="24px">
-                <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
-                    ${itemName}
-                </span>
-            </div>
-            <hr class="plain-hr" />`
+            label = this._createChatLabel(item.img, itemName)
         }
 
         // Determine whether we have a valid target number or formula
