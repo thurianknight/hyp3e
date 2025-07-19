@@ -11,6 +11,8 @@ import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../helpers/cha
  */
 export class Hyp3eActor extends Actor {
 
+    /** CORE OVERRIDES ----------------------------------*/
+
     /** @override */
     prepareData() {
         // Prepare data for the actor. Calling the super version of this executes
@@ -18,18 +20,12 @@ export class Hyp3eActor extends Actor {
         // prepareBaseData(), prepareEmbeddedDocuments() (including active effects),
         // prepareDerivedData().
         super.prepareData();
-        // Testing how deepClone() works...
-        // console.log(`CLONE_TEST: Actor ${this.name}:`, this)
-        // const actorClone = foundry.utils.deepClone(this)
-        // console.log(`CLONE_TEST: Clone of ${this.name}:`, actorClone)
     }
 
     /** @override */
     async prepareBaseData() {
         // Data modifications in this step occur before processing embedded
         // documents or derived data.
-        // const actorData = this;
-        // const systemData = this.system;
 
     }
 
@@ -101,20 +97,14 @@ export class Hyp3eActor extends Actor {
 
         // // Auto-calculate AC, DR, MV if configuration is enabled
         if (CONFIG.HYP3E.autoCalcAc) {
-            // const acMvObj = this.getCharacterAcAndMv(this, systemData)
             this.getCharacterAcAndMv(this, systemData)
-            // systemData.ac.value = acMvObj.ac
-            // systemData.ac.dr = acMvObj.dr
-            // systemData.movement.base.value = acMvObj.mv
         }
 
         // Apply temp AC, DR, and MV modifiers
         this._applyTempModifiers(systemData);
 
         // Log the prepared data
-        // if (CONFIG.HYP3E.debugMessages) { 
-            console.log("Prepared Character Data: ", systemData) 
-        // }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Prepared Character Data: ", systemData) }
 
     }
 
@@ -170,6 +160,8 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log(`getRollData: Actor ${this.name}`, data) }
         return data;
     }
+
+    /** ACTOR DATA HELPERS ------------------------------*/
 
     /**
      * Prepare character roll data.
@@ -364,6 +356,36 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
+     * Handle adding and removing a bonus spell
+     * @param {String} spellLvl The bonus spell level to be updated
+     * @param {Bool} val The true or false value to be assigned
+     */
+    async updateBonusSpell(spellLvl, val) {
+        const attr = spellLvl.substring(0,3) // Get the attribute name (int or wis)
+        const spellLevel = spellLvl.substring(3).toLowerCase() // Get the spell level (Lvl1, Lvl2, etc.)
+        const key = `system.attributes.${attr}.bonusSpells.${spellLevel}`;
+        await this.update({ [key]: val });
+        // this.render(true)
+        if (CONFIG.HYP3E.debugMessages) { console.log("updateBonusSpell update:", key, val) }
+    }
+
+    // Get the names of effects applied to the actor, and return an array
+    _getEffectNames() {
+        let effects
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12...
+            effects = this.effects
+        } else if (foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v13...
+            // effects = this._getAllApplicableEffects()
+            effects = this.allApplicableEffects()
+        }
+        return this.effects.map(e => e.name);
+    }
+
+    /** CUSTOM TEMPORARY MODIFIERS (NOT USED YET) -------*/
+
+    /**
      * Add a temporary modifier to the actor's system.tempModifiers array
      * @param {*} templateField 
      * @param {*} source 
@@ -408,6 +430,8 @@ export class Hyp3eActor extends Actor {
         })
     }
 
+    /** ACTIVE EFFECTS HELPERS --------------------------*/
+
     /**
      * Resolve item effect changes that include data paths or roll formulas.
      * Then update the item's effect/change with a number, so it becomes "permanent".
@@ -445,6 +469,110 @@ export class Hyp3eActor extends Actor {
                 }
             }
         }
+    }
+
+    /**
+     * Process temporary effects on the actor, including persistent damage. Disable any expired effects.
+     */
+    async processTemporaryEffects() {
+        let totalDamage = 0;
+        let damageMessages = [];
+
+        // Collect updates to disable expired effects
+        const expiredEffectUpdates = [];
+
+        for (const effect of this.effects) {
+            if (effect.isTemporary && !effect.disabled) {
+                const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
+                if (persistentDamage) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: ${effect.name}`, persistentDamage); }
+
+                    const [damageType, rawDamageRoll] = persistentDamage.value.split(",");
+                    const damageRollFormula = rawDamageRoll.replace(";", "").trim();
+
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: rolling ${damageRollFormula} ${damageType}`); }
+
+                    const roll = new Roll(damageRollFormula);
+                    await roll.evaluate({ evaluateSync: true });
+
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects roll result:`, roll); }
+
+                    totalDamage += roll.total;
+
+                    damageMessages.push(`${this.name} takes ${roll.total} ${damageType} damage!`);
+                }
+
+                if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
+                    expiredEffectUpdates.push(effect);
+                }
+            }
+        }
+
+        // Apply total damage once
+        if (totalDamage > 0) {
+            await this.applyHealthChange(totalDamage, false);
+
+            // Post all the damage messages together
+            const chatContent = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
+            sendSimpleChat(this, "", chatContent)
+        }
+
+        // Update all expired effects
+        if (expiredEffectUpdates.length > 0) {
+            const updates = expiredEffectUpdates.map(effect => ({
+                _id: effect.id,
+                disabled: true,
+                "duration.startRound": null,
+                "duration.startTurn": null
+            }));
+            await this.updateEmbeddedDocuments("ActiveEffect", updates);
+        }
+
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log(`processTemporaryEffects: ${this.name} took ${totalDamage} total damage!`);
+        }
+    }
+
+    /**
+     * Update the value of an effect's change
+     * @param {*} key // Effect change-key to find
+     * @param {*} updateValue // Value to subtract from the effect's change
+     */
+    async updateEffectValue(key, updateValue, minVal = 0, maxVal = 100) {
+        // Find the effect specified by key
+        const effect = this.effects.find(e => e.changes.some(c => c.key === key));
+        if (!effect) {
+            return updateValue; // No effect found, return same value (no change)
+        }
+
+        // Store all changes for a single batch update at the end
+        let updatedChanges = [...effect.changes];  // Start with a shallow copy
+        let didUpdate = false;
+        let newValue = 0;
+        let excess = 0;
+
+        for (let i = 0; i < updatedChanges.length; i++) {
+            const change = updatedChanges[i];
+            if (change.key === key) {
+                // Update the value of the change
+                newValue = change.value - updateValue;
+                if (newValue < minVal) {
+                    excess = Math.abs(newValue);
+                }
+                // Clamp the value between minVal and maxVal
+                newValue = Math.max(minVal, Math.min(newValue, maxVal));
+                updatedChanges[i] = { ...change, value: newValue };
+                didUpdate = true;
+            }
+        }
+        // Batch out the updates to the effect
+        if (didUpdate) {
+            await effect.update({
+                changes: updatedChanges
+            });
+        }
+        // Return any excess that could not be removed from the effect
+        return excess;
     }
 
     /**
@@ -570,110 +698,6 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Process temporary effects on the actor, including persistent damage. Disable any expired effects.
-     */
-    async processTemporaryEffects() {
-        let totalDamage = 0;
-        let damageMessages = [];
-
-        // Collect updates to disable expired effects
-        const expiredEffectUpdates = [];
-
-        for (const effect of this.effects) {
-            if (effect.isTemporary && !effect.disabled) {
-                const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
-                if (persistentDamage) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: ${effect.name}`, persistentDamage); }
-
-                    const [damageType, rawDamageRoll] = persistentDamage.value.split(",");
-                    const damageRollFormula = rawDamageRoll.replace(";", "").trim();
-
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: rolling ${damageRollFormula} ${damageType}`); }
-
-                    const roll = new Roll(damageRollFormula);
-                    await roll.evaluate({ evaluateSync: true });
-
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects roll result:`, roll); }
-
-                    totalDamage += roll.total;
-
-                    damageMessages.push(`${this.name} takes ${roll.total} ${damageType} damage!`);
-                }
-
-                if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-                    expiredEffectUpdates.push(effect);
-                }
-            }
-        }
-
-        // Apply total damage once
-        if (totalDamage > 0) {
-            await this.applyHealthChange(totalDamage, false);
-
-            // Post all the damage messages together
-            const chatContent = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
-            sendSimpleChat(this, "", chatContent)
-        }
-
-        // Update all expired effects
-        if (expiredEffectUpdates.length > 0) {
-            const updates = expiredEffectUpdates.map(effect => ({
-                _id: effect.id,
-                disabled: true,
-                "duration.startRound": null,
-                "duration.startTurn": null
-            }));
-            await this.updateEmbeddedDocuments("ActiveEffect", updates);
-        }
-
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`processTemporaryEffects: ${this.name} took ${totalDamage} total damage!`);
-        }
-    }
-
-    /**
-     * Update the value of an effect's change
-     * @param {*} key // Effect change-key to find
-     * @param {*} updateValue // Value to subtract from the effect's change
-     */
-    async updateEffectValue(key, updateValue, minVal = 0, maxVal = 100) {
-        // Find the effect specified by key
-        const effect = this.effects.find(e => e.changes.some(c => c.key === key));
-        if (!effect) {
-            return updateValue; // No effect found, return same value (no change)
-        }
-
-        // Store all changes for a single batch update at the end
-        let updatedChanges = [...effect.changes];  // Start with a shallow copy
-        let didUpdate = false;
-        let newValue = 0;
-        let excess = 0;
-
-        for (let i = 0; i < updatedChanges.length; i++) {
-            const change = updatedChanges[i];
-            if (change.key === key) {
-                // Update the value of the change
-                newValue = change.value - updateValue;
-                if (newValue < minVal) {
-                    excess = Math.abs(newValue);
-                }
-                // Clamp the value between minVal and maxVal
-                newValue = Math.max(minVal, Math.min(newValue, maxVal));
-                updatedChanges[i] = { ...change, value: newValue };
-                didUpdate = true;
-            }
-        }
-        // Batch out the updates to the effect
-        if (didUpdate) {
-            await effect.update({
-                changes: updatedChanges
-            });
-        }
-        // Return any excess that could not be removed from the effect
-        return excess;
-    }
-
-    /**
      * Use a consumable inventory item, decrementing its qty by 1
      * @param {*} itemId
      */
@@ -703,6 +727,8 @@ export class Hyp3eActor extends Actor {
         // Send a chat message that the item was used
         sendSimpleChat(this, "", message)
     }
+
+    /** ROLL FUNCTIONS ----------------------------------*/
 
     /**
      * Execute an item macro
@@ -816,29 +842,133 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Use an item to apply its effects to the owner or another target
+     * Execute a saving throw
      * @param {*} dataset 
      */
-    // async rollApplyEffects(dataset) {
-    //     if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: ${dataset.label}...`) }
+    async rollSave(dataset) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
 
-    //     const item = this.items.get(dataset.itemId)
-    //     let label = `${dataset.label}...`
-    //     dataset.rollButtonLabel = "Use Item"
+        let saveRollParts = []
+        let rollFormula = ""
+        let rollResponse
+        let label = `${dataset.label}...`
 
-    //     // Log the dataset before the dialog renders
-    //     if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: ${dataset.label} dataset: `, dataset) }
-    //     try {
-    //         let rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
-    //         // Use actor's system data to pass to item._displayItemInChat()
-    //         const actorData = this.getRollData()
-    //         // Since we don't need to roll anything, just display the item in chat.
-    //         if (CONFIG.HYP3E.debugMessages) { console.log(`rollApplyEffects: roll response: `, rollResponse) }
-    //         item._displayItemInChat(actorData)
-    //     } catch(err) {
-    //         return
-    //     }
-    // }
+        if (this.type == "character") {
+            // Get the character's saving throw modifiers
+            dataset.avoidMod = this.system.attributes.dex.defMod
+            dataset.poisonMod = this.system.attributes.con.poisRadMod
+            dataset.willMod = this.system.attributes.wis.willMod
+
+            // Log the dataset before the dialog renders
+            if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+            try {
+                rollResponse = await Hyp3eDialog.ShowSaveRollDialog(dataset)
+            } catch(err) {
+                return
+            }
+
+            // Default basic save with only sit mod from dice dialog
+            saveRollParts.push(dataset.roll)
+
+            // Get saving throw modifer if one was selected
+            if (rollResponse.avoidMod) {
+                saveRollParts.push(rollResponse.avoidMod)
+                label = `${dataset.label} with Avoidance modifier...`
+            }
+            if (rollResponse.poisonMod) {
+                saveRollParts.push(rollResponse.poisonMod)
+                label = `${dataset.label} with Poison/Radiation modifier...`
+            }
+            if (rollResponse.willMod) {
+                saveRollParts.push(rollResponse.willMod)
+                label = `${dataset.label} with Willpower modifier...`
+            }
+        } else {
+            // NPC/monster save, no attribute-based mods
+            dataset.rollButtonLabel = "Roll Save"
+            // Log the dataset before the dialog renders
+            if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+            try {
+                rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset);
+                // Default basic save with only sit mod from dice dialog
+                saveRollParts.push(dataset.roll)
+            } catch(err) {
+                return
+            }
+        }
+
+        // Add situational modifier from the dice dialog
+        saveRollParts.push(rollResponse.sitMod)
+
+        // Construct our save roll formula
+        rollFormula = saveRollParts.join(" + ")
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log("Save roll parts:", saveRollParts)
+            console.log("Save formula:", rollFormula)
+        }
+
+        // Roll the dice!
+        const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, this.getRollData(), dataset.rollTarget, "ge");
+        if (success) {
+            label += "<br /><b>Success!</b>"
+        } else {
+            label += "<br /><b>Fail.</b>"
+        }
+
+        // Output roll result to a chat message
+        sendRollToChat(roll, this, label, "", rollResponse.rollMode)
+
+        return roll
+    }
+
+    /**
+     * Execute a hit-die roll directly from the npc-actor sheet
+     * @param {*} dataset 
+     */
+    async rollHD() {
+        if (this.type !== 'npc') return;
+        if (!this.system.hd){
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHD: No HD value to roll!") }
+            return;
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHD: Rolling HD ${this.system.hd}...`) }
+        const roll = new Roll(this.system.hd);
+        await roll.roll();
+        if (roll != undefined && roll.total != undefined) {
+            const newHealth = roll.total;
+            await this.update({ system: { hp: { value: newHealth, max: newHealth } } });
+        } else {
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHD: Roll failed, no total value!") }
+        }
+    }
+
+    /**
+     * Execute a hit-point increase (hit die + CN roll) directly from the character-actor sheet
+     * @param {*} dataset 
+     */
+    async rollHP() {
+        if (this.type !== 'character') return;
+        if (!this.system.hd){
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: No HD value to roll!") }
+            return;
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHP: Rolling HD ${this.system.hd} + ${this.system.attributes.con.hpMod}...`) }
+        const roll = new Roll(`${this.system.hd} + ${this.system.attributes.con.hpMod}`);
+        await roll.roll();
+        if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll result: ", roll) }
+        if (roll != undefined && roll.total != undefined) {
+            const hpIncrease = roll.total;
+            const newHealth = parseInt(this.system.hp.value) + hpIncrease;
+            const newMax = parseInt(this.system.hp.max) + hpIncrease;
+            // Log the update
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Updated HP:", newHealth, "Max HP:", newMax) }
+            await this.update({
+                system: { hp: { value: newHealth, max: newMax } }
+            });
+        } else {
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll failed, no total value!") }
+        }
+    }
 
     /**
      * Execute an item check or attack roll
@@ -920,6 +1050,8 @@ export class Hyp3eActor extends Actor {
             item._displayItemInChat(dataset.actorData)
         }
     }
+
+    /** ITEM ROLL SUB-FUNCTIONS -------------------------*/
 
     /**
      * Execute a check roll directly from the actor sheet
@@ -1067,10 +1199,10 @@ export class Hyp3eActor extends Actor {
             }
         } else if (turnUndead) {
             // Resolve the results of the attempted turning undead
-            htmlContent = this.resolveTurnUndead(roll.total, rollData)
+            htmlContent = this._resolveTurnUndead(roll.total, rollData)
         } else if (assassinate) {
             // Resolve the results of the attempted assassination
-            htmlContent = this.resolveAssassination(targetToken, roll.total, rollData)
+            htmlContent = this._resolveAssassination(targetToken, roll.total, rollData)
         }
         // Hit must be false so we don't display any damage buttons
         roll.hit = false
@@ -1233,6 +1365,8 @@ export class Hyp3eActor extends Actor {
         // Return Roll Result
         return atkRoll;
     }
+
+    /** ITEM & ATTACK ROLL HELPERS ----------------------*/
 
     /**
      * Validate item state before performing an action.
@@ -1786,344 +1920,31 @@ export class Hyp3eActor extends Actor {
         return dmgFormulas;
     }
 
-    /**
-     * Creates the HTML for the chat card header/label.
-     * @param {string|null} itemImg - Path to the item image.
-     * @param {string} itemName - Name of the item/action.
-     * @returns {string} HTML string for the label.
-     */
-    _createChatLabel(itemImg, itemName) {
-        // Use a default image if itemImg is missing
-        const imgSrc = itemImg || "icons/svg/mystery-man.svg";
-        return `
-            <hr class="plain-hr" />
-            <div style="margin: 10px 0;">
-                <img src="${imgSrc}" style="border: none; float: left;" width="24px" height="24px">
-                <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
-                    ${itemName}
-                </span>
-            </div>
-            <hr class="plain-hr" />`;
-    }
-    // END Helper Functions for attack rolls & spellcasting
-
-
-    /**
-     * Execute a saving throw
-     * @param {*} dataset 
-     */
-    async rollSave(dataset) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
-
-        let saveRollParts = []
-        let rollFormula = ""
-        let rollResponse
-        let label = `${dataset.label}...`
-
-        if (this.type == "character") {
-            // Get the character's saving throw modifiers
-            dataset.avoidMod = this.system.attributes.dex.defMod
-            dataset.poisonMod = this.system.attributes.con.poisRadMod
-            dataset.willMod = this.system.attributes.wis.willMod
-
-            // Log the dataset before the dialog renders
-            if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
-            try {
-                rollResponse = await Hyp3eDialog.ShowSaveRollDialog(dataset)
-            } catch(err) {
-                return
-            }
-
-            // Default basic save with only sit mod from dice dialog
-            saveRollParts.push(dataset.roll)
-
-            // Get saving throw modifer if one was selected
-            if (rollResponse.avoidMod) {
-                saveRollParts.push(rollResponse.avoidMod)
-                label = `${dataset.label} with Avoidance modifier...`
-            }
-            if (rollResponse.poisonMod) {
-                saveRollParts.push(rollResponse.poisonMod)
-                label = `${dataset.label} with Poison/Radiation modifier...`
-            }
-            if (rollResponse.willMod) {
-                saveRollParts.push(rollResponse.willMod)
-                label = `${dataset.label} with Willpower modifier...`
-            }
+    // Parse item name to see if it has an attack/damage modifier
+    _parseItemMod(itemName) {
+        let itemData = {
+            atkMod: 0,
+            dmgMod: 0
+        }
+        // Use a regex to find the attack and damage bonus
+        let mod = itemName.match(/\+(\d+)/g)
+        // Log the regex results
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item mod regex:", mod) }
+        // If we found a modifier, parse
+        if (mod) {
+            itemData.atkMod = parseInt(mod[0].replace("+", ""))
+            itemData.dmgMod = parseInt(mod[0].replace("+", ""))
         } else {
-            // NPC/monster save, no attribute-based mods
-            dataset.rollButtonLabel = "Roll Save"
-            // Log the dataset before the dialog renders
-            if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
-            try {
-                rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset);
-                // Default basic save with only sit mod from dice dialog
-                saveRollParts.push(dataset.roll)
-            } catch(err) {
-                return
+            // Check for penalty, if no bonus found
+            mod = itemName.match(/\-(\d+)/g)
+            if (mod) {
+                itemData.atkMod = parseInt(mod[0])
+                itemData.dmgMod = parseInt(mod[0])
             }
         }
-
-        // Add situational modifier from the dice dialog
-        saveRollParts.push(rollResponse.sitMod)
-
-        // Construct our save roll formula
-        rollFormula = saveRollParts.join(" + ")
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log("Save roll parts:", saveRollParts)
-            console.log("Save formula:", rollFormula)
-        }
-
-        // Roll the dice!
-        const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, this.getRollData(), dataset.rollTarget, "ge");
-        if (success) {
-            label += "<br /><b>Success!</b>"
-        } else {
-            label += "<br /><b>Fail.</b>"
-        }
-
-        // Output roll result to a chat message
-        sendRollToChat(roll, this, label, "", rollResponse.rollMode)
-
-        return roll
-    }
-
-    /**
-     * Execute a hit-die roll directly from the npc-actor sheet
-     * @param {*} dataset 
-     */
-    async rollHD() {
-        if (this.type !== 'npc') return;
-        if (!this.system.hd){
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHD: No HD value to roll!") }
-            return;
-        }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHD: Rolling HD ${this.system.hd}...`) }
-        const roll = new Roll(this.system.hd);
-        await roll.roll();
-        if (roll != undefined && roll.total != undefined) {
-            const newHealth = roll.total;
-            await this.update({ system: { hp: { value: newHealth, max: newHealth } } });
-        } else {
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHD: Roll failed, no total value!") }
-        }
-    }
-
-    /**
-     * Execute a hit-point increase (hit die + CN roll) directly from the character-actor sheet
-     * @param {*} dataset 
-     */
-    async rollHP() {
-        if (this.type !== 'character') return;
-        if (!this.system.hd){
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: No HD value to roll!") }
-            return;
-        }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHP: Rolling HD ${this.system.hd} + ${this.system.attributes.con.hpMod}...`) }
-        const roll = new Roll(`${this.system.hd} + ${this.system.attributes.con.hpMod}`);
-        await roll.roll();
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll result: ", roll) }
-        if (roll != undefined && roll.total != undefined) {
-            const hpIncrease = roll.total;
-            const newHealth = parseInt(this.system.hp.value) + hpIncrease;
-            const newMax = parseInt(this.system.hp.max) + hpIncrease;
-            // Log the update
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Updated HP:", newHealth, "Max HP:", newMax) }
-            await this.update({
-                system: { hp: { value: newHealth, max: newMax } }
-            });
-        } else {
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll failed, no total value!") }
-        }
-    }
-
-    async useItemSpell(item, spellUuid) {
-        // Ensure item has spellcasting data
-        const spellcasting = item.system?.spellcasting;
-        if (!spellcasting?.hasSpells) {
-            ui.notifications.warn(`${item.name} has no spells to cast.`);
-            return;
-        }
-
-        // Load the spell
-        const spell = await fromUuid(spellUuid);
-        if (!spell || !(spell instanceof Item)) {
-            ui.notifications.error(`Failed to load spell: ${spellUuid}`);
-            return;
-        }
-        if (CONFIG.HYP3E.debugMessages) { console.log("useItemSpell spell:", spell) };
-
-        // Get spell charges to use
-        const spellEntry = item.system.spellcasting.spellRefs.find(spell => spell.uuid === spellUuid)
-        const spellCharges = spellEntry.charges
-
-        // Check item has enough charges (if applicable) for the spell
-        if (spellcasting.charges.value >= 0 && spellcasting.charges.value < spellCharges) {
-            ui.notifications.warn(`${item.name} does not have enough charges.`);
-            return;
-        }
-
-        const dataset = {
-            "rollType": "item",
-            "rollMode": "publicroll",
-            "label": `Cast spell ${spell.name}`,
-            "itemId": spellUuid,
-            "actorId": this.id,
-            "baseClass": this.system.baseClass,
-            "tokenId": this?.sheet?.token.id,
-            "isItemSpell": true,
-            "itemCa": item.system.spellcasting.ca
-        }
-        if (CONFIG.HYP3E.debugMessages) { console.log("useItemSpell dataset:", dataset) };
-        // Cast the spell as if from the actor, but override CA from item
-        await this.rollItem(dataset)
-
-        // Deduct charges
-        if (spellcasting.charges?.value != null) {
-            item.update({ "system.spellcasting.charges.value": spellcasting.charges.value - spellCharges });
-        }
-    }
-
-    // Build the chat message for assassination
-    resolveAssassination(target, rollTotal, rollData) {
-        /*
-        Assassination
-        =============
-        The assassin's chance to kill a target outright is based on the difference between the roll 
-        and the target's AC. The table below shows the results of the roll, and the number of levels 
-        of success (or failure) that result from it.
-
-        Logic:
-        - If the original attack roll was a natural 19 or 20, the target must make a death save or die.
-        - If the attack roll hit but was not a natural 19 or 20, we roll on the Assassination table.
-        - The table uses an unmodified d20 roll, with a success if we roll the target number or lower.
-        - A natural 17 or higher is an automatic fail, as 16 is the highest target number in the table.
-        - The assassin's damage multiplier is based on his class level, and should be included in the 
-        chat message.
-        - We should be able to grab the previous damage roll and apply the multiplier automatically...
-        need to test this. But it acts like a critical hit, so the code should be similar.
-        */
-        let assassinationHtml = ''
-        let results = []
-        console.log("Assassination roll data: ", rollData)
-        console.log("Assassination target: ", target)
-        const assassinLevel = parseInt(rollData.details.level.value)
-        const baseSuccess = assassinLevel + 4
-        const targetName = target.actor.name
-        const targetLevel = parseInt(target.actor.type == "npc" ? target.actor.system?.hd.split("d")[0] : target.actor.system?.details.level.value)
-        const targetDifficultyMod = Math.floor(targetLevel/2)
-        const targetIsAssassin = target.actor.type == "character" && target.actor.system?.details.class == "Assassin"
-        const assassinTargetMod = targetIsAssassin && targetLevel > assassinLevel ? (targetLevel - assassinLevel) : 0
-
-        // Was this a complete fail?
-        if (rollTotal > 16) {
-            return `<p>Assassination attempt vs. ${targetName} failed...</p>`
-        }
-
-        // From here on it's mostly some level of success
-        if (rollTotal <= baseSuccess - targetDifficultyMod - assassinTargetMod) {
-            results.push(`<p>Assassination attempt vs. ${targetName} <b>succeeded</b>!</p>`)
-            results.push(`<ul><li>The target must make a <i>death</i> saving throw or die.</li>`)
-            results.push(`<ul><li>However, if the original d20 attack roll was a natural 19 or 20, then no saving throw is allowed.</li></ul>`)
-            let backstabMult = ``
-            if (assassinLevel >= 9) {
-                backstabMult = `<b>×4</b>`
-            } else if (assassinLevel >= 5) {
-                backstabMult = `<b>×3</b>`
-            } else {
-                backstabMult = `<b>×2</b>`
-            }
-            results.push(`<li>If the target makes its <i>death</i> save, it still takes <b>backstab</b> damage. For a level ${assassinLevel} assassin, the backstab multipler is ${backstabMult}.</li>`)
-            results.push(`<li>Other damage modifiers (strength, sorcery, etc.) are added after the dice are totaled.</li></ul>`)
-            results.push(`<div class='save-button' style='padding-top: 5px' data-save='death'></div>`)
-        } else {
-            return `<p>Assassination attempt vs. ${targetName} failed...</p>`
-        }
-        assassinationHtml = results.join("")
-        return assassinationHtml
-    }
-
-    // Build the chat message for turning undead
-    resolveTurnUndead(rollTotal, rollData) {
-        /*
-        Turning Undead
-        ==============
-        Cross-reference the cleric (or sub-class) TA and die roll against the Turn Undead table to determine possible 
-        results, and output those to the chat.
-        We can just use the actor's TA and dynamically calculate the results row from the Turn Undead table, since the 
-        minimum value for success is always a target number of 10, affecting undead at Type [TA - 1].
-
-        Logic:
-        - If TA is 1, it is possible to completely fail.
-        - If TA is 2 or higher, we have the chance for an automatic turn of undead.
-        - As long as we have some kind of success, we always roll 2d6 for the number of undead affected (except if 
-        TA >= 7, see below).
-        - If TA >= 2, then it is possible that some undead will be turned automatically without even requiring a roll.
-        - If TA >= 4, it is possible that lower-Type undead may be Destroyed.
-        - If TA >= 7, it is possible that some lower-Type undead may be Utterly Destroyed. All this does is change the 
-        number affected from 2d6 to 1d6+6, thus increasing the average roll.
-
-        Example: a cleric with TA of 5 can turn undead up to Type 3 automatically, turn undead of 
-        type 4 with a target number of 10, type 5 with a target number of 7, type 6 with a target 
-        number of 4, and finally type 7 with a target number of 1.
-        Knowing that all TA numbers calculate the same way, we know that:
-        - A target number of 10 will turn undead of Type [cleric TA - 1].
-        - A target number of 7 will turn undead of Type [cleric TA].
-        - A TN of 4 affects undead of Type [cleric TA + 1].
-        - And a TN of 1 affects undead of Type [cleric TA + 2].
-        And with all of this information, we can also calculate the Types of undead that may be 
-        Turned automatically (undead Type == [cleric TA] - 2), or Destroyed (undead Type == 
-        [cleric TA] - 4), or Ultimately Destroyed (undead Type == [cleric TA] - 7).
-        */
-        let turnUndeadHtml = ''
-        let orLess = ''
-        let results = []
-        let rollAffected = '2d6'
-
-        // Was this a complete fail?
-        if (rollData.ta <= 1 && rollTotal > 10) {
-            return '<p>No undead were turned...</p>';
-        }
-
-        // From here on it's all some level of success
-        if (rollTotal <= 1) {
-            if ((rollData.ta+2) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta+2} ${orLess}are <b>turned</b>.</li>`)
-        } else if (rollTotal <= 4) {
-            if ((rollData.ta+1) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta+1} ${orLess}are <b>turned</b>.</li>`)
-        } else if (rollTotal <= 7) {
-            if ((rollData.ta) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta} ${orLess}are <b>turned</b>.</li>`)
-        } else if (rollTotal <= 10) {
-            if ((rollData.ta-1) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta-1} ${orLess}are <b>turned</b>.</li>`)
-        } else {
-            // Even a roll of 11 or 12 is still successful against weaker undead
-            if ((rollData.ta-2) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta-2} ${orLess}are <b>turned</b>.</li>`)
-        }
-        // Reset orLess
-        orLess = ''
-        // At TA 4+, the cleric can actually destroy undead
-        if (rollData.ta >= 4) {
-            if ((rollData.ta-4) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta-4} ${orLess}are <b>destroyed</b>.</li>`)
-        }
-            // At TA 7+, the cleric is so powerful that his number affected is greatly improved
-            if (rollData.ta >= 7) {
-            rollAffected = '1d6+6'
-        }
-
-        // Now we can setup our description output from the results
-        turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
-        for (let i = results.length-1; i >=0; i--) {
-            turnUndeadHtml += results[i]
-        }
-        turnUndeadHtml += `</ul>`
-
-        if (CONFIG.HYP3E.debugMessages) { console.log("Turn Undead: ", turnUndeadHtml) }
-        return turnUndeadHtml;
+        // Log the parsed item data
+        if (CONFIG.HYP3E.debugMessages) { console.log("Item mod data:", itemData) }
+        return itemData
     }
 
     _getCombatantSitMods(attacker, target) {
@@ -2268,45 +2089,215 @@ export class Hyp3eActor extends Actor {
         return sitModObj
     }
 
-    // Get the names of effects applied to the actor, and return an array
-    _getEffectNames() {
-        let effects
-        if (!foundry.utils.isNewerVersion(game.version, "13")) {
-            // For Foundry v12...
-            effects = this.effects
-        } else if (foundry.utils.isNewerVersion(game.version, "13")) {
-            // For Foundry v13...
-            // effects = this._getAllApplicableEffects()
-            effects = this.allApplicableEffects()
+    /**
+     * Creates the HTML for the chat card header/label.
+     * @param {string|null} itemImg - Path to the item image.
+     * @param {string} itemName - Name of the item/action.
+     * @returns {string} HTML string for the label.
+     */
+    _createChatLabel(itemImg, itemName) {
+        // Use a default image if itemImg is missing
+        const imgSrc = itemImg || "icons/svg/mystery-man.svg";
+        return `
+            <hr class="plain-hr" />
+            <div style="margin: 10px 0;">
+                <img src="${imgSrc}" style="border: none; float: left;" width="24px" height="24px">
+                <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
+                    ${itemName}
+                </span>
+            </div>
+            <hr class="plain-hr" />`;
+    }
+    /** END Helper Functions for item/attack rolls ------*/
+
+
+    async useItemSpell(item, spellUuid) {
+        // Ensure item has spellcasting data
+        const spellcasting = item.system?.spellcasting;
+        if (!spellcasting?.hasSpells) {
+            ui.notifications.warn(`${item.name} has no spells to cast.`);
+            return;
         }
-        return this.effects.map(e => e.name);
+
+        // Load the spell
+        const spell = await fromUuid(spellUuid);
+        if (!spell || !(spell instanceof Item)) {
+            ui.notifications.error(`Failed to load spell: ${spellUuid}`);
+            return;
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log("useItemSpell spell:", spell) };
+
+        // Get spell charges to use
+        const spellEntry = item.system.spellcasting.spellRefs.find(spell => spell.uuid === spellUuid)
+        const spellCharges = spellEntry.charges
+
+        // Check item has enough charges (if applicable) for the spell
+        if (spellcasting.charges.value >= 0 && spellcasting.charges.value < spellCharges) {
+            ui.notifications.warn(`${item.name} does not have enough charges.`);
+            return;
+        }
+
+        const dataset = {
+            "rollType": "item",
+            "rollMode": "publicroll",
+            "label": `Cast spell ${spell.name}`,
+            "itemId": spellUuid,
+            "actorId": this.id,
+            "baseClass": this.system.baseClass,
+            "tokenId": this?.sheet?.token.id,
+            "isItemSpell": true,
+            "itemCa": item.system.spellcasting.ca
+        }
+        if (CONFIG.HYP3E.debugMessages) { console.log("useItemSpell dataset:", dataset) };
+        // Cast the spell as if from the actor, but override CA from item
+        await this.rollItem(dataset)
+
+        // Deduct charges
+        if (spellcasting.charges?.value != null) {
+            item.update({ "system.spellcasting.charges.value": spellcasting.charges.value - spellCharges });
+        }
     }
 
-    // Parse item name to see if it has an attack/damage modifier
-    _parseItemMod(itemName) {
-        let itemData = {
-            atkMod: 0,
-            dmgMod: 0
+    // Build the chat message for assassination
+    _resolveAssassination(target, rollTotal, rollData) {
+        /*
+        Assassination
+        =============
+        The assassin's chance to kill a target outright is based on the difference between the roll 
+        and the target's AC. The table below shows the results of the roll, and the number of levels 
+        of success (or failure) that result from it.
+
+        Logic:
+        - If the original attack roll was a natural 19 or 20, the target must make a death save or die.
+        - If the attack roll hit but was not a natural 19 or 20, we roll on the Assassination table.
+        - The table uses an unmodified d20 roll, with a success if we roll the target number or lower.
+        - A natural 17 or higher is an automatic fail, as 16 is the highest target number in the table.
+        - The assassin's damage multiplier is based on his class level, and should be included in the 
+        chat message.
+        - We should be able to grab the previous damage roll and apply the multiplier automatically...
+        need to test this. But it acts like a critical hit, so the code should be similar.
+        */
+        let assassinationHtml = ''
+        let results = []
+        console.log("Assassination roll data: ", rollData)
+        console.log("Assassination target: ", target)
+        const assassinLevel = parseInt(rollData.details.level.value)
+        const baseSuccess = assassinLevel + 4
+        const targetName = target.actor.name
+        const targetLevel = parseInt(target.actor.type == "npc" ? target.actor.system?.hd.split("d")[0] : target.actor.system?.details.level.value)
+        const targetDifficultyMod = Math.floor(targetLevel/2)
+        const targetIsAssassin = target.actor.type == "character" && target.actor.system?.details.class == "Assassin"
+        const assassinTargetMod = targetIsAssassin && targetLevel > assassinLevel ? (targetLevel - assassinLevel) : 0
+
+        // Was this a complete fail?
+        if (rollTotal > 16) {
+            return `<p>Assassination attempt vs. ${targetName} failed...</p>`
         }
-        // Use a regex to find the attack and damage bonus
-        let mod = itemName.match(/\+(\d+)/g)
-        // Log the regex results
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item mod regex:", mod) }
-        // If we found a modifier, parse
-        if (mod) {
-            itemData.atkMod = parseInt(mod[0].replace("+", ""))
-            itemData.dmgMod = parseInt(mod[0].replace("+", ""))
-        } else {
-            // Check for penalty, if no bonus found
-            mod = itemName.match(/\-(\d+)/g)
-            if (mod) {
-                itemData.atkMod = parseInt(mod[0])
-                itemData.dmgMod = parseInt(mod[0])
+
+        // From here on it's mostly some level of success
+        if (rollTotal <= baseSuccess - targetDifficultyMod - assassinTargetMod) {
+            results.push(`<p>Assassination attempt vs. ${targetName} <b>succeeded</b>!</p>`)
+            results.push(`<ul><li>The target must make a <i>death</i> saving throw or die.</li>`)
+            results.push(`<ul><li>However, if the original d20 attack roll was a natural 19 or 20, then no saving throw is allowed.</li></ul>`)
+            let backstabMult = ``
+            if (assassinLevel >= 9) {
+                backstabMult = `<b>×4</b>`
+            } else if (assassinLevel >= 5) {
+                backstabMult = `<b>×3</b>`
+            } else {
+                backstabMult = `<b>×2</b>`
             }
+            results.push(`<li>If the target makes its <i>death</i> save, it still takes <b>backstab</b> damage. For a level ${assassinLevel} assassin, the backstab multipler is ${backstabMult}.</li>`)
+            results.push(`<li>Other damage modifiers (strength, sorcery, etc.) are added after the dice are totaled.</li></ul>`)
+            results.push(`<div class='save-button' style='padding-top: 5px' data-save='death'></div>`)
+        } else {
+            return `<p>Assassination attempt vs. ${targetName} failed...</p>`
         }
-        // Log the parsed item data
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item mod data:", itemData) }
-        return itemData
+        assassinationHtml = results.join("")
+        return assassinationHtml
+    }
+
+    // Build the chat message for turning undead
+    _resolveTurnUndead(rollTotal, rollData) {
+        /*
+        Turning Undead
+        ==============
+        Cross-reference the cleric (or sub-class) TA and die roll against the Turn Undead table to determine possible 
+        results, and output those to the chat.
+        We can just use the actor's TA and dynamically calculate the results row from the Turn Undead table, since the 
+        minimum value for success is always a target number of 10, affecting undead at Type [TA - 1].
+
+        Logic:
+        - If TA is 1, it is possible to completely fail.
+        - If TA is 2 or higher, we have the chance for an automatic turn of undead.
+        - As long as we have some kind of success, we always roll 2d6 for the number of undead affected (except if 
+        TA >= 7, see below).
+        - If TA >= 2, then it is possible that some undead will be turned automatically without even requiring a roll.
+        - If TA >= 4, it is possible that lower-Type undead may be Destroyed.
+        - If TA >= 7, it is possible that some lower-Type undead may be Utterly Destroyed. All this does is change the 
+        number affected from 2d6 to 1d6+6, thus increasing the average roll.
+
+        Example: a cleric with TA of 5 can turn undead up to Type 3 automatically, turn undead of 
+        type 4 with a target number of 10, type 5 with a target number of 7, type 6 with a target 
+        number of 4, and finally type 7 with a target number of 1.
+        Knowing that all TA numbers calculate the same way, we know that:
+        - A target number of 10 will turn undead of Type [cleric TA - 1].
+        - A target number of 7 will turn undead of Type [cleric TA].
+        - A TN of 4 affects undead of Type [cleric TA + 1].
+        - And a TN of 1 affects undead of Type [cleric TA + 2].
+        And with all of this information, we can also calculate the Types of undead that may be 
+        Turned automatically (undead Type == [cleric TA] - 2), or Destroyed (undead Type == 
+        [cleric TA] - 4), or Ultimately Destroyed (undead Type == [cleric TA] - 7).
+        */
+        let turnUndeadHtml = ''
+        let orLess = ''
+        let results = []
+        let rollAffected = '2d6'
+
+        // Was this a complete fail?
+        if (rollData.ta <= 1 && rollTotal > 10) {
+            return '<p>No undead were turned...</p>';
+        }
+
+        // From here on it's all some level of success
+        if (rollTotal <= 1) {
+            if ((rollData.ta+2) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${rollData.ta+2} ${orLess}are <b>turned</b>.</li>`)
+        } else if (rollTotal <= 4) {
+            if ((rollData.ta+1) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${rollData.ta+1} ${orLess}are <b>turned</b>.</li>`)
+        } else if (rollTotal <= 7) {
+            if ((rollData.ta) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${rollData.ta} ${orLess}are <b>turned</b>.</li>`)
+        } else if (rollTotal <= 10) {
+            if ((rollData.ta-1) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${rollData.ta-1} ${orLess}are <b>turned</b>.</li>`)
+        } else {
+            // Even a roll of 11 or 12 is still successful against weaker undead
+            if ((rollData.ta-2) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${rollData.ta-2} ${orLess}are <b>turned</b>.</li>`)
+        }
+        // Reset orLess
+        orLess = ''
+        // At TA 4+, the cleric can actually destroy undead
+        if (rollData.ta >= 4) {
+            if ((rollData.ta-4) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${rollData.ta-4} ${orLess}are <b>destroyed</b>.</li>`)
+        }
+            // At TA 7+, the cleric is so powerful that his number affected is greatly improved
+            if (rollData.ta >= 7) {
+            rollAffected = '1d6+6'
+        }
+
+        // Now we can setup our description output from the results
+        turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
+        for (let i = results.length-1; i >=0; i--) {
+            turnUndeadHtml += results[i]
+        }
+        turnUndeadHtml += `</ul>`
+
+        if (CONFIG.HYP3E.debugMessages) { console.log("Turn Undead: ", turnUndeadHtml) }
+        return turnUndeadHtml;
     }
 
     /**
@@ -2348,33 +2339,6 @@ export class Hyp3eActor extends Actor {
         let output = ""
         output = table[val]
         return output
-    }
-
-    isAttributeLow(attr) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Checking ${attr} attribute for ${this.system.details.class}...`) }
-        // const attrReqs = this.classData[this.system.details.class]?.attrReqs
-        const attrReqs = Hyp3eCharacter.classData[this.system.details.class]?.attrReqs || CONFIG.HYP3E.customClassData[this.system.details.class];
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Attribute requirements: `, attrReqs) }
-        if (attrReqs[attr]) {
-            if (this.system.attributes[attr].value < attrReqs[attr]) {
-                return true
-            }    
-        }
-        return false
-    }
-
-    /**
-     * Handle adding and removing a bonus spell
-     * @param {String} spellLvl The bonus spell level to be updated
-     * @param {Bool} val The true or false value to be assigned
-     */
-    async updateBonusSpell(spellLvl, val) {
-        const attr = spellLvl.substring(0,3) // Get the attribute name (int or wis)
-        const spellLevel = spellLvl.substring(3).toLowerCase() // Get the spell level (Lvl1, Lvl2, etc.)
-        const key = `system.attributes.${attr}.bonusSpells.${spellLevel}`;
-        await this.update({ [key]: val });
-        // this.render(true)
-        if (CONFIG.HYP3E.debugMessages) { console.log("updateBonusSpell update:", key, val) }
     }
 
 }

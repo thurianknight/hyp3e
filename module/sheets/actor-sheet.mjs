@@ -107,47 +107,46 @@ export class Hyp3eActorSheet extends ActorSheet {
      * @return {undefined}
      */
     _prepareCharacterData(context) {
-
         // Handle attribute scores
         for (let [k, v] of Object.entries(context.system.attributes)) {
             v.label = game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[k]) ?? k;
-            // if (CONFIG.HYP3E.debugMessages) { console.log("Attributes:", k, v, v.label) }
+            const actorData = context.system
             // Have we selected a class yet?
             if (context.system.details.class) {
                 // Flag attributes that are too low for the character class
                 switch (k) {
                     case "str":
-                        if (this.actor.isAttributeLow(k)) {
+                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
                             // ui.notifications.warn(`ST is too low for ${context.system.details.class}!`)
                             context.warnStr = true
                         }
                         break
                     case "dex":
-                        if (this.actor.isAttributeLow(k)) {
+                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
                             // ui.notifications.warn(`DX is too low for ${context.system.details.class}!`)
                             context.warnDex = true
                         }
                         break
                     case "con":
-                        if (this.actor.isAttributeLow(k)) {
+                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
                             // ui.notifications.warn(`CN is too low for ${context.system.details.class}!`)
                             context.warnCon = true
                         }
                         break
                     case "int":
-                        if (this.actor.isAttributeLow(k)) {
+                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
                             // ui.notifications.warn(`IN is too low for ${context.system.details.class}!`)
                             context.warnInt = true
                         }
                         break
                     case "wis":
-                        if (this.actor.isAttributeLow(k)) {
+                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
                             // ui.notifications.warn(`WS is too low for ${context.system.details.class}!`)
                             context.warnWis = true
                         }
                         break
                     case "cha":
-                        if (this.actor.isAttributeLow(k)) {
+                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
                             // ui.notifications.warn(`CH is too low for ${context.system.details.class}!`)
                             context.warnCha = true
                         }
@@ -167,31 +166,21 @@ export class Hyp3eActorSheet extends ActorSheet {
         for (let [k, v] of Object.entries(context.system.movement)) {
             if (k == "tempMvMod") continue;
             v.label = game.i18n.localize(CONFIG.HYP3E.movement[k]) ?? k;
-            // if (CONFIG.HYP3E.debugMessages) { console.log("Movement Types:", k, v, v.label) }
         }
 
         // Handle money types
         for (let [k, v] of Object.entries(context.system.money)) {
             v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
-            // if (CONFIG.HYP3E.debugMessages) { console.log("Money Types:", k, v, v.label) }
         }
 
-        // The following are global system settings
+        // Global system settings
         context.enableAttrChecks = CONFIG.HYP3E.enableAttrChecks
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Enable attribute checks:", context.enableAttrChecks) }
-
         context.characterClasses = CONFIG.HYP3E.characterClasses
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet class list:", context.characterClasses) }
-
         context.races = CONFIG.HYP3E.races
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet races list:", context.races) }
-
         context.languages = CONFIG.HYP3E.languages
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet languages:", context.languages) }
 
         // System-defined roll modes
         context.rollModes = CONFIG.Dice.rollModes
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Dice-roll modes:", context.rollModes) }
 
         // We can set these two constants even if they aren't used (when encumbrance is disabled)
         const encumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "encumbered")

@@ -3656,6 +3656,17 @@ export class Hyp3eCharacter {
         return output
     }
 
+    static isAttributeLow(actorData, attr) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Checking ${attr} attribute for ${actorData.details.class}...`) }
+        const attrReqs = this.classData[actorData.details.class]?.attrReqs || CONFIG.HYP3E.customClassData[actorData.details.class];
+        if (attrReqs[attr]) {
+            if (actorData.attributes[attr].value < attrReqs[attr]) {
+                return true
+            }    
+        }
+        return false
+    }
+
     /**
      * Quickly create a character actor from a basic dataset.
      * @param {Object} dataset - The dataset from the actor.
