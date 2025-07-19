@@ -1051,7 +1051,7 @@ export class Hyp3eActor extends Actor {
         }
     }
 
-    /** ITEM ROLL SUB-FUNCTIONS -------------------------*/
+    /** ITEM, ATTACK & SPELL ROLL SUB-FUNCTIONS ---------*/
 
     /**
      * Execute a check roll directly from the actor sheet
@@ -1366,7 +1366,7 @@ export class Hyp3eActor extends Actor {
         return atkRoll;
     }
 
-    /** ITEM & ATTACK ROLL HELPERS ----------------------*/
+    /** ITEM, ATTACK & SPELL ROLL HELPERS ---------------*/
 
     /**
      * Validate item state before performing an action.
@@ -1730,47 +1730,6 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Processes dialog results, like consuming ammunition.
-     * @param {object} rollResponse - The data returned from the dialog.
-     * @param {Item|null} item - The item being used.
-     * @param {object|null} itemData - The system data for the item.
-     * @returns {Promise<{ammoMods: object, ammoUpdated: boolean}>} Object containing ammo modifiers and whether ammo was updated.
-     */
-    async _consumeAmmoOrItem(rollResponse, item, itemData) {
-        let ammoMods = {};
-        let ammoUpdated = false;
-
-        // Decrement ammunition if selected
-        if (item?.type === "weapon" && rollResponse.ammunition) {
-            const ammo = this.items.get(rollResponse.ammunition);
-            if (ammo && ammo.system.quantity?.value > 0) {
-                ammoMods = this._parseItemMod(ammo.name); // Assuming this helper exists
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeAmmoOrItem: Using ammo: ${ammo.name}`, ammo.system); }
-                try {
-                    await this.updateEmbeddedDocuments("Item", [
-                        { _id: ammo.id, "system.quantity.value": ammo.system.quantity.value - 1 },
-                    ]);
-                    ammoUpdated = true;
-                } catch (err) {
-                    console.error(`rollAttackOrSpell/_consumeAmmoOrItem: Failed to update ammo quantity for ${ammo.name}:`, err);
-                }
-            } else if (rollResponse.ammunition && CONFIG.HYP3E.debugMessages) {
-                console.warn(`rollAttackOrSpell/_consumeAmmoOrItem: Selected ammo ${rollResponse.ammunition} not found or has 0 quantity.`);
-            }
-        } else if (item?.type === "weapon" && item.system.isConsumable) {
-            // If the weapon itself is consumable (like a grenade), decrement its qty
-            try {
-                await this.updateEmbeddedDocuments("Item", [
-                    { _id: item.id, "system.quantity.value": item.system.quantity.value - 1 },
-                ]);
-            } catch (err) {
-                console.error(`rollAttackOrSpell/_consumeAmmoOrItem: Failed to update quantity for ${item.name}:`, err);
-            }
-        }
-        return { ammoMods, ammoUpdated };
-    }
-
-    /**
      * Gets the attack modifier based on the selected range band.
      * @param {string} rangeSelection - 'short', 'medium', or 'long'.
      * @returns {number} The modifier for the range.
@@ -1781,22 +1740,6 @@ export class Hyp3eActor extends Actor {
             case "medium": return -2;
             case "long": return -5;
             default: return 0; // Default if no range or invalid selection
-        }
-    }
-
-    /**
-     * Consumes a spell slot if the spell is memorized.
-     * @param {Item} spellItem - The spell item being cast.
-     */
-    async _consumeSpellSlot(spellItem) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeSpellSlot: Consuming memorized spell: ${spellItem.name}`); }
-        try {
-            await this.updateEmbeddedDocuments("Item", [
-                { _id: spellItem.id, "system.quantity.value": spellItem.system.quantity.value - 1 },
-            ]);
-            // Optionally refresh sheet: this.sheet.render(false);
-        } catch (err) {
-            console.error(`rollAttackOrSpell/_consumeSpellSlot: Failed to update spell quantity for ${spellItem.name}:`, err);
         }
     }
 
@@ -2111,6 +2054,65 @@ export class Hyp3eActor extends Actor {
     /** END Helper Functions for item/attack rolls ------*/
 
 
+    /** ITEM USAGE AND CONSUMPTION ----------------------*/
+
+    /**
+     * Processes dialog results, like consuming ammunition.
+     * @param {object} rollResponse - The data returned from the dialog.
+     * @param {Item|null} item - The item being used.
+     * @param {object|null} itemData - The system data for the item.
+     * @returns {Promise<{ammoMods: object, ammoUpdated: boolean}>} Object containing ammo modifiers and whether ammo was updated.
+     */
+    async _consumeAmmoOrItem(rollResponse, item, itemData) {
+        let ammoMods = {};
+        let ammoUpdated = false;
+
+        // Decrement ammunition if selected
+        if (item?.type === "weapon" && rollResponse.ammunition) {
+            const ammo = this.items.get(rollResponse.ammunition);
+            if (ammo && ammo.system.quantity?.value > 0) {
+                ammoMods = this._parseItemMod(ammo.name); // Assuming this helper exists
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeAmmoOrItem: Using ammo: ${ammo.name}`, ammo.system); }
+                try {
+                    await this.updateEmbeddedDocuments("Item", [
+                        { _id: ammo.id, "system.quantity.value": ammo.system.quantity.value - 1 },
+                    ]);
+                    ammoUpdated = true;
+                } catch (err) {
+                    console.error(`rollAttackOrSpell/_consumeAmmoOrItem: Failed to update ammo quantity for ${ammo.name}:`, err);
+                }
+            } else if (rollResponse.ammunition && CONFIG.HYP3E.debugMessages) {
+                console.warn(`rollAttackOrSpell/_consumeAmmoOrItem: Selected ammo ${rollResponse.ammunition} not found or has 0 quantity.`);
+            }
+        } else if (item?.type === "weapon" && item.system.isConsumable) {
+            // If the weapon itself is consumable (like a grenade), decrement its qty
+            try {
+                await this.updateEmbeddedDocuments("Item", [
+                    { _id: item.id, "system.quantity.value": item.system.quantity.value - 1 },
+                ]);
+            } catch (err) {
+                console.error(`rollAttackOrSpell/_consumeAmmoOrItem: Failed to update quantity for ${item.name}:`, err);
+            }
+        }
+        return { ammoMods, ammoUpdated };
+    }
+
+    /**
+     * Consumes a spell slot if the spell is memorized.
+     * @param {Item} spellItem - The spell item being cast.
+     */
+    async _consumeSpellSlot(spellItem) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeSpellSlot: Consuming memorized spell: ${spellItem.name}`); }
+        try {
+            await this.updateEmbeddedDocuments("Item", [
+                { _id: spellItem.id, "system.quantity.value": spellItem.system.quantity.value - 1 },
+            ]);
+            // Optionally refresh sheet: this.sheet.render(false);
+        } catch (err) {
+            console.error(`rollAttackOrSpell/_consumeSpellSlot: Failed to update spell quantity for ${spellItem.name}:`, err);
+        }
+    }
+
     async useItemSpell(item, spellUuid) {
         // Ensure item has spellcasting data
         const spellcasting = item.system?.spellcasting;
@@ -2157,6 +2159,8 @@ export class Hyp3eActor extends Actor {
             item.update({ "system.spellcasting.charges.value": spellcasting.charges.value - spellCharges });
         }
     }
+
+    /** SPECIALIZED SKILL/TASK RESOLUTION ---------------*/
 
     // Build the chat message for assassination
     _resolveAssassination(target, rollTotal, rollData) {
@@ -2299,6 +2303,8 @@ export class Hyp3eActor extends Actor {
         if (CONFIG.HYP3E.debugMessages) { console.log("Turn Undead: ", turnUndeadHtml) }
         return turnUndeadHtml;
     }
+
+    /** LOOKUP TABLES AND FUNCTIONS ---------------------*/
 
     /**
      * Reaction lookup table
