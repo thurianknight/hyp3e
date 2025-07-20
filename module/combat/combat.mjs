@@ -66,25 +66,26 @@ export class HYP3ECombat extends Combat {
     }
 
     async _onEndTurn(combatant, context) {
-        // Log the context object
-        // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Context: ", context) }
         await super._onEndTurn(combatant, context);
-
-        // Log the combatant
-        // if (CONFIG.HYP3E.debugMessages) { console.log("End-Turn Combatant: ", combatant) }
+        // Log the context & combatant objects
+        if (CONFIG.HYP3E.debugMessages) { 
+            console.log("End-Turn Context: ", context)
+            console.log("End-Turn Combatant: ", combatant)
+        }
 
         if (foundry.utils.isNewerVersion(game.version, "13")) {
             // Clear the movement history to prevent any movement restrictions on its next turn
             combatant.clearMovementHistory();
         }
 
-        // Cycle through active effects and update combatant status
+        // Cycle through temporary effects and items, update combatant status
         const actor = combatant.actor;
         if (actor) {
             await combatant.actor.processTemporaryEffects();
+            await combatant.actor.processTemporaryItems();
             await combatant.updateStatus();
         } else {
-            console.warn("_onEndTurn: Combatant has no actor, cannot process temporary effects!");
+            console.warn(`_onEndTurn: Combatant has no actor, cannot process temporary effects!`);
         }
     }
 

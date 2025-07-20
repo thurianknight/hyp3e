@@ -516,8 +516,8 @@ export class Hyp3eActor extends Actor {
             await this.applyHealthChange(totalDamage, false);
 
             // Post all the damage messages together
-            const chatContent = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
-            sendSimpleChat(this, "", chatContent)
+            const persistentDamageMsg = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
+            sendSimpleChat(this, "", persistentDamageMsg)
         }
 
         // Update all expired effects
@@ -529,6 +529,10 @@ export class Hyp3eActor extends Actor {
                 "duration.startTurn": null
             }));
             await this.updateEmbeddedDocuments("ActiveEffect", updates);
+            // Post all the expiration together
+            const effectNames = expiredEffectUpdates.map(effect => effect.name)
+            const expiredEffectsMsg = `Active effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
+            sendSimpleChat(this, "", expiredEffectsMsg)
         }
 
         if (CONFIG.HYP3E.debugMessages) {
@@ -576,6 +580,78 @@ export class Hyp3eActor extends Actor {
         }
         // Return any excess that could not be removed from the effect
         return excess;
+    }
+
+    /**
+     * Create a temporary item owned by the actor, using the provided dataset (NOT USED YET)
+     * @param {*} dataset 
+     */
+    async createTempItem(dataset) {
+        // const name = dataset.name
+        // const type = dataset.type
+        // const system = { ...dataset.system }
+
+        // Prepare the item object
+        const itemData = {
+            name: dataset.name,
+            type: dataset.type,
+            system: { ...dataset.system }
+        };
+        console.log(`createTempItem: Creating ${itemData.name} with data:`, itemData)
+        // Finally, create the item!
+        return await Item.create(itemData, {parent: this});
+    }
+
+    /**
+     * Process temporary items on the actor, deleting any that are expired.
+     */
+    async processTemporaryItems() {
+        // Filter items with numeric duration > 0
+        const tempItems = this.items.filter(item => {
+            const dur = item.system?.duration;
+            return typeof dur === "number" && dur > 0 && item.type != "spell";
+        });
+
+        // Log items to decrement duration
+        const namesToReduce = tempItems.map(item => item.name);
+        if (namesToReduce.length > 0) console.log(`processTemporaryItems: Decrementing duration for ${namesToReduce.join(", ")}...`)
+
+        // Decrement duration on temporary items
+        const updates = [];
+        for (const item of tempItems) {
+            const dur = item.system?.duration;
+            // Duration must be a positive number
+            if (typeof dur === "number" && dur > 0) {
+                updates.push({
+                    _id: item.id,
+                    "system.duration": dur - 1
+                });
+            }
+        }
+        if (updates.length > 0) {
+            await this.updateEmbeddedDocuments("Item", updates);
+        }
+
+        // Filter items with numeric duration <= 0
+        const expiredItems = this.items.filter(item => {
+            const dur = item.system?.duration;
+            return typeof dur === "number" && dur <= 0 && item.type != "spell";
+        });
+
+        if (expiredItems.length == 0) return;
+
+        // Log items to delete
+        const namesToDelete = expiredItems.map(item => item.name);
+        if (namesToDelete.length > 0) {
+            console.log(`processTemporaryItems: Deleting ${namesToDelete.join(", ")}...`)
+            // Post all the item expiration messages together
+            const chatContent = `Conjured item has expired...<ul><li>${namesToDelete.join("</li><li>")}</li></ul>`;
+            sendSimpleChat(this, "", chatContent)
+        }
+
+        // Delete all expired items
+        const idsToDelete = expiredItems.map(item => item.id);
+        await this.deleteEmbeddedDocuments("Item", idsToDelete);
     }
 
     /** DAMAGE/HEALING APPLICATION ----------------------*/

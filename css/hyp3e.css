@@ -940,8 +940,17 @@ textarea {
   padding: 0 10px;
   margin-right: 10px;
 }
+.hyp3e .bg-attributes {
+  input {
+    text-align: center;
+    min-width: 25px;
+    max-width: 35px;
+    margin-right: 10px;
+  }
+}
+
 .hyp3e .item-description {
-  padding: 0 10px;
+    padding: 0 10px;
   .editor {
     height: 80%;
   }

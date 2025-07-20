@@ -141,23 +141,28 @@
             <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
             {{/if}}
         {{/if}}
-        <div class="flexrow flexshrink flex-group-left item-attributes">
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.carried'}}</label>
           <input name="system.equipped" type="checkbox" {{checked system.equipped}}>
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.carried'}}</div>
         </div>
-        <div class="flexrow flexshrink flex-group-left item-attributes">
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.consumable'}}</label>
           <input name="system.isConsumable" type="checkbox" {{checked system.isConsumable}}>
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isConsumable'}}</div>
         </div>
-        <div class="flexrow flexshrink flex-group-left item-attributes">
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.ammunition'}}</label>
           <input name="system.isAmmunition" type="checkbox" {{checked system.isAmmunition}}>
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isAmmunition'}}</div>
         </div>
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.duration'}}</label>
+          <input type="text" name="system.duration" value="{{system.duration}}" data-dtype="Number">
+          <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.duration'}}</div>
+        </div>
         {{#if isGM}}
-        <div class="flexrow flexshrink flex-group-left item-attributes">
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.hasSpells'}}</label>
           <input name="system.spellcasting.hasSpells" type="checkbox" {{checked system.spellcasting.hasSpells}}>
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.hasSpells'}}</div>
@@ -169,7 +174,7 @@
         <label class="resource-label">{{localize 'HYP3E.dataLabel.containerId'}}</label>
         <input type="text" name="system.containerId" value="{{system.containerId}}"/>
         {{/unless}}
-        <div class="flexrow flexshrink flex-group-left item-attributes">
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.container'}}</label>
           <input id="system.isContainer" name="system.isContainer" type="checkbox" {{checked system.isContainer}}>
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isContainer'}}</div>

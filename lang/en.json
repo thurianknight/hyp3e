@@ -323,6 +323,7 @@
             "grenade": "Grenade-like item",
             "areaEffect": "Area effect attack",
             "container": "Container",
+            "duration": "Duration",
             "hasSpells": "Has Spells",
             "cost": "Cost",
             "value": "GP Value",
@@ -341,6 +342,7 @@
                 "isConsumable": "The Consumable tag gives this item the increment/decrement buttons.",
                 "isAmmunition": "The Ammunition tag causes this item to display on the Combat tab.",
                 "isContainer": "The Container tag allows this item to contain other non-container items.",
+                "duration": "Duration in rounds (numbers only) for a conjured or ephemeral item. Leave blank if permanent.",
                 "hasSpells": "The Has Spells tag allows this item to have one or more spells as usable powers."
             }
         },
