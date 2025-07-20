@@ -130,6 +130,7 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
+     * @override
      * Set token defaults when actor is created
      */
     async _preCreate(data, options, user) {
@@ -148,6 +149,7 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
+     * @override
      * Override getRollData() that's supplied to rolls.
      */
     getRollData() {
@@ -159,6 +161,51 @@ export class Hyp3eActor extends Actor {
         // this._getNpcRollData(data);  // POSSIBLE FUTURE USE
         if (CONFIG.HYP3E.debugMessages) { console.log(`getRollData: Actor ${this.name}`, data) }
         return data;
+    }
+
+    /**
+     * @override
+     * Overrides the core system applyActiveEffects method on the actor.
+     * Capture change values that include roll formulas or data paths, and resolve them
+     * to a final number that can be applied to the actor.
+     */
+    async applyActiveEffects() {
+        this.updateItemEffectChanges()
+        const overrides = {};
+        this.statuses.clear();
+
+        // Organize non-disabled effects by their application priority
+        const changes = [];
+        for ( const effect of this.allApplicableEffects() ) {
+            if ( effect.disabled || !effect.active ) continue;
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: ${effect.name}:`, effect) }
+            changes.push(...effect.changes.map(change => {
+                const c = foundry.utils.deepClone(change);
+                c.effect = effect;
+                c.priority = c.priority ?? (c.mode * 10);
+                if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: ${effect.name} ${change.key}:`, change) }
+                return c;
+            }));
+            for ( const statusId of effect.statuses ) this.statuses.add(statusId);
+        }
+        changes.sort((a, b) => a.priority - b.priority);
+        if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: Prioritized changes to ${this.name}:`, changes) }
+
+        // Apply all changes
+        for ( const change of changes ) {
+            if ( !change.key ) continue;
+            // Here is where we resolve roll formulas and data paths to a number, if needed
+            // if (isNaN(change.value)) {
+            //     change.value = await parseAndResolveChangeValue(change.value, this)
+            // }
+            // Now we can apply the resolved change
+            const changes = change.effect.apply(this, change);
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: Updated changes object:`, changes) }
+            Object.assign(overrides, changes);
+        }
+
+        // Expand the set of final overrides
+        this.overrides = foundry.utils.expandObject(overrides);
     }
 
     /** ACTOR DATA HELPERS ------------------------------*/
@@ -229,51 +276,6 @@ export class Hyp3eActor extends Actor {
                 hint: game.i18n.localize(value.hint)
             };
         }
-    }
-
-    /**
-     * @override
-     * Overrides the core system applyActiveEffects method on the actor.
-     * Capture change values that include roll formulas or data paths, and resolve them
-     * to a final number that can be applied to the actor.
-     */
-    async applyActiveEffects() {
-        this.updateItemEffectChanges()
-        const overrides = {};
-        this.statuses.clear();
-
-        // Organize non-disabled effects by their application priority
-        const changes = [];
-        for ( const effect of this.allApplicableEffects() ) {
-            if ( effect.disabled || !effect.active ) continue;
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: ${effect.name}:`, effect) }
-            changes.push(...effect.changes.map(change => {
-                const c = foundry.utils.deepClone(change);
-                c.effect = effect;
-                c.priority = c.priority ?? (c.mode * 10);
-                if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: ${effect.name} ${change.key}:`, change) }
-                return c;
-            }));
-            for ( const statusId of effect.statuses ) this.statuses.add(statusId);
-        }
-        changes.sort((a, b) => a.priority - b.priority);
-        if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: Prioritized changes to ${this.name}:`, changes) }
-
-        // Apply all changes
-        for ( const change of changes ) {
-            if ( !change.key ) continue;
-            // Here is where we resolve roll formulas and data paths to a number, if needed
-            // if (isNaN(change.value)) {
-            //     change.value = await parseAndResolveChangeValue(change.value, this)
-            // }
-            // Now we can apply the resolved change
-            const changes = change.effect.apply(this, change);
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: Updated changes object:`, changes) }
-            Object.assign(overrides, changes);
-        }
-
-        // Expand the set of final overrides
-        this.overrides = foundry.utils.expandObject(overrides);
     }
 
     /**
@@ -472,7 +474,8 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Process temporary effects on the actor, including persistent damage. Disable any expired effects.
+     * Process temporary effects on the actor, including persistent damage.
+     *  Disable any expired effects.
      */
     async processTemporaryEffects() {
         let totalDamage = 0;
@@ -575,11 +578,12 @@ export class Hyp3eActor extends Actor {
         return excess;
     }
 
+    /** DAMAGE/HEALING APPLICATION ----------------------*/
+
     /**
-     * Apply a health change (damage or healing) to the actor, optionally considering Damage Reduction (DR).
+     * Apply a hit point change (damage or healing) to the actor, optionally considering Damage Reduction (DR).
      * Handles HP clamping, DR application, and prevents updates if no actual change occurs.
-     *
-     * @param {number} amount - The amount of health change. Positive values represent damage, negative values represent healing.
+     * @param {number} amount - The amount of HP change. Positive values represent damage, negative values represent healing.
      * @param {boolean} [applyDr=true] - If true (default), apply the actor's Damage Reduction (system.ac.dr) against positive (damage) amounts.
      * @returns {Promise<void|Error>} Returns nothing on success or early exit, or the Error object if the actor update fails.
      */
@@ -634,7 +638,7 @@ export class Hyp3eActor extends Actor {
                 if (damageAfterDr === 0 && amount > 0) { // Check amount > 0 to ensure it was actual damage initially
                     if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: DR absorbed all damage for ${actorName}.`); }
                     // Optionally, trigger chat message or automation for "damage absorbed"
-                    // e.g., ChatMessage.create({content: `${this.name}'s armor absorbs the blow!`});
+                    // ChatMessage.create({content: `${this.name}'s armor absorbs the blow!`});
                     return; // Exit as no health change will occur
                 }
                 netChange = damageAfterDr; // Update netChange to the post-DR damage amount
@@ -749,9 +753,11 @@ export class Hyp3eActor extends Actor {
             }
 
             // Trigger the item roll
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Macro actor: `, this) }
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Macro item: `, item) }
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling macro for ${item.type} ${item.name}:`, item) }
+            if (CONFIG.HYP3E.debugMessages) { 
+                console.log(`Macro actor: `, this)
+                console.log(`Macro item: `, item)
+                console.log(`Rolling macro for ${item.type} ${item.name}:`, item) 
+            }
 
             // Create dataset object and start populating it
             let dataset = {}
@@ -922,7 +928,7 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Execute a hit-die roll directly from the npc-actor sheet
+     * Initialize an NPC's hit points by executing a hit-die roll from the npc-actor sheet
      * @param {*} dataset 
      */
     async rollHD() {
@@ -943,16 +949,16 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Execute a hit-point increase (hit die + CN roll) directly from the character-actor sheet
+     * Heal a PC by rolling its hit die + CN mod (NOT CURRENTLY USED)
      * @param {*} dataset 
      */
     async rollHP() {
         if (this.type !== 'character') return;
         if (!this.system.hd){
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: No HD value to roll!") }
+            if (CONFIG.HYP3E.debugMessages) { console.error("rollHP: No HD value to roll!") }
             return;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHP: Rolling HD ${this.system.hd} + ${this.system.attributes.con.hpMod}...`) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHP: Rolling hit points ${this.system.hd} + ${this.system.attributes.con.hpMod}...`) }
         const roll = new Roll(`${this.system.hd} + ${this.system.attributes.con.hpMod}`);
         await roll.roll();
         if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll result: ", roll) }
@@ -971,7 +977,7 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Execute an item check or attack roll
+     * Begin processing an item check or attack roll
      * @param {*} dataset 
      */
     async rollItem(dataset) {
@@ -1292,7 +1298,7 @@ export class Hyp3eActor extends Actor {
         if (dataset.isItemSpell) {
             actorData.ca = dataset.itemCa
         }
-        // Handle Spell Slot Consumption (if applicable)
+        // Handle spell slot consumption if applicable
         if (!dataset.isItemSpell && item?.type === "spell" && itemData?.quantity?.value > 0) {
             await this._consumeSpellSlot(item);
         }
@@ -1301,12 +1307,11 @@ export class Hyp3eActor extends Actor {
             item._displayItemInChat(actorData);
             return null;
         }
-
-        // Process Dialog Response (Ammo, Mods)
+        // Use ammo or consumable item, and return ammo atk/dmg mods if applicable
         const { ammoMods, ammoUpdated } = await this._consumeAmmoOrItem(rollResponse, item, itemData);
         if (ammoUpdated) {
             // If ammo was used, refresh the actor sheet or relevant UI if needed
-            // this.sheet.render(false); // Example
+            // this.sheet.render(false);
         }
 
         // Update dataset with final situational mods and roll mode from dialog
@@ -2049,7 +2054,7 @@ export class Hyp3eActor extends Actor {
     /** ITEM USAGE AND CONSUMPTION ----------------------*/
 
     /**
-     * Processes dialog results, like consuming ammunition.
+     * Processes dialog results, like consuming ammunition and returning magic ammo modifiers.
      * @param {object} rollResponse - The data returned from the dialog.
      * @param {Item|null} item - The item being used.
      * @param {object|null} itemData - The system data for the item.
@@ -2063,7 +2068,7 @@ export class Hyp3eActor extends Actor {
         if (item?.type === "weapon" && rollResponse.ammunition) {
             const ammo = this.items.get(rollResponse.ammunition);
             if (ammo && ammo.system.quantity?.value > 0) {
-                ammoMods = this._parseItemMod(ammo.name); // Assuming this helper exists
+                ammoMods = this._parseItemMod(ammo.name);
                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeAmmoOrItem: Using ammo: ${ammo.name}`, ammo.system); }
                 try {
                     await this.updateEmbeddedDocuments("Item", [
@@ -2091,20 +2096,25 @@ export class Hyp3eActor extends Actor {
 
     /**
      * Consumes a spell slot if the spell is memorized.
-     * @param {Item} spellItem - The spell item being cast.
+     * @param {Item} spell - The spell being cast.
      */
-    async _consumeSpellSlot(spellItem) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeSpellSlot: Consuming memorized spell: ${spellItem.name}`); }
+    async _consumeSpellSlot(spell) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeSpellSlot: Consuming memorized spell: ${spell.name}`); }
         try {
             await this.updateEmbeddedDocuments("Item", [
-                { _id: spellItem.id, "system.quantity.value": spellItem.system.quantity.value - 1 },
+                { _id: spell.id, "system.quantity.value": spell.system.quantity.value - 1 },
             ]);
-            // Optionally refresh sheet: this.sheet.render(false);
         } catch (err) {
-            console.error(`rollAttackOrSpell/_consumeSpellSlot: Failed to update spell quantity for ${spellItem.name}:`, err);
+            console.error(`rollAttackOrSpell/_consumeSpellSlot: Failed to update spell quantity for ${spell.name}:`, err);
         }
     }
 
+    /**
+     * Triggers the casting of an item-spell, with the item's CA to override the actor's
+     * @param {*} item 
+     * @param {*} spellUuid 
+     * @returns null
+     */
     async useItemSpell(item, spellUuid) {
         // Ensure item has spellcasting data
         const spellcasting = item.system?.spellcasting;
@@ -2119,7 +2129,7 @@ export class Hyp3eActor extends Actor {
             ui.notifications.error(`Failed to load spell: ${spellUuid}`);
             return;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("useItemSpell spell:", spell) };
+        if (CONFIG.HYP3E.debugMessages) { console.log(`useItemSpell: casting spell ${spell.name}:`, spell) };
 
         // Get spell charges to use
         const spellEntry = item.system.spellcasting.spellRefs.find(spell => spell.uuid === spellUuid)
