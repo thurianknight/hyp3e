@@ -1159,15 +1159,17 @@ export class Hyp3eActor extends Actor {
         }
 
         // If the Target has variables like a roll formula, resolve it to a number
-        const targetRoll = new Roll(dataset.rollTarget, rollData)
-        await targetRoll.roll()
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`Check target formula: ${dataset.rollTarget} evaluates to ${targetRoll.formula} = ${targetRoll.total}`)
-            console.log("Target formula eval: ", targetRoll)
+        if (isNaN(dataset.rollTarget)) {
+            const targetRoll = new Roll(dataset.rollTarget, rollData)
+            await targetRoll.roll()
+            if (CONFIG.HYP3E.debugMessages) {
+                console.log(`Check target formula: ${dataset.rollTarget} evaluates to ${targetRoll.formula} = ${targetRoll.total}`)
+                console.log("Target formula eval: ", targetRoll)
+            }
+            // Override rollTarget, even if it has the same value
+            dataset.rollTarget = targetRoll.total
         }
-        // Override rollTarget, even if it has the same value
-        dataset.rollTarget = targetRoll.total
-        checkText += ` (target ${targetRoll.total})... `
+        checkText += ` (target ${dataset.rollTarget})... `
 
         // Log the dataset before the dialog renders
         if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
