@@ -744,15 +744,18 @@ Hooks.on("renderChatMessage", addChatMessageButtons);
  * Capture the token creation event to run some extra processes on it
  */
 Hooks.on("createToken", (token, options, userId) => {
+    // Exit if not a GM
+    if (!game.user.isGM) return;
+
     // Replace the actual name with the alias, if it exists
-    console.log(`Token creation:`, token)
-    console.log(`Tokens on canvas at creation time:`, canvas.tokens)
+    console.log(`createToken: Token creation:`, token)
+    console.log(`createToken: Tokens on canvas at creation time:`, canvas.tokens)
     if (token.actor.system.tokenAlias != "") {
         let tokenAlias = token.actor.system.tokenAlias
         if (token.appendNumber || token.actor.prototypeToken.appendNumber) {
             // Get all existing tokens that match tokenAlias
             const matchingTokens = canvas.tokens.placeables.filter(t => t.name.indexOf(tokenAlias) === 0) ?? null;
-            console.log(`Tokens that match ${tokenAlias}: `, matchingTokens)
+            console.log(`createToken: Tokens that match ${tokenAlias}: `, matchingTokens)
             // Send the list of tokens to this function and get the next available number back
             const i = getAvailableTokenNumber(matchingTokens)
             tokenAlias = `${tokenAlias} (${i})`
@@ -764,12 +767,22 @@ Hooks.on("createToken", (token, options, userId) => {
             const adjective = token.name.split(" ")[0];
             tokenAlias = `${adjective} ${tokenAlias}`
         }
-        console.log(`Updating token name from ${token.name} to ${tokenAlias}...`)
-        token.update({"name": tokenAlias})
+        console.log(`createToken: Updating token name from ${token.name} to ${tokenAlias}...`)
+        try {
+            token.update({"name": tokenAlias})
+        } catch (err) {
+            console.error(`Failed to update token name for ${token.name}:`, err);
+            ui.notifications.error(`Failed to update token name for ${token.name}. Check the console for details.`);
+        }
     }
     // Roll HD for NPCs & monsters
     if (token.actor?.type == "npc" && token.actor.system.rollHD) {
-        token.actor.rollHD()
+        try {
+            token.actor.rollHD()
+        } catch (err) {
+            console.error(`Failed to roll HD for NPC ${token.actor.name}:`, err);
+            ui.notifications.error(`Failed to roll HD for NPC ${token.actor.name}. Check the console for details.`);
+        }
     }
 });
 
