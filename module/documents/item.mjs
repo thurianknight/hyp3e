@@ -37,6 +37,7 @@ export class Hyp3eItem extends Item {
         this.updateSource(updateData);
     }
 
+    /** @override */
     prepareData() {
         // As with the actor class, items are documents that can have their data
         // preparation methods overridden (such as prepareBaseData()).
@@ -69,6 +70,19 @@ export class Hyp3eItem extends Item {
         if (this.type === "weapon" && itemData.type === "missile" && (itemData.usesAmmo === false || typeof itemData.usesAmmo === "undefined")) {
             if (/(bow|sling|gun)/i.test(this.name)) {
                 itemData.usesAmmo = true;
+            }
+        }
+
+        // isLightSource flag
+        if (itemData.isLightSource === undefined) {
+            // Check if the item name matches a light source in the lookup table
+            const lightSourceProps = this._getLightSourceProperties();
+            if (lightSourceProps) {
+                itemData.isLightSource = true;
+                itemData.lightRadius = lightSourceProps.radius;
+                itemData.lightAngle = lightSourceProps.angle;
+            } else {
+                itemData.isLightSource = false;
             }
         }
     }
@@ -420,4 +434,47 @@ export class Hyp3eItem extends Item {
         }
         return "";
     }
+
+    /** LOOKUP TABLES AND FUNCTIONS ---------------------*/
+
+    /**
+     * Light source lookup table
+     */
+    lightSources = {
+        "bonfire": { radius: 60, angle: 360 },
+        "campfire": { radius: 40, angle: 360 },
+        "candle": { radius: 5, angle: 360 },
+        "continuous_light": { radius: 30, angle: 360 },
+        "lantern_bullseye": { radius: 60, angle: 15 },
+        "lantern_hooded": { radius: 30, angle: 360 },
+        "light": { radius: 15, angle: 360 },
+        "produce_flame_spell": { radius: 40, angle: 360 },
+        "torch": { radius: 30, angle: 360 }
+    }
+
+    /**
+     * Check if this item is a light source based on its name. Return properties if found.
+     * @param {*} name - Simple name of the light source, e.g. "Torch", "Lantern, Hooded", etc.
+     * @returns 
+     */
+    _getLightSourceProperties() {
+        // Convert the name to lowercase and replace spaces with underscores
+        let normalized = this.name.toLowerCase().replace(/\s+/g, "_");
+        // Replace hyphens, commas, and apostrophes with null
+        normalized = normalized.replace(/[-,']/g, "");
+        // Check if the normalized name exists in the lightSources table
+        if (this.lightSources[normalized]) {
+            return this.lightSources[normalized];
+        } else {
+            // If not found, return a default value or null
+            console.log(`Light source "${this.name}" not found in lookup table.`);
+            return null;
+        }
+    }
+
+    _stringOrObjectFromTable(table, val) {
+        const output = table[val]
+        return output
+    }
+
 }

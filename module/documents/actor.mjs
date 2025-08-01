@@ -2248,6 +2248,77 @@ export class Hyp3eActor extends Actor {
         }
     }
 
+    async toggleLightSource(itemId) {
+        // Toggle the light source on the actor's token. 
+        //  Light sources are all on or all off, we don't try to track multiple light sources.
+        if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: actor ${this.name}:`, this); }
+        const token = this?.token ?? this?.sheet?.token;
+        if (!token) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: no token found for actor ${this.name}.`); }
+            return;
+        }
+        const item = this.items.get(itemId);
+        if (!item) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: item ${itemId} not found for actor ${this.name}.`); }
+            return;
+        }
+
+        // Check if the token already has a light source
+        const hasLight = token.light?.dim || token.light?.bright;
+        if (hasLight) {
+            // Remove the light source
+            await token.update({
+                "light": null
+            });
+            ui.notifications.info(`Light source removed from ${token.name}.`);
+            if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: Light source removed from token ${token.name}.`); }
+        } else {
+            // Apply a default light source, e.g., 20 feet radius, 60 degrees angle
+            const { radius, angle } = item._getLightSourceProperties();
+            if (CONFIG.HYP3E.debugMessages) { console.log("Light source properties:", radius, angle) }
+            if (radius && angle) {
+                await this.applyLightToSelf(radius, angle);
+            }
+        }
+    }
+
+    /**
+     * Apply a light source to the actor's token.
+     * @param {*} radius - The radius of the dim light effect. Bright light is half the radius.
+     * @param {*} angle - The angle of the light cone, in degrees.
+     * @param {*} lightData - (Optional) Additional light data to apply, such as color or intensity.
+     */
+    async applyLightToSelf(radius, angle, lightData = {}) {
+        const token = this?.token ?? this?.sheet?.token;
+        if (!token) {
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: no token found for actor ${this.name}.`); }
+            return;
+        }
+
+        // Prepare the light data
+        const lightSource = {
+            dim: radius,
+            bright: Math.floor(radius / 2),
+            angle: angle,
+            color: lightData.color || "#ffffff", // Default to white if no color provided
+            alpha: lightData.alpha || 0.5, // Default alpha
+            animation: lightData.animation || { type: "none" } // Default animation
+        };
+        if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: Applying light source to token ${token.name}:`, lightSource); }
+        // Update the token with the light source
+        try {
+            await token.update({
+                "light": lightSource,
+                "vision": true // Ensure the token can see
+            });
+            ui.notifications.info(`Light source applied to ${token.name}.`);
+            if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: Light source applied to token ${token.name}.`); }
+        } catch (err) {
+            console.error(`applyLightToSelf: Failed to apply light source to token ${token.name}:`, err);
+            ui.notifications.error(`Failed to apply light source: ${err.message}`);
+        }
+    }
+
     /** SPECIALIZED SKILL/TASK RESOLUTION ---------------*/
 
     // Build the chat message for assassination

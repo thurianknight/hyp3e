@@ -478,6 +478,22 @@ export class Hyp3eActorSheet extends ActorSheet {
     // Rollable abilities.
     html.find('.rollable').click(this._onRoll.bind(this));
 
+    // Light sources toggle
+    html.find(".item-toggle-light").on("click", async ev => {
+        const itemId = ev.currentTarget.closest(".item")?.dataset?.itemId;
+        const item = this.actor.items.get(itemId);
+        if (CONFIG.HYP3E.debugMessages) { console.log("Toggling light source for item:", item) }
+        // Toggle the light source
+        if (item.system.isLightSource) {
+            // Toggle the light source on/off
+            await this.actor.toggleLightSource(itemId);
+            // Update the UI
+            this.render(true);
+        } else {
+            ui.notifications.warn(`${item.name} is not a valid light source!`);
+        }
+    });
+
     // Items that have their own spells or features to use
     html.find(".item-cast-spell").on("click", async ev => {
         const itemId = ev.currentTarget.closest(".item")?.dataset?.itemId;

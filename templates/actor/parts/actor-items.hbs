@@ -36,11 +36,17 @@
                 <img src="{{container.img}}" title="{{container.name}}" width="24" height="24"/>
                 {{/if}}
               </div>
-              <!-- New cast spell button (only shown if item has spells) -->
-              {{#if item.system.identified}}
-              {{#if item.system.spellcasting.spellRefs.length}}
+              {{#if container.system.identified}}
+              <!-- Cast spell button (only shown if item has spells) -->
+              {{#if container.system.spellcasting.spellRefs.length}}
               <div class="item-prop" style="margin-right: 5px;">
-                <a class="item-cast-spell" data-item-id="{{item.id}}" data-roll-mode="publicroll" title='{{localize "Use Spell"}}'><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+                <a class="item-cast-spell" data-item-id="{{container.id}}" data-roll-mode="publicroll" title='{{localize "Use Spell"}}'><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+              </div>
+              {{/if}}
+              {{!-- Toggle light button (only if item name is in the lightSources table) --}}
+              {{#if container.system.isLightSource}}
+              <div class="item-prop" style="margin-right: 5px;">
+                <a class="item-toggle-light" data-item-id="{{container.id}}" title='{{localize "HYP3E.item.toggleLight"}}'><i class="fa-solid fa-lightbulb"></i></a>
               </div>
               {{/if}}
               {{/if}}
@@ -84,11 +90,17 @@
                   <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                   {{/if}}
                 </div>
-                <!-- New cast spell button (only shown if item has spells) -->
                 {{#if item.system.identified}}
+                <!-- Cast spell button (only shown if item has spells) -->
                 {{#if item.system.spellcasting.spellRefs.length}}
                 <div class="item-prop" style="margin-right: 5px;">
                     <a class="item-cast-spell" data-item-id="{{item.id}}" data-roll-mode="publicroll" title='{{localize "Use Spell"}}'><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+                </div>
+                {{/if}}
+                {{!-- Toggle light button (only if item name is in the lightSources table) --}}
+                {{#if item.system.isLightSource}}
+                <div class="item-prop" style="margin-right: 5px;">
+                    <a class="item-toggle-light" data-item-id="{{item.id}}" title='{{localize "HYP3E.item.toggleLight"}}'><i class="fa-solid fa-lightbulb"></i></a>
                 </div>
                 {{/if}}
                 {{/if}}
@@ -140,11 +152,17 @@
                 <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                 {{/if}}
               </div>
-              <!-- New cast spell button (only shown if item has spells) -->
               {{#if item.system.identified}}
+              <!-- Cast spell button (only shown if item has spells) -->
               {{#if item.system.spellcasting.spellRefs.length}}
               <div class="item-prop" style="margin-right: 5px;">
                 <a class="item-cast-spell" data-item-id="{{item.id}}" data-roll-mode="publicroll" title='{{localize "Use Spell"}}'><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+              </div>
+              {{/if}}
+              {{!-- Toggle light button (only if item name is in the lightSources table) --}}
+              {{#if item.system.isLightSource}}
+              <div class="item-prop" style="margin-right: 5px;">
+                <a class="item-toggle-light" data-item-id="{{item.id}}" title='{{localize "HYP3E.item.toggleLight"}}'><i class="fa-solid fa-lightbulb"></i></a>
               </div>
               {{/if}}
               {{/if}}
