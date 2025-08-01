@@ -137,7 +137,6 @@ export class HYP3ECombatTracker extends CombatTracker {
         // Roll for group that the player's combatant is in
         html.find('.combat-control[data-action="rollGroup"]').click((ev) => {
             const combatant = game.combat.combatants.find(c => c.actor.isOwner);
-            console.log(`_onRender: Rolling initiative for group combatant: `, combatant);
             if (combatant) {
                 game.combat.rollInitiative([combatant.id]);
             }
@@ -186,6 +185,10 @@ export class HYP3ECombatTracker extends CombatTracker {
         if (CONFIG.HYP3E.debugMessages) { console.log(`_onCombatantControl: Action: `, target.dataset.action) }
         // If no combatant, exit
         if ( !combatant ) return;
+        // If user is not the owner, exit
+        if ( !combatant.actor.isOwner ) {
+            return;
+        }
 
         // Handle the combatant control
         switch ( target.dataset.action ) {

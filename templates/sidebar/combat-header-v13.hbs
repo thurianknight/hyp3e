@@ -73,7 +73,7 @@
         {{!-- Player-group initiative control --}}
         {{#if isGroupInitiative}}
         {{#unless user.isGM}}
-            <button type="button" class="inline-control combat-control icon fa-solid fa-users" data-action="rollGroup"
+            <button type="button" class="inline-control combat-control icon fa-solid fa-dice" data-action="rollGroup"
                 {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="{{ localize "HYP3E.rollGroup" }}"
                 aria-label="{{ localize "HYP3E.rollGroup" }}"></button>
         {{/unless}}
