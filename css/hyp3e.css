@@ -1282,7 +1282,7 @@ textarea {
 
   /* Fade in tooltip */
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.5s;
 }
 /* Show the tooltip text when you mouse over the combatant controls */
 .combatant-controls:hover .tooltip-initiative {
