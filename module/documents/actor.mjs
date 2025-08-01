@@ -1334,7 +1334,7 @@ export class Hyp3eActor extends Actor {
         const { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance);
         rangeMessages.forEach(msg => ui.notifications.warn(msg)); // Show range warnings immediately
         if (isOutOfRange && CONFIG.HYP3E.forceRangeLimit) {
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target out of range and forceRangeLimit enabled. Aborting."); }
+            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target out of range, or too close, and forceRangeLimit enabled. Aborting."); }
             return null; // Abort if out of range and setting is enabled
         }
 
@@ -1724,13 +1724,21 @@ export class Hyp3eActor extends Actor {
 
         // Missile Check
         if (itemData.missile && itemData.range) {
+            const meleeRange = this._getMeleeRange(0);
             rangeGroup = "rangeGroup"; // Identifier for the dialog field
             ranges = {
                 short: `Short (${itemData.range.short})`,
                 medium: `Med (${itemData.range.medium})`,
                 long: `Long (${itemData.range.long})`
             };
-            if (gridDistance <= itemData.range.short) {
+            if (gridDistance > 0 && gridDistance <= meleeRange) {
+                // If gridDistance == 0, then we assume no target and allow the attack to go through
+                chosenRange = "short"; // Default to short even if too close
+                const msg = `In melee range! (${gridDistance} ${canvas.scene.grid.units})`;
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
+                rangeMessages.push(msg);
+                isOutOfRange = true;
+            } else if (gridDistance <= itemData.range.short) {
                 chosenRange = "short";
             } else if (gridDistance <= itemData.range.medium) {
                 chosenRange = "medium";
