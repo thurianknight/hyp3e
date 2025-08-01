@@ -1733,8 +1733,8 @@ export class Hyp3eActor extends Actor {
             };
             if (gridDistance > 0 && gridDistance <= meleeRange) {
                 // If gridDistance == 0, then we assume no target and allow the attack to go through
-                chosenRange = "short"; // Default to short even if too close
-                const msg = `In melee range! (${gridDistance} ${canvas.scene.grid.units})`;
+                chosenRange = "short"; // Set to Short even if too close
+                const msg = `Target is in melee range! (${gridDistance} ${canvas.scene.grid.units})`;
                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
                 rangeMessages.push(msg);
                 isOutOfRange = true;
@@ -1745,7 +1745,7 @@ export class Hyp3eActor extends Actor {
             } else if (gridDistance <= itemData.range.long) {
                 chosenRange = "long";
             } else {
-                chosenRange = "long"; // Default to long even if out
+                chosenRange = "long"; // Set to Long even if out of range
                 const msg = `Target is out of missile range! (${gridDistance} ${canvas.scene.grid.units} > ${itemData.range.long} ${canvas.scene.grid.units})`;
                 if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
                 rangeMessages.push(msg);
