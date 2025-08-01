@@ -141,9 +141,9 @@ export async function setupEffectHandlers() {
     });
     Hooks.on("applyActiveEffect", async(actor, change, current, delta, changes) => {
         if (CONFIG.HYP3E.debugMessages) {
-            console.log("applyActiveEffect: Actor receiving effect:", actor);
-            console.log("applyActiveEffect: Change:", change);
-            console.log("applyActiveEffect: Other params:", current, delta, changes);
+            // console.log("applyActiveEffect: Actor receiving effect:", actor);
+            // console.log("applyActiveEffect: Change:", change);
+            // console.log("applyActiveEffect: Other params:", current, delta, changes);
         }
     });
 }

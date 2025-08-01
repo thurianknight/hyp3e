@@ -52,21 +52,31 @@
     {{/if}}
 
     <div class="encounter-controls {{#if hasCombat}}combat{{/if}}">
-
-        {{!-- Bulk Rolls --}}
+        {{!-- GM initiative and group controls --}}
         {{#if user.isGM}}
             {{#if isGroupInitiative}}
             <button type="button" class="inline-control combat-control icon fa-solid fa-dice" data-action="rollAll"
-                {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="COMBAT.RollAll"
+                {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="{{ localize 'COMBAT.RollAll' }}"
                 aria-label="{{ localize 'COMBAT.RollAll' }}"></button>
             <button type="button" class="inline-control combat-control icon fa-solid fa-flag" data-action="set-groups"
-                {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="HYP3E.combat.setCombatantGroups"
+                {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="{{ localize 'HYP3E.combat.setCombatantGroups' }}"
                 aria-label="{{ localize 'HYP3E.combat.setCombatantGroups' }}"></button>
             {{else}}
             <button type="button" class="inline-control combat-control icon fa-solid fa-users" data-action="rollAll"
-                {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="COMBAT.RollAll"
+                {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="{{ localize "COMBAT.RollAll" }}"
                 aria-label="{{ localize "COMBAT.RollAll" }}"></button>
+            <button type="button" class="inline-control combat-control icon fa-solid fa-users" data-action="RollNPC"
+                {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="{{ localize "COMBAT.RollNPC" }}"
+                aria-label="{{ localize "COMBAT.RollNPC" }}"></button>
             {{/if}}
+        {{/if}}
+        {{!-- Player-group initiative control --}}
+        {{#if isGroupInitiative}}
+        {{#unless user.isGM}}
+            <button type="button" class="inline-control combat-control icon fa-solid fa-users" data-action="rollGroup"
+                {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="{{ localize "HYP3E.rollGroup" }}"
+                aria-label="{{ localize "HYP3E.rollGroup" }}"></button>
+        {{/unless}}
         {{/if}}
 
         {{!-- Combat Status --}}

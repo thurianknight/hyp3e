@@ -130,13 +130,14 @@ export class HYP3ECombatTracker extends CombatTracker {
         // super.activateListeners(html);
 
         // Reroll group initiative
-        html.find('.combat-button[data-control="reroll"]').click((ev) => {      
+        html.find('.combat-control[data-action="reroll"]').click((ev) => {      
             game.combat.rollInitiative();
         });
 
         // Roll for group that the player's combatant is in
-        html.find('.combat-button[data-control="rollGroup"]').click((ev) => {
+        html.find('.combat-control[data-action="rollGroup"]').click((ev) => {
             const combatant = game.combat.combatants.find(c => c.actor.isOwner);
+            console.log(`_onRender: Rolling initiative for group combatant: `, combatant);
             if (combatant) {
                 game.combat.rollInitiative([combatant.id]);
             }
