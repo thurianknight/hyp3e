@@ -76,13 +76,16 @@ export class Hyp3eItem extends Item {
             }
         }
 
-        // isLightSource flag (physical items only)
-        if (["armor", "item", "weapon"].includes(this.type)) {
-            if (itemData.isLightSource === undefined) {
-                // Check if the item name matches a light source in the lookup table
+        // isLightSource flag (physical items & spells)
+        if (["armor", "item", "weapon", "spell"].includes(this.type)) {
+            if (itemData.isLightSource === undefined || itemData.isLightSource === null) {
+                // Match item name to a light source in the lookup table
                 const lightSourceProps = this._getLightSourceProperties();
                 if (lightSourceProps) {
                     itemData.isLightSource = true;
+                    itemData.light.dim = lightSourceProps.radius;
+                    itemData.light.bright = Math.floor(lightSourceProps.radius/2);
+                    itemData.light.angle = lightSourceProps.angle;
                 } else {
                     itemData.isLightSource = false;
                 }
@@ -441,43 +444,38 @@ export class Hyp3eItem extends Item {
     /** LOOKUP TABLES AND FUNCTIONS ---------------------*/
 
     /**
-     * Light source lookup table
-     */
-    lightSources = {
-        "bonfire": { radius: 60, angle: 360 },
-        "campfire": { radius: 40, angle: 360 },
-        "candle": { radius: 5, angle: 360 },
-        "continuous_light": { radius: 30, angle: 360 },
-        "lantern": { radius: 30, angle: 360 },
-        "lantern_bullseye": { radius: 60, angle: 15 },
-        "lantern_hooded": { radius: 30, angle: 360 },
-        "light": { radius: 15, angle: 360 },
-        "produce_flame_spell": { radius: 40, angle: 360 },
-        "torch": { radius: 30, angle: 360 }
-    }
-
-    /**
      * Check if this item is a light source based on its name. Return properties if found.
      * @param {*} name - Simple name of the light source, e.g. "Torch", "Lantern, Hooded", etc.
      * @returns 
      */
     _getLightSourceProperties() {
+        // If the item hasn't been initialized yet, return null
+        if (!this.name || !this.system) return null;
+
+        // Light source lookup table
+        const lightSources = {
+            "bonfire": { "radius": 60, "angle": 360 },
+            "campfire": { "radius": 40, "angle": 360 },
+            "candle": { "radius": 5, "angle": 360 },
+            "continuous_light": { "radius": 30, "angle": 360 },
+            "lantern": { "radius": 30, "angle": 360 },
+            "lantern_bullseye": { "radius": 60, "angle": 15 },
+            "lantern_hooded": { "radius": 30, "angle": 360 },
+            "light": { "radius": 15, "angle": 360 },
+            "produce_flame_spell": { "radius": 40, "angle": 360 },
+            "torch": { "radius": 30, "angle": 360 }
+        }
+
         // Convert the name to lowercase and replace spaces with underscores
         let normalized = this.name.toLowerCase().replace(/\s+/g, "_");
         // Replace hyphens, commas, and apostrophes with null
         normalized = normalized.replace(/[-,']/g, "");
         // Check if the normalized name exists in the lightSources table
         let lightSourceProps
-        try {
-            lightSourceProps = this.lightSources[normalized];
-        } catch (error) {
-            console.log(`Error reading lightSources table for "${normalized}":`, error);
-        }
+        lightSourceProps = lightSources[normalized];
         if (lightSourceProps) {
             return lightSourceProps;
         } else {
-            // If not found, return a default value or null
-            console.log(`Light source "${this.name}" not found in lookup table.`);
             return null;
         }
     }

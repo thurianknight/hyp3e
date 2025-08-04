@@ -941,12 +941,31 @@ textarea {
   margin-right: 10px;
 }
 .hyp3e .bg-attributes {
+  margin-bottom: 5px;
   input {
     text-align: center;
     min-width: 25px;
     max-width: 35px;
     margin-right: 10px;
   }
+}
+.hyp3e .bg-attributes-wide {
+  margin-bottom: 5px;
+  input {
+    text-align: center;
+    min-width: 40px;
+    max-width: 75px;
+    margin-right: 10px;
+  }
+}
+.hyp3e .color-preview {
+  display: inline-block;
+  width: 20px;
+  max-width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border: 1px solid #000;
 }
 
 .hyp3e .item-description {

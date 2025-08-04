@@ -2273,22 +2273,24 @@ export class Hyp3eActor extends Actor {
             ui.notifications.info(`Light source removed from ${token.name}.`);
             if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: Light source removed from token ${token.name}.`); }
         } else {
-            // Apply a default light source, e.g., 20 feet radius, 60 degrees angle
-            const { radius, angle } = item._getLightSourceProperties();
-            if (CONFIG.HYP3E.debugMessages) { console.log("Light source properties:", radius, angle) }
-            if (radius && angle) {
-                await this.applyLightToSelf(radius, angle);
+            // Apply light source properties
+            // const { radius, angle, color } = item._getLightSourceProperties();
+            const lightProps = item.system.light;
+            if (CONFIG.HYP3E.debugMessages) { console.log("Light source properties:", lightProps) }
+            if (Object.keys(lightProps).length > 0) {
+                await this.applyLightToSelf(lightProps.dim, lightProps.bright, lightProps.angle, { color: lightProps.color });
             }
         }
     }
 
     /**
      * Apply a light source to the actor's token.
-     * @param {*} radius - The radius of the dim light effect. Bright light is half the radius.
+     * @param {*} dim - The radius of the dim light effect.
+     * @param {*} bright - The radius of the bright light effect.
      * @param {*} angle - The angle of the light cone, in degrees.
      * @param {*} lightData - (Optional) Additional light data to apply, such as color or intensity.
      */
-    async applyLightToSelf(radius, angle, lightData = {}) {
+    async applyLightToSelf(dim, bright, angle, lightData = {}) {
         const token = this?.token ?? this?.sheet?.token;
         if (!token) {
             if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: no token found for actor ${this.name}.`); }
@@ -2297,9 +2299,9 @@ export class Hyp3eActor extends Actor {
 
         // Prepare the light data
         const lightSource = {
-            dim: radius,
-            bright: Math.floor(radius / 2),
-            angle: angle,
+            dim,
+            bright,
+            angle,
             color: lightData.color || "#ffffff", // Default to white if no color provided
             alpha: lightData.alpha || 0.5, // Default alpha
             animation: lightData.animation || { type: "none" } // Default animation

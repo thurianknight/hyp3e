@@ -318,6 +318,14 @@
             "carried": "Carried",
             "consumable": "Consumable",
             "ammunition": "Ammunition",
+            "lightSource": "Light Source",
+            "light": {
+                "lightRadius": "Light Radius",
+                "dim": "Dim",
+                "bright": "Bright",
+                "angle": "Emission Angle",
+                "color": "Light Color"
+            },
             "addAmmo": "Add Ammunition",
             "usesAmmo": "Uses ammo",
             "grenade": "Grenade-like item",
@@ -341,6 +349,10 @@
                 "carried": "The Carried tag allows this item to be carried or dropped.",
                 "isConsumable": "The Consumable tag gives this item the increment/decrement buttons.",
                 "isAmmunition": "The Ammunition tag causes this item to display on the Combat tab.",
+                "isLightSource": "The Light Source tag allows this item to be used as a light source.",
+                "lightRadius": "Distance of light emission. Bright must be included within the radius of dim light.",
+                "lightAngle": "Limit the angle of emission for this light source.",
+                "lightColor": "Coloration applied to this light source.",
                 "isContainer": "The Container tag allows this item to contain other non-container items.",
                 "duration": "Duration in rounds (numbers only) for a conjured or ephemeral item. Leave blank if permanent.",
                 "hasSpells": "The Has Spells tag allows this item to have one or more spells as usable powers."

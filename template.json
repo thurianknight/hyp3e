@@ -226,6 +226,8 @@
                     "max": 0
                 },
                 "isConsumable": false,
+                "isLightSource": null,
+                "light": {},
                 "location": "",
                 "weight": 0,
                 "cost": 0,

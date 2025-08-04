@@ -157,8 +157,40 @@
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isAmmunition'}}</div>
         </div>
         <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.lightSource'}}</label>
+          <input name="system.isLightSource" type="checkbox" {{checked system.isLightSource}}>
+          <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isLightSource'}}</div>
+        </div>
+        {{#if system.isLightSource}}
+        <fieldset>
+            <div class="flexrow flexshrink flex-group-left bg-attributes">
+                <label class="resource-label">{{localize 'HYP3E.item.light.lightRadius'}}</label>
+                <div class="flex-xlarge">
+                    {{localize 'HYP3E.item.light.dim'}}:
+                    <input type="number" name="system.light.dim" value="{{system.light.dim}}">
+                    {{localize 'HYP3E.item.light.bright'}}:
+                    <input type="number" name="system.light.bright" value="{{system.light.bright}}">
+                    {{localize 'HYP3E.item.attributes.lightRadius'}}
+                </div>
+            </div>
+            <div class="flexrow flexshrink flex-group-left bg-attributes">
+                <label class="resource-label">{{localize 'HYP3E.item.light.angle'}}</label>
+                <input type="number" name="system.light.angle" value="{{system.light.angle}}">
+                <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.lightAngle'}}</div>
+            </div>
+            <div class="flexrow flexshrink flex-group-left bg-attributes-wide">
+                <label class="resource-label">{{localize 'HYP3E.item.light.color'}}</label>
+                <input type="text" name="system.light.color" value="{{system.light.color}}" data-type="color">
+                <div class="flex-xlarge">
+                    <div class="color-preview" style="background: {{system.light.color}};"></div>
+                    {{localize 'HYP3E.item.attributes.lightColor'}}
+                </div>
+            </div>
+        </fieldset>
+        {{/if}}
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.duration'}}</label>
-          <input type="text" name="system.duration" value="{{system.duration}}" data-dtype="Number">
+          <input type="number" name="system.duration" value="{{system.duration}}">
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.duration'}}</div>
         </div>
         {{#if isGM}}

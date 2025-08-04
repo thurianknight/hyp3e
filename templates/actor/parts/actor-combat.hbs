@@ -185,11 +185,17 @@
                         <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                     </a>
                 </div>
-                <!-- New cast spell button (only shown if item has spells) -->
                 {{#if item.system.identified}}
+                <!-- Cast spell button (only shown if item has spells) -->
                 {{#if item.system.spellcasting.spellRefs.length}}
                 <div class="item-prop" style="margin-right: 5px;">
                     <a class="item-cast-spell" data-item-id="{{item.id}}" data-roll-mode="publicroll" title='{{localize "Use Spell"}}'><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+                </div>
+                {{/if}}
+                {{!-- Toggle light button if item is a light source --}}
+                {{#if item.system.isLightSource}}
+                <div class="item-prop" style="margin-right: 5px;">
+                    <a class="item-toggle-light" data-item-id="{{item.id}}" title='{{localize "HYP3E.item.toggleLight"}}'><i class="fa-solid fa-lightbulb"></i></a>
                 </div>
                 {{/if}}
                 {{/if}}
@@ -313,11 +319,17 @@
               <div class="item-image">
                 <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
               </div>
-              <!-- New cast spell button (only shown if item has spells) -->
               {{#if item.system.identified}}
+              <!-- Cast spell button (only shown if item has spells) -->
               {{#if item.system.spellcasting.spellRefs.length}}
               <div class="item-prop" style="margin-right: 5px;">
                 <a class="item-cast-spell" data-item-id="{{item.id}}" data-roll-mode="publicroll" title='{{localize "Use Spell"}}'><i class="fa-solid fa-wand-magic-sparkles"></i></a>
+              </div>
+              {{/if}}
+              {{!-- Toggle light button if item is a light source --}}
+              {{#if item.system.isLightSource}}
+              <div class="item-prop" style="margin-right: 5px;">
+                <a class="item-toggle-light" data-item-id="{{item.id}}" title='{{localize "HYP3E.item.toggleLight"}}'><i class="fa-solid fa-lightbulb"></i></a>
               </div>
               {{/if}}
               {{/if}}

@@ -657,12 +657,12 @@ Hooks.once("ready", async function() {
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
         // No need to migrate if system version is x.x.x or higher
-        const NEEDS_MIGRATION_TO_VERSION = "1.14.0"
-        const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
-        if (needsMigration) {
-            const alreadyRan = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
-            // const alreadyRan = false
-            if (!alreadyRan) {
+        // const NEEDS_MIGRATION_TO_VERSION = "1.18.0"
+        // const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
+        // if (needsMigration) {
+            const migrationHasRun = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
+            // const migrationHasRun = false
+            if (!migrationHasRun) {
                 console.log("Running one-time migration...");
 
                 // Do the world migration
@@ -672,7 +672,7 @@ Hooks.once("ready", async function() {
                 await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
                 console.log("Migration complete.");
             }
-        }
+        // }
     }
 
     // Pre-load processing

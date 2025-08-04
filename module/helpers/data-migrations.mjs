@@ -92,7 +92,16 @@ export function migrateItemData(item) {
     console.log(`migrateItemData: Original ${item.name} to migrate:`, item)
     // let newItem = {...item};
     let updates = {};
-    // All item types
+
+    // Is the item a known light source?
+    const lightSourceUpdates = (lightSourceProps) => ({
+        "system.isLightSource": true,
+        "system.light.dim": lightSourceProps.radius,
+        "system.light.bright": Math.floor(lightSourceProps.radius / 2),
+        "system.light.angle": lightSourceProps.angle || 360,
+    });
+
+    // All items, regardless of type
     if (!("identified" in item.system)) {
         updates = { ...updates, "system.identified": true };
     }
@@ -108,20 +117,35 @@ export function migrateItemData(item) {
 
     // Armor only
     if (item.type === "armor") {
-        // updates = { ...updates, "system.equipped": true };
+
     }
+
     // Features only
     if (item.type === "feature") {
 
     }
+
     // General items only
     if (item.type === "item") {
         // updates = { ...updates, "system.equipped": true };
+        // Add the new light source properties if they do not exist yet
+        if (item.system.isLightSource === undefined || item.system.isLightSource === null) {
+            const lightSourceProps = item._getLightSourceProperties();
+            if (lightSourceProps) {
+                const lightProps = lightSourceUpdates(lightSourceProps);
+                updates = { ...updates, ...lightProps };
+            } else {
+                // If the item not a known light source, set it to false
+                updates = { ...updates, "system.isLightSource": false };
+            }
+        }
     }
+
     // Spells only
     if (item.type === "spell") {
 
     }
+
     // Weapons only
     if (item.type === "weapon") {
         // updates = { ...updates, "system.equipped": false };
