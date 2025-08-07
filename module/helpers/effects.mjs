@@ -142,7 +142,7 @@ export async function setupEffectHandlers() {
             });
         }
 
-        // Automatically set the remaining turns for active effects with a rounds duration.
+        // Automatically set the remaining turns for active effects with a duration in rounds.
         //  This is useful for effects that are generally applied outside of combat and last for 
         //  multiple turns (much longer than a typical combat spell/effect).
         if (!effect.getFlag("hyp3e", "remainingTurns")) {
@@ -158,53 +158,90 @@ export async function setupEffectHandlers() {
             console.log(`createActiveEffect: Auto-set remainingTurns to ${durationTurns} for ${effect.name}`);
         }
 
-        // Process a light source coming from an item and applied to an actor/token
-        const origin = effect.origin;
+        // Does the effect include light source properties?
+        const lightProps = effect.getFlag("hyp3e", "lightProps");
+        if (lightProps) {
+            // // Prepare the light data
+            // const lightSource = {
+            //     dim: lightProps.dim,
+            //     bright: lightProps.bright,
+            //     angle: lightProps.angle || 360, // Default to 360 degrees if no angle provided
+            //     color: lightProps.color || "#ffffff", // Default to white if no color provided
+            //     alpha: lightProps.alpha || 0.5, // Default alpha if none provided
+            //     animation: lightProps.animation || { type: "none" } // Default animation if none provided
+            // };
 
-        // Get source item
-        const sourceItem = await fromUuid(origin);
-        if (!sourceItem?.system?.light) return;
+            // Find all placed tokens for this actor (usually just one) in the current scene
+            for (const token of canvas.tokens.placeables) {
+                if (token.actor?.id !== actor.id) continue;
+                // Apply the light source to the token
+                applyTokenLight(token, lightProps);
+                // Store original light properties as a flag, in case you want to restore later
+                // const currentLight = token.document.light;
+                // await token.document.setFlag("hyp3e", "originalLight", currentLight);
 
-        // Is the item configured as a light source?
-        const lightProps = foundry.utils.deepClone(sourceItem.system.light);
-        if (!lightProps) return;
+                // // Update light on the placed token
+                // await token.document.update({
+                //     "light": lightSource,
+                //     "vision": true // Ensure the token can see
+                // });
 
-        // Prepare the light data
-        const lightSource = {
-            dim: lightProps.dim,
-            bright: lightProps.bright,
-            angle: lightProps.angle || 360, // Default to 360 degrees if no angle provided
-            color: lightProps.color || "#ffffff", // Default to white if no color provided
-            alpha: lightProps.alpha || 0.5, // Default alpha
-            animation: lightProps.animation || { type: "none" } // Default animation
-        };
-
-        // Find all placed tokens for this actor (usually just one) in the current scene
-        for (const token of canvas.tokens.placeables) {
-            if (token.actor?.id !== actor.id) continue;
-
-            // Store original light properties as a flag, in case you want to restore later
-            const currentLight = token.document.light;
-            await token.document.setFlag("hyp3e", "originalLight", currentLight);
-
-            // Update light on the placed token
-            await token.document.update({
-                "light": lightSource,
-                "vision": true // Ensure the token can see
-            });
-
-            console.log(`createActiveEffect: Applied light from ${sourceItem.name} to token ${token.name}`);
+                // console.log(`createActiveEffect: Applied ${effect.name} to token ${token.name}`);
+            }
         }
+        // Theoretically we can continue processing here, for other types of effects...
     });
 
     /**
      * Handle the application of an active effect to an actor.
      */
     Hooks.on("applyActiveEffect", async(actor, change, current, delta, changes) => {
-        if (CONFIG.HYP3E.debugMessages) {
+        // if (CONFIG.HYP3E.debugMessages) {
             // console.log("applyActiveEffect: Actor receiving effect:", actor);
             // console.log("applyActiveEffect: Change:", change);
             // console.log("applyActiveEffect: Other params:", current, delta, changes);
+        // }
+    });
+
+    Hooks.on("updateActiveEffect", async(effect, change, options, userId) => {
+        if ("disabled" in change) {
+            const wasDisabled = change.disabled;
+            if (wasDisabled === true) {
+                console.log("Effect was just disabled:", effect);
+                // Does the effect include light source properties?
+                const lightProps = effect.getFlag("hyp3e", "lightProps");
+                if (lightProps) {
+                    // Find all placed tokens for this actor (usually just one) in the current scene
+                    for (const token of canvas.tokens.placeables) {
+                        if (token.actor?.id !== effect.parent.id) continue;
+
+                        // Restore original light properties from the flag
+                        const originalLight = token.document.getFlag("hyp3e", "originalLight");
+                        if (originalLight) {
+                            await token.document.update({ light: originalLight });
+                            await token.document.unsetFlag("hyp3e", "originalLight");
+                            console.log(`updateActiveEffect: Restored original light for token ${token.name}`);
+                        } else {
+                            await token.document.update({ light: null });
+                            console.warn(`updateActiveEffect: Removed light source from token ${token.name}`);
+                        }
+                    }
+                }
+            } else if (wasDisabled === false) {
+                console.log("Effect was just enabled:", effect);
+                // Does the effect include light source properties?
+                const lightProps = effect.getFlag("hyp3e", "lightProps");
+                if (lightProps) {
+                    // Find all placed tokens for this actor (usually just one) in the current scene
+                    for (const token of canvas.tokens.placeables) {
+                        if (token.actor?.id !== effect.parent.id) continue;
+
+                        // Apply the light source to the token
+                        await applyTokenLight(token, lightProps);
+                        console.log(`updateActiveEffect: Applied light source to token ${token.name}`);
+                    }
+                }
+            }
         }
     });
 
@@ -284,6 +321,38 @@ export async function parseAndResolveChangeValue(changeValue, actor) {
         // If the result is a decimal, round it down to the nearest integer
         return Math.floor(result);
     }
+}
+
+/**
+ * Handle applying a light source to a token document.
+ * @param {*} token - The token document to receive the light source
+ * @param {*} lightProps - An object containing the light properties to apply
+ */
+export async function applyTokenLight(token, lightProps) {
+    if (CONFIG.HYP3E.debugMessages) { console.log("applyTokenLight: Token: ", token) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("applyTokenLight: Light Properties: ", lightProps) }
+
+    // Prepare the light data
+    const lightSource = {
+        dim: lightProps.dim,
+        bright: lightProps.bright,
+        angle: lightProps.angle || 360, // Default to 360 degrees if no angle provided
+        color: lightProps.color || "#ffffff", // Default to white if no color provided
+        alpha: lightProps.alpha || 0.5, // Default alpha if none provided
+        animation: lightProps.animation || { type: "none" } // Default animation if none provided
+    };
+
+    // Store original light properties as a flag, in case you want to restore later
+    const currentLight = token.document.light;
+    await token.document.setFlag("hyp3e", "originalLight", currentLight);
+
+    // Update light on the placed token
+    await token.document.update({
+        "light": lightSource,
+        "vision": true // Ensure the token can see
+    });
+
+    console.log(`applyTokenLight: Applied light source to token ${token.name}`);
 }
 
 /**

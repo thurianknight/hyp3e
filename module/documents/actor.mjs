@@ -2269,7 +2269,8 @@ export class Hyp3eActor extends Actor {
         const hasLight = token.light?.dim || token.light?.bright;
         if (hasLight) {
             // Remove the light source active effect from actor
-            const activeEffects = this.effects.filter(e => e.origin === item.uuid && e.name.startsWith("Light Source:"));
+            // const activeEffects = this.effects.filter(e => e.origin === item.uuid && e.name.startsWith("Light Source:"));
+            const activeEffects = this.effects.filter(e => e.name.startsWith("Light Source:"));
             if (activeEffects.length > 0) {
                 await activeEffects[0].delete();
                 if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: Light source active effect removed from actor ${this.name}.`); }
@@ -2295,16 +2296,30 @@ export class Hyp3eActor extends Actor {
             }
             if (CONFIG.HYP3E.debugMessages) { console.log("Light source properties:", lightProps) }
             if (Object.keys(lightProps).length > 0) {
-                // await this.applyLightToSelf(lightProps.dim, lightProps.bright, lightProps.angle, { color: lightProps.color });
                 ui.notifications.info(`Light source applied to ${token.name}.`);
-                // Create & apply "Light Source" active effect to actor
-                return this.createEmbeddedDocuments("ActiveEffect", [{
+
+                const lightEffect = new ActiveEffect({
                     name: `Light Source: ${item.name}`,
                     img: "icons/svg/light.svg",
                     origin: item.uuid,
+                    disabled: false,
                     duration: { rounds: lightProps.duration || undefined },
-                    disabled: false
-                }]);
+                    flags: {
+                        hyp3e: {
+                            lightProps: lightProps
+                        }
+                    }
+                });
+                await this.createEmbeddedDocuments("ActiveEffect", [lightEffect]);
+
+                // // Create & apply "Light Source" active effect to actor
+                // return this.createEmbeddedDocuments("ActiveEffect", [{
+                //     name: `Light Source: ${item.name}`,
+                //     img: "icons/svg/light.svg",
+                //     origin: item.uuid,
+                //     duration: { rounds: lightProps.duration || undefined },
+                //     disabled: false
+                // }]);
             }
         }
     }
