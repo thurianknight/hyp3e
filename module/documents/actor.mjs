@@ -514,7 +514,9 @@ export class Hyp3eActor extends Actor {
         // Apply total damage once
         if (totalDamage > 0) {
             await this.applyHealthChange(totalDamage, false);
-
+            if (CONFIG.HYP3E.debugMessages) {
+                console.log(`processTemporaryEffects: ${this.name} took ${totalDamage} total damage!`);
+            }
             // Post all the damage messages together
             const persistentDamageMsg = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
             sendSimpleChat(this, "", persistentDamageMsg)
@@ -529,14 +531,10 @@ export class Hyp3eActor extends Actor {
                 "duration.startTurn": null
             }));
             await this.updateEmbeddedDocuments("ActiveEffect", updates);
-            // Post all the expiration together
+            // Post all the expirations together
             const effectNames = expiredEffectUpdates.map(effect => effect.name)
             const expiredEffectsMsg = `Active effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
             sendSimpleChat(this, "", expiredEffectsMsg)
-        }
-
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`processTemporaryEffects: ${this.name} took ${totalDamage} total damage!`);
         }
     }
 
@@ -605,7 +603,7 @@ export class Hyp3eActor extends Actor {
     /**
      * Process temporary items on the actor, deleting any that are expired.
      */
-    async processTemporaryItems() {
+    async processTemporaryItems(rounds = 1) {
         // Filter items with numeric duration > 0
         const tempItems = this.items.filter(item => {
             const dur = item.system?.duration;
@@ -624,7 +622,7 @@ export class Hyp3eActor extends Actor {
             if (typeof dur === "number" && dur > 0) {
                 updates.push({
                     _id: item.id,
-                    "system.duration": dur - 1
+                    "system.duration": dur - rounds
                 });
             }
         }
@@ -2248,9 +2246,13 @@ export class Hyp3eActor extends Actor {
         }
     }
 
+    /**
+     * Toggle the light source on the actor's token.
+     * Light sources are either all on or all off, we don't try to track multiple sources.
+     * @param {*} itemId - The ID of the item to toggle light source for.
+     * @returns - null
+     */
     async toggleLightSource(itemId) {
-        // Toggle the light source on the actor's token. 
-        //  Light sources are all on or all off, we don't try to track multiple light sources.
         if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: actor ${this.name}:`, this); }
         const token = this?.token ?? this?.sheet?.token;
         if (!token) {
@@ -2266,19 +2268,43 @@ export class Hyp3eActor extends Actor {
         // Check if the token already has a light source
         const hasLight = token.light?.dim || token.light?.bright;
         if (hasLight) {
-            // Remove the light source
-            await token.update({
-                "light": null
-            });
+            // Remove the light source active effect from actor
+            const activeEffects = this.effects.filter(e => e.origin === item.uuid && e.name.startsWith("Light Source:"));
+            if (activeEffects.length > 0) {
+                await activeEffects[0].delete();
+                if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: Light source active effect removed from actor ${this.name}.`); }
+            } else {
+                if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: No active effect found for light source on actor ${this.name}.`); }
+                // Remove light source from token, if necessary (e.g., if it was applied directly)
+                await token.update({
+                    "light": null
+                });
+            }
             ui.notifications.info(`Light source removed from ${token.name}.`);
             if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: Light source removed from token ${token.name}.`); }
         } else {
             // Apply light source properties
-            // const { radius, angle, color } = item._getLightSourceProperties();
-            const lightProps = item.system.light;
+            const lightProps = foundry.utils.deepClone(item.system.light);
+            // Resolve duration roll formula to number
+            if (lightProps.duration) {
+                const durationRoll = new Roll(lightProps.duration, this.getRollData());
+                await durationRoll.evaluate({ evaluateSync: true });
+                lightProps.duration = durationRoll.total;
+            } else {
+                lightProps.duration = null; // Default to null if no duration specified
+            }
             if (CONFIG.HYP3E.debugMessages) { console.log("Light source properties:", lightProps) }
             if (Object.keys(lightProps).length > 0) {
-                await this.applyLightToSelf(lightProps.dim, lightProps.bright, lightProps.angle, { color: lightProps.color });
+                // await this.applyLightToSelf(lightProps.dim, lightProps.bright, lightProps.angle, { color: lightProps.color });
+                ui.notifications.info(`Light source applied to ${token.name}.`);
+                // Create & apply "Light Source" active effect to actor
+                return this.createEmbeddedDocuments("ActiveEffect", [{
+                    name: `Light Source: ${item.name}`,
+                    img: "icons/svg/light.svg",
+                    origin: item.uuid,
+                    duration: { rounds: lightProps.duration || undefined },
+                    disabled: false
+                }]);
             }
         }
     }
@@ -2298,27 +2324,57 @@ export class Hyp3eActor extends Actor {
         }
 
         // Prepare the light data
-        const lightSource = {
-            dim,
-            bright,
-            angle,
-            color: lightData.color || "#ffffff", // Default to white if no color provided
-            alpha: lightData.alpha || 0.5, // Default alpha
-            animation: lightData.animation || { type: "none" } // Default animation
-        };
-        if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: Applying light source to token ${token.name}:`, lightSource); }
-        // Update the token with the light source
-        try {
-            await token.update({
-                "light": lightSource,
-                "vision": true // Ensure the token can see
-            });
-            ui.notifications.info(`Light source applied to ${token.name}.`);
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: Light source applied to token ${token.name}.`); }
-        } catch (err) {
-            console.error(`applyLightToSelf: Failed to apply light source to token ${token.name}:`, err);
-            ui.notifications.error(`Failed to apply light source: ${err.message}`);
+        // const lightSource = {
+        //     dim,
+        //     bright,
+        //     angle,
+        //     color: lightData.color || "#ffffff", // Default to white if no color provided
+        //     alpha: lightData.alpha || 0.5, // Default alpha
+        //     animation: lightData.animation || { type: "none" } // Default animation
+        // };
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: Applying light source to token ${token.name}:`, lightSource); }
+        // // Update the token with the light source
+        // try {
+        //     await token.update({
+        //         "light": lightSource,
+        //         "vision": true // Ensure the token can see
+        //     });
+        //     ui.notifications.info(`Light source applied to ${token.name}.`);
+        //     if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: Light source applied to token ${token.name}.`); }
+        // } catch (err) {
+        //     console.error(`applyLightToSelf: Failed to apply light source to token ${token.name}:`, err);
+        //     ui.notifications.error(`Failed to apply light source: ${err.message}`);
+        // }
+    }
+
+    /**
+     * Handle active effects that might expire, or events that occur, with a new turn.
+     * @param {*} turn - The current game-world turn number.
+     */
+    async handleExplorationTurn(turn) {
+        // Process active effects
+        for (const effect of this.effects) {
+            if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
+            if (CONFIG.HYP3E.debugMessages) { console.log(`handleExplorationTurn: Processing effect ${effect.name} for actor ${this.name}...`, effect) }
+            // Check if the effect has a remaining turns flag
+            const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
+            // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
+            if (typeof remainingTurns === "number") {
+                const newRemaining = remainingTurns - 1;
+                if (newRemaining <= 0) {
+                    effect.delete();
+                    const msg = `The effect <b>${effect.name}</b> on ${this.name} has expired.`;
+                    ui.notifications.info(msg);
+                    sendSimpleChat(this, "", msg);
+                } else {
+                    effect.setFlag("hyp3e", "remainingTurns", newRemaining);
+                }
+                // Update temporary effects if not expired yet
+                this.processTemporaryEffects();
+            }
         }
+        // Update temporary items & delete if expired
+        this.processTemporaryItems(60); // 60 rounds = 10 minutes = 1 Hyperborea turn
     }
 
     /** SPECIALIZED SKILL/TASK RESOLUTION ---------------*/

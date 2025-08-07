@@ -109,6 +109,9 @@ export function prepareActiveEffectCategories(effects) {
 }
 
 export async function setupEffectHandlers() {
+    /**
+     * Handle the creation of an active effect on an actor.
+     */
     Hooks.on("createActiveEffect", async (effect, options, userId) => {
         // Only process if we're the one who owns this actor
         const actor = effect.parent;
@@ -138,12 +141,92 @@ export async function setupEffectHandlers() {
                 changes: updatedChanges
             });
         }
+
+        // Automatically set the remaining turns for active effects with a rounds duration.
+        //  This is useful for effects that are generally applied outside of combat and last for 
+        //  multiple turns (much longer than a typical combat spell/effect).
+        if (!effect.getFlag("hyp3e", "remainingTurns")) {
+            // if (!effect.duration.rounds) return; // Only auto-set for effects with a rounds duration
+            // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
+            const durationTurns = Math.floor(effect.duration.rounds / 60) ?? undefined;
+            if (durationTurns < 1) {
+                console.log(`createActiveEffect: Effect ${effect.label} has <60 rounds and will expire at the next turn.`);
+            } else if (isNaN(durationTurns)) {
+                console.log(`createActiveEffect: Effect ${effect.label} has no duration limit and will not expire.`);
+            }
+            await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
+            console.log(`createActiveEffect: Auto-set remainingTurns to ${durationTurns} for ${effect.name}`);
+        }
+
+        // Process a light source coming from an item and applied to an actor/token
+        const origin = effect.origin;
+
+        // Get source item
+        const sourceItem = await fromUuid(origin);
+        if (!sourceItem?.system?.light) return;
+
+        // Is the item configured as a light source?
+        const lightProps = foundry.utils.deepClone(sourceItem.system.light);
+        if (!lightProps) return;
+
+        // Prepare the light data
+        const lightSource = {
+            dim: lightProps.dim,
+            bright: lightProps.bright,
+            angle: lightProps.angle || 360, // Default to 360 degrees if no angle provided
+            color: lightProps.color || "#ffffff", // Default to white if no color provided
+            alpha: lightProps.alpha || 0.5, // Default alpha
+            animation: lightProps.animation || { type: "none" } // Default animation
+        };
+
+        // Find all placed tokens for this actor (usually just one) in the current scene
+        for (const token of canvas.tokens.placeables) {
+            if (token.actor?.id !== actor.id) continue;
+
+            // Store original light properties as a flag, in case you want to restore later
+            const currentLight = token.document.light;
+            await token.document.setFlag("hyp3e", "originalLight", currentLight);
+
+            // Update light on the placed token
+            await token.document.update({
+                "light": lightSource,
+                "vision": true // Ensure the token can see
+            });
+
+            console.log(`createActiveEffect: Applied light from ${sourceItem.name} to token ${token.name}`);
+        }
     });
+
+    /**
+     * Handle the application of an active effect to an actor.
+     */
     Hooks.on("applyActiveEffect", async(actor, change, current, delta, changes) => {
         if (CONFIG.HYP3E.debugMessages) {
             // console.log("applyActiveEffect: Actor receiving effect:", actor);
             // console.log("applyActiveEffect: Change:", change);
             // console.log("applyActiveEffect: Other params:", current, delta, changes);
+        }
+    });
+
+    /**
+     * Handle the deletion of an active effect on an actor.
+     */
+    Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
+        const actor = effect.parent;
+        if (!actor) return;
+
+        // When an active effect is deleted, check if it had modified the token's light.
+        //  If so, restore the original light settings from the flag.
+        for (const token of canvas.tokens.placeables) {
+            if (token.actor?.id !== actor.id) continue;
+
+            const originalLight = token.document.getFlag("hyp3e", "originalLight");
+            if (!originalLight) continue;
+
+            await token.document.update({ light: originalLight });
+            await token.document.unsetFlag("hyp3e", "originalLight");
+
+            console.log(`deleteActiveEffect: Restored original light for token ${token.name}`);
         }
     });
 }

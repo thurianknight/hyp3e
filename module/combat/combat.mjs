@@ -82,7 +82,7 @@ export class HYP3ECombat extends Combat {
         const actor = combatant.actor;
         if (actor) {
             await combatant.actor.processTemporaryEffects();
-            await combatant.actor.processTemporaryItems();
+            await combatant.actor.processTemporaryItems(1);
             await combatant.updateStatus();
         } else {
             console.warn(`_onEndTurn: Combatant has no actor, cannot process temporary effects!`);

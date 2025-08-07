@@ -441,6 +441,29 @@ export class Hyp3eItem extends Item {
         return "";
     }
 
+    /**
+     * Handle active effects that might expire, or events that occur, with a new turn.
+     * @param {*} turn - The current game-world turn number.
+     */
+    async handleExplorationTurn(turn) {
+        // Custom logic here
+        // if (this.name === "Torch") {
+            // We need a way to track duration of a burning torch...
+
+            // const uses = item.system.uses?.value ?? null;
+            // if (typeof uses === "number" && uses > 0) {
+            //     item.update({ "system.uses.value": uses - 1 });
+            //     if (uses === 1) {
+            //         ui.notifications.info(`${actor.name}'s torch goes out.`);
+            //     }
+            // }
+        // }
+        if (this.system.duration > 0) {
+            // Handle temporary or ephemeral items
+            const duration = this.system.duration;
+        }
+    }
+
     /** LOOKUP TABLES AND FUNCTIONS ---------------------*/
 
     /**
@@ -457,11 +480,11 @@ export class Hyp3eItem extends Item {
             "bonfire": { "radius": 60, "angle": 360 },
             "campfire": { "radius": 40, "angle": 360 },
             "candle": { "radius": 5, "angle": 360 },
-            "continuous_light": { "radius": 30, "angle": 360 },
+            "continuous_light_spell": { "radius": 30, "angle": 360 },
             "lantern": { "radius": 30, "angle": 360 },
             "lantern_bullseye": { "radius": 60, "angle": 15 },
             "lantern_hooded": { "radius": 30, "angle": 360 },
-            "light": { "radius": 15, "angle": 360 },
+            "light_spell": { "radius": 15, "angle": 360 },
             "produce_flame_spell": { "radius": 40, "angle": 360 },
             "torch": { "radius": 30, "angle": 360 }
         }

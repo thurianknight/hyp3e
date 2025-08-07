@@ -353,6 +353,7 @@
                 "lightRadius": "Distance of light emission. Bright must be included within the radius of dim light.",
                 "lightAngle": "Limit the angle of emission for this light source.",
                 "lightColor": "Coloration applied to this light source.",
+                "lightDuration": "Duration in rounds (roll formula allowed) for a light source. Leave blank if permanent.",
                 "isContainer": "The Container tag allows this item to contain other non-container items.",
                 "duration": "Duration in rounds (numbers only) for a conjured or ephemeral item. Leave blank if permanent.",
                 "hasSpells": "The Has Spells tag allows this item to have one or more spells as usable powers."
