@@ -161,32 +161,11 @@ export async function setupEffectHandlers() {
         // Does the effect include light source properties?
         const lightProps = effect.getFlag("hyp3e", "lightProps");
         if (lightProps) {
-            // // Prepare the light data
-            // const lightSource = {
-            //     dim: lightProps.dim,
-            //     bright: lightProps.bright,
-            //     angle: lightProps.angle || 360, // Default to 360 degrees if no angle provided
-            //     color: lightProps.color || "#ffffff", // Default to white if no color provided
-            //     alpha: lightProps.alpha || 0.5, // Default alpha if none provided
-            //     animation: lightProps.animation || { type: "none" } // Default animation if none provided
-            // };
-
             // Find all placed tokens for this actor (usually just one) in the current scene
             for (const token of canvas.tokens.placeables) {
                 if (token.actor?.id !== actor.id) continue;
                 // Apply the light source to the token
                 applyTokenLight(token, lightProps);
-                // Store original light properties as a flag, in case you want to restore later
-                // const currentLight = token.document.light;
-                // await token.document.setFlag("hyp3e", "originalLight", currentLight);
-
-                // // Update light on the placed token
-                // await token.document.update({
-                //     "light": lightSource,
-                //     "vision": true // Ensure the token can see
-                // });
-
-                // console.log(`createActiveEffect: Applied ${effect.name} to token ${token.name}`);
             }
         }
         // Theoretically we can continue processing here, for other types of effects...
@@ -235,10 +214,8 @@ export async function setupEffectHandlers() {
                     // Find all placed tokens for this actor (usually just one) in the current scene
                     for (const token of canvas.tokens.placeables) {
                         if (token.actor?.id !== effect.parent.id) continue;
-
                         // Apply the light source to the token
                         await applyTokenLight(token, lightProps);
-                        console.log(`updateActiveEffect: Applied light source to token ${token.name}`);
                     }
                 }
             }
