@@ -2316,12 +2316,12 @@ export class Hyp3eActor extends Actor {
      * @param {*} angle - The angle of the light cone, in degrees.
      * @param {*} lightData - (Optional) Additional light data to apply, such as color or intensity.
      */
-    async applyLightToSelf(dim, bright, angle, lightData = {}) {
-        const token = this?.token ?? this?.sheet?.token;
-        if (!token) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: no token found for actor ${this.name}.`); }
-            return;
-        }
+    // async applyLightToSelf(dim, bright, angle, lightData = {}) {
+    //     const token = this?.token ?? this?.sheet?.token;
+    //     if (!token) {
+    //         if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: no token found for actor ${this.name}.`); }
+    //         return;
+    //     }
 
         // Prepare the light data
         // const lightSource = {
@@ -2345,7 +2345,7 @@ export class Hyp3eActor extends Actor {
         //     console.error(`applyLightToSelf: Failed to apply light source to token ${token.name}:`, err);
         //     ui.notifications.error(`Failed to apply light source: ${err.message}`);
         // }
-    }
+    // }
 
     /**
      * Handle active effects that might expire, or events that occur, with a new turn.
