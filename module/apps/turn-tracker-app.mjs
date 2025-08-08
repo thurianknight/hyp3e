@@ -1,12 +1,12 @@
-// systems/hyp3e/module/apps/exploration-timer-app.mjs
+// systems/hyp3e/module/apps/turn-tracker-app.mjs
 import { HYP3E } from "../helpers/config.mjs"
 
-export class HYP3EExplorationTimerApp extends Application {
+export class HYP3ETurnTrackerApp extends Application {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             id: "hyp3e-exploration-timer-app",
             title: "Exploration Timer",
-            template: `${HYP3E.templatePath}/apps/exploration-timer-app.hbs`,
+            template: `${HYP3E.templatePath}/apps/turn-tracker-app.hbs`,
             popOut: true,
             resizable: false,
             width: 300,

@@ -1,4 +1,4 @@
-export class ExplorationTimer {
+export class HYP3ETurnTracker {
 
     static get currentTurn() {
         return game.settings.get("hyp3e", "explorationTurn") || 1;

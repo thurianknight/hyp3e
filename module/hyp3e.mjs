@@ -13,8 +13,8 @@ import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { Hyp3eCharacter } from "./helpers/character.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
-import { ExplorationTimer } from "./helpers/exploration-timer.mjs";
-import { HYP3EExplorationTimerApp } from "./apps/exploration-timer-app.mjs";
+import { HYP3ETurnTracker } from "./helpers/turn-tracker.mjs";
+import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -48,12 +48,22 @@ Hooks.once('init', async function() {
     });
 
     // Register a world setting to store the current exploration turn
-    game.settings.register("hyp3e", "explorationTurn", {
+    game.settings.register(game.system.id, "explorationTurn", {
         name: "Exploration Turn",
-        scope: "world",          // Saved in the world, not per-client
+        scope: "world",
         config: false,           // Hidden from settings UI
         type: Number,
         default: 0
+    });
+
+    // Enable the Turn Tracker app
+    game.settings.register(game.system.id, "enableTurnTracker", {
+        name: game.i18n.localize("HYP3E.settings.enableTurnTracker"),
+        hint: game.i18n.localize("HYP3E.settings.enableTurnTrackerHint"),
+        scope: "world",
+        config: true,
+        type: Boolean,
+        default: true
     });
 
     // Automatic Armor Class calculation
@@ -64,7 +74,7 @@ Hooks.once('init', async function() {
         scope: "world",
         type: Boolean,
         config: true,
-        requiresReload: true,
+        requiresReload: true
     });
 
     // Enable quick-create characters by selecting a roll method
@@ -686,16 +696,20 @@ Hooks.once("ready", async function() {
         // }
     }
 
-    // Log the start of the exploration timer
-    console.log(`Current exploration turn is ${ExplorationTimer.getTurn()}`);
-    // Example macro or control
+    // Log the start of the turn tracker
+    console.log(`Current exploration turn is ${HYP3ETurnTracker.getTurn()}`);
+    // Import the turn tracker class methods
     game.hyp3e = game.hyp3e || {};
-    game.hyp3e.advanceTurn = () => ExplorationTimer.advanceTurn();
-    game.hyp3e.resetTurn = () => ExplorationTimer.reset();
-    game.hyp3e.getTurn = () => ExplorationTimer.getTurn();
-    // const explorationTimer = new HYP3EExplorationTimerApp();
-    game.hyp3e.explorationTimer = new HYP3EExplorationTimerApp();
-    game.hyp3e.explorationTimer.render(true);
+    game.hyp3e.advanceTurn = () => HYP3ETurnTracker.advanceTurn();
+    game.hyp3e.resetTurn = () => HYP3ETurnTracker.reset();
+    game.hyp3e.getTurn = () => HYP3ETurnTracker.getTurn();
+    // The Turn Tracker app is separate from the class, and is only loaded if enabled
+    if (game.settings.get(game.system.id, "enableTurnTracker")) {
+        game.hyp3e.turnTracker = new HYP3ETurnTrackerApp();
+        game.hyp3e.turnTracker.render(true);
+    } else {
+        console.log("Turn Tracker is disabled, not rendering the app.");
+    }
 
     // Pre-load processing
     if (game.user.isGM) {
