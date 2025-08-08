@@ -1,5 +1,3 @@
-// exploration-timer.mjs
-
 export class ExplorationTimer {
 
     static get currentTurn() {
@@ -19,9 +17,12 @@ export class ExplorationTimer {
         return newTurn;
     }
 
-    static reset() {
-        this.currentTurn = 1;
+    static async reset() {
+        const newTurn = 1;
+        await game.settings.set("hyp3e", "explorationTurn", newTurn);
+        this.currentTurn = newTurn;
         console.log("Exploration timer reset to turn 1.");
+        return newTurn;
     }
 
     static getTurn() {

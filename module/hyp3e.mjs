@@ -14,6 +14,7 @@ import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { Hyp3eCharacter } from "./helpers/character.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
 import { ExplorationTimer } from "./helpers/exploration-timer.mjs";
+import { HYP3EExplorationTimerApp } from "./apps/exploration-timer-app.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -692,6 +693,9 @@ Hooks.once("ready", async function() {
     game.hyp3e.advanceTurn = () => ExplorationTimer.advanceTurn();
     game.hyp3e.resetTurn = () => ExplorationTimer.reset();
     game.hyp3e.getTurn = () => ExplorationTimer.getTurn();
+    // const explorationTimer = new HYP3EExplorationTimerApp();
+    game.hyp3e.explorationTimer = new HYP3EExplorationTimerApp();
+    game.hyp3e.explorationTimer.render(true);
 
     // Pre-load processing
     if (game.user.isGM) {
@@ -805,79 +809,10 @@ Hooks.on("createToken", (token, options, userId) => {
 });
 
 /**
- * Automatically set the remaining turns for active effects with a rounds duration.
- * This is useful for effects that are generally applied outside of combat and last for 
- * multiple turns (much longer than a typical combat spell/effect).
- * This hook runs when an active effect is created.
- */
-// Hooks.on("createActiveEffect", async (effect, options, userId) => {
-//     if (!effect.getFlag("hyp3e", "remainingTurns")) {
-//         if (!effect.duration.rounds) return; // Only auto-set for effects with a rounds duration
-//         const durationTurns = Math.floor(effect.duration.rounds / 60); // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
-//         if (durationTurns < 1) {
-//             console.log(`createActiveEffect: Effect ${effect.label} has <60 rounds and will expire at the next turn.`);
-//         }
-//         await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
-//         console.log(`createActiveEffect: Auto-set remainingTurns to ${durationTurns} for ${effect.name}`);
-//     }
-
-//     // Process a light source coming from an item and applied to an actor/token
-//     const origin = effect.origin;
-//     // if (!origin?.startsWith("Item.")) return;
-
-//     // Get source item
-//     const sourceItem = await fromUuid(origin);
-//     if (!sourceItem?.system?.light) return;
-
-//     // Confirm the effect was applied to an Actor
-//     const actor = effect.parent;
-//     if (!actor) return;
-
-//     const lightData = foundry.utils.deepClone(sourceItem.system.light);
-//     if (!lightData) return;
-
-//     // Find all placed tokens for this actor (usually just one) in the current scene
-//     for (const token of canvas.tokens.placeables) {
-//         if (token.actor?.id !== actor.id) continue;
-
-//         // Store original light properties as a flag, in case you want to restore later
-//         const currentLight = token.document.light;
-//         await token.document.setFlag("hyp3e", "originalLight", currentLight);
-
-//         // Update light on the placed token
-//         await token.document.update({ light: lightData });
-
-//         console.log(`createActiveEffect: Applied light from ${sourceItem.name} to token ${token.name}`);
-//     }
-// });
-
-/**
- * When an active effect is deleted, check if it modified the token's light.
- * If so, restore the original light settings from the flag.
- */
-// Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
-//     const actor = effect.parent;
-//     if (!actor) return;
-
-//     for (const token of canvas.tokens.placeables) {
-//         if (token.actor?.id !== actor.id) continue;
-
-//         const originalLight = token.document.getFlag("hyp3e", "originalLight");
-//         if (!originalLight) continue;
-
-//         await token.document.update({ light: originalLight });
-//         await token.document.unsetFlag("hyp3e", "originalLight");
-
-//         console.log(`deleteActiveEffect: Restored original light for token ${token.name}`);
-//     }
-// });
-
-/**
  * Custom hook for handling exploration turns.
  */
 Hooks.on("explorationTurnAdvanced", (turn) => {
     console.log(`Exploration turn ${turn} triggered`);
-
     for (const token of canvas.tokens.placeables) {
         const actor = token.actor;
         if (!actor) continue;
