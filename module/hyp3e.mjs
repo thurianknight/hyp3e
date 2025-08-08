@@ -501,6 +501,11 @@ Handlebars.registerHelper("capitalizeWords", function (str) {
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
 
+Hooks.on("renderChatLog", (chatLog, html, data) => {
+    console.log("renderChatLog fired!");
+    // Insert your custom turn tracker into the chat UI here
+});
+
 Hooks.once("ready", async function() {
     // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
     Hooks.on("hotbarDrop", (bar, data, slot) => {
@@ -711,6 +716,49 @@ Hooks.once("ready", async function() {
         console.log("Turn Tracker is disabled, not rendering the app.");
     }
 
+    /**
+     * Render the exploration turn tracker app in the chat log.
+     * This will show the current turn, and allow GMs to advance or reset the turn.
+     * It will also show the current turn in the chat log when requested.
+     */
+    Hooks.on("renderChatLog", async (chatLog, html, data) => {
+        console.log("Rendering the Turn Tracker app in the chat log...");
+        console.log("Incoming HTML:", html);
+        const $html = $(html); // wrap DOM in jQuery
+
+        // Render your Handlebars template to HTML
+        const templatePath = "systems/hyp3e/templates/apps/turn-tracker-app.hbs";
+        const context = {
+            currentTurn: game.hyp3e.getTurn()
+        };
+        const rendered = await renderTemplate(templatePath, context);
+
+        // Inject into chat log, above the chat input
+        const chatControls = $(rendered).addClass("chat-turn-tracker");
+        $html.find(".chat-form").before(chatControls);
+
+        // Wire up the buttons
+        chatControls.find(".advance-turn").on("click", async () => {
+            await game.hyp3e.advanceTurn();
+            updateTurnDisplay(chatControls);
+        });
+
+        chatControls.find(".reset").on("click", async () => {
+            await game.hyp3e.resetTurn();
+            updateTurnDisplay(chatControls);
+        });
+
+        chatControls.find(".show-turn").on("click", () => {
+            const turn = game.hyp3e.getTurn();
+            ChatMessage.create({
+                content: `<strong>Current</strong> exploration turn: ${turn}.`,
+                whisper: ChatMessage.getWhisperRecipients("GM"),
+                type: CONST.CHAT_MESSAGE_TYPES.OTHER
+            });
+        });
+    });
+    ui.chat.render(true); // Force chat log to render again
+
     // Pre-load processing
     if (game.user.isGM) {
         // If the token resize option is set, do that now, while the game is loading
@@ -744,6 +792,11 @@ Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
         settingRow.find("input").replaceWith(button);
     }
 });
+
+function updateTurnDisplay(container) {
+    const turn = game.hyp3e.getTurn();
+    container.find("h3").text(`Turn: ${turn}`);
+}
 
 /**
  * Before a token can complete its movement during a turn, ensure it has not overstepped 
@@ -827,13 +880,21 @@ Hooks.on("createToken", (token, options, userId) => {
  */
 Hooks.on("explorationTurnAdvanced", (turn) => {
     console.log(`Exploration turn ${turn} triggered`);
+
+    // Update the turn tracker display in the chat log
+    const tracker = $(".chat-turn-tracker");
+    if (!tracker.length) return;
+    // const turn = game.hyp3e.getTurn();
+    tracker.find("h3").text(`Turn: ${turn}`);
+
+    // Process all tokens on the canvas
     for (const token of canvas.tokens.placeables) {
         const actor = token.actor;
         if (!actor) continue;
 
         actor.handleExplorationTurn(turn);
 
-        // Optional: process equipped items
+        // Process equipped items
         for (const item of actor.items) {
             if (!item) continue;
             item.handleExplorationTurn(turn);
