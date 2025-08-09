@@ -501,10 +501,10 @@ Handlebars.registerHelper("capitalizeWords", function (str) {
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
 
-Hooks.on("renderChatLog", (chatLog, html, data) => {
-    console.log("renderChatLog fired!");
-    // Insert your custom turn tracker into the chat UI here
-});
+// Hooks.on("renderChatLog", (chatLog, html, data) => {
+//     console.log("renderChatLog fired!");
+//     // Insert your custom turn tracker into the chat UI here
+// });
 
 Hooks.once("ready", async function() {
     // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
@@ -722,9 +722,12 @@ Hooks.once("ready", async function() {
      * It will also show the current turn in the chat log when requested.
      */
     Hooks.on("renderChatLog", async (chatLog, html, data) => {
-        console.log("Rendering the Turn Tracker app in the chat log...");
-        console.log("Incoming HTML:", html);
+        console.log("renderChatLog: Rendering the Turn Tracker app in the chat log...");
+        console.log("renderChatLog: Incoming HTML:", html);
         const $html = $(html); // wrap DOM in jQuery
+
+        // Get the Foundry version
+        const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
         // Render your Handlebars template to HTML
         const templatePath = "systems/hyp3e/templates/apps/turn-tracker-app.hbs";
@@ -735,10 +738,17 @@ Hooks.once("ready", async function() {
 
         // Inject into chat log, above the chat input
         const chatControls = $(rendered).addClass("chat-turn-tracker");
-        $html.find(".chat-form").before(chatControls);
+        if (majorVersion >= 13) {
+            // For v13+, use the chat-form container
+            $html.find(".chat-form").before(chatControls);
+        } else {
+            // For v12, use the chat-controls container
+            $html.find("#chat-controls").before(chatControls);
+        }
 
         // Wire up the buttons
         chatControls.find(".advance-turn").on("click", async () => {
+            console.log("renderChatLog: Advance turn button clicked.");
             await game.hyp3e.advanceTurn();
             updateTurnDisplay(chatControls);
         });
@@ -751,11 +761,12 @@ Hooks.once("ready", async function() {
         chatControls.find(".show-turn").on("click", () => {
             const turn = game.hyp3e.getTurn();
             ChatMessage.create({
-                content: `<strong>Current</strong> exploration turn: ${turn}.`,
-                whisper: ChatMessage.getWhisperRecipients("GM"),
+                content: `Current exploration turn: ${turn}.`,
                 type: CONST.CHAT_MESSAGE_TYPES.OTHER
             });
         });
+        console.log("Button handlers bound", chatControls.find(".advance-turn").length);
+
     });
     ui.chat.render(true); // Force chat log to render again
 
@@ -876,15 +887,25 @@ Hooks.on("createToken", (token, options, userId) => {
 });
 
 /**
- * Custom hook for handling exploration turns.
+ * Custom hook for handling exploration turn reset to 1.
+ */
+Hooks.on("explorationTurnReset", (turn) => {
+    console.log(`Exploration turn reset to ${turn}`);
+    // Update the turn tracker display in the chat log
+    const tracker = $(".chat-turn-tracker");
+    if (!tracker.length) return;
+    tracker.find("h3").text(`Turn: ${turn}`);
+});
+
+/**
+ * Custom hook for handling exploration turn advancement.
  */
 Hooks.on("explorationTurnAdvanced", (turn) => {
-    console.log(`Exploration turn ${turn} triggered`);
+    console.log(`Exploration turn ${turn} triggered.`);
 
     // Update the turn tracker display in the chat log
     const tracker = $(".chat-turn-tracker");
     if (!tracker.length) return;
-    // const turn = game.hyp3e.getTurn();
     tracker.find("h3").text(`Turn: ${turn}`);
 
     // Process all tokens on the canvas

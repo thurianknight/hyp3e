@@ -1311,12 +1311,28 @@ textarea {
 
 /* Styles for the Turn Tracker app */
 .turn-tracker {
+  width: 100%;
   text-align: center;
+  display: flex;
+  background: rgba(0, 0, 0, 0.50);
+  /* flex-direction: row; */
+  z-index: 30;
+  position: relative; /* or absolute */
+  pointer-events: auto;
 }
 
 .turn-tracker h3 {
   margin: 0.5em 0;
+  text-align: center;
   text-decoration: none;
+  font-size: medium;
+}
+
+.turn-tracker .controls {
+  display: flex;
+  flex: auto;
+  justify-content: center;
+  flex-direction: row;
 }
 
 .turn-tracker .controls button {
@@ -1326,9 +1342,10 @@ textarea {
 }
 
 .chat-turn-tracker {
+    width: 300px;
     padding: 4px 6px;
     border-top: 1px solid var(--color-border-dark-2);
-    margin-bottom: 6px;
+    margin-bottom: 3px;
 }
 
 

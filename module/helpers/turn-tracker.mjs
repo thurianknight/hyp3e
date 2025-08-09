@@ -12,7 +12,7 @@ export class HYP3ETurnTracker {
         const newTurn = this.currentTurn + 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
         this.currentTurn = newTurn;
-        console.log(`Current Exploration Turn: ${newTurn}`);
+        console.log(`Turn tracker advanced to turn ${newTurn}`);
         Hooks.call("explorationTurnAdvanced", newTurn);
         return newTurn;
     }
@@ -21,7 +21,8 @@ export class HYP3ETurnTracker {
         const newTurn = 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
         this.currentTurn = newTurn;
-        console.log("Exploration timer reset to turn 1.");
+        console.log(`Turn tracker reset to turn ${newTurn}.`);
+        Hooks.call("explorationTurnReset", newTurn);
         return newTurn;
     }
 
