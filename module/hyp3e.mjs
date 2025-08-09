@@ -712,8 +712,8 @@ Hooks.once("ready", async function() {
 
     /**
      * Render the exploration turn tracker app in the chat log.
-     * This will show the current turn, and allow GMs to advance or reset the turn.
-     * It will also show the current turn in the chat log when requested.
+     * This shows the current turn, and allow GMs to advance or reset the turn count.
+     * It also pushes the current turn to the chat log when requested.
      */
     Hooks.on("renderChatLog", async (chatLog, html, data) => {
         if (!game.user.isGM) return; // Only render for GMs
@@ -724,11 +724,20 @@ Hooks.once("ready", async function() {
             console.log("Turn Tracker is disabled, not rendering the app.");
             return; // Exit early if the turn tracker is disabled
         }
-        // Get the Foundry version
+        // Get the Foundry version -- needed for chat form CSS differences
         const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
-
         const $html = $(html); // wrap DOM in jQuery
-        const container = $html.find(".chat-form");
+        let container;
+        if (majorVersion >= 13) {            
+            container = $html.find(".chat-form");
+        } else {
+            container = $html.find("#chat-controls");
+        }
+        console.log("renderChatLog: Container for app:", container);
+        if (container.length === 0) {
+            console.warn("renderChatLog: Could not find chat controls container, cannot render Turn Tracker app.");
+            return;
+        }
         game.hyp3e = game.hyp3e || {};
         game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerApp();
 
