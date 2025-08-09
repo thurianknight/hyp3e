@@ -63,7 +63,8 @@ Hooks.once('init', async function() {
         scope: "world",
         config: true,
         type: Boolean,
-        default: true
+        default: true,
+        requiresReload: true
     });
 
     // Automatic Armor Class calculation
@@ -708,13 +709,6 @@ Hooks.once("ready", async function() {
     game.hyp3e.advanceTurn = () => HYP3ETurnTracker.advanceTurn();
     game.hyp3e.resetTurn = () => HYP3ETurnTracker.reset();
     game.hyp3e.getTurn = () => HYP3ETurnTracker.getTurn();
-    // The Turn Tracker app is separate from the class, and is only loaded if enabled
-    if (game.settings.get(game.system.id, "enableTurnTracker")) {
-        game.hyp3e.turnTracker = new HYP3ETurnTrackerApp();
-        game.hyp3e.turnTracker.render(true);
-    } else {
-        console.log("Turn Tracker is disabled, not rendering the app.");
-    }
 
     /**
      * Render the exploration turn tracker app in the chat log.
@@ -722,51 +716,24 @@ Hooks.once("ready", async function() {
      * It will also show the current turn in the chat log when requested.
      */
     Hooks.on("renderChatLog", async (chatLog, html, data) => {
+        if (!game.user.isGM) return; // Only render for GMs
         console.log("renderChatLog: Rendering the Turn Tracker app in the chat log...");
         console.log("renderChatLog: Incoming HTML:", html);
-        const $html = $(html); // wrap DOM in jQuery
 
+        if (!game.settings.get(game.system.id, "enableTurnTracker")) {
+            console.log("Turn Tracker is disabled, not rendering the app.");
+            return; // Exit early if the turn tracker is disabled
+        }
         // Get the Foundry version
         const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
-        // Render your Handlebars template to HTML
-        const templatePath = "systems/hyp3e/templates/apps/turn-tracker-app.hbs";
-        const context = {
-            currentTurn: game.hyp3e.getTurn()
-        };
-        const rendered = await renderTemplate(templatePath, context);
+        const $html = $(html); // wrap DOM in jQuery
+        const container = $html.find(".chat-form");
+        game.hyp3e = game.hyp3e || {};
+        game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerApp();
 
-        // Inject into chat log, above the chat input
-        const chatControls = $(rendered).addClass("chat-turn-tracker");
-        if (majorVersion >= 13) {
-            // For v13+, use the chat-form container
-            $html.find(".chat-form").before(chatControls);
-        } else {
-            // For v12, use the chat-controls container
-            $html.find("#chat-controls").before(chatControls);
-        }
-
-        // Wire up the buttons
-        chatControls.find(".advance-turn").on("click", async () => {
-            console.log("renderChatLog: Advance turn button clicked.");
-            await game.hyp3e.advanceTurn();
-            updateTurnDisplay(chatControls);
-        });
-
-        chatControls.find(".reset").on("click", async () => {
-            await game.hyp3e.resetTurn();
-            updateTurnDisplay(chatControls);
-        });
-
-        chatControls.find(".show-turn").on("click", () => {
-            const turn = game.hyp3e.getTurn();
-            ChatMessage.create({
-                content: `Current exploration turn: ${turn}.`,
-                type: CONST.CHAT_MESSAGE_TYPES.OTHER
-            });
-        });
-        console.log("Button handlers bound", chatControls.find(".advance-turn").length);
-
+        // Embed into chat (this will call activateListeners on the injected HTML)
+        game.hyp3e.turnTrackerApp.renderEmbedded(container);
     });
     ui.chat.render(true); // Force chat log to render again
 
@@ -804,10 +771,10 @@ Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
     }
 });
 
-function updateTurnDisplay(container) {
-    const turn = game.hyp3e.getTurn();
-    container.find("h3").text(`Turn: ${turn}`);
-}
+// function updateTurnDisplay(container) {
+//     const turn = game.hyp3e.getTurn();
+//     container.find("h3").text(`Turn: ${turn}`);
+// }
 
 /**
  * Before a token can complete its movement during a turn, ensure it has not overstepped 
@@ -892,7 +859,7 @@ Hooks.on("createToken", (token, options, userId) => {
 Hooks.on("explorationTurnReset", (turn) => {
     console.log(`Exploration turn reset to ${turn}`);
     // Update the turn tracker display in the chat log
-    const tracker = $(".chat-turn-tracker");
+    const tracker = $(".turn-tracker");
     if (!tracker.length) return;
     tracker.find("h3").text(`Turn: ${turn}`);
 });
@@ -904,7 +871,7 @@ Hooks.on("explorationTurnAdvanced", (turn) => {
     console.log(`Exploration turn ${turn} triggered.`);
 
     // Update the turn tracker display in the chat log
-    const tracker = $(".chat-turn-tracker");
+    const tracker = $(".turn-tracker");
     if (!tracker.length) return;
     tracker.find("h3").text(`Turn: ${turn}`);
 
