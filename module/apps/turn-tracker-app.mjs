@@ -10,22 +10,6 @@ export class HYP3ETurnTrackerApp extends Application {
         Hooks.on("explorationTurnReset", this._onTurnReset.bind(this));
     }
 
-    // async render(force = false, options = {}) {
-    //     // Call super to get the HTML, but don't attach it to the body
-    //     const html = await super._renderHTML(force, options);
-        
-    //     // Inject into the Chat Log before the input
-    //     const $chatForm = $("#chat .chat-form");
-    //     if ($chatForm.length) {
-    //         $chatForm.before(html);
-    //     }
-
-    //     // Activate listeners on the injected HTML
-    //     this._element = html; // Store reference so close(), etc. still work
-    //     this.activateListeners(html);
-    //     return this;
-    // }
-
     /** Render this app embedded into a given container (jQuery element or selector). */
     async renderEmbedded(container) {
         // Resolve container as jQuery
@@ -34,17 +18,17 @@ export class HYP3ETurnTrackerApp extends Application {
 
         // Render the template with current data
         const htmlString = await renderTemplate(this.options.template, this.getData());
-        const $html = $(htmlString).addClass("hyp3e-turn-tracker");
+        const $html = $(htmlString).addClass("turn-tracker");
 
         // Remove a previous embedded instance if present
         if (this._embeddedElement) {
             this.closeEmbedded();
         }
 
-        // Insert the HTML into the DOM (before container, similar to your previous code)
+        // Insert the HTML into the DOM (before container)
         $container.before($html);
 
-        // Keep a reference so closeEmbedded can remove it later
+        // Keep a reference so closeEmbedded can remove it later (NOT USED YET)
         this._embeddedElement = $html;
         this._embedded = true;
 

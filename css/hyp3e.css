@@ -1312,6 +1312,7 @@ textarea {
 /* Styles for the Turn Tracker app */
 .turn-tracker {
   width: 292px;
+  max-height: 50px;
   padding: 4px;
   margin: 4px;
   border-radius: 6px;
@@ -1326,7 +1327,7 @@ textarea {
   background: rgba(0, 0, 0, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
-  h3 {
+  .turn-label {
     color: #fff;
   };
   controls {
@@ -1349,7 +1350,7 @@ textarea {
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(0, 0, 0, 0.2);
   color: #2a2a2a;
-    h3 {
+    .turn-label {
       color: #2a2a2a;
     };
     controls {
@@ -1369,11 +1370,11 @@ textarea {
     }
 }
 
-.turn-tracker h3 {
+.turn-tracker .turn-label {
   margin: 0.5em 0;
   text-align: center;
   text-decoration: none;
-  font-size: medium;
+  font-size: large;
 }
 
 .turn-tracker .controls {

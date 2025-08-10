@@ -16,6 +16,9 @@ import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-
 import { HYP3ETurnTracker } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
 
+// Set this now, to use later
+let trackerInitialized = false;
+
 /* -------------------------------------------- */
 /*  Init Hook                                   */
 /* -------------------------------------------- */
@@ -502,11 +505,6 @@ Handlebars.registerHelper("capitalizeWords", function (str) {
 /*  Ready Hook                                  */
 /* -------------------------------------------- */
 
-// Hooks.on("renderChatLog", (chatLog, html, data) => {
-//     console.log("renderChatLog fired!");
-//     // Insert your custom turn tracker into the chat UI here
-// });
-
 Hooks.once("ready", async function() {
     // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
     Hooks.on("hotbarDrop", (bar, data, slot) => {
@@ -709,42 +707,15 @@ Hooks.once("ready", async function() {
     game.hyp3e.advanceTurn = () => HYP3ETurnTracker.advanceTurn();
     game.hyp3e.resetTurn = () => HYP3ETurnTracker.reset();
     game.hyp3e.getTurn = () => HYP3ETurnTracker.getTurn();
-
-    /**
-     * Render the exploration turn tracker app in the chat log.
-     * This shows the current turn, and allow GMs to advance or reset the turn count.
-     * It also pushes the current turn to the chat log when requested.
-     */
-    Hooks.on("renderChatLog", async (chatLog, html, data) => {
-        if (!game.user.isGM) return; // Only render for GMs
-        console.log("renderChatLog: Rendering the Turn Tracker app in the chat log...");
-        console.log("renderChatLog: Incoming HTML:", html);
-
-        if (!game.settings.get(game.system.id, "enableTurnTracker")) {
-            console.log("Turn Tracker is disabled, not rendering the app.");
-            return; // Exit early if the turn tracker is disabled
+    // Initialize the turn tracker in the chat log
+    if (!trackerInitialized) {
+        const chatLog = ui.chat;
+        if (chatLog) {
+            initTurnTrackerInChatLog(chatLog, chatLog.element, chatLog.options);
+            trackerInitialized = true;
         }
-        // Get the Foundry version -- needed for chat form CSS differences
-        const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
-        const $html = $(html); // wrap DOM in jQuery
-        let container;
-        if (majorVersion >= 13) {            
-            container = $html.find(".chat-form");
-        } else {
-            container = $html.find("#chat-controls");
-        }
-        console.log("renderChatLog: Container for app:", container);
-        if (container.length === 0) {
-            console.warn("renderChatLog: Could not find chat controls container, cannot render Turn Tracker app.");
-            return;
-        }
-        game.hyp3e = game.hyp3e || {};
-        game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerApp();
-
-        // Embed into chat (this will call activateListeners on the injected HTML)
-        game.hyp3e.turnTrackerApp.renderEmbedded(container);
-    });
-    ui.chat.render(true); // Force chat log to render again
+    }
+    // ui.chat.render(true); // Force chat log to render again
 
     // Pre-load processing
     if (game.user.isGM) {
@@ -756,6 +727,24 @@ Hooks.once("ready", async function() {
 
 });
 
+/* -------------------------------------------- */
+/*  Additional Hooks                            */
+/* -------------------------------------------- */
+
+/**
+ * Insert the turn tracker app into the chat log.
+ * This is only done once, when the chat log is first rendered.
+ */
+Hooks.on("renderChatLog", (app, html, data) => {
+    if (!game.ready || trackerInitialized) return;
+    trackerInitialized = true;
+    initTurnTrackerInChatLog(app, html, data);
+});
+
+/**
+ * Render the Settings Config app for our Hyperborea system options.
+ * This is only available to GMs.
+ */
 Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
     const html = $(htmlElement); // Wrap in jQuery
 
@@ -779,11 +768,6 @@ Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
         settingRow.find("input").replaceWith(button);
     }
 });
-
-// function updateTurnDisplay(container) {
-//     const turn = game.hyp3e.getTurn();
-//     container.find("h3").text(`Turn: ${turn}`);
-// }
 
 /**
  * Before a token can complete its movement during a turn, ensure it has not overstepped 
@@ -898,6 +882,41 @@ Hooks.on("explorationTurnAdvanced", (turn) => {
         }
     }
 });
+
+/**
+ * Render the exploration turn tracker app in the chat log.
+ * This shows the current turn, and allows GMs to advance or reset the turn count.
+ * It also pushes the current turn to the chat log when requested.
+ */
+async function initTurnTrackerInChatLog(app, html, data) {
+    if (!game.user.isGM) return; // Only render for GMs
+    console.log("initTurnTrackerInChatLog: Rendering the Turn Tracker app in the chat log...");
+    console.log("initTurnTrackerInChatLog: Incoming HTML:", html);
+
+    if (!game.settings.get(game.system.id, "enableTurnTracker")) {
+        console.log("Turn Tracker is disabled, not rendering the app.");
+        return; // Exit early if the turn tracker is disabled
+    }
+    // Get the Foundry version -- needed for chat form CSS differences
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    const $html = $(html); // wrap DOM in jQuery
+    let container;
+    if (majorVersion >= 13) {            
+        container = $html.find(".chat-form");
+    } else {
+        container = html.find("#chat-controls");
+    }
+    console.log("initTurnTrackerInChatLog: Container for app:", container);
+    if (container.length === 0) {
+        console.warn("initTurnTrackerInChatLog: Could not find chat controls container, cannot render Turn Tracker app.");
+        return;
+    }
+    game.hyp3e = game.hyp3e || {};
+    game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerApp();
+
+    // Embed into chat (this will call activateListeners on the injected HTML)
+    game.hyp3e.turnTrackerApp.renderEmbedded(container);
+}
 
 /* -------------------------------------------- */
 /*  Migrate system/world functions              */
