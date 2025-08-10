@@ -853,7 +853,7 @@ Hooks.on("explorationTurnReset", (turn) => {
     // Update the turn tracker display in the chat log
     const tracker = $(".turn-tracker");
     if (!tracker.length) return;
-    tracker.find("h3").text(`Turn: ${turn}`);
+    tracker.find(".turn-label").text(`Turn: ${turn}`);
 });
 
 /**
@@ -865,7 +865,7 @@ Hooks.on("explorationTurnAdvanced", (turn) => {
     // Update the turn tracker display in the chat log
     const tracker = $(".turn-tracker");
     if (!tracker.length) return;
-    tracker.find("h3").text(`Turn: ${turn}`);
+    tracker.find(".turn-label").text(`Turn: ${turn}`);
 
     // Process all tokens on the canvas
     for (const token of canvas.tokens.placeables) {
