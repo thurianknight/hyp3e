@@ -715,7 +715,6 @@ Hooks.once("ready", async function() {
             trackerInitialized = true;
         }
     }
-    // ui.chat.render(true); // Force chat log to render again
 
     // Pre-load processing
     if (game.user.isGM) {
@@ -890,13 +889,13 @@ Hooks.on("explorationTurnAdvanced", (turn) => {
  */
 async function initTurnTrackerInChatLog(app, html, data) {
     if (!game.user.isGM) return; // Only render for GMs
+    if (!game.settings.get(game.system.id, "enableTurnTracker")) {
+        console.log("initTurnTrackerInChatLog: Turn Tracker is disabled, not rendering the app.");
+        return; // Exit early if the turn tracker is disabled
+    }
     console.log("initTurnTrackerInChatLog: Rendering the Turn Tracker app in the chat log...");
     console.log("initTurnTrackerInChatLog: Incoming HTML:", html);
 
-    if (!game.settings.get(game.system.id, "enableTurnTracker")) {
-        console.log("Turn Tracker is disabled, not rendering the app.");
-        return; // Exit early if the turn tracker is disabled
-    }
     // Get the Foundry version -- needed for chat form CSS differences
     const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
     const $html = $(html); // wrap DOM in jQuery
@@ -914,7 +913,7 @@ async function initTurnTrackerInChatLog(app, html, data) {
     game.hyp3e = game.hyp3e || {};
     game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerApp();
 
-    // Embed into chat (this will call activateListeners on the injected HTML)
+    // Embed into chat (this will call activateListeners on the injected app)
     game.hyp3e.turnTrackerApp.renderEmbedded(container);
 }
 
