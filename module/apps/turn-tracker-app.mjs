@@ -70,6 +70,10 @@ export class HYP3ETurnTrackerApp extends Application {
 
     _onTurnAdvanced(data) {
         console.log("Turn advanced:", data);
+        // Update the turn tracker display in the chat log
+        const tracker = $(".turn-tracker");
+        if (!tracker.length) return;
+        tracker.find(".turn-label").text(`Turn: ${data}`);
         this.render(false); // Update the tracker
     }
 

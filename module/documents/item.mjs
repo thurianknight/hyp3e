@@ -464,6 +464,15 @@ export class Hyp3eItem extends Item {
         }
     }
 
+    /**
+     * Handle active effects that might expire, or events that occur, with a new turn.
+     * @param {*} turn - The current game-world turn number.
+     */
+    async retreatExplorationTurn(turn) {
+        // Handle temporary or ephemeral items
+        const duration = this.system.duration;
+    }
+
     /** LOOKUP TABLES AND FUNCTIONS ---------------------*/
 
     /**
