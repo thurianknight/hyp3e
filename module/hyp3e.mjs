@@ -705,6 +705,7 @@ Hooks.once("ready", async function() {
     // Import the turn tracker class methods
     game.hyp3e = game.hyp3e || {};
     game.hyp3e.advanceTurn = () => HYP3ETurnTracker.advanceTurn();
+    game.hyp3e.retreatTurn = () => HYP3ETurnTracker.retreatTurn();
     game.hyp3e.resetTurn = () => HYP3ETurnTracker.reset();
     game.hyp3e.getTurn = () => HYP3ETurnTracker.getTurn();
     // Initialize the turn tracker in the chat log
@@ -872,12 +873,38 @@ Hooks.on("explorationTurnAdvanced", (turn) => {
         const actor = token.actor;
         if (!actor) continue;
 
-        actor.handleExplorationTurn(turn);
+        actor.advanceExplorationTurn(turn);
 
         // Process equipped items
         for (const item of actor.items) {
             if (!item) continue;
-            item.handleExplorationTurn(turn);
+            item.advanceExplorationTurn(turn);
+        }
+    }
+});
+
+/**
+ * Custom hook for handling exploration turn retreat.
+ */
+Hooks.on("explorationTurnRetreat", (turn) => {
+    console.log(`Exploration turn ${turn} triggered.`);
+
+    // Update the turn tracker display in the chat log
+    const tracker = $(".turn-tracker");
+    if (!tracker.length) return;
+    tracker.find(".turn-label").text(`Turn: ${turn}`);
+
+    // Process all tokens on the canvas
+    for (const token of canvas.tokens.placeables) {
+        const actor = token.actor;
+        if (!actor) continue;
+
+        actor.retreatExplorationTurn(turn);
+
+        // Process equipped items
+        for (const item of actor.items) {
+            if (!item) continue;
+            item.retreatExplorationTurn(turn);
         }
     }
 });

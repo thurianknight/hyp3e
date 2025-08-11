@@ -445,7 +445,7 @@ export class Hyp3eItem extends Item {
      * Handle active effects that might expire, or events that occur, with a new turn.
      * @param {*} turn - The current game-world turn number.
      */
-    async handleExplorationTurn(turn) {
+    async advanceExplorationTurn(turn) {
         // Custom logic here
         // if (this.name === "Torch") {
             // We need a way to track duration of a burning torch...

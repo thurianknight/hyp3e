@@ -612,9 +612,9 @@ export class Hyp3eActor extends Actor {
 
         // Log items to decrement duration
         const namesToReduce = tempItems.map(item => item.name);
-        if (namesToReduce.length > 0) console.log(`processTemporaryItems: Decrementing duration for ${namesToReduce.join(", ")}...`)
+        if (namesToReduce.length > 0) console.log(`processTemporaryItems: Updating duration for ${namesToReduce.join(", ")}...`)
 
-        // Decrement duration on temporary items
+        // Update duration on temporary items
         const updates = [];
         for (const item of tempItems) {
             const dur = item.system?.duration;
@@ -2311,15 +2311,6 @@ export class Hyp3eActor extends Actor {
                     }
                 });
                 await this.createEmbeddedDocuments("ActiveEffect", [lightEffect]);
-
-                // // Create & apply "Light Source" active effect to actor
-                // return this.createEmbeddedDocuments("ActiveEffect", [{
-                //     name: `Light Source: ${item.name}`,
-                //     img: "icons/svg/light.svg",
-                //     origin: item.uuid,
-                //     duration: { rounds: lightProps.duration || undefined },
-                //     disabled: false
-                // }]);
             }
         }
     }
@@ -2366,11 +2357,11 @@ export class Hyp3eActor extends Actor {
      * Handle active effects that might expire, or events that occur, with a new turn.
      * @param {*} turn - The current game-world turn number.
      */
-    async handleExplorationTurn(turn) {
+    async advanceExplorationTurn(turn) {
         // Process active effects
         for (const effect of this.effects) {
             if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
-            if (CONFIG.HYP3E.debugMessages) { console.log(`handleExplorationTurn: Processing effect ${effect.name} for actor ${this.name}...`, effect) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`advanceExplorationTurn: Processing effect ${effect.name} for actor ${this.name}...`, effect) }
             // Check if the effect has a remaining turns flag
             const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
             // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
@@ -2390,6 +2381,27 @@ export class Hyp3eActor extends Actor {
         }
         // Update temporary items & delete if expired
         this.processTemporaryItems(60); // 60 rounds = 10 minutes = 1 Hyperborea turn
+    }
+
+    /**
+     * Handle active effects that might expire, or events that occur, by retreating one turn.
+     * @param {*} turn - The current game-world turn number.
+     */
+    async retreatExplorationTurn(turn) {
+        // Process active effects
+        for (const effect of this.effects) {
+            if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
+            if (CONFIG.HYP3E.debugMessages) { console.log(`retreatExplorationTurn: Processing effect ${effect.name} for actor ${this.name}...`, effect) }
+            // Check if the effect has a remaining turns flag
+            const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
+            // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
+            if (typeof remainingTurns === "number") {
+                const newRemaining = remainingTurns + 1;
+                effect.setFlag("hyp3e", "remainingTurns", newRemaining);
+            }
+        }
+        // Update temporary items & delete if expired
+        this.processTemporaryItems(-60); // 60 rounds = 10 minutes = 1 Hyperborea turn
     }
 
     /** SPECIALIZED SKILL/TASK RESOLUTION ---------------*/

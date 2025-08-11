@@ -7,6 +7,7 @@ export class HYP3ETurnTrackerApp extends Application {
 
         // Only register once
         Hooks.on("explorationTurnAdvanced", this._onTurnAdvanced.bind(this));
+        Hooks.on("explorationTurnRetreat", this._onTurnRetreat.bind(this));
         Hooks.on("explorationTurnReset", this._onTurnReset.bind(this));
     }
 
@@ -72,6 +73,11 @@ export class HYP3ETurnTrackerApp extends Application {
         this.render(false); // Update the tracker
     }
 
+    _onTurnRetreat(data) {
+        console.log("Turn retreat:", data);
+        this.render(false); // Update the tracker
+    }
+
     _onTurnReset(data) {
         console.log("Turn reset:", data);
         this.render(false); // Update/reset display
@@ -83,6 +89,9 @@ export class HYP3ETurnTrackerApp extends Application {
 
         html.find(".advance-turn").on("click", async ev => {
             await game.hyp3e.advanceTurn();
+        });
+        html.find(".retreat-turn").on("click", async ev => {
+            await game.hyp3e.retreatTurn();
         });
         html.find(".reset").on("click", async ev => {
             await game.hyp3e.resetTurn();

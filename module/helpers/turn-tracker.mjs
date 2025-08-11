@@ -17,6 +17,15 @@ export class HYP3ETurnTracker {
         return newTurn;
     }
 
+    static async retreatTurn() {
+        const newTurn = this.currentTurn - 1;
+        await game.settings.set("hyp3e", "explorationTurn", newTurn);
+        this.currentTurn = newTurn;
+        console.log(`Turn tracker retreated to turn ${newTurn}`);
+        Hooks.call("explorationTurnRetreat", newTurn);
+        return newTurn;
+    }
+
     static async reset() {
         const newTurn = 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
