@@ -229,18 +229,21 @@ export async function setupEffectHandlers() {
         const actor = effect.parent;
         if (!actor) return;
 
-        // When an active effect is deleted, check if it had modified the token's light.
+        // When an active effect is deleted, check whether it had modified the token's light.
         //  If so, restore the original light settings from the flag.
-        for (const token of canvas.tokens.placeables) {
-            if (token.actor?.id !== actor.id) continue;
+        const lightProps = effect.getFlag("hyp3e", "lightProps");
+        if (lightProps) {
+            for (const token of canvas.tokens.placeables) {
+                if (token.actor?.id !== actor.id) continue;
 
-            const originalLight = token.document.getFlag("hyp3e", "originalLight");
-            if (!originalLight) continue;
+                const originalLight = token.document.getFlag("hyp3e", "originalLight");
+                if (!originalLight) continue;
 
-            await token.document.update({ light: originalLight });
-            await token.document.unsetFlag("hyp3e", "originalLight");
+                await token.document.update({ light: originalLight });
+                await token.document.unsetFlag("hyp3e", "originalLight");
 
-            console.log(`deleteActiveEffect: Restored original light for token ${token.name}`);
+                console.log(`deleteActiveEffect: Restored original light for token ${token.name}`);
+            }
         }
     });
 }
