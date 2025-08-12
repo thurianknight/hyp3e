@@ -1,0 +1,35 @@
+<form autocomplete="off">
+    <div class="turn-advance-actions-config">
+        <div class="form-group">
+            <button type="button" class="add-action">Add Action</button>
+        </div>
+
+        <ol class="action-list">
+            {{#each actions as |action i|}}
+            <li class="action-item">
+                <div class="flexrow">
+                    <span class="action-label">{{localize 'UUID'}}:</span>
+                    <input type="text" name="uuid" value="{{action.uuid}}" placeholder="UUID">
+                </div>
+                <div class="flexrow">
+                    <span class="action-label">{{localize 'Name'}}:</span>
+                    <input type="text" name="label" value="{{action.label}}" placeholder="Label (optional)">
+                </div>
+                <div class="flexrow">
+                    <span class="action-label">{{localize 'Chat Mode'}}:</span>
+                    <select name="output">
+                        <option value="public" {{#if (eq action.output "public")}}selected{{/if}}>Public</option>
+                        <option value="gm" {{#if (eq action.output "gm")}}selected{{/if}}>Whisper to GM</option>
+                    </select>
+                </div>
+                <button type="button" class="remove-action">Remove</button>
+            </li>
+            <hr>
+            {{/each}}
+        </ol>
+
+        <footer class="sheet-footer flexrow">
+            <button type="submit">Save</button>
+        </footer>
+    </div>
+</form>

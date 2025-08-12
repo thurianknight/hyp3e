@@ -54,9 +54,18 @@ Hooks.once('init', async function() {
     game.settings.register(game.system.id, "explorationTurn", {
         name: "Exploration Turn",
         scope: "world",
-        config: false,           // Hidden from settings UI
+        config: false, // Hidden from settings UI
         type: Number,
         default: 0
+    });
+
+    // Register a game setting to store turn advance actions
+    game.settings.register(game.system.id, "turnAdvanceActions", {
+        name: "Turn Advance Actions",
+        scope: "world",
+        config: false, // We'll manage it via our own UI
+        type: Array,
+        default: []
     });
 
     // Enable the Turn Tracker app
@@ -860,7 +869,7 @@ Hooks.on("explorationTurnReset", (turn) => {
 /**
  * Custom hook for handling exploration turn advancement.
  */
-Hooks.on("explorationTurnAdvanced", (turn) => {
+Hooks.on("explorationTurnAdvanced", async (turn) => {
     console.log(`Exploration turn ${turn} triggered.`);
 
     // Update the turn tracker display in the chat log
@@ -881,7 +890,30 @@ Hooks.on("explorationTurnAdvanced", (turn) => {
             item.advanceExplorationTurn(turn);
         }
     }
+
+    // Execute any actions defined in the settings for turn advancement
+    const actions = game.settings.get(game.system.id, "turnAdvanceActions") || [];
+    for (const action of actions) {
+        const doc = await fromUuid(action.uuid);
+        if (!doc) {
+            ui.notifications.warn(`Could not find document for ${action.label || action.uuid}`);
+            continue;
+        }
+
+        if (doc instanceof RollTable) {
+            const rollMode = getRollMode(action.output);
+            await doc.draw({ displayChat: true, rollMode: action.rollMode });
+        } else if (doc instanceof Macro) {
+            await doc.execute();
+        } else {
+            ui.notifications.warn(`${action.label || action.uuid} is not a Roll Table or Macro, cannot execute.`);
+        }
+    }
 });
+function getRollMode(type) {
+    if (type === "gm") return "blindroll";
+    return "publicroll";
+}
 
 /**
  * Custom hook for handling exploration turn retreat.

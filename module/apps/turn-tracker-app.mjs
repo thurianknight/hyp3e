@@ -1,5 +1,6 @@
 // systems/hyp3e/module/apps/turn-tracker-app.mjs
 import { HYP3E } from "../helpers/config.mjs"
+import { TurnAdvanceActionsConfig } from "./turn-advance-actions-config.mjs";
 
 export class HYP3ETurnTrackerApp extends Application {
     constructor(options = {}) {
@@ -106,6 +107,10 @@ export class HYP3ETurnTrackerApp extends Application {
                 content: `Current exploration turn: ${turn}.`,
                 type: CONST.CHAT_MESSAGE_TYPES.OTHER
             });
+        });
+        html.find(".open-turn-actions").on("click", ev => {
+            ev.preventDefault();
+            new TurnAdvanceActionsConfig().render(true);
         });
     }
 }
