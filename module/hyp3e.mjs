@@ -13,7 +13,7 @@ import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { Hyp3eCharacter } from "./helpers/character.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
-import { HYP3ETurnTracker } from "./helpers/turn-tracker.mjs";
+import { HYP3ETurnTracker, setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
 
 // Set this now, to use later
@@ -855,92 +855,8 @@ Hooks.on("createToken", (token, options, userId) => {
     }
 });
 
-/**
- * Custom hook for handling exploration turn reset to 1.
- */
-Hooks.on("explorationTurnReset", (turn) => {
-    console.log(`Exploration turn reset to ${turn}`);
-    // Update the turn tracker display in the chat log
-    const tracker = $(".turn-tracker");
-    if (!tracker.length) return;
-    tracker.find(".turn-label").text(`Turn: ${turn}`);
-});
-
-/**
- * Custom hook for handling exploration turn advancement.
- */
-Hooks.on("explorationTurnAdvanced", async (turn) => {
-    console.log(`Exploration turn ${turn} triggered.`);
-
-    // Update the turn tracker display in the chat log
-    const tracker = $(".turn-tracker");
-    if (!tracker.length) return;
-    tracker.find(".turn-label").text(`Turn: ${turn}`);
-
-    // Process all tokens on the canvas
-    for (const token of canvas.tokens.placeables) {
-        const actor = token.actor;
-        if (!actor) continue;
-
-        actor.advanceExplorationTurn(turn);
-
-        // Process equipped items
-        for (const item of actor.items) {
-            if (!item) continue;
-            item.advanceExplorationTurn(turn);
-        }
-    }
-
-    // Execute any actions defined in the settings for turn advancement
-    const actions = game.settings.get(game.system.id, "turnAdvanceActions") || [];
-    for (const action of actions) {
-        if (!action.enabled) continue; // Skip if not enabled
-        const doc = await fromUuid(action.uuid);
-        if (!doc) {
-            ui.notifications.warn(`Could not find document for ${action.label || action.uuid}`);
-            continue;
-        }
-
-        if (doc instanceof RollTable) {
-            const rollMode = getRollMode(action.output);
-            await doc.draw({ displayChat: true, rollMode: rollMode });
-        } else if (doc instanceof Macro) {
-            await doc.execute();
-        } else {
-            ui.notifications.warn(`${action.label || action.uuid} is not a Roll Table or Macro, cannot execute.`);
-        }
-    }
-});
-function getRollMode(type) {
-    if (type === "gm") return "privateroll";
-    return "publicroll";
-}
-
-/**
- * Custom hook for handling exploration turn retreat.
- */
-Hooks.on("explorationTurnRetreat", (turn) => {
-    console.log(`Exploration turn ${turn} triggered.`);
-
-    // Update the turn tracker display in the chat log
-    const tracker = $(".turn-tracker");
-    if (!tracker.length) return;
-    tracker.find(".turn-label").text(`Turn: ${turn}`);
-
-    // Process all tokens on the canvas
-    for (const token of canvas.tokens.placeables) {
-        const actor = token.actor;
-        if (!actor) continue;
-
-        actor.retreatExplorationTurn(turn);
-
-        // Process equipped items
-        for (const item of actor.items) {
-            if (!item) continue;
-            item.retreatExplorationTurn(turn);
-        }
-    }
-});
+// Register Turn Tracker hooks
+await setupTurnTrackerHooks();
 
 /**
  * Render the exploration turn tracker app in the chat log.
