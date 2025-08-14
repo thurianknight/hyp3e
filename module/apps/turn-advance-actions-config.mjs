@@ -40,8 +40,14 @@ export class TurnAdvanceActionsConfig extends FormApplication {
                             <option value="gm">Whisper to GM</option>
                         </select>
                     </div>
-                    <button type="button" class="remove-action">Remove</button>
+                    <div class="flexrow">
+                        <span class="action-label">Enabled
+                            <input type="checkbox" name="enabled" checked>
+                        </span>
+                        <button type="button" class="remove-action">Remove</button>
+                    </div>
                 </li>
+                <hr>
             `);
             list.append(li);
             li.find(".remove-action").on("click", () => li.remove());
@@ -84,15 +90,17 @@ export class TurnAdvanceActionsConfig extends FormApplication {
         const uuids = formData["uuid"];
         const labels = formData["label"];
         const outputs = formData["output"];
-
+        const enableds = formData["enabled"];
+        console.log("Form data:", formData);
         // Normalize in case of single entry (not array)
         const count = Array.isArray(uuids) ? uuids.length : 1;
         for (let i = 0; i < count; i++) {
             const uuid = Array.isArray(uuids) ? uuids[i] : uuids;
             const label = Array.isArray(labels) ? labels[i] : labels;
             const output = Array.isArray(outputs) ? outputs[i] : outputs;
+            const enabled = Array.isArray(enableds) ? enableds[i] : enableds;
             if (!uuid) continue;
-            actions.push({ uuid, label, output });
+            actions.push({ uuid, label, output, enabled });
         }
         console.log("Saving turn advance actions:", actions);
         await game.settings.set(game.system.id, "turnAdvanceActions", actions);

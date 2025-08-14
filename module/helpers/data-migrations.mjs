@@ -15,27 +15,27 @@ export function migrateActorData(actor) {
         updates = { ...updates, "system.tokenAlias": "" };
     }
     // Migrate, fix, or delete old data
-    if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp == "object") {
+    if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp === "object") {
         console.log(`Fixing temp HP for ${actor.name}...`);
         updates = { ...updates, "system.hp.tempHp": 0 };
     }
     // If tempAcMod is an object, convert it to zero
-    if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod == "object") {
+    if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod === "object") {
         console.log(`Fixing temp attack mod for ${actor.name}...`);
         updates = { ...updates, "system.tempAtkMod": 0 };
     }
     // If tempDmgMod is an object, convert it to zero
-    if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod == "object") {
+    if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod === "object") {
         console.log(`Fixing temp damage mod for ${actor.name}...`);
         updates = { ...updates, "system.tempDmgMod": 0 };
     }
     // If tempAcMod is an object, convert it to zero
-    if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod == "object") {
+    if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod === "object") {
         console.log(`Fixing temp AC mod for ${actor.name}...`);
         updates = { ...updates, "system.ac.tempAcMod": 0 };
     }
     // If tempDrMod is an object, convert it to zero
-    if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod == "object") {
+    if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod === "object") {
         console.log(`Fixing temp DR mod for ${actor.name}...`);
         updates = { ...updates, "system.ac.tempDrMod": 0 };
     }

@@ -894,6 +894,7 @@ Hooks.on("explorationTurnAdvanced", async (turn) => {
     // Execute any actions defined in the settings for turn advancement
     const actions = game.settings.get(game.system.id, "turnAdvanceActions") || [];
     for (const action of actions) {
+        if (!action.enabled) continue; // Skip if not enabled
         const doc = await fromUuid(action.uuid);
         if (!doc) {
             ui.notifications.warn(`Could not find document for ${action.label || action.uuid}`);
@@ -902,7 +903,7 @@ Hooks.on("explorationTurnAdvanced", async (turn) => {
 
         if (doc instanceof RollTable) {
             const rollMode = getRollMode(action.output);
-            await doc.draw({ displayChat: true, rollMode: action.rollMode });
+            await doc.draw({ displayChat: true, rollMode: rollMode });
         } else if (doc instanceof Macro) {
             await doc.execute();
         } else {
@@ -911,7 +912,7 @@ Hooks.on("explorationTurnAdvanced", async (turn) => {
     }
 });
 function getRollMode(type) {
-    if (type === "gm") return "blindroll";
+    if (type === "gm") return "privateroll";
     return "publicroll";
 }
 

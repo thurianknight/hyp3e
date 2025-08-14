@@ -1400,15 +1400,23 @@ textarea {
   border-radius: 6px;
   .action-label {
     font-weight: bold;
-    padding: 5px 10px;
-    flex: 1 1 auto;
+    /* padding: 5px 5px; */
+    padding: 0.25em 0;
+    flex: 1 auto;
   }
-  input {
+  input[type=text] {
     text-align: center;
     min-width: 150px;
     max-width: 200px;
     margin-bottom: 5px;
     flex: 2 auto;
+  }
+  input[type=checkbox] {
+    /* margin: 5px 10px; */
+    padding: 0.25em 0;
+    /* margin-top: 5px; */
+    /* padding: 5px 10px; */
+    /* flex: 1 auto; */
   }
   select {
     min-width: 150px;
@@ -1417,7 +1425,7 @@ textarea {
     flex: 2 auto;
   }
   button {
-    width: 75%;
+    min-width: 125px;
     margin: 0.25em 0;
     font-size: medium;
     font-weight: bold;

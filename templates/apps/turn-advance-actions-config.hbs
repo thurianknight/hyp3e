@@ -22,7 +22,12 @@
                         <option value="gm" {{#if (eq action.output "gm")}}selected{{/if}}>Whisper to GM</option>
                     </select>
                 </div>
-                <button type="button" class="remove-action">Remove</button>
+                <div class="flexrow">
+                    <span class="action-label">{{localize 'Enabled'}}
+                        <input type="checkbox" name="enabled" {{#if action.enabled}}checked{{/if}}>
+                    </span>
+                    <button type="button" class="remove-action">Remove</button>
+                </div>
             </li>
             <hr>
             {{/each}}
