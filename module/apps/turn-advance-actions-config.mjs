@@ -53,6 +53,11 @@ export class TurnAdvanceActionsConfig extends FormApplication {
             li.find(".remove-action").on("click", () => li.remove());
             // Attach drag/drop listener for the new input
             this._attachUuidDropListener(li.find("input[name='uuid']"));
+            // Resize window — increase height
+            const pos = this.position;  // current position/size
+            this.setPosition({
+                height: pos.height + 150  // adjust to match new content size
+            });
         });
 
         // Remove an action
@@ -72,16 +77,29 @@ export class TurnAdvanceActionsConfig extends FormApplication {
             ev.originalEvent.dataTransfer.dropEffect = "copy";
         });
 
-        $input.on("drop", ev => {
+        $input.on("drop", async ev => {
             ev.preventDefault();
             const data = JSON.parse(ev.originalEvent.dataTransfer.getData("text/plain"));
-            const uuid = fromUuidSync(data.uuid ?? data.id ? data.uuid || `Macro.${data.id}` : "");
-            // Foundry already includes uuid in drag data for documents
-            if (data.uuid) {
-                $input.val(data.uuid);
-            } else {
+            if (!data.uuid) {
                 ui.notifications.warn("That item cannot be dropped here. Please drop a Macro or RollTable.");
+                return;
             }
+
+            // Resolve the dropped document
+            const doc = await fromUuid(data.uuid);
+            if (!doc) {
+                ui.notifications.warn("Unable to resolve dropped document.");
+                return;
+            }
+
+            // Set the UUID in the field
+            $input.val(data.uuid);
+            // Set the label field to the document's name
+            const $labelInput = $input.closest(".action-item").find('input[name="label"]');
+            $labelInput.val(doc.name);
+
+            // Automatically save the form
+            this.submit({ preventClose: true });
         });
     }
 
