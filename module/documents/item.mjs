@@ -446,18 +446,6 @@ export class Hyp3eItem extends Item {
      * @param {*} turn - The current game-world turn number.
      */
     async advanceExplorationTurn(turn) {
-        // Custom logic here
-        // if (this.name === "Torch") {
-            // We need a way to track duration of a burning torch...
-
-            // const uses = item.system.uses?.value ?? null;
-            // if (typeof uses === "number" && uses > 0) {
-            //     item.update({ "system.uses.value": uses - 1 });
-            //     if (uses === 1) {
-            //         ui.notifications.info(`${actor.name}'s torch goes out.`);
-            //     }
-            // }
-        // }
         if (this.system.duration > 0) {
             // Handle temporary or ephemeral items
             const duration = this.system.duration;

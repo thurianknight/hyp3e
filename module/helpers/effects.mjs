@@ -146,13 +146,12 @@ export async function setupEffectHandlers() {
         //  This is useful for effects that are generally applied outside of combat and last for 
         //  multiple turns (much longer than a typical combat spell/effect).
         if (!effect.getFlag("hyp3e", "remainingTurns")) {
-            // if (!effect.duration.rounds) return; // Only auto-set for effects with a rounds duration
             // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
             const durationTurns = Math.floor(effect.duration.rounds / 60) ?? undefined;
             if (durationTurns < 1) {
-                console.log(`createActiveEffect: Effect ${effect.label} has <60 rounds and will expire at the next turn.`);
+                console.log(`createActiveEffect: Effect ${effect.name} has <60 rounds and will expire at the next turn.`);
             } else if (isNaN(durationTurns)) {
-                console.log(`createActiveEffect: Effect ${effect.label} has no duration limit and will not expire.`);
+                console.log(`createActiveEffect: Effect ${effect.name} has no duration limit and will not expire.`);
             }
             await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
             console.log(`createActiveEffect: Auto-set remainingTurns to ${durationTurns} for ${effect.name}`);

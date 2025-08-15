@@ -34,10 +34,10 @@ export class TurnAdvanceActionsConfig extends FormApplication {
                         <input type="text" name="label" placeholder="Label (optional)">
                     </div>
                     <div class="flexrow">
-                        <span class="action-label">Chat Mode:</span>
+                        <span class="action-label">RollTable Results:</span>
                         <select name="output">
                             <option value="public">Public</option>
-                            <option value="gm">Whisper to GM</option>
+                            <option value="gm" selected>Whisper to GM</option>
                         </select>
                     </div>
                     <div class="flexrow">
