@@ -2,7 +2,7 @@ export class TurnAdvanceActionsConfig extends FormApplication {
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
             id: "turn-advance-actions-config",
-            title: "Turn Advance Actions",
+            title: "Turn-Advance Actions",
             template: "systems/hyp3e/templates/apps/turn-advance-actions-config.hbs",
             width: 400,
             classes: ["hyp3e", "turn-advance-actions-config"],
@@ -120,7 +120,7 @@ export class TurnAdvanceActionsConfig extends FormApplication {
             if (!uuid) continue;
             actions.push({ uuid, label, output, enabled });
         }
-        console.log("Saving turn advance actions:", actions);
+        console.log("Saving turn-advance actions:", actions);
         await game.settings.set(game.system.id, "turnAdvanceActions", actions);
     }
 }

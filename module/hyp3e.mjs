@@ -59,9 +59,9 @@ Hooks.once('init', async function() {
         default: 0
     });
 
-    // Register a game setting to store turn advance actions
+    // Register a game setting to store turn-advance actions
     game.settings.register(game.system.id, "turnAdvanceActions", {
-        name: "Turn Advance Actions",
+        name: "Turn-Advance Actions",
         scope: "world",
         config: false, // We'll manage it via our own UI
         type: Array,
