@@ -102,6 +102,7 @@ export class HYP3ETurnTracker {
     }
 
     static async retreatTurn() {
+        if (this.currentTurn <= 1) return;  // Don't let turn go below 1
         const newTurn = this.currentTurn - 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
         this.currentTurn = newTurn;
