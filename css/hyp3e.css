@@ -311,8 +311,8 @@ textarea {
 .chat-button-small {
     width: 28px;
     max-width: 32px;
-    height: 26px;
-    max-height: 28px;
+    height: 28px;
+    max-height: 32px;
     font-size: 12px;
     line-height: 1px;
     padding: 1px 1px;

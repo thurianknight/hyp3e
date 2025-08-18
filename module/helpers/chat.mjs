@@ -154,23 +154,23 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
 
     if (dmg.length > 0) {
         dmg.each((_i, b) => {
-            let total = Number($(b).data('total'));
-            let naturalRoll = Number($(b).data('natural'));
+            const total = Number($(b).data('total'));
+            const naturalRoll = Number($(b).data('natural'));
             const applyDr = $(b).data('applyDr');
             let dieFormula = $(b).data('roll');
             let sourceType = $(b).data('sourceType');
 
             const fullDamageButton = $(
-                `<button class="dice-total-fullDamage-btn chat-button-small" title="Click to apply full damage to selected token(s)."><i class="fas fa-user-minus"></i></button>`
+                `<button class="dice-total-fullDamage-btn chat-button-small" title="Click to apply ${total} damage to selected token(s)."><i class="fas fa-user-minus"></i></button>`
             );
             const halfDamageButton = $(
                 `<button class="dice-total-halfDamage-btn chat-button-small" title="Click to apply half damage to selected token(s)."><i class="fas fa-user-shield"></i></button>`
             );
             const fullHealingButton = $(
-                `<button class="dice-total-fullHealing-btn chat-button-small" title="Click to apply full healing to selected token(s)."><i class="fas fa-user-plus"></i></button>`
+                `<button class="dice-total-fullHealing-btn chat-button-small" title="Click to apply ${total} healing to selected token(s)."><i class="fas fa-user-plus"></i></button>`
             );
             const fullDamageModifiedButton = $(
-                `<button class="dice-total-fullDamageMod-btn chat-button-small" title="Click to apply full damage with modifier prompt to selected token(s)."><i class="fas fa-user-edit"></i></button>`
+                `<button class="dice-total-fullDamageMod-btn chat-button-small" title="Click to apply ${total} damage with modifier prompt to selected token(s)."><i class="fas fa-user-edit"></i></button>`
             );
             dmg.append(fullDamageButton);
             dmg.append(halfDamageButton);
@@ -258,7 +258,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const applyDr = $(b).data('applyDr');
             // let dieFormula =$(b).data('roll');
             const critDamageButton = $(
-                `<button class="dice-total-critDamage-btn chat-button-crit" title="Click to apply damage to selected token(s).">Apply Damage <i class="fas fa-user"></i></button>`
+                `<button class="dice-total-critDamage-btn chat-button-crit" title="Click to apply ${total} damage to selected token(s).">Apply Damage <i class="fas fa-user-minus"></i></button>`
             );
             critDmg.append(critDamageButton);
             // Handle button clicks
