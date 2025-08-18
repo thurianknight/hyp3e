@@ -90,6 +90,8 @@ export async function renderCustomChat(roll, item, actor, tokenId, label, debugR
  * @param {*} _data 
  */
 export const addChatMessageButtons = async function(_msg, html, _data) {
+    // Set this flag
+    let addGenericDmgHealBtns = true
 
     // Damage-roll button
     let dmgRoll = html.find(".dmg-roll-button");
@@ -115,6 +117,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, itemUuid, tokenId, sourceType);
             });
         });
+        addGenericDmgHealBtns = false;
     }
     // Damage-roll button for 2-hand damage
     let dmgRoll2h = html.find(".dmg-roll-button2h");
@@ -141,6 +144,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, itemUuid, tokenId, sourceType);
             });
         });
+        addGenericDmgHealBtns = false;
     }
 
     // Four damage-applying buttons
@@ -164,7 +168,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             );
             const fullHealingButton = $(
                 `<button class="dice-total-fullHealing-btn chat-button-small" title="Click to apply full healing to selected token(s)."><i class="fas fa-user-plus"></i></button>`
-            );        
+            );
             const fullDamageModifiedButton = $(
                 `<button class="dice-total-fullDamageMod-btn chat-button-small" title="Click to apply full damage with modifier prompt to selected token(s)."><i class="fas fa-user-edit"></i></button>`
             );
@@ -176,17 +180,17 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             fullDamageButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthDrop(total, applyDr);
+                applyHealthChange(total, applyDr);
             });
 
             halfDamageButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthDrop(Math.floor(total*0.5), applyDr);
+                applyHealthChange(Math.floor(total*0.5), applyDr);
             });
 
             fullHealingButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthDrop(total*-1, false);
+                applyHealthChange(total*-1, false);
             });
 
             fullDamageModifiedButton.on("click", (ev) => {
@@ -243,6 +247,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 }).render(true);
             });
         });
+        addGenericDmgHealBtns = false;
     }
 
     // Apply critical damage button
@@ -259,9 +264,10 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             critDamageButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthDrop(total, applyDr);
+                applyHealthChange(total, applyDr);
             });
         });
+        addGenericDmgHealBtns = false;
     }
 
     // "longer" button style for crit miss/hit
@@ -287,6 +293,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 rollCritMiss(baseClass, actorId);
             });
         });
+        addGenericDmgHealBtns = false;
     }
 
     let critHit = html.find(".critical-hit");
@@ -309,6 +316,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 rollCritHit(baseClass, actorId);
             });
         });
+        addGenericDmgHealBtns = false;
     }
 
     // Saving throw button
@@ -328,6 +336,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 rollSaveButton(saveType);
             });
         });
+        addGenericDmgHealBtns = false;
     }
 
     // Apply/Enable/Disable Effect buttons
@@ -417,7 +426,42 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                 }
             });
         });
+        addGenericDmgHealBtns = false;
     }
+
+    // Skip RollTable results
+    if (_msg.flags?.core?.RollTable || _msg.flags?.documentType === "RollTable") {
+        addGenericDmgHealBtns = false;
+    }
+    // Only add buttons to "unflavored" dice roll chat messages
+    console.log("Chat message type:", _msg.type)
+    console.log("Chat message flavor:", _msg.flavor)
+    if (_msg.flavor !== "") {
+        addGenericDmgHealBtns = false;
+    }
+
+    // Don't add the generic damage/heal buttons if previous functions already added their own
+    if (!addGenericDmgHealBtns) return;
+
+    // Catch any generic dice roll sent to chat
+    const total = _msg.rolls?.[0]?.total ?? _msg.roll?.total;
+    if (total === undefined) return; // not a dice roll
+
+    const btnContainer = $(`<div class="roll-chat-buttons flexrow"></div>`);
+    // const dmgBtn = $(`<button type="button" class="apply-damage">Apply ${total} Damage</button>`);
+    // const healBtn = $(`<button type="button" class="apply-heal">Apply ${total} Healing</button>`);
+    const dmgBtn = $(
+        `<button class="dice-total-fullDamage-btn chat-button-small" title="Click to apply ${total} damage to selected token(s)."><i class="fas fa-user-minus"></i></button>`
+    );
+    const healBtn = $(
+        `<button class="dice-total-fullHealing-btn chat-button-small" title="Click to apply ${total} healing to selected token(s)."><i class="fas fa-user-plus"></i></button>`
+    );
+
+    btnContainer.append(dmgBtn, healBtn);
+    html.append(btnContainer);
+
+    dmgBtn.on("click", () => applyHealthChange(total, true));
+    healBtn.on("click", () => applyHealthChange(total * -1, false)); // Healing is negative, and ignore DR
 }
 
 // Show a change in value by a token
@@ -599,14 +643,19 @@ async function rollCriticalDamage(total, extraRoll, applyDr) {
 
 }
 
-// Apply a health drop (positive number is damage) to one or more tokens.
-async function applyHealthDrop(total, applyDr=true) {
-    if (total == 0) return; // Skip changes of 0
+/**
+ * Apply a health drop (positive number is damage, negative is healing) to selected token(s).
+ * @param {Number} total - Damage/healing to apply
+ * @param {Boolean} applyDr - Apply DR or not
+ * @returns 
+ */
+async function applyHealthChange(total, applyDr=true) {
+    if (total === 0) return; // Skip changes of 0
 
     // Get selected tokens
     const tokens = canvas?.tokens?.controlled;
-    if (!tokens || tokens.length == 0) {
-        ui.notifications?.error("Apply Damage: Please select at least one token.");
+    if (!tokens || tokens.length === 0) {
+        ui.notifications?.error("Apply Health Change: Please select at least one token.");
         return;
     }
 
@@ -615,7 +664,7 @@ async function applyHealthDrop(total, applyDr=true) {
     for (const t of tokens) {
         const actor = t.actor;
         if (!actor) {
-            ui.notifications?.error(`Apply Damage: Actor ${t.name} not found!`);
+            ui.notifications?.error(`Apply Health Change: Actor ${t.name} not found!`);
             continue;
         }
 
@@ -655,7 +704,6 @@ async function applyHealthDrop(total, applyDr=true) {
         extraRoll: "",
         title: title,
         body: body,
-        // image: image
     };
 
     const template = `${HYP3E.templatePath}/chat/apply-damage.hbs`;

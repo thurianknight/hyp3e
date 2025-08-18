@@ -304,18 +304,19 @@ textarea {
 
 /* Chat message damage text */
 .dice-damage {
-  font-style: italic;
-  font-weight: bold;
-  /* color: #e90000; */
+    font-style: italic;
+    font-weight: bold;
 }
 
 .chat-button-small {
-  width: 22px;
-  height: 22px;
-  font-size: 10px;
-  line-height: 1px;
-  padding: 1px 1px;
-  margin: 1px 2px;
+    width: 28px;
+    max-width: 32px;
+    height: 26px;
+    max-height: 28px;
+    font-size: 12px;
+    line-height: 1px;
+    padding: 1px 1px;
+    margin: 1px 2px;
 }
 
 .chat-button-crit {
@@ -329,6 +330,10 @@ textarea {
 
 .chat-btn-full-width {
     width: 100%;
+}
+
+.roll-chat-buttons {
+    justify-content: flex-end; /* align right */
 }
 
 .chat-table {
