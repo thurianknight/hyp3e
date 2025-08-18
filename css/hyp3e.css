@@ -308,12 +308,15 @@ textarea {
     font-weight: bold;
 }
 
+.damage-button {
+    flex-direction: row;
+}
+
 .chat-button-small {
     width: 28px;
     max-width: 32px;
     height: 28px;
     max-height: 32px;
-    font-size: 12px;
     line-height: 1px;
     padding: 1px 1px;
     margin: 1px 2px;
@@ -321,8 +324,9 @@ textarea {
 
 .chat-button-crit {
     width: 44px;
-    height: 22px;
-    font-size: 12px;
+    max-width: 140px;
+    height: 28px;
+    max-height: 32px;
     line-height: 1px;
     padding: 1px 1px;
     margin: 1px 2px;

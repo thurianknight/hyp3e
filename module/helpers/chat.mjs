@@ -433,7 +433,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     if (_msg.flags?.core?.RollTable || _msg.flags?.documentType === "RollTable") {
         addGenericDmgHealBtns = false;
     }
-    // Only add buttons to "unflavored" dice roll chat messages
+    // Only add damage/heal buttons to "unflavored" dice roll chat messages
     console.log("Chat message type:", _msg.type)
     console.log("Chat message flavor:", _msg.flavor)
     if (_msg.flavor !== "") {
@@ -615,7 +615,7 @@ async function rollCriticalDamage(total, extraRoll, applyDr) {
         <div class="dice-roll">
             <div class="dice-formula flexrow">
                 <span class="dice-damage">${total} HP damage!</span>
-                <span class="crit-damage-button flexrow" data-apply-dr="${applyDr}" data-total="${total}"></span>
+                <span class="crit-damage-button" data-apply-dr="${applyDr}" data-total="${total}"></span>
             </div>
         </div>`
 
