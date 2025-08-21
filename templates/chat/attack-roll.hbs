@@ -33,13 +33,17 @@
     </div>
 </div>
 {{#if roll.hit}}
-<div class='dmg-roll-button' style='padding-top: 5px' data-item-id='{{item.id}}' data-item-uuid='{{item.uuid}}' data-actor-id='{{actorId}}' 
-    data-token-id='{{tokenId}}' data-base-damage='{{item.system.damage}}' data-formula='{{item.dmgFormula}}' data-debug-formula='{{item.debugDmgRollFormula}}' 
+<div class='dmg-roll-button' style='padding-top: 5px' data-item-id='{{item.id}}' 
+    data-item-uuid='{{item.uuid}}' data-actor-id='{{actorId}}' data-token-id='{{tokenId}}' 
+    data-base-damage='{{item.system.damage}}' data-damage-type='{{item.system.dmgType}}' 
+    data-formula='{{item.dmgFormula}}' data-debug-formula='{{item.debugDmgRollFormula}}' 
     data-source-type='{{item.type}}'>
 </div>
 {{#if item.dmgFormula2h}}
-<div class='dmg-roll-button2h' style='padding-top: 2px' data-item-id='{{item.id}}' data-item-uuid='{{item.uuid}}' data-actor-id='{{actorId}}' 
-    data-token-id='{{tokenId}}' data-base-damage='{{item.system.damage2h}}' data-formula='{{item.dmgFormula2h}}' data-debug-formula='{{item.debugDmgRollFormula2h}}' 
+<div class='dmg-roll-button2h' style='padding-top: 2px' data-item-id='{{item.id}}' 
+    data-item-uuid='{{item.uuid}}' data-actor-id='{{actorId}}' data-token-id='{{tokenId}}' 
+    data-base-damage='{{item.system.damage2h}}' data-damage-type='{{item.system.dmgType}}' 
+    data-formula='{{item.dmgFormula2h}}' data-debug-formula='{{item.debugDmgRollFormula2h}}' 
     data-source-type='{{item.type}}'>
 </div>
 {{/if}}

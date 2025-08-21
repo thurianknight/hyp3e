@@ -323,8 +323,8 @@ textarea {
 }
 
 .chat-button-crit {
-    width: 44px;
-    max-width: 140px;
+    min-width: 130px;
+    max-width: 150px;
     height: 28px;
     max-height: 32px;
     line-height: 1px;

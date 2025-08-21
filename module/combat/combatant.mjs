@@ -215,7 +215,7 @@ export class HYP3ECombatant extends Combatant {
             }    
         }
     }
-
+    /**
     async applyDamage(damageType, damageRoll, applyDr=true) {
         // Roll damage formula and log the result
         if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage Combatant: `, this) }
@@ -226,7 +226,7 @@ export class HYP3ECombatant extends Combatant {
         if (CONFIG.HYP3E.debugMessages) { console.log(`applyDamage total: ${damage}`) }
 
         // Apply the damage to the combatant
-        await this.actor.applyHealthChange(damage, applyDr)
+        await this.actor.applyHealthChange(damage, damageType, applyDr)
 
         // Send a chat message that damage is being applied
         const message = `${this.actor.name} takes ${damage} ${damageType} damage!`;
@@ -272,5 +272,6 @@ export class HYP3ECombatant extends Combatant {
             }    
         }
     }
+    */
 
 }

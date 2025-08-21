@@ -431,7 +431,10 @@ export class Hyp3eItem extends Item {
 
         const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData);
         const roll = new Roll(dmgObj.formula, actorData);
-        return `<div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' data-actor-id='${actorData.actorId}' data-formula='${roll.formula}' data-debug-formula='${dmgObj.debugFormula}' data-source-type='${item.type}'></div>`;
+        return `<div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' 
+            data-actor-id='${actorData.actorId}' data-formula='${roll.formula}' 
+            data-damage-type='${itemData.dmgType}' data-debug-formula='${dmgObj.debugFormula}' 
+            data-source-type='${item.type}'></div>`;
     }
 
     _renderItemCheckSection(itemData) {

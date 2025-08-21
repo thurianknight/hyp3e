@@ -479,6 +479,8 @@ export class Hyp3eActor extends Actor {
      */
     async processTemporaryEffects() {
         let totalDamage = 0;
+        let damageType = ""
+        let rawDamageRoll = ""
         let damageMessages = [];
 
         // Collect updates to disable expired effects
@@ -490,7 +492,7 @@ export class Hyp3eActor extends Actor {
                 if (persistentDamage) {
                     if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: ${effect.name}`, persistentDamage); }
 
-                    const [damageType, rawDamageRoll] = persistentDamage.value.split(",");
+                    [damageType, rawDamageRoll] = persistentDamage.value.split(",");
                     const damageRollFormula = rawDamageRoll.replace(";", "").trim();
 
                     if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: rolling ${damageRollFormula} ${damageType}`); }
@@ -513,7 +515,7 @@ export class Hyp3eActor extends Actor {
 
         // Apply total damage once
         if (totalDamage > 0) {
-            await this.applyHealthChange(totalDamage, false);
+            await this.applyHealthChange(totalDamage, damageType, false);
             if (CONFIG.HYP3E.debugMessages) {
                 console.log(`processTemporaryEffects: ${this.name} took ${totalDamage} total damage!`);
             }
@@ -661,7 +663,7 @@ export class Hyp3eActor extends Actor {
      * @param {boolean} [applyDr=true] - If true (default), apply the actor's Damage Reduction (system.ac.dr) against positive (damage) amounts.
      * @returns {Promise<void|Error>} Returns nothing on success or early exit, or the Error object if the actor update fails.
      */
-    async applyHealthChange(amount, applyDr = true) {
+    async applyHealthChange(amount, damageType = "basic", applyDr = true) {
         const actorName = this.name ?? 'Unknown Actor'; // Use actor's name for logging
 
         // Input Validation

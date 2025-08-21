@@ -101,6 +101,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const baseDmgFormula = $(b).data('baseDamage');
             const dmgFormula = $(b).data('formula');
             const debugDmgRollFormula = $(b).data('debugFormula');
+            const damageType = $(b).data('damageType');
             const sourceType = $(b).data('sourceType');
             const itemId = $(b).data('itemId');
             const itemUuid = $(b).data('itemUuid');
@@ -114,7 +115,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, itemUuid, tokenId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType);
             });
         });
         addGenericDmgHealBtns = false;
@@ -127,7 +128,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             const baseDmgFormula = $(b).data('baseDamage');
             const dmgFormula = $(b).data('formula');
             const debugDmgRollFormula = $(b).data('debugFormula');
-            const applyDr = $(b).data('applyDr');
+            const damageType = $(b).data('damageType');
             const sourceType = $(b).data('sourceType');
             const itemId = $(b).data('itemId');
             const itemUuid = $(b).data('itemUuid');
@@ -141,7 +142,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             dmgRoll2h.on("click", (ev) => {
                 ev.stopPropagation();
-                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, itemUuid, tokenId, sourceType);
+                rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType);
             });
         });
         addGenericDmgHealBtns = false;
@@ -156,6 +157,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
         dmg.each((_i, b) => {
             const total = Number($(b).data('total'));
             const naturalRoll = Number($(b).data('natural'));
+            const damageType = $(b).data('damageType');
             const applyDr = $(b).data('applyDr');
             let dieFormula = $(b).data('roll');
             let sourceType = $(b).data('sourceType');
@@ -180,17 +182,17 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             fullDamageButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthChange(total, applyDr);
+                applyHealthChange(total, damageType, applyDr);
             });
 
             halfDamageButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthChange(Math.floor(total*0.5), applyDr);
+                applyHealthChange(Math.floor(total*0.5), damageType, applyDr);
             });
 
             fullHealingButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthChange(total*-1, false);
+                applyHealthChange(total*-1, damageType, false);
             });
 
             fullDamageModifiedButton.on("click", (ev) => {
@@ -207,7 +209,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                             if (modifier && modifier != "") {
                                 const nModifier = Number(modifier);
                                 if (nModifier) {
-                                    rollCriticalDamage(total + nModifier, "", applyDr);
+                                    rollCriticalDamage(total + nModifier, "", damageType, applyDr);
                                 } else {
                                     ui.notifications?.error(modifier + " is not a number");
                                 }
@@ -220,17 +222,17 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
                     buttons["two"] = {
                         icon: "<i class='fas fa-check'></i>",
                         label: `×2 Dice Dmg (roll only)`,
-                        callback: () => rollCriticalDamage(total, dieFormula, applyDr)
+                        callback: () => rollCriticalDamage(total, dieFormula, damageType, applyDr)
                     };
                     buttons["three"] = {
                         icon: "<i class='fas fa-check'></i>",
                         label: `×3 Dice Dmg (roll only)`,
-                        callback: () => rollCriticalDamage(total, `${dieFormula}+${dieFormula}`, applyDr)
+                        callback: () => rollCriticalDamage(total, `${dieFormula}+${dieFormula}`, damageType, applyDr)
                     };
                     buttons["four"] = {
                         icon: "<i class='fas fa-check'></i>",
                         label: `×4 Dice Dmg (roll only)`,
-                        callback: () => rollCriticalDamage(total, `${dieFormula}+${dieFormula}+${dieFormula}`, applyDr)
+                        callback: () => rollCriticalDamage(total, `${dieFormula}+${dieFormula}+${dieFormula}`, damageType, applyDr)
                     };
                 }
                 new Dialog({
@@ -255,6 +257,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     if (critDmg.length > 0) {
         critDmg.each((_i, b) => {
             const total = Number($(b).data('total'));
+            const damageType = $(b).data('damageType');
             const applyDr = $(b).data('applyDr');
             // let dieFormula =$(b).data('roll');
             const critDamageButton = $(
@@ -264,7 +267,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
             // Handle button clicks
             critDamageButton.on("click", (ev) => {
                 ev.stopPropagation();
-                applyHealthChange(total, applyDr);
+                applyHealthChange(total, damageType, applyDr);
             });
         });
         addGenericDmgHealBtns = false;
@@ -460,8 +463,8 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     btnContainer.append(dmgBtn, healBtn);
     html.append(btnContainer);
 
-    dmgBtn.on("click", () => applyHealthChange(total, true));
-    healBtn.on("click", () => applyHealthChange(total * -1, false)); // Healing is negative, and ignore DR
+    dmgBtn.on("click", () => applyHealthChange(total, "basic", true));
+    healBtn.on("click", () => applyHealthChange(total * -1, "", false)); // Healing is negative, and ignores DR
 }
 
 // Show a change in value by a token
@@ -488,7 +491,7 @@ export async function showValueChange(t, fillColor, total) {
 }
 
 // Roll damage button and display results in chat
-async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actorId, itemId, itemUuid, tokenId, sourceType) {
+async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType) {
     // Fix invalid formulae if possible
     if (formula == "" || formula == null || formula == "0") {
         formula = "0d0"
@@ -524,7 +527,11 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actor
     //  - The attack is a weapon (melee or missile), AND it is not a grenade-like or area-effect attack
     // Answer NO if:
     //  - The attack is a spell, grenade-like attack, or area-effect attack
-    const applyDr = (item.type == "weapon" && !item.system?.isGrenade && !item.system?.isAreaEffect) ? true : false
+    let applyDr = (item.type == "weapon" && !item.system?.isGrenade && !item.system?.isAreaEffect) ? true : false
+    // From here, we may override a YES if the primary damage type is not a basic physical type
+    if (!["basic", "bludgeoning", "piercing", "slashing"].includes(damageType)) {
+        applyDr = false
+    }
 
     if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll formula: ${formula}`) }
     // Invoke the damage roll
@@ -547,6 +554,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, actor
         debugDmgRollFormula: debugDmgRollFormula,
         naturalDmgRoll: naturalDmgRoll,
         dmgBaseRoll: baseDmgFormula,
+        damageType: damageType,
         itemId: itemId,
         itemUuid: itemUuid,
         actorId: actorId,
@@ -599,7 +607,7 @@ async function useItem(itemId, actorId) {
 }
 
 // Roll additional critical-hit damage and display, with a button to apply
-async function rollCriticalDamage(total, extraRoll, applyDr) {
+async function rollCriticalDamage(total, extraRoll, damageType, applyDr) {
     if (extraRoll != "") {
         const roll = await new Roll(extraRoll).roll();
         if (total => 0) {
@@ -615,7 +623,7 @@ async function rollCriticalDamage(total, extraRoll, applyDr) {
         <div class="dice-roll">
             <div class="dice-formula flexrow">
                 <span class="dice-damage">${total} HP damage!</span>
-                <span class="crit-damage-button" data-apply-dr="${applyDr}" data-total="${total}"></span>
+                <span class="crit-damage-button" data-apply-dr="${applyDr}" data-damage-type="${damageType}" data-total="${total}"></span>
             </div>
         </div>`
 
@@ -644,12 +652,12 @@ async function rollCriticalDamage(total, extraRoll, applyDr) {
 }
 
 /**
- * Apply a health drop (positive number is damage, negative is healing) to selected token(s).
+ * Apply a health change (positive number is damage, negative is healing) to selected token(s).
  * @param {Number} total - Damage/healing to apply
  * @param {Boolean} applyDr - Apply DR or not
  * @returns 
  */
-async function applyHealthChange(total, applyDr=true) {
+async function applyHealthChange(total, damageType = "basic", applyDr = true) {
     if (total === 0) return; // Skip changes of 0
 
     // Get selected tokens
@@ -681,7 +689,7 @@ async function applyHealthChange(total, applyDr=true) {
         if (damage_mod == 0) continue;
 
         // Apply the change to the actor
-        await actor.applyHealthChange(total, applyDr)
+        await actor.applyHealthChange(total, damageType, applyDr)
 
         // Show the health change by the token
         // Taken from Mana
