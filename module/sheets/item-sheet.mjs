@@ -301,6 +301,44 @@ export class Hyp3eItemSheet extends ItemSheet {
         });
     }
 
+    /**
+     * Handle dropping items on the actor sheet
+     * @param {*} event - Item drop event
+     * @param {*} data - Item data
+     * @returns null
+     */
+    async _onDropItem(event, data) {
+        const item = await Item.implementation.fromDropData(data);
+        if (!item) return;
+
+        // If this is a normal item, fall back to the default behavior
+        if (item.type !== "effectTemplate") {
+            return super._onDropItem(event, data);
+        }
+
+        // If this is an effect template, copy its ActiveEffects
+        const effects = item.effects.contents.map(e => e.toObject());
+
+        if (!effects.length) {
+            ui.notifications.warn(`No ActiveEffects found on template: ${item.name}`);
+            return;
+        }
+
+        // Duplicate onto this actor
+        await this.item.createEmbeddedDocuments("ActiveEffect", effects);
+
+        ui.notifications.info(
+            `Applied ${effects.length} effect(s) from template "${item.name}" to ${this.item.name}.`
+        );
+
+        return;
+    }
+
+    /**
+     * Handle all document drop events
+     * @param {*} event - The drop event
+     * @returns null
+     */
     async _onDrop(event) {
         event.preventDefault();
 
@@ -321,8 +359,17 @@ export class Hyp3eItemSheet extends ItemSheet {
         const droppedItem = await fromUuid(dropData.uuid ?? dropData.data?.uuid);
         if (!droppedItem) return;
 
-        // Add the spell to the item
-        await this.item.addSpell(droppedItem);
+        // If a spell was dropped, add the spell to the item
+        if (droppedItem.type == "spell") {
+            await this.item.addSpell(droppedItem);
+        }
+
+        // If an effectTemplate was dropped, add the effect to the item
+        if (droppedItem.type == "effectTemplate") {
+            await this._onDropItem(event, dropData);
+        }
+
+        // Re-render the sheet
         this.render();
     }
 
@@ -347,23 +394,23 @@ export class Hyp3eItemSheet extends ItemSheet {
         if (item?.sheet) item.sheet.render(true);
     }
 
-  /**
-   * Handle checkbox changes related to attack type (e.g., isGrenade, isAreaEffect)
-   * @param {*} event 
-   * @private
-   */
-  async _onTypeRelatedChange(event) {
-    event.preventDefault();
+    /**
+     * Handle checkbox changes related to attack type (e.g., isGrenade, isAreaEffect)
+     * @param {*} event 
+     * @private
+     */
+    async _onTypeRelatedChange(event) {
+        event.preventDefault();
 
-    const formData = this._getSubmitData();
-    // Merge or update item data as needed
-    await this.item.update(formData);
+        const formData = this._getSubmitData();
+        // Merge or update item data as needed
+        await this.item.update(formData);
 
-    // Apply attack formula logic
-    await this.item.applyAttackFormula();
+        // Apply attack formula logic
+        await this.item.applyAttackFormula();
 
-    // Optionally re-render to show changes live
-    this.render(true);
-  }
+        // Optionally re-render to show changes live
+        this.render(true);
+    }
 
 }

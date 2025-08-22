@@ -310,6 +310,14 @@
         "feature": {
             "add": "Add Feature"
         },
+        "itemTypes": {
+            "armor": "Armour", 
+            "feature": "Feature", 
+            "item": "Item", 
+            "spell": "Spell", 
+            "weapon": "Weapon", 
+            "effectTemplate": "Effect Template"
+        },
         "item": {
             "add": "Add Item",
             "edit": "Edit",

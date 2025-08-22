@@ -206,7 +206,7 @@
         }
     },
     "Item": {
-        "types": ["armor", "feature", "item", "spell", "weapon"],
+        "types": ["armor", "feature", "item", "spell", "weapon", "effectTemplate"],
         "templates": {
             "base": {
                 "friendlyName": "",
@@ -316,6 +316,9 @@
             "isAreaEffect": false,
             "usesAmmo": false,
             "annotations": []
+        },
+        "effectTemplate": {
+            "templates": ["base"]
         }
     }
 }

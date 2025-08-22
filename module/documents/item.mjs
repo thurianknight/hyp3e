@@ -17,11 +17,12 @@ export class Hyp3eItem extends Item {
 
         // Replace default image for new items, but if an image is defined, leave it be
         const TYPE_IMAGES = {
-            spell: "icons/svg/book.svg",
-            feature: "icons/svg/target.svg",
             armor: "icons/svg/shield.svg",
-            weapon: "icons/svg/combat.svg",
+            effectTemplate: "icons/svg/aura.svg",
+            feature: "icons/svg/target.svg",
             item: "icons/svg/item-bag.svg",
+            spell: "icons/svg/book.svg",
+            weapon: "icons/svg/combat.svg",
             container: "icons/svg/item-bag.svg"
         };
         if (!data.img || data.img === "") {

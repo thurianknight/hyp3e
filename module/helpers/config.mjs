@@ -147,6 +147,19 @@ HYP3E.movementAbbreviations = {
 };
 
 /**
+ * The overall item types
+ * @type {Object}
+ */
+HYP3E.itemTypes = {
+    "armor": "HYP3E.itemTypes.armor", 
+    "feature": "HYP3E.itemTypes.feature", 
+    "item": "HYP3E.itemTypes.item", 
+    "spell": "HYP3E.itemTypes.spell", 
+    "weapon": "HYP3E.itemTypes.weapon", 
+    "effectTemplate": "HYP3E.itemTypes.effectTemplate"
+}
+
+/**
  * The weapon types
  * @type {Object}
  */

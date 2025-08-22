@@ -701,6 +701,45 @@ export class Hyp3eActorSheet extends ActorSheet {
     item._displayItemInChat(actorData)
   }
 
+    /**
+     * Handle dropping items on the actor sheet
+     * @param {*} event - Item drop event
+     * @param {*} data - Item data
+     * @returns null
+     */
+    async _onDropItem(event, data) {
+        const item = await Item.implementation.fromDropData(data);
+        if (!item) return;
+
+        // If this is a normal item, fall back to the default behavior
+        if (item.type !== "effectTemplate") {
+            return super._onDropItem(event, data);
+        }
+
+        // If this is an effect template, copy its ActiveEffects
+        const effects = item.effects.contents.map(e => e.toObject());
+
+        if (!effects.length) {
+            ui.notifications.warn(`No ActiveEffects found on template: ${item.name}`);
+            return;
+        }
+
+        // Duplicate onto this actor
+        await this.actor.createEmbeddedDocuments("ActiveEffect", effects);
+
+        ui.notifications.info(
+            `Applied ${effects.length} effect(s) from template "${item.name}" to ${this.actor.name}.`
+        );
+
+        return;
+    }
+
+  /**
+   * Handle sorting of items in inventory lists
+   * @param {*} event - Item sort event
+   * @param {*} itemData - Item data
+   * @returns null
+   */
   _onSortItem(event, itemData) {
     if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Event:", event) }
     if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Data:", itemData) }
@@ -729,7 +768,7 @@ export class Hyp3eActorSheet extends ActorSheet {
       if (source.type === 'container' || source.system.isContainer) { 
         ui.notifications.info(`Cannot move container (${source.name}) into another container (${target.name})!`)
         if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot move container (${source.name}) into another container (${target.name})!`) }
-        return 
+        return;
       }
       // Update the container info on the item
       this.actor.updateEmbeddedDocuments("Item", [
