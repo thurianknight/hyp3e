@@ -84,7 +84,7 @@ export async function renderCustomChat(roll, item, actor, tokenId, label, debugR
 }
 
 /**
- * Hook listener for adding buttons to chat messages... fires on renderChatMessage event
+ * Hook listener for adding buttons to chat messages... fires on renderChatMessage event.
  * Done here instead of inline to add listeners in js
  * @param {*} _msg 
  * @param {*} html 
@@ -489,7 +489,19 @@ export async function showValueChange(t, fillColor, total) {
     );
 }
 
-// Roll damage button and display results in chat
+/**
+ * Roll normal or 2-hand damage button and display results in chat.
+ * @param {*} formula - Damage roll formula including all calculated modifiers
+ * @param {*} debugDmgRollFormula - Friendly text-string of damage formula with mods
+ * @param {*} baseDmgFormula - Damage roll formula from the item, no additional mods
+ * @param {*} damageType - Base damage type specified by the weapon or spell
+ * @param {*} actorId - ID of the actor making the attack
+ * @param {*} itemId - ID of the weapon or spell
+ * @param {*} itemUuid - UUID of the weapon or spell
+ * @param {*} tokenId - ID of the target token
+ * @param {*} sourceType - Item type, either "weapon" or "spell"
+ * @returns null
+ */
 async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType) {
     // Fix invalid formulae if possible
     if (formula == "" || formula == null || formula == "0") {
@@ -522,19 +534,8 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
         return;
     }
 
-    // Determine whether to apply DR to this damage
+    // Determine whether to apply DR based on item & damage type
     let applyDr = getApplyDr(item)
-    // Is this attack type reduced by DR? Answer YES if:
-    //  - The attack is a weapon (melee or missile), AND it is not a grenade-like or area-effect attack
-    // Answer NO if:
-    //  - The attack is a spell, grenade-like attack, or area-effect attack
-    // let applyDr = (item.type == "weapon" && !item.system?.isGrenade && !item.system?.isAreaEffect) ? true : false
-    // From here, we may override applyDr based on the primary damage type
-    // if (["basic", "bludgeoning", "piercing", "slashing"].includes(damageType)) {
-    //     applyDr = true
-    // } else {
-    //     applyDr = false
-    // }
 
     if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll formula: ${formula}`) }
     // Invoke the damage roll
@@ -577,7 +578,6 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
         speaker: ChatMessage.getSpeaker({ actor: actor }),
         content: html
     })
-
 }
 
 // Roll a saving throw for the selected token(s) and display in chat
@@ -609,7 +609,13 @@ async function useItem(itemId, actorId) {
     actor.useItem(itemId);
 }
 
-// Roll additional critical-hit damage and display, with a button to apply
+/**
+ * Roll additional critical-hit damage and display, with a button to apply.
+ * @param {*} total - The original damage roll total
+ * @param {*} extraRoll - Extra dice to be rolled for the crit
+ * @param {*} damageType - Damage type specified by the weapon or spell
+ * @param {*} applyDr - Whether to apply DR to the damage
+ */
 async function rollCriticalDamage(total, extraRoll, damageType, applyDr) {
     if (extraRoll != "") {
         const roll = await new Roll(extraRoll).roll();
@@ -663,7 +669,7 @@ function getApplyDr(item) {
     let applyDr = false;
 
     if (item.system.dmgType === "basic" || item.system.dmgType === "") {
-        // If the damage type is "basic" or is blank, then we determine DR by item/attack type
+        // If the damage type is "basic" or blank, we determine DR by item/attack type
         applyDr = (item.type === "weapon" && !item.system?.isGrenade && !item.system?.isAreaEffect) ? true : false
     } else {
         // If the damage type has been specified, then we use that to determine DR
@@ -679,7 +685,7 @@ function getApplyDr(item) {
 /**
  * Apply a health change (positive number is damage, negative is healing) to selected token(s).
  * @param {Number} total - Damage/healing to apply
- * @param {Boolean} applyDr - Apply DR or not
+ * @param {Boolean} applyDr - Whether to apply DR or not
  * @returns 
  */
 async function applyHealthChange(total, damageType = "basic", applyDr = true) {
@@ -748,6 +754,10 @@ async function applyHealthChange(total, damageType = "basic", applyDr = true) {
     };
     ChatMessage.create(chatData, {});
 }
+
+/**********************************************************
+ * Critical Hit / Miss Supporting Functions
+ **********************************************************/
 
 async function getFeetAndDirectionCritMiss() {
     let feetRoll = await new Roll("1d6+4").roll();
@@ -834,7 +844,6 @@ async function rollCritHit(charType, actorId) {
         roll: roll,
         content: html
     })
-
 }
 
 async function rollCritMiss(charType, actorId) {
@@ -949,5 +958,4 @@ async function rollCritMiss(charType, actorId) {
         roll: roll,
         content: html
     })
-    
 }
