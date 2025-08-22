@@ -1,4 +1,5 @@
 import { HYP3E } from "./config.mjs"
+import { Hyp3eDice } from "./dice.mjs";
 import {applyEffect, enableEffect, disableEffect} from "./effects.mjs";
 
 
@@ -451,8 +452,6 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     if (total === undefined) return; // not a dice roll
 
     const btnContainer = $(`<div class="roll-chat-buttons flexrow"></div>`);
-    // const dmgBtn = $(`<button type="button" class="apply-damage">Apply ${total} Damage</button>`);
-    // const healBtn = $(`<button type="button" class="apply-heal">Apply ${total} Healing</button>`);
     const dmgBtn = $(
         `<button class="dice-total-fullDamage-btn chat-button-small" title="Click to apply ${total} damage to selected token(s)."><i class="fas fa-user-minus"></i></button>`
     );
@@ -523,15 +522,19 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
         return;
     }
 
+    // Determine whether to apply DR to this damage
+    let applyDr = getApplyDr(item)
     // Is this attack type reduced by DR? Answer YES if:
     //  - The attack is a weapon (melee or missile), AND it is not a grenade-like or area-effect attack
     // Answer NO if:
     //  - The attack is a spell, grenade-like attack, or area-effect attack
-    let applyDr = (item.type == "weapon" && !item.system?.isGrenade && !item.system?.isAreaEffect) ? true : false
-    // From here, we may override a YES if the primary damage type is not a basic physical type
-    if (!["basic", "bludgeoning", "piercing", "slashing"].includes(damageType)) {
-        applyDr = false
-    }
+    // let applyDr = (item.type == "weapon" && !item.system?.isGrenade && !item.system?.isAreaEffect) ? true : false
+    // From here, we may override applyDr based on the primary damage type
+    // if (["basic", "bludgeoning", "piercing", "slashing"].includes(damageType)) {
+    //     applyDr = true
+    // } else {
+    //     applyDr = false
+    // }
 
     if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll formula: ${formula}`) }
     // Invoke the damage roll
@@ -649,6 +652,28 @@ async function rollCriticalDamage(total, extraRoll, damageType, applyDr) {
     };
     ChatMessage.create(chatData, {});
 
+}
+
+/**
+ * Determine whether to apply DR based on the attack & damage type.
+ * @param {*} item - An item object with properties including type, dmgType, etc.
+ * @returns {Boolean}
+ */
+function getApplyDr(item) {
+    let applyDr = false;
+
+    if (item.system.dmgType === "basic" || item.system.dmgType === "") {
+        // If the damage type is "basic" or is blank, then we determine DR by item/attack type
+        applyDr = (item.type === "weapon" && !item.system?.isGrenade && !item.system?.isAreaEffect) ? true : false
+    } else {
+        // If the damage type has been specified, then we use that to determine DR
+        if (["bludgeoning", "piercing", "slashing"].includes(item.system.dmgType)) {
+            applyDr = true;
+        } else {
+            applyDr = false;
+        }
+    }
+    return applyDr;
 }
 
 /**

@@ -675,7 +675,7 @@ export class Hyp3eActor extends Actor {
         }
 
         if (CONFIG.HYP3E.debugMessages) {
-            console.log(`applyHealthChange: Processing ${amount} HP change for ${actorName}. Apply DR: ${applyDr}`);
+            console.log(`applyHealthChange: Processing ${amount} HP change for ${actorName}. Damage type: ${damageType}. Apply DR: ${applyDr}`);
         }
 
         // Get Current State & Define Change Type
