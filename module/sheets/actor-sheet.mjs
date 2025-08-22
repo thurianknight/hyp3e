@@ -720,7 +720,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         const effects = item.effects.contents.map(e => e.toObject());
 
         if (!effects.length) {
-            ui.notifications.warn(`No ActiveEffects found on template: ${item.name}`);
+            console.warn(`No ActiveEffects found on template: ${item.name}`);
             return;
         }
 

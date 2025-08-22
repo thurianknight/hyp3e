@@ -68,6 +68,11 @@ export function migrateActorData(actor) {
         if ("explorationSkills" in actor.system) {
             updates = { ...updates, "system.-=explorationSkills": null };
         }
+        // Alignment is under system instead of system.details
+        if (!actor.system.alignment && actor.system.details.alignment) {
+            const fixAlignment = { "system.alignment": actor.system.details.alignment }
+            updates = { ...updates, fixAlignment };
+        }
 
     }
 

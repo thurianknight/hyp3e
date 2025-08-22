@@ -324,7 +324,7 @@ export class Hyp3eItemSheet extends ItemSheet {
             return;
         }
 
-        // Duplicate onto this actor
+        // Duplicate onto this item
         await this.item.createEmbeddedDocuments("ActiveEffect", effects);
 
         ui.notifications.info(
