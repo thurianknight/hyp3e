@@ -307,32 +307,40 @@ export class Hyp3eItemSheet extends ItemSheet {
      * @param {*} data - Item data
      * @returns null
      */
-    async _onDropItem(event, data) {
-        const item = await Item.implementation.fromDropData(data);
-        if (!item) return;
+    // async _onDropItem(event, data) {
+    //     event.preventDefault();
+    //     event.stopPropagation();
+    //     console.log(`_onDropItem: Dropped item:`, data)
+    //     const droppedItem = await Item.implementation.fromDropData(data);
+    //     if (!droppedItem) return;
 
-        // If this is a normal item, fall back to the default behavior
-        if (item.type !== "effectTemplate") {
-            return super._onDropItem(event, data);
-        }
+    //     // Prevent duplicate inserts
+    //     const existing = this.item.effects.find(e => e.name === droppedItem.name);
+    //     if (existing) return;
 
-        // If this is an effect template, copy its ActiveEffects
-        const effects = item.effects.contents.map(e => e.toObject());
+    //     // If this is not an effectTemplate item, exit early
+    //     if (droppedItem.type !== "effectTemplate") {
+    //         // return super._onDropItem(event, data);
+    //         return;
+    //     }
 
-        if (!effects.length) {
-            ui.notifications.warn(`No ActiveEffects found on template: ${item.name}`);
-            return;
-        }
+    //     // Copy the effectTemplate's ActiveEffects to this item
+    //     const effects = droppedItem.effects.contents.map(e => e.toObject());
 
-        // Duplicate onto this item
-        await this.item.createEmbeddedDocuments("ActiveEffect", effects);
+    //     if (!effects.length) {
+    //         ui.notifications.warn(`No ActiveEffects found on template: ${droppedItem.name}`);
+    //         return;
+    //     }
 
-        ui.notifications.info(
-            `Applied ${effects.length} effect(s) from template "${item.name}" to ${this.item.name}.`
-        );
+    //     // Duplicate onto this item
+    //     await this.item.createEmbeddedDocuments("ActiveEffect", effects);
 
-        return;
-    }
+    //     ui.notifications.info(
+    //         `Applied ${effects.length} effect(s) from template "${droppedItem.name}" to ${this.item.name}.`
+    //     );
+
+    //     return;
+    // }
 
     /**
      * Handle all document drop events
@@ -341,32 +349,65 @@ export class Hyp3eItemSheet extends ItemSheet {
      */
     async _onDrop(event) {
         event.preventDefault();
+        event.stopPropagation();
+
+        if (event._dropHandled) return;
+        event._dropHandled = true;
 
         // Read dropped data
         const dataTransfer = event.dataTransfer?.getData("text/plain");
+        // if (CONFIG.HYP3E.debugMessages) { console.log(`_onDrop: Dropped data:`, dataTransfer) };
         if (!dataTransfer) return;
 
         let dropData;
         try {
             dropData = JSON.parse(dataTransfer);
+            if (CONFIG.HYP3E.debugMessages) { console.log(`_onDrop: Dropped data:`, dropData) };
         } catch {
             return;
         }
 
         // Check if it's an Item
         if (dropData.type !== "Item") return;
-        
-        const droppedItem = await fromUuid(dropData.uuid ?? dropData.data?.uuid);
+        const uuid = dropData.uuid ?? dropData.data?.uuid;
+        const droppedItem = await fromUuid(uuid);
         if (!droppedItem) return;
 
         // If a spell was dropped, add the spell to the item
-        if (droppedItem.type == "spell") {
+        if (droppedItem.type === "spell") {
+            // Prevent duplicate inserts
+            const spellRefs = foundry.utils.deepClone(this.item.system.spellcasting?.spellRefs ?? []);
+            if (spellRefs.some(ref => ref.uuid === uuid)) {
+                ui.notifications.info(`Spell ${droppedItem.name} is already linked to this item.`);
+                return;
+            }
             await this.item.addSpell(droppedItem);
         }
 
         // If an effectTemplate was dropped, add the effect to the item
-        if (droppedItem.type == "effectTemplate") {
-            await this._onDropItem(event, dropData);
+        if (droppedItem.type === "effectTemplate") {
+            // Prevent duplicate inserts
+            const droppedEffectNames = droppedItem.effects.map(e => e.name);
+            const existing = this.item.effects.find(e => droppedEffectNames.includes(e.name));
+            if (existing) { 
+                ui.notifications.info(`Effect ${existing.name} is already linked to this item.`);
+                return; 
+            }
+
+            // Copy the effectTemplate's ActiveEffects to this item
+            const effects = droppedItem.effects.contents.map(e => e.toObject());
+
+            if (!effects.length) {
+                ui.notifications.warn(`No ActiveEffects found on template: ${droppedItem.name}`);
+                return;
+            }
+
+            // Duplicate template effects onto this item
+            await this.item.createEmbeddedDocuments("ActiveEffect", effects);
+
+            ui.notifications.info(
+                `Applied ${effects.length} effect(s) from template "${droppedItem.name}" to ${this.item.name}.`
+            );
         }
 
         // Re-render the sheet

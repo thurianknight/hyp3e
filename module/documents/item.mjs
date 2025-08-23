@@ -285,14 +285,12 @@ export class Hyp3eItem extends Item {
 
         // Check for duplicates
         if (spellRefs.some(ref => ref.uuid === uuid)) {
-            ui.notifications.info("That spell is already linked to this item.");
+            ui.notifications.info(`Spell ${droppedItem.name} is already linked to this item.`);
             return;
         }
 
         spellRefs.push({ uuid, charges: 1 });
-
         await this.update({ "system.spellcasting.spellRefs": spellRefs });
-        ui.notifications.info(`Added spell "${droppedItem.name}" to item.`);
     }
 
     /**
