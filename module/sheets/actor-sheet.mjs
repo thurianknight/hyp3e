@@ -734,58 +734,58 @@ export class Hyp3eActorSheet extends ActorSheet {
         return;
     }
 
-  /**
-   * Handle sorting of items in inventory lists
-   * @param {*} event - Item sort event
-   * @param {*} itemData - Item data
-   * @returns null
-   */
-  _onSortItem(event, itemData) {
-    if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Event:", event) }
-    if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Data:", itemData) }
+    /**
+     * Handle sorting of items in inventory lists
+     * @param {*} event - Item sort event
+     * @param {*} itemData - Item data
+     * @returns null
+     */
+    _onSortItem(event, itemData) {
+        if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Event:", event) }
+        if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Data:", itemData) }
 
-    // Get the drag source and drop target
-    const items = this.actor.items;
-    const source = items.get(itemData._id);
-    if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Source:", source) }
+        // Get the drag source and drop target
+        const items = this.actor.items;
+        const source = items.get(itemData._id);
+        if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Source:", source) }
 
-    const dropTarget = event.target.closest("[data-item-id]");
-    if ( !dropTarget ) return;
-    if (CONFIG.HYP3E.debugMessages) { console.log("Drop Target:", dropTarget) }
+        const dropTarget = event.target.closest("[data-item-id]");
+        if ( !dropTarget ) return;
+        if (CONFIG.HYP3E.debugMessages) { console.log("Drop Target:", dropTarget) }
 
-    const target = items.get(dropTarget.dataset.itemId);
-    if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Target:", target) }
+        const target = items.get(dropTarget.dataset.itemId);
+        if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Target:", target) }
 
-    // Don't sort on yourself
-    if ( source.id === target.id ) return;
+        // Don't sort on yourself
+        if ( source.id === target.id ) return;
 
-    // if (!target) throw new Error("Couldn't drop near " + event.target);
-    // const targetData = target?.system;
+        // if (!target) throw new Error("Couldn't drop near " + event.target);
+        // const targetData = target?.system;
 
-    // Dragging an item into a container sets its containerId and location to the container
-    if ( (target?.type === "container" || target?.system.isContainer) ) {
-      // One container cannot hold another container
-      if (source.type === 'container' || source.system.isContainer) { 
-        ui.notifications.info(`Cannot move container (${source.name}) into another container (${target.name})!`)
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot move container (${source.name}) into another container (${target.name})!`) }
-        return;
-      }
-      // Update the container info on the item
-      this.actor.updateEmbeddedDocuments("Item", [
-        { _id: source.id, "system.containerId": target.id, "system.location": target.name },
-      ]);
-      return;
+        // Dragging an item into a container sets its containerId and location to the container
+        if ( (target?.type === "container" || target?.system.isContainer) ) {
+            // One container cannot hold another container
+            if (source.type === 'container' || source.system.isContainer) { 
+                ui.notifications.info(`Cannot move container (${source.name}) into another container (${target.name})!`)
+                if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot move container (${source.name}) into another container (${target.name})!`) }
+                return;
+            }
+            // Update the container info on the item
+            this.actor.updateEmbeddedDocuments("Item", [
+                { _id: source.id, "system.containerId": target.id, "system.location": target.name },
+            ]);
+            return;
+        }
+
+        // Dragging an item out over a non-container resets its containerId and location to blank
+        if (source?.system.containerId !== "") {
+            this.actor.updateEmbeddedDocuments("Item", [
+                { _id: source.id, "system.containerId": "", "system.location": "" },
+            ]);
+        }
+        // Now call the Foundry core _onSortItem event so we don't break anything
+        super._onSortItem(event, itemData);
     }
-
-    // Dragging an item out over a non-container resets its containerId and location to blank
-    if (source?.system.containerId !== "") {
-      this.actor.updateEmbeddedDocuments("Item", [
-        { _id: source.id, "system.containerId": "", "system.location": "" },
-      ]);
-    }
-    // Now call the Foundry core _onSortItem event so we don't break anything
-    super._onSortItem(event, itemData);
-  }
 
   /**
    * Handle clickable rolls.
