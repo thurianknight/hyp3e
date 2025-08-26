@@ -2,7 +2,7 @@ import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { Hyp3eDice } from "../helpers/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { HYP3E } from "../helpers/config.mjs"
-import { parseAndResolveChangeValue, setupEffectHandlers } from "../helpers/effects.mjs";
+import { parseAndResolveChangeValue, checkAndResolveDuration } from "../helpers/effects.mjs";
 import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../helpers/chat.mjs"
 
 /**
@@ -170,7 +170,10 @@ export class Hyp3eActor extends Actor {
      * to a final number that can be applied to the actor.
      */
     async applyActiveEffects() {
-        this.updateItemEffectChanges()
+        // For items that apply effects with variables, we resolve those variables 
+        //  on the item effect rather than the actor
+        this.updateItemEffects()
+
         const overrides = {};
         this.statuses.clear();
 
@@ -435,18 +438,41 @@ export class Hyp3eActor extends Actor {
     /** ACTIVE EFFECTS HELPERS --------------------------*/
 
     /**
-     * Resolve item effect changes that include data paths or roll formulas.
+     * Resolve item effects and changes that include data paths or roll formulas.
      * Then update the item's effect/change with a number, so it becomes "permanent".
      */
-    async updateItemEffectChanges() {
+    async updateItemEffects() {
         for ( const item of this.items ) {
             if ( !item.system.equipped ) continue;
             for ( const effect of item.effects ) {
                 if ( !effect.transfer ) continue;
-                // Store all changes for a single batch update at the end
-                let updatedChanges = [...effect.changes];  // Start with a shallow copy
-                if (CONFIG.HYP3E.debugMessages) { console.log(`updateItemEffectChanges: Checking effect ${effect.name} for changes to resolve...`, updatedChanges) }
+
+                // Flag to track whether anything needs to be updated
                 let didUpdate = false;
+
+                // Check to see if we have a rollable duration formula, and resolve it if so
+                const { updatedDuration, updated } = await checkAndResolveDuration(effect);
+                if (CONFIG.HYP3E.debugMessages) { console.log(`updateItemEffects: Effect "${effect.name}" duration:`, updatedDuration) };
+                if (updated) didUpdate = true;
+                // // Store duration for a batch update at the end
+                // let updatedDuration = {...effect.duration};  // Start with a shallow copy
+
+                // // Check to see if we have a rollable duration formula
+                // const formula = effect.getFlag("hyp3e", "durationFormula");
+                // if (formula) {
+                //     try {
+                //         const roll = await new Roll(formula).evaluate({async: true});
+                //         updatedDuration = { "rounds": roll.total, "turns": roll.total };
+                //         if (CONFIG.HYP3E.debugMessages) { console.log(`updateItemEffects: Effect "${effect.name}" resolved duration "${formula}" to ${roll.total} rounds`) };
+                //         didUpdate = true;
+                //     } catch (err) {
+                //         console.error("updateItemEffects: Invalid duration formula:", formula, err);
+                //     }
+                // }
+
+                // Store all changes for a batch update at the end
+                let updatedChanges = [...effect.changes];  // Start with a shallow copy
+                if (CONFIG.HYP3E.debugMessages) { console.log(`updateItemEffects: Checking effect ${effect.name} for changes to resolve...`, updatedChanges) }
                 for (let i = 0; i < updatedChanges.length; i++) {
                     const change = updatedChanges[i];
                     let resolvedChange = change.value
@@ -464,8 +490,12 @@ export class Hyp3eActor extends Actor {
                 }
                 // Batch out the updates to the effect
                 if (didUpdate) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`updateItemEffectChanges: Effect ${effect.name} has updated Changes: `, updatedChanges) }
+                    if (CONFIG.HYP3E.debugMessages) {
+                        console.log("updateItemEffects: Duration: ", updatedDuration)
+                        console.log("updateItemEffects: Changes: ", updatedChanges)
+                    }
                     await effect.update({
+                        duration: updatedDuration,
                         changes: updatedChanges
                     });
                 }

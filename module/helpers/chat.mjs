@@ -440,6 +440,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     // Only add damage/heal buttons to "unflavored" dice roll chat messages
     console.log("Chat message type:", _msg.type)
     console.log("Chat message flavor:", _msg.flavor)
+    console.log("Chat message content:", _msg.content)
     if (_msg.flavor !== "") {
         addGenericDmgHealBtns = false;
     }
@@ -792,40 +793,41 @@ async function rollCritHit(charType, actorId) {
     let roll = await new Roll("1d6").roll();
     if (charType === "fighter") {
         if (roll.total <= 2) {
-            content = `<div class="dice-damage">+2 ${dmg}</div>`;
+            content = `<div class="dice-damage medium">+2 ${dmg}</div>`;
         } else if (roll.total <= 4) {
-            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage medium">x2 Dice ${dmg}</div>`;
         } else if (roll.total <= 6) {
-            content = `<div class="dice-damage">x3 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage medium">x3 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else if (charType === "magician") {
         if (roll.total <= 2) {
-            content = `<div class="dice-damage">+1 ${dmg}</div>`;
+            content = `<div class="dice-damage medium">+1 ${dmg}</div>`;
         } else if (roll.total <= 4) {
-            content = `<div class="dice-damage">+2 ${dmg}</div>`;
+            content = `<div class="dice-damage medium">+2 ${dmg}</div>`;
         } else if (roll.total <= 6) {
-            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage medium">x2 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else {
         // cleric/thief/npc-monster
         if (roll.total <= 1) {
-            content = `<div class="dice-damage">+1 ${dmg}</div>`;
+            content = `<div class="dice-damage medium">+1 ${dmg}</div>`;
         } else if (roll.total <= 3) {
-            content = `<div class="dice-damage">+2 ${dmg}</div>`;
+            content = `<div class="dice-damage medium">+2 ${dmg}</div>`;
         } else if (roll.total <= 5) {
-            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage medium">x2 Dice ${dmg}</div>`;
         }  else if (roll.total <= 6) {
-            content = `<div class="dice-damage">x3 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage medium">x3 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     }
     const templateData = {
-        title: game.i18n.localize(`HYP3E.attack.critHit.${charType}`),
+        // title: game.i18n.localize(`HYP3E.attack.critHit.${charType}`),
+        title: "",
         content: content,
         diceRoll: await roll.render()
     };
@@ -837,11 +839,13 @@ async function rollCritHit(charType, actorId) {
         console.log(`Roll Crit Hit: Actor ${actorId} not found!`)
     }
 
+    const flavor = `<div class="dice-damage medium">` + game.i18n.localize(`HYP3E.attack.critHit.${charType}`) + `</div>`
     // Send to chat
     roll.toMessage({
         author: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: actor }),
         roll: roll,
+        flavor: flavor,
         content: html
     })
 }
@@ -938,8 +942,10 @@ async function rollCritMiss(charType, actorId) {
         }
     }
 
+    content = `<div class="dice-damage medium">` + content + `</div>`
     const templateData = {
-        title: game.i18n.localize(`HYP3E.attack.critMiss.${charType}`),
+        // title: game.i18n.localize(`HYP3E.attack.critMiss.${charType}`),
+        title: "",
         content: content,
         diceRoll: await roll.render()
     };
@@ -951,11 +957,13 @@ async function rollCritMiss(charType, actorId) {
         console.log(`Roll Crit Hit: Actor ${actorId} not found!`)
     }
 
+    const flavor = `<div class="dice-damage medium">` + game.i18n.localize(`HYP3E.attack.critMiss.${charType}`) + `</div>`
     // Send to chat
     roll.toMessage({
         author: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: actor }),
         roll: roll,
+        flavor: flavor,
         content: html
     })
 }
