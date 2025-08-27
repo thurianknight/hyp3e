@@ -761,9 +761,11 @@ export class Hyp3eActor extends Actor {
                 // Is the temp HP being applied by an ActiveEffect?
                 const tempHpEffect = this.effects.find(e => e.changes.some(c => c.key === "system.hp.tempHp"));
                 if (tempHpEffect) {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Effect applying temp HP: ${tempHpEffect.name}.`); }
                     // Find the effect that is applying temp HP, and update it
                     netChange = await this.updateEffectValue("system.hp.tempHp", netChange, 0, 100);
                 } else {
+                    if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Temp HP was applied manually.`); }
                     // No effect found, just subtract from tempHp directly
                     const originalTempHp = tempHp;
                     tempHp = Math.max(0, tempHp - netChange);
