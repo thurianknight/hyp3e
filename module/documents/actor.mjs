@@ -721,7 +721,7 @@ export class Hyp3eActor extends Actor {
         // Condition: Trying to damage an already incapacitated/dead actor
         if (isDamage && currentHp <= minHp) {
             if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${actorName} is already incapacitated (HP <= ${minHp}). No damage applied.`); }
-            // You might want to trigger "overkill" effects or messages here if applicable
+            // We might want to trigger "overkill" effects or messages here...
             return;
         }
         // Condition: Change amount is zero
@@ -758,8 +758,19 @@ export class Hyp3eActor extends Actor {
         if (isDamage) {
             // Subtract from any effect that is adding temporary HP first, then from currentHp
             if (tempHp > 0) {
-                // Find the effect that is applying temp HP, and update it
-                netChange = await this.updateEffectValue("system.hp.tempHp", netChange, 0, 100);
+                // Is the temp HP being applied by an ActiveEffect?
+                const tempHpEffect = this.effects.find(e => e.changes.some(c => c.key === "system.hp.tempHp"));
+                if (tempHpEffect) {
+                    // Find the effect that is applying temp HP, and update it
+                    netChange = await this.updateEffectValue("system.hp.tempHp", netChange, 0, 100);
+                } else {
+                    // No effect found, just subtract from tempHp directly
+                    const originalTempHp = tempHp;
+                    tempHp = Math.max(0, tempHp - netChange);
+                    netChange = Math.max(0, netChange - originalTempHp);
+                    // Directly update the actor's tempHp value
+                    await this.update({ "system.hp.tempHp": tempHp });
+                }
                 // Lock netChange to zero if it came back negative
                 netChange = netChange < 0 ? 0 : netChange;
                 if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Net change after temp HP: ${netChange}.`); }
