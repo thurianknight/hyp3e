@@ -153,27 +153,6 @@ export async function setupEffectHandlers() {
         if (CONFIG.HYP3E.debugMessages) { console.log(`createActiveEffect: Effect "${effect.name}" duration:`, updatedDuration) };
         if (updated) didUpdate = true;
 
-        // // Store duration for a batch update at the end
-        // let updatedDuration = {...effect.duration};  // Start with a shallow copy
-
-        // // Check to see if we have a rollable duration formula
-        // const formula = effect.getFlag("hyp3e", "durationFormula");
-        // if (formula) {
-        //     try {
-        //         // Only roll if the parent is an Actor
-        //         if (effect.parent instanceof Actor) {
-        //             const roll = await new Roll(formula).evaluate({async: true});
-        //             updatedDuration = { "rounds": roll.total, "turns": roll.total };
-        //             if (CONFIG.HYP3E.debugMessages) { console.log(`createActiveEffect: Effect "${effect.name}" resolved duration "${formula}" to ${roll.total} rounds`) };
-        //         } else {
-        //             updatedDuration = { "rounds": 1, "turns": 1 };
-        //         }
-        //         didUpdate = true;
-        //     } catch (err) {
-        //         console.error("createActiveEffect: Invalid duration formula:", formula, err);
-        //     }
-        // }
-
         // Store all changes for a batch update at the end
         let updatedChanges = [...effect.changes];  // Start with a shallow copy
 
