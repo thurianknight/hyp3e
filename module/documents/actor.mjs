@@ -3,7 +3,7 @@ import { Hyp3eDice } from "../helpers/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 import { parseAndResolveChangeValue, checkAndResolveDuration } from "../helpers/effects.mjs";
-import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../helpers/chat.mjs"
+import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../chat/chat.mjs"
 
 /**
  * Extend the base Actor document by defining a custom roll data structure which is ideal for the Simple system.
@@ -808,7 +808,7 @@ export class Hyp3eActor extends Actor {
             await this.update({ "system.hp.value": newHp });
 
             // Optional: Add hook calls after successful update if other modules/systems need to react
-            // Hooks.callAll("actorHealthChanged", this, currentHp, newHp, netChange, isDamage, isHealing);
+            Hooks.callAll("actorHealthChanged", this, currentHp, newHp, netChange, isDamage, isHealing);
 
         } catch (err) {
             // Log the error and notify the user if the update fails

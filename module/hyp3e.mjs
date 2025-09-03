@@ -7,7 +7,7 @@ import { Hyp3eItemSheet } from "./sheets/item-sheet.mjs";
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
-import { addChatMessageButtons } from "./helpers/chat.mjs";
+import { addChatMessageButtons } from "./chat/chat.mjs";
 import { parseAndResolveChangeValue, setupEffectHandlers } from "./helpers/effects.mjs";
 import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
