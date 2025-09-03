@@ -1,5 +1,5 @@
 import { Hyp3eCharacter } from "../helpers/character.mjs";
-import { Hyp3eDice } from "../helpers/dice.mjs";
+import { Hyp3eDice } from "../dice/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 import { parseAndResolveChangeValue, checkAndResolveDuration } from "../helpers/effects.mjs";

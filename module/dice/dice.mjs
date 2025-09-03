@@ -1,4 +1,4 @@
-import { HYP3E } from "./config.mjs"
+import { HYP3E } from "../helpers/config.mjs"
 
 export class Hyp3eDice {
     /**

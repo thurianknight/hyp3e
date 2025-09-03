@@ -1,6 +1,6 @@
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
-import HYP3EItemSetAnnotations from "../helpers/item-set-annotations.mjs";
-import HYP3EItemSetDmgTypes from "../helpers/item-set-dmg-types.mjs";
+import HYP3EItemSetAnnotations from "../apps/item-set-annotations.mjs";
+import HYP3EItemSetDmgTypes from "../apps/item-set-dmg-types.mjs";
 
 // Note: this must be declared outside the class to avoid re-initialization on each instance creation
 const _recentSpellDrops = new Set();
