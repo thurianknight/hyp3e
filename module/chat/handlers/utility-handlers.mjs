@@ -14,18 +14,18 @@ import {applyEffect, enableEffect, disableEffect} from "../../helpers/effects.mj
  */
 export async function handleSaveButtons(html) {
     // Saving throw button
-    let save = html.find(".save-button");
-    if (save.length === 0) return false;
+    let saveBtnElement = html.find(".save-button");
+    if (saveBtnElement.length === 0) return false;
 
-    save.each((_i, b) => {
+    saveBtnElement.each((_i, b) => {
         let saveType = $(b).data('save');
         let saveButton = $(
             `<button class="chat-btn-full-width" title="Click to roll save to selected token(s)."><i class="fas fa-dice-d20"></i>Save: ${saveType}</button>`
         );
-        save.append(saveButton);
+        saveBtnElement.append(saveButton);
 
         // Handle button clicks
-        save.on("click", (ev) => {
+        saveBtnElement.on("click", (ev) => {
             ev.stopPropagation();
             rollSaveButton(saveType);
         });
@@ -41,10 +41,10 @@ export async function handleSaveButtons(html) {
  */
 export async function handleEffectButtons(html) {
     // Apply/Enable/Disable Effect buttons
-    let effectApply = html.find(".apply-effects-button");
-    if (effectApply.length === 0) return false;
+    let effectBtnElement = html.find(".apply-effects-button");
+    if (effectBtnElement.length === 0) return false;
 
-    effectApply.each(async (_i, b) => {
+    effectBtnElement.each(async (_i, b) => {
         let itemId = $(b).data('itemId');
         let itemUuid = $(b).data('itemUuid');
         let actorId = $(b).data('actorId');
@@ -90,7 +90,7 @@ export async function handleEffectButtons(html) {
                     let effectDisableButton = $(
                         `<button class="chat-btn-full-width" title="Click to disable ${effect.name} on ${actor.name}."><i class="fas fa-user-slash"></i>Disable ${effect.name}</button>`
                     );
-                    effectApply.append(effectDisableButton);
+                    effectBtnElement.append(effectDisableButton);
                     // Handle button clicks
                     effectDisableButton.on("click", (ev) => {
                         ev.stopPropagation();
@@ -101,7 +101,7 @@ export async function handleEffectButtons(html) {
                     let effectEnableButton = $(
                         `<button class="chat-btn-full-width" title="Click to enable ${effect.name} on ${actor.name}."><i class="fas fa-user-check"></i>Enable ${effect.name}</button>`
                     );
-                    effectApply.append(effectEnableButton);
+                    effectBtnElement.append(effectEnableButton);
                     // Handle button clicks
                     effectEnableButton.on("click", (ev) => {
                         ev.stopPropagation();
@@ -113,7 +113,7 @@ export async function handleEffectButtons(html) {
                 let effectApplyButton = $(
                     `<button class="chat-btn-full-width" title="Click to apply ${effect.name} to selected tokens."><i class="fas fa-hand-paper"></i>Apply ${effect.name}</button>`
                 );
-                effectApply.append(effectApplyButton);
+                effectBtnElement.append(effectApplyButton);
                 // Handle button clicks
                 effectApplyButton.on("click", (ev) => {
                     ev.stopPropagation();

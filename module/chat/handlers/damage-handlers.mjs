@@ -11,10 +11,10 @@ import { HYP3E } from "../../helpers/config.mjs"
  * @returns {Boolean} - True if buttons were added, false if not
  */
 export async function handleDamageRollButtons(html) {
-    let dmgRoll = html.find(".dmg-roll-button");
-    if (dmgRoll.length === 0) return false;
+    let dmgRollElement = html.find(".dmg-roll-button");
+    if (dmgRollElement.length === 0) return false;
 
-    dmgRoll.each((_i, b) => {
+    dmgRollElement.each((_i, b) => {
         const baseDmgFormula = $(b).data('baseDamage');
         const dmgFormula = $(b).data('formula');
         const debugDmgRollFormula = $(b).data('debugFormula');
@@ -28,9 +28,9 @@ export async function handleDamageRollButtons(html) {
         let dmgButton = $(
             `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>Damage: ${dmgFormula}</button>`
         );
-        dmgRoll.append(dmgButton);
+        dmgRollElement.append(dmgButton);
 
-        dmgRoll.on("click", (ev) => {
+        dmgRollElement.on("click", (ev) => {
             ev.stopPropagation();
             rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType);
         });
@@ -45,10 +45,10 @@ export async function handleDamageRollButtons(html) {
  * @returns {Boolean} - True if buttons were added, false if not
  */
 export async function handleDamageRoll2hButtons(html) {
-    let dmgRoll2h = html.find(".dmg-roll-button2h");
-    if (dmgRoll2h.length === 0) return false;
+    let dmgRoll2hElement = html.find(".dmg-roll-button2h");
+    if (dmgRoll2hElement.length === 0) return false;
 
-    dmgRoll2h.each((_i, b) => {
+    dmgRoll2hElement.each((_i, b) => {
         const baseDmgFormula = $(b).data('baseDamage');
         const dmgFormula = $(b).data('formula');
         const debugDmgRollFormula = $(b).data('debugFormula');
@@ -62,9 +62,9 @@ export async function handleDamageRoll2hButtons(html) {
         let dmgButton2h = $(
             `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
         );
-        dmgRoll2h.append(dmgButton2h);
+        dmgRoll2hElement.append(dmgButton2h);
 
-        dmgRoll2h.on("click", (ev) => {
+        dmgRoll2hElement.on("click", (ev) => {
             ev.stopPropagation();
             rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType);
         });
@@ -80,10 +80,10 @@ export async function handleDamageRoll2hButtons(html) {
  */
 export async function handleApplyDamageButtons(html) {
     // Four damage-applying buttons in a row: full dmg, half dmg, full heal, full dmg w/ modifier prompt
-    let dmgBtn = html.find(".damage-button");
-    if (dmgBtn.length === 0) return false;
+    let dmgBtnsElement = html.find(".damage-button");
+    if (dmgBtnsElement.length === 0) return false;
 
-    dmgBtn.each((_i, b) => {
+    dmgBtnsElement.each((_i, b) => {
         const total = Number($(b).data('total'));
         // const naturalRoll = Number($(b).data('natural'));
         const damageType = $(b).data('damageType');
@@ -103,10 +103,10 @@ export async function handleApplyDamageButtons(html) {
         const fullDamageModifiedButton = $(
             `<button class="dice-total-fullDamageMod-btn chat-button-small" title="Click to apply ${total} damage with modifier prompt to selected token(s)."><i class="fas fa-user-edit"></i></button>`
         );
-        dmgBtn.append(fullDamageButton);
-        dmgBtn.append(halfDamageButton);
-        dmgBtn.append(fullHealingButton);
-        dmgBtn.append(fullDamageModifiedButton);
+        dmgBtnsElement.append(fullDamageButton);
+        dmgBtnsElement.append(halfDamageButton);
+        dmgBtnsElement.append(fullHealingButton);
+        dmgBtnsElement.append(fullDamageModifiedButton);
 
         // Handle button clicks
         fullDamageButton.on("click", (ev) => {

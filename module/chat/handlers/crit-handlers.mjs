@@ -14,10 +14,10 @@ import { applyHealthChange } from "./damage-handlers.mjs";
  */
 export async function handleCritDamageButton(html) {
     // Apply critical damage button
-    let critDmg = html.find(".crit-damage-button");
-    if (critDmg.length === 0) return false;
+    let critDmgElement = html.find(".crit-damage-button");
+    if (critDmgElement.length === 0) return false;
 
-    critDmg.each((_i, b) => {
+    critDmgElement.each((_i, b) => {
         const total = Number($(b).data('total'));
         const damageType = $(b).data('damageType');
         const applyDr = $(b).data('applyDr');
@@ -25,7 +25,7 @@ export async function handleCritDamageButton(html) {
         const critDamageButton = $(
             `<button class="dice-total-critDamage-btn chat-button-crit" title="Click to apply ${total} damage to selected token(s).">Apply Damage <i class="fas fa-user-minus"></i></button>`
         );
-        critDmg.append(critDamageButton);
+        critDmgElement.append(critDamageButton);
         // Handle button clicks
         critDamageButton.on("click", (ev) => {
             ev.stopPropagation();
@@ -46,15 +46,15 @@ export async function handleCritMissOrHitButtons(html) {
     const long_button = (critType, charType, icon) => `<button class="chat-btn-full-width" title="Click to roll critical ${critType} to selected token(s)."><i class="fas ${icon}"></i>${charType}</button>`;
 
     // Crit misses & hits are mutually exclusive so we can handle them both here
-    let critMiss = html.find(".critical-miss");
-    let critHit = html.find(".critical-hit");
-    if (critMiss.length === 0 && critHit.length === 0) return false;
+    let critMissElement = html.find(".critical-miss");
+    let critHitElement = html.find(".critical-hit");
+    if (critMissElement.length === 0 && critHitElement.length === 0) return false;
 
     let baseClass = "";
     let baseClassLabel = "";
 
-    if (critMiss.length > 0) {
-        critMiss.each((_i, b) => {
+    if (critMissElement.length > 0) {
+        critMissElement.each((_i, b) => {
             baseClass = $(b).data('baseClass');
             if (baseClass != "npc") {
                 baseClassLabel = baseClass.charAt(0).toUpperCase()+baseClass.substring(1)
@@ -64,7 +64,7 @@ export async function handleCritMissOrHitButtons(html) {
             let actorId = $(b).data('actorId');
             const icon = "fa-user-slash";
             const critMissButton = $(long_button('miss',`Roll Critical Miss for ${baseClassLabel}-class`, icon));
-            critMiss.append(critMissButton);
+            critMissElement.append(critMissButton);
 
             // Handle button clicks
             critMissButton.on("click", (ev) => {
@@ -74,8 +74,8 @@ export async function handleCritMissOrHitButtons(html) {
         });
     }
 
-    if (critHit.length > 0) {
-        critHit.each((_i, b) => {
+    if (critHitElement.length > 0) {
+        critHitElement.each((_i, b) => {
             baseClass = $(b).data('baseClass');
             if (baseClass != "npc") {
                 baseClassLabel = baseClass.charAt(0).toUpperCase()+baseClass.substring(1)
@@ -85,7 +85,7 @@ export async function handleCritMissOrHitButtons(html) {
             let actorId = $(b).data('actorId');
             const icon = "fa-user";
             const critHitButton = $(long_button('hit',`Roll Critical Hit for ${baseClassLabel}-class`, icon));
-            critHit.append(critHitButton);
+            critHitElement.append(critHitButton);
 
             // Handle button clicks
             critHitButton.on("click", (ev) => {
