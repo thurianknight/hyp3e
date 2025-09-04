@@ -1183,11 +1183,11 @@ export class Hyp3eActor extends Actor {
      * @param {*} dataset 
      */
     async rollCheck(dataset) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`rollCheck: Rolling ${dataset.label}...`) }
 
         // Declare vars
-        let tokenId = ""
-        let itemId = dataset.itemId
+        const itemId = dataset.itemId ?? null
+        const tokenId = dataset.tokenId ?? null
         let itemName = ""
         let label = ""
         let checkText = dataset.label
@@ -1195,23 +1195,20 @@ export class Hyp3eActor extends Actor {
         let rollResponse
 
         // Did we get a token ID?
-        if (dataset.tokenId) {
-            // Get the token ID from the dataset
-            tokenId = dataset.tokenId
+        if (tokenId) {
             // Get the token from the canvas
             const token = canvas.tokens.get(tokenId)
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Token (ID ${tokenId}): `, token) }
+            if (CONFIG.HYP3E.debugMessages) { console.log(`rollCheck: Token (ID ${tokenId}): `, token) }
             if (token) {
                 // Get the token's actor
                 const tokenActor = token.actor
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Token actor: `, tokenActor) }
+                if (CONFIG.HYP3E.debugMessages) { console.log(`rollCheck: Token actor: `, tokenActor) }
             }
         }
 
         // Is this an item or ability check?
-        const item = this.items.get(dataset.itemId) ?? null
+        const item = this.items.get(itemId) ?? null
         if (item) {
-            itemId = item.id
             itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
             label = this._createChatLabel(item.img, itemName)
         }
@@ -1225,9 +1222,8 @@ export class Hyp3eActor extends Actor {
 
         // Retrieve roll data from the actor
         const rollData = this.getRollData();
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data:", rollData) }
 
-        // Get the item's ID and friendly name if it has one
+        // Set the roll button label based on item type
         if (item) {
             // Determine the roll-button label to use
             switch (item.type) {
@@ -1243,6 +1239,20 @@ export class Hyp3eActor extends Actor {
             }
         } else {
             dataset.rollButtonLabel = "Roll"
+        }
+
+        // Check to see if we need to add an attribute modifier for thief skills
+        dataset.sitMod = 0;
+        dataset.sitModList = "";
+        const actorAttributes = { 
+            dx: this.system.attributes.dex.value, 
+            in: this.system.attributes.wis.value, 
+            ws: this.system.attributes.int.value
+        };
+        const sitModObj = this._getThiefSkillModifier(itemName, actorAttributes)
+        if (sitModObj.modifier > 0) {
+            dataset.sitMod = sitModObj.modifier
+            dataset.sitModList = `${sitModObj.attribute.toUpperCase()} modifier (+${sitModObj.modifier})`
         }
 
         // This is needed for Turn Undead & Assassinate results
@@ -2016,6 +2026,12 @@ export class Hyp3eActor extends Actor {
         return itemData
     }
 
+    /**
+     * 
+     * @param {*} attacker - attacking token
+     * @param {*} target - targeted token
+     * @returns {Object} sitModObj { sitMod: number, sitModsArr: Array }
+     */
     _getCombatantSitMods(attacker, target) {
         if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for attacker ${this.name}...`) }
 
@@ -2156,6 +2172,37 @@ export class Hyp3eActor extends Actor {
             sitModList: sitModsArr.join(", ")
         }
         return sitModObj
+    }
+
+    /**
+     * Returns a thief skill modifier based on actor attributes.
+     * @param {string} skillName - The thief skill being checked (e.g., "open locks").
+     * @param {object} attributes - The actor's attributes (dx, in, ws).
+     * @returns {{modifier: number, attribute: string|null}} The modifier to apply (0 or +1), and the attribute used.
+     */
+    _getThiefSkillModifier(skillName, attributes) {
+        const skillMap = {
+            // DX-based
+            "climb": "dx",
+            "hide": "dx",
+            "manipulate traps": "dx",
+            "move silently": "dx",
+            "open locks": "dx",
+            "pick pockets": "dx",
+            // IN-based
+            "decipher script": "in",
+            "read scrolls": "in",
+            // WS-based
+            "discern noise": "ws"
+        };
+
+        const attrKey = skillMap[skillName.toLowerCase()];
+        if (!attrKey) return { modifier: 0, attribute: null }; // not a thief progressive skill
+
+        const score = attributes[attrKey] ?? 0;
+        const modifier = score >= 16 ? 1 : 0;
+
+        return { modifier: modifier, attribute: attrKey };
     }
 
     /**
