@@ -215,16 +215,8 @@ export async function setupEffectHandlers() {
     });
 
     /**
-     * Handle the application of an active effect to an actor.
+     * Handle the update of an active effect on an actor.
      */
-    Hooks.on("applyActiveEffect", async(actor, change, current, delta, changes) => {
-        // if (CONFIG.HYP3E.debugMessages) {
-            // console.log("applyActiveEffect: Actor receiving effect:", actor);
-            // console.log("applyActiveEffect: Change:", change);
-            // console.log("applyActiveEffect: Other params:", current, delta, changes);
-        // }
-    });
-
     Hooks.on("updateActiveEffect", async(effect, change, options, userId) => {
         if ("disabled" in change) {
             const wasDisabled = change.disabled;
@@ -452,7 +444,7 @@ async function sendEffectChatMessage(effect) {
     messageParts.push(`<strong>${targetName}</strong>`);
 
     // If it's being added or applied, add source name
-    messageParts.push(sourceName != targetName ? `by ${sourceName}` : "");
+    if (sourceName != targetName) messageParts.push(`by ${sourceName}`);
 
     // Optional: resolve UUIDs to documents if you want links
     // let sourceLink = sourceName;
