@@ -90,6 +90,16 @@ Hooks.once('init', async function() {
         requiresReload: true
     });
 
+    game.settings.register(game.system.id, "enforceWeaponEquipRules", {
+        name: game.i18n.localize("HYP3E.settings.enforceWeaponEquipRules"),
+        hint: game.i18n.localize("HYP3E.settings.enforceWeaponEquipRulesHint"),
+        default: true,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: false
+    });
+
     // Enable quick-create characters by selecting a roll method
     game.settings.register(game.system.id, "quickCreateChars", {
         name: game.i18n.localize("HYP3E.settings.quickCreateChars"),
@@ -853,6 +863,23 @@ Hooks.on("createToken", (token, options, userId) => {
             ui.notifications.error(`Failed to roll HD for NPC ${token.actor.name}. Check the console for details.`);
         }
     }
+});
+
+/**
+ * When a weapon is equipped, ensure that any other weapons are unequipped if the
+ *  "forceWeaponEquip" setting is enabled.
+ */
+Hooks.on("preUpdateItem", async (item, update) => {
+    if (item.type !== "weapon") return;
+    if (getProperty(update, "system.equipped") !== true) return;
+  
+    // Check config setting
+    if (!game.settings.get(game.system.id, "enforceWeaponEquipRules")) return;
+
+    const actor = item.actor;
+    if (!actor) return;
+
+    await actor.enforceWeaponEquipRules(item);
 });
 
 // Register Turn Tracker hooks

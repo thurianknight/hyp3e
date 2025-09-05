@@ -18,6 +18,8 @@
             "explorationTurn": "Exploration Turn",
             "autoCalcAc": "Auto-calculate Armour Class & encounter Movement",
             "autoCalcAcHint": "Use 'equipped' status of armour and shields to calculate AC & MV. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
+            "enforceWeaponEquipRules": "Enforce Weapon Equip Rules",
+            "enforceWeaponEquipRulesHint": "When enabled, only one weapon may be equipped at a time, except dual-wielding melee weapons if Dex ≥ 13 and WC ≤ 2.",
             "quickCreateChars": "Enable Quick-Create Characters",
             "quickCreateCharsHint": "Enable the Quick Create Characters button on the Character sheet by selecting a Method. All stats are rolled down-the-line, and the system will re-roll until it gets a set that meets class requirements.",
             "customCompendia": "Search Compendia",

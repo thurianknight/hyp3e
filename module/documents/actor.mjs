@@ -388,6 +388,64 @@ export class Hyp3eActor extends Actor {
         return this.effects.map(e => e.name);
     }
 
+    /**
+     * Enforce weapon equip rules:
+     * - Only one weapon equipped by default.
+     * - Dual wielding allowed if dex >= 13 and both weapons are wc <= 2 and melee.
+     * @param {Item} newlyEquipped - the weapon being equipped
+     */
+    async enforceWeaponEquipRules(newlyEquipped) {
+        if (newlyEquipped.type !== "weapon") return;
+        if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Newly equipped weapon:`, newlyEquipped) }
+
+        const dex = this.system.attributes?.dex?.value ?? 0;
+        // Note: these arrow functions return a value to the caller
+        const isMelee = w => w.system.melee; // adjust to schema
+        const isLight = w => (w.system.wc ?? 99) <= 2;
+
+        // All other currently equipped weapons
+        const equippedWeapons = this.items.filter(i =>
+            i.type === "weapon" && i.id !== newlyEquipped.id && i.system.equipped
+        );
+        if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Currently equipped weapons:`, equippedWeapons) }
+
+        // Equipping a missile weapon will unequip all other weapons
+        if (!isMelee(newlyEquipped)) {
+            if (equippedWeapons.length > 0) {
+                const unequipUpdates = equippedWeapons.map(w => ({
+                    _id: w.id,
+                    "system.equipped": false
+                }));
+                if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Equipping a missile weapon, unequipping all other weapons:`, unequipUpdates) }
+                await this.updateEmbeddedDocuments("Item", unequipUpdates);
+            }
+            return;
+        }
+
+        // Check dual-wield condition (exactly one other weapon equipped)
+        if (equippedWeapons.length === 1) {
+            const other = equippedWeapons[0];
+            if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Other equipped weapon:`, other) }
+            const dualAllowed =
+                dex >= 13 &&
+                isMelee(newlyEquipped) && isMelee(other) &&
+                isLight(newlyEquipped) && isLight(other);
+
+            if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Dual wield allowed?`, dualAllowed) }
+            if (dualAllowed) return; // allowed state, do nothing
+        }
+
+        // Otherwise, unequip all other weapons
+        if (equippedWeapons.length > 0) {
+            const unequipUpdates = equippedWeapons.map(w => ({
+                _id: w.id,
+                "system.equipped": false
+            }));
+            if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Unequipping other weapons:`, unequipUpdates) }
+            await this.updateEmbeddedDocuments("Item", unequipUpdates);
+        }
+    }
+
     /** CUSTOM TEMPORARY MODIFIERS (NOT USED YET) -------*/
 
     /**
