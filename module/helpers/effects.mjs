@@ -153,15 +153,6 @@ export async function setupEffectHandlers() {
         // Flag to track whether anything needs to be updated
         let didUpdate = false;
 
-        // Is this effect's parent an item?
-        let newSourceName = effect.sourceName;
-        if (effect.parent.documentName === "Item") {
-            // Update the effect's sourceName
-            newSourceName = effect.parent.system?.friendlyName ? effect.parent.system.friendlyName : effect.parent.name;
-            didUpdate = true;
-            if (CONFIG.HYP3E.debugMessages) { console.log(`createActiveEffect: Effect parent is an Item: ${newSourceName}`) }
-        }
-
         // Check to see if we have a rollable duration formula, and resolve it if so
         const { updatedDuration, updated } = await checkAndResolveDuration(effect);
         if (CONFIG.HYP3E.debugMessages) { console.log(`createActiveEffect: Effect "${effect.name}" duration:`, updatedDuration) };
@@ -188,12 +179,10 @@ export async function setupEffectHandlers() {
             if (CONFIG.HYP3E.debugMessages) { 
                 console.log("createActiveEffect: Duration: ", updatedDuration)
                 console.log("createActiveEffect: Changes: ", updatedChanges)
-                console.log("createActiveEffect: sourceName: ", newSourceName)
             }
             await effect.update({
                 duration: updatedDuration,
-                changes: updatedChanges,
-                sourceName: newSourceName
+                changes: updatedChanges
             });
         }
 
