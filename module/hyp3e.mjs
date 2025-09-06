@@ -9,7 +9,7 @@ import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./chat/chat.mjs";
 import { parseAndResolveChangeValue, setupEffectHandlers } from "./helpers/effects.mjs";
-import { getAvailableTokenNumber } from "./helpers/tokens.mjs";
+import { getAvailableTokenNumber, overlayEquippedWeaponAndShield } from "./helpers/tokens.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { Hyp3eCharacter } from "./helpers/character.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
@@ -789,23 +789,29 @@ Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
 });
 
 /**
+ * When a token is refreshed (moved, updated, etc), overlay icons for equipped weapons
+ */
+Hooks.on("refreshToken", async (token, tokenState) => {
+    // Overlay equipped weapon and shield icons on the token
+    await overlayEquippedWeaponAndShield(token, tokenState)
+});
+
+/**
  * Before a token can complete its movement during a turn, ensure it has not overstepped 
  *  its MV speed. Give a warning and possibly cancel the movement if option is configured.
  *  The "preMoveToken" event is only available in v13+, this won't work in Foundry v12.
  */
 Hooks.on("preMoveToken", (token, movement, operation) => {
-    if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken Token:", token); }
     // We only enforce this rule in combat
     if (!token.inCombat) return;
 
     const actor = token.actor;
     if (!actor) return;
-    if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken Actor:", actor); }
-    const speed = actor.system.movement?.base.value ?? 40;
-    if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken Movement:", movement); }
+
     // Calculate current move, including completed and pending waypoints
+    const speed = actor.system.movement?.base.value ?? 40;
     const totalDistance = movement.history.distance + movement.passed.distance + movement.pending.distance;
-    if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken: Total distance:", totalDistance); }
+    // if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken: Total distance:", totalDistance); }
     if (totalDistance > speed) {
         ui.notifications.warn(`${actor.name} can only move ${speed} ft per round!`);
         if (CONFIG.HYP3E.limitMovement) {
