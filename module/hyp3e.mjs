@@ -103,8 +103,8 @@ Hooks.once('init', async function() {
 
     // Show equipped weapons & shields on tokens
     game.settings.register(game.system.id, "showWeaponOverlay", {
-        name: "Show Weapon/Shield Overlays",
-        hint: "If enabled, small icons of equipped weapons and shields will appear on tokens.",
+        name: game.i18n.localize("HYP3E.settings.showWeaponOverlay"),
+        hint: game.i18n.localize("HYP3E.settings.showWeaponOverlayHint"),
         default: false,
         scope: "world",
         type: Boolean,

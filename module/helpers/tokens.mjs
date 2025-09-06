@@ -67,7 +67,7 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
         equippedWeapons.splice(2);
     }
     // Finally, flip the order of items so that the first item will appear on top
-    equippedWeapons.reverse();
+    // equippedWeapons.reverse();
     // if (CONFIG.HYP3E.debugMessages) { console.log("overlayEquippedWeaponAndShield: Equipped gear: ", equippedWeapons) }
 
     // Create overlay container
@@ -77,7 +77,7 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
     container.zIndex = 9999;
     token.mesh.sortChildren();
     // Default grid/token size seems to be 64, but the math works out to 128 px
-    const DEFAULT_TOKEN_SIZE = canvas.grid.size * 2;
+    const DEFAULT_TOKEN_SIZE = canvas?.grid?.size * 2 ?? 128;
 
     // Load and add sprites
     for (let [idx, item] of equippedWeapons.entries()) {
@@ -88,8 +88,24 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
             const size = Math.max(token.w / 2, 80); // Max 80 px or about 1/3 token width
             sprite.width = sprite.height = size;
 
-            sprite.x = (idx * (size * 0.4)) - DEFAULT_TOKEN_SIZE;  // horizontal offset 40%
-            sprite.y = token.h - size - (idx * (size * 0.2)) + (DEFAULT_TOKEN_SIZE - token.h);
+            // sprite.x = (idx * (size * 0.4)) - DEFAULT_TOKEN_SIZE;  // horizontal offset 40%
+            // sprite.y = token.h - size - (idx * (size * 0.2)) + (DEFAULT_TOKEN_SIZE - token.h);
+
+            // Position weapon/shield icons
+            if (item.type === "weapon") {
+                // sprite.anchor.set(0, 1);           // bottom-left
+                if (idx === 0) {
+                    sprite.x = (idx * (size * 0.4)) - DEFAULT_TOKEN_SIZE;  // horizontal offset 40%
+                    sprite.y = token.h - size - (idx * (size * 0.2)) + (DEFAULT_TOKEN_SIZE - token.h);
+                } else {
+                    sprite.x = token.w * 0.75;
+                    sprite.y = token.h - size + (DEFAULT_TOKEN_SIZE - token.h);
+                }
+            } else if (item.type === "armor" && item.system.type === "shield") {
+                // sprite.anchor.set(1, 1);           // bottom-right
+                sprite.x = token.w * 0.75;
+                sprite.y = token.h - size + (DEFAULT_TOKEN_SIZE - token.h);
+            }
 
             sprite.alpha = 1.0;
             sprite.visible = true;
