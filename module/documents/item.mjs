@@ -506,5 +506,4 @@ export class Hyp3eItem extends Item {
         const output = table[val]
         return output
     }
-
 }
