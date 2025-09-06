@@ -20,6 +20,8 @@
             "autoCalcAcHint": "Use 'equipped' status of armour and shields to calculate Armour Class & Movement. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
             "enforceWeaponEquipRules": "Enforce weapon equip rules",
             "enforceWeaponEquipRulesHint": "When enabled, only one weapon may be equipped at a time, except dual-wielding melee weapons if Dex ≥ 13 and WC ≤ 2.",
+            "showWeaponOverlay": "Show weapon/shield overlays",
+            "showWeaponOverlayHint": "If enabled, small icons of equipped weapons and shields will appear on tokens. Disabled by default.",
             "quickCreateChars": "Enable quick-create characters",
             "quickCreateCharsHint": "Enable the Quick Create Characters button on the Character sheet by selecting a Method. All stats are rolled down-the-line, and the system will re-roll until it gets a set that meets class requirements.",
             "customCompendia": "Search compendia",

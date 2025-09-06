@@ -76,6 +76,8 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
     token.mesh.addChild(container);
     container.zIndex = 9999;
     token.mesh.sortChildren();
+    // Default grid/token size seems to be 64, but the math works out to 128 px
+    const DEFAULT_TOKEN_SIZE = canvas.grid.size * 2;
 
     // Load and add sprites
     for (let [idx, item] of equippedWeapons.entries()) {
@@ -83,11 +85,11 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
             const texture = await loadTexture(item.img);  // works with svg/webp/png/jpg
             const sprite = new PIXI.Sprite(texture);
 
-            const size = Math.max(token.w / 2, 80);
+            const size = Math.max(token.w / 2, 80); // Max 80 px or about 1/3 token width
             sprite.width = sprite.height = size;
 
-            sprite.x = (idx * (size * 0.4)) - 128;  // horizontal offset 40%
-            sprite.y = token.h - size - (idx * (size * 0.2)) + (128 - token.h);
+            sprite.x = (idx * (size * 0.4)) - DEFAULT_TOKEN_SIZE;  // horizontal offset 40%
+            sprite.y = token.h - size - (idx * (size * 0.2)) + (DEFAULT_TOKEN_SIZE - token.h);
 
             sprite.alpha = 1.0;
             sprite.visible = true;

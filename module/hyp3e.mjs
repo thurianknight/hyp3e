@@ -90,6 +90,7 @@ Hooks.once('init', async function() {
         requiresReload: true
     });
 
+    // Enforce weapon equippage rules
     game.settings.register(game.system.id, "enforceWeaponEquipRules", {
         name: game.i18n.localize("HYP3E.settings.enforceWeaponEquipRules"),
         hint: game.i18n.localize("HYP3E.settings.enforceWeaponEquipRulesHint"),
@@ -98,6 +99,17 @@ Hooks.once('init', async function() {
         type: Boolean,
         config: true,
         requiresReload: false
+    });
+
+    // Show equipped weapons & shields on tokens
+    game.settings.register(game.system.id, "showWeaponOverlay", {
+        name: "Show Weapon/Shield Overlays",
+        hint: "If enabled, small icons of equipped weapons and shields will appear on tokens.",
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true
     });
 
     // Enable quick-create characters by selecting a roll method
@@ -792,6 +804,15 @@ Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
  * When a token is refreshed (moved, updated, etc), overlay icons for equipped weapons
  */
 Hooks.on("refreshToken", async (token, tokenState) => {
+    // Check config setting
+    if (!game.settings.get(game.system.id, "showWeaponOverlay")) {
+        if (token.weaponOverlay) {
+            token.weaponOverlay.destroy({ children: true });
+            token.weaponOverlay = null;
+        }
+        return;
+    }
+
     // Overlay equipped weapon and shield icons on the token
     await overlayEquippedWeaponAndShield(token, tokenState)
 });
