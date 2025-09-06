@@ -1,5 +1,5 @@
 import { Hyp3eCharacter } from "../helpers/character.mjs";
-import {enableAllEffects, disableAllEffects, onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
+import {enableItemEffectsOnActor, disableItemEffectsOnActor, onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -445,10 +445,10 @@ export class Hyp3eActorSheet extends ActorSheet {
         // Disable or enable any active effects coming from the item
         if (!item.system.equipped) {
             // Disable effects
-            disableAllEffects(item, this.actor.id, true)
+            disableItemEffectsOnActor(item, this.actor.id)
         } else {
             // Enable effects
-            enableAllEffects(item, this.actor.id, true)
+            enableItemEffectsOnActor(item, this.actor.id)
         }
         // Send a chat message that the item was equipped/unequipped or carried/dropped
         const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
@@ -464,7 +464,7 @@ export class Hyp3eActorSheet extends ActorSheet {
                 containerText = " and its contents"
             }
         }
-        const message = `${this.actor.name} ${equipText} ${itemName}${containerText}.`
+        const message = `${this.actor.name} ${equipText} <strong>${itemName}</strong>${containerText}.`
         const chatData = {
             author: game.user_id,
             content: message
@@ -718,7 +718,6 @@ export class Hyp3eActorSheet extends ActorSheet {
 
         // If this is an effect template, copy its ActiveEffects
         const effects = item.effects.contents.map(e => e.toObject());
-
         if (!effects.length) {
             console.warn(`No ActiveEffects found on template: ${item.name}`);
             return;

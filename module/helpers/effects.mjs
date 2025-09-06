@@ -17,6 +17,7 @@
                 label: "New Effect",
                 img: "icons/svg/aura.svg",
                 origin: owner.uuid,
+                sourceName: owner.name,
                 "duration.rounds": li.dataset.effectType === "temporary" ? 1 : undefined,
                 disabled: li.dataset.effectType === "inactive"
             }]);
@@ -152,6 +153,15 @@ export async function setupEffectHandlers() {
         // Flag to track whether anything needs to be updated
         let didUpdate = false;
 
+        // Is this effect's parent an item?
+        let newSourceName = effect.sourceName;
+        if (effect.parent.documentName === "Item") {
+            // Update the effect's sourceName
+            newSourceName = effect.parent.system?.friendlyName ? effect.parent.system.friendlyName : effect.parent.name;
+            didUpdate = true;
+            if (CONFIG.HYP3E.debugMessages) { console.log(`createActiveEffect: Effect parent is an Item: ${newSourceName}`) }
+        }
+
         // Check to see if we have a rollable duration formula, and resolve it if so
         const { updatedDuration, updated } = await checkAndResolveDuration(effect);
         if (CONFIG.HYP3E.debugMessages) { console.log(`createActiveEffect: Effect "${effect.name}" duration:`, updatedDuration) };
@@ -178,10 +188,12 @@ export async function setupEffectHandlers() {
             if (CONFIG.HYP3E.debugMessages) { 
                 console.log("createActiveEffect: Duration: ", updatedDuration)
                 console.log("createActiveEffect: Changes: ", updatedChanges)
+                console.log("createActiveEffect: sourceName: ", newSourceName)
             }
             await effect.update({
                 duration: updatedDuration,
-                changes: updatedChanges
+                changes: updatedChanges,
+                sourceName: newSourceName
             });
         }
 
@@ -190,9 +202,10 @@ export async function setupEffectHandlers() {
         //  multiple turns (much longer than a typical combat spell/effect).
         if (!effect.getFlag("hyp3e", "remainingTurns")) {
             // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
-            const durationTurns = Math.floor(effect.duration.rounds / 60) ?? undefined;
-            if (durationTurns < 1) {
-                console.log(`createActiveEffect: Effect ${effect.name} has <60 rounds and will expire at the next turn.`);
+            const durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
+            const durationTurns = Math.floor(durationRounds / 60) ?? null;
+            if (durationRounds && durationRounds < 60) {
+                console.log(`createActiveEffect: Effect ${effect.name} has duration <60 rounds and will expire at the next turn.`);
             } else if (isNaN(durationTurns)) {
                 console.log(`createActiveEffect: Effect ${effect.name} has no duration limit and will not expire.`);
             }
@@ -454,7 +467,10 @@ async function sendEffectChatMessage(effect) {
     // }
 
     // Build consistently styled content
-    const content = `<p>${messageParts.join(" ")}.</p>`;
+    const content = `
+        <p><strong>${effect.sourceName}:</strong></p>
+        <ul><li>${messageParts.join(" ")}.</li></ul>
+    `;
     if (CONFIG.HYP3E.debugMessages) { console.log("sendEffectChatMessage: Chat Content: ", content) }
 
     // Dispatch the chat message
@@ -470,7 +486,7 @@ async function sendEffectChatMessage(effect) {
  **********************************************************/
 
 /**
- * Apply specified effect from an item to the selected tokens
+ * Apply specified effect from an item or spell to the selected tokens
  * @param {itemId} string      The item that has the effect
  * @param {effectId} string    The effect ID to apply
  * @param {actorId} string     The actor that owns the item
@@ -526,9 +542,6 @@ export async function applyEffect(item, effectId, actorId, disabled = false) {
         damageRoll = roll.formula;
     }
 
-    // Initialize the chat string
-    // let chatMsg = ""
-
     // Apply the effect to selected tokens/actors
     for (const t of tokens) {
         if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Target Token: ", t) }
@@ -537,7 +550,7 @@ export async function applyEffect(item, effectId, actorId, disabled = false) {
         const childEffect = result[0];
         console.log("applyEffect: Created Effect: ", childEffect)
         if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: Target Actor: ", t.actor) }
-        // chatMsg += `<p>${actor.name} applied <i>${effectData.name}</i> to ${t.name}.</p>`
+
         // Set flag to store metadata about the effect source & target actor
         await childEffect.setFlag("hyp3e", "source", {
             srcItemUuid: item.uuid,
@@ -560,12 +573,6 @@ export async function applyEffect(item, effectId, actorId, disabled = false) {
             }
         }
     }
-    // const chatData = {
-    //     author: game.user_id,
-    //     speaker: ChatMessage.getSpeaker({ actor: actor }),
-    //     content: chatMsg
-    // };
-    // ChatMessage.create(chatData, {});
 }
 
 /**
@@ -659,11 +666,8 @@ export async function enableEffect(item, effectId, actorId) {
     await effect.setFlag("hyp3e", "source", {
         srcItemUuid: item.uuid,
         srcActorUuid: actor.uuid,
-        appliedBy: actor.name
+        appliedBy: itemName
     });
-
-    // Initialize the chat string
-    // let chatMsg = ""
 
     // Enable the effect on the actor
     if (CONFIG.HYP3E.debugMessages) { console.log(`enableEffect: Effect to enable: `, effect) }
@@ -681,16 +685,9 @@ export async function enableEffect(item, effectId, actorId) {
             // applyEffect(item, effectId, actorId, false);
         }
     }
-    // chatMsg += `<p><i>${effect.name}</i> enabled on ${actor.name}.</p>`
 
     // Send a chat message that the effect was enabled
     sendEffectChatMessage(effect)
-    // const chatData = {
-    //     author: game.user_id,
-    //     speaker: ChatMessage.getSpeaker({ actor: actor }),
-    //     content: chatMsg
-    // };
-    // ChatMessage.create(chatData, {});
 }
 
 /**
@@ -698,58 +695,61 @@ export async function enableEffect(item, effectId, actorId) {
  * @param {itemId} string      The item that has the effects to enable
  * @param {actorId} string     The actor that owns the item and will receive/enable the effects
  */
-export async function enableAllEffects(item, actorId, transferOnly = false) {
+export async function enableItemEffectsOnActor(item, actorId) {
+    // Get a list of item effects that are applied to the actor
+    const transferEffects = item.effects.filter(e => e.transfer && e.duration.rounds === null && e.duration.turns === null);
+    console.log("enableItemEffectsOnActor: transferEffects:", transferEffects, Array.isArray(transferEffects));
+    if (transferEffects.length === 0) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`enableItemEffectsOnActor: Item ${item.name} has no transferrable effects to apply.`); }
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("enableItemEffectsOnActor: Transfer Effects: ", transferEffects) }
     // Get the actor
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
-        ui.notifications?.error(`Enable All Effects: Actor ${actorId} not found!`)
+        ui.notifications?.error(`Enable All Item Effects: Actor ${actorId} not found!`)
         return
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log("enableAllEffects: Item: ", item) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("enableItemEffectsOnActor: Item: ", item) }
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
 
-    // Check if the item has any effects to enable
-    if (item.effects.contents.length === 0) {
-        console.log(`enableAllEffects: Item ${itemName} has no effects to enable.`);
-        return;
-    }
-
     // Initialize the chat string
-    let chatMsg = ""
+    let chatMsg = []
+    chatMsg.push(`<p><strong>${itemName}:</strong></p><ul>`)
 
-    // Enable the effects on the actor
-    item.effects.forEach(effect => async () => {
-        if (!transferOnly || transferOnly && effect.transfer) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`enableAllEffects: Effect to enable: `, effect) }
-            // Update the item effect
-            await effect.update({ disabled: false });
-            if (!foundry.utils.isNewerVersion(game.version, "13")) {
-                // For Foundry v12 only...
-                // We updated the effect on the source item. Now, find the matching effect on 
-                //  the actor, so we can toggle that as well.
-                const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
-                if (actorEffect) {
-                    // actorEffect.update({ disabled: false });
-                } else {
-                    // If the effect can't be found, we apply the effect to the actor instead.
-                    // applyAllEffects(item, actorId, false);
-                }
+    // Enable the transferrable effects on the actor
+    transferEffects.forEach(async effect => {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`enableItemEffectsOnActor: Effect to enable: `, effect) }
+        chatMsg.push(`<li><i>${effect.name}</i> enabled on ${actor.name}.</li>`)
+        // Update the item effect
+        await effect.update({ disabled: false });
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12 only...
+            // We updated the effect on the source item. Now, find the matching effect on 
+            //  the actor, so we can toggle that as well.
+            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+            if (actorEffect) {
+                // actorEffect.update({ disabled: false });
+            } else {
+                // If the effect can't be found, we apply the effect to the actor instead.
+                // applyAllEffects(item, actorId, false);
             }
-            // Set flag to store metadata about the effect source & target actor
-            await effect.setFlag("hyp3e", "source", {
-                srcItemUuid: item.uuid,
-                srcActorUuid: actor.uuid,
-                appliedBy: actor.name
-            });
-            chatMsg += `<p><i>${effect.name}</i> enabled on ${actor.name}.</p>`
         }
+        // Set flag to store metadata about the effect source & target actor
+        await effect.setFlag("hyp3e", "source", {
+            srcItemUuid: item.uuid,
+            srcActorUuid: actor.uuid,
+            appliedBy: itemName
+        });
     })
+    chatMsg.push(`</ul>`)
+
     // Send a chat message that the effects were enabled
-    if (CONFIG.HYP3E.debugMessages) { console.log(`enableAllEffects: Chat message: `, chatMsg) }
+    if (CONFIG.HYP3E.debugMessages) { console.log(`enableItemEffectsOnActor: Chat message: `, chatMsg) }
     const chatData = {
         author: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: actor }),
-        content: chatMsg
+        content: chatMsg.join("")
     };
     ChatMessage.create(chatData, {});
 }
@@ -780,7 +780,7 @@ export async function disableEffect(item, effectId, actorId) {
     await effect.setFlag("hyp3e", "source", {
         srcItemUuid: item.uuid,
         srcActorUuid: actor.uuid,
-        appliedBy: actor.name
+        appliedBy: itemName
     });
 
     // Initialize the chat string
@@ -817,56 +817,61 @@ export async function disableEffect(item, effectId, actorId) {
  * @param {itemId} string      The item that has the effects to disable
  * @param {actorId} string     The actor that owns the item and will disable the effects
  */
-export async function disableAllEffects(item, actorId, transferOnly = false) {
-    let chatMsg = ""
-
+export async function disableItemEffectsOnActor(item, actorId) {
+    // Get a list of item effects that are applied to the actor
+    const transferEffects = item.effects.filter(e => e.transfer);
+    console.log("disableItemEffectsOnActor: transferEffects:", transferEffects, Array.isArray(transferEffects));
+    if (transferEffects.length === 0) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`disableItemEffectsOnActor: Item ${item.name} has no transferrable effects to disable.`); }
+        return;
+    }
+    if (CONFIG.HYP3E.debugMessages) { console.log("disableItemEffectsOnActor: Transfer Effects: ", transferEffects) }
     // Get the actor & item
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
-        ui.notifications?.error(`Disable All Effects: Actor ${actorId} not found!`)
+        ui.notifications?.error(`Disable All Item Effects: Actor ${actorId} not found!`)
         return
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log("disableAllEffects: Item: ", item) }
+    if (CONFIG.HYP3E.debugMessages) { console.log("disableItemEffectsOnActor: Item: ", item) }
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
 
-    // Check if the item has any effects to disable
-    if (item.effects.contents.length === 0) {
-        console.log(`disableAllEffects: Item ${itemName} has no effects to disable.`);
-        return;
-    }
+    // Initialize the chat array
+    let chatMsg = []
+    chatMsg.push(`<p><strong>${itemName}:</strong></p><ul>`)
 
-    item.effects.forEach(effect => async () => {
-        if (!transferOnly || transferOnly && effect.transfer) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`disableAllEffects: Effect to disable: `, effect) }
-            // Update the item effect
-            await effect.update({ disabled: true });
-            if (!foundry.utils.isNewerVersion(game.version, "13")) {
-                // For Foundry v12 only...
-                // We updated the effect on the source item. Now, find the matching effect on 
-                //  the actor, so we can toggle that as well.
-                const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
-                if (actorEffect) {
-                    // actorEffect.update({ disabled: true });
-                } else {
-                    // If the effect can't be found, we apply the effect to the actor instead.
-                    // applyAllEffects(item, actorId, true);
-                }
+    // transferEffects.forEach(effect => async () => {
+    transferEffects.forEach(async effect => {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`disableItemEffectsOnActor: Effect to disable: `, effect) }
+        chatMsg.push(`<li><i>${effect.name}</i> disabled on ${actor.name}.</li>`)
+        // Update the item effect
+        await effect.update({ disabled: true });
+        if (!foundry.utils.isNewerVersion(game.version, "13")) {
+            // For Foundry v12 only...
+            // We updated the effect on the source item. Now, find the matching effect on 
+            //  the actor, so we can toggle that as well.
+            const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+            if (actorEffect) {
+                // actorEffect.update({ disabled: true });
+            } else {
+                // If the effect can't be found, we apply the effect to the actor instead.
+                // applyAllEffects(item, actorId, true);
             }
-            // Set flag to store metadata about the effect source & target actor
-            await effect.setFlag("hyp3e", "source", {
-                srcItemUuid: item.uuid,
-                srcActorUuid: actor.uuid,
-                appliedBy: actor.name
-            });
-            chatMsg += `<p><i>${effect.name}</i> disabled on ${actor.name}.</p>`
         }
+        // Set flag to store metadata about the effect source & target actor
+        await effect.setFlag("hyp3e", "source", {
+            srcItemUuid: item.uuid,
+            srcActorUuid: actor.uuid,
+            appliedBy: itemName
+        });
     })
+    chatMsg.push(`</ul>`)
+
     // Send a chat message that the effects were disabled
-    if (CONFIG.HYP3E.debugMessages) { console.log(`disableAllEffects: Chat message: `, chatMsg) }
+    if (CONFIG.HYP3E.debugMessages) { console.log(`disableItemEffectsOnActor: Chat message: `, chatMsg) }
     const chatData = {
         author: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: actor }),
-        content: chatMsg
+        content: chatMsg.join("")
     };
     ChatMessage.create(chatData, {});
 }

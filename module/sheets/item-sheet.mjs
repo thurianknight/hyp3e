@@ -395,7 +395,12 @@ export class Hyp3eItemSheet extends ItemSheet {
             }
 
             // Copy the effectTemplate's ActiveEffects to this item
-            const effects = droppedItem.effects.contents.map(e => e.toObject());
+            const effects = droppedItem.effects.contents.map(e => {
+                let effectData = e.toObject();
+                effectData.origin = this.item.uuid;
+                effectData.sourceName = this.item.system?.friendlyName ? this.item.system.friendlyName : this.item.name;
+                return effectData;
+            });
 
             if (!effects.length) {
                 ui.notifications.warn(`No ActiveEffects found on template: ${droppedItem.name}`);
