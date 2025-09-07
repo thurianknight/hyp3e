@@ -1304,8 +1304,8 @@ export class Hyp3eActor extends Actor {
         dataset.sitModList = "";
         const actorAttributes = { 
             dx: this.system.attributes.dex.value, 
-            in: this.system.attributes.wis.value, 
-            ws: this.system.attributes.int.value
+            in: this.system.attributes.int.value, 
+            ws: this.system.attributes.wis.value
         };
         const sitModObj = this._getThiefSkillModifier(itemName, actorAttributes)
         if (sitModObj.modifier > 0) {
