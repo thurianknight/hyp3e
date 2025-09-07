@@ -88,9 +88,6 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
             const size = Math.max(token.w / 2, 80); // Max 80 px or about 1/3 token width
             sprite.width = sprite.height = size;
 
-            // sprite.x = (idx * (size * 0.4)) - DEFAULT_TOKEN_SIZE;  // horizontal offset 40%
-            // sprite.y = token.h - size - (idx * (size * 0.2)) + (DEFAULT_TOKEN_SIZE - token.h);
-
             // Position weapon/shield icons
             if (item.type === "weapon") {
                 // sprite.anchor.set(0, 1);           // bottom-left
@@ -98,12 +95,12 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
                     sprite.x = (idx * (size * 0.4)) - DEFAULT_TOKEN_SIZE;  // horizontal offset 40%
                     sprite.y = token.h - size - (idx * (size * 0.2)) + (DEFAULT_TOKEN_SIZE - token.h);
                 } else {
-                    sprite.x = token.w * 0.75;
+                    sprite.x = token.w - size + (DEFAULT_TOKEN_SIZE - token.w);
                     sprite.y = token.h - size + (DEFAULT_TOKEN_SIZE - token.h);
                 }
             } else if (item.type === "armor" && item.system.type === "shield") {
                 // sprite.anchor.set(1, 1);           // bottom-right
-                sprite.x = token.w * 0.75;
+                sprite.x = token.w - size + (DEFAULT_TOKEN_SIZE - token.w);
                 sprite.y = token.h - size + (DEFAULT_TOKEN_SIZE - token.h);
             }
 
