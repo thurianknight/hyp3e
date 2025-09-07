@@ -112,5 +112,5 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
             console.error("overlayEquippedWeaponAndShield: Error loading texture for item", item.name, item.img, err);
         }
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log(`overlayEquippedWeaponAndShield: Weapon overlay added for ${token.name}:`, token, equippedWeapons.map(i => i.name)); }
+    // if (CONFIG.HYP3E.debugMessages) { console.log(`overlayEquippedWeaponAndShield: Weapon overlay added for ${token.name}:`, token, equippedWeapons.map(i => i.name)); }
 }

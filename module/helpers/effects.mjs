@@ -213,6 +213,7 @@ export async function setupEffectHandlers() {
             }
         }
         // Send a chat message that the effect was applied
+        sendEffectChatMessage(effect)
 
     });
 
@@ -546,8 +547,8 @@ export async function applyEffect(item, effectId, actorId, disabled = false) {
             srcActorUuid: actor.uuid,
             appliedBy: actor.name
         });
-        // Send a chat message that the effect was applied
-        sendEffectChatMessage(childEffect)
+        // // Send a chat message that the effect was applied
+        // sendEffectChatMessage(childEffect)
         // Now we get the newly-created effect, and modify the persistent damage roll if needed
         if (persistentDamage) {
             if (CONFIG.HYP3E.debugMessages) { console.log("applyEffect: New Effect: ", childEffect) }
@@ -772,9 +773,6 @@ export async function disableEffect(item, effectId, actorId) {
         appliedBy: itemName
     });
 
-    // Initialize the chat string
-    // let chatMsg = ""
-
     if (CONFIG.HYP3E.debugMessages) { console.log(`disableEffect: Effect to disable: `, effect) }
     // Update the item effect
     await effect.update({ disabled: true });
@@ -790,15 +788,8 @@ export async function disableEffect(item, effectId, actorId) {
             // applyEffect(item, effectId, actorId, true);
         }
     }
-    // chatMsg += `<p><i>${effect.name}</i> disabled on ${actor.name}.</p>`
     // Send a chat message that the effect was disabled
     sendEffectChatMessage(effect)
-    // const chatData = {
-    //     author: game.user_id,
-    //     speaker: ChatMessage.getSpeaker({ actor: actor }),
-    //     content: chatMsg
-    // };
-    // ChatMessage.create(chatData, {});
 }
 
 /**
