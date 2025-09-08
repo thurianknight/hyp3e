@@ -91,6 +91,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         // All item sheets get the same basic data
         context.weaponTypes = CONFIG.HYP3E.weaponTypes;
         context.armorTypes = CONFIG.HYP3E.armorTypes;
+        context.shieldTypes = CONFIG.HYP3E.shieldTypes;
         context.weaponAnnotations = CONFIG.HYP3E.weaponAnnotations;
         context.damageTypes = CONFIG.HYP3E.damageTypes;
         context.blindRollOpts = CONFIG.HYP3E.blindRollOpts;
@@ -100,6 +101,9 @@ export class Hyp3eItemSheet extends ItemSheet {
         // Set isShield flag for armor items
         if (context.item.type === 'armor') {
             context.system.isShield = context.system.type === "shield" ? true : false
+        }
+        if (context.item.type === 'shield') {
+            context.system.isShield = true
         }
 
         // Refresh the annotations list for weapons

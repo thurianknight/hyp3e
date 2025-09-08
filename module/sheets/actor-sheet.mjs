@@ -322,7 +322,7 @@ export class Hyp3eActorSheet extends ActorSheet {
                 weapons.push(i);
             }
             // Append to armor.
-            if (i.type === 'armor') {
+            if (i.type === 'armor' || i.type === 'shield') {
                 armor.push(i);
             }
             // Append to spells.
@@ -454,7 +454,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
         let equipText = ""
         let containerText = ""
-        if (item.type === "armor" || item.type === "weapon") {
+        if (item.type === "armor" || item.type === "shield" || item.type === "weapon") {
             equipText = item.system.equipped ? "equipped" : "unequipped"
         } else if (item.type === "item" || item.type === "container") {
             equipText = item.system.equipped ? "is carrying" : "dropped"

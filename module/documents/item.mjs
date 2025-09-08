@@ -17,10 +17,11 @@ export class Hyp3eItem extends Item {
 
         // Replace default image for new items, but if an image is defined, leave it be
         const TYPE_IMAGES = {
-            armor: "icons/svg/shield.svg",
+            armor: "icons/svg/statue.svg",
             effectTemplate: "icons/svg/aura.svg",
             feature: "icons/svg/target.svg",
             item: "icons/svg/item-bag.svg",
+            shield: "icons/svg/shield.svg",
             spell: "icons/svg/book.svg",
             weapon: "icons/svg/combat.svg",
             container: "icons/svg/item-bag.svg"
@@ -56,6 +57,10 @@ export class Hyp3eItem extends Item {
         if (itemData.identified && !itemData.realDescription?.trim()) {
             itemData.realDescription = itemData.description;
         }
+        // If the item is identified but has no Description, set it to the realDescription
+        if (itemData.identified && !itemData.description?.trim()) {
+            itemData.description = itemData.realDescription;
+        }
 
         // Fix weapon & spell missing or invalid damage type
         if (["weapon", "spell"].includes(this.type)) {
@@ -78,7 +83,7 @@ export class Hyp3eItem extends Item {
         }
 
         // isLightSource flag (physical items & spells)
-        if (["armor", "item", "weapon", "spell"].includes(this.type)) {
+        if (["armor", "item", "shield", "weapon", "spell"].includes(this.type)) {
             if (itemData.isLightSource === undefined || itemData.isLightSource === null) {
                 // Match item name to a light source in the lookup table
                 const lightSourceProps = this._getLightSourceProperties();

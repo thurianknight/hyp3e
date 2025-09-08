@@ -301,8 +301,8 @@
     {{!-- Armors appear here --}}
     <ol class="items-list">
       <li class="item flexrow items-header">
-        <div class="item-name">{{localize "HYP3E.headers.armor"}}</div>
-        <div class="item-prop">{{localize "HYP3E.headers.type"}}</div>
+        <div class="item-name">{{localize "HYP3E.headers.armorAndShields"}}</div>
+        {{!-- <div class="item-prop">{{localize "HYP3E.headers.type"}}</div> --}}
         <div class="item-prop">{{localize "HYP3E.armor.ac"}}</div>
         <div class="item-prop">{{localize "HYP3E.armor.dr"}}</div>
         <div class="item-prop">{{localize "HYP3E.movement.base.abbrev"}}</div>
@@ -335,7 +335,7 @@
               {{/if}}
               <a><h4 class="item-drop">{{item.name}}</h4></a>
             </div>
-            <div class="item-prop">{{item.system.type}}</div>
+            {{!-- <div class="item-prop">{{item.system.type}}<br>{{item.type}}</div> --}}
             <div class="item-prop">
                 {{#if item.system.identified}}
                 {{item.system.ac}}

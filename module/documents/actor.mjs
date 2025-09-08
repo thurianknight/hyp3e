@@ -97,7 +97,8 @@ export class Hyp3eActor extends Actor {
 
         // // Auto-calculate AC, DR, MV if configuration is enabled
         if (CONFIG.HYP3E.autoCalcAc) {
-            this.getCharacterAcAndMv(this, systemData)
+            // this.getCharacterAcAndMv(this, systemData)
+            this.updateCharacterAcAndMv(this, systemData)
         }
 
         // Apply temp AC, DR, and MV modifiers
@@ -294,7 +295,7 @@ export class Hyp3eActor extends Actor {
         let tempDR = 0
         // Loop through all inventory item types to find armor
         for (let itmType of Object.entries(actorData.itemTypes)) {
-            if (itmType[0] == "armor") {
+            if (itmType[0] === "armor") {
                 // Armor as an item type can include armor, shields, and some protective magic items
                 for (let [key, obj] of Object.entries(itmType[1])) {
                     if (CONFIG.HYP3E.debugMessages) { console.log("Armor data: ", obj) }
@@ -358,6 +359,100 @@ export class Hyp3eActor extends Actor {
         systemData.ac.value = Math.clamp(tempAC, -9, 9);
         systemData.ac.dr = tempDR
         systemData.movement.base.value = tempMV
+    }
+
+    /**
+     * Mutate the character's AC, DR, and MV in the actor's system data
+     * @param {*} actorData - The actor data object
+     * @param {*} systemData - The actor system data object
+     */
+    updateCharacterAcAndMv(actorData, systemData) {
+        const { ac, dr, mv } = this._calculateAcDrMv(actorData, systemData);
+        systemData.ac.value = ac;
+        systemData.ac.dr = dr;
+        systemData.movement.base.value = mv;
+    }
+
+    /**
+     * Calculate the character's AC, DR, and MV based on equipped armor, shields, etc.
+     * @param {*} actorData - The actor data object
+     * @param {*} systemData - The actor system data object
+     * @returns 
+     */
+    _calculateAcDrMv(actorData, systemData) {
+        let ac = 9;
+        let mv = 40;
+        let dr = 0;
+        let shieldMod = 0;
+
+        const items = this._getEquippedProtectionItems(actorData);
+
+        for (const item of items) {
+            const sys = item.system ?? {};
+
+            // DR — pick the best
+            // dr = Math.max(dr, sys.dr || 0);
+
+            if (this._isHandShield(item)) {
+                // Shield = stacking AC mod
+                shieldMod += sys.ac || 0;
+            } else {
+                // Armor (or passive AC) = pick the best
+                //  The assumption here is that if multiple armor items are equipped, only
+                //  the best one counts (no stacking).
+                if (sys.ac < ac) {
+                    ac = sys.ac;
+                    dr = sys.dr || dr;
+                }
+                // Movement = pick the worst
+                if (sys.mv < mv) {
+                    mv = sys.mv ?? mv;
+                }
+            }
+        }
+
+        // Encumbrance
+        if (game.settings.get(game.system.id, "enableEncumbrance")) {
+            if (this.getFlag(game.system.id, "isEncumbered")) {
+                ac += 1; mv -= 10;
+            } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
+                ac += 2; mv -= 20;
+            }
+        }
+
+        // Dex and shields
+        ac -= (systemData.attributes.dex.defMod || 0) + shieldMod;
+
+        return {
+            ac: Math.clamp(ac, -9, 9),
+            dr,
+            mv
+        };
+    }
+
+    /**
+     * Gather equipped protection items (armor, shields, passives).
+     */
+    _getEquippedProtectionItems(actorData) {
+        const items = [];
+        for (const [type, collection] of Object.entries(actorData.itemTypes)) {
+            if (type === "armor" || type === "shield") {
+            for (const obj of Object.values(collection)) {
+                if (obj.system?.equipped) items.push(obj);
+            }
+            }
+        }
+        return items;
+    }
+
+    /**
+     * Return true if the item should be treated as a hand-using shield.
+     */
+    _isHandShield(item) {
+        return (
+            (item.type === "shield" && item.system.type !== "passive") ||
+            (item.type === "armor" && item.system.type === "shield")
+        );
     }
 
     /**

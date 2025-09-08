@@ -206,7 +206,7 @@
         }
     },
     "Item": {
-        "types": ["armor", "feature", "item", "spell", "weapon", "effectTemplate"],
+        "types": ["armor", "feature", "item", "shield", "spell", "weapon", "effectTemplate"],
         "templates": {
             "base": {
                 "friendlyName": "",
@@ -284,6 +284,12 @@
             "isContainer": false,
             "itemIds": [],
             "isAmmunition": false
+        },
+        "shield": {
+            "templates": ["base", "physical", "equippable", "canHaveSpells"],
+            "type": "small",
+            "ac": 1,
+            "dr": 0
         },
         "spell": {
             "templates": ["base", "rollable"],

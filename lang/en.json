@@ -85,6 +85,7 @@
             "abilitiesItems": "Abilities & Items",
             "weapons": "Weapons",
             "armor": "Armour",
+            "armorAndShields": "Armour & Shields",
             "weaponsAndArmor": "Weapons & Armour",
             "items": "Items",
             "ability": "Ability",
@@ -318,6 +319,7 @@
             "armor": "Armour", 
             "feature": "Feature", 
             "item": "Item", 
+            "shield": "Shield",
             "spell": "Spell", 
             "weapon": "Weapon", 
             "effectTemplate": "Effect Template"
@@ -457,6 +459,16 @@
             "dmgReduct": "Dmg Reduction",
             "dr": "DR",
             "unarmored": "Unarmoured",
+            "acMod": "AC Mod"
+        },
+        "shield": {
+            "add": "Add Shield",
+            "type": {
+                "small": "Small",
+                "large": "Large",
+                "passive": "Passive"
+            },
+            "shieldType": "Shield Type",
             "acMod": "AC Mod"
         },
         "attack": {

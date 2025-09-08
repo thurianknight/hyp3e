@@ -154,6 +154,7 @@ HYP3E.itemTypes = {
     "armor": "HYP3E.itemTypes.armor", 
     "feature": "HYP3E.itemTypes.feature", 
     "item": "HYP3E.itemTypes.item", 
+    "shield": "HYP3E.itemTypes.shield", 
     "spell": "HYP3E.itemTypes.spell", 
     "weapon": "HYP3E.itemTypes.weapon", 
     "effectTemplate": "HYP3E.itemTypes.effectTemplate"
@@ -217,6 +218,15 @@ HYP3E.armorTypes = {
   "medium": "HYP3E.armor.type.medium",
   "heavy": "HYP3E.armor.type.heavy",
   "shield": "HYP3E.armor.type.shield"
+};
+/**
+ * The shield types
+ * @type {Object}
+ */
+HYP3E.shieldTypes = {
+  "small": "HYP3E.shield.type.small",
+  "large": "HYP3E.shield.type.large",
+  "passive": "HYP3E.shield.type.passive"
 };
 
 export default HYP3E;
