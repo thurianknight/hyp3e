@@ -5,15 +5,23 @@
     <div class="flexrow flex-group-left">
       <div class="item">
         <span class="spells-label">{{localize "HYP3E.castingAbility"}}</span>
-        <input type="text" class="spells" name="system.spellcasting.ca" value="{{system.spellcasting.ca}}" data-dtype="Number"/>
+        <input type="text" class="spells" name="system.spellcasting.ca" value="{{system.spellcasting.ca}}" data-dtype="Number" {{#unless isGM}}readonly{{/unless}}/>
       </div>
       <div class="item flexlarge">
         <span class="spells-label">{{localize "HYP3E.item.charges"}}</span>
-        <input type="text" class="spells" name="system.spellcasting.charges.value" value="{{system.spellcasting.charges.value}}" data-dtype="Number"/>
+        {{#if isGM}}
+        <input type="text" class="spells" name="system.spellcasting.charges.value" value="{{system.spellcasting.charges.value}}" data-dtype="Number" />
         /
-        <input type="text" class="spells" name="system.spellcasting.charges.max" value="{{system.spellcasting.charges.max}}" data-dtype="Number"/>
-      {{!-- </div>
-      <div class="item"> --}}
+        <input type="text" class="spells" name="system.spellcasting.charges.max" value="{{system.spellcasting.charges.max}}" data-dtype="Number" />
+        {{else}}
+        {{#if system.spellcasting.hideCharges}}
+        <input type="text" class="spells" name="system.spellcasting.charges.value" value="***" readonly/>
+        {{else}}
+        <input type="text" class="spells" name="system.spellcasting.charges.value" value="{{system.spellcasting.charges.value}}" readonly/>
+        /
+        <input type="text" class="spells" name="system.spellcasting.charges.max" value="{{system.spellcasting.charges.max}}" readonly/>
+        {{/if}}
+        {{/if}}
         <span class="spells-label">({{localize "HYP3E.dataLabel.leaveBlank"}})</span>
       </div>
     </div>
@@ -43,6 +51,7 @@
                         name="system.spellcasting.spellRefs.{{idx}}.charges" 
                         value="{{entry.charges}}" 
                         data-dtype="Number"
+                        {{#unless @root.isGM}}readonly{{/unless}}
                     />
                 </div>
                 <div class="item-prop">{{entry.spell.system.spellLevel}}</div>

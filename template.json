@@ -237,6 +237,7 @@
             "canHaveSpells": {
                 "spellcasting": {
                     "hasSpells": false,
+                    "hideCharges": false,
                     "ca": null,
                     "charges": {
                         "value": null,
