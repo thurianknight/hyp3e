@@ -122,7 +122,10 @@ export function migrateItemData(item) {
 
     // Armor only
     if (item.type === "armor") {
-
+        const shieldUpdate = migrateShield(item);
+        if (shieldUpdate) {
+            updates = { ...updates, ...shieldUpdate };
+        }
     }
 
     // Features only
@@ -153,16 +156,84 @@ export function migrateItemData(item) {
 
     // Weapons only
     if (item.type === "weapon") {
-        // updates = { ...updates, "system.equipped": false };
-        let friendlyName = fixFriendlyName(item);
+        const friendlyName = fixFriendlyName(item);
         if (friendlyName) {
             updates = { ...updates, "system.friendlyName": friendlyName };
+        }
+        const handsUpdate = migrateWeaponHands(item);
+        if (handsUpdate) {
+            updates = { ...updates, ...handsUpdate };
         }
     }
 
     console.log(`migrateItemData: Updated data for ${item.name}:`, updates)
     return updates;
 }
+
+/**
+ * Migrate shield item data to new format
+ * @param {*} item - Item document to process for data migration
+ * @returns {Object|null} - JSON of update data
+ */
+export function migrateShield(item) {
+    if (!(item.type === "armor" && item.system.type === "shield")) return null;
+
+    let shieldType = "small"; // default
+    const name = item.name.toLowerCase();
+
+    if (
+        name.includes("tower") || 
+        name.includes("door") || 
+        name.includes("large")
+    ) { shieldType = "large"; }
+
+    if (
+        name.includes("ring") ||
+        name.includes("cloak") ||
+        name.includes("boots") ||
+        name.includes("helm") ||
+        name.includes("scarab") ||
+        name.includes("amulet")
+    ) { shieldType = "passive"; }
+
+    const update = {
+        type: "shield",
+        "system.type": shieldType
+    }
+    return update;
+}
+
+/**
+ * Determine if a weapon is one-handed or two-handed
+ * Returns an update object if a change is needed, otherwise null
+ * @param {*} item - Item document to process for data migration
+ * @returns {Object|null} - JSON of update data or null if no change needed
+ */
+export function migrateWeaponHands(item) {
+    if (item.type !== "weapon") return null;
+
+    let hands = 1; // default
+    const name = item.name.toLowerCase();
+
+    if (
+        name.includes("two-handed") ||
+        name.includes("2h") ||
+        name.includes("great") ||
+        name.includes("bow") ||
+        name.includes("sling") ||
+        name.includes("gun") ||
+        (Array.isArray(item.system.annotations) &&
+            item.system.annotations.some(a => a.toLowerCase().includes("true2hand")))
+    ) { hands = 2; }
+
+    // Only return an update if the hands property differs
+    if (item.system.hands !== hands) {
+        return { "system.hands": hands };
+    }
+
+    return null;
+}
+
 
 /**
  * 

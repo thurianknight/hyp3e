@@ -1020,9 +1020,9 @@ async function migrateWorld() {
                 switch(packType) {
                 case "Actor":
                     // Migrate actor data
-                    const origActor = foundry.utils.deepClone(doc)
-                    const actorUpdates = migrateActorData(origActor)
-                    if (actorUpdates && actorUpdates != {}) await doc.update(actorUpdates)
+                    const origActor = foundry.utils.deepClone(doc);
+                    const actorUpdates = migrateActorData(origActor);
+                    if (actorUpdates && actorUpdates != {}) await doc.update(actorUpdates);
                     // Migrate the actor's items
                     if (doc.items) {
                         for (let item of doc.items) {
@@ -1038,10 +1038,10 @@ async function migrateWorld() {
                     const origItem = foundry.utils.deepClone(doc);
                     const itemUpdates = migrateItemData(origItem);
                     if (itemUpdates && itemUpdates != {}) await doc.update(itemUpdates);
-                    break
+                    break;
 
                 default:
-                    break
+                    break;
                 }
             } catch (err) {
                 const errMsg = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}: ${err.message}`;
