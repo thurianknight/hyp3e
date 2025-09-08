@@ -968,13 +968,22 @@ async function migrateWorld() {
         // Migrate actor data
         const origActor = foundry.utils.deepClone(actor)
         const actorUpdates = migrateActorData(origActor)
-        if (actorUpdates && actorUpdates != {}) await actor.update(actorUpdates)
+        if (actorUpdates && Object.keys(actorUpdates).length > 0) {
+            await actor.update(actorUpdates);
+        }
         // Migrate the actor's items
         if (actor.items) {
             for (let item of actor.items) {
                 const origItem = foundry.utils.deepClone(item);
                 const itemUpdates = migrateItemData(origItem);
-                if (itemUpdates && itemUpdates != {}) await item.update(itemUpdates);
+                if (itemUpdates && Object.keys(itemUpdates).length > 0) {
+                    if (origItem.type === "armor" && origItem.system.type === "shield") {
+                        // Legacy shields need non-recursive update to force item type change
+                        await item.update(itemUpdates, { recursive: false });
+                    } else {
+                        await item.update(itemUpdates);
+                    }
+                }
             }
         }
     }
@@ -987,7 +996,14 @@ async function migrateWorld() {
     for (let item of game.items.contents) {
         const origItem = foundry.utils.deepClone(item);
         const itemUpdates = migrateItemData(origItem);
-        if (itemUpdates && itemUpdates != {}) await item.update(itemUpdates);
+        if (itemUpdates && Object.keys(itemUpdates).length > 0) {
+            if (origItem.type === "armor" && origItem.system.type === "shield") {
+                // Legacy shields need non-recursive update to force item type change
+                await item.update(itemUpdates, { recursive: false });
+            } else {
+                await item.update(itemUpdates);
+            }
+        }
     }
 
     // We only migrate the Hyperborea compendium if the GM requests it.
@@ -1022,13 +1038,22 @@ async function migrateWorld() {
                     // Migrate actor data
                     const origActor = foundry.utils.deepClone(doc);
                     const actorUpdates = migrateActorData(origActor);
-                    if (actorUpdates && actorUpdates != {}) await doc.update(actorUpdates);
+                    if (actorUpdates && Object.keys(actorUpdates).length > 0) {
+                        await doc.update(actorUpdates);
+                    }
                     // Migrate the actor's items
                     if (doc.items) {
                         for (let item of doc.items) {
                             const origItem = foundry.utils.deepClone(item);
                             const itemUpdates = migrateItemData(origItem);
-                            if (itemUpdates && itemUpdates != {}) await item.update(itemUpdates);
+                            if (itemUpdates && Object.keys(itemUpdates).length > 0) {
+                                if (origItem.type === "armor" && origItem.system.type === "shield") {
+                                    // Legacy shields need non-recursive update to force item type change
+                                    await item.update(itemUpdates, { recursive: false });
+                                } else {
+                                    await item.update(itemUpdates);
+                                }
+                            }
                         }
                     }
                     break
@@ -1037,7 +1062,14 @@ async function migrateWorld() {
                     // Do for all items regardless of type
                     const origItem = foundry.utils.deepClone(doc);
                     const itemUpdates = migrateItemData(origItem);
-                    if (itemUpdates && itemUpdates != {}) await doc.update(itemUpdates);
+                    if (itemUpdates && Object.keys(itemUpdates).length > 0) {
+                        if (origItem.type === "armor" && origItem.system.type === "shield") {
+                            // Legacy shields need non-recursive update to force item type change
+                            await doc.update(itemUpdates, { recursive: false });
+                        } else {
+                            await doc.update(itemUpdates);
+                        }
+                    }
                     break;
 
                 default:

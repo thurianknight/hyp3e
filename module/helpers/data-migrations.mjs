@@ -162,6 +162,7 @@ export function migrateItemData(item) {
         }
         const handsUpdate = migrateWeaponHands(item);
         if (handsUpdate) {
+            console.log(`migrateItemData: Updated weapon data for ${item.name}:`, handsUpdate)
             updates = { ...updates, ...handsUpdate };
         }
     }
@@ -181,24 +182,16 @@ export function migrateShield(item) {
     let shieldType = "small"; // default
     const name = item.name.toLowerCase();
 
-    if (
-        name.includes("tower") || 
-        name.includes("door") || 
-        name.includes("large")
-    ) { shieldType = "large"; }
+    if (["tower", "door", "large"].some(s => name.includes(s))) 
+        shieldType = "large";
 
-    if (
-        name.includes("ring") ||
-        name.includes("cloak") ||
-        name.includes("boots") ||
-        name.includes("helm") ||
-        name.includes("scarab") ||
-        name.includes("amulet")
-    ) { shieldType = "passive"; }
+    if (["ring", "cloak", "boots", "helm", "scarab", "amulet"].some(s => name.includes(s))) 
+        shieldType = "passive";
 
+    const systemData = foundry.utils.duplicate(item.system);
     const update = {
         type: "shield",
-        "system.type": shieldType
+        system: { ...systemData, type: shieldType }
     }
     return update;
 }
@@ -215,13 +208,7 @@ export function migrateWeaponHands(item) {
     let hands = 1; // default
     const name = item.name.toLowerCase();
 
-    if (
-        name.includes("two-handed") ||
-        name.includes("2h") ||
-        name.includes("great") ||
-        name.includes("bow") ||
-        name.includes("sling") ||
-        name.includes("gun") ||
+    if (["two-handed", "2h", "great", "halberd", "pike", "staff", "bow", "sling", "gun"].some(w => name.includes(w)) ||
         (Array.isArray(item.system.annotations) &&
             item.system.annotations.some(a => a.toLowerCase().includes("true2hand")))
     ) { hands = 2; }

@@ -289,7 +289,7 @@
             "templates": ["base", "physical", "equippable", "canHaveSpells"],
             "type": "small",
             "ac": 1,
-            "dr": 0
+            "dr": null
         },
         "spell": {
             "templates": ["base", "rollable"],
