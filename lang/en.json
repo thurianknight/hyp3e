@@ -93,6 +93,7 @@
             "rof": "RoF",
             "classRange": "Class/Range",
             "wpnClass": "Wpn Class",
+            "hands": "# Hands",
             "atkMod": "Atk Mod",
             "dmgMod": "Dmg Mod",
             "damage": "Damage",
@@ -407,6 +408,10 @@
             },
             "range": "Range",
             "atkType": "Atk Type",
+            "hands": {
+                "one": "1 Hand",
+                "two": "2 Hands"
+            },
             "master": "Master",
             "grandMaster": "Grandmaster",
             "damageTypes": {

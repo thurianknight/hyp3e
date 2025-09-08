@@ -162,6 +162,29 @@ export class Hyp3eItem extends Item {
     }
 
     /**
+     * Update the weapon hands required to wield the weapon.
+     * @param {*} hands - Number of hands required (1 or 2).
+     * @returns 
+     */
+    async updateWeaponHands(hands) {
+        console.log(`updateWeaponHands: hands = ${hands}`);
+        const updates = {};
+        switch (hands) {
+            case 1:
+                updates["system.hands"] = 1;
+                break;
+            case 2:
+                updates["system.hands"] = 2;
+                break;
+            default:
+                console.warn(`Invalid hands value: ${hands}`);
+                return;
+        }
+        console.log(`updateWeaponHands: updates =`, updates);
+        await this.update(updates);
+    }
+
+    /**
      * Apply the attack formula based on the item type and properties.
      * This method sets the formula for attack rolls based on whether the item is a weapon,
      * grenade, area effect, or other item type.

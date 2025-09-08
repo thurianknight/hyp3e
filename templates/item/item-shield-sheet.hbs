@@ -80,18 +80,12 @@
           {{#if isGM}}
             <label class="resource-label">{{localize 'HYP3E.shield.acMod'}}</label>
             <input type="text" name="system.ac" value="{{system.ac}}" data-dtype="Number" />
-            <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
-            <input type="text" name="system.dr" value="{{system.dr}}" data-dtype="Number" />
           {{else}}
             {{#if system.identified}}
                 <label class="resource-label">{{localize 'HYP3E.shield.acMod'}}</label>
                 <input type="text" name="system.ac" value="{{system.ac}}" data-dtype="Number" />
-                <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
-                <input type="text" name="system.dr" value="{{system.dr}}" data-dtype="Number" />
             {{else}}
                 <label class="resource-label">{{localize 'HYP3E.shield.acMod'}}</label>
-                <input type="text" value="??" disabled />
-                <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
                 <input type="text" value="??" disabled />
             {{/if}}
           {{/if}}
@@ -165,11 +159,6 @@
             </div>
             <div class="flexrow flexshrink flex-group-left bg-attributes-wide">
                 <label class="resource-label">{{localize 'HYP3E.item.light.color'}}</label>
-                {{!-- <input type="text" name="system.light.color" value="{{system.light.color}}" data-type="color">
-                <div class="flex-xlarge">
-                    <div class="color-preview" style="background: {{system.light.color}};"></div>
-                    {{localize 'HYP3E.item.attributes.lightColor'}}
-                </div> --}}
                 <div class="flexrow flex-xlarge">
                     <color-picker name="system.light.color" value="{{system.light.color}}">
                         <input type="text" placeholder="" style="">
@@ -191,6 +180,15 @@
           <input name="system.spellcasting.hasSpells" type="checkbox" {{checked system.spellcasting.hasSpells}}>
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.hasSpells'}}</div>
         </div>
+        {{#if system.spellcasting.hasSpells}}
+        <fieldset>
+          <div class="flexrow flexshrink flex-group-left bg-attributes">
+            <label class="resource-label">{{localize 'HYP3E.item.hideCharges'}}</label>
+            <input name="system.spellcasting.hideCharges" type="checkbox" {{checked system.spellcasting.hideCharges}}>
+            <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.hideCharges'}}</div>
+          </div>
+        </fieldset>
+        {{/if}}
         {{/if}}
         <label class="resource-label">{{localize 'HYP3E.dataLabel.itemId'}}</label>
         <input type="text" name="item._id" value="{{item._id}}" disabled/>

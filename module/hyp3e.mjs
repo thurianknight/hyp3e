@@ -562,6 +562,11 @@ Hooks.once("ready", async function() {
     CONFIG.HYP3E.autoCalcAc = autoCalcAc;
     if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc) }
 
+    // Enforce weapon equippage rules
+    const enforceWeaponEquipRules = game.settings.get(game.system.id, "enforceWeaponEquipRules");
+    CONFIG.HYP3E.enforceWeaponEquipRules = enforceWeaponEquipRules;
+    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Enforce weapon equippage rules:", CONFIG.HYP3E.enforceWeaponEquipRules) }
+
     // Enable basic attribute checks
     const enableAttrChecks = game.settings.get(game.system.id, "enableAttrChecks");
     CONFIG.HYP3E.enableAttrChecks = enableAttrChecks;
@@ -893,20 +898,24 @@ Hooks.on("createToken", (token, options, userId) => {
 });
 
 /**
- * When a weapon is equipped, ensure that any other weapons are unequipped if the
- *  "forceWeaponEquip" setting is enabled.
+ * When a armor or weapons are equipped, ensure that any others are unequipped if necessary.
  */
 Hooks.on("preUpdateItem", async (item, update) => {
-    if (item.type !== "weapon") return;
+    if (item.type !== "armor" && item.type !== "shield" && item.type !== "weapon") return;
     if (getProperty(update, "system.equipped") !== true) return;
-  
-    // Check config setting
-    if (!game.settings.get(game.system.id, "enforceWeaponEquipRules")) return;
 
     const actor = item.actor;
     if (!actor) return;
 
-    await actor.enforceWeaponEquipRules(item);
+    // Check config setting for weapons & shields
+    if (game.settings.get(game.system.id, "enforceWeaponEquipRules")) {
+        await actor.enforceWeaponEquipRules(item);
+    }
+
+    // Check config setting for armor
+    if (item.type === "armor" && game.settings.get(game.system.id, "autoCalcAc")) {
+        await actor.enforceSingleArmor(item);
+    }
 });
 
 // Register Turn Tracker hooks

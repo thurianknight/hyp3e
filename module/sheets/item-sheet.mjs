@@ -195,6 +195,9 @@ export class Hyp3eItemSheet extends ItemSheet {
         // Toggle weapon melee/missile attack type
         html.find('.weapon-type').click(event => this._handleWeaponType(event));
 
+        // Toggle weapon one-handed/two-handed
+        html.find('.weapon-hands').click(event => this._handleWeaponHands(event));
+
         // Toggle weapon mastery & grand-mastery true/false
         html.find('.weapon-mastery').click(event => this._handleWeaponMastery(event));
 
@@ -252,6 +255,11 @@ export class Hyp3eItemSheet extends ItemSheet {
         const attackType = $(event.currentTarget).data("attackType");
         await this.item.updateWeaponType(attackType);
         await this.item.applyAttackFormula();
+    }
+
+    async _handleWeaponHands(event) {
+        const hands = $(event.currentTarget).data("hands");
+        await this.item.updateWeaponHands(hands);
     }
 
     async _handleWeaponMastery(event) {

@@ -41,7 +41,7 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
         i.type === "weapon" && i.system.equipped
     ).slice(0, 2); // up to two items
     const equippedShields = actor.items.filter(i =>
-        i.type === "armor" && i.system.type === "shield" && i.system.equipped
+        (i.type === "shield" || (i.type === "armor" && i.system.type === "shield")) && i.system.equipped
     ).slice(0, 2); // up to two items... crazy, but allowable if no weapons are equipped
 
     // Neither weapons nor shield equipped, exit early...
@@ -98,7 +98,7 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
                     sprite.x = token.w - size + (DEFAULT_TOKEN_SIZE - token.w);
                     sprite.y = token.h - size + (DEFAULT_TOKEN_SIZE - token.h);
                 }
-            } else if (item.type === "armor" && item.system.type === "shield") {
+            } else if (item.type === "shield" || (item.type === "armor" && item.system.type === "shield")) {
                 // sprite.anchor.set(1, 1);           // bottom-right
                 sprite.x = token.w - size + (DEFAULT_TOKEN_SIZE - token.w);
                 sprite.y = token.h - size + (DEFAULT_TOKEN_SIZE - token.h);

@@ -309,6 +309,7 @@
             "melee": true,
             "missile": false,
             "wc": 0,
+            "hands": 1,
             "range": {
                 "short": 0,
                 "medium": 0,
