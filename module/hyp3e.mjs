@@ -15,6 +15,7 @@ import { Hyp3eCharacter } from "./helpers/character.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
+import { Hyp3eLogger } from "./helpers/logger.mjs";
 
 // Set this now, to use later
 let trackerInitialized = false;
@@ -33,10 +34,10 @@ Hooks.once('init', async function() {
         rollItemMacro
     };
 
-    console.log("Game info:", game)
-    console.log("System info:", game.system)
-    const currentVersion = game.system.version
-    console.log(`System version ${currentVersion}`)
+    console.log("Game info:", game);
+    console.log("System info:", game.system);
+    const currentVersion = game.system.version;
+    console.log(`System version ${currentVersion}`);
 
     // Disable legacy effect transferral
     CONFIG.ActiveEffect.legacyTransferral = false;
@@ -222,7 +223,7 @@ Hooks.once('init', async function() {
     });
 
     // Get the Foundry version for conditional options
-    console.log("Foundry version:", game.version)
+    console.log("Foundry version:", game.version);
     const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
     if (majorVersion >= 13) {
@@ -399,6 +400,20 @@ Hooks.once('init', async function() {
         requiresReload: true,
     });
 
+    game.settings.register(game.system.id, "logLevel", {
+        name: "Logging Level",
+        hint: "Controls the verbosity of system logs.",
+        scope: "world",
+        config: true,
+        type: String,
+        choices: {
+            "0": "Verbose (Info, Warnings, Errors)",
+            "1": "Warnings & Errors",
+            "2": "Errors Only"
+        },
+        default: "0"
+    });
+
     // Migrate compendia data, if desired (default false)
     game.settings.register(game.system.id, "migrateCompendia", {
         name: game.i18n.localize("HYP3E.settings.migrateCompendia"),
@@ -437,10 +452,10 @@ Hooks.once('init', async function() {
     // Register sheet application classes
     Actors.unregisterSheet("core", ActorSheet);
     Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: true });
-    console.log("Registered Hyp3eActorSheet")
+    Hyp3eLogger.info("Init", "Registered Hyp3eActorSheet");
     Items.unregisterSheet("core", ItemSheet);
     Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: true });
-    console.log("Registered Hyp3eItemSheet")
+    Hyp3eLogger.info("Init", "Registered Hyp3eItemSheet");
 
 
     // Get initiative mode: group vs. individual
@@ -453,14 +468,13 @@ Hooks.once('init', async function() {
     const { HYP3EGroupCombatant } = await import( "./combat/combatant-group.mjs");
     // Initiative roll is the same d6, regardless of group/individual
     CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
-    console.log("CONFIG.Combat.initiative:", CONFIG.Combat.initiative)
     // Set the Combat and Combatant document classes based on initiative mode
     if (isGroupInitiative) {
-        console.log("Using group-based initiative.")
+        Hyp3eLogger.info("Init", "Group-based combat initiative:", CONFIG.Combat.initiative);
         CONFIG.Combat.documentClass = HYP3EGroupCombat;
         CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
     } else {
-        console.log("Using individual initiative.")
+        Hyp3eLogger.info("Init", "Individual combat initiative:", CONFIG.Combat.initiative);
         CONFIG.Combat.documentClass = HYP3ECombat;
         CONFIG.Combatant.documentClass = HYP3ECombatant;
     }
@@ -560,49 +574,49 @@ Hooks.once("ready", async function() {
     // Automatically calculate AC
     const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");
     CONFIG.HYP3E.autoCalcAc = autoCalcAc;
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc) }
+    Hyp3eLogger.info("Init", "CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc);
 
     // Enforce weapon equippage rules
     const enforceWeaponEquipRules = game.settings.get(game.system.id, "enforceWeaponEquipRules");
     CONFIG.HYP3E.enforceWeaponEquipRules = enforceWeaponEquipRules;
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Enforce weapon equippage rules:", CONFIG.HYP3E.enforceWeaponEquipRules) }
+    Hyp3eLogger.info("Init", "CONFIG Enforce weapon equippage rules:", CONFIG.HYP3E.enforceWeaponEquipRules);
 
     // Enable basic attribute checks
     const enableAttrChecks = game.settings.get(game.system.id, "enableAttrChecks");
     CONFIG.HYP3E.enableAttrChecks = enableAttrChecks;
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Enable basic attribute checks:", CONFIG.HYP3E.enableAttrChecks) }
+    Hyp3eLogger.info("Init", "CONFIG Enable basic attribute checks:", CONFIG.HYP3E.enableAttrChecks);
 
     // Reverse situational modifiers on roll-under checks
     const flipRollUnderMods = game.settings.get(game.system.id, "flipRollUnderMods");
     CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods) }
+    Hyp3eLogger.info("Init", "CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods);
 
     // Enable/disable group-based initiative
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
     CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative) }
+    Hyp3eLogger.info("Init", "CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative);
 
     // Limit token movement to actor MV base
     if (majorVersion >= 13) {
         const limitMovement = game.settings.get(game.system.id, "limitMovement");
         CONFIG.HYP3E.limitMovement = limitMovement;
-        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Limit token movement to actor MV base:", CONFIG.HYP3E.limitMovement) }
+        Hyp3eLogger.info("Init", "CONFIG Limit token movement to actor MV base:", CONFIG.HYP3E.limitMovement);
     }
 
     // Force range limitations on weapon & spell attacks
     const forceRangeLimit = game.settings.get(game.system.id, "forceRangeLimit");
     CONFIG.HYP3E.forceRangeLimit = forceRangeLimit;
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Force range limitations on weapon & spell attacks:", CONFIG.HYP3E.forceRangeLimit) }
+    Hyp3eLogger.info("Init", "CONFIG Force range limitations on weapon & spell attacks:", CONFIG.HYP3E.forceRangeLimit);
 
     // Force weapon equippage to use
     const forceWeaponEquip = game.settings.get(game.system.id, "forceWeaponEquip");
     CONFIG.HYP3E.forceWeaponEquip = forceWeaponEquip;
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Force item equippage to use:", CONFIG.HYP3E.forceWeaponEquip) }
+    Hyp3eLogger.info("Init", "CONFIG Force item equippage to use:", CONFIG.HYP3E.forceWeaponEquip);
 
     // Force spell memorization to cast
     const forceSpellMemorize = game.settings.get(game.system.id, "forceSpellMemorize");
     CONFIG.HYP3E.forceSpellMemorize = forceSpellMemorize;
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Force spell memorization to cast:", CONFIG.HYP3E.forceSpellMemorize) }
+    Hyp3eLogger.info("Init", "CONFIG Force spell memorization to cast:", CONFIG.HYP3E.forceSpellMemorize);
 
     // Set crit configs
     //const critHits = game.settings.get(game.system.id, "critHits");
@@ -613,7 +627,7 @@ Hooks.once("ready", async function() {
         CONFIG.HYP3E.races = {}
         const racesArray = races.split(",");
         racesArray.forEach((l, i) => (CONFIG.HYP3E.races[l.trim()] = l.trim()));
-        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Races:", CONFIG.HYP3E.races) }
+        Hyp3eLogger.info("Init", "CONFIG Races:", CONFIG.HYP3E.races);
     }
 
     // Load language list
@@ -622,7 +636,7 @@ Hooks.once("ready", async function() {
         CONFIG.HYP3E.languages = {}
         const langArray = languages.split(",");
         langArray.forEach((l, i) => (CONFIG.HYP3E.languages[l.trim()] = l.trim()));
-        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Languages:", CONFIG.HYP3E.languages) }
+        Hyp3eLogger.info("Init", "CONFIG Languages:", CONFIG.HYP3E.languages);
     }
 
     // Load class list
@@ -631,26 +645,26 @@ Hooks.once("ready", async function() {
         CONFIG.HYP3E.characterClasses = {}
         const classArray = characterClasses.split(",");
         classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
-        // if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
+        Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
     }
     // Load custom classes
     CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
     // For testing only...
-    if (!CONFIG.HYP3E.customClassData || CONFIG.HYP3E.customClassData == {}) {
-        console.log("No custom class data found, creating Chronomancer test data.");
-        const magician = Hyp3eCharacter.classData["Magician"]
-        const chronomancer = {}
-        chronomancer["Chronomancer"] = foundry.utils.duplicate(magician)
-        CONFIG.HYP3E.customClassData = game.settings.set(game.system.id, "customClassData", chronomancer);
-        CONFIG.HYP3E.customClassData = chronomancer;
-    }
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Custom Classes:", CONFIG.HYP3E.customClassData) }
+    // if (!CONFIG.HYP3E.customClassData || CONFIG.HYP3E.customClassData == {}) {
+    //     console.log("No custom class data found, creating Chronomancer test data.");
+    //     const magician = Hyp3eCharacter.classData["Magician"]
+    //     const chronomancer = {}
+    //     chronomancer["Chronomancer"] = foundry.utils.duplicate(magician)
+    //     CONFIG.HYP3E.customClassData = game.settings.set(game.system.id, "customClassData", chronomancer);
+    //     CONFIG.HYP3E.customClassData = chronomancer;
+    // }
     // End testing
+    Hyp3eLogger.info("Init", "CONFIG Custom Classes:", CONFIG.HYP3E.customClassData);
     for (const [className, classData] of Object.entries(CONFIG.HYP3E.customClassData)) {
         // Append the class name to characterClasses
         CONFIG.HYP3E.characterClasses[className] = className;
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Classes:", CONFIG.HYP3E.characterClasses) }
+    Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
 
     // Load Phenotypes list
     const phenotypes = game.settings.get(game.system.id, "phenotypes");
@@ -658,7 +672,7 @@ Hooks.once("ready", async function() {
         CONFIG.HYP3E.phenotypes = {}
         const phenotypesArray = phenotypes.split(",");
         phenotypesArray.forEach((l, i) => (CONFIG.HYP3E.phenotypes[l.trim()] = l.trim()));
-        if (CONFIG.HYP3E.debugMessages) { console.log("CONFIG Phenotypes:", CONFIG.HYP3E.phenotypes) }
+        Hyp3eLogger.info("Init", "CONFIG Phenotypes:", CONFIG.HYP3E.phenotypes);
     }
 
     // Load saving throws
@@ -666,7 +680,7 @@ Hooks.once("ready", async function() {
         for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {
             CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
         }
-        console.log("CONFIG Saves:", CONFIG.HYP3E.saves)
+        Hyp3eLogger.info("Init", "CONFIG Saves:", CONFIG.HYP3E.saves);
     }
 
     // Load creature sizes
@@ -674,7 +688,7 @@ Hooks.once("ready", async function() {
         for (let [k, v] of Object.entries(CONFIG.HYP3E.creatureSizes)) {
             CONFIG.HYP3E.creatureSizes[k] = game.i18n.localize(CONFIG.HYP3E.creatureSizes[k])
         }
-        console.log("CONFIG Creature Sizes:", CONFIG.HYP3E.creatureSizes)
+        Hyp3eLogger.info("Init", "CONFIG Creature Sizes:", CONFIG.HYP3E.creatureSizes);
     }
 
     // Load weapon types
@@ -682,7 +696,7 @@ Hooks.once("ready", async function() {
         for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponTypes)) {
             CONFIG.HYP3E.weaponTypes[k] = game.i18n.localize(CONFIG.HYP3E.weaponTypes[k])
         }
-        console.log("CONFIG Weapon Types:", CONFIG.HYP3E.weaponTypes)
+        Hyp3eLogger.info("Init", "CONFIG Weapon Types:", CONFIG.HYP3E.weaponTypes);
     }
 
     // Load weapon annotations
@@ -690,7 +704,7 @@ Hooks.once("ready", async function() {
         for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponAnnotations)) {
             CONFIG.HYP3E.weaponAnnotations[k] = game.i18n.localize(CONFIG.HYP3E.weaponAnnotations[k])
         }
-        console.log("CONFIG Weapon Annotations:", CONFIG.HYP3E.weaponAnnotations)
+        Hyp3eLogger.info("Init", "CONFIG Weapon Annotations:", CONFIG.HYP3E.weaponAnnotations);
     }
 
     // Load damage types
@@ -698,7 +712,7 @@ Hooks.once("ready", async function() {
         for (let [k, v] of Object.entries(CONFIG.HYP3E.damageTypes)) {
             CONFIG.HYP3E.damageTypes[k] = game.i18n.localize(CONFIG.HYP3E.damageTypes[k])
         }
-        console.log("CONFIG Damage Types:", CONFIG.HYP3E.damageTypes)
+        Hyp3eLogger.info("Init", "CONFIG Damage Types:", CONFIG.HYP3E.damageTypes);
         // Append additional damage types
         const addlDamageTypes = (game.settings.get(game.system.id, "addlDamageTypes")).trim();
         if (addlDamageTypes != "") {
@@ -712,32 +726,27 @@ Hooks.once("ready", async function() {
         for (let [k, v] of Object.entries(CONFIG.HYP3E.armorTypes)) {
             CONFIG.HYP3E.armorTypes[k] = game.i18n.localize(CONFIG.HYP3E.armorTypes[k])
         }
-        console.log("CONFIG Armor Types:", CONFIG.HYP3E.armorTypes)
+        Hyp3eLogger.info("Init", "CONFIG Armor Types:", CONFIG.HYP3E.armorTypes);
     }
 
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
-        // No need to migrate if system version is x.x.x or higher
-        // const NEEDS_MIGRATION_TO_VERSION = "1.18.0"
-        // const needsMigration = !currentVersion || foundry.utils.isNewerVersion(NEEDS_MIGRATION_TO_VERSION, currentVersion)
-        // if (needsMigration) {
-            const migrationHasRun = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
-            // const migrationHasRun = false
-            if (!migrationHasRun) {
-                console.log("Running one-time migration...");
+        const migrationHasRun = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
+        // const migrationHasRun = false  // FOR DEBUGGING, TO FORCE A RE-RUN
+        if (!migrationHasRun) {
+            Hyp3eLogger.info("Init", "Running one-time migration...");
 
-                // Do the world migration
-                await migrateWorld();
+            // Do the world migration
+            await migrateWorld();
 
-                // Set the flag so it doesn't run again
-                await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
-                console.log("Migration complete.");
-            }
-        // }
+            // Set the flag so it doesn't run again
+            await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
+            Hyp3eLogger.info("Init", "Migration complete.");
+        }
     }
 
     // Log the start of the turn tracker
-    console.log(`Current exploration turn is ${HYP3ETurnTracker.getTurn()}`);
+    Hyp3eLogger.info("Init", `Current exploration turn is ${HYP3ETurnTracker.getTurn()}`);
     // Import the turn tracker class methods
     game.hyp3e = game.hyp3e || {};
     game.hyp3e.advanceTurn = () => HYP3ETurnTracker.advanceTurn();
@@ -859,14 +868,14 @@ Hooks.on("createToken", (token, options, userId) => {
     if (!game.user.isGM) return;
 
     // Replace the actual name with the alias, if it exists
-    console.log(`createToken: Token creation:`, token)
-    console.log(`createToken: Tokens on canvas at creation time:`, canvas.tokens)
+    Hyp3eLogger.info("createToken", `Token creation:`, token);
+    Hyp3eLogger.info("createToken", `Tokens on canvas at creation time:`, canvas.tokens);
     if (token.actor.system.tokenAlias != "") {
         let tokenAlias = token.actor.system.tokenAlias
         if (token.appendNumber || token.actor.prototypeToken.appendNumber) {
             // Get all existing tokens that match tokenAlias
             const matchingTokens = canvas.tokens.placeables.filter(t => t.name.indexOf(tokenAlias) === 0) ?? null;
-            console.log(`createToken: Tokens that match ${tokenAlias}: `, matchingTokens)
+            Hyp3eLogger.info("createToken", `Tokens that match ${tokenAlias}: `, matchingTokens);
             // Send the list of tokens to this function and get the next available number back
             const i = getAvailableTokenNumber(matchingTokens)
             tokenAlias = `${tokenAlias} (${i})`
@@ -878,11 +887,11 @@ Hooks.on("createToken", (token, options, userId) => {
             const adjective = token.name.split(" ")[0];
             tokenAlias = `${adjective} ${tokenAlias}`
         }
-        console.log(`createToken: Updating token name from ${token.name} to ${tokenAlias}...`)
+        Hyp3eLogger.info("createToken", `Updating token name from ${token.name} to ${tokenAlias}...`);
         try {
             token.update({"name": tokenAlias})
         } catch (err) {
-            console.error(`Failed to update token name for ${token.name}:`, err);
+            Hyp3eLogger.error("createToken", `Failed to update token name for ${token.name}:`, err);
             ui.notifications.error(`Failed to update token name for ${token.name}. Check the console for details.`);
         }
     }
@@ -891,7 +900,7 @@ Hooks.on("createToken", (token, options, userId) => {
         try {
             token.actor.rollHD()
         } catch (err) {
-            console.error(`Failed to roll HD for NPC ${token.actor.name}:`, err);
+            Hyp3eLogger.error("createToken", `Failed to roll HD for NPC ${token.actor.name}:`, err);
             ui.notifications.error(`Failed to roll HD for NPC ${token.actor.name}. Check the console for details.`);
         }
     }
@@ -929,11 +938,11 @@ await setupTurnTrackerHooks();
 async function initTurnTrackerInChatLog(app, html, data) {
     if (!game.user.isGM) return; // Only render for GMs
     if (!game.settings.get(game.system.id, "enableTurnTracker")) {
-        console.log("initTurnTrackerInChatLog: Turn Tracker is disabled, not rendering the app.");
+        Hyp3eLogger.info("initTurnTrackerInChatLog", "Turn Tracker is disabled, not rendering the app.");
         return; // Exit early if the turn tracker is disabled
     }
-    console.log("initTurnTrackerInChatLog: Rendering the Turn Tracker app in the chat log...");
-    console.log("initTurnTrackerInChatLog: Incoming HTML:", html);
+    Hyp3eLogger.info("initTurnTrackerInChatLog", "Rendering the Turn Tracker app in the chat log...");
+    Hyp3eLogger.info("initTurnTrackerInChatLog", "Incoming HTML:", html);
 
     // Get the Foundry version -- needed for chat form CSS differences
     const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
@@ -944,9 +953,9 @@ async function initTurnTrackerInChatLog(app, html, data) {
     } else {
         container = html.find("#chat-controls");
     }
-    console.log("initTurnTrackerInChatLog: Container for app:", container);
+    Hyp3eLogger.info("initTurnTrackerInChatLog", "Container for app:", container);
     if (container.length === 0) {
-        console.warn("initTurnTrackerInChatLog: Could not find chat controls container, cannot render Turn Tracker app.");
+        Hyp3eLogger.warn("initTurnTrackerInChatLog", "Could not find chat controls container, cannot render Turn Tracker app.");
         return;
     }
     game.hyp3e = game.hyp3e || {};
@@ -960,10 +969,10 @@ async function initTurnTrackerInChatLog(app, html, data) {
 /*  Migrate system/world functions              */
 /* -------------------------------------------- */
 async function migrateWorld() {
-    console.log(`Migrating world ${game.system.version}...`)
+    Hyp3eLogger.info("migrateWorld", `Migrating world ${game.system.version}...`);
 
     // Migrate Actor directory
-    console.log(`Updating data for actors in the directory...`)
+    Hyp3eLogger.info("migrateWorld", `Updating data for actors in the directory...`);
     for (let actor of game.actors.contents) {
         // Migrate actor data
         const origActor = foundry.utils.deepClone(actor)
@@ -992,7 +1001,7 @@ async function migrateWorld() {
     // return true;
 
     // Migrate Items directory
-    console.log(`Updating data for items in the directory...`)
+    Hyp3eLogger.info("migrateWorld", `Updating data for items in the directory...`);
     for (let item of game.items.contents) {
         const origItem = foundry.utils.deepClone(item);
         const itemUpdates = migrateItemData(origItem);
@@ -1018,7 +1027,7 @@ async function migrateWorld() {
 
         const packType = pack.metadata.type
 
-        console.log(`Compendium pack ${pack.metadata.label}:`, pack)
+        Hyp3eLogger.info("migrateWorld", `Compendium pack ${pack.metadata.label}:`, pack);
         const documentName = pack.documentName;
 
         // Get the compendium's locked property, then unlock it
@@ -1026,7 +1035,7 @@ async function migrateWorld() {
         await pack.configure({ locked: false })
 
         // Begin by requesting server-side data model migration, and get the pack docs
-        console.log(`Migrating compendium pack ${pack.metadata.label}...`)
+        Hyp3eLogger.info("migrateWorld", `Migrating compendium pack ${pack.metadata.label}...`);
         await pack.migrate()
         const documents = await pack.getDocuments()
 
@@ -1077,13 +1086,13 @@ async function migrateWorld() {
                 }
             } catch (err) {
                 const errMsg = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}: ${err.message}`;
-                console.error(errMsg);
+                Hyp3eLogger.error("migrateWorld", errMsg, err);
             }
         }
 
         // Re-lock the compendium if it was locked before
         await pack.configure({ locked: wasLocked })
-        console.log(`Migrated all ${documentName} documents from Compendium ${pack.collection}`);
+        Hyp3eLogger.info("migrateWorld", `Migrated all ${documentName} documents from Compendium ${pack.collection}`);
 
     }
     return true;
@@ -1121,20 +1130,21 @@ async function createItemMacro(data, slot) {
     if (data.type == "Macro") {
         // Get the macro & code from the drop data
         const macro = await Macro.fromDropData(data);
-        console.log(`Macro:`, macro);
-        console.log(`Adding macro ${macro.name} to hotbar slot ${slot}`);
+        Hyp3eLogger.info("createItemMacro", `Macro:`, macro);
+        Hyp3eLogger.info("createItemMacro", `Adding macro ${macro.name} to hotbar slot ${slot}`);
         game.user.assignHotbarMacro(macro, slot);
         return false;
     }
 
     // Is this is a valid owned item?
     if (data.type !== "Item") {
-        console.log(`Cannot create macro: ${data.type} is not an item`)
-        console.log(`Macro Data:`, data)
+        Hyp3eLogger.warn("createItemMacro", `Cannot create macro: ${data.type} is not an item`);
+        Hyp3eLogger.warn("createItemMacro", `Macro Data:`, data);
         return;
     }
     if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.')) {
-        return ui.notifications.warn("You can only create macro buttons for owned Items");
+        Hyp3eLogger.warn("createItemMacro", "You can only create macro buttons for owned Items.");
+        return ui.notifications.warn("You can only create macro buttons for owned Items!");
     }
     // If it is, retrieve it based on the uuid.
     const item = await Item.fromDropData(data);
@@ -1163,7 +1173,9 @@ async function createItemMacro(data, slot) {
 function rollItemMacro(itemUuid, actorId=null) {
     // wsAI: looks like actor could be retrieved from itemUuid, not sure cons/risks of that approach.
     if (actorId == null){
-        return ui.notifications.warn(`Could not find actor for item ${itemUuid}. You may need to delete and recreate this macro.`);
+        const msg = `Could not find actor for item ${itemUuid}. You may need to delete and recreate this macro.`;
+        Hyp3eLogger.warn("rollItemMacro", msg);
+        return ui.notifications.warn(msg);
         // // wsAI old way. should likely be removed if rollItemMacro is always created with actorId
         // // Reconstruct the drop data so that we can load the item.
         // const dropData = {
@@ -1189,8 +1201,9 @@ function rollItemMacro(itemUuid, actorId=null) {
         if (typeof actor.rollMacro === 'function') {
             actor.rollMacro(itemUuid);
         } else {
-            ui.notifications.error("Actor does not have a roll function");
+            const msg = "Actor does not have a roll function";
+            Hyp3eLogger.error("rollItemMacro", msg);
+            ui.notifications.error(msg);
         }
     }
-
 }

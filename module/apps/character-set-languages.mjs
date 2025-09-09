@@ -1,5 +1,5 @@
 import HYP3E from "../helpers/config.mjs";
-import { Hyp3eItem } from "../documents/item.mjs";
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 
 const {
     HandlebarsApplicationMixin,
@@ -56,7 +56,7 @@ export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMix
     // ===========================================================================
 
     async _prepareContext(_options) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Character Languages context options: `, _options) }
+        Hyp3eLogger.info("_prepareContext", `Character Languages context options: `, _options);
 
         const actor = await fromUuid(_options.actorUuid)
         if (!actor) {
@@ -74,8 +74,8 @@ export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMix
     }
 
     _onRender(context, options) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Character Languages render context: `, context) }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Character Languages render options: `, options) }
+        Hyp3eLogger.info("_onRender", `Character Languages render context: `, context);
+        Hyp3eLogger.info("_onRender", `Character Languages render options: `, options);
         super._onRender(context, options);
     }
 
@@ -85,13 +85,14 @@ export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMix
     // ===========================================================================
 
     static async toggleLanguage(event, target) {
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`Toggle Language Target:`, target)
-            console.log(`Toggle Language Item ID:`, target.dataset.actorUuid)
-        }
+        Hyp3eLogger.info("toggleLanguage", `Toggle Language Target:`, target);
+        Hyp3eLogger.info("toggleLanguage", `Toggle Language Actor ID:`, target.dataset.actorUuid);
+
         const actor = await fromUuid(target.dataset.actorUuid)
         if (!actor) {
-            ui.notifications.warn(`No actor found for actorUuid ${target.dataset.actorUuid}!`)
+            const msg = `No actor found for actorUuid ${target.dataset.actorUuid}!`
+            Hyp3eLogger.warn("toggleLanguage", msg);
+            ui.notifications.warn(msg)
             return
         }
 
@@ -125,8 +126,8 @@ export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMix
             if (b === "Common" && a !== "Common") return 1;   // b goes first
             return a.localeCompare(b);                        // otherwise alphabetical
         });
-        // Log the results and update the item
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Languages:`, languages) }
+        // Log the results and update the actor
+        Hyp3eLogger.info("toggleLanguage", `${actor.name} known languages:`, languages);
         await actor.update({system: {knownLanguages: languages.join(", ")}})
 
         this.render(true, { actorUuid: target.dataset.actorUuid, focus: true })
