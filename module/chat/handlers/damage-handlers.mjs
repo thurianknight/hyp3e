@@ -5,6 +5,8 @@
  * @module chat/handlers/damage-handlers
  */
 import { HYP3E } from "../../helpers/config.mjs"
+import { Hyp3eLogger } from "../../helpers/logger.mjs";
+
 /**
  * Insert 1-Hand damage roll button into chat messages and hook up it's event handler.
  * @param {*} html - The chat message HTML
@@ -147,7 +149,6 @@ export async function handleApplyDamageButtons(html) {
                 }
             };
             if (sourceType === "weapon") {
-                if (CONFIG.HYP3E.debugMessages) { console.log("Adding ×2/×3/×4 buttons for weapon") }
                 buttons["two"] = {
                     icon: "<i class='fas fa-check'></i>",
                     label: `×2 Dice Dmg (roll only)`,
@@ -236,7 +237,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
 
     // Log the attacking token, if available
     const token = canvas?.tokens.get(tokenId);
-    if (CONFIG.HYP3E.debugMessages) { console.log(`rollDmgButton: Token (ID ${tokenId}): `, token) }
+    Hyp3eLogger.info("rollDmgButton", `Token (ID ${tokenId}): `, token);
     if (token) {
         // Get the token's actor
         actor = token.actor;
@@ -245,24 +246,28 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
         actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     }
     if (!actor) {
-        ui.notifications?.error(`Roll Damage: Actor ${actorId} not found!`)
-        return
+        const msg = `Actor ${actorId} not found!`;
+        Hyp3eLogger.error("rollDmgButton", msg);
+        ui.notifications?.error(msg);
+        return;
     }
-    if (CONFIG.HYP3E.debugMessages) { console.log(`rollDmgButton: Actor: `, actor) }
+    Hyp3eLogger.info("rollDmgButton", `Actor: `, actor);
 
     const item = actor.items.get(itemId) ?? await fromUuid(itemUuid)
     if (!item) {
-        ui.notifications?.error(`Roll Damage: Item ${itemId} not found!`);
+        const msg = `Item ${itemId} not found!`;
+        Hyp3eLogger.error("rollDmgButton", msg);
+        ui.notifications?.error(msg);
         return;
     }
 
     // Determine whether to apply DR based on item & damage type
     let applyDr = getApplyDr(item)
 
-    if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll formula: ${formula}`) }
+    Hyp3eLogger.info("rollDmgButton", `Damage roll formula: ${formula}`);
     // Invoke the damage roll
     let dmgRoll = new Roll(formula);
-    if (CONFIG.HYP3E.debugMessages) { console.log(`Damage roll object: `, dmgRoll) }
+    Hyp3eLogger.info("rollDmgButton", `Damage roll object: `, dmgRoll);
     // Resolve the roll
     await dmgRoll.evaluate({ evaluateSync: true });
 
@@ -319,7 +324,7 @@ async function rollCriticalDamage(total, extraRoll, damageType, applyDr) {
         }
         // For showing the roll
         extraRoll = await roll.render();
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollCriticalDamage: Extra roll result: ", extraRoll) }
+        Hyp3eLogger.info("rollCriticalDamage", "Extra roll result: ", extraRoll);
     }
     const body = `
         <div class="dice-roll">

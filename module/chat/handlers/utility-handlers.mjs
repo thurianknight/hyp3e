@@ -5,6 +5,7 @@
  * @module chat/handlers/utility-handlers
  */
 import { HYP3E } from "../../helpers/config.mjs"
+import { Hyp3eLogger } from "../../helpers/logger.mjs";
 import {applyEffect, enableEffect, disableEffect} from "../../helpers/effects.mjs";
 
 /**
@@ -51,22 +52,26 @@ export async function handleEffectButtons(html) {
         // Get the actor
         let actor = game.actors.get(actorId);
         if (!actor) {
-            ui.notifications?.error(`Apply Effects Button: Actor ${actorId} not found!`);
+            const msg = `Apply Effects Button: Actor ${actorId} not found!`;
+            Hyp3eLogger.error("handleEffectButtons", msg)
+            ui.notifications.error(msg);
             return;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Apply Effects Button actor: `, actor) }
+        Hyp3eLogger.info("handleEffectButtons", `Apply Effects Button actor: `, actor);
         // Get the actor's item or global item
         let item = actor.items.get(itemId) ?? await fromUuid(itemUuid);
         if (!item) {
-            ui.notifications?.error(`Apply Effects Button: Item ${itemId} not found! See console log for details.`);
-            if (CONFIG.HYP3E.debugMessages) {
-                console.log(`Apply Effects Button: Item ${itemId} not found!`)
-                console.log(`Apply Effects Button: Likely issue is that the item is owned by a token, but not the base actor.`)
-                console.log(`Apply Effects Button: This is most common with NPCs and monsters, if the GM drags an item or creates a new item directly in the token sheet.`)
-            }
+            const msg = `Apply Effects Button: Item ${itemId} not found!`;
+            Hyp3eLogger.error("handleEffectButtons", msg)
+            ui.notifications?.error(`${msg} See console log for details.`);
+            const moreInfo = `
+            Item ${itemId} not found: 
+            Likely issue is that the item is owned by a token, but not the base actor.
+            This is most common with NPCs and monsters, if the GM drags an item or creates a new item directly in the token sheet.`;
+            Hyp3eLogger.info("handleEffectButtons", moreInfo);
             return;
         } else if (!item.system.identified) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Item ${item.name} has not been identified, so we will not display any buttons.`) }
+            Hyp3eLogger.info("handleEffectButtons", `Item ${item.name} has not been identified, so we will not display any buttons.`);
             return;
         }
 

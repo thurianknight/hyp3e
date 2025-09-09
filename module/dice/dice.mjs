@@ -1,4 +1,4 @@
-import { HYP3E } from "../helpers/config.mjs"
+import { Hyp3eLogger } from "../helpers/logger.mjs"
 
 export class Hyp3eDice {
     /**
@@ -27,7 +27,7 @@ export class Hyp3eDice {
         //   For grenade-like items, it only includes the DX mod.
         let tmpAtkRollParts = rollData.roll.split("+")
         atkRollParts = tmpAtkRollParts.map(str => str.trim())
-        if (CONFIG.HYP3E.debugMessages) { console.log("buildAttackFormula: Base attack roll parts:", atkRollParts) }
+        Hyp3eLogger.info("buildAttackFormula", "Base attack roll parts:", atkRollParts);
 
         // If the formula includes a fixed number like +1, integrate that into the base roll.
         //   This is a bit of a hack, but it works.
@@ -39,7 +39,7 @@ export class Hyp3eDice {
                 // Skip the first element, that should always be "1d20"
                 if (index == 0) { return }
                 if (part.match(reNum)) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log("buildAttackFormula: Found a fixed number in the formula: ", part) }
+                    Hyp3eLogger.info("buildAttackFormula", "Found a fixed number in the formula: ", part);
                     // If we find a match, remove it from the array
                     atkRollParts.splice(index, 1)
                     // Add it to the first element in the array
@@ -53,12 +53,12 @@ export class Hyp3eDice {
         debugAtkRollParts = [...atkRollParts]
         // Take the first element in the debug array and wrap it in the table html
         debugAtkRollParts[0] = `<tr><td>${debugAtkRollParts[0]}</td><td>${atkRollParts[0]}</td></tr>`
-        if (CONFIG.HYP3E.debugMessages) { console.log("buildAttackFormula: Debug attack roll parts:", debugAtkRollParts) }
+        Hyp3eLogger.info("buildAttackFormula", "Debug attack roll parts:", debugAtkRollParts);
 
         // Strip '@item.atkMod' out since we add it automatically anyway...
         //   Ideally this won't ever happen, but some items might have it in their formula.
         if (atkRollParts.includes("@item.atkMod")) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`buildAttackFormula: DEBUG: ${rollData.itemName} still has @itemData.atkMod in its formula!`) }
+            Hyp3eLogger.info("buildAttackFormula", `DEBUG: ${rollData.itemName} still has @itemData.atkMod in its formula!`);
             atkRollParts = atkRollParts.filter(part => (part != "@item.atkMod"))
             debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@item.atkMod"))
         }
@@ -188,10 +188,8 @@ export class Hyp3eDice {
         }
 
         // Log the attack roll parts & the constructed formula
-        if (CONFIG.HYP3E.debugMessages) { 
-            console.log("buildAttackFormula: Attack roll parts:", atkRollParts)
-            console.log("buildAttackFormula: Debug attack roll parts:", debugAtkRollParts)
-        }
+        Hyp3eLogger.info("buildAttackFormula", "Attack roll parts:", atkRollParts);
+        Hyp3eLogger.info("buildAttackFormula", "Debug attack roll parts:", debugAtkRollParts);
         debugAtkRollFormula += debugAtkRollParts.join("") + "</table>"
 
         // Construct the attack roll formula from parts, and return an object with the formula and debug formula
@@ -212,13 +210,12 @@ export class Hyp3eDice {
     static buildDamageFormula(itemData, ammoData = null, actorData = null) {
         let dmgRollParts = []
         let debugDmgRollParts = []
-        if (CONFIG.HYP3E.debugMessages) { 
-            console.log(`buildDamageFormula: Item damage type: ${itemData?.dmgType}`) 
-            console.log(`buildDamageFormula: Actor data:`, actorData)
-        }
+        Hyp3eLogger.info("buildDamageFormula", `Item damage type: ${itemData?.dmgType}`);
+        Hyp3eLogger.info("buildDamageFormula", `Actor data:`, actorData);
+
         const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Basic"
         const altDmgTypes =  Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
-        if (CONFIG.HYP3E.debugMessages) { console.log(`buildDamageFormula: Alternate damage types:`, altDmgTypes) }
+        Hyp3eLogger.info("buildDamageFormula", `Alternate damage types:`, altDmgTypes);
         // I may regret this, but I'm going to assume we will never have more than 2 damage fields 
         //  and hard-code it into this function.
         let dmgRoll2Parts = []
@@ -367,12 +364,10 @@ export class Hyp3eDice {
         if (itemData.damage2h) { debugDmgRoll2Parts.push(`</table>`) }
 
         // Log the damage roll parts & the constructed formula
-        if (CONFIG.HYP3E.debugMessages) { 
-            console.log("buildDamageFormula: Damage roll parts:", dmgRollParts)
-            console.log("buildDamageFormula: Debug damage parts:", debugDmgRollParts)
-            console.log("buildDamageFormula: Damage 2H roll parts:", dmgRoll2Parts)
-            console.log("buildDamageFormula: Debug damage 2H parts:", debugDmgRoll2Parts)
-        }
+        Hyp3eLogger.info("buildDamageFormula", "Damage roll parts:", dmgRollParts);
+        Hyp3eLogger.info("buildDamageFormula", "Debug damage parts:", debugDmgRollParts);
+        Hyp3eLogger.info("buildDamageFormula", "Damage 2H roll parts:", dmgRoll2Parts);
+        Hyp3eLogger.info("buildDamageFormula", "Debug damage 2H parts:", debugDmgRoll2Parts);
 
         // Construct the damage roll formula from parts, and return an object with the formula and debug formula
         const dmgObj = {
@@ -394,7 +389,7 @@ export class Hyp3eDice {
      */
     static async rollFormulaAndEvaluateSuccess(formula, rollData, target, comparison = "ge") {
         if (!formula || typeof parseInt(target) !== "number") {
-            console.warn("Hyp3eDice.rollFormulaAndEvaluateSuccess: Missing formula or target number.");
+            Hyp3eLogger.warn("rollFormulaAndEvaluateSuccess", "Missing formula or target number.");
             return { roll: null, total: null, success: false };
         }
 
@@ -403,7 +398,7 @@ export class Hyp3eDice {
             roll = new Roll(formula, rollData);
             await roll.roll();
         } catch (error) {
-            console.error("Hyp3eDice.rollFormulaAndEvaluateSuccess: Error evaluating roll formula:", error);
+            Hyp3eLogger.error("rollFormulaAndEvaluateSuccess", "Error evaluating roll formula:", error);
             return { roll: null, total: null, success: false };
         }
 
@@ -420,9 +415,7 @@ export class Hyp3eDice {
             break;
         }
 
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`rollFormulaAndEvaluateSuccess: ${roll.formula} = ${total} vs. ${comparison} ${target}: ${success ? "Success" : "Failure"}`);
-        }
+        Hyp3eLogger.info("rollFormulaAndEvaluateSuccess", `${roll.formula} = ${total} vs. ${comparison} ${target}: ${success ? "Success" : "Failure"}`);
 
         return { roll, total, success };
     }
