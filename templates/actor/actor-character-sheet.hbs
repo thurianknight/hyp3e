@@ -82,7 +82,12 @@
           </div>
           <div class="flexrow flex-group-center">
             <label for="system.knownLanguages" class="header-label align-left">{{localize 'HYP3E.details.languages'}}</label>
-            <input class="flex-xlarge" type="text" name="system.knownLanguages" value="{{system.knownLanguages}}"/>
+            <a class="languages-button item-control" aria-label="{{localize 'HYP3E.details.languages'}}" role="button" data-tooltip="HYP3E.dataLabel.languages" data-control="set-languages">
+                <i class="fas fa-book" style="font-size: small"></i>
+            </a>
+            {{!-- <input class="flex-xlarge" type="text" name="system.knownLanguages" value="{{system.knownLanguages}}"/> --}}
+            {{!-- <span class="flex-xlarge">{{system.knownLanguages}}</span> --}}
+            <textarea class="flex-xlarge" name="system.knownLanguages">{{system.knownLanguages}}</textarea>
           </div>
         </div>
       </div>

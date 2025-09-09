@@ -1,0 +1,18 @@
+<div>
+    <label class="resource-label">{{actor.name}}</label> - 
+    <label class="resource-label">{{localize 'HYP3E.details.languages'}}</label>
+    {{!-- <p>Actor UUID: {{actorUuid}}</p> --}}
+    <ul>
+        {{#each languages as |language|}}
+        <li class="item-set-annotations" data-actor-uuid="{{../actorUuid}}">
+            <a class='item-control {{#ifInList language ../actor.system.knownLanguages}}font-color-red{{/ifInList}}' 
+                data-tooltip="{{language}}" data-action="toggleLanguage"
+                data-control="{{language}}" data-actor-uuid="{{../actorUuid}}"
+                role="button"
+            >
+                {{language}}
+            </a>
+        </li>
+        {{/each}}
+    </ul>
+</div>

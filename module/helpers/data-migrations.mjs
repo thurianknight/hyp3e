@@ -135,7 +135,6 @@ export function migrateItemData(item) {
 
     // General items only
     if (item.type === "item") {
-        // updates = { ...updates, "system.equipped": true };
         // Add the new light source properties if they do not exist yet
         if (item.system.isLightSource === undefined || item.system.isLightSource === null) {
             const lightSourceProps = item._getLightSourceProperties();

@@ -1,0 +1,127 @@
+import HYP3E from "../helpers/config.mjs";
+import { Hyp3eItem } from "../documents/item.mjs";
+
+const {
+    HandlebarsApplicationMixin,
+    ApplicationV2
+} = foundry.applications.api;
+
+export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMixin(ApplicationV2) {
+    // _highlighted;
+    constructor(actorUuid, options={}) {
+        super(options);
+        this.actorUuid = actorUuid;
+    }
+
+    // ===========================================================================
+    // APPLICATION SETUP
+    // ===========================================================================
+    static DEFAULT_OPTIONS = {
+        ...super.DEFAULT_OPTIONS,
+        id: "character-set-languages",
+        classes: ["character-set-languages", "scrollable"],
+        tag: "form",
+        window: {
+            title: "HYP3E.details.languages",
+            icon: "fa-book",
+            contentClasses: ["standard-form"]
+        },
+        actions: {
+            toggleLanguage: HYP3ECharacterSetLanguages.toggleLanguage
+        },
+        form: {
+            handler: undefined,
+            submitOnChange: true,
+            closeOnSubmit: false
+        },
+        position: {
+            width: 400,
+            height: "auto"
+        }
+    }
+
+    get title() {
+        return `${game.i18n.localize(this.options.window.title)}`;
+    }
+
+    static PARTS = {
+        main: {
+            template: `${HYP3E.templatePath}/apps/character-languages.hbs`
+        }
+    }
+
+
+    // ===========================================================================
+    // RENDER SETUP
+    // ===========================================================================
+
+    async _prepareContext(_options) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Character Languages context options: `, _options) }
+
+        const actor = await fromUuid(_options.actorUuid)
+        if (!actor) {
+            ui.notifications.warn(`No actor found for actorUuid ${target.dataset.actorUuid}!`)
+            return
+        }
+        let languages = CONFIG.HYP3E.languages
+
+        return {
+            // Return the actor and languages
+            actorUuid: _options.actorUuid,
+            actor: actor,
+            languages: languages
+        }
+    }
+
+    _onRender(context, options) {
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Character Languages render context: `, context) }
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Character Languages render options: `, options) }
+        super._onRender(context, options);
+    }
+
+
+    // ===========================================================================
+    // UPDATING
+    // ===========================================================================
+
+    static async toggleLanguage(event, target) {
+        if (CONFIG.HYP3E.debugMessages) {
+            console.log(`Toggle Language Target:`, target)
+            console.log(`Toggle Language Item ID:`, target.dataset.actorUuid)
+        }
+        const actor = await fromUuid(target.dataset.actorUuid)
+        if (!actor) {
+            ui.notifications.warn(`No actor found for actorUuid ${target.dataset.actorUuid}!`)
+            return
+        }
+
+        // Check to see if the language is already in the list, return true or false
+        function checkLanguage(language) {
+            return language != target.dataset.control
+        }
+
+        // Toggle this language on/off for the actor
+        let newList = []
+        let languages
+        if (actor.system?.knownLanguages) {
+            languages = actor.system.knownLanguages.split(",").map(l => l.trim())
+        } else {
+            languages = []
+        }
+
+        // The filter function will delete any entries that match the clicked item, thus toggling it off
+        newList = languages.filter(checkLanguage)
+        if (newList.length == languages.length) {
+            // Nothing was deleted, so we will add this to the list, thus toggling it on
+            languages.push(target.dataset.control)
+        } else {
+            // If something was deleted before, replace languages with newList
+            languages = newList
+        }
+        // Log the results and update the item
+        if (CONFIG.HYP3E.debugMessages) { console.log(`Languages:`, languages) }
+        await actor.update({system: {knownLanguages: languages.join(", ")}})
+
+        this.render(true, { actorUuid: target.dataset.actorUuid, focus: true })
+    }
+}

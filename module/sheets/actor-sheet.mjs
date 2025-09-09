@@ -1,4 +1,5 @@
 import { Hyp3eCharacter } from "../helpers/character.mjs";
+import HYP3EActorSetLanguages from "../apps/character-set-languages.mjs";
 import {enableItemEffectsOnActor, disableItemEffectsOnActor, onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 
 /**
@@ -17,6 +18,8 @@ export class Hyp3eActorSheet extends ActorSheet {
     });
   }
 
+  static LANGUAGES_APP = new HYP3EActorSetLanguages();
+  
   /** @override */
   get template() {
     const path = `${CONFIG.HYP3E.templatePath}/actor`;
@@ -404,6 +407,11 @@ export class Hyp3eActorSheet extends ActorSheet {
     // -------------------------------------------------------------
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
+
+    // Set character languages
+    html.find('.languages-button[data-control="set-languages"]').click((ev) => {
+        Hyp3eActorSheet.LANGUAGES_APP.render(true, { actorUuid: this.actor.uuid, focus: true });
+    });
 
     // Toggle bonus spells true/false
     html.find(".bonus-spell").click(async (event) => {
