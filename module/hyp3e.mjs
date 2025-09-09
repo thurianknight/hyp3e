@@ -841,14 +841,19 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
     if (!token.inCombat) return;
 
     const actor = token.actor;
-    if (!actor) return;
+    if (!actor) {
+        Hyp3eLogger.warn("preMoveToken", `Token actor not found!`, token)
+        return;
+    }
 
     // Calculate current move, including completed and pending waypoints
     const speed = actor.system.movement?.base.value ?? 40;
     const totalDistance = movement.history.distance + movement.passed.distance + movement.pending.distance;
-    // if (CONFIG.HYP3E.debugMessages) { console.log("preMoveToken: Total distance:", totalDistance); }
+    Hyp3eLogger.info("preMoveToken", `${actor.name} total distance: `, totalDistance);
     if (totalDistance > speed) {
-        ui.notifications.warn(`${actor.name} can only move ${speed} ft per round!`);
+        const msg = `${actor.name} can only move ${speed} ft per round!`;
+        Hyp3eLogger.warn("preMoveToken", msg)
+        ui.notifications.warn(msg);
         if (CONFIG.HYP3E.limitMovement) {
             return false; // Prevent the movement
         }

@@ -1,6 +1,7 @@
 // systems/hyp3e/module/apps/class-editor.mjs
 import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { HYP3E } from "../helpers/config.mjs"
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { findItemsByFolderOrCompendiumName } from "../helpers/folders-and-compendia.mjs"
 
 export class HYP3EClassEditor extends FormApplication {
@@ -144,9 +145,9 @@ export class HYP3EClassEditor extends FormApplication {
             await this._updateObject(new Event("submit"), formData);
 
             // Now we can merge those same changes in memory
-            console.log("Current form data:", formData)
+            Hyp3eLogger.info("add-item click", "Current form data:", formData);
             this.classData = foundry.utils.mergeObject(this.classData, formData.classData || {}, { inplace: false });
-            console.log("Merged class data:", this.classData);
+            Hyp3eLogger.info("add-item click", "Merged class data:", this.classData);
 
             // Add the new item to the correct pack
             if (!Array.isArray(this.classData.startingPack[pack])) {
@@ -160,16 +161,16 @@ export class HYP3EClassEditor extends FormApplication {
 
     async _updateObject(event, formData) {
         const data = foundry.utils.expandObject(formData);
-        console.log("Saving class with form data:", data);
+        Hyp3eLogger.info("_updateObject", "Saving class with form data:", data);
         this.name = data.name?.trim() || this.classKey;
         this.classData = foundry.utils.mergeObject(this.classData, data.classData || {}, { inplace: false });
-        console.log("Merged class data:", this.classKey, this.name, this.classData);
+        Hyp3eLogger.info("_updateObject", "Merged class data:", this.classKey, this.name, this.classData);
 
         // If the class has been renamed, flag it here
         let renameClass = false;
         if (this.classKey && this.name != this.classKey) {
             renameClass = true;
-            console.log(`Renaming class from ${this.classKey} to ${this.name}...`);
+            Hyp3eLogger.info("_updateObject", `Renaming class from ${this.classKey} to ${this.name}...`);
         } else if (!this.classKey && this.name != "") {
             // This is not renaming, it is giving a name to a new (unnamed) class
             this.classKey = this.name;
