@@ -118,6 +118,13 @@ export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMix
             // If something was deleted before, replace languages with newList
             languages = newList
         }
+
+        // Sort the languages, putting "Common" first if it exists, then alphabetically
+        languages.sort((a, b) => {
+            if (a === "Common" && b !== "Common") return -1;  // a goes first
+            if (b === "Common" && a !== "Common") return 1;   // b goes first
+            return a.localeCompare(b);                        // otherwise alphabetical
+        });
         // Log the results and update the item
         if (CONFIG.HYP3E.debugMessages) { console.log(`Languages:`, languages) }
         await actor.update({system: {knownLanguages: languages.join(", ")}})
