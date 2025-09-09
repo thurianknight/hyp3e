@@ -1,5 +1,6 @@
 // systems/hyp3e/module/apps/class-list.mjs
 import { HYP3E } from "../helpers/config.mjs"
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3EClassEditor } from "./class-editor.mjs";
 
 export class HYP3ECustomClassList extends Application {
@@ -15,26 +16,24 @@ export class HYP3ECustomClassList extends Application {
 
     getData() {
         const classData = game.settings.get(game.system.id, "customClassData") || {};
-        console.log("getData called", classData);
+        Hyp3eLogger.info("getData", "Custom class data", classData);
         return { classes: classData };
     }
 
     activateListeners(htmlData) {
         super.activateListeners(htmlData);
-        console.log("activateListeners called.");
         const html = $(htmlData); // Wrap in jQuery
 
         html.find(".edit-class").on("click", ev => {
             const className = ev.currentTarget.dataset.class;
             const classData = game.settings.get(game.system.id, "customClassData")[className];
-            console.log(`Editing class: ${className}`, classData);
+            Hyp3eLogger.info("edit-class onClick", `Editing class: ${className}`, classData);
             // Open the class editor with the existing class data
             new HYP3EClassEditor(className, classData).render(true);
             this.close();
         });
 
         html.find(".new-class").on("click", () => {
-            console.log("Creating new class");
             // Open the class editor with no class data
             new HYP3EClassEditor(null, {}).render(true);
             this.close();

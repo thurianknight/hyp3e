@@ -8,10 +8,9 @@ import { Hyp3eItemSheet } from "./sheets/item-sheet.mjs";
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./chat/chat.mjs";
-import { parseAndResolveChangeValue, setupEffectHandlers } from "./helpers/effects.mjs";
+import { setupEffectHandlers } from "./helpers/effects.mjs";
 import { getAvailableTokenNumber, overlayEquippedWeaponAndShield } from "./helpers/tokens.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
-import { Hyp3eCharacter } from "./helpers/character.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";

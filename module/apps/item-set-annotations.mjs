@@ -1,4 +1,5 @@
 import HYP3E from "../helpers/config.mjs";
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { Hyp3eItem } from "../documents/item.mjs";
 
 const {
@@ -56,12 +57,14 @@ export default class HYP3EItemSetAnnotations extends HandlebarsApplicationMixin(
     // ===========================================================================
 
     async _prepareContext(_options) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Item Annotations context options: `, _options) }
+        Hyp3eLogger.info("_prepareContext", `Item Annotations context options: `, _options);
 
         const item = await fromUuid(_options.itemUuid)
         if (!item) {
-            ui.notifications.warn(`No item found for itemUuid ${target.dataset.itemUuid}!`)
-            return
+            const msg = `No item found for itemUuid ${target.dataset.itemUuid}!`;
+            Hyp3eLogger.warn("_prepareContext", msg);
+            ui.notifications.warn(msg);
+            return;
         }
         let annotList = CONFIG.HYP3E.weaponAnnotations
 
@@ -74,8 +77,8 @@ export default class HYP3EItemSetAnnotations extends HandlebarsApplicationMixin(
     }
 
     _onRender(context, options) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Item Annotations render context: `, context) }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Item Annotations render options: `, options) }
+        Hyp3eLogger.info("_onRender", `Item Annotations render context: `, context);
+        Hyp3eLogger.info("_onRender", `Item Annotations render options: `, options);
         super._onRender(context, options);
     }
 
@@ -85,13 +88,14 @@ export default class HYP3EItemSetAnnotations extends HandlebarsApplicationMixin(
     // ===========================================================================
 
     static async toggleAnnotation(event, target) {
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`Toggle Annotation Target:`, target)
-            console.log(`Toggle Annotation Item ID:`, target.dataset.itemUuid)
-        }
+        Hyp3eLogger.info("toggleAnnotation", `Toggle Annotation Target:`, target);
+        Hyp3eLogger.info("toggleAnnotation", `Toggle Annotation Item ID:`, target.dataset.itemUuid);
+
         const item = await fromUuid(target.dataset.itemUuid)
         if (!item) {
-            ui.notifications.warn(`No item found for itemUuid ${target.dataset.itemUuid}!`)
+            const msg = `No item found for itemUuid ${target.dataset.itemUuid}!`;
+            Hyp3eLogger.warn("toggleAnnotation", msg);
+            ui.notifications.warn(msg);
             return
         }
 
@@ -119,7 +123,7 @@ export default class HYP3EItemSetAnnotations extends HandlebarsApplicationMixin(
             annotations = newList
         }
         // Log the results and update the item
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Annotations:`, annotations) }
+        Hyp3eLogger.info("toggleAnnotation", `Annotations on ${item.name}: `, annotations);
         await item.update({system: {annotations: annotations}})
 
         this.render(true, { itemUuid: target.dataset.itemUuid, focus: true })

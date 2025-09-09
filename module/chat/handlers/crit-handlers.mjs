@@ -5,6 +5,7 @@
  * @module chat/handlers/crit-handlers
  */
 import { HYP3E } from "../../helpers/config.mjs"
+import { Hyp3eLogger } from "../../helpers/logger.mjs";
 import { applyHealthChange } from "./damage-handlers.mjs";
 
 /**
@@ -151,7 +152,7 @@ async function rollCritHit(charType, actorId) {
 
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
-        console.log(`Roll Crit Hit: Actor ${actorId} not found!`)
+        Hyp3eLogger.warn("rollCritHit", `Roll Crit Hit: Actor ${actorId} not found!`)
     }
 
     const flavor = `<div class="dice-damage medium">` + game.i18n.localize(`HYP3E.attack.critHit.${charType}`) + `</div>`
@@ -269,7 +270,7 @@ async function rollCritMiss(charType, actorId) {
 
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
-        console.log(`Roll Crit Hit: Actor ${actorId} not found!`)
+        Hyp3eLogger.warn("rollCritMiss", `Roll Crit Miss: Actor ${actorId} not found!`)
     }
 
     const flavor = `<div class="dice-damage medium">` + game.i18n.localize(`HYP3E.attack.critMiss.${charType}`) + `</div>`

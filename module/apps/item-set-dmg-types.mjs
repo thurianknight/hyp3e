@@ -1,5 +1,5 @@
-import HYP3E from "../helpers/config.mjs";
-import { Hyp3eItem } from "../documents/item.mjs";
+import { HYP3E } from "../helpers/config.mjs";
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 
 const {
     HandlebarsApplicationMixin,
@@ -59,11 +59,13 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     // ===========================================================================
 
     async _prepareContext(_options) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_prepareContext: options: `, _options) }
+        Hyp3eLogger.info("_prepareContext", `Context options: `, _options);
 
         const item = await fromUuid(_options.itemUuid)
         if (!item) {
-            ui.notifications.warn(`No item found for itemUuid ${target.dataset.itemUuid}!`)
+            const msg = `No item found for itemUuid ${target.dataset.itemUuid}!`;
+            Hyp3eLogger.warn("_prepareContext", msg)
+            ui.notifications.warn(msg)
             return
         }
         this.item = item
@@ -102,13 +104,13 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
             }
         }
 
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_prepareContext: return context: `, context) }
+        Hyp3eLogger.info("_prepareContext", `Return context: `, context);
         return context;
     }
 
     _onRender(context, options) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_prepareContext: render context: `, context) }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_prepareContext: render options: `, options) }
+        Hyp3eLogger.info("_onRender", `Render context: `, context);
+        Hyp3eLogger.info("_onRender", `Render options: `, options);
         super._onRender(context, options);
     }
 
@@ -118,18 +120,19 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     // ===========================================================================
 
     static async #onSubmit(event, form, formData) {
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`onSubmit event:`, event)
-            console.log(`onSubmit form data:`, formData)
-        }
+        Hyp3eLogger.info("#onSubmit", `Submit event:`, event);
+        Hyp3eLogger.info("#onSubmit", `Submit form data:`, formData);
+
         const formDataObj = foundry.utils.expandObject(formData.object);
         const itemUuid = this.itemUuid
 
         if (!this.item) {
-            ui.notifications.warn(`No item found for itemUuid ${itemUuid}!`)
+            const msg = `No item found for itemUuid ${itemUuid}!`;
+            Hyp3eLogger.warn("#onSubmit", msg)
+            ui.notifications.warn(msg);
             return
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`onSubmit: item:`, this.item) }
+        Hyp3eLogger.info("#onSubmit", `Item:`, this.item);
 
         const dmgType = formDataObj[`dmgType`]?.trim();
 
@@ -157,11 +160,11 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
         }
 
         // Log the results and update the item
-        if (CONFIG.HYP3E.debugMessages) { console.log(`onSubmit:`, altDmg) }
+        Hyp3eLogger.info("#onSubmit", `Alternate Damage Types:`, altDmg);
         try {
             await this.item.update({ "system.dmgType": dmgType, "system.altDmg": altDmg })
         } catch(err) {
-            console.error(`Item update error!`, err)
+            Hyp3eLogger.error("#onSubmit", `Item update error!`, err);
         }
     }
 }

@@ -1,5 +1,6 @@
 // systems/hyp3e/module/apps/turn-tracker-app.mjs
 import { HYP3E } from "../helpers/config.mjs"
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { TurnAdvanceActionsConfig } from "./turn-advance-actions-config.mjs";
 
 export class HYP3ETurnTrackerApp extends Application {
@@ -70,7 +71,7 @@ export class HYP3ETurnTrackerApp extends Application {
     }
 
     _onTurnAdvanced(data) {
-        console.log("Turn advanced:", data);
+        Hyp3eLogger.info("_onTurnAdvanced", "Turn advanced:", data);
         // Update the turn tracker display in the chat log
         const tracker = $(".turn-tracker");
         if (!tracker.length) return;
@@ -79,12 +80,12 @@ export class HYP3ETurnTrackerApp extends Application {
     }
 
     _onTurnRetreat(data) {
-        console.log("Turn retreat:", data);
+        Hyp3eLogger.info("_onTurnRetreat", "Turn retreat:", data);
         this.render(false); // Update the tracker
     }
 
     _onTurnReset(data) {
-        console.log("Turn reset:", data);
+        Hyp3eLogger.info("_onTurnReset", "Turn reset:", data);
         this.render(false); // Update/reset display
     }
 

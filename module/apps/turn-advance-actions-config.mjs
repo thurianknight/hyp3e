@@ -1,3 +1,5 @@
+import { Hyp3eLogger } from "../helpers/logger.mjs";
+
 export class TurnAdvanceActionsConfig extends FormApplication {
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
@@ -109,7 +111,7 @@ export class TurnAdvanceActionsConfig extends FormApplication {
         const labels = formData["label"];
         const outputs = formData["output"];
         const enableds = formData["enabled"];
-        console.log("Form data:", formData);
+        Hyp3eLogger.info("_updateObject", "Form data:", formData);
         // Normalize in case of single entry (not array)
         const count = Array.isArray(uuids) ? uuids.length : 1;
         for (let i = 0; i < count; i++) {
@@ -120,7 +122,7 @@ export class TurnAdvanceActionsConfig extends FormApplication {
             if (!uuid) continue;
             actions.push({ uuid, label, output, enabled });
         }
-        console.log("Saving turn-advance actions:", actions);
+        Hyp3eLogger.info("_updateObject", "Saving turn-advance actions:", actions);
         await game.settings.set(game.system.id, "turnAdvanceActions", actions);
     }
 }
