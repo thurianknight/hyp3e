@@ -31,20 +31,20 @@ export class HYP3ECombat extends Combat {
         if (this.#rerollBehavior !== "reset")
             await this.#rollAbsolutelyEveryone();
         // Log the combat object
-        if (CONFIG.HYP3E.debugMessages) { console.log("startCombat: Combat Started: ", this) }
+        Hyp3eLogger.info("startCombat", `Combat Started:`, this);
         return this;
     }
 
     async endCombat() {
-        // For each combatant, disable any temporary effects
-        // for (const combatant of this.combatants) {
-        //     combatant.actor.effects.forEach(effect => {
-        //         if (effect.isTemporary) {
-        //             // if (CONFIG.HYP3E.debugMessages) { console.log(`endCombat: Temporary Effect to delete: ${effect.name}`, effect) }
-        //             return effect.delete();
-        //         }
-        //     });
-        // }
+        // For each combatant, delete any temporary effects that were previously disabled
+        for (const combatant of this.combatants) {
+            combatant.actor.effects.forEach(effect => {
+                if (effect.disabled && effect.isTemporary) {
+                    Hyp3eLogger.info("endCombat", `Deleting effect ${effect.name} from ${combatant.name}:`, effect);
+                    return effect.delete();
+                }
+            });
+        }
         // Cleanup the combat object
         await super.endCombat();
     }
@@ -68,11 +68,8 @@ export class HYP3ECombat extends Combat {
 
     async _onEndTurn(combatant, context) {
         await super._onEndTurn(combatant, context);
-        // Log the context & combatant objects
-        if (CONFIG.HYP3E.debugMessages) { 
-            console.log("End-Turn Context: ", context)
-            console.log("End-Turn Combatant: ", combatant)
-        }
+        // Log the combatant whose turn is ending
+        Hyp3eLogger.info("_onEndTurn", `End-Turn Combatant:`, combatant)
 
         if (foundry.utils.isNewerVersion(game.version, "13")) {
             // Clear the movement history to prevent any movement restrictions on its next turn
@@ -86,7 +83,7 @@ export class HYP3ECombat extends Combat {
             await combatant.actor.processTemporaryItems(1);
             await combatant.updateStatus();
         } else {
-            console.warn(`_onEndTurn: Combatant has no actor, cannot process temporary effects!`);
+            Hyp3eLogger.warn("_onEndTurn", `Combatant has no actor, cannot process temporary effects!`);
         }
     }
 
@@ -114,7 +111,6 @@ export class HYP3ECombat extends Combat {
                 defeatedInit: null
             })
         )
-        // if (CONFIG.HYP3E.debugMessages) { console.log("resetAll: Combatants Updates: ", updates) }
         await this.updateEmbeddedDocuments("Combatant", updates);
 
         // Reset turn init rolls in combat
@@ -126,7 +122,6 @@ export class HYP3ECombat extends Combat {
                         initRoll: null
             })
         )
-        // if (CONFIG.HYP3E.debugMessages) { console.log("resetAll: Turns Updates: ", turnUpdates) }
         await this.updateEmbeddedDocuments("Combatant", turnUpdates);
 
         // Reset group initiatives, if needed
@@ -134,13 +129,9 @@ export class HYP3ECombat extends Combat {
         for (const initGroup in this.combatantsByGroup) {
             initiativeMap.set(initGroup, null)
         }
-        // if (CONFIG.HYP3E.debugMessages) { console.log("resetAll: Initiative Map Updates: ", initiativeMap) }
         await this.update({initiativeMap})
 
         // Try again with the main reset
         await super.resetAll()
-
-        // if (CONFIG.HYP3E.debugMessages) { console.log("resetAll: Combat: ", this) }
     }
-
 }

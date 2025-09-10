@@ -1,4 +1,5 @@
 import { Hyp3eCharacter } from "../helpers/character.mjs";
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import HYP3EActorSetLanguages from "../apps/character-set-languages.mjs";
 import {enableItemEffectsOnActor, disableItemEffectsOnActor, onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 
@@ -32,20 +33,17 @@ export class Hyp3eActorSheet extends ActorSheet {
 
   /** @override */
   async getData() {
-    if (CONFIG.HYP3E.debugMessages) { console.log("Getting actor sheet data...") }
-
     // Retrieve the data structure from the base sheet. You can inspect or log
     // the context variable to see the structure, but some key properties for
     // sheets are the actor object, the data object, whether or not it's
     // editable, the items array, and the effects array.
     const context = super.getData();
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor Sheet Context:", context) }
 
-    // Use a safe clone of the actor data for further operations.
+    // Use a safe clone of the actor data for further operations
     const actorData = this.actor.toObject(false);
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor Data:", actorData) }
+    Hyp3eLogger.info("getData", `Actor data for sheet:`, actorData);
 
-    // Add the actor's data to context.data for easier access, as well as flags.
+    // Add the actor's data to context.data for easier access, as well as flags
     context.system = actorData.system;
     context.flags = actorData.flags;
     
@@ -72,17 +70,15 @@ export class Hyp3eActorSheet extends ActorSheet {
     };
 
     // Prepare active effects
-    if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applied effects: `, this.actor.appliedEffects) }
-    if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor.allApplicableEffects()) }
-    // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor applicable effects: `, this.actor._getAllApplicableEffects()) }
+    Hyp3eLogger.info("getData", `Actor applied effects: `, this.actor.appliedEffects);
+    Hyp3eLogger.info("getData", `Actor applicable effects: `, this.actor.allApplicableEffects());
+
     if (!foundry.utils.isNewerVersion(game.version, "13")) {
         // For Foundry v12...
-        // context.effects = prepareActiveEffectCategories(this.actor.effects);
         context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
     } else if (foundry.utils.isNewerVersion(game.version, "13")) {
         // For Foundry v13...
         context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
-        // context.effects = prepareActiveEffectCategories(this.actor._getAllApplicableEffects());
     }
 
     // Enrich the description field for TinyMCE editors.
@@ -93,11 +89,9 @@ export class Hyp3eActorSheet extends ActorSheet {
             async: true 
         }
     );
-    // console.log("Roll Data in ItemSheet:", context.rollData);
-    // console.log("Enriched HTML:", context.enrichedDescription);
 
-    // Log the actor's data
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor sheet data complete:", context) }
+    // Log the complete actor sheet data
+    Hyp3eLogger.info("getData", `Actor sheet data complete:`, context);
 
     return context;
   }
@@ -120,37 +114,37 @@ export class Hyp3eActorSheet extends ActorSheet {
                 switch (k) {
                     case "str":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            // ui.notifications.warn(`ST is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.warn("_prepareCharacterData", `ST is too low for ${context.system.details.class}!`)
                             context.warnStr = true
                         }
                         break
                     case "dex":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            // ui.notifications.warn(`DX is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.warn("_prepareCharacterData", `DX is too low for ${context.system.details.class}!`)
                             context.warnDex = true
                         }
                         break
                     case "con":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            // ui.notifications.warn(`CN is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.warn("_prepareCharacterData", `CN is too low for ${context.system.details.class}!`)
                             context.warnCon = true
                         }
                         break
                     case "int":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            // ui.notifications.warn(`IN is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.warn("_prepareCharacterData", `IN is too low for ${context.system.details.class}!`)
                             context.warnInt = true
                         }
                         break
                     case "wis":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            // ui.notifications.warn(`WS is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.warn("_prepareCharacterData", `WS is too low for ${context.system.details.class}!`)
                             context.warnWis = true
                         }
                         break
                     case "cha":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            // ui.notifications.warn(`CH is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.warn("_prepareCharacterData", `CH is too low for ${context.system.details.class}!`)
                             context.warnCha = true
                         }
                         break
@@ -161,7 +155,7 @@ export class Hyp3eActorSheet extends ActorSheet {
             // If the attribute is NOT at its default 10, set disableQuickCreate to true
             if (v.value != 10 && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
                 this.actor.setFlag(game.system.id, "disableQuickCreate", true)
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Attribute ${k} is not at default 10, disabling quick-create!`) }
+                Hyp3eLogger.info("_prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
             }
         }
 
@@ -189,21 +183,20 @@ export class Hyp3eActorSheet extends ActorSheet {
         const encumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "encumbered")
         const heavilyEncumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "heavilyEncumbered")
         if (game.settings.get(game.system.id, "enableEncumbrance")) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`Checking encumbrance vs Strength...`) }
             if (context.encumbrance > heavilyEncumberedWt) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is Heavily Encumbered!`) }
+                Hyp3eLogger.info("_prepareCharacterData", `${this.actor.name} is Heavily Encumbered!`);
                 this.actor.setFlag(game.system.id, "isHeavilyEncumbered", true)
                 this.actor.setFlag(game.system.id, "isEncumbered", false)
                 context.isHeavilyEncumbered = true
                 context.isEncumbered = false
             } else if (context.encumbrance > encumberedWt) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is Encumbered!`) }
+                Hyp3eLogger.info("_prepareCharacterData", `${this.actor.name} is Encumbered!`);
                 this.actor.setFlag(game.system.id, "isEncumbered", true)
                 this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
                 context.isEncumbered = true
                 context.isHeavilyEncumbered = false
             } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`${this.actor.name} is not Encumbered. :-)`) }
+                Hyp3eLogger.info("_prepareCharacterData", `${this.actor.name} is not Encumbered. :-)`);
                 this.actor.setFlag(game.system.id, "isEncumbered", false)
                 this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
                 context.isEncumbered = false
@@ -340,7 +333,6 @@ export class Hyp3eActorSheet extends ActorSheet {
             }
         }
         encumbrance = Math.round(encumbrance * 10)/10
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Total weight carried: ${encumbrance} pounds`) }
         allTheGold = Math.round(allTheGold * 100)/100
         // Now convert allTheGold to a string and add " gp" to the end
         allTheGold = allTheGold.toLocaleString("en-US", {
@@ -443,7 +435,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     html.find(".item-equip").click(async (event) => {
         const li = $(event.currentTarget).closest(".item-entry")
         const item = this.actor.items.get(li.data("itemId"))
-        if (CONFIG.HYP3E.debugMessages) { console.log("Actor item-equip toggle:", item) }
         // Do the equip/unequip
         await item.update({
             system: {
@@ -490,7 +481,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     html.find(".item-toggle-light").on("click", async ev => {
         const itemId = ev.currentTarget.closest(".item")?.dataset?.itemId;
         const item = this.actor.items.get(itemId);
-        if (CONFIG.HYP3E.debugMessages) { console.log("Toggling light source for item:", item) }
         // Toggle the light source
         if (item.system.isLightSource) {
             // Toggle the light source on/off
@@ -498,7 +488,9 @@ export class Hyp3eActorSheet extends ActorSheet {
             // Update the UI
             this.render(true);
         } else {
-            ui.notifications.warn(`${item.name} is not a valid light source!`);
+            const msg = `${item.name} is not a valid light source!`;
+            Hyp3eLogger.warn("item-toggle-light click", msg);
+            ui.notifications.warn(msg);
         }
     });
 
@@ -519,7 +511,6 @@ export class Hyp3eActorSheet extends ActorSheet {
 
         // Select spell (if multiple)
         const spellRefs = item.system?.spellcasting?.spellRefs ?? [];
-        console.log(`item-cast-spell: spells:`, spellRefs)
         if (spellRefs.length === 1) {
             this.actor.useItemSpell(item, spellRefs[0].uuid);
         } else {
@@ -570,9 +561,10 @@ export class Hyp3eActorSheet extends ActorSheet {
   _carryOrDropContainer(container) {
     // Has the container been carried or dropped?
     const carrying = container.system.equipped
+
     // Find all items in the container
     const items = this.actor.items.filter(i => i.system.containerId === container.id)
-    if (CONFIG.HYP3E.debugMessages) { console.log("Items in container:", items) }
+
     // Batch the updates to the actor
     this.actor.updateEmbeddedDocuments("Item", items.map(item => ({
         _id: item.id,
@@ -614,7 +606,7 @@ export class Hyp3eActorSheet extends ActorSheet {
         break
     }
     this.render(true)
-    if (CONFIG.HYP3E.debugMessages) { console.log("Actor after sheet update:", this.actor.system) }
+    Hyp3eLogger.info("_updateBonusSpell", `Actor after update:`, this.actor.system);
   }
 
   /**
@@ -626,7 +618,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
     if (item.system.quantity.value > 0) {
-      if (CONFIG.HYP3E.debugMessages) { console.log("Decrement item:", item) }
       // Update the embedded item document
       this.actor.updateEmbeddedDocuments("Item", [
         { _id: item.id, "system.quantity.value": item.system.quantity.value-1 },
@@ -643,7 +634,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     const li = $(event.currentTarget).closest(".item-entry")
     const item = this.actor.items.get(li.data("itemId"))
     if (item.system.quantity.value < item.system.quantity.max) {
-      if (CONFIG.HYP3E.debugMessages) { console.log("Increment item:", item) }
       // Update the embedded item document
       this.actor.updateEmbeddedDocuments("Item", [
         { _id: item.id, "system.quantity.value": item.system.quantity.value+1 },
@@ -727,16 +717,16 @@ export class Hyp3eActorSheet extends ActorSheet {
         // If this is an effect template, copy its ActiveEffects
         const effects = item.effects.contents.map(e => e.toObject());
         if (!effects.length) {
-            console.warn(`No ActiveEffects found on template: ${item.name}`);
+            Hyp3eLogger.warn("_onDropItem", `No ActiveEffects found on effect template: ${item.name}`);
             return;
         }
 
         // Duplicate onto this actor
         await this.actor.createEmbeddedDocuments("ActiveEffect", effects);
 
-        ui.notifications.info(
-            `Applied ${effects.length} effect(s) from template "${item.name}" to ${this.actor.name}.`
-        );
+        const msg = `Applied ${effects.length} effect(s) from template "${item.name}" to ${this.actor.name}.`;
+        Hyp3eLogger.info("_onDropItem", msg)
+        ui.notifications.info(msg);
 
         return;
     }
@@ -748,33 +738,23 @@ export class Hyp3eActorSheet extends ActorSheet {
      * @returns null
      */
     _onSortItem(event, itemData) {
-        if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Event:", event) }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Data:", itemData) }
-
         // Get the drag source and drop target
         const items = this.actor.items;
         const source = items.get(itemData._id);
-        if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Source:", source) }
 
         const dropTarget = event.target.closest("[data-item-id]");
         if ( !dropTarget ) return;
-        if (CONFIG.HYP3E.debugMessages) { console.log("Drop Target:", dropTarget) }
 
         const target = items.get(dropTarget.dataset.itemId);
-        if (CONFIG.HYP3E.debugMessages) { console.log("Sort Item Target:", target) }
 
         // Don't sort on yourself
         if ( source.id === target.id ) return;
-
-        // if (!target) throw new Error("Couldn't drop near " + event.target);
-        // const targetData = target?.system;
 
         // Dragging an item into a container sets its containerId and location to the container
         if ( (target?.type === "container" || target?.system.isContainer) ) {
             // One container cannot hold another container
             if (source.type === 'container' || source.system.isContainer) { 
                 ui.notifications.info(`Cannot move container (${source.name}) into another container (${target.name})!`)
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot move container (${source.name}) into another container (${target.name})!`) }
                 return;
             }
             // Update the container info on the item
@@ -804,17 +784,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     const element = event.currentTarget
     // const dataset = element.dataset
     const dataset = { ...event.currentTarget.dataset };
-
-    // Log the element
-    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Clicked element: ", element) }
-    // Log the element dataset
-    if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Element dataset: ", dataset) }
-    // Log the sheet data
-    // if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Actor-Sheet Data:", this) }
-    // Log the actor
-    // if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Actor:", this.actor) }
-    // Log the token
-    // if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Current Token:", this.token) }
 
     // How many different roll types do we have?
     //  Test of Attribute: d6 roll-under target
@@ -848,9 +817,6 @@ export class Hyp3eActorSheet extends ActorSheet {
     //      No formula needed, but item effect can be built into item => item sheet of type "item"
 
     try {
-      // What is our roll type?
-      if (CONFIG.HYP3E.debugMessages) { console.log("_onRoll: Roll Type:", dataset.rollType) }
-
       dataset.itemId = ""
       dataset.actorId = this.actor.id
       dataset.baseClass = this.actor.system.baseClass
@@ -917,15 +883,15 @@ export class Hyp3eActorSheet extends ActorSheet {
             break
 
         default:
-          // This should never happen, all rolls should have a roll-type
-          ui.notifications.info("No Roll Type provided, this should never happen...")
-          console.log("_onRoll: No Roll Type provided, this should never happen...");
-
+            // This should never happen, all rolls should have a roll-type
+            const msg = `No Roll Type provided, this should never happen...`;
+            Hyp3eLogger.warn("_onRoll", msg);
+            ui.notifications.info(msg);
       }
       
     } catch(err) {
-      // Log the error
-      console.log("_onRoll: Error: ", err)
+        // Log the error
+        Hyp3eLogger.error("_onRoll", `Error:`, err)
     }
   }
 

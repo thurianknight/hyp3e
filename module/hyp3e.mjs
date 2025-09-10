@@ -1142,13 +1142,14 @@ async function createItemMacro(data, slot) {
 
     // Is this is a valid owned item?
     if (data.type !== "Item") {
-        Hyp3eLogger.warn("createItemMacro", `Cannot create macro: ${data.type} is not an item`);
+        Hyp3eLogger.warn("createItemMacro", `Cannot create macro: ${data.type} is not an item.`);
         Hyp3eLogger.warn("createItemMacro", `Macro Data:`, data);
         return;
     }
     if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.')) {
-        Hyp3eLogger.warn("createItemMacro", "You can only create macro buttons for owned Items.");
-        return ui.notifications.warn("You can only create macro buttons for owned Items!");
+        const msg = "You can only create macro buttons for owned Items!"
+        Hyp3eLogger.warn("createItemMacro", msg);
+        return ui.notifications.warn(msg);
     }
     // If it is, retrieve it based on the uuid.
     const item = await Item.fromDropData(data);

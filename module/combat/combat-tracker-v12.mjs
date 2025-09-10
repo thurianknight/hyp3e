@@ -11,8 +11,6 @@ export class HYP3ECombatTracker extends CombatTracker {
     /** @inheritdoc */
     static get defaultOptions() {
         if (super.defaultOptions) {
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Loading template ${HYP3E.templatePath}/sidebar/combat-tracker.hbs...`) }
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`HYP3ECombatTracker defaultOptions: `, super.defaultOptions) }
             // Merge the default options with the custom template path
             return foundry.utils.mergeObject(super.defaultOptions, {
                 template: `${HYP3E.templatePath}/sidebar/combat-tracker-v12.hbs`,
@@ -22,7 +20,6 @@ export class HYP3ECombatTracker extends CombatTracker {
 
     static GROUP_CONFIG_APP = new HYP3ECombatGroupSelector();
 
-
     // ===========================================================================
     // RENDERING
     // ===========================================================================
@@ -30,15 +27,11 @@ export class HYP3ECombatTracker extends CombatTracker {
     // Foundry v12 code
     async getData(options) {
         const context = await super.getData(options);
-        // Log the context object
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Sidebar getData: Combat Tab Context: ", context) }
-        
         const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
 
         // @ts-expect-error - We don't have type data for the combat tracker turn object
         const turns = context.turns.map((turn) => {
             const combatant = game.combat.combatants.get(turn.id);
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Turn ${turn.name} Combatant: `, combatant) }
             turn.isMelee = !!combatant.getFlag(game.system.id, "isMelee")
             turn.isMissile = !!combatant.getFlag(game.system.id, "isMissile")
             turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
@@ -47,9 +40,7 @@ export class HYP3ECombatTracker extends CombatTracker {
             turn.debugMessages = CONFIG.HYP3E.debugMessages;
             turn.isOwnedByUser = !!combatant.actor.isOwner;
             turn.initGroup = combatant.initGroup;
-            // if (!isGroupInitiative) turn.initRoll = Math.floor(combatant.initiative)
             turn.initRoll = Math.floor(combatant.initiative)
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Sidebar getData: Combatant Turn: `, turn) }
             return turn;
         });
 
@@ -61,7 +52,8 @@ export class HYP3ECombatTracker extends CombatTracker {
                 return arr;
             }
 
-            if (CONFIG.HYP3E.debugMessages) { console.log(`getData: Group Init Scores: `, game.combat.groupInitiativeScores) }
+            Hyp3eLogger.info("getData", `Group init scores:`, game.combat.groupInitiativeScores);
+
             const initiative = game.combat.groupInitiativeScores?.get(turn.initGroup) ? game.combat.groupInitiativeScores.get(turn.initGroup) : null
 
             return [...arr, {
@@ -71,7 +63,8 @@ export class HYP3ECombatTracker extends CombatTracker {
                 turns: [turn]
             }];
         }, []);
-        if (CONFIG.HYP3E.debugMessages) { console.log("getData: Grouped Combat Turns: ", initGroups) }
+
+        Hyp3eLogger.info("getData", `Grouped Combat Turns:`, initGroups);
         
         return foundry.utils.mergeObject(context, {
             turns,
@@ -112,7 +105,6 @@ export class HYP3ECombatTracker extends CombatTracker {
         const isActive = !!combatant.getFlag(game.system.id, flag);
         // These combat actions require special logic
         const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement']
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Toggling combatant flag ${flag} to ${!isActive}...`) }
         if (combatActions.some(f => f == flag)) {
             // Combat actions can be mutually exclusive, so we may need to toggle multiple flags
             await combatant.setCombatAction(flag, !isActive)            
@@ -120,7 +112,6 @@ export class HYP3ECombatTracker extends CombatTracker {
             // Non-combat actions are toggled normally
             await combatant.setFlag(game.system.id, flag, !isActive);
         }
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Toggle Flag: ${flag}`, combatant) }
     }
 
     /**
@@ -132,9 +123,7 @@ export class HYP3ECombatTracker extends CombatTracker {
         event.preventDefault();
         event.stopPropagation();
         const btn = event.currentTarget;
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Control Button: `, btn) }
         const li = btn.closest(".combatant");
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant item: `, li) }
         const combat = this.viewed;
         const c = combat.combatants.get(li.dataset.combatantId);
 
@@ -159,7 +148,6 @@ export class HYP3ECombatTracker extends CombatTracker {
 
     _getEntryContextOptions() {
         const options = super._getEntryContextOptions();
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Context Options: `, options) }
         return [
             {
                 name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
@@ -171,6 +159,6 @@ export class HYP3ECombatTracker extends CombatTracker {
                 }
             },
             ...options
-            ];
+        ];
     }
 }

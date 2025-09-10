@@ -39,7 +39,7 @@ export class HYP3ECombatTracker extends CombatTracker {
 
     async _prepareCombatContext(context, options) {
         // Log incoming parameters
-        console.log("_prepareCombatContext: incoming Context: ", context, options)
+        Hyp3eLogger.info("_prepareCombatContext", `Incoming combat context:`, context)
         // Prepare the combat context
         await super._prepareCombatContext(context, options);
         // Add group initiative flag
@@ -50,9 +50,9 @@ export class HYP3ECombatTracker extends CombatTracker {
 
     async _prepareTrackerContext(context, options) {
         // Log incoming parmeters
-        console.log("_prepareTrackerContext: Context: ", context, options)
+        Hyp3eLogger.info("_prepareTrackerContext", `Tracker Context:`, context)
         // Log the combat object
-        console.log("_prepareTrackerContext: Combat: ", this.viewed)
+        Hyp3eLogger.info("_prepareTrackerContext", `Tracker Combat:`, this.viewed)
         // Prepare the combat tracker context
         await super._prepareTrackerContext(context, options);
 
@@ -67,7 +67,7 @@ export class HYP3ECombatTracker extends CombatTracker {
                         return arr;
                     }
 
-                    if (CONFIG.HYP3E.debugMessages) { console.log("_prepareTrackerContext: Group Init Scores: ", game.combat.groupInitiativeScores) }
+                    Hyp3eLogger.info("_prepareTrackerContext", `Group init scores:`, game.combat.groupInitiativeScores);
                     const initiative = game.combat.groupInitiativeScores?.get(turn.initGroup) ? game.combat.groupInitiativeScores.get(turn.initGroup) : null
 
                     return [...arr, {
@@ -79,7 +79,7 @@ export class HYP3ECombatTracker extends CombatTracker {
                 }, []);
 
                 // Log the initiative groups
-                if (CONFIG.HYP3E.debugMessages) { console.log("_prepareTrackerContext: Init Groups: ", initGroups) }
+                Hyp3eLogger.info("_prepareTrackerContext", `Initiative groups:`, initGroups);
                 context.initGroups = initGroups;
             }    
         }
@@ -88,13 +88,10 @@ export class HYP3ECombatTracker extends CombatTracker {
 
     async _prepareTurnContext(combat, combatant, index) {
         // Log incoming parameters
-        console.log("_prepareTurnContext: Combatant: ", combatant)
-        // Log the combat object
-        console.log("_prepareTurnContext: Combat: ", combat)
+        Hyp3eLogger.info("_prepareTurnContext", `This turn combatant:`, combatant)
+
         // Prepare the combatant context
         const turn = await super._prepareTurnContext(combat, combatant, index);
-        // Log the turn context
-        // if (CONFIG.HYP3E.debugMessages) { console.log("_prepareTurnContext: Turn: ", turn) }
 
         // Add group initiative flag
         const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
@@ -114,9 +111,10 @@ export class HYP3ECombatTracker extends CombatTracker {
         // Otherwise...
         if (!isGroupInitiative) turn.initRoll = Math.floor(combatant.initiative)
 
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_prepareTurnContext: Turn: `, turn) }
-        return turn;
+        // Log the updated turn
+        Hyp3eLogger.info("_prepareTurnContext", `This turn:`, turn);
 
+        return turn;
     }
 
 
@@ -155,7 +153,6 @@ export class HYP3ECombatTracker extends CombatTracker {
         const isActive = !!combatant.getFlag(game.system.id, flag);
         // These combat actions require special logic
         const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement']
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_toggleFlag: Toggling flag ${flag} to ${!isActive}...`) }
         if (combatActions.some(f => f == flag)) {
             // Combat actions can be mutually exclusive, so we may need to toggle multiple flags
             await combatant.setCombatAction(flag, !isActive)            
@@ -163,7 +160,7 @@ export class HYP3ECombatTracker extends CombatTracker {
             // Non-combat actions are toggled normally
             await combatant.setFlag(game.system.id, flag, !isActive);
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_toggleFlag: Combatant Flag: ${flag}`, combatant) }
+        Hyp3eLogger.info("_toggleFlag", `Combatant flag: ${flag}`, combatant);
     }
 
     /**
@@ -174,22 +171,25 @@ export class HYP3ECombatTracker extends CombatTracker {
     static _onCombatantControl(event, target) {
         // event.preventDefault();
         // event.stopPropagation();
-        // Log event and target
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_onCombatantControl: Event: `, event) }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_onCombatantControl: Target: `, target) }
+        // Log the target
+        Hyp3eLogger.info("_onCombatantControl", `Combatant control target:`, target);
 
         // Get the combatant from the target
         const { combatantId } = target.closest("[data-combatant-id]")?.dataset ?? {};
         const combatant = this.viewed?.combatants.get(combatantId);
-        // Log the combatant & action
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_onCombatantControl: Combatant: `, combatant) }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_onCombatantControl: Action: `, target.dataset.action) }
         // If no combatant, exit
-        if ( !combatant ) return;
+        if ( !combatant ) {
+            Hyp3eLogger.warn("_onCombatantControl", `No actor found matching ID ${combatantId}!`);
+            return;
+        }
         // If user is not the owner, exit
         if ( !combatant.actor.isOwner ) {
             return;
         }
+
+        // Log the combatant & action
+        Hyp3eLogger.info("_onCombatantControl", `Combatant: `, combatant);
+        Hyp3eLogger.info("_onCombatantControl", `Action:`, target.dataset.action);
 
         // Handle the combatant control
         switch ( target.dataset.action ) {
@@ -213,7 +213,7 @@ export class HYP3ECombatTracker extends CombatTracker {
 
     _getEntryContextOptions() {
         const options = super._getEntryContextOptions();
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Combatant Context Options: `, options) }
+
         return [
             {
                 name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),

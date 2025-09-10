@@ -60,7 +60,9 @@ export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMix
 
         const actor = await fromUuid(_options.actorUuid)
         if (!actor) {
-            ui.notifications.warn(`No actor found for actorUuid ${target.dataset.actorUuid}!`)
+            const msg = `No actor found for actorUuid ${target.dataset.actorUuid}!`;
+            Hyp3eLogger.warn("_prepareContext", msg)
+            ui.notifications.warn(msg)
             return
         }
         let languages = CONFIG.HYP3E.languages

@@ -76,12 +76,11 @@ export default class HYP3ECombatGroupSelector extends HandlebarsApplicationMixin
         const combatant = game.combat.combatants.get(event.target.name);
         if (!combatant) {
             ui.notifications.error(`Combatant not found for ID ${event.target.name}. Cannot update initGroup!`);
-            console.warn(`_updateObject: Combatant not found for ${event.target.name}`);
+            Hyp3eLogger.warn("_updateObject", `Combatant not found for ${event.target.name}`);
             return;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_updateObject: Setting initGroup for combatant ${combatant.name} to ${event.target.value}`) }
+        Hyp3eLogger.info("_updateObject", `Setting initGroup for combatant ${combatant.name} to ${event.target.value}:`, combatant);
         await combatant.setFlag(game.system.id, "initGroup", event.target.value)
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_updateObject: Updated combatant ${combatant.name}: `, combatant) }
     }
 
 

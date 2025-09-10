@@ -88,7 +88,7 @@ export class HYP3ECombatant extends Combatant {
         // Get the actor's roll data now, so we can use the DX value
         const rollData = this.actor?.getRollData() || {};
         const name = this.actor?.name || ""
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Actor roll data for initiative: ", rollData) }
+        Hyp3eLogger.info("getInitiativeRoll", `Actor roll data for individual initiative:`, rollData);
 
         // Movement partially overrides the other combat actions for initiative order
         this.getActionModifiers();
@@ -109,13 +109,8 @@ export class HYP3ECombatant extends Combatant {
         this.getDefeatedModifier();
         rollTerms += `+ ${this.defeatedInit}`;
 
-        // Log the complete initiative roll formula
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`${name} initiative roll terms: `, rollTerms) }
-
         // Finally, roll initiative and return the result
         const result = new Roll(rollTerms, rollData);
-        // if (CONFIG.HYP3E.debugMessages) { console.log("Individual initiative roll:", result) }
-        // this.initRoll = result.dice[0].total
         return result
     }
 
@@ -152,7 +147,6 @@ export class HYP3ECombatant extends Combatant {
         this.statusInit = 0;
         this.isSlowed = false;
         for ( let e of this.actor.effects) {
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`Actor ${this.actor.name} has effect: `, e) }
             if (e.name == "Slowed" && !e.disabled) {
                 this.statusInit += HYP3ECombatant.INITIATIVE_MOD_SLOWED;
                 this.isSlowed = true;
@@ -170,14 +164,11 @@ export class HYP3ECombatant extends Combatant {
 
     setInitRoll() {
         // Set the combatant's initiative roll value
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`setInitRoll: ${this.actor.name}: `, this) }
         this.initRoll = Math.floor(this.initiative);
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`setInitRoll: ${this.actor.name} base init roll: `, this.initRoll) }
         return this.initRoll;
     }
 
     async updateStatus() {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`updateStatus Combatant: `, this) }
         // Check if the actor is unconscious or defeated
         let isDefeated = false;
         let isUnconscious = false;
@@ -201,7 +192,6 @@ export class HYP3ECombatant extends Combatant {
         }
         await this.update({ defeated: isDefeated, unconscious: isUnconscious });
         const defeated_status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED);
-        // const unconscious_status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.Unconscious);
         if (isDefeated) {
             let effect = this.actor && defeated_status ? defeated_status : CONFIG.controlIcons.defeated;
             if (this.token.object) {
@@ -216,5 +206,6 @@ export class HYP3ECombatant extends Combatant {
                 });
             }    
         }
+        Hyp3eLogger.info("updateStatus", `Combatant unconscious/defeated status updated:`, this);
     }
 }
