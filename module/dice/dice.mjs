@@ -268,7 +268,6 @@ export class Hyp3eDice {
         const caRegex = /\+\s*@ca/g
         if (debugDmgRollParts[1].match(caRegex) > "") {
             // This is where we override the actor's CA if the spell is being cast from an item
-            
 
             // Temp fix if CA is null
             if (actorData.ca == null) actorData.ca = 0
@@ -316,6 +315,26 @@ export class Hyp3eDice {
             } else {
                 // NPCs/monsters don't have a ST attribute, so nothing to do here except 
                 //  note it in a comment. :-)
+            }
+        }
+        // Apply the character's ST damage mod if the item has the "strDmgAdj" annotation (missile weapons)
+        if (itemData.missile && Array.isArray(itemData.annotations) && 
+          (itemData.annotations?.includes("hurled") || itemData.annotations?.includes("strDmgAdj"))) {
+            const baseFormula = itemData.damage || "";
+            const hasStrVar = baseFormula.includes("@str.dmgMod");
+
+            if (!hasStrVar) {
+                if (actorData?.actorType === "character") {
+                    dmgRollParts.push(actorData.str.dmgMod);
+                    debugDmgRollParts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${actorData.str.dmgMod}</td></tr>`);
+                    if (itemData.damage2h) {
+                        dmgRoll2Parts.push(actorData.str.dmgMod);
+                        debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${actorData.str.dmgMod}</td></tr>`);
+                    }
+                } else {
+                    // NPCs/monsters don't have a ST attribute, so nothing to do here except 
+                    //  note it in a comment. :-)
+                }
             }
         }
 
@@ -398,7 +417,7 @@ export class Hyp3eDice {
             roll = new Roll(formula, rollData);
             await roll.roll();
         } catch (error) {
-            Hyp3eLogger.error("rollFormulaAndEvaluateSuccess", "Error evaluating roll formula:", error);
+            Hyp3eLogger.error("rollFormulaAndEvaluateSuccess", "Error evaluating roll formula.", error);
             return { roll: null, total: null, success: false };
         }
 

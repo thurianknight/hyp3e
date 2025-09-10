@@ -111,9 +111,11 @@ export class Hyp3eItemSheet extends ItemSheet {
         if (context.item.type === 'weapon') {
             context.annotList = []
             try {
-                context.system.annotations.forEach(annot => {
-                    context.annotList.push(context.weaponAnnotations[annot])
-                })
+                if (Array.isArray(context.system?.annotations) && context.system?.annotations.length > 0) {
+                    context.system.annotations.forEach(annot => {
+                        context.annotList.push(context.weaponAnnotations[annot])
+                    })
+                }
             } catch (err) {
                 Hyp3eLogger.error("_prepareItemData", `Error loading weapon annotations:`, err)
             }
