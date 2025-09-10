@@ -446,7 +446,7 @@
                 "dismountRider": "Weapon has a 4-in-6 chance to dismount a rider on a natural 19 or 20 attack roll.",
                 "dblDmgFromCharge": "Double damage dice (apply modifiers after) when used from a charging mount.",
                 "d10FromWarhorse": "Base damage improves to 1d10 when mounted on a heavy warhorse.",
-                "strDmgAdj": "Strength damage adjustment applies.",
+                "strDmgAdj": "Strength damage adjustment applies [for certain missile weapons].",
                 "strDmgIfCustomized": "Strength damage adjustment applies only if draw weight is adjusted for the archer."
             }
         },
