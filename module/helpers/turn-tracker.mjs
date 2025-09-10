@@ -1,9 +1,11 @@
+import { Hyp3eLogger } from "./logger.mjs";
+
 export async function setupTurnTrackerHooks() {
     /**
      * Custom hook for handling exploration turn reset to 1.
      */
     Hooks.on("explorationTurnReset", (turn) => {
-        console.log(`Exploration turn reset to ${turn}`);
+        Hyp3eLogger.info("explorationTurnReset", `Exploration turn reset to ${turn}`);
         // Update the turn tracker display in the chat log
         const tracker = $(".turn-tracker");
         if (!tracker.length) return;
@@ -14,7 +16,7 @@ export async function setupTurnTrackerHooks() {
      * Custom hook for handling exploration turn advancement.
      */
     Hooks.on("explorationTurnAdvanced", async (turn) => {
-        console.log(`Exploration turn ${turn} triggered.`);
+        Hyp3eLogger.info("explorationTurnAdvanced", `Exploration turn ${turn} triggered.`);
 
         // Update the turn tracker display in the chat log
         const tracker = $(".turn-tracker");
@@ -59,7 +61,7 @@ export async function setupTurnTrackerHooks() {
      * Custom hook for handling exploration turn retreat.
      */
     Hooks.on("explorationTurnRetreat", (turn) => {
-        console.log(`Exploration turn ${turn} triggered.`);
+        Hyp3eLogger.info("explorationTurnRetreat", `Exploration turn ${turn} triggered.`);
 
         // Update the turn tracker display in the chat log
         const tracker = $(".turn-tracker");
@@ -96,7 +98,7 @@ export class HYP3ETurnTracker {
         const newTurn = this.currentTurn + 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
         this.currentTurn = newTurn;
-        console.log(`Turn tracker advanced to turn ${newTurn}`);
+        Hyp3eLogger.info("advanceTurn", `Turn tracker advanced to turn ${newTurn}`);
         Hooks.call("explorationTurnAdvanced", newTurn);
         return newTurn;
     }
@@ -106,7 +108,7 @@ export class HYP3ETurnTracker {
         const newTurn = this.currentTurn - 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
         this.currentTurn = newTurn;
-        console.log(`Turn tracker retreated to turn ${newTurn}`);
+        Hyp3eLogger.info("retreatTurn", `Turn tracker retreated to turn ${newTurn}`);
         Hooks.call("explorationTurnRetreat", newTurn);
         return newTurn;
     }
@@ -115,7 +117,7 @@ export class HYP3ETurnTracker {
         const newTurn = 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
         this.currentTurn = newTurn;
-        console.log(`Turn tracker reset to turn ${newTurn}.`);
+        Hyp3eLogger.info("reset", `Turn tracker reset to turn ${newTurn}.`);
         Hooks.call("explorationTurnReset", newTurn);
         return newTurn;
     }

@@ -1,3 +1,4 @@
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 import HYP3EItemSetAnnotations from "../apps/item-set-annotations.mjs";
 import HYP3EItemSetDmgTypes from "../apps/item-set-dmg-types.mjs";
@@ -41,7 +42,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         context.rollData = {};
         const actor = this.actor;
         context.rollData = this.actor?.getRollData();
-        if (CONFIG.HYP3E.debugMessages) { console.log("getData: Roll Data in ItemSheet:", context.rollData); }
+        Hyp3eLogger.info("getData" `Roll Data in ItemSheet:`, context.rollData);
 
         // Prepare item-spell list
         const spellRefs = this.item.system?.spellcasting?.spellRefs ?? [];
@@ -59,7 +60,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         context.flags = context.item.flags;
 
         // Log item context data
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item Context Data:", context) }
+        Hyp3eLogger.info("getData" `Item Context Data:`, context);
 
         // Enrich the description field for TinyMCE editors
         context.enrichedDescription = await TextEditor.enrichHTML(
@@ -114,7 +115,7 @@ export class Hyp3eItemSheet extends ItemSheet {
                     context.annotList.push(context.weaponAnnotations[annot])
                 })
             } catch (err) {
-                console.log("Error loading weapon annotations:", err)
+                Hyp3eLogger.error("_prepareItemData" `Error loading weapon annotations:`, err)
             }
         }
     }
@@ -126,14 +127,8 @@ export class Hyp3eItemSheet extends ItemSheet {
             return super._updateObject(event, formData);
         }
 
-        if (CONFIG.HYP3E.debugMessages) {
-            // Log current identified state
-            console.log("Form data identified:", foundry.utils.getProperty(formData, "system.identified"))
-            console.log("Object data identified:", this.object.system.identified)
-        }
         const isIdentified = foundry.utils.getProperty(formData, "system.identified") || this.object.system.identified;
-        // const isIdentified = this.object.system.identified;
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item identified:", isIdentified) }
+        Hyp3eLogger.info("_updateObject" `Is item identified?`, isIdentified);
 
         // Apply name and description based on identification state.
         if (isIdentified) {
@@ -164,7 +159,7 @@ export class Hyp3eItemSheet extends ItemSheet {
             data.system.spellcasting.spellRefs = Object.values(refs);
         }
 
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Updated item data:`, data) }
+        Hyp3eLogger.info("_updateObject" `Updated item data:`, data);
         return super._updateObject(event, data);
     }
 
@@ -303,7 +298,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         const flavor = element.dataset.tooltip;
     
         // Log the element
-        console.log("Item _onRoll: Clicked element: ", element)
+        Hyp3eLogger.info("_onRoll" `Clicked element:`, element)
 
         // Perform the roll
         const roll = new Roll(formula);
@@ -312,47 +307,6 @@ export class Hyp3eItemSheet extends ItemSheet {
             speaker: ChatMessage.getSpeaker({ actor: this.item.actor })
         });
     }
-
-    /**
-     * Handle dropping items on the actor sheet
-     * @param {*} event - Item drop event
-     * @param {*} data - Item data
-     * @returns null
-     */
-    // async _onDropItem(event, data) {
-    //     event.preventDefault();
-    //     event.stopPropagation();
-    //     console.log(`_onDropItem: Dropped item:`, data)
-    //     const droppedItem = await Item.implementation.fromDropData(data);
-    //     if (!droppedItem) return;
-
-    //     // Prevent duplicate inserts
-    //     const existing = this.item.effects.find(e => e.name === droppedItem.name);
-    //     if (existing) return;
-
-    //     // If this is not an effectTemplate item, exit early
-    //     if (droppedItem.type !== "effectTemplate") {
-    //         // return super._onDropItem(event, data);
-    //         return;
-    //     }
-
-    //     // Copy the effectTemplate's ActiveEffects to this item
-    //     const effects = droppedItem.effects.contents.map(e => e.toObject());
-
-    //     if (!effects.length) {
-    //         ui.notifications.warn(`No ActiveEffects found on template: ${droppedItem.name}`);
-    //         return;
-    //     }
-
-    //     // Duplicate onto this item
-    //     await this.item.createEmbeddedDocuments("ActiveEffect", effects);
-
-    //     ui.notifications.info(
-    //         `Applied ${effects.length} effect(s) from template "${droppedItem.name}" to ${this.item.name}.`
-    //     );
-
-    //     return;
-    // }
 
     /**
      * Handle all document drop events
@@ -368,13 +322,12 @@ export class Hyp3eItemSheet extends ItemSheet {
 
         // Read dropped data
         const dataTransfer = event.dataTransfer?.getData("text/plain");
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`_onDrop: Dropped data:`, dataTransfer) };
         if (!dataTransfer) return;
 
         let dropData;
         try {
             dropData = JSON.parse(dataTransfer);
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_onDrop: Dropped data:`, dropData) };
+            Hyp3eLogger.info("_onDrop", `Dropped data:`, dropData);
         } catch {
             return;
         }
@@ -415,16 +368,18 @@ export class Hyp3eItemSheet extends ItemSheet {
             });
 
             if (!effects.length) {
-                ui.notifications.warn(`No ActiveEffects found on template: ${droppedItem.name}`);
+                const msg = `No ActiveEffects found on template: ${droppedItem.name}`;
+                Hyp3eLogger.warn("_onDrop", msg);
+                ui.notifications.warn(msg);
                 return;
             }
 
             // Duplicate template effects onto this item
             await this.item.createEmbeddedDocuments("ActiveEffect", effects);
 
-            ui.notifications.info(
-                `Applied ${effects.length} effect(s) from template "${droppedItem.name}" to ${this.item.name}.`
-            );
+            const msg = `Applied ${effects.length} effect(s) from template "${droppedItem.name}" to ${this.item.name}.`;
+            Hyp3eLogger.info("_onDrop", msg);
+            ui.notifications.info(msg);
         }
 
         // Re-render the sheet
