@@ -164,7 +164,7 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
         try {
             await this.item.update({ "system.dmgType": dmgType, "system.altDmg": altDmg })
         } catch(err) {
-            Hyp3eLogger.error("#onSubmit", `Item update error!`, err);
+            Hyp3eLogger.error("#onSubmit", `Item damage types update error!`, err);
         }
     }
 }

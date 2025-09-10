@@ -895,7 +895,7 @@ Hooks.on("createToken", (token, options, userId) => {
         try {
             token.update({"name": tokenAlias})
         } catch (err) {
-            Hyp3eLogger.error("createToken", `Failed to update token name for ${token.name}:`, err);
+            Hyp3eLogger.error("createToken", `Failed to update token name for ${token.name}.`, err);
             ui.notifications.error(`Failed to update token name for ${token.name}. Check the console for details.`);
         }
     }
@@ -904,7 +904,7 @@ Hooks.on("createToken", (token, options, userId) => {
         try {
             token.actor.rollHD()
         } catch (err) {
-            Hyp3eLogger.error("createToken", `Failed to roll HD for NPC ${token.actor.name}:`, err);
+            Hyp3eLogger.error("createToken", `Failed to roll HD for NPC ${token.actor.name}.`, err);
             ui.notifications.error(`Failed to roll HD for NPC ${token.actor.name}. Check the console for details.`);
         }
     }
@@ -1089,7 +1089,7 @@ async function migrateWorld() {
                     break;
                 }
             } catch (err) {
-                const errMsg = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}: ${err.message}`;
+                const errMsg = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}.`;
                 Hyp3eLogger.error("migrateWorld", errMsg, err);
             }
         }
