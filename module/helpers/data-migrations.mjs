@@ -122,9 +122,18 @@ export function migrateItemData(item) {
 
     // Armor only
     if (item.type === "armor") {
+        // Convert legacy shield to new type
         const shieldUpdate = migrateShield(item);
         if (shieldUpdate) {
             updates = { ...updates, ...shieldUpdate };
+        }
+        // On actual armor, replace default shield icon with new breastplate icon
+        if (item.system.type !== "shield") {
+            const defaultIcon = "icons/svg/shield.svg"
+            const newIcon = "systems/hyp3e/assets/breastplate_wht.svg"
+            if (item.img === defaultIcon) {
+                updates = { ...updates, "img": newIcon };
+            }
         }
     }
 
@@ -220,7 +229,6 @@ export function migrateWeaponHands(item) {
     return null;
 }
 
-
 /**
  * 
  * @param {*} actor - The Actor whose token prototype will be modified
@@ -255,7 +263,7 @@ export function fixTokenSize(actor) {
 }
 
 /**
- * 
+ * Remove 1H or 2H from weapon names
  * @param {*} item - Item whose friendly name will be fixed
  * @returns {Object} - JSON of update data
  */

@@ -1,4 +1,5 @@
 import {Hyp3eDice} from "../dice/dice.mjs";
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 
 /**
@@ -17,7 +18,7 @@ export class Hyp3eItem extends Item {
 
         // Replace default image for new items, but if an image is defined, leave it be
         const TYPE_IMAGES = {
-            armor: "icons/svg/statue.svg",
+            armor: `${HYP3E.assetsPath}/breastplate_wht.svg`,
             effectTemplate: "icons/svg/aura.svg",
             feature: "icons/svg/target.svg",
             item: "icons/svg/item-bag.svg",
@@ -35,7 +36,7 @@ export class Hyp3eItem extends Item {
             updateData["system.containerId"] = "";
             updateData["system.location"] = "";
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("Hyp3eItem _preCreate: updateData", updateData) }
+        Hyp3eLogger.info("Hyp3eItem _preCreate", `Update data:`, updateData);
         this.updateSource(updateData);
     }
 
@@ -65,7 +66,7 @@ export class Hyp3eItem extends Item {
         // Fix weapon & spell missing or invalid damage type
         if (["weapon", "spell"].includes(this.type)) {
             if (!CONFIG.HYP3E.damageTypes[itemData.dmgType]) {
-                console.log(`ITEM ERROR: Invalid damage type on ${this.name}. Setting to Basic...`)
+                Hyp3eLogger.warn("prepareData", `Invalid damage type on ${this.name}. Setting to Basic...`)
                 itemData.dmgType = "basic"
             }
         }
@@ -157,7 +158,11 @@ export class Hyp3eItem extends Item {
                 updates["system.missile"] = true;
                 updates["system.type"] = "missile";
                 break;
+            default:
+                Hyp3eLogger.warn("updateWeaponType", `Invalid weapon type: ${attackType}`);
+                return;
         }
+        Hyp3eLogger.info("updateWeaponType", `Update data:`, updates);
         await this.update(updates);
     }
 
@@ -167,7 +172,6 @@ export class Hyp3eItem extends Item {
      * @returns 
      */
     async updateWeaponHands(hands) {
-        console.log(`updateWeaponHands: hands = ${hands}`);
         const updates = {};
         switch (hands) {
             case 1:
@@ -177,10 +181,10 @@ export class Hyp3eItem extends Item {
                 updates["system.hands"] = 2;
                 break;
             default:
-                console.warn(`Invalid hands value: ${hands}`);
+                Hyp3eLogger.warn("updateWeaponHands", `Invalid hands value: ${hands}`);
                 return;
         }
-        console.log(`updateWeaponHands: updates =`, updates);
+        Hyp3eLogger.info("updateWeaponHands", `Update data:`, updates);
         await this.update(updates);
     }
 
@@ -247,7 +251,7 @@ export class Hyp3eItem extends Item {
             return await this.update({ system: updateData });
         }
         // Default if invalid weapon type
-        console.warn(`ITEM ERROR: Weapon ${this.name} has invalid type. Defaulting to melee.`);
+        Hyp3eLogger.error("applyAttackFormula", `Weapon ${this.name} has invalid type. Defaulting to melee.`);
         updateData = {
             melee: true,
             missile: false,
@@ -286,12 +290,12 @@ export class Hyp3eItem extends Item {
                 };
                 break;
             default:
-                console.warn(`Invalid mastery type: ${mastery}`);
+                Hyp3eLogger.warn("updateWeaponMastery", `Invalid mastery type: ${mastery}`);
                 return;
         }
 
         if (CONFIG.HYP3E.debugMessages) {
-            console.log(`Updating Weapon Mastery:`, updateData);
+            Hyp3eLogger.warn("updateWeaponMastery", `Update data:`, updateData);
         }
 
         return await this.update({ system: updateData });
@@ -359,7 +363,6 @@ export class Hyp3eItem extends Item {
     async _displayItemInChat(actorData) {
         const item = foundry.utils.deepClone(this)
         const itemData = item.system
-        // if (CONFIG.HYP3E.debugMessages) { console.log("_displayItemInChat: Item clicked:", item) }
 
         // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
         const typeLabel = item.type === 'feature' ? 'Ability' : item.type.capitalize();
