@@ -1,7 +1,7 @@
 import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { Hyp3eDice } from "../dice/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
-import { HYP3E } from "../helpers/config.mjs"
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { parseAndResolveChangeValue, checkAndResolveDuration } from "../helpers/effects.mjs";
 import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../chat/chat.mjs"
 
@@ -58,12 +58,12 @@ export class Hyp3eActor extends Actor {
         //      }
         //  Each entry must be unique by templateField and source!
         //  In theory, we could use an effect to create an entry... need to test.
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[]:`, systemData.tempModifiers) }
+        // Hyp3eLogger.info("prepareDerivedData", `tempModifiers[]:`, systemData.tempModifiers);
         systemData.tempModifiers.forEach((mod, id) => {
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, mod) }
+            // Hyp3eLogger.info("prepareDerivedData", `tempModifiers[${id}]:`, mod);
             // const obj = JSON.parse(mod)
             // EXAMPLE: obj = JSON.parse('{"templateField": "system.ac.value", "source": "isEncumbered", "modifier": 1}')
-            // if (CONFIG.HYP3E.debugMessages) { console.log(`tempModifiers[${id}]:`, obj) }
+            // Hyp3eLogger.info("prepareDerivedData", `tempModifiers[${id}]:`, obj);
         })
 
         // Make separate methods for each Actor type (character vs. npc) to keep
@@ -105,7 +105,7 @@ export class Hyp3eActor extends Actor {
         this._applyTempModifiers(systemData);
 
         // Log the prepared data
-        if (CONFIG.HYP3E.debugMessages) { console.log("Prepared Character Data: ", systemData) }
+        Hyp3eLogger.info("_prepareCharacterData", `Character Data:`, systemData);
 
     }
 
@@ -160,7 +160,7 @@ export class Hyp3eActor extends Actor {
         // Prepare character/npc roll data.
         this._getCharacterRollData(data);
         // this._getNpcRollData(data);  // POSSIBLE FUTURE USE
-        if (CONFIG.HYP3E.debugMessages) { console.log(`getRollData: Actor ${this.name}`, data) }
+        Hyp3eLogger.info("getRollData", `${this.name} data:`, data);
         return data;
     }
 
@@ -182,18 +182,18 @@ export class Hyp3eActor extends Actor {
         const changes = [];
         for ( const effect of this.allApplicableEffects() ) {
             if ( effect.disabled || !effect.active ) continue;
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: ${effect.name}:`, effect) }
+            Hyp3eLogger.info("applyActiveEffects", `${effect.name}:`, effect);
             changes.push(...effect.changes.map(change => {
                 const c = foundry.utils.deepClone(change);
                 c.effect = effect;
                 c.priority = c.priority ?? (c.mode * 10);
-                if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: ${effect.name} ${change.key}:`, change) }
+                Hyp3eLogger.info("applyActiveEffects", `${effect.name} ${change.key}:`, change);
                 return c;
             }));
             for ( const statusId of effect.statuses ) this.statuses.add(statusId);
         }
         changes.sort((a, b) => a.priority - b.priority);
-        if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: Prioritized changes to ${this.name}:`, changes) }
+        Hyp3eLogger.info("applyActiveEffects", `Prioritized changes to ${this.name}:`, changes);
 
         // Apply all changes
         for ( const change of changes ) {
@@ -204,7 +204,7 @@ export class Hyp3eActor extends Actor {
             // }
             // Now we can apply the resolved change
             const changes = change.effect.apply(this, change);
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyActiveEffects: Updated changes object:`, changes) }
+            Hyp3eLogger.info("applyActiveEffects", `Updated changes object:`, changes);
             Object.assign(overrides, changes);
         }
 
@@ -256,17 +256,17 @@ export class Hyp3eActor extends Actor {
         const tempMvMod = parseInt(systemData.movement?.tempMvMod) || 0;
 
         if (tempAcMod) {
-            if (CONFIG.HYP3E.debugMessages) console.log(`Applying temp AC mod: ${tempAcMod}`);
+            Hyp3eLogger.info("_applyTempModifiers", `Applying temp AC mod: ${tempAcMod}`);
             systemData.ac.value = Math.clamp(systemData.ac.value - tempAcMod, -9, 9);
         }
 
         if (tempDrMod) {
-            if (CONFIG.HYP3E.debugMessages) console.log(`Applying temp DR mod: ${tempDrMod}`);
+            Hyp3eLogger.info("_applyTempModifiers", `Applying temp DR mod: ${tempDrMod}`);
             systemData.ac.dr += tempDrMod;
         }
 
         if (tempMvMod) {
-            if (CONFIG.HYP3E.debugMessages) console.log(`Applying temp MV mod: ${tempMvMod}`);
+            Hyp3eLogger.info("_applyTempModifiers", `Applying temp MV mod: ${tempMvMod}`);
             systemData.movement.base.value += tempMvMod;
         }
     }
@@ -298,7 +298,7 @@ export class Hyp3eActor extends Actor {
             if (itmType[0] === "armor") {
                 // Armor as an item type can include armor, shields, and some protective magic items
                 for (let [key, obj] of Object.entries(itmType[1])) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log("Armor data: ", obj) }
+                    Hyp3eLogger.info("getCharacterAcAndMv", `Armor data:`, obj);
                     // Only count an item if it is equipped... but also note that only 1 suit of armor 
                     //   will ever be counted -- no stacking of armor.
                     // The logic here should use the best AC if multiple armor types are equipped, as in 
@@ -318,20 +318,16 @@ export class Hyp3eActor extends Actor {
                                 tempAC = obj.system.ac
                                 tempMV = obj.system.mv
                             }
-                            if (CONFIG.HYP3E.debugMessages) { 
-                                console.log(`Armor equipped: ${obj.name}, Base AC: ${tempAC}, Base DR: ${tempDR}, Base MV: ${tempMV}`)
-                            }
+                            Hyp3eLogger.info("getCharacterAcAndMv", `Armor equipped: ${obj.name}, Base AC: ${tempAC}, Base DR: ${tempDR}, Base MV: ${tempMV}`)
                         } else {
                             // Shield AC is a modifier subtracted from base AC.
                             // We allow shield modifiers to stack because many protective magic items give an AC bonus
                             //  similar to shields, and they should stack.
                             shieldMod += obj.system.ac
-                            if (CONFIG.HYP3E.debugMessages) {
-                                console.log("Shield equipped: ", obj.name, ", Shield Mod: ", shieldMod)
-                            }
+                            Hyp3eLogger.info("getCharacterAcAndMv", `Shield equipped: ${obj.name}, shield mod: ${shieldMod}`)
                         }
                     } else {
-                        if (CONFIG.HYP3E.debugMessages) { console.log("Armor not equipped: ", obj.name) }
+                        Hyp3eLogger.info("getCharacterAcAndMv", `${obj.name} not equipped.`);
                     }
                 }
             }
@@ -341,13 +337,13 @@ export class Hyp3eActor extends Actor {
             if (this.getFlag(game.system.id, "isEncumbered")) {
                 tempAC += 1
                 tempMV -= 10
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Encumbered: AC ${tempAC}, MV ${tempMV}`) }
+                Hyp3eLogger.info("getCharacterAcAndMv", `Encumbered: AC ${tempAC}, MV ${tempMV}`);
             } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
                 tempAC += 2
                 tempMV -= 20
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Heavily Encumbered: AC ${tempAC}, MV ${tempMV}`) }
+                Hyp3eLogger.info("getCharacterAcAndMv", `Heavily Encumbered: AC ${tempAC}, MV ${tempMV}`);
             } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Not Encumbered: AC ${tempAC}, MV ${tempMV}`) }
+                Hyp3eLogger.info("getCharacterAcAndMv", `Not Encumbered: AC ${tempAC}, MV ${tempMV}`);
             }
         }
 
@@ -473,7 +469,7 @@ export class Hyp3eActor extends Actor {
         const key = `system.attributes.${attr}.bonusSpells.${spellLevel}`;
         await this.update({ [key]: val });
         // this.render(true)
-        if (CONFIG.HYP3E.debugMessages) { console.log("updateBonusSpell update:", key, val) }
+        Hyp3eLogger.info("updateBonusSpell", `Update: ${key}, ${val}`);
     }
 
     // Get the names of effects applied to the actor, and return an array
@@ -509,15 +505,15 @@ export class Hyp3eActor extends Actor {
                 w.system.annotations.some(a => a.toLowerCase().includes("true2hand")));
 
         if (newlyEquipped.type !== "weapon" && !_isShield(newlyEquipped)) return;
-        if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Newly equipped:`, newlyEquipped) }
+        Hyp3eLogger.info("enforceWeaponEquipRules", `Newly equipped:`, newlyEquipped);
 
         // All other currently equipped weapons
         const equippedWeapons = this._getEquippedWeapons(newlyEquipped.id);
-        if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Currently equipped weapons:`, equippedWeapons) }
+        Hyp3eLogger.info("enforceWeaponEquipRules", `Currently equipped weapons:`, equippedWeapons);
 
         // All other currently equipped shields
         const equippedShields = this._getEquippedShields(newlyEquipped.id);
-        if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Currently equipped shield:`, equippedShields) }
+        Hyp3eLogger.info("enforceWeaponEquipRules", `Currently equipped shield:`, equippedShields);
 
         // Handle weapons first
         if (newlyEquipped.type === "weapon") {
@@ -526,13 +522,13 @@ export class Hyp3eActor extends Actor {
             // Check dual-wield condition (exactly one other weapon equipped)
             if (equippedWeapons.length === 1 && isMelee(newlyEquipped) && isLight(newlyEquipped)) {
                 const other = equippedWeapons[0];
-                if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Other equipped weapon:`, other) }
+                Hyp3eLogger.info("enforceWeaponEquipRules", `Other equipped weapon:`, other);
                 dualWielding =
                     dex >= 13 &&
                     isMelee(newlyEquipped) && isMelee(other) &&
                     isLight(newlyEquipped) && isLight(other);
 
-                if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Dual wielding?`, dualWielding) }
+                Hyp3eLogger.info("enforceWeaponEquipRules", `Dual wielding?`, dualWielding);
                 if (dualWielding) {
                     // If dual wielding, we must unequip any shields
                     if (equippedShields.length > 0) {
@@ -540,7 +536,7 @@ export class Hyp3eActor extends Actor {
                             _id: s.id,
                             "system.equipped": false
                         }));
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Unequipping shields:`, unequipUpdates) }
+                        Hyp3eLogger.info("enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
                         await this.updateEmbeddedDocuments("Item", unequipUpdates);
                     }
                 }
@@ -551,7 +547,7 @@ export class Hyp3eActor extends Actor {
                     _id: w.id,
                     "system.equipped": false
                 }));
-                if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Unequipping other weapons:`, unequipUpdates) }
+                Hyp3eLogger.info("enforceWeaponEquipRules", `Unequipping other weapons:`, unequipUpdates);
                 await this.updateEmbeddedDocuments("Item", unequipUpdates);
             }
             // If a 2-handed weapon is being equipped, unequip all hand-shields
@@ -562,7 +558,7 @@ export class Hyp3eActor extends Actor {
                         _id: s.id,
                         "system.equipped": false
                     }));
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Unequipping shields:`, unequipUpdates) }
+                    Hyp3eLogger.info("enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
                     await this.updateEmbeddedDocuments("Item", unequipUpdates);
                 }
             }
@@ -576,7 +572,7 @@ export class Hyp3eActor extends Actor {
                     _id: s.id,
                     "system.equipped": false
                 }));
-                if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Unequipping shields:`, unequipUpdates) }
+                Hyp3eLogger.info("enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
                 await this.updateEmbeddedDocuments("Item", unequipUpdates);
             }
             // Unequip any two-handed weapons
@@ -594,7 +590,7 @@ export class Hyp3eActor extends Actor {
                     _id: s.id,
                     "system.equipped": false
                 }));
-                if (CONFIG.HYP3E.debugMessages) { console.log(`enforceWeaponEquipRules: Unequipping two-handers:`, unequipUpdates) }
+                Hyp3eLogger.info("enforceWeaponEquipRules", `Unequipping two-handers:`, unequipUpdates);
                 await this.updateEmbeddedDocuments("Item", unequipUpdates);
             }
         }
@@ -624,7 +620,7 @@ export class Hyp3eActor extends Actor {
     async enforceSingleArmor(newArmor) {
         if (newArmor.type !== "armor") return;
         if (newArmor.system.type === "shield") return; // Legacy shields are handled with weapons
-        if (CONFIG.HYP3E.debugMessages) { console.log(`enforceSingleArmor: Newly equipped armor:`, newArmor) }
+        Hyp3eLogger.info("enforceSingleArmor", `Newly equipped armor:`, newArmor);
 
         // Find other equipped armor items
         const equippedArmors = this.items.filter(i =>
@@ -637,7 +633,7 @@ export class Hyp3eActor extends Actor {
         // Unequip them
         for (const armor of equippedArmors) {
             await armor.update({ "system.equipped": false });
-            if (CONFIG.HYP3E.debugMessages) { console.log(`enforceSingleArmor: Unequipping ${armor.name}`); }
+            Hyp3eLogger.info("enforceSingleArmor", `Unequipping armor:`, armor);
         }
     }
 
@@ -660,7 +656,7 @@ export class Hyp3eActor extends Actor {
         // Check for existence of this modifier, before we try adding it
         this.system.tempModifiers.forEach((mod, id) => {
             if (mod.templateField == templateField && mod.source == source) { 
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Cannot add temp modifier, it already exists! templateField ${templateField}, source ${source}.`) }
+                Hyp3eLogger.info("addTempModifier", `Cannot add temp modifier, it already exists! templateField ${templateField}, source ${source}.`);
                 return
             }
         })
@@ -682,7 +678,7 @@ export class Hyp3eActor extends Actor {
         // Find & delete the modifier
         this.system.tempModifiers.forEach((mod, id) => {
             if (mod.templateField == templateField && mod.source == source) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`Found temp modifier, deleting. templateField ${templateField}, source ${source}.`) }
+                Hyp3eLogger.info("deleteTempModifier", `Found temp modifier, deleting. templateField ${templateField}, source ${source}.`);
                 this.system.tempModifiers.splice(id, 1)
             }
         })
@@ -705,27 +701,12 @@ export class Hyp3eActor extends Actor {
 
                 // Check to see if we have a rollable duration formula, and resolve it if so
                 const { updatedDuration, updated } = await checkAndResolveDuration(effect);
-                if (CONFIG.HYP3E.debugMessages) { console.log(`updateItemEffects: Effect "${effect.name}" duration:`, updatedDuration) };
+                Hyp3eLogger.info("updateItemEffects", `Effect "${effect.name}" duration:`, updatedDuration);
                 if (updated) didUpdate = true;
-                // // Store duration for a batch update at the end
-                // let updatedDuration = {...effect.duration};  // Start with a shallow copy
-
-                // // Check to see if we have a rollable duration formula
-                // const formula = effect.getFlag("hyp3e", "durationFormula");
-                // if (formula) {
-                //     try {
-                //         const roll = await new Roll(formula).evaluate({async: true});
-                //         updatedDuration = { "rounds": roll.total, "turns": roll.total };
-                //         if (CONFIG.HYP3E.debugMessages) { console.log(`updateItemEffects: Effect "${effect.name}" resolved duration "${formula}" to ${roll.total} rounds`) };
-                //         didUpdate = true;
-                //     } catch (err) {
-                //         console.error("updateItemEffects: Invalid duration formula:", formula, err);
-                //     }
-                // }
 
                 // Store all changes for a batch update at the end
                 let updatedChanges = [...effect.changes];  // Start with a shallow copy
-                if (CONFIG.HYP3E.debugMessages) { console.log(`updateItemEffects: Checking effect ${effect.name} for changes to resolve...`, updatedChanges) }
+                Hyp3eLogger.info("updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, updatedChanges);
                 for (let i = 0; i < updatedChanges.length; i++) {
                     const change = updatedChanges[i];
                     let resolvedChange = change.value
@@ -743,10 +724,8 @@ export class Hyp3eActor extends Actor {
                 }
                 // Batch out the updates to the effect
                 if (didUpdate) {
-                    if (CONFIG.HYP3E.debugMessages) {
-                        console.log("updateItemEffects: Duration: ", updatedDuration)
-                        console.log("updateItemEffects: Changes: ", updatedChanges)
-                    }
+                    Hyp3eLogger.info("updateItemEffects", `Duration:`, updatedDuration)
+                    Hyp3eLogger.info("updateItemEffects", `Changes:`, updatedChanges)
                     await effect.update({
                         duration: updatedDuration,
                         changes: updatedChanges
@@ -773,17 +752,17 @@ export class Hyp3eActor extends Actor {
             if (effect.isTemporary && !effect.disabled) {
                 const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
                 if (persistentDamage) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: ${effect.name}`, persistentDamage); }
+                    Hyp3eLogger.info("processTemporaryEffects", `${effect.name}:`, persistentDamage);
 
                     [damageType, rawDamageRoll] = persistentDamage.value.split(",");
                     const damageRollFormula = rawDamageRoll.replace(";", "").trim();
 
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects: rolling ${damageRollFormula} ${damageType}`); }
+                    Hyp3eLogger.info("processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType}`);
 
                     const roll = new Roll(damageRollFormula);
                     await roll.evaluate({ evaluateSync: true });
 
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`processTemporaryEffects roll result:`, roll); }
+                    Hyp3eLogger.info("processTemporaryEffects", `Roll result:`, roll);
 
                     totalDamage += roll.total;
 
@@ -799,9 +778,7 @@ export class Hyp3eActor extends Actor {
         // Apply total damage once
         if (totalDamage > 0) {
             await this.applyHealthChange(totalDamage, damageType, false);
-            if (CONFIG.HYP3E.debugMessages) {
-                console.log(`processTemporaryEffects: ${this.name} took ${totalDamage} total damage!`);
-            }
+            Hyp3eLogger.info("processTemporaryEffects", `${this.name} took ${totalDamage} total damage!`);
             // Post all the damage messages together
             const persistentDamageMsg = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
             sendSimpleChat(this, "", persistentDamageMsg)
@@ -880,7 +857,7 @@ export class Hyp3eActor extends Actor {
             type: dataset.type,
             system: { ...dataset.system }
         };
-        console.log(`createTempItem: Creating ${itemData.name} with data:`, itemData)
+        Hyp3eLogger.info("createTempItem", `Creating ${itemData.name} with data:`, itemData)
         // Finally, create the item!
         return await Item.create(itemData, {parent: this});
     }
@@ -897,7 +874,9 @@ export class Hyp3eActor extends Actor {
 
         // Log items to decrement duration
         const namesToReduce = tempItems.map(item => item.name);
-        if (namesToReduce.length > 0) console.log(`processTemporaryItems: Updating duration for ${namesToReduce.join(", ")}...`)
+        if (namesToReduce.length > 0) {
+            Hyp3eLogger.info("processTemporaryItems", `Updating duration for ${namesToReduce.join(", ")}...`)
+        }
 
         // Update duration on temporary items
         const updates = [];
@@ -926,7 +905,7 @@ export class Hyp3eActor extends Actor {
         // Log items to delete
         const namesToDelete = expiredItems.map(item => item.name);
         if (namesToDelete.length > 0) {
-            console.log(`processTemporaryItems: Deleting ${namesToDelete.join(", ")}...`)
+            Hyp3eLogger.info("processTemporaryItems", `Deleting ${namesToDelete.join(", ")}...`)
             // Post all the item expiration messages together
             const chatContent = `Conjured item has expired...<ul><li>${namesToDelete.join("</li><li>")}</li></ul>`;
             sendSimpleChat(this, "", chatContent)
@@ -952,14 +931,12 @@ export class Hyp3eActor extends Actor {
         // Input Validation
         if (typeof amount !== "number" || isNaN(amount)) {
             const errorMsg = `Invalid health change amount: '${amount}'. Must be a valid number.`;
-            console.error(`applyHealthChange Error for ${actorName}: ${errorMsg}`);
+            Hyp3eLogger.info("applyHealthChange", `Error for ${actorName}: ${errorMsg}`);
             ui.notifications?.error(errorMsg);
             return; // Exit early for invalid input
         }
 
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`applyHealthChange: Processing ${amount} HP change for ${actorName}. Damage type: ${damageType}. Apply DR: ${applyDr}`);
-        }
+        Hyp3eLogger.info("applyHealthChange", `Processing ${amount} HP change for ${actorName}. Damage type: ${damageType}. Apply DR: ${applyDr}`);
 
         // Get Current State & Define Change Type
         const currentHp = this.system.hp?.value ?? 0;
@@ -973,13 +950,13 @@ export class Hyp3eActor extends Actor {
         // Check Early Exit Conditions
         // Condition: Trying to damage an already incapacitated/dead actor
         if (isDamage && currentHp <= minHp) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: ${actorName} is already incapacitated (HP <= ${minHp}). No damage applied.`); }
+            Hyp3eLogger.info("applyHealthChange", `${actorName} is already incapacitated (HP <= ${minHp}). No damage applied.`);
             // We might want to trigger "overkill" effects or messages here...
             return;
         }
         // Condition: Change amount is zero
         if (amount === 0) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Health change for ${actorName} is zero. No changes needed.`); }
+            Hyp3eLogger.info("applyHealthChange", `Health change for ${actorName} is zero. No changes needed.`);
             return;
         }
 
@@ -991,11 +968,11 @@ export class Hyp3eActor extends Actor {
             const drValue = this.system.ac?.dr ?? 0; // Safely access DR, defaulting to 0
             if (drValue > 0) {
                 const damageAfterDr = Math.max(0, amount - drValue); // Ensure damage doesn't become negative healing due to DR
-                if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Applying DR ${drValue} to ${amount} damage for ${actorName}. Resulting damage: ${damageAfterDr}`); }
+                Hyp3eLogger.info("applyHealthChange", `Applying DR ${drValue} to ${amount} damage for ${actorName}. Resulting damage: ${damageAfterDr}`);
 
                 // Condition: DR absorbed all the damage
                 if (damageAfterDr === 0 && amount > 0) { // Check amount > 0 to ensure it was actual damage initially
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: DR absorbed all damage for ${actorName}.`); }
+                    Hyp3eLogger.info("applyHealthChange", `DR absorbed all damage for ${actorName}.`);
                     // Optionally, trigger chat message or automation for "damage absorbed"
                     // ChatMessage.create({content: `${this.name}'s armor absorbs the blow!`});
                     return; // Exit as no health change will occur
@@ -1014,11 +991,11 @@ export class Hyp3eActor extends Actor {
                 // Is the temp HP being applied by an ActiveEffect?
                 const tempHpEffect = this.effects.find(e => e.changes.some(c => c.key === "system.hp.tempHp"));
                 if (tempHpEffect) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Effect applying temp HP: ${tempHpEffect.name}.`); }
+                    Hyp3eLogger.info("applyHealthChange", `Effect applying temp HP: ${tempHpEffect.name}.`);
                     // Find the effect that is applying temp HP, and update it
                     netChange = await this.updateEffectValue("system.hp.tempHp", netChange, 0, 100);
                 } else {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Temp HP was applied manually.`); }
+                    Hyp3eLogger.info("applyHealthChange", `Temp HP was applied manually.`);
                     // No effect found, just subtract from tempHp directly
                     const originalTempHp = tempHp;
                     tempHp = Math.max(0, tempHp - netChange);
@@ -1028,7 +1005,7 @@ export class Hyp3eActor extends Actor {
                 }
                 // Lock netChange to zero if it came back negative
                 netChange = netChange < 0 ? 0 : netChange;
-                if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: Net change after temp HP: ${netChange}.`); }
+                Hyp3eLogger.info("applyHealthChange", `Net change after temp HP: ${netChange}.`);
             }
             // Now apply the remaining damage (if any) to current HP.
             //  Prevent the new HP from going below the allowed minimum.
@@ -1040,22 +1017,21 @@ export class Hyp3eActor extends Actor {
 
         // Clamp the calculated HP between the actor's min and max HP values
         newHp = Math.max(minHp, Math.min(newHp, maxHp));
-        if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: New HP for ${actorName}: ${newHp}.`); }
+        Hyp3eLogger.info("applyHealthChange", `New HP for ${actorName}: ${newHp}.`);
 
         // Check if Update is Necessary
         // Avoid updating the actor if the clamped HP is the same as the current HP
         // (e.g., healing when already at max HP, or taking 0 damage after DR)
         if (newHp === currentHp) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`applyHealthChange: No actual HP change needed for ${actorName} after clamping/DR (Current: ${currentHp}, Calculated New: ${newHp}).`); }
+            Hyp3eLogger.info("applyHealthChange", `No actual HP change needed for ${actorName} after clamping/DR (Current: ${currentHp}, Calculated New: ${newHp}).`);
             return; // No update needed
         }
 
+        const actualChangeAmount = Math.abs(currentHp - newHp); // How much HP *really* changed
+        const changeType = (newHp < currentHp) ? "damage" : "healing";
+        Hyp3eLogger.info("applyHealthChange", `Updating ${actorName} HP. Old: ${currentHp}, New: ${newHp} (${actualChangeAmount} ${changeType}).`);
+
         // Perform Actor Update
-        if (CONFIG.HYP3E.debugMessages) {
-            const actualChangeAmount = Math.abs(currentHp - newHp); // How much HP *really* changed
-            const changeType = (newHp < currentHp) ? "damage" : "healing";
-            console.log(`applyHealthChange: Updating ${actorName} HP. Old: ${currentHp}, New: ${newHp} (${actualChangeAmount} ${changeType}).`);
-        }
         try {
             // Perform the asynchronous update on the actor document
             await this.update({ "system.hp.value": newHp });
@@ -1065,7 +1041,7 @@ export class Hyp3eActor extends Actor {
 
         } catch (err) {
             // Log the error and notify the user if the update fails
-            console.error(`applyHealthChange: Failed to update HP for ${actorName}:`, err);
+            Hyp3eLogger.info("applyHealthChange", `Failed to update HP for ${actorName}:`, err);
             ui.notifications?.error(`Failed to update HP for ${actorName}. See console log for details.`);
             return err; // Return the error object
         }
@@ -1078,18 +1054,18 @@ export class Hyp3eActor extends Actor {
      * @param {*} itemId
      */
     async useItem(itemId) {
-        if (CONFIG.HYP3E.debugMessages) { console.log("useItem: All actor items:", this.items) }
         const item = this.items?.get(itemId);
-        if (CONFIG.HYP3E.debugMessages) { console.log("useItem: Using item:", item) }
         if (!item) {
             ui.notifications?.error(`Use Item: Item ${itemId} not found! See console log for details.`);
-            if (CONFIG.HYP3E.debugMessages) {
-                console.log(`useItem: Item ${itemId} not found!`)
-                console.log(`useItem: Likely issue is that the item is owned by a token, but not the base actor.`)
-                console.log(`useItem: This is most common with NPCs and monsters, if the GM drags an item or creates a new item directly in the token sheet.`)
-            }
+            const msg = `
+                Item ${itemId} not found!
+                Likely issue is that the item is owned by a token, but not the base actor.
+                This is most common with NPCs and monsters, if the GM drags an item or creates a new item directly in the token sheet.
+            `
+            Hyp3eLogger.info("useItem", msg);
             return;
         }
+        Hyp3eLogger.info("useItem", `Using item:`, item);
         const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name
         let message = `<p>${this.name} used ${itemName}.</p>`
         // Decrement qty if it's consumable, otherwise just allow it to be used
@@ -1125,11 +1101,9 @@ export class Hyp3eActor extends Actor {
             }
 
             // Trigger the item roll
-            if (CONFIG.HYP3E.debugMessages) { 
-                console.log(`Macro actor: `, this)
-                console.log(`Macro item: `, item)
-                console.log(`Rolling macro for ${item.type} ${item.name}:`, item) 
-            }
+            Hyp3eLogger.info("rollMacro", `Macro actor: `, this)
+            Hyp3eLogger.info("rollMacro", `Macro item: `, item)
+            Hyp3eLogger.info("rollMacro", `Rolling macro for ${item.type} ${item.name}:`, item) 
 
             // Create dataset object and start populating it
             let dataset = {}
@@ -1149,14 +1123,14 @@ export class Hyp3eActor extends Actor {
      * @param {*} dataset 
      */
     async rollBasic(dataset) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
+        Hyp3eLogger.info("rollBasic", `Rolling ${dataset.label}...`);
 
         let rollResponse
         let label = `${dataset.label}...`
         dataset.rollButtonLabel = "Roll"
 
         // Log the dataset before the dialog renders
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+        Hyp3eLogger.info("rollBasic", `${dataset.label} dataset:`, dataset);
         try {
             rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
         } catch(err) {
@@ -1170,7 +1144,7 @@ export class Hyp3eActor extends Actor {
         let roll = new Roll(rollFormula, this.getRollData())
         // Resolve the roll
         let result = await roll.roll()
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
+        Hyp3eLogger.info("rollBasic", `${dataset.label} roll result:`, result);
 
         // Output roll result to a chat message
         sendRollToChat(roll, this, label, "", rollResponse.rollMode)
@@ -1183,14 +1157,14 @@ export class Hyp3eActor extends Actor {
      * @param {*} dataset 
      */
     async rollReaction(dataset) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
+        Hyp3eLogger.info("rollReaction", `Rolling ${dataset.label}...`);
 
         let rollResponse
         let label = `${dataset.label}...`
         dataset.rollButtonLabel = "Roll Reaction"
 
         // Log the dataset before the dialog renders
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+        Hyp3eLogger.info("rollReaction", `${dataset.label} dataset:`, dataset);
         try {
             rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
         } catch(err) {
@@ -1204,13 +1178,13 @@ export class Hyp3eActor extends Actor {
         let roll = new Roll(rollFormula, this.getRollData())
         // Resolve the roll
         let result = await roll.roll()
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} roll result: `, result) }
+        Hyp3eLogger.info("rollReaction", `${dataset.label} roll result:`, result);
         // The roll shouldn't go below zero, even if modifiers would make it so
         let rollTotal = roll.total
         if (rollTotal < 0) { rollTotal = 0 }
 
         let reaction = this._valueFromTable(this.reactionTable, rollTotal)
-        if (CONFIG.HYP3E.debugMessages) { console.log(reaction) }
+        Hyp3eLogger.info("rollReaction", `Reaction:`, reaction);
         label += `<br /><b>${reaction}</b>`
 
         // Output roll result to a chat message
@@ -1224,7 +1198,7 @@ export class Hyp3eActor extends Actor {
      * @param {*} dataset 
      */
     async rollSave(dataset) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Rolling ${dataset.label}...`) }
+        Hyp3eLogger.info("rollSave", `Rolling ${dataset.label}...`);
 
         let saveRollParts = []
         let rollFormula = ""
@@ -1238,7 +1212,7 @@ export class Hyp3eActor extends Actor {
             dataset.willMod = this.system.attributes.wis.willMod
 
             // Log the dataset before the dialog renders
-            if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+            Hyp3eLogger.info("rollSave", `${dataset.label} dataset:`, dataset);
             try {
                 rollResponse = await Hyp3eDialog.ShowSaveRollDialog(dataset)
             } catch(err) {
@@ -1265,7 +1239,7 @@ export class Hyp3eActor extends Actor {
             // NPC/monster save, no attribute-based mods
             dataset.rollButtonLabel = "Roll Save"
             // Log the dataset before the dialog renders
-            if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+            Hyp3eLogger.info("rollSave", `${dataset.label} dataset:`, dataset);
             try {
                 rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset);
                 // Default basic save with only sit mod from dice dialog
@@ -1280,10 +1254,8 @@ export class Hyp3eActor extends Actor {
 
         // Construct our save roll formula
         rollFormula = saveRollParts.join(" + ")
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log("Save roll parts:", saveRollParts)
-            console.log("Save formula:", rollFormula)
-        }
+        Hyp3eLogger.info("rollSave", `Save roll parts:`, saveRollParts)
+        Hyp3eLogger.info("rollSave", `Save formula:`, rollFormula)
 
         // Roll the dice!
         const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, this.getRollData(), dataset.rollTarget, "ge");
@@ -1306,17 +1278,17 @@ export class Hyp3eActor extends Actor {
     async rollHD() {
         if (this.type !== 'npc') return;
         if (!this.system.hd){
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHD: No HD value to roll!") }
+            Hyp3eLogger.info("rollHD", `No HD value to roll!`);
             return;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHD: Rolling HD ${this.system.hd}...`) }
+        Hyp3eLogger.info("rollHD", `Rolling HD ${this.system.hd}...`);
         const roll = new Roll(this.system.hd);
         await roll.roll();
         if (roll != undefined && roll.total != undefined) {
             const newHealth = roll.total;
             await this.update({ system: { hp: { value: newHealth, max: newHealth } } });
         } else {
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHD: Roll failed, no total value!") }
+            Hyp3eLogger.warn("rollHD", `Roll failed, no total value!`);
         }
     }
 
@@ -1327,24 +1299,24 @@ export class Hyp3eActor extends Actor {
     async rollHP() {
         if (this.type !== 'character') return;
         if (!this.system.hd){
-            if (CONFIG.HYP3E.debugMessages) { console.error("rollHP: No HD value to roll!") }
+            Hyp3eLogger.error("rollHP", `No HD value in ${this.name} to roll!`);
             return;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollHP: Rolling hit points ${this.system.hd} + ${this.system.attributes.con.hpMod}...`) }
+        Hyp3eLogger.info("rollHP", `Rolling hit points ${this.system.hd} + ${this.system.attributes.con.hpMod}...`);
         const roll = new Roll(`${this.system.hd} + ${this.system.attributes.con.hpMod}`);
         await roll.roll();
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll result: ", roll) }
+        Hyp3eLogger.info("rollHP", `Roll result:`, roll);
         if (roll != undefined && roll.total != undefined) {
             const hpIncrease = roll.total;
             const newHealth = parseInt(this.system.hp.value) + hpIncrease;
             const newMax = parseInt(this.system.hp.max) + hpIncrease;
             // Log the update
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Updated HP:", newHealth, "Max HP:", newMax) }
+            Hyp3eLogger.info("rollHP", `Updated HP: ${newHealth}, Max HP: ${newMax}`);
             await this.update({
                 system: { hp: { value: newHealth, max: newMax } }
             });
         } else {
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollHP: Roll failed, no total value!") }
+            Hyp3eLogger.warn("rollHP", `Roll failed, no total value!`);
         }
     }
 
@@ -1375,7 +1347,7 @@ export class Hyp3eActor extends Actor {
         dataset = await this._prepareRollDataset(dataset.itemId, dataset);
         if (!dataset) return;
 
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label}:`, item) }
+        Hyp3eLogger.info("rollItem", `${dataset.label}:`, item);
         if (item.type === "weapon") {
             // Attack with the weapon
             this.rollAttackOrSpell(dataset)
@@ -1436,7 +1408,7 @@ export class Hyp3eActor extends Actor {
      * @param {*} dataset 
      */
     async rollCheck(dataset) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollCheck: Rolling ${dataset.label}...`) }
+        Hyp3eLogger.info("rollCheck", `Rolling ${dataset.label}...`);
 
         // Declare vars
         const itemId = dataset.itemId ?? null
@@ -1451,11 +1423,11 @@ export class Hyp3eActor extends Actor {
         if (tokenId) {
             // Get the token from the canvas
             const token = canvas.tokens.get(tokenId)
-            if (CONFIG.HYP3E.debugMessages) { console.log(`rollCheck: Token (ID ${tokenId}): `, token) }
+            Hyp3eLogger.info("rollCheck", `Token (ID ${tokenId}):`, token);
             if (token) {
                 // Get the token's actor
                 const tokenActor = token.actor
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollCheck: Token actor: `, tokenActor) }
+                Hyp3eLogger.info("rollCheck", `Token actor:`, tokenActor);
             }
         }
 
@@ -1468,8 +1440,9 @@ export class Hyp3eActor extends Actor {
 
         // Determine whether we have a valid target number or formula
         if (dataset.rollTarget == '' || dataset.rollTarget == undefined || dataset.rollTarget <= 0) {
-            console.log("Missing or invalid target number, cannot confirm success of check!")
-            ui.notifications.info("Missing or invalid target number, cannot confirm success of check!")
+            const msg = `Missing or invalid target number, cannot confirm success of check!`
+            Hyp3eLogger.info("rollCheck", msg)
+            ui.notifications.info(msg)
             return false
         }
 
@@ -1544,17 +1517,15 @@ export class Hyp3eActor extends Actor {
         if (isNaN(dataset.rollTarget)) {
             const targetRoll = new Roll(dataset.rollTarget, rollData)
             await targetRoll.roll()
-            if (CONFIG.HYP3E.debugMessages) {
-                console.log(`Check target formula: ${dataset.rollTarget} evaluates to ${targetRoll.formula} = ${targetRoll.total}`)
-                console.log("Target formula eval: ", targetRoll)
-            }
+            Hyp3eLogger.info("rollCheck", `Check target formula: ${dataset.rollTarget} evaluates to ${targetRoll.formula} = ${targetRoll.total}`)
+            Hyp3eLogger.info("rollCheck", `Target formula eval:`, targetRoll)
             // Override rollTarget, even if it has the same value
             dataset.rollTarget = targetRoll.total
         }
         checkText += ` (target ${dataset.rollTarget})... `
 
         // Log the dataset before the dialog renders
-        if (CONFIG.HYP3E.debugMessages) { console.log(`${dataset.label} dataset: `, dataset) }
+        Hyp3eLogger.info("rollCheck", `${dataset.label} dataset:`, dataset);
         try {
             rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
         } catch(err) {
@@ -1600,9 +1571,7 @@ export class Hyp3eActor extends Actor {
      * @param {object} dataset - Initial data for the roll (label, itemId, tokenId, etc.).
      */
     async rollAttackOrSpell(dataset) {
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`rollAttackOrSpell: Rolling ${dataset.label}...`, dataset);
-        }
+        Hyp3eLogger.info("rollAttackOrSpell", `Rolling ${dataset.label}...`, dataset);
 
         // Gather Initial Information
         const { attacker, attackerPos } = await this._getAttackerDetails(dataset);
@@ -1610,7 +1579,7 @@ export class Hyp3eActor extends Actor {
         const actorData = this.getRollData();
 
         if (!item && !dataset.formula) { // If there's no item and no predefined formula (e.g., basic attack removed)
-            console.warn("rollAttackOrSpell: No item or formula provided for the roll.");
+            Hyp3eLogger.warn("rollAttackOrSpell", `No item or formula provided for the roll.`);
             ui.notifications.warn("Cannot perform action: No item or formula specified.");
             return null;
         }
@@ -1618,7 +1587,7 @@ export class Hyp3eActor extends Actor {
 
         // Early exit if item requires a roll but has no formula (data setup errors)
         if (item && !itemData.formula && (item.type === "weapon" || (item.type === "spell" && itemData.atkRoll))) {
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Item has no roll formula, displaying description instead."); }
+            Hyp3eLogger.info("rollAttackOrSpell", `Item has no roll formula, displaying description instead.`);
             item._displayItemInChat(actorData);
             return null;
         }
@@ -1640,7 +1609,7 @@ export class Hyp3eActor extends Actor {
         const { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance);
         rangeMessages.forEach(msg => ui.notifications.warn(msg)); // Show range warnings immediately
         if (isOutOfRange && CONFIG.HYP3E.forceRangeLimit) {
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Target out of range, or too close, and forceRangeLimit enabled. Aborting."); }
+            Hyp3eLogger.info("rollAttackOrSpell", `Target out of range, or too close, and forceRangeLimit enabled. Aborting.`);
             return null; // Abort if out of range and setting is enabled
         }
 
@@ -1670,11 +1639,11 @@ export class Hyp3eActor extends Actor {
         try {
             rollResponse = await this._showRollDialog(dialogData, item?.type, carriedAmmo, rangeGroup, ranges, chosenRange);
             if (!rollResponse) { // Handle dialog cancellation
-                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Dialog cancelled by user."); }
+                Hyp3eLogger.info("rollAttackOrSpell", `Dialog canceled by user.`);
                 return null;
             }
         } catch (err) {
-            console.error("rollAttackOrSpell: Error displaying dialog:", err);
+            Hyp3eLogger.info("rollAttackOrSpell", `Error displaying dialog:`, err);
             return null;
         }
 
@@ -1705,12 +1674,12 @@ export class Hyp3eActor extends Actor {
 
         // Build Roll Formula
         const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData); // Assuming this exists
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell: Final attack formula:", rollFormula); }
+        Hyp3eLogger.info("rollAttackOrSpell", `Final attack formula:`, rollFormula);
 
         // Execute the Roll
         const { atkRoll, naturalRoll } = await this._executeRoll(rollFormula, actorData);
         if (!atkRoll) {
-            console.error("rollAttackOrSpell: Roll execution failed.");
+            Hyp3eLogger.error("rollAttackOrSpell", `Roll execution failed.`);
             return null;
         }
 
@@ -1833,10 +1802,8 @@ export class Hyp3eActor extends Actor {
         // Optionally inject rollData reference for later convenience
         dataset.actorData = actorData;
 
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log("_prepareRollDataset: Actor roll data:", actorData);
-            console.log("_prepareRollDataset: Prepared dataset:", dataset);
-        }
+        Hyp3eLogger.info("_prepareRollDataset", `Actor roll data:`, actorData);
+        Hyp3eLogger.info("_prepareRollDataset", `Prepared dataset:`, dataset);
 
         return dataset;
     }
@@ -1867,10 +1834,9 @@ export class Hyp3eActor extends Actor {
         }
 
         const attackerPos = attacker?.center ?? null;
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log("rollAttackOrSpell/_getAttackerDetails: Attacker:", attacker);
-            console.log("rollAttackOrSpell/_getAttackerDetails: Attacker Position:", attackerPos);
-        }
+        Hyp3eLogger.info("_getAttackerDetails", `Attacker:`, attacker);
+        Hyp3eLogger.info("_getAttackerDetails", `Attacker Position:`, attackerPos);
+
         return { attacker, attackerPos };
     }
 
@@ -1882,10 +1848,8 @@ export class Hyp3eActor extends Actor {
     async _getItemDetails(itemId) {
         const item = this.items.get(itemId) ?? await fromUuid(itemId);
         const itemData = item ? { ...item.system, itemType: item.type } : null;
-        if (CONFIG.HYP3E.debugMessages) {
-            console.log(`_getItemDetails: Item ${itemId}:`, item);
-            console.log("_getItemDetails: Item Data:", itemData);
-        }
+        Hyp3eLogger.info("_getItemDetails", `Item ${itemId}:`, item);
+        Hyp3eLogger.info("_getItemDetails", `Item Data:`, itemData);
 
         // itemName should be prioritized as (1) itemAlias [but only if not identified], 
         //  (2) friendlyName, and (3) realName
@@ -1951,13 +1915,11 @@ export class Hyp3eActor extends Actor {
             // Ensure distance is not negative
             if (gridDistance < 0) gridDistance = 0;
 
-            if (CONFIG.HYP3E.debugMessages) {
-                console.log("rollAttackOrSpell/_getTargetDetails: Target:", target);
-                console.log("rollAttackOrSpell/_getTargetDetails: Target Data:", targetData);
-                console.log("rollAttackOrSpell/_getTargetDetails: Distance:", gridDistance);
-            }
+            Hyp3eLogger.info("_getTargetDetails", `Target:`, target);
+            Hyp3eLogger.info("_getTargetDetails", `Target Data:`, targetData);
+            Hyp3eLogger.info("_getTargetDetails", `Distance:`, gridDistance);
         } else {
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_getTargetDetails: No target selected or attacker missing."); }
+            Hyp3eLogger.info("getTargetDetails", `No target selected or attacker missing.`);
             // Optionally notify if an attack requires a target but none is selected
             // ui.notifications.info("No target selected!"); // Consider moving this notification logic elsewhere if needed more broadly
         }
@@ -1994,10 +1956,10 @@ export class Hyp3eActor extends Actor {
             if (unit === 'yd' || unit === 'yards') value *= 3;
             if (unit === 'm' || unit === 'meters') value *= 3.28084;
             if (unit === 'mi' || unit === 'miles') value *= 5280;
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_parseSpellRange: Spell range: ${rangeStr} = ${value} feet`) }
+            Hyp3eLogger.info("_parseSpellRange", `Spell range: ${rangeStr} = ${value} feet`);
             return Math.round(value);
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_parseSpellRange: Spell range ${rangeStr} could not be determined!`) }
+        Hyp3eLogger.info("_parseSpellRange", `Spell range ${rangeStr} could not be determined!`);
         return Infinity; // Unknown range format
     }
 
@@ -2022,7 +1984,7 @@ export class Hyp3eActor extends Actor {
             const meleeRange = this._getMeleeRange(itemData.wc);
             if (gridDistance > meleeRange) {
                 const msg = `Target is beyond melee range! (${gridDistance} ${canvas.scene.grid.units} > ${meleeRange} ${canvas.scene.grid.units})`;
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
+                Hyp3eLogger.info("_prepareRangeData", msg);
                 rangeMessages.push(msg);
                 isOutOfRange = true;
             }
@@ -2041,7 +2003,7 @@ export class Hyp3eActor extends Actor {
                 // If gridDistance == 0, then we assume no target and allow the attack to go through
                 chosenRange = "short"; // Set to Short even if too close
                 const msg = `Target is in melee range! (${gridDistance} ${canvas.scene.grid.units})`;
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
+                Hyp3eLogger.info("_prepareRangeData", msg);
                 rangeMessages.push(msg);
                 isOutOfRange = true;
             } else if (gridDistance <= itemData.range.short) {
@@ -2053,7 +2015,7 @@ export class Hyp3eActor extends Actor {
             } else {
                 chosenRange = "long"; // Set to Long even if out of range
                 const msg = `Target is out of missile range! (${gridDistance} ${canvas.scene.grid.units} > ${itemData.range.long} ${canvas.scene.grid.units})`;
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
+                Hyp3eLogger.info("_prepareRangeData", msg);
                 rangeMessages.push(msg);
                 isOutOfRange = true;
             }
@@ -2064,7 +2026,7 @@ export class Hyp3eActor extends Actor {
             const spellRange = this._parseSpellRange(itemData.range);
             if (gridDistance > spellRange) {
                 const msg = `Target is out of spell range! (${gridDistance} ${canvas.scene.grid.units} > ${spellRange} ${canvas.scene.grid.units})`;
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_prepareRangeData: ${msg}`); }
+                Hyp3eLogger.info("_prepareRangeData", msg);
                 rangeMessages.push(msg);
                 isOutOfRange = true;
             }
@@ -2084,7 +2046,7 @@ export class Hyp3eActor extends Actor {
         for (let ammo of ammoList) {
             carriedAmmo[ammo._id] = `${ammo.name} (${ammo.system.quantity.value})`;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_getCarriedAmmo: Carried ammo:", carriedAmmo); }
+        Hyp3eLogger.info("_getCarriedAmmo", `Carried ammo:`, carriedAmmo);
         return carriedAmmo;
     }
 
@@ -2109,12 +2071,12 @@ export class Hyp3eActor extends Actor {
                 // Fallback for non-item rolls if needed, potentially reusing ShowAttackRollDialog
                 rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, {}, "", {}, "");
             }
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_showRollDialog: Dialog response:", rollResponse); }
+            Hyp3eLogger.info("_showRollDialog", `Dialog response:`, rollResponse);
             return rollResponse;
         } catch (err) {
             // Catch dialog cancellation (often returns null or throws specific error)
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_showRollDialog: Dialog closed or error:", err); }
-            return null; // Indicate cancellation
+            Hyp3eLogger.info("_showRollDialog", `Dialog closed or error:`, err);
+            return null;
         }
     }
 
@@ -2145,14 +2107,12 @@ export class Hyp3eActor extends Actor {
             const d20Die = atkRoll.dice.find(d => d.faces === 20);
             const naturalRoll = d20Die ? d20Die.results[0].result : 0;
 
-            if (CONFIG.HYP3E.debugMessages) {
-                console.log("rollAttackOrSpell/_executeRoll: Attack Roll:", atkRoll);
-                console.log("rollAttackOrSpell/_executeRoll: Roll Result:", atkRoll.total);
-                console.log("rollAttackOrSpell/_executeRoll: Natural d20 Roll:", naturalRoll);
-            }
+            Hyp3eLogger.info("_executeRoll", `Attack Roll:`, atkRoll);
+            Hyp3eLogger.info("_executeRoll", `Roll Result:`, atkRoll.total);
+            Hyp3eLogger.info("_executeRoll", `Natural d20 Roll:`, naturalRoll);
             return { atkRoll, naturalRoll };
         } catch (err) {
-            console.error("rollAttackOrSpell/_executeRoll: Error rolling formula:", rollFormula, err);
+            Hyp3eLogger.error("_executeRoll", `Error rolling formula:`, rollFormula, err);
             ui.notifications.error(`Error rolling formula: ${rollFormula}`);
             return { atkRoll: null, naturalRoll: 0 };
         }
@@ -2188,10 +2148,10 @@ export class Hyp3eActor extends Actor {
             if (total >= tn) {
                 hit = true;
                 attackTextResult = `<b>Hits a ${sizeFromTable} target!</b>`;
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_determineHitResult: Grenade Hit! ${total} >= ${tn}`); }
+                Hyp3eLogger.info("_determineHitResult", `Grenade Hit! ${total} >= ${tn}`);
             } else {
                 attackTextResult = `<b>Misses a ${sizeFromTable} target.</b>`;
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_determineHitResult: Grenade Miss! ${total} < ${tn}`); }
+                Hyp3eLogger.info("_determineHitResult", `Grenade Miss! ${total} < ${tn}`);
             }
         } else {
             // Normal attack TN based on AC
@@ -2201,23 +2161,23 @@ export class Hyp3eActor extends Actor {
             if (naturalRoll === 20) {
                 hit = true;
                 attackTextResult = `<span style='color:#00b34c'><b>Critical Hit!</b></span>`;
-                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_determineHitResult: Natural 20 Crit Hit!"); }
+                Hyp3eLogger.info("_determineHitResult", `Natural 20 Crit Hit!`);
                 if (game.settings.get(game.system.id, "critHit")) {
                     critFooterHTML = `<div class='critical-hit' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
                 }
             } else if (naturalRoll === 1) {
                 attackTextResult = `<span style='color:#e90000'><b>Critical Miss!</b></span>`;
-                if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_determineHitResult: Natural 1 Crit Miss!"); }
+                Hyp3eLogger.info("_determineHitResult", `Natural 1 Crit Miss!`);
                 if (game.settings.get(game.system.id, "critMiss")) {
                     critFooterHTML = `<div class='critical-miss' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
                 }
             } else if (total >= tn) {
                 hit = true;
                 attackTextResult = `<b>Hits AC ${hitAC}!</b>`;
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_determineHitResult: Hit! ${total} >= ${tn}`); }
+                Hyp3eLogger.info("_determineHitResult", `Hit! ${total} >= ${tn}`);
             } else {
                 attackTextResult = `<b>Miss${hitAC <= 9 ? `, would have hit AC ${hitAC}` : 'es AC 9'}.</b>`;
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_determineHitResult: Miss! ${total} < ${tn}`); }
+                Hyp3eLogger.info("_determineHitResult", `Miss! ${total} < ${tn}`);
             }
         }
 
@@ -2239,7 +2199,7 @@ export class Hyp3eActor extends Actor {
             formula: dmgObj.formula,
             debugFormula: dmgObj.debugFormula
         };
-        if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_prepareDamageFormulas: Damage formula:", dmgObj.formula); }
+        Hyp3eLogger.info("_prepareDamageFormulas", `Damage formula: ${dmgObj.formula}`);
 
         // Build secondary (e.g., 2-handed) damage formula if applicable
         if (itemData.damage2h) {
@@ -2247,7 +2207,7 @@ export class Hyp3eActor extends Actor {
                 formula: dmgObj.formula2h,
                 debugFormula: dmgObj.debugFormula2h
             };
-            if (CONFIG.HYP3E.debugMessages) { console.log("rollAttackOrSpell/_prepareDamageFormulas: Damage formula 2H:", dmgObj.formula2h); }
+            Hyp3eLogger.info("_prepareDamageFormulas", `Damage formula 2H: ${dmgObj.formula2h}`);
         }
         return dmgFormulas;
     }
@@ -2261,7 +2221,7 @@ export class Hyp3eActor extends Actor {
         // Use a regex to find the attack and damage bonus
         let mod = itemName.match(/\+(\d+)/g)
         // Log the regex results
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item mod regex:", mod) }
+        Hyp3eLogger.info("_parseItemMod", `Item mod regex: ${mod}`);
         // If we found a modifier, parse
         if (mod) {
             itemData.atkMod = parseInt(mod[0].replace("+", ""))
@@ -2275,7 +2235,7 @@ export class Hyp3eActor extends Actor {
             }
         }
         // Log the parsed item data
-        if (CONFIG.HYP3E.debugMessages) { console.log("Item mod data:", itemData) }
+        Hyp3eLogger.info("_parseItemMod", `Item mod data:`, itemData);
         return itemData
     }
 
@@ -2286,7 +2246,7 @@ export class Hyp3eActor extends Actor {
      * @returns {Object} sitModObj { sitMod: number, sitModsArr: Array }
      */
     _getCombatantSitMods(attacker, target) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Getting situational modifiers for attacker ${this.name}...`) }
+        Hyp3eLogger.info("_getCombatantSitMods", `Getting situational modifiers for attacker ${this.name}...`);
 
         // Our return object
         let sitModObj = {}
@@ -2300,7 +2260,7 @@ export class Hyp3eActor extends Actor {
             // attackerEffects = this._getAllApplicableEffects()
             attackerEffects = this.allApplicableEffects()
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Attacker effects:`, attackerEffects) }
+        Hyp3eLogger.info("_getCombatantSitMods", `Attacker effects:`, attackerEffects);
         // const effects = this._getEffectNames()
 
         // Hopefully we have a target!
@@ -2314,7 +2274,7 @@ export class Hyp3eActor extends Actor {
                 // targetEffects = target.actor._getAllApplicableEffects()
                 targetEffects = target.actor.allApplicableEffects()
             }
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effects:`, targetEffects) }
+            Hyp3eLogger.info("_getCombatantSitMods", `Target effects:`, targetEffects);
             // targetEffects = targetActor._getEffectNames()
         }
 
@@ -2324,11 +2284,11 @@ export class Hyp3eActor extends Actor {
         // Effect names can be arbitrary, what we care about is the token status/condition
         attackerEffects.forEach(effect => {
             if (!effect.disabled) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor effect statuses:`, effect.statuses) }
+                Hyp3eLogger.info("_getCombatantSitMods", `Actor effect statuses:`, effect.statuses);
                 // Does the effect apply a tempAtkMod?
                 const chg = effect.changes.find(c => c.key === "system.tempAtkMod")
                 if (chg) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Actor ${this.name} has tempAtkMod: ${chg.value}`) }
+                    Hyp3eLogger.info("_getCombatantSitMods", `Actor ${this.name} has tempAtkMod: ${chg.value}`);
                     // Add the tempAtkMod to the sitMod
                     sitModSum += parseInt(chg.value)
                     const changeString = parseInt(chg.value) > 0 ? `+${chg.value}` : `${chg.value}`
@@ -2354,7 +2314,7 @@ export class Hyp3eActor extends Actor {
         });
         // Hopefully we have a target!
         if (target) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target elevation (${target.document.elevation}) vs. Attacker elevation (${attacker.document.elevation})...`) }
+            Hyp3eLogger.info("_getCombatantSitMods", `Target elevation (${target.document.elevation}) vs. Attacker elevation (${attacker.document.elevation})...`);
             // Attacker on higher ground (token height vs. target token height)
             if (attacker.document.elevation > target.document.elevation) {
             // if (attacker.elevation > target.elevation) {
@@ -2371,7 +2331,7 @@ export class Hyp3eActor extends Actor {
             // Effect names can be arbitrary, what we care about is the token status/condition
             targetEffects.forEach(effect => {
                 if (!effect.disabled) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log(`_getCombatantSitMods: Target effect statuses:`, effect.statuses) }
+                    Hyp3eLogger.info("_getCombatantSitMods", `Target effect statuses:`, effect.statuses);
                     // Status effects that may not apply any changes...
                     //      The assumption here is that if an effect has at least one change 
                     //      being applied, it is probably modifying the target's AC. So we don't
@@ -2498,17 +2458,17 @@ export class Hyp3eActor extends Actor {
             const ammo = this.items.get(rollResponse.ammunition);
             if (ammo && ammo.system.quantity?.value > 0) {
                 ammoMods = this._parseItemMod(ammo.name);
-                if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeAmmoOrItem: Using ammo: ${ammo.name}`, ammo.system); }
+                Hyp3eLogger.info("_consumeAmmoOrItem", `Using ammo: ${ammo.name}`, ammo.system);
                 try {
                     await this.updateEmbeddedDocuments("Item", [
                         { _id: ammo.id, "system.quantity.value": ammo.system.quantity.value - 1 },
                     ]);
                     ammoUpdated = true;
                 } catch (err) {
-                    console.error(`rollAttackOrSpell/_consumeAmmoOrItem: Failed to update ammo quantity for ${ammo.name}:`, err);
+                    Hyp3eLogger.error("_consumeAmmoOrItem", `Failed to update ammo quantity for ${ammo.name}:`, err);
                 }
             } else if (rollResponse.ammunition && CONFIG.HYP3E.debugMessages) {
-                console.warn(`rollAttackOrSpell/_consumeAmmoOrItem: Selected ammo ${rollResponse.ammunition} not found or has 0 quantity.`);
+                Hyp3eLogger.warn("_consumeAmmoOrItem", `Selected ammo ${rollResponse.ammunition} not found or has 0 quantity.`);
             }
         } else if (item?.type === "weapon" && item.system.isConsumable) {
             // If the weapon itself is consumable (like a grenade), decrement its qty
@@ -2517,7 +2477,7 @@ export class Hyp3eActor extends Actor {
                     { _id: item.id, "system.quantity.value": item.system.quantity.value - 1 },
                 ]);
             } catch (err) {
-                console.error(`rollAttackOrSpell/_consumeAmmoOrItem: Failed to update quantity for ${item.name}:`, err);
+                Hyp3eLogger.error("_consumeAmmoOrItem", `Failed to update quantity for ${item.name}:`, err);
             }
         }
         return { ammoMods, ammoUpdated };
@@ -2528,13 +2488,13 @@ export class Hyp3eActor extends Actor {
      * @param {Item} spell - The spell being cast.
      */
     async _consumeSpellSlot(spell) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttackOrSpell/_consumeSpellSlot: Consuming memorized spell: ${spell.name}`); }
+        Hyp3eLogger.info("_consumeSpellSlot", `Consuming memorized spell: ${spell.name}`);
         try {
             await this.updateEmbeddedDocuments("Item", [
                 { _id: spell.id, "system.quantity.value": spell.system.quantity.value - 1 },
             ]);
         } catch (err) {
-            console.error(`rollAttackOrSpell/_consumeSpellSlot: Failed to update spell quantity for ${spell.name}:`, err);
+            Hyp3eLogger.error("_consumeSpellSlot", `Failed to update spell quantity for ${spell.name}:`, err);
         }
     }
 
@@ -2558,7 +2518,7 @@ export class Hyp3eActor extends Actor {
             ui.notifications.error(`Failed to load spell: ${spellUuid}`);
             return;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`useItemSpell: casting spell ${spell.name}:`, spell) };
+        Hyp3eLogger.info("useItemSpell", `Casting spell ${spell.name}:`, spell);;
 
         // Get spell charges to use
         const spellEntry = item.system.spellcasting.spellRefs.find(spell => spell.uuid === spellUuid)
@@ -2581,7 +2541,7 @@ export class Hyp3eActor extends Actor {
             "isItemSpell": true,
             "itemCa": item.system.spellcasting.ca
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("useItemSpell dataset:", dataset) };
+        Hyp3eLogger.info("useItemSpell", `Spell dataset:`, dataset);
         // Cast the spell as if from the actor, but override CA from item
         await this.rollItem(dataset)
 
@@ -2598,15 +2558,15 @@ export class Hyp3eActor extends Actor {
      * @returns - null
      */
     async toggleLightSource(itemId) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: actor ${this.name}:`, this); }
+        Hyp3eLogger.info("toggleLightSource", `Actor ${this.name}:`, this);
         const token = this?.token ?? this?.sheet?.token;
         if (!token) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: no token found for actor ${this.name}.`); }
+            Hyp3eLogger.warn("toggleLightSource", `No token found for actor ${this.name}.`);
             return;
         }
         const item = this.items.get(itemId);
         if (!item) {
-            if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: item ${itemId} not found for actor ${this.name}.`); }
+            Hyp3eLogger.warn("toggleLightSource", `item ${itemId} not found for actor ${this.name}.`);
             return;
         }
 
@@ -2618,16 +2578,16 @@ export class Hyp3eActor extends Actor {
             const activeEffects = this.effects.filter(e => e.name.startsWith("Light Source:"));
             if (activeEffects.length > 0) {
                 await activeEffects[0].delete();
-                if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: Light source active effect removed from actor ${this.name}.`); }
+                Hyp3eLogger.info("toggleLightSource", `Light source active effect removed from actor ${this.name}.`);
             } else {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: No active effect found for light source on actor ${this.name}.`); }
+                Hyp3eLogger.info("toggleLightSource", `No active effect found for light source on actor ${this.name}.`);
                 // Remove light source from token, if necessary (e.g., if it was applied directly)
                 await token.update({
                     "light": null
                 });
             }
             ui.notifications.info(`Light source removed from ${token.name}.`);
-            if (CONFIG.HYP3E.debugMessages) { console.log(`toggleLightSource: Light source removed from token ${token.name}.`); }
+            Hyp3eLogger.info("toggleLightSource", `Light source removed from token ${token.name}.`);
         } else {
             // Apply light source properties
             const lightProps = foundry.utils.deepClone(item.system.light);
@@ -2639,7 +2599,7 @@ export class Hyp3eActor extends Actor {
             } else {
                 lightProps.duration = null; // Default to null if no duration specified
             }
-            if (CONFIG.HYP3E.debugMessages) { console.log("Light source properties:", lightProps) }
+            Hyp3eLogger.info("toggleLightSource", `Light source properties:`, lightProps);
             if (Object.keys(lightProps).length > 0) {
                 ui.notifications.info(`Light source applied to ${token.name}.`);
 
@@ -2661,44 +2621,6 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Apply a light source to the actor's token.
-     * @param {*} dim - The radius of the dim light effect.
-     * @param {*} bright - The radius of the bright light effect.
-     * @param {*} angle - The angle of the light cone, in degrees.
-     * @param {*} lightData - (Optional) Additional light data to apply, such as color or intensity.
-     */
-    // async applyLightToSelf(dim, bright, angle, lightData = {}) {
-    //     const token = this?.token ?? this?.sheet?.token;
-    //     if (!token) {
-    //         if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: no token found for actor ${this.name}.`); }
-    //         return;
-    //     }
-
-        // Prepare the light data
-        // const lightSource = {
-        //     dim,
-        //     bright,
-        //     angle,
-        //     color: lightData.color || "#ffffff", // Default to white if no color provided
-        //     alpha: lightData.alpha || 0.5, // Default alpha
-        //     animation: lightData.animation || { type: "none" } // Default animation
-        // };
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: Applying light source to token ${token.name}:`, lightSource); }
-        // // Update the token with the light source
-        // try {
-        //     await token.update({
-        //         "light": lightSource,
-        //         "vision": true // Ensure the token can see
-        //     });
-        //     ui.notifications.info(`Light source applied to ${token.name}.`);
-        //     if (CONFIG.HYP3E.debugMessages) { console.log(`applyLightToSelf: Light source applied to token ${token.name}.`); }
-        // } catch (err) {
-        //     console.error(`applyLightToSelf: Failed to apply light source to token ${token.name}:`, err);
-        //     ui.notifications.error(`Failed to apply light source: ${err.message}`);
-        // }
-    // }
-
-    /**
      * Handle active effects that might expire, or events that occur, with a new turn.
      * @param {*} turn - The current game-world turn number.
      */
@@ -2706,7 +2628,7 @@ export class Hyp3eActor extends Actor {
         // Process active effects
         for (const effect of this.effects) {
             if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
-            if (CONFIG.HYP3E.debugMessages) { console.log(`advanceExplorationTurn: Processing effect ${effect.name} for actor ${this.name}...`, effect) }
+            Hyp3eLogger.info("advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
             // Check if the effect has a remaining turns flag
             const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
             // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
@@ -2736,7 +2658,7 @@ export class Hyp3eActor extends Actor {
         // Process active effects
         for (const effect of this.effects) {
             if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
-            if (CONFIG.HYP3E.debugMessages) { console.log(`retreatExplorationTurn: Processing effect ${effect.name} for actor ${this.name}...`, effect) }
+            Hyp3eLogger.info("retreatExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
             // Check if the effect has a remaining turns flag
             const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
             // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
@@ -2772,8 +2694,8 @@ export class Hyp3eActor extends Actor {
         */
         let assassinationHtml = ''
         let results = []
-        console.log("Assassination roll data: ", rollData)
-        console.log("Assassination target: ", target)
+        Hyp3eLogger.info("_resolveAssassination", `Assassination roll data:`, rollData)
+        Hyp3eLogger.info("_resolveAssassination", `Assassination target:`, target)
         const assassinLevel = parseInt(rollData.details.level.value)
         const baseSuccess = assassinLevel + 4
         const targetName = target.actor.name
@@ -2889,7 +2811,7 @@ export class Hyp3eActor extends Actor {
         }
         turnUndeadHtml += `</ul>`
 
-        if (CONFIG.HYP3E.debugMessages) { console.log("Turn Undead: ", turnUndeadHtml) }
+        Hyp3eLogger.info("_resolveTurnUndead", `Turn Undead:`, turnUndeadHtml);
         return turnUndeadHtml;
     }
 
