@@ -1,3 +1,5 @@
+import { Hyp3eLogger } from "./logger.mjs";
+
 /**
  * Find item names from folders or compendia based on inclusion and exclusion name fragments.
  * @param {string} includeFragments - Comma-separated name fragments to include (e.g., "equipment").
@@ -44,7 +46,7 @@ export async function findItemsByFolderOrCompendiumName(includeFragments, itemTy
         if (!shouldInclude(label) || shouldExclude(label)) continue;
 
         const index = await pack.getIndex({ fields: ["name", "type", "folder"] });
-        console.log(`Searching pack: ${pack.collection}:`, index);
+        Hyp3eLogger.info("findItemsByFolderOrCompendiumName", `Searching pack: ${pack.collection}:`, index);
         for (const entry of index) {
             // Check item type
             if (entry.type !== itemTypeFilter) continue;
@@ -56,7 +58,7 @@ export async function findItemsByFolderOrCompendiumName(includeFragments, itemTy
                 // Try to get folder from compendium metadata
                 const fullDoc = await pack.getDocument(entry._id);
                 folderName = fullDoc.folder?.name ?? null;
-                console.log(`Found folder name: ${folderName} for item ${entry.name} in pack ${pack.collection}`);
+                Hyp3eLogger.info("findItemsByFolderOrCompendiumName", `Found folder name: ${folderName} for item ${entry.name} in pack ${pack.collection}`);
             }
             // Apply folder name filters
             if (folderName) {

@@ -17,7 +17,7 @@ export class Hyp3eDialog {
             rollModes: CONFIG.Dice.rollModes,
             rollMode: rollMode
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("ShowBasicRollDialog: dataset: ", dataset) }
+        Hyp3eLogger.info("ShowBasicRollDialog", `Dialog dataset:`, dataset);
         const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
         const dialogHtml = await renderTemplate(template, dialogData)
 
@@ -37,11 +37,11 @@ export class Hyp3eDialog {
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
                             if (CONFIG.HYP3E.debugMessages) { 
-                                console.log('ShowBasicRollDialog: Form data object:', formDataObj)
+                                Hyp3eLogger.info("ShowBasicRollDialog", `Form data object:`, formDataObj)
                                 if (CONFIG.HYP3E.flipRollUnderMods) {
-                                    console.log("ShowBasicRollDialog: Rolling " + dataset.roll + " - " + formDataObj.sitMod + " ...")
+                                    Hyp3eLogger.info("ShowBasicRollDialog", `Rolling ${dataset.roll} - ${formDataObj.sitMod}...`)
                                 } else {
-                                    console.log("ShowBasicRollDialog: Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
+                                    Hyp3eLogger.info("ShowBasicRollDialog", `Rolling ${dataset.roll} + ${formDataObj.sitMod} ...`)
                                 }
                             }
                             resolve(formDataObj)
@@ -51,14 +51,14 @@ export class Hyp3eDialog {
                         icon: '<i class="fas fa-times"></i>',
                         label: "Cancel",
                         callback: (html) => {
-                            if (CONFIG.HYP3E.debugMessages) { console.log("ShowBasicRollDialog: Roll canceled!") }
+                            Hyp3eLogger.info("ShowBasicRollDialog", `Roll canceled!`)
                             reject()
                         }
                     }
                 },
                 default: "roll",
-                render: html => console.log("ShowBasicRollDialog: Register interactivity in the rendered dialog"),
-                close: html => console.log("ShowBasicRollDialog: Dialog closed")
+                render: html => Hyp3eLogger.info("ShowBasicRollDialog", `Register interactivity in the rendered dialog`),
+                close: html => Hyp3eLogger.info("ShowBasicRollDialog", `Dialog closed`)
             })
             rollDialog.render(true)
         })
@@ -81,9 +81,9 @@ export class Hyp3eDialog {
             chosen: chosen
         }
         // Log dataset, ammo, ranges
-        if (CONFIG.HYP3E.debugMessages) { console.log("ShowAttackRollDialog: dataset: ", dataset) }
-        if (CONFIG.HYP3E.debugMessages) { console.log("ShowAttackRollDialog: ammo types: ", ammoTypes) }
-        if (CONFIG.HYP3E.debugMessages) { console.log("ShowAttackRollDialog: ranges: ", ranges) }
+        Hyp3eLogger.info("ShowAttackRollDialog", `Dialog dataset:`, dataset);
+        Hyp3eLogger.info("ShowAttackRollDialog", `Ammo types:`, ammoTypes);
+        Hyp3eLogger.info("ShowAttackRollDialog", `Weapon ranges:`, ranges);
         const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
         const dialogHtml = await renderTemplate(template, dialogData)
 
@@ -102,10 +102,8 @@ export class Hyp3eDialog {
                             const formDataObj = formData.object
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            if (CONFIG.HYP3E.debugMessages) { 
-                                console.log('Form data object:', formDataObj) 
-                                console.log("Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-                            }
+                            Hyp3eLogger.info("ShowAttackRollDialog", `Form data object:`, formDataObj) 
+                            Hyp3eLogger.info("ShowAttackRollDialog", `Rolling ${dataset.roll} + ${formDataObj.sitMod}...`)
                             resolve(formDataObj)
                         }
                     },
@@ -113,14 +111,14 @@ export class Hyp3eDialog {
                         icon: '<i class="fas fa-times"></i>',
                         label: "Cancel",
                         callback: (html) => {
-                            if (CONFIG.HYP3E.debugMessages) { console.log("ShowAttackRollDialog: Roll canceled!") }
+                            Hyp3eLogger.info("ShowAttackRollDialog", `Roll canceled!`);
                             reject()
                         }
                     }
                 },
                 default: "roll",
-                render: html => console.log("ShowAttackRollDialog: Register interactivity in the rendered dialog"),
-                close: html => console.log("ShowAttackRollDialog: Dialog closed")
+                render: html => Hyp3eLogger.info("ShowAttackRollDialog", `Register interactivity in the rendered dialog`),
+                close: html => Hyp3eLogger.info("ShowAttackRollDialog", `Dialog closed`)
             })
             rollDialog.render(true)
         })
@@ -140,7 +138,7 @@ export class Hyp3eDialog {
             rollModes: CONFIG.Dice.rollModes,
             rollMode: rollMode
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("ShowSpellcastingDialog: dataset: ", dataset) }
+        Hyp3eLogger.info("ShowSpellcastingDialog", `Dialog dataset:`, dataset);
         const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
         const dialogHtml = await renderTemplate(template, dialogData)
 
@@ -159,10 +157,8 @@ export class Hyp3eDialog {
                             const formDataObj = formData.object
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            if (CONFIG.HYP3E.debugMessages) {
-                                console.log('ShowSpellcastingDialog: Form data object:', formDataObj)
-                                console.log("ShowSpellcastingDialog: Rolling " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-                            }
+                            Hyp3eLogger.info("ShowSpellcastingDialog", `Form data object:`, formDataObj)
+                            Hyp3eLogger.info("ShowSpellcastingDialog", `Rolling ${dataset.roll} + ${formDataObj.sitMod}...`)
                             resolve(formDataObj)
                         }
                     },
@@ -170,14 +166,14 @@ export class Hyp3eDialog {
                         icon: '<i class="fas fa-times"></i>',
                         label: "Cancel",
                         callback: (html) => {
-                            console.log("ShowSpellcastingDialog: Roll canceled!")
+                            Hyp3eLogger.info("ShowSpellcastingDialog", `Roll canceled!`)
                             reject()
                         }
                     }
                 },
                 default: "roll",
-                render: html => console.log("ShowSpellcastingDialog: Register interactivity in the rendered dialog"),
-                close: html => console.log("ShowSpellcastingDialog: Dialog closed")
+                render: html => Hyp3eLogger.info("ShowSpellcastingDialog", `Register interactivity in the rendered dialog`),
+                close: html => Hyp3eLogger.info("ShowSpellcastingDialog", `Dialog closed`)
             })
             rollDialog.render(true)
         })
@@ -199,7 +195,7 @@ export class Hyp3eDialog {
             rollModes: CONFIG.Dice.rollModes,
             rollMode: rollMode
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log("ShowSaveRollDialog: dataset: ", dataset) }
+        Hyp3eLogger.info("ShowSaveRollDialog", `Dialog dataset:`, dataset);
         const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
         const dialogHtml = await renderTemplate(template, dialogData)
 
@@ -218,10 +214,8 @@ export class Hyp3eDialog {
                             const formDataObj = formData.object
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            if (CONFIG.HYP3E.debugMessages) {
-                                console.log('ShowSaveRollDialog: Form data object:', formDataObj)
-                                console.log("ShowSaveRollDialog: Rolling basic save: " + dataset.roll + " + " + formDataObj.sitMod + " ...")
-                            }
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Form data object:`, formDataObj)
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling basic save: ${dataset.roll} + ${formDataObj.sitMod}...`)
                             resolve(formDataObj)
                         }
                     },
@@ -235,10 +229,8 @@ export class Hyp3eDialog {
                             formDataObj.avoidMod = dataset.avoidMod
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            if (CONFIG.HYP3E.debugMessages) {
-                                console.log('ShowSaveRollDialog: Form data object:', formDataObj)
-                                console.log("ShowSaveRollDialog: Rolling save with Avoidance mod: " + dataset.roll + " + " + formDataObj.avoidMod + " + " + formDataObj.sitMod + " ...")
-                            }
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Form data object:`, formDataObj)
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling save with Avoidance mod: ${dataset.roll} + ${formDataObj.avoidMod} + ${formDataObj.sitMod}...`)
                             resolve(formDataObj)
                         }
                     },
@@ -252,10 +244,8 @@ export class Hyp3eDialog {
                             formDataObj.poisonMod = dataset.poisonMod
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            if (CONFIG.HYP3E.debugMessages) {
-                                console.log('ShowSaveRollDialog: Form data object:', formDataObj)
-                                console.log("ShowSaveRollDialog: Rolling save with Poison/Radiation mod: " + dataset.roll + " + " + formDataObj.poisonMod + " + " + formDataObj.sitMod + " ...")
-                            }
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Form data object:`, formDataObj)
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling save with Poison/Radiation mod: ${dataset.roll} + ${formDataObj.poisonMod} + ${formDataObj.sitMod}...`)
                             resolve(formDataObj)
                         }
                     },
@@ -269,10 +259,8 @@ export class Hyp3eDialog {
                             formDataObj.willMod = dataset.willMod
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            if (CONFIG.HYP3E.debugMessages) {
-                                console.log('ShowSaveRollDialog: Form data object:', formDataObj)
-                                console.log("ShowSaveRollDialog: Rolling save with Willpower mod: " + dataset.roll + " + " + formDataObj.willMod + " + " + formDataObj.sitMod + " ...")
-                            }
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Form data object:`, formDataObj)
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling save with Willpower mod: ${dataset.roll} + ${formDataObj.willMod} + ${formDataObj.sitMod}...`)
                             resolve(formDataObj)
                         }
                     },
@@ -280,14 +268,14 @@ export class Hyp3eDialog {
                         icon: '<i class="fas fa-times"></i>',
                         label: "Cancel",
                         callback: (html) => {
-                            console.log("ShowSaveRollDialog: Roll canceled!")
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Roll canceled!`)
                             reject()
                         }
                     }
                 },
                 default: "roll",
-                render: html => console.log("ShowSaveRollDialog: Register interactivity in the rendered dialog"),
-                close: html => console.log("ShowSaveRollDialog: Dialog closed")
+                render: html => Hyp3eLogger.info("ShowSaveRollDialog", `Register interactivity in the rendered dialog`),
+                close: html => Hyp3eLogger.info("ShowSaveRollDialog", `Dialog closed`)
             })
             rollDialog.render(true)
         })
@@ -322,8 +310,8 @@ export class Hyp3eDialog {
                     }
                 },
                 default: "cancel",
-                render: html => console.log("ShowSetModifiersDialog: Register interactivity in the rendered dialog"),
-                close: html => console.log("ShowSetModifiersDialog: Dialog closed")
+                render: html => Hyp3eLogger.info("ShowSetModifiersDialog", `Register interactivity in the rendered dialog`),
+                close: html => Hyp3eLogger.info("ShowSetModifiersDialog", `Dialog closed`)
             }).render(true);
         })
     }
@@ -357,8 +345,8 @@ export class Hyp3eDialog {
                     }
                 },
                 default: "cancel",
-                render: html => console.log("ShowLevelUpDialog: Register interactivity in the rendered dialog"),
-                close: html => console.log("ShowLevelUpDialog: Dialog closed")
+                render: html => Hyp3eLogger.info("ShowLevelUpDialog", `Register interactivity in the rendered dialog`),
+                close: html => Hyp3eLogger.info("ShowLevelUpDialog", `Dialog closed`)
             }).render(true);
         })
     }
