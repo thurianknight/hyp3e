@@ -1,3 +1,4 @@
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3ECombatant } from "./combatant.mjs";
 
 export class HYP3EGroupCombatant extends HYP3ECombatant {

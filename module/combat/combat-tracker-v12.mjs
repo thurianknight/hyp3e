@@ -1,4 +1,5 @@
 import HYP3E from "../helpers/config.mjs";
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3EGroupCombat } from "./combat-group.mjs";
 import HYP3ECombatGroupSelector from "./combat-set-groups.mjs";
 

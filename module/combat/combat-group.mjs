@@ -1,4 +1,5 @@
 import HYP3E from "../helpers/config.mjs";
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3ECombat } from "./combat.mjs";
 
 export const colorGroups = HYP3E.colors;
@@ -20,7 +21,6 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     // ===========================================================================
 
     static get GROUPS () {
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`Color Groups:`, colorGroups) }
         return {
             ...colorGroups,
             ...actionGroups,

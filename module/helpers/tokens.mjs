@@ -34,7 +34,6 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
 
     const actor = token.actor;
     if (!actor) return;
-    // if (CONFIG.HYP3E.debugMessages) { console.log("overlayEquippedWeaponAndShield: Processing token:", token) }
 
     // Get equipped weapons/shields
     const equippedWeapons = actor.items.filter(i =>
@@ -68,7 +67,6 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
     }
     // Finally, flip the order of items so that the first item will appear on top
     // equippedWeapons.reverse();
-    // if (CONFIG.HYP3E.debugMessages) { console.log("overlayEquippedWeaponAndShield: Equipped gear: ", equippedWeapons) }
 
     // Create overlay container
     const container = new PIXI.Container();
@@ -109,8 +107,7 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
 
             container.addChild(sprite);
         } catch (err) {
-            console.error("overlayEquippedWeaponAndShield: Error loading texture for item", item.name, item.img, err);
+            Hyp3eLogger.error("overlayEquippedWeaponAndShield", `Error loading image ${item.img} for item ${item.name}:`, err);
         }
     }
-    // if (CONFIG.HYP3E.debugMessages) { console.log(`overlayEquippedWeaponAndShield: Weapon overlay added for ${token.name}:`, token, equippedWeapons.map(i => i.name)); }
 }

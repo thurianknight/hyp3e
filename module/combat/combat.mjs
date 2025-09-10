@@ -1,7 +1,8 @@
+import { Hyp3eLogger } from "../helpers/logger.mjs";
+
 /**
  * @file System-level modifications to the way combat works
  */
-
 /**
  * An extension of Foundry's Combat class that implements initiative for indivitual combatants.
  */

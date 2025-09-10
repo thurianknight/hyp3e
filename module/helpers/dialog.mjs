@@ -1,4 +1,5 @@
 import { HYP3E } from "./config.mjs"
+import { Hyp3eLogger } from "./logger.mjs"
 
 export class Hyp3eDialog {
     /**

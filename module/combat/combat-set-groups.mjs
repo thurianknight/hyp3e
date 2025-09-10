@@ -1,4 +1,5 @@
 import HYP3E from "../helpers/config.mjs";
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { colorGroups } from "./combat-group.mjs";
 
 const {

@@ -1,3 +1,5 @@
+import { Hyp3eLogger } from "./logger.mjs";
+
 /**
  * Manage Active Effect instances through the Actor Sheet via effect control buttons.
  * @param {MouseEvent} event      The left-click event on the effect control
@@ -240,7 +242,6 @@ export async function setupEffectHandlers() {
                             console.log(`updateActiveEffect: Restored original light for token ${token.name}`);
                         } else {
                             await token.document.update({ light: null });
-                            console.warn(`updateActiveEffect: Removed light source from token ${token.name}`);
                         }
                     }
                 }
@@ -364,7 +365,7 @@ export async function checkAndResolveDuration(effect) {
             }
             updated = true;
         } catch (err) {
-            console.error("checkAndResolveDuration: Invalid duration formula:", formula, err);
+            Hyp3eLogger.error("checkAndResolveDuration", `Invalid duration formula: ${formula}`, err);
         }
     }
     if (CONFIG.HYP3E.debugMessages) { console.log(`checkAndResolveDuration: Return data:`, { updatedDuration, updated }) };

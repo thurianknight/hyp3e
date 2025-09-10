@@ -1,3 +1,5 @@
+import { Hyp3eLogger } from "../helpers/logger.mjs";
+
 export class HYP3ECombatant extends Combatant {
     // These are added to the initiative roll + DX of an actor, to position them in order high to low
     static INITIATIVE_MOD_MELEE = 0.80

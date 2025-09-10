@@ -1,5 +1,6 @@
 import { Hyp3eActor } from "../documents/actor.mjs";
 import {Hyp3eDialog} from "./dialog.mjs";
+import { Hyp3eLogger } from "./logger.mjs";
 
 /**
  * Hyp3eCharacter class
@@ -3640,7 +3641,6 @@ export class Hyp3eCharacter {
 
     static _valueFromTable(table, val) {
         let output;
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`_valueFromTable:`, table, val) }
         for (let i = 0; i <= val; i++) {
             if (table[i] != undefined) {
                 output = table[i];
@@ -3650,14 +3650,13 @@ export class Hyp3eCharacter {
     }
 
     static _stringFromTable(table, val) {
-        // if (CONFIG.HYP3E.debugMessages) { console.log(`_stringFromTable:`, table, val) }
         let output = ""
         output = table[val]
         return output
     }
 
     static isAttributeLow(actorData, attr) {
-        if (CONFIG.HYP3E.debugMessages) { console.log(`Checking ${attr} attribute for ${actorData.details.class}...`) }
+        Hyp3eLogger.info("isAttributeLow", `Checking ${attr} attribute for ${actorData.details.class}...`)
         const attrReqs = this.classData[actorData.details.class]?.attrReqs || CONFIG.HYP3E.customClassData[actorData.details.class];
         if (attrReqs[attr]) {
             if (actorData.attributes[attr].value < attrReqs[attr]) {
@@ -3673,15 +3672,15 @@ export class Hyp3eCharacter {
      * @return {boolean} Success or failure of the character creation.
      */
     static async quickCreateCharacter(dataset) {
-        if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: dataset:", dataset) };
+        Hyp3eLogger.info("quickCreateCharacter", `Incoming dataset:`, dataset);
         let actor = game.actors.get(dataset.actorId)
         if (!actor) {
-            console.error(`levelUp: Actor not found for id ${dataset.actorId}`);
+            Hyp3eLogger.error("quickCreateCharacter", `Actor not found for id ${dataset.actorId}`);
             return false;
         }
 
         const attributes = await this.rollAttributesForClass(actor, dataset);
-        if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: Attributes:", attributes) };
+        Hyp3eLogger.info("quickCreateCharacter", `Attributes:`, attributes);
         if (attributes) {
             // Set the attributes in the actor
             for (let [k, v] of Object.entries(attributes)) {
@@ -3693,7 +3692,7 @@ export class Hyp3eCharacter {
 
             const roll = new Roll(`${actor.system.hd} + ${actor.system.attributes.con.hpMod}`);
             await roll.evaluate({ evaluateSync: true });
-            if (CONFIG.HYP3E.debugMessages) { console.log("quickCreateCharacter: HP roll result: ", roll) }
+            Hyp3eLogger.info("quickCreateCharacter", `HP roll result:`, roll);
             if (roll != undefined && roll.total != undefined) {
                 await actor.update({
                     system: {
@@ -3707,11 +3706,11 @@ export class Hyp3eCharacter {
                 actor.system.hp.value = roll.total;
                 actor.system.hp.max = roll.total;
             } else {
-                console.error("quickCreateCharacter: HP roll failed to evaluate properly.");
+                Hyp3eLogger.error("quickCreateCharacter", `HP roll failed to evaluate properly.`);
                 return false;
             }
         } else {
-            console.error("quickCreateCharacter: Attributes roll failed.");
+            Hyp3eLogger.error("quickCreateCharacter", `Attributes roll failed.`);
             return false;
         }
         // Now we check to see if the Items directory has the folders & items we need.
@@ -3793,26 +3792,26 @@ export class Hyp3eCharacter {
      */
     static async rollAttributesForClass(actor, dataset) {
         const charClass = actor.system.details.class;
-        console.log(`rollAttributesForClass: class to roll:`, charClass);
+        Hyp3eLogger.info("rollAttributesForClass", `Class to roll:`, charClass);
         // Get the class attribute requirements
         let classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
         if (!classData) {
-            console.error(`rollAttributesForClass: Class data not found for class ${charClass}!`);
+            Hyp3eLogger.error("rollAttributesForClass", `Class data not found for class ${charClass}!`);
             return null;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttributesForClass: Creating character of class ${charClass}, starting with class data:`, classData) }
+        Hyp3eLogger.info("rollAttributesForClass", `Creating character of class ${charClass}, starting with class data:`, classData);
 
         // Roll attributes down the line, retry until we get a set that meets the class requirements
-        if (CONFIG.HYP3E.debugMessages) { console.log(`rollAttributesForClass: Rolling attributes for class ${charClass}`) }
+        Hyp3eLogger.info("rollAttributesForClass", `Rolling attributes for class ${charClass}`);
         let metReqs = false;
         let attributes = {};
         while (!metReqs) {
             attributes = await this._rollAttributes(actor);
             metReqs = await this._checkAttrRequirements(charClass, attributes);
             if (metReqs) {
-                console.log(`rollAttributesForClass: Character meets class requirements for ${charClass}, attributes rolled:`, attributes);
+                Hyp3eLogger.info("rollAttributesForClass", `Character meets class requirements for ${charClass}, attributes rolled:`, attributes);
             } else {
-                console.warn(`rollAttributesForClass: Character does not meet class requirements for ${charClass}, rolling again...`)
+                Hyp3eLogger.warn("rollAttributesForClass", `Character does not meet class requirements for ${charClass}, rolling again...`)
             }
         }
         // If we reach here, we have a set of attributes that meets the class requirements
@@ -3821,33 +3820,32 @@ export class Hyp3eCharacter {
 
     static async _rollAttributes(actor) {
         const rollFormula = game.settings.get(game.system.id, "quickCreateChars")
-        console.log(`_rollAttributes: Rolling attributes using formula ${rollFormula} down the line...`);
+        Hyp3eLogger.info("_rollAttributes", `Rolling attributes using formula ${rollFormula} down the line...`);
         // Just roll and return the attributes
         let attributes = {};
         for (const attr of Object.keys(actor.system.attributes)) {
             // Roll specified formula for each attribute
             let roll = new Roll(rollFormula);
             await roll.roll();
-            if (CONFIG.HYP3E.debugMessages) { console.log(`_rollAttributes: Rolled ${roll.total} for attribute ${attr}`) }
             attributes[attr] = roll.total;
         }
-        if (CONFIG.HYP3E.debugMessages) { console.log(`_rollAttributes: Rolled attributes:`, attributes) }
+        Hyp3eLogger.info("_rollAttributes", `Rolled attributes:`, attributes);
         return attributes;
     }
 
     static async _checkAttrRequirements(charClass, attributes) {
         const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
         if (!classData) {
-            console.error(`_checkAttrRequirements: Class data not found for class ${charClass}!`);
+            Hyp3eLogger.error("_checkAttrRequirements", `Class data not found for class ${charClass}!`);
             return false;
         }
-        console.log(`_checkAttrRequirements: Checking attribute list:`, attributes);
+        Hyp3eLogger.info("_checkAttrRequirements", `Checking attribute list:`, attributes);
 
         // Check if the character meets the attribute requirements
         for (const [attr, minValue] of Object.entries(classData.attrReqs)) {
-            console.log(`_checkAttrRequirements: Checking ${attr} requirement for class ${charClass}: Required: ${minValue}, Rolled: ${attributes[attr]}`);
+            Hyp3eLogger.info("_checkAttrRequirements", `Checking ${attr} requirement for class ${charClass}: Required: ${minValue}, Rolled: ${attributes[attr]}`);
             if (attributes[attr] < minValue) {
-                console.warn(`_checkAttrRequirements: Character does not meet ${attr} requirement for class ${charClass}. Required: ${minValue}, Rolled: ${attributes[attr]}`);
+                Hyp3eLogger.warn("_checkAttrRequirements", `Character does not meet ${attr} requirement for class ${charClass}. Required: ${minValue}, Rolled: ${attributes[attr]}`);
                 return false;
             }
         }
@@ -3867,17 +3865,17 @@ export class Hyp3eCharacter {
         const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
 
         if (!classData) {
-            console.error(`getDefaultItemsForClass: Class data not found for class ${charClass}!`);
+            Hyp3eLogger.error("getDefaultItemsForClass", `Class data not found for class ${charClass}!`);
             return [];
         }
 
         const startingItems = classData.startingPack?.[packKey];
         if (!Array.isArray(startingItems) || startingItems.length === 0) {
-            console.warn(`getDefaultItemsForClass: No starting ${itemType} defined for class ${charClass}.`);
+            Hyp3eLogger.warn("getDefaultItemsForClass", `No starting ${itemType} defined for class ${charClass}.`);
             return [];
         }
 
-        console.log(`getDefaultItemsForClass: Getting default ${itemType} for ${charClass}:`, startingItems);
+        Hyp3eLogger.info("getDefaultItemsForClass", `Getting default ${itemType} for ${charClass}:`, startingItems);
 
         // Build compendium list
         let compendiaList = [];
@@ -3897,7 +3895,7 @@ export class Hyp3eCharacter {
             );
             compendiaList.push(...matchingPacks);
         }
-        console.log(`getDefaultItemsForClass: Compendium list for ${itemType}:`, compendiaList.map(p => p.metadata.label));
+        Hyp3eLogger.info("getDefaultItemsForClass", `Compendium list for ${itemType}:`, compendiaList.map(p => p.metadata.label));
 
         const results = [];
 
@@ -3913,7 +3911,7 @@ export class Hyp3eCharacter {
                 if (folderNames.includes(folder)) {
                     newItem = item.toObject();
                     newItem.system.quantity = { value: quantity, max: quantity };
-                    console.log(`getDefaultItemsForClass: Found ${itemType} in folder: ${folder}`, newItem);
+                    Hyp3eLogger.info("getDefaultItemsForClass", `Found ${itemType} in folder ${folder}:`, newItem);
                     break;
                 }
             }
@@ -3927,7 +3925,7 @@ export class Hyp3eCharacter {
                         const doc = await pack.getDocument(compMatch._id);
                         newItem = doc.toObject();
                         newItem.system.quantity = { value: quantity, max: quantity };
-                        console.log(`getDefaultItemsForClass: Found ${itemType} in compendium: ${pack.metadata.label}`, newItem);
+                        Hyp3eLogger.info("getDefaultItemsForClass", `Found ${itemType} in compendium ${pack.metadata.label}:`, newItem);
                         break;
                     }
                 }
@@ -3935,7 +3933,7 @@ export class Hyp3eCharacter {
 
             // Fallback item
             if (!newItem) {
-            console.warn(`Item ${entry.name} not found. Creating fallback.`);
+            Hyp3eLogger.warn("getDefaultItemsForClass", `Item ${entry.name} not found. Creating fallback.`);
             newItem = {
                 name: entry.name,
                 type: itemType,
@@ -3964,15 +3962,15 @@ export class Hyp3eCharacter {
         const charClass = actor.system.details.class;
         const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
         if (!classData) {
-            console.error(`getStartingGoldForClass: Class data not found for class ${charClass}!`);
+            Hyp3eLogger.error("getStartingGoldForClass", `Class data not found for class ${charClass}!`);
             return 0;
         }
-        console.log(`getStartingGoldForClass: Getting starting gold for class ${charClass}:`, classData.startingPack.gold);
+        Hyp3eLogger.info("getStartingGoldForClass", `Getting starting gold for class ${charClass}:`, classData.startingPack.gold);
         // Roll the starting gold using the defined formula
         const rollFormula = classData.startingPack.gold;
         const roll = new Roll(rollFormula);
         await roll.roll();
-        if (CONFIG.HYP3E.debugMessages) { console.log(`getStartingGoldForClass: Rolled ${roll.total} gold for class ${charClass}`) }
+        Hyp3eLogger.info("getStartingGoldForClass", `Rolled ${roll.total} gold for class ${charClass}`);
         // Return the rolled gold amount
         return roll.total;
     }
@@ -3982,15 +3980,13 @@ export class Hyp3eCharacter {
      * @param {*} dataset
      */
     static async levelUp(dataset) {
-        console.log("levelUp: Checking XP for level up...")
-
         let actor = game.actors.get(dataset.actorId)
         if (!actor) {
-            console.error(`levelUp: Actor not found for id ${dataset.actorId}`);
+            Hyp3eLogger.error("levelUp", `Actor not found for id ${dataset.actorId}`);
             return false;
         }
         // Log the dataset before the dialog renders
-        if (CONFIG.HYP3E.debugMessages) { console.log(`levelUp: ${actor.name} dataset: `, dataset) }
+        Hyp3eLogger.info("levelUp", `${actor.name} dataset: `, dataset);
 
         // Get the class & level data
         let thisClass = this.classData[actor.system.details.class] || CONFIG.HYP3E.customClassData[actor.system.details.class];
@@ -4006,7 +4002,7 @@ export class Hyp3eCharacter {
         try {
             let rollResponse = await Hyp3eDialog.ShowLevelUpDialog(dataset)
         } catch(err) {
-            console.log(`levelUp: Dialog error ${err}`);
+            Hyp3eLogger.error("levelUp", `Dialog error:`, err);
             return false;
         }
 
@@ -4027,12 +4023,12 @@ export class Hyp3eCharacter {
         let currentXp = parseInt((data.details.xp.value).replace(/,|\./g, ""))
         if (currentXp < requiredXp) {
             ui.notifications.warn(`Not enough XP to level up! ${currentXp} < ${requiredXp}`)
-            console.log(`levelUp: Not enough XP to level up! ${currentXp} < ${requiredXp}`)
+            Hyp3eLogger.info("levelUp", `Not enough XP to level up! ${currentXp} < ${requiredXp}`)
             return false
         }
 
         // Yes, we can level up
-        console.log(`levelUp: Leveling up ${actor.name} to level ${nextLevel}...`)
+        Hyp3eLogger.info("levelUp", `Leveling up ${actor.name} to level ${nextLevel}...`)
         // Update the actor's level and next-level XP
         data.details.level.value = nextLevel
         data.details.xp.toNextLvl = nextLevelXp
@@ -4041,11 +4037,13 @@ export class Hyp3eCharacter {
         const hpRoll = thisClass.levelAdvancement[nextLevel].hpRoll
         const roll = new Roll(`${hpRoll} + ${data.attributes.con.hpMod}`);
         await roll.roll();
-        if (CONFIG.HYP3E.debugMessages) { console.log("levelUp: HP roll result: ", roll) }
+        Hyp3eLogger.info("levelUp", `HP roll result:`, roll);
         if (roll != undefined && roll.total != undefined) {
             hpIncrease = roll.total;
             data.hp.value = parseInt(data.hp.value) + hpIncrease
             data.hp.max = parseInt(data.hp.max) + hpIncrease
+        } else {
+            Hyp3eLogger.error("levelUp", `HP roll failed!`)
         }
         // Update fighting ability, casting ability, and turning ability
         data.fa = thisClass.levelAdvancement[nextLevel].fa
@@ -4105,16 +4103,16 @@ export class Hyp3eCharacter {
 
         // Apply updates to the actor
         try {
-            if (CONFIG.HYP3E.debugMessages) { console.log('levelUp: Updated level data:', updateData) }
+            Hyp3eLogger.info("levelUp", `Updated level data:`, updateData);
             if(actor.validate(updateData)) {
-                if (CONFIG.HYP3E.debugMessages) { console.log('levelUp: Validation OK, executing update...') }
+                Hyp3eLogger.info("levelUp", `Validation OK, executing update...`);
                 // Update the main actor data
                 await actor.update(updateData)
                 // Log the actor data after updating
-                if (CONFIG.HYP3E.debugMessages) { console.log('levelUp: Actor after update:', actor.system) }
+                Hyp3eLogger.info("levelUp", `Actor after update:`, actor);
             }
         } catch(err) {
-            console.log(`levelUp: Actor update error: ${err}`)
+            Hyp3eLogger.error("levelUp", `Actor update error:`, err)
         }
 
         // Update the actor with the new data
@@ -4157,22 +4155,20 @@ export class Hyp3eCharacter {
      * @param {*} dataset 
      */
     static async setAttributeMods(dataset, skipPrompt = false) {
-        console.log("setAttributeMods: Setting attribute modifiers...")
-
         let actor = game.actors.get(dataset.actorId)
         if (!actor) {
-            console.error(`setAttributeMods: Actor not found for id ${dataset.actorId}`)
+            Hyp3eLogger.error("setAttributeMods", `Actor not found for id ${dataset.actorId}`)
             return false
         }
         // Log the dataset before the dialog renders
-        if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: ${actor.name} dataset: `, dataset) }
+        Hyp3eLogger.info("setAttributeMods", `${actor.name} dataset: `, dataset);
 
         if (!skipPrompt) {
             // Display the confirmation dialog, and exit if the user cancels this action
             try {
                 let rollResponse = await Hyp3eDialog.ShowSetModifiersDialog(dataset)
             } catch(err) {
-                console.log(`setAttributeMods: Dialog error ${err}`)
+                Hyp3eLogger.error("setAttributeMods", `Roll dialog error:`, err)
                 return false
             }
         }
@@ -4188,13 +4184,13 @@ export class Hyp3eCharacter {
         let content = `<ul>`
 
         // Here we modify the cloned data object of the actor...
-        if (CONFIG.HYP3E.debugMessages) { console.log("setAttributeMods: cloned Actor system data:", data) }
+        Hyp3eLogger.info("setAttributeMods", `Cloned Actor system data:`, data);
         if (data.details.class) {
             // Override label if character class selected
             label = `<div class='medium-bold'>Values for ${data.details.class} updated...</div>`
-            if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${data.details.class} hit die...`) }
+            Hyp3eLogger.info("setAttributeMods", `Setting ${data.details.class} hit die...`);
             thisClass = this.classData[data.details.class] || CONFIG.HYP3E.customClassData[data.details.class];
-            if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Class Data for ${data.details.class}: `, thisClass) }
+            Hyp3eLogger.info("setAttributeMods", `Class Data for ${data.details.class}:`, thisClass);
             data.hd = thisClass.hitDie
             content += `<li>Hit Die: ${thisClass.hitDie}</li>`
             data.fa = thisClass.fa
@@ -4202,7 +4198,7 @@ export class Hyp3eCharacter {
             data.ca = thisClass.ca
             content += `<li>Casting Ability: ${thisClass.ca}</li>`
             if (thisClass?.spellLists && thisClass.spellLists.length > 0) {
-                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${data.details.class} spell lists...`) }
+                Hyp3eLogger.info("setAttributeMods", `Setting ${data.details.class} spell lists...`);
                 data.spellList = thisClass.spellLists[0]
                 data.spellList2 = thisClass.spellLists.length > 1 ? thisClass.spellLists[1] : null
                 if (data.spellList2 && data.spellList2 != "") {
@@ -4235,7 +4231,7 @@ export class Hyp3eCharacter {
             for (let [k, v] of Object.entries(data.attributes)) {
                 switch (k) {
                     case "str":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${k} modifiers...`) }
+                        Hyp3eLogger.info("setAttributeMods", `Setting ${k} modifiers...`);
                         content += `<li>ST Mods:</li><ul>`
                         data.attributes.str.atkMod = this._valueFromTable(this.strAtkMod, data.attributes.str.value)
                         content += `<li>Melee Attack Mod: ${data.attributes.str.atkMod}</li>`
@@ -4248,13 +4244,13 @@ export class Hyp3eCharacter {
                         if (data.details.class) {
                             // Check if ST does not meet attribute pre-req for this class
                             if (thisClass.attrReqs.str) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking ST requirements for ${data.details.class}...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking ST requirements for ${data.details.class}...`);
                                 if (data.attributes.str.value < thisClass.attrReqs.str) {
                                     ui.notifications.warn(`ST is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.str) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking XP bonus on high ST...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking XP bonus on high ST...`);
                                 if (data.attributes.str.value >= thisClass.xpBonusReq.str && xpBonusPossible != false) {
                                     xpBonusPossible = true
                                 } else {
@@ -4267,7 +4263,7 @@ export class Hyp3eCharacter {
                                 }
                             }
                             if (thisClass.featBonus && thisClass.featBonus.str) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking for Extraordinary Feat of ST...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking for Extraordinary Feat of ST...`);
                                 data.attributes.str.feat += thisClass.featBonus.str
                                 content += `<li>Extraordinary Feat of ST override: ${data.attributes.str.feat}</li>`
                             }
@@ -4276,7 +4272,7 @@ export class Hyp3eCharacter {
                         break
 
                     case "dex":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${k} modifiers...`) }
+                        Hyp3eLogger.info("setAttributeMods", `Setting ${k} modifiers...`);
                         content += `<li>DX Mods:</li><ul>`
                         data.attributes.dex.atkMod = this._valueFromTable(this.dexAtkMod, data.attributes.dex.value)
                         content += `<li>Missile Attack Mod: ${data.attributes.dex.atkMod}</li>`
@@ -4289,13 +4285,13 @@ export class Hyp3eCharacter {
                         if (data.details.class) {
                             // Check if DX does not meet attribute pre-req for this class
                             if (thisClass.attrReqs.dex) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking DX requirements for ${data.details.class}...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking DX requirements for ${data.details.class}...`);
                                 if (data.attributes.dex.value < thisClass.attrReqs.dex) {
                                     ui.notifications.warn(`DX is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.dex) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking XP bonus on high DX...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking XP bonus on high DX...`);
                                 if (data.attributes.dex.value >= thisClass.xpBonusReq.dex && xpBonusPossible != false) {
                                     xpBonusPossible = true
                                 } else {
@@ -4308,7 +4304,7 @@ export class Hyp3eCharacter {
                                 }    
                             }
                             if (thisClass.featBonus && thisClass.featBonus.dex) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking for Extraordinary Feat of DX...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking for Extraordinary Feat of DX...`);
                                 data.attributes.dex.feat += thisClass.featBonus.dex
                                 content += `<li>Extraordinary Feat of DX override: ${data.attributes.dex.feat}</li>`
                             }
@@ -4317,7 +4313,7 @@ export class Hyp3eCharacter {
                         break
 
                     case "con":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${k} modifiers...`) }
+                        Hyp3eLogger.info("setAttributeMods", `Setting ${k} modifiers...`);
                         content += `<li>CN Mods:</li><ul>`
                         data.attributes.con.hpMod = this._valueFromTable(this.conHpMod, data.attributes.con.value)
                         content += `<li>Hit Point Mod: ${data.attributes.con.hpMod}</li>`
@@ -4332,13 +4328,13 @@ export class Hyp3eCharacter {
                         if (data.details.class) {
                             // Check if CN does not meet attribute pre-req for this class
                             if (thisClass.attrReqs.con) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking CN requirements for ${data.details.class}...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking CN requirements for ${data.details.class}...`);
                                 if (data.attributes.con.value < thisClass.attrReqs.con) {
                                     ui.notifications.warn(`CN is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.con) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking XP bonus on high CN...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking XP bonus on high CN...`);
                                 if (data.attributes.con.value >= thisClass.xpBonusReq.con && xpBonusPossible != false) {
                                     xpBonusPossible = true
                                 } else {
@@ -4351,7 +4347,7 @@ export class Hyp3eCharacter {
                                 }
                             }
                             if (thisClass.featBonus && thisClass.featBonus.con) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking for Extraordinary Feat of CN...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking for Extraordinary Feat of CN...`);
                                 data.attributes.con.feat += thisClass.featBonus.con
                                 content += `<li>Extraordinary Feat of CN override: ${data.attributes.con.feat}</li>`
                             }
@@ -4360,7 +4356,7 @@ export class Hyp3eCharacter {
                         break
 
                     case "int":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${k} modifiers...`) }
+                        Hyp3eLogger.info("setAttributeMods", `Setting ${k} modifiers...`);
                         content += `<li>IN Mods:</li><ul>`
 
                         data.attributes.int.languages = this._valueFromTable(this.intLanguages, data.attributes.int.value)
@@ -4396,13 +4392,13 @@ export class Hyp3eCharacter {
                         if (data.details.class) {
                             // Check if IN does not meet attribute pre-req for this class
                             if (thisClass.attrReqs.int) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking IN requirements for ${data.details.class}...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking IN requirements for ${data.details.class}...`);
                                 if (data.attributes.int.value < thisClass.attrReqs.int) {
                                     ui.notifications.warn(`IN is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.int) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking XP bonus on high IN...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking XP bonus on high IN...`);
                                 if (data.attributes.int.value >= thisClass.xpBonusReq.int && xpBonusPossible != false) {
                                     xpBonusPossible = true
                                 } else {
@@ -4419,7 +4415,7 @@ export class Hyp3eCharacter {
                         break
 
                     case "wis":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${k} modifiers...`) }
+                        Hyp3eLogger.info("setAttributeMods", `Setting ${k} modifiers...`);
                         content += `<li>WS Mods:</li><ul>`
 
                         data.attributes.wis.willMod = this._valueFromTable(this.wisWillMod, data.attributes.wis.value)
@@ -4455,13 +4451,13 @@ export class Hyp3eCharacter {
                         if (data.details.class) {
                             // Check if WS does not meet attribute pre-req for this class
                             if (thisClass.attrReqs.wis) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking WS requirements for ${data.details.class}...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking WS requirements for ${data.details.class}...`);
                                 if (data.attributes.wis.value < thisClass.attrReqs.wis) {
                                     ui.notifications.warn(`WS is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.wis) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking XP bonus on high WS...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking XP bonus on high WS...`);
                                 if (data.attributes.wis.value >= thisClass.xpBonusReq.wis && xpBonusPossible != false) {
                                     xpBonusPossible = true
                                 } else {
@@ -4478,7 +4474,7 @@ export class Hyp3eCharacter {
                         break
 
                     case "cha":
-                        if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Setting ${k} modifiers...`) }
+                        Hyp3eLogger.info("setAttributeMods", `Setting ${k} modifiers...`);
                         content += `<li>CH Mods:</li><ul>`
                         data.attributes.cha.reaction = this._valueFromTable(this.chaReactionMod, data.attributes.cha.value)
                         content += `<li>Reaction Mod: ${data.attributes.cha.reaction}</li>`
@@ -4489,13 +4485,13 @@ export class Hyp3eCharacter {
                         if (data.details.class) {
                             // Check if CH does not meet attribute pre-req for this class
                             if (thisClass.attrReqs.cha) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking CH requirements for ${data.details.class}...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking CH requirements for ${data.details.class}...`);
                                 if (data.attributes.cha.value < thisClass.attrReqs.cha) {
                                     ui.notifications.warn(`CH is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.cha) {
-                                if (CONFIG.HYP3E.debugMessages) { console.log(`setAttributeMods: Checking XP bonus on high CH...`) }
+                                Hyp3eLogger.info("setAttributeMods", `Checking XP bonus on high CH...`);
                                 if (data.attributes.cha.value >= thisClass.xpBonusReq.cha && xpBonusPossible != false) {
                                     xpBonusPossible = true
                                 } else {
@@ -4607,16 +4603,16 @@ export class Hyp3eCharacter {
 
             // Apply updates to the actor
             try {
-                if (CONFIG.HYP3E.debugMessages) { console.log('setAttributeMods: Updated attribute modifier data:', updateData) }
+                Hyp3eLogger.info("setAttributeMods", `Updated attribute modifier data:`, updateData);
                 if(actor.validate(updateData)) {
-                    if (CONFIG.HYP3E.debugMessages) { console.log('setAttributeMods: Validation OK, executing update...') }
+                    Hyp3eLogger.info("setAttributeMods", `Validation OK, executing update...`);
                     // Update the main actor data
                     await actor.update(updateData)
                     // Log the actor data after updating
-                    if (CONFIG.HYP3E.debugMessages) { console.log('setAttributeMods: Actor after update:', actor.system) }
+                    Hyp3eLogger.info("setAttributeMods", `Actor after update:`, actor.system);
                 }
             } catch(err) {
-                console.log(`setAttributeMods: Actor update error: ${err}`)
+                Hyp3eLogger.error("setAttributeMods", `Actor update error:`, err)
             }
 
             // Now we can display the chat message
