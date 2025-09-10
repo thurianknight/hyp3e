@@ -39,10 +39,10 @@ export class Hyp3eItemSheet extends ItemSheet {
         context.isGM = game.user.isGM
 
         // Retrieve the actor's roll data for TinyMCE editors.
-        context.rollData = {};
+        // context.rollData = {};
         const actor = this.actor;
-        context.rollData = this.actor?.getRollData();
-        Hyp3eLogger.info("getData" `Roll Data in ItemSheet:`, context.rollData);
+        context.rollData = this.actor?.getRollData() ?? {};
+        Hyp3eLogger.info("getData", `Roll Data in ItemSheet:`, context.rollData);
 
         // Prepare item-spell list
         const spellRefs = this.item.system?.spellcasting?.spellRefs ?? [];
@@ -60,7 +60,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         context.flags = context.item.flags;
 
         // Log item context data
-        Hyp3eLogger.info("getData" `Item Context Data:`, context);
+        Hyp3eLogger.info("getData", `Item Context Data:`, context);
 
         // Enrich the description field for TinyMCE editors
         context.enrichedDescription = await TextEditor.enrichHTML(
@@ -115,7 +115,7 @@ export class Hyp3eItemSheet extends ItemSheet {
                     context.annotList.push(context.weaponAnnotations[annot])
                 })
             } catch (err) {
-                Hyp3eLogger.error("_prepareItemData" `Error loading weapon annotations:`, err)
+                Hyp3eLogger.error("_prepareItemData", `Error loading weapon annotations:`, err)
             }
         }
     }
@@ -128,7 +128,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         }
 
         const isIdentified = foundry.utils.getProperty(formData, "system.identified") || this.object.system.identified;
-        Hyp3eLogger.info("_updateObject" `Is item identified?`, isIdentified);
+        Hyp3eLogger.info("_updateObject", `Is item identified?`, isIdentified);
 
         // Apply name and description based on identification state.
         if (isIdentified) {
@@ -159,7 +159,7 @@ export class Hyp3eItemSheet extends ItemSheet {
             data.system.spellcasting.spellRefs = Object.values(refs);
         }
 
-        Hyp3eLogger.info("_updateObject" `Updated item data:`, data);
+        Hyp3eLogger.info("_updateObject", `Updated item data:`, data);
         return super._updateObject(event, data);
     }
 
@@ -298,7 +298,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         const flavor = element.dataset.tooltip;
     
         // Log the element
-        Hyp3eLogger.info("_onRoll" `Clicked element:`, element)
+        Hyp3eLogger.info("_onRoll", `Clicked element:`, element)
 
         // Perform the roll
         const roll = new Roll(formula);
