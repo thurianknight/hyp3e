@@ -413,6 +413,17 @@ Hooks.once('init', async function() {
         default: "1"
     });
 
+    // Re-run world migration on next launch
+    game.settings.register(game.system.id, "reRunMigration", {
+        name: game.i18n.localize("HYP3E.settings.reRunMigration"),
+        hint: game.i18n.localize("HYP3E.settings.reRunMigrationHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: true,
+        requiresReload: true,
+    });
+
     // Migrate compendia data, if desired (default false)
     game.settings.register(game.system.id, "migrateCompendia", {
         name: game.i18n.localize("HYP3E.settings.migrateCompendia"),
@@ -732,17 +743,21 @@ Hooks.once("ready", async function() {
 
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
+        const reRunMigration = game.settings.get(game.system.id, `reRunMigration`);
         const migrationHasRun = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
         // const migrationHasRun = false  // FOR DEBUGGING, TO FORCE A RE-RUN
-        if (!migrationHasRun) {
+        if (!migrationHasRun || reRunMigration) {
             Hyp3eLogger.info("Init", "Running one-time migration...");
 
             // Do the world migration
             await migrateWorld();
 
-            // Set the flag so it doesn't run again
+            // Set the flags so it doesn't run again
             await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
+            await game.settings.set(game.system.id, `reRunMigration`, false);
             Hyp3eLogger.info("Init", "Migration complete.");
+        } else {
+            Hyp3eLogger.info("Init", "Migration has been run before, no need to do it again.");
         }
     }
 

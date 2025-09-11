@@ -1,6 +1,8 @@
 {
     "HYP3E": {
         "settings": {
+            "reRunMigration": "Re-run world migration",
+            "reRunMigrationHint": "When this world is loaded again, re-run world data migrations included with the most recent release. Does not include compendia.",
             "migrateCompendia": "Migrate compendia",
             "migrateCompendiaHint": "Migrates compendium data to the latest version. Meant for developers only. If you don't know what this does, you really shouldn't click it. Seriously. Don't.",
             "debugMessages": "Debug Messages",
