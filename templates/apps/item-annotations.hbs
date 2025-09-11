@@ -6,7 +6,7 @@
     <ul>
         {{#each annotList as |annot id|}}
         <li class="item-set-annotations" data-item-uuid="{{../itemUuid}}">
-            <a class='item-control {{#ifInList id ../item.system.annotations}}font-color-red{{/ifInList}}' 
+            <a class='item-control {{#ifInList id ../item.system.annotations}}item-in-list{{/ifInList}}' 
                 data-tooltip="{{id}}" data-action="toggleAnnotation"
                 data-control="{{id}}" data-item-uuid="{{../itemUuid}}"
                 role="button"

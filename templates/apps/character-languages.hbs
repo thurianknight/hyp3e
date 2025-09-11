@@ -6,7 +6,7 @@
     <ul>
         {{#each languages as |language|}}
         <li class="item-set-annotations" data-actor-uuid="{{../actorUuid}}">
-            <a class='item-control {{#ifInList language ../actor.system.knownLanguages}}font-color-red{{/ifInList}}' 
+            <a class='item-control {{#ifInList language ../actor.system.knownLanguages}}item-in-list{{/ifInList}}' 
                 data-tooltip="{{language}}" data-action="toggleLanguage"
                 data-control="{{language}}" data-actor-uuid="{{../actorUuid}}"
                 role="button"

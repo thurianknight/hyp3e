@@ -1067,6 +1067,15 @@ textarea {
     font-size: medium;
 }
 
+/* Highlighted text in custom apps */
+.item-in-list {
+  color: #2196f3;
+  background-color: rgba(33, 150, 243, 0.15); /* soft tint */
+  border-radius: 4px;
+  font-weight: bold;
+  padding: 0 2px; /* optional: prevents text from touching rounded edges */
+}
+
 /* Font color example */
 .font-color-red {
     color: red;
