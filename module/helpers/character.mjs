@@ -4002,7 +4002,7 @@ export class Hyp3eCharacter {
         try {
             let rollResponse = await Hyp3eDialog.ShowLevelUpDialog(dataset)
         } catch(err) {
-            Hyp3eLogger.error("levelUp", `Dialog error:`, err);
+            Hyp3eLogger.info("levelUp", `Dialog canceled.`, err);
             return false;
         }
 
@@ -4168,7 +4168,7 @@ export class Hyp3eCharacter {
             try {
                 let rollResponse = await Hyp3eDialog.ShowSetModifiersDialog(dataset)
             } catch(err) {
-                Hyp3eLogger.error("setAttributeMods", `Roll dialog error:`, err)
+                Hyp3eLogger.info("setAttributeMods", `Roll dialog canceled.`, err)
                 return false
             }
         }
