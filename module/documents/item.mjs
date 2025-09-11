@@ -294,10 +294,8 @@ export class Hyp3eItem extends Item {
                 return;
         }
 
-        if (CONFIG.HYP3E.debugMessages) {
-            Hyp3eLogger.warn("updateWeaponMastery", `Update data:`, updateData);
-        }
-
+        Hyp3eLogger.info("updateWeaponMastery", `Update data:`, updateData);
+    
         return await this.update({ system: updateData });
     }
 

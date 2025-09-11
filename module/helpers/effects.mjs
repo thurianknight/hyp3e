@@ -587,7 +587,7 @@ export async function applyAllEffects(item, actorId, disabled = false) {
     // //     ui.notifications?.error(`Apply Effects: Item ${itemId} not found!`);
     // //     return;
     // // }
-    // if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Item: ", item) }
+    // Hyp3eLogger.info("applyAllEffects", `Item:`, item) }
     // const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
 
     // // Check if the item has any effects to enable
@@ -601,14 +601,14 @@ export async function applyAllEffects(item, actorId, disabled = false) {
 
     // // Apply the effects to selected tokens/actors
     // for (const t of tokens) {
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Token: ", t) }
-    //     if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Token Actor: ", t.actor) }
+    //     Hyp3eLogger.info("applyAllEffects", `Token:`, t) }
+    //     Hyp3eLogger.info("applyAllEffects", `Token Actor:`, t.actor) }
     //     item.effects.forEach(effect => async () => {
     //         // const effectData = foundry.utils.deepClone(effect);
     //         const effectData = {...effect};
     //         effectData.origin = item.uuid;
     //         if (disabled) effectData.disabled = true;
-    //         if (CONFIG.HYP3E.debugMessages) { console.log("applyAllEffects: Cloned Effect:", effectData) }
+    //         Hyp3eLogger.info("applyAllEffects", `Cloned Effect:`, effectData) }
     //         // Set flag to store metadata about the effect source & target actor
     //         await effect.setFlag("hyp3e", "source", {
     //             srcItemUuid: item.uuid,

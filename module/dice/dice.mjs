@@ -58,7 +58,7 @@ export class Hyp3eDice {
         // Strip '@item.atkMod' out since we add it automatically anyway...
         //   Ideally this won't ever happen, but some items might have it in their formula.
         if (atkRollParts.includes("@item.atkMod")) {
-            Hyp3eLogger.info("buildAttackFormula", `DEBUG: ${rollData.itemName} still has @itemData.atkMod in its formula!`);
+            Hyp3eLogger.info("buildAttackFormula", `${rollData.itemName} still has @itemData.atkMod in its formula!`);
             atkRollParts = atkRollParts.filter(part => (part != "@item.atkMod"))
             debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@item.atkMod"))
         }

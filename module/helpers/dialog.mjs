@@ -36,13 +36,10 @@ export class Hyp3eDialog {
                             const formDataObj = formData.object
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            if (CONFIG.HYP3E.debugMessages) { 
-                                Hyp3eLogger.info("ShowBasicRollDialog", `Form data object:`, formDataObj)
-                                if (CONFIG.HYP3E.flipRollUnderMods) {
-                                    Hyp3eLogger.info("ShowBasicRollDialog", `Rolling ${dataset.roll} - ${formDataObj.sitMod}...`)
-                                } else {
-                                    Hyp3eLogger.info("ShowBasicRollDialog", `Rolling ${dataset.roll} + ${formDataObj.sitMod} ...`)
-                                }
+                            if (CONFIG.HYP3E.flipRollUnderMods) {
+                                Hyp3eLogger.info("ShowBasicRollDialog", `Rolling ${dataset.roll} - ${formDataObj.sitMod}...`, formDataObj)
+                            } else {
+                                Hyp3eLogger.info("ShowBasicRollDialog", `Rolling ${dataset.roll} + ${formDataObj.sitMod} ...`, formDataObj)
                             }
                             resolve(formDataObj)
                         }
@@ -102,8 +99,7 @@ export class Hyp3eDialog {
                             const formDataObj = formData.object
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            Hyp3eLogger.info("ShowAttackRollDialog", `Form data object:`, formDataObj) 
-                            Hyp3eLogger.info("ShowAttackRollDialog", `Rolling ${dataset.roll} + ${formDataObj.sitMod}...`)
+                            Hyp3eLogger.info("ShowAttackRollDialog", `Rolling ${dataset.roll} + ${formDataObj.sitMod}...`, formDataObj)
                             resolve(formDataObj)
                         }
                     },
@@ -157,8 +153,7 @@ export class Hyp3eDialog {
                             const formDataObj = formData.object
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            Hyp3eLogger.info("ShowSpellcastingDialog", `Form data object:`, formDataObj)
-                            Hyp3eLogger.info("ShowSpellcastingDialog", `Rolling ${dataset.roll} + ${formDataObj.sitMod}...`)
+                            Hyp3eLogger.info("ShowSpellcastingDialog", `Rolling ${dataset.roll} + ${formDataObj.sitMod}...`, formDataObj)
                             resolve(formDataObj)
                         }
                     },
@@ -214,8 +209,7 @@ export class Hyp3eDialog {
                             const formDataObj = formData.object
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            Hyp3eLogger.info("ShowSaveRollDialog", `Form data object:`, formDataObj)
-                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling basic save: ${dataset.roll} + ${formDataObj.sitMod}...`)
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling basic save: ${dataset.roll} + ${formDataObj.sitMod}...`, formDataObj)
                             resolve(formDataObj)
                         }
                     },
@@ -229,8 +223,7 @@ export class Hyp3eDialog {
                             formDataObj.avoidMod = dataset.avoidMod
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            Hyp3eLogger.info("ShowSaveRollDialog", `Form data object:`, formDataObj)
-                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling save with Avoidance mod: ${dataset.roll} + ${formDataObj.avoidMod} + ${formDataObj.sitMod}...`)
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling save with Avoidance mod: ${dataset.roll} + ${formDataObj.avoidMod} + ${formDataObj.sitMod}...`, formDataObj)
                             resolve(formDataObj)
                         }
                     },
@@ -244,8 +237,7 @@ export class Hyp3eDialog {
                             formDataObj.poisonMod = dataset.poisonMod
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            Hyp3eLogger.info("ShowSaveRollDialog", `Form data object:`, formDataObj)
-                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling save with Poison/Radiation mod: ${dataset.roll} + ${formDataObj.poisonMod} + ${formDataObj.sitMod}...`)
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling save with Poison/Radiation mod: ${dataset.roll} + ${formDataObj.poisonMod} + ${formDataObj.sitMod}...`, formDataObj)
                             resolve(formDataObj)
                         }
                     },
@@ -259,8 +251,7 @@ export class Hyp3eDialog {
                             formDataObj.willMod = dataset.willMod
                             // No situational modifier? Set it to 0
                             if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
-                            Hyp3eLogger.info("ShowSaveRollDialog", `Form data object:`, formDataObj)
-                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling save with Willpower mod: ${dataset.roll} + ${formDataObj.willMod} + ${formDataObj.sitMod}...`)
+                            Hyp3eLogger.info("ShowSaveRollDialog", `Rolling save with Willpower mod: ${dataset.roll} + ${formDataObj.willMod} + ${formDataObj.sitMod}...`, formDataObj)
                             resolve(formDataObj)
                         }
                     },

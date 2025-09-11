@@ -84,7 +84,7 @@
                 {{#if this.defeated}}
                     <i class="fa fa-dizzy"></i>
                 {{else if this.hasRolled}}
-                    {{#if this.debugMessages}}
+                    {{#if (eq this.logLevel 0)}}
                     <span class="initiative">{{this.initiative}}</span>
                     {{/if}}
                 {{/if}}

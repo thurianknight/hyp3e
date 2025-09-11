@@ -389,15 +389,15 @@ Hooks.once('init', async function() {
     });
 
     // Debug logging & messages
-    game.settings.register(game.system.id, "debugMessages", {
-        name: game.i18n.localize("HYP3E.settings.debugMessages"),
-        hint: game.i18n.localize("HYP3E.settings.debugMessagesHint"),
-        default: false,
-        scope: "world",
-        type: Boolean,
-        config: true,
-        requiresReload: true,
-    });
+    // game.settings.register(game.system.id, "debugMessages", {
+    //     name: game.i18n.localize("HYP3E.settings.debugMessages"),
+    //     hint: game.i18n.localize("HYP3E.settings.debugMessagesHint"),
+    //     default: false,
+    //     scope: "world",
+    //     type: Boolean,
+    //     config: true,
+    //     requiresReload: true,
+    // });
 
     game.settings.register(game.system.id, "logLevel", {
         name: "Logging Level",
@@ -410,7 +410,7 @@ Hooks.once('init', async function() {
             "1": "Warnings & Errors",
             "2": "Errors Only"
         },
-        default: "0"
+        default: "1"
     });
 
     // Migrate compendia data, if desired (default false)
@@ -567,8 +567,10 @@ Hooks.once("ready", async function() {
     /**
      * Load system settings
      */
-    const debugMessages = game.settings.get(game.system.id, "debugMessages");
-    CONFIG.HYP3E.debugMessages = debugMessages;
+    // const debugMessages = game.settings.get(game.system.id, "debugMessages");
+    // CONFIG.HYP3E.debugMessages = debugMessages;
+    const logLevel = game.settings.get(game.system.id, "logLevel");
+    CONFIG.HYP3E.logLevel = logLevel;
 
     // Automatically calculate AC
     const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");

@@ -37,7 +37,7 @@ export class HYP3ECombatTracker extends CombatTracker {
             turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
             turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
             turn.isSlowed = !!combatant.isSlowed;
-            turn.debugMessages = CONFIG.HYP3E.debugMessages;
+            turn.logLevel = CONFIG.HYP3E.logLevel;
             turn.isOwnedByUser = !!combatant.actor.isOwner;
             turn.initGroup = combatant.initGroup;
             turn.initRoll = Math.floor(combatant.initiative)

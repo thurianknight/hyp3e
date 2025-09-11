@@ -2467,7 +2467,7 @@ export class Hyp3eActor extends Actor {
                 } catch (err) {
                     Hyp3eLogger.error("_consumeAmmoOrItem", `Failed to update ammo quantity for ${ammo.name}:`, err);
                 }
-            } else if (rollResponse.ammunition && CONFIG.HYP3E.debugMessages) {
+            } else if (rollResponse.ammunition) {
                 Hyp3eLogger.warn("_consumeAmmoOrItem", `Selected ammo ${rollResponse.ammunition} not found or has 0 quantity.`);
             }
         } else if (item?.type === "weapon" && item.system.isConsumable) {
