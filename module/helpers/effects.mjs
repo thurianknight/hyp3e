@@ -150,6 +150,8 @@ export async function setupEffectHandlers() {
         // Only process if we're the one who owns this actor
         const actor = effect.parent;
         if (!actor?.isOwner) return;
+        // Only let the GM create the effect
+        if (!game.user.isGM) return;
         Hyp3eLogger.info("createActiveEffect", `Create event fired:`, effect);
 
         // Flag to track whether anything needs to be updated
