@@ -14,7 +14,8 @@ import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
-import { HYP3E_CALENDAR } from "./apps/calendar-data.mjs"
+import { HYP3E_CALENDAR } from "./helpers/calendar-data.mjs"
+import { HYP3ECalendar } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
 
@@ -782,10 +783,20 @@ Hooks.once("ready", async function() {
         }
     }
 
+    game.hyp3e = game.hyp3e || {};
+
+    // Log the initialization of the calendar
+    Hyp3eLogger.info("Init", `Hyperborean date is ${HYP3ECalendar.getCurrentDate()}`);
+    // Import the calendar class methods
+    game.hyp3e.getCurrentDate = () => HYP3ECalendar.getCurrentDate();
+    game.hyp3e.setCurrentDate = () => HYP3ECalendar.setCurrentDate();
+    game.hyp3e.advanceDay = () => HYP3ECalendar.advanceDay();
+    game.hyp3e.formatDate = () => HYP3ECalendar.formatDate();
+    game.hyp3e.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
+
     // Log the start of the turn tracker
     Hyp3eLogger.info("Init", `Current exploration turn is ${HYP3ETurnTracker.getTurn()}`);
     // Import the turn tracker class methods
-    game.hyp3e = game.hyp3e || {};
     game.hyp3e.advanceTurn = () => HYP3ETurnTracker.advanceTurn();
     game.hyp3e.retreatTurn = () => HYP3ETurnTracker.retreatTurn();
     game.hyp3e.resetTurn = () => HYP3ETurnTracker.reset();
@@ -904,8 +915,8 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
     if (!message.startsWith("/cal")) return;
     const parts = message.split(" ");
 
-    if (parts[1] === "chat") sendDateToChat();
-    if (parts[1] === "advance" && game.user.isGM) advanceDay(true);
+    if (parts[1] === "chat") game.hyp3e.sendDateToChat();
+    if (parts[1] === "advance" && game.user.isGM) game.hyp3e.advanceDay(true);
     else if (parts.length === 1) new HYP3ECalendarApp().render(true);
 
     return false;
@@ -989,48 +1000,8 @@ Hooks.on("preUpdateItem", async (item, update) => {
 /*  Date & Time-Keeping functions               */
 /* -------------------------------------------- */
 
-function getCurrentDate() {
-    return game.settings.get("hyp3e", "calendarDate");
-}
-
-function setCurrentDate({year, month, day}) {
-    game.settings.set("hyp3e", "calendarDate", {year, month, day});
-}
-
-function advanceDay(resetTurns = false) {
-    let {year, month, day} = getCurrentDate();
-    day++;
-    if (day > 28) {
-        day = 1; month++;
-        if (month > 13) {
-            month = 1; year++;
-            if (year > 13) year = 1; // loop cycle
-        }
-    }
-    setCurrentDate({year, month, day});
-    
-    if (resetTurns) {
-        game.hyp3e.turnTracker.reset();
-    }
-}
-
-function formatDate(verbose = true) {
-    const {year, month, day} = getCurrentDate();
-    const y = HYP3E_CALENDAR.years[year-1];
-    const m = HYP3E_CALENDAR.months[month-1];
-    const weekday = HYP3E_CALENDAR.weekdays[(day-1)%7];
-
-    if (!verbose) return `Y${year}/M${month}/D${day}`;
-    return `${weekday}, the ${day} of ${m.name}, Year of the ${y.name}`;
-}
-
-function sendDateToChat() {
-    ChatMessage.create({
-        user: game.user.id,
-        content: formatDate(game.settings.get("hyp3e", "calendarVerbose"))
-    });
-}
-
+// Register Calendar hooks
+await setupCalendarHooks();
 
 // Register Turn Tracker hooks
 await setupTurnTrackerHooks();
