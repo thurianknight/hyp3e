@@ -1,0 +1,58 @@
+<div class="hyp3e-calendar">
+  <!-- Header -->
+  <header class="calendar-header flexrow">
+    <div class="year-select">
+      <label>Year:</label>
+      <select name="year">
+        {{#each years}}
+          <option value="{{this.num}}" {{#if (eq this.num ../current.year)}}selected{{/if}}>
+            {{this.num}} — Year of the {{this.name}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="month-select">
+      <label>Month:</label>
+      <select name="month">
+        {{#each months}}
+          <option value="{{this.num}}" {{#if (eq this.num ../current.month)}}selected{{/if}}>
+            {{this.num}} — {{this.name}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+  </header>
+
+  <!-- Calendar Grid -->
+  <section class="calendar-grid">
+    <div class="weekday-row">
+      {{#each weekdays}}
+        <div class="weekday">{{this}}</div>
+      {{/each}}
+    </div>
+
+    <div class="days-grid">
+      {{#each (range 1 29)}}
+        <div class="day-cell {{#if (eq this ../current.day)}}current-day{{/if}}"
+             data-day="{{this}}">
+          {{this}}
+
+          {{!-- Festival marker (if this month has any festivals) --}}
+          {{#each (lookup ../months (sub ../current.month 1)).festivals}}
+            {{!-- Example: only show on the first day of the month --}}
+            {{!-- {{#if (eq ../this 1)}}
+              <div class="festival">{{this}}</div>
+            {{/if}} --}}
+          {{/each}}
+        </div>
+      {{/each}}
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="calendar-footer flexrow">
+    <button type="button" class="advance-day">Advance Day</button>
+    <button type="button" class="send-to-chat">Send to Chat</button>
+  </footer>
+</div>

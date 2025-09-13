@@ -1450,6 +1450,64 @@ textarea {
   }
 }
 
+/* Styles for the Calendar app */
+.hyp3e-calendar {
+  font-family: var(--font-primary);
+  padding: 0.5em;
+}
+
+.calendar-header {
+  margin-bottom: 0.5em;
+  justify-content: space-between;
+}
+
+.calendar-grid {
+  border: 1px solid #666;
+  margin-bottom: 0.5em;
+}
+
+.weekday-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: #222;
+  color: #fff;
+  text-align: center;
+  font-weight: bold;
+}
+
+.weekday {
+  padding: 0.25em;
+  border-right: 1px solid #444;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.day-cell {
+  height: 3em;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #444;
+  position: relative;
+  cursor: pointer;
+}
+
+.day-cell.current-day {
+  background: #446;
+  color: #fff;
+  font-weight: bold;
+}
+
+.day-cell .festival {
+  font-size: 0.6em;
+  color: #ff0;
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+}
+
 /* Base style for logging to chat */
 .chat-message .hyp3e-log {
   font-family: monospace;

@@ -14,6 +14,8 @@ import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
+import { HYP3E_CALENDAR } from "./apps/calendar-data.mjs"
+import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
 
 // Set this now, to use later
@@ -50,6 +52,15 @@ Hooks.once('init', async function() {
         default: false,
     });
 
+    // Register a world setting to store the current Hyperborean date
+    game.settings.register(game.system.id, "calendarDate", {
+        name: "Calendar Date",
+        scope: "world",
+        config: false,
+        type: Object,
+        default: { year: 1, month: 1, day: 1 }
+    });
+
     // Register a world setting to store the current exploration turn
     game.settings.register(game.system.id, "explorationTurn", {
         name: "Exploration Turn",
@@ -66,6 +77,16 @@ Hooks.once('init', async function() {
         config: false, // We'll manage it via our own UI
         type: Array,
         default: []
+    });
+
+    // Display Hyperborean date format: short or verbose
+    game.settings.register(game.system.id, "calendarVerbose", {
+        name: "Verbose Date Format",
+        hint: "When enabled, display the date as 'Sun, the 1 of Aries, Year of the Tempest'. Otherwise just display as '576/1/1'.",
+        scope: "world",
+        config: true,
+        type: Boolean,
+        default: true
     });
 
     // Enable the Turn Tracker app
@@ -877,6 +898,20 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
 });
 
 /**
+ * Capture chat commands for the calendar app
+ */
+Hooks.on("chatMessage", (chatLog, message, chatData) => {
+    if (!message.startsWith("/cal")) return;
+    const parts = message.split(" ");
+
+    if (parts[1] === "chat") sendDateToChat();
+    if (parts[1] === "advance" && game.user.isGM) advanceDay(true);
+    else if (parts.length === 1) new HYP3ECalendarApp().render(true);
+
+    return false;
+});
+
+/**
  * Insert damage, save, and effect buttons into chats
  */
 Hooks.on("renderChatMessage", addChatMessageButtons);
@@ -928,7 +963,7 @@ Hooks.on("createToken", (token, options, userId) => {
 });
 
 /**
- * When a armor or weapons are equipped, ensure that any others are unequipped if necessary.
+ * Capture the preUpdateItem event to run some custom processing
  */
 Hooks.on("preUpdateItem", async (item, update) => {
     if (item.type !== "armor" && item.type !== "shield" && item.type !== "weapon") return;
@@ -936,6 +971,8 @@ Hooks.on("preUpdateItem", async (item, update) => {
 
     const actor = item.actor;
     if (!actor) return;
+
+    // When a armor or weapons are equipped, ensure that any others are unequipped
 
     // Check config setting for weapons & shields
     if (game.settings.get(game.system.id, "enforceWeaponEquipRules")) {
@@ -947,6 +984,53 @@ Hooks.on("preUpdateItem", async (item, update) => {
         await actor.enforceSingleArmor(item);
     }
 });
+
+/* -------------------------------------------- */
+/*  Date & Time-Keeping functions               */
+/* -------------------------------------------- */
+
+function getCurrentDate() {
+    return game.settings.get("hyp3e", "calendarDate");
+}
+
+function setCurrentDate({year, month, day}) {
+    game.settings.set("hyp3e", "calendarDate", {year, month, day});
+}
+
+function advanceDay(resetTurns = false) {
+    let {year, month, day} = getCurrentDate();
+    day++;
+    if (day > 28) {
+        day = 1; month++;
+        if (month > 13) {
+            month = 1; year++;
+            if (year > 13) year = 1; // loop cycle
+        }
+    }
+    setCurrentDate({year, month, day});
+    
+    if (resetTurns) {
+        game.hyp3e.turnTracker.reset();
+    }
+}
+
+function formatDate(verbose = true) {
+    const {year, month, day} = getCurrentDate();
+    const y = HYP3E_CALENDAR.years[year-1];
+    const m = HYP3E_CALENDAR.months[month-1];
+    const weekday = HYP3E_CALENDAR.weekdays[(day-1)%7];
+
+    if (!verbose) return `Y${year}/M${month}/D${day}`;
+    return `${weekday}, the ${day} of ${m.name}, Year of the ${y.name}`;
+}
+
+function sendDateToChat() {
+    ChatMessage.create({
+        user: game.user.id,
+        content: formatDate(game.settings.get("hyp3e", "calendarVerbose"))
+    });
+}
+
 
 // Register Turn Tracker hooks
 await setupTurnTrackerHooks();
@@ -963,7 +1047,6 @@ async function initTurnTrackerInChatLog(app, html, data) {
         return; // Exit early if the turn tracker is disabled
     }
     Hyp3eLogger.info("initTurnTrackerInChatLog", "Rendering the Turn Tracker app in the chat log...");
-    Hyp3eLogger.info("initTurnTrackerInChatLog", "Incoming HTML:", html);
 
     // Get the Foundry version -- needed for chat form CSS differences
     const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
