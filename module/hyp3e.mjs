@@ -15,7 +15,7 @@ import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-
 import { HYP3ETurnTracker, setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
 import { HYP3E_CALENDAR } from "./helpers/calendar-data.mjs"
-import { HYP3ECalendar } from "./helpers/calendar.mjs";
+import { HYP3ECalendar, setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
 
@@ -785,14 +785,21 @@ Hooks.once("ready", async function() {
 
     game.hyp3e = game.hyp3e || {};
 
-    // Log the initialization of the calendar
-    Hyp3eLogger.info("Init", `Hyperborean date is ${HYP3ECalendar.getCurrentDate()}`);
+    // Initialize the calendar app
+    try {
+        game.hyp3e.calendar = new HYP3ECalendarApp();
+        game.hyp3e.openCalendar = () => game.hyp3e.calendar.render(true);
+        // Hyp3eLogger.info("Init", `Hyperborean date is ${HYP3ECalendar.getCurrentDate()}`);
+    } catch (err) {
+        Hyp3eLogger.error("Init", `Error initializing calendar app.`, err.message)
+    }
     // Import the calendar class methods
     game.hyp3e.getCurrentDate = () => HYP3ECalendar.getCurrentDate();
     game.hyp3e.setCurrentDate = () => HYP3ECalendar.setCurrentDate();
     game.hyp3e.advanceDay = () => HYP3ECalendar.advanceDay();
     game.hyp3e.formatDate = () => HYP3ECalendar.formatDate();
     game.hyp3e.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
+    Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.formatDate()}.`, game.hyp3e.getCurrentDate());
 
     // Log the start of the turn tracker
     Hyp3eLogger.info("Init", `Current exploration turn is ${HYP3ETurnTracker.getTurn()}`);
@@ -915,10 +922,21 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
     if (!message.startsWith("/cal")) return;
     const parts = message.split(" ");
 
+    // Anyone can open the calendar (read-only for players), or send the date to chat
+    if (parts[0] === "/cal" && parts.length === 1) {
+        game.hyp3e.openCalendar();
+    }
     if (parts[1] === "chat") game.hyp3e.sendDateToChat();
-    if (parts[1] === "advance" && game.user.isGM) game.hyp3e.advanceDay(true);
-    else if (parts.length === 1) new HYP3ECalendarApp().render(true);
-
+    // Only GMs can advance the day
+    if (parts[1] === "advance" && game.user.isGM) {
+        // "/cal advance reset" will reset the Turn Tracker too
+        const reset = parts.includes("reset");
+        game.hyp3e.advanceDay(reset);
+        game.hyp3e.sendDateToChat();
+    }
+    else if (game.user.isGM) {  // Invalid commands by non-GMs will be ignored
+        ui.notifications.warn("Unknown /cal command");
+    }
     return false;
 });
 
@@ -1099,6 +1117,7 @@ async function migrateWorld() {
 
     // Migrate compendia, one document at a time (time-consuming!)
     for (let pack of game.packs) {
+        if (!pack.collection.startsWith("hyperborea-3e-compendium")) continue;
 
         const packType = pack.metadata.type
 

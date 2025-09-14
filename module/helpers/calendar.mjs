@@ -5,7 +5,7 @@ export async function setupCalendarHooks() {
     /**
      * Custom hook for handling calendar day advancement.
      */
-    Hooks.on("calendarDayAdvanced", async (day) => {
+    Hooks.on("calendarDayAdvanced", async (newDate) => {
         // Do stuff
 
     });
@@ -31,12 +31,13 @@ export class HYP3ECalendar {
                 if (year > 13) year = 1; // loop cycle
             }
         }
-        this.setCurrentDate({year, month, day});
+        const newDate = { year, month, day };
+        this.setCurrentDate(newDate);
 
-        Hyp3eLogger.info("advanceDay", `Calendar advanced to day ${day}`);
-        Hooks.call("calendarDayAdvanced", day);
+        Hyp3eLogger.info("advanceDay", `Calendar advanced to ${this.formatDate()}`);
+        Hooks.call("calendarDayAdvanced", newDate);
 
-        if (resetTurns) {
+        if (resetTurns && game.hyp3e?.turnTracker) {
             game.hyp3e.turnTracker.reset();
         }
     }
@@ -54,7 +55,9 @@ export class HYP3ECalendar {
     static sendDateToChat() {
         ChatMessage.create({
             user: game.user.id,
-            content: this.formatDate(game.settings.get("hyp3e", "calendarVerbose"))
+            content: `<div class="hyp3e-calendar-date">${this.formatDate(
+                game.settings.get("hyp3e", "calendarVerbose")
+            )}</div>`
         });
     }
 }
