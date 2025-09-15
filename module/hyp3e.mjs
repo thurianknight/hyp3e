@@ -59,7 +59,7 @@ Hooks.once('init', async function() {
         scope: "world",
         config: false,
         type: Object,
-        default: { year: 1, month: 1, day: 1 }
+        default: { year: 576, month: 1, day: 1 }
     });
 
     // Register a world setting to store the current exploration turn
@@ -789,17 +789,16 @@ Hooks.once("ready", async function() {
     try {
         game.hyp3e.calendar = new HYP3ECalendarApp();
         game.hyp3e.openCalendar = () => game.hyp3e.calendar.render(true);
-        // Hyp3eLogger.info("Init", `Hyperborean date is ${HYP3ECalendar.getCurrentDate()}`);
     } catch (err) {
         Hyp3eLogger.error("Init", `Error initializing calendar app.`, err.message)
     }
     // Import the calendar class methods
-    game.hyp3e.getCurrentDate = () => HYP3ECalendar.getCurrentDate();
-    game.hyp3e.setCurrentDate = () => HYP3ECalendar.setCurrentDate();
-    game.hyp3e.advanceDay = () => HYP3ECalendar.advanceDay();
-    game.hyp3e.formatDate = () => HYP3ECalendar.formatDate();
-    game.hyp3e.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
-    Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.formatDate()}.`, game.hyp3e.getCurrentDate());
+    game.hyp3e.calendar.getCurrentDate = () => HYP3ECalendar.getCurrentDate();
+    game.hyp3e.calendar.setCurrentDate = () => HYP3ECalendar.setCurrentDate();
+    game.hyp3e.calendar.advanceDay = () => HYP3ECalendar.advanceDay();
+    game.hyp3e.calendar.formatDate = () => HYP3ECalendar.formatDate();
+    game.hyp3e.calendar.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
+    Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.calendar.formatDate(true)}.`, game.hyp3e.calendar.getCurrentDate());
 
     // Log the start of the turn tracker
     Hyp3eLogger.info("Init", `Current exploration turn is ${HYP3ETurnTracker.getTurn()}`);
@@ -925,16 +924,23 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
     // Anyone can open the calendar (read-only for players), or send the date to chat
     if (parts[0] === "/cal" && parts.length === 1) {
         game.hyp3e.openCalendar();
+        return false;
     }
-    if (parts[1] === "chat") game.hyp3e.sendDateToChat();
+    if (parts[1] === "chat") {
+        game.hyp3e.sendDateToChat();
+        return false;
+    }
     // Only GMs can advance the day
     if (parts[1] === "advance" && game.user.isGM) {
         // "/cal advance reset" will reset the Turn Tracker too
         const reset = parts.includes("reset");
         game.hyp3e.advanceDay(reset);
         game.hyp3e.sendDateToChat();
+        return false;
     }
-    else if (game.user.isGM) {  // Invalid commands by non-GMs will be ignored
+
+    // Invalid commands by non-GMs will be ignored, but GMs get an error message
+    if (game.user.isGM) {
         ui.notifications.warn("Unknown /cal command");
     }
     return false;

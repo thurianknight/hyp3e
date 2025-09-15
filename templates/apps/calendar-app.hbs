@@ -1,11 +1,42 @@
-<div class="hyp3e-calendar">
-  <h3>{{currentDate}}</h3>
-  <div class="calendar-controls">
-    <button type="button" data-action="advance-day">
-      <i class="fa-solid fa-forward-step"></i> Advance Day
-    </button>
-    <button type="button" data-action="send-date">
-      <i class="fa-solid fa-comment"></i> Announce Date
-    </button>
-  </div>
+<div class="hyp3e-calendar-container">
+    <div class="calendar-header">
+        <div class="flex flexrow">
+            <select id="calendar-month">
+                {{#each months as |month idx|}}
+                <option value="{{idx}}" {{#if (eq ../currentMonth idx)}}selected{{/if}}>
+                    {{month.name}}
+                </option>
+                {{/each}}
+            </select> 
+            <input id="calendar-year" type="number" value="{{currentYear}}" /> 
+            <span name="year">(Year of the {{year.name}}, <i>{{year.alt}})</i></span>
+        </div>
+    </div>
+
+    <table class="calendar-grid">
+        <thead>
+            <tr>
+            {{#each weekdays}}
+                <th>{{this}}</th>
+            {{/each}}
+            </tr>
+        </thead>
+        <tbody>
+            {{#each days}}
+            <tr>
+                {{#each this}}
+                <td class="{{#if isToday}}today{{/if}}" data-day="{{number}}">
+                    {{number}}
+                </td>
+                {{/each}}
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <div class="calendar-toolbar">
+        <button type="button" data-action="advance">Advance Day</button>
+        <button type="button" data-action="chat">Send Date to Chat</button>
+        <button type="button" data-action="reset">Advance + Reset Turns</button>
+    </div>
 </div>

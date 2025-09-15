@@ -128,27 +128,4 @@ export default class HYP3EItemSetAnnotations extends HandlebarsApplicationMixin(
 
         this.render(true, { itemUuid: target.dataset.itemUuid, focus: true })
     }
-
-
-    // ===========================================================================
-    // UI EVENTS
-    // ===========================================================================
-
-    // #onCombatantHoverIn(event) {
-    //     event.preventDefault();
-    //     if ( !canvas.ready ) return;
-    //     const li = event.currentTarget;
-    //     const combatant = game.combat.combatants.get(li.dataset.combatantId);
-    //     const token = combatant.token?.object;
-    //     if ( token?.isVisible ) {
-    //         if ( !token.controlled ) token._onHoverIn(event, {hoverOutOthers: true});
-    //         this._highlighted = token;
-    //     }
-    // }
-
-    // #onCombatantHoverOut(event) {
-    //     event.preventDefault();
-    //     if ( this._highlighted ) this._highlighted._onHoverOut(event);
-    //     this._highlighted = null;
-    // }
 }

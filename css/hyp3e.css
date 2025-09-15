@@ -1451,61 +1451,71 @@ textarea {
 }
 
 /* Styles for the Calendar app */
-.hyp3e-calendar {
-  font-family: var(--font-primary);
-  padding: 0.5em;
-}
-
-.calendar-header {
-  margin-bottom: 0.5em;
-  justify-content: space-between;
-}
-
-.calendar-grid {
-  border: 1px solid #666;
-  margin-bottom: 0.5em;
-}
-
-.weekday-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  background: #222;
-  color: #fff;
+.hyp3e-calendar .calendar-header {
   text-align: center;
+  margin-bottom: 0.5rem;
+  input {
+    text-align: center;
+    font-weight: bold;
+    font-size: large;
+    min-width: 20px;
+    max-width: 50px;
+    margin-right: 5px;
+  };
+  select {
+    text-align: center;
+    font-weight: bold;
+    font-size: large;
+    min-width: 100px;
+    max-width: 125px;
+    margin-right: 5px;
+  };
+  span {
+    text-align: left;
+    font-weight: bold;
+    font-size: large;
+  }
+}
+
+.hyp3e-calendar .calendar-grid {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: center;
+}
+
+.hyp3e-calendar .calendar-grid th,
+.hyp3e-calendar .calendar-grid td {
+  border: 1px solid var(--color-border-light-tertiary);
+  padding: 4px;
+  width: 14.2%; /* 100/7 */
+  text-align: center;
+}
+
+.hyp3e-calendar .calendar-grid td.today {
+  color: #0f7ed8;
+  background-color: rgba(33, 150, 243, 0.15); /* soft tint */
+  border-radius: 4px;
   font-weight: bold;
+  padding: 0 2px; /* optional: prevents text from touching rounded edges */
+  /* background: var(--color-border-highlight-alt); */
+  /* font-weight: bold; */
+  /* border: 2px solid var(--color-border-highlight); */
 }
 
-.weekday {
-  padding: 0.25em;
-  border-right: 1px solid #444;
+.hyp3e-calendar .calendar-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 0.5rem;
 }
 
-.days-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+.hyp3e-calendar .calendar-toolbar button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
 }
 
-.day-cell {
-  height: 3em;
-  text-align: center;
-  vertical-align: middle;
-  border: 1px solid #444;
-  position: relative;
+.hyp3e-calendar .calendar-grid td {
   cursor: pointer;
-}
-
-.day-cell.current-day {
-  background: #446;
-  color: #fff;
-  font-weight: bold;
-}
-
-.day-cell .festival {
-  font-size: 0.6em;
-  color: #ff0;
-  position: absolute;
-  bottom: 2px;
-  left: 2px;
 }
 
 /* Base style for logging to chat */
