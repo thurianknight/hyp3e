@@ -18,8 +18,52 @@ export class HYP3ECalendar {
     }
 
     static getCycleYear(year) {
-        // 1–13, wrapping properly
+        // Returns 1–13, wrapping properly
         return ((year - 1) % 13) + 1;
+    }
+
+    static getSeason(year, month) {
+        const y = HYP3E_CALENDAR.years[this.getCycleYear(year) - 1];
+        Hyp3eLogger.info("getSeason", `Resolved cycle year for ${year} and month ${month}:`, y)
+        if (!y?.season) return "Unknown";
+
+        const parts = y.season.split("|");
+        if (parts.length === 1) return parts[0];
+
+        // Handle split seasons
+        return (month <= 6) ? parts[0] : parts[1];
+    }
+
+    static phaseIcons = {
+        "New": "🌑",
+        "Waxing Crescent": "🌒",
+        "First Quarter": "🌓",
+        "Waxing Gibbous": "🌔",
+        "Waxing": "🌔",
+        "Full": "🌕",
+        "Waning Gibbous": "🌖",
+        "Third Quarter": "🌗",
+        "Waning Crescent": "🌘",
+        "Waning": "🌘",
+    };
+
+    static getMoonPhase(year, monthNum, day, moonName) {
+        const month = HYP3E_CALENDAR.months.find(m => m.num === monthNum);
+        if (!month) return "";
+        const phases = month.moonPhases?.[moonName];
+        if (!phases) return "";
+
+        // Direct match, when it happens
+        if (phases[day]) return phases[day];
+
+        // Find most recent defined phase
+        const days = Object.keys(phases).map(d => parseInt(d)).sort((a, b) => a - b);
+        let lastPhase = "";
+        for (let d of days) {
+            if (d <= day) lastPhase = phases[d];
+            else break;
+        }
+        return lastPhase;
     }
 
     static async setCurrentDate({year, month, day}) {
@@ -50,7 +94,9 @@ export class HYP3ECalendar {
 
     static formatDate(verbose = true) {
         const {year, month, day} = this.getCurrentDate();
+        Hyp3eLogger.info("formatDate", `Current date:`, {year, month, day})
         const cycleYear = this.getCycleYear(year);
+        Hyp3eLogger.info("formatDate", `Cycle year: ${cycleYear}`)
 
         const y = HYP3E_CALENDAR.years[cycleYear - 1];
         const m = HYP3E_CALENDAR.months[month - 1];

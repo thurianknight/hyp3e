@@ -3,7 +3,7 @@
         <div class="flex flexrow">
             <select id="calendar-month">
                 {{#each months as |month idx|}}
-                <option value="{{idx}}" {{#if (eq ../currentMonth idx)}}selected{{/if}}>
+                <option value="{{idx}}" {{#if (eq ../monthIndex idx)}}selected{{/if}}>
                     {{month.name}}
                 </option>
                 {{/each}}
@@ -25,14 +25,67 @@
             {{#each days}}
             <tr>
                 {{#each this}}
-                <td class="{{#if isToday}}today{{/if}}" data-day="{{number}}">
-                    {{number}}
+                <td class="{{#if isFestival}}festival{{/if}} {{#if isToday}}today{{/if}}" data-day="{{number}}">
+                    <div class="day-number">{{number}}</div>
+                    <div class="moon-icons">
+                      {{!-- {{#if isToday}} --}}
+                      {{#if phobosIcon}}
+                      <span class="moon-icon" title="Phobos: {{phobosPhase}}">{{phobosIcon}}</span>
+                      {{/if}}
+                      {{#if seleneIcon}}
+                      <span class="moon-icon" title="Selene: {{selenePhase}}">{{seleneIcon}}</span>
+                      {{/if}}
+                      {{!-- {{/if}} --}}
+                      {{!-- {{#unless isToday}}
+                      {{#if (eq phobosPhase "Full")}}
+                      <span class="moon-icon" title="Phobos: {{phobosPhase}}">{{phobosIcon}}</span>
+                      {{/if}}
+                      {{#if (eq phobosPhase "New")}}
+                      <span class="moon-icon" title="Phobos: {{phobosPhase}}">{{phobosIcon}}</span>
+                      {{/if}}
+                      {{#if (eq selenePhase "Full")}}
+                      <span class="moon-icon" title="Selene: {{selenePhase}}">{{seleneIcon}}</span>
+                      {{/if}}
+                      {{#if (eq selenePhase "New")}}
+                      <span class="moon-icon" title="Selene: {{selenePhase}}">{{seleneIcon}}</span>
+                      {{/if}}
+                      {{/unless}} --}}
+                    </div>
                 </td>
                 {{/each}}
             </tr>
             {{/each}}
         </tbody>
     </table>
+
+    <div class="calendar-footer">
+        <div class="flex flexrow">
+            <div>
+                <div class="season-banner">
+                    Season: {{season}}
+                </div>
+            </div>
+            <div>
+                <div class="moon-legend">
+                    <div class="legend-item">Moons Today:</div>
+                    <div class="legend-item" title="{{todayPhobos.phase}}">
+                        <span class="moon-icon">{{todayPhobos.icon}}</span> Phobos
+                    </div>
+                    <div class="legend-item" title="{{todaySelene.phase}}">
+                        <span class="moon-icon">{{todaySelene.icon}}</span> Selene
+                    </div>
+                </div>
+                <div class="festival-container">
+                    {{#if currentFestival}}
+                    <div class="festival-banner">
+                        Festival: {{currentFestival.name}} (Days {{currentFestival.startDay}}–{{currentFestival.endDay}})
+                    </div>
+                    {{/if}}
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <div class="calendar-toolbar">
         <button type="button" data-action="advance">Advance Day</button>

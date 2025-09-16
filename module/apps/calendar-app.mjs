@@ -19,7 +19,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         },
         classes: ["hyp3e-calendar"],
         position: {
-            width: 500,
+            width: 550,
             height: "auto"
         },
         form: {
@@ -44,7 +44,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         Hyp3eLogger.info("_prepareContext", `Calendar parameters:`, {partId, context, options})
         const date = HYP3ECalendar.getCurrentDate();
         const currentYear = date.year;
-        const currentMonth = date.month - 1;
+        const monthIndex = date.month - 1;
         const { years, months, weekdays } = HYP3E_CALENDAR;
         const verbose = game.settings.get(game.system.id, "calendarVerbose");
         Hyp3eLogger.info("_prepareContext", `Retrieving Hyperborea calendar date...${HYP3ECalendar.formatDate(verbose)}`)
@@ -53,29 +53,57 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
             // Get the named year and month... remember arrays are zero-indexed
             const year = years[HYP3ECalendar.getCycleYear(date.year) - 1];
             const month = months[date.month - 1];
+            const festival = month.festivals?.name ? month.festivals : null;
+            Hyp3eLogger.info("_prepareContext", `Array element year (${year.num}) and month (${month.num}).`)
 
-            // build day grid (7 days per week, 4 weeks)
+            // Build day grid (7 days per week, 4 weeks)
             const days = [];
             for (let w = 0; w < 4; w++) {
                 const week = [];
                 for (let d = 0; d < 7; d++) {
                     const dayNum = w * 7 + d + 1;
+                    const isFestival =
+                                festival &&
+                                dayNum >= festival.startDay &&
+                                dayNum <= festival.endDay;
+                    const phobosPhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, dayNum, "Phobos");
+                    const selenePhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, dayNum, "Selene");
+
                     week.push({
                         number: dayNum,
                         weekday: weekdays[d],
-                        isToday: dayNum === date.day
+                        isToday: dayNum === date.day,
+                        isFestival,
+                        phobosPhase,
+                        phobosIcon: HYP3ECalendar.phaseIcons[phobosPhase],
+                        selenePhase,
+                        seleneIcon: HYP3ECalendar.phaseIcons[selenePhase]
                     });
                 }
                 days.push(week);
             }
+            const phobosPhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, date.day, "Phobos");
+            const selenePhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, date.day, "Selene");
+
             return {
                 date,
                 year,
                 currentYear,
-                currentMonth,
+                monthIndex,
                 months,
                 weekdays,
-                days
+                days,
+                currentFestival: festival,
+                season: HYP3ECalendar.getSeason(currentYear, date.month),
+                phaseIcons: HYP3ECalendar.phaseIcons,
+                todayPhobos: {
+                    phase: phobosPhase,
+                    icon: HYP3ECalendar.phaseIcons[phobosPhase] || ""
+                },
+                todaySelene: {
+                    phase: selenePhase,
+                    icon: HYP3ECalendar.phaseIcons[selenePhase] || ""
+                }
             };
         } catch (err) {
             Hyp3eLogger.error("_prepareContext", `Error preparing context:`, err);

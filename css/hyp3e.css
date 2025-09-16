@@ -1481,6 +1481,7 @@ textarea {
   border-collapse: collapse;
   width: 100%;
   text-align: center;
+  margin: 16px 0;
 }
 
 .hyp3e-calendar .calendar-grid th,
@@ -1493,13 +1494,64 @@ textarea {
 
 .hyp3e-calendar .calendar-grid td.today {
   color: #0f7ed8;
-  background-color: rgba(33, 150, 243, 0.15); /* soft tint */
-  border-radius: 4px;
+  background-color: rgba(223, 55, 55, 0.2);
   font-weight: bold;
-  padding: 0 2px; /* optional: prevents text from touching rounded edges */
-  /* background: var(--color-border-highlight-alt); */
-  /* font-weight: bold; */
-  /* border: 2px solid var(--color-border-highlight); */
+  padding: 4px;
+}
+
+.hyp3e-calendar .calendar-grid td.festival {
+  color: #7a39e4;
+  background-color: rgba(120, 80, 160, 0.2);
+  font-weight: bold;
+  padding: 4px;
+}
+
+.hyp3e-calendar .calendar-grid td.today.festival {
+  color: #0f59d8;
+  background-color: rgba(223, 55, 55, 0.2);
+  font-weight: bold;
+  padding: 4px;
+}
+
+.hyp3e-calendar .calendar-grid td {
+  cursor: pointer;
+}
+
+.moon-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5em;
+  margin-top: 0.25em;
+  font-size: 0.85em;
+}
+
+.moon-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.festival-container {
+  margin-top: 0.5em;
+}
+
+.festival-banner {
+  padding: 0.3em 0.6em;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.season-banner {
+  font-weight: bold;
+  justify-content: center;
+  margin: 0 0.5em;
+  font-size: 1.5em;
+}
+
+.hyp3e-calendar .calendar-footer {
+  text-align: left;
+  margin-bottom: 0.5rem;
 }
 
 .hyp3e-calendar .calendar-toolbar {
@@ -1512,10 +1564,8 @@ textarea {
 .hyp3e-calendar .calendar-toolbar button {
   padding: 0.25rem 0.5rem;
   font-size: 0.9rem;
-}
-
-.hyp3e-calendar .calendar-grid td {
-  cursor: pointer;
+  width: 100%;
+  height: 35px;
 }
 
 /* Base style for logging to chat */
