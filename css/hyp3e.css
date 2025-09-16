@@ -1559,12 +1559,20 @@ textarea {
   gap: 0.5rem;
   justify-content: center;
   margin-bottom: 0.5rem;
+  button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    margin: 0.25em;
+    width: 70px;
+    height: 35px;
+  }
 }
 
-.hyp3e-calendar .calendar-toolbar button {
-  padding: 0.25rem 0.5rem;
+.hyp3e-calendar .calendar-toolbar .controls-label {
+  padding: 0.5rem 0.25rem 0.25rem 0.5rem;
   font-size: 0.9rem;
-  width: 100%;
+  margin: 0.25em;
+  width: 75px;
   height: 35px;
 }
 

@@ -142,6 +142,17 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
                 });
             });
         }
+        // Handle Date-grid selection changes
+        root.querySelectorAll("td[data-day]").forEach(td => {
+            td.addEventListener("click", async ev => {
+                const day = Number(ev.currentTarget.dataset.day);
+                console.log("[HYP3E] Clicked day:", day);
+                await HYP3ECalendar.setCurrentDate({
+                    ...HYP3ECalendar.getCurrentDate(),
+                    day
+                });
+            });
+        });
 
         root.querySelector("[data-action='advance']")
             ?.addEventListener("click", () => {
@@ -154,23 +165,18 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
                 HYP3ECalendar.sendDateToChat();
             });
 
-        root.querySelector("[data-action='reset']")
+        root.querySelector("[data-action='advance-reset']")
             ?.addEventListener("click", () => {
-                HYP3ECalendar.advanceDay(true);
+                HYP3ECalendar.advanceDay(false);
+                game.hyp3e.resetTurn();
                 this.render(true);
             });
 
-        root.querySelectorAll("td[data-day]").forEach(td => {
-            td.addEventListener("click", async ev => {
-                const day = Number(ev.currentTarget.dataset.day);
-                console.log("[HYP3E] Clicked day:", day);
-                await HYP3ECalendar.setCurrentDate({
-                    ...HYP3ECalendar.getCurrentDate(),
-                    day
-                });
-                // this.render(true);
+        root.querySelector("[data-action='reset']")
+            ?.addEventListener("click", () => {
+                game.hyp3e.resetTurn();
+                this.render(true);
             });
-        });
     }
 
     /** Example form handler */

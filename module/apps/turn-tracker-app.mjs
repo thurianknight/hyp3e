@@ -93,6 +93,9 @@ export class HYP3ETurnTrackerApp extends Application {
         super.activateListeners(htmlData);
         const html = $(htmlData); // Wrap in jQuery
 
+        html.find(".open-calendar").on("click", ev => {
+            game.hyp3e.openCalendar();
+        });
         html.find(".advance-turn").on("click", async ev => {
             await game.hyp3e.advanceTurn();
         });
