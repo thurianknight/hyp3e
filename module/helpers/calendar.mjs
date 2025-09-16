@@ -102,8 +102,20 @@ export class HYP3ECalendar {
         const m = HYP3E_CALENDAR.months[month - 1];
         const weekday = HYP3E_CALENDAR.weekdays[(day - 1) % 7];
 
-        if (!verbose) return `Y${year}/M${month}/D${day}`;
-        return `${weekday}, the ${day} of ${m.name}, ${year} (Year of the ${y.name})`;
+        // helper for ordinals
+        function ordinal(n) {
+            const s = ["th", "st", "nd", "rd"];
+            const v = n % 100;
+            return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        }
+
+        const dayOrdinal = ordinal(day);
+
+        if (!verbose) {
+            // Short version: "8th Libra, 576"
+            return `${dayOrdinal} ${m.name}, ${year}`;
+        }
+        return `${weekday}, the ${dayOrdinal} of ${m.name}, ${year} (Year of the ${y.name})`;
     }
 
     static sendDateToChat() {
