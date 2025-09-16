@@ -67,6 +67,11 @@ export class HYP3ECalendar {
     }
 
     static async setCurrentDate({year, month, day}) {
+        if (!game.user.isGM) {
+            Hyp3eLogger.warn("setCurrentDate", "Only the GM can change the date.");
+            return;
+        }
+
         await game.settings.set("hyp3e", "calendarDate", {year, month, day});
 
         // Broadcast a global hook so all apps refresh
@@ -74,6 +79,11 @@ export class HYP3ECalendar {
     }
 
     static async advanceDay(resetTurns = false) {
+        if (!game.user.isGM) {
+            Hyp3eLogger.warn("advanceDay", "Only the GM can change the date.");
+            return;
+        }
+
         let {year, month, day} = this.getCurrentDate();
         day++;
         if (day > 28) {
@@ -88,7 +98,7 @@ export class HYP3ECalendar {
         Hooks.call("calendarDayAdvanced", { year, month, day });
 
         if (resetTurns && game.hyp3e?.turnTrackerApp) {
-            game.hyp3e.resetTurn();
+            await game.hyp3e.resetTurn();
         }
     }
 

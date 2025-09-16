@@ -121,6 +121,11 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         // Handle year input changes
         const yearInput = root.querySelector("#calendar-year");
         if (yearInput) {
+            // Read-only for players
+            if (!game.user.isGM) {
+                // yearInput.prop("readonly", true);
+                yearInput.readOnly = true;
+            }
             yearInput.addEventListener("change", async (event) => {
                 const newYear = parseInt(event.target.value);
                 if (!isNaN(newYear)) {
@@ -134,6 +139,11 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         // Handle Month selection changes
         const monthSelect = this.element.querySelector("#calendar-month");
         if (monthSelect) {
+            // Read-only for players
+            if (!game.user.isGM) {
+                // monthSelect.prop("disabled", true);
+                monthSelect.disabled = true;
+            }
             monthSelect.addEventListener("change", async (event) => {
                 const newMonth = parseInt(event.target.value) + 1;
                 await HYP3ECalendar.setCurrentDate({
@@ -142,41 +152,51 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
                 });
             });
         }
-        // Handle Date-grid selection changes
-        root.querySelectorAll("td[data-day]").forEach(td => {
-            td.addEventListener("click", async ev => {
-                const day = Number(ev.currentTarget.dataset.day);
-                console.log("[HYP3E] Clicked day:", day);
-                await HYP3ECalendar.setCurrentDate({
-                    ...HYP3ECalendar.getCurrentDate(),
-                    day
+        // Only add listener for the GM, not players
+        if (game.user.isGM) {
+            // Handle date-grid selection changes
+            root.querySelectorAll("td[data-day]").forEach(td => {
+                td.addEventListener("click", async ev => {
+                    const day = Number(ev.currentTarget.dataset.day);
+                    console.log("[HYP3E] Clicked day:", day);
+                    await HYP3ECalendar.setCurrentDate({
+                        ...HYP3ECalendar.getCurrentDate(),
+                        day
+                    });
                 });
             });
-        });
+        }
 
-        root.querySelector("[data-action='advance']")
-            ?.addEventListener("click", () => {
-                HYP3ECalendar.advanceDay(false);
-                this.render(true);
-            });
+        if (game.user.isGM) {
+            root.querySelector("[data-action='advance']")
+                ?.addEventListener("click", () => {
+                    // Sending 'false' tells advanceDay() to NOT reset the turn counter
+                    HYP3ECalendar.advanceDay(false);
+                    this.render(true);
+                });
+        }
 
         root.querySelector("[data-action='chat']")
             ?.addEventListener("click", () => {
                 HYP3ECalendar.sendDateToChat();
             });
 
-        root.querySelector("[data-action='advance-reset']")
-            ?.addEventListener("click", () => {
-                HYP3ECalendar.advanceDay(false);
-                game.hyp3e.resetTurn();
-                this.render(true);
-            });
+        if (game.user.isGM) {
+            root.querySelector("[data-action='advance-reset']")
+                ?.addEventListener("click", () => {
+                    // Sending 'true' tells advanceDay() to also reset the turn counter
+                    HYP3ECalendar.advanceDay(true);
+                    this.render(true);
+                });
+        }
 
-        root.querySelector("[data-action='reset']")
-            ?.addEventListener("click", () => {
-                game.hyp3e.resetTurn();
-                this.render(true);
-            });
+        if (game.user.isGM) {
+            root.querySelector("[data-action='reset']")
+                ?.addEventListener("click", () => {
+                    game.hyp3e.resetTurn();
+                    this.render(true);
+                });
+        }
     }
 
     /** Example form handler */

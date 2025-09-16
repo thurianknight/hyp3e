@@ -823,7 +823,6 @@ Hooks.once("ready", async function() {
             resizeTokenPrototypes()
         }
     }
-
 });
 
 /* -------------------------------------------- */
@@ -926,16 +925,16 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
         game.hyp3e.openCalendar();
         return false;
     }
-    if (parts[1] === "chat") {
-        game.hyp3e.sendDateToChat();
+    if (parts[0] === "/cal" && parts[1] === "chat") {
+        game.hyp3e.calendar.sendDateToChat();
         return false;
     }
     // Only GMs can advance the day
     if (parts[1] === "advance" && game.user.isGM) {
         // "/cal advance reset" will reset the Turn Tracker too
         const reset = parts.includes("reset");
-        game.hyp3e.advanceDay(reset);
-        game.hyp3e.sendDateToChat();
+        game.hyp3e.calendar.advanceDay(reset);
+        game.hyp3e.calendar.sendDateToChat();
         return false;
     }
 
