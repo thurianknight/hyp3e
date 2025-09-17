@@ -219,11 +219,11 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     /** store toggle state and re-render */
-    _setShowMoonPhases(showAll) {
-        this.showAllMoonPhases = showAll;
-        game.settings.set("hyp3e", "showAllMoonPhases", this.showAllMoonPhases);
-        this.render();
-    }
+    // _setShowMoonPhases(showAll) {
+    //     this.showAllMoonPhases = showAll;
+    //     game.settings.set("hyp3e", "showAllMoonPhases", this.showAllMoonPhases);
+    //     this.render();
+    // }
 
     /** Example form handler */
     static async onSubmit(event, form, formData) {
