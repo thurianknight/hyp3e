@@ -940,10 +940,12 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
     }
     // Only GMs can advance the day
     if (parts[1] === "advance" && game.user.isGM) {
-        // "/cal advance reset" will reset the Turn Tracker too
+        // "/cal advance reset" will reset the Turn Tracker too (NOT WORKING?)
         const reset = parts.includes("reset");
         game.hyp3e.calendar.advanceDay(reset);
-        game.hyp3e.calendar.sendDateToChat();
+        setTimeout(() => {
+            game.hyp3e.calendar.sendDateToChat();
+        }, 500);
         return false;
     }
 
