@@ -6,14 +6,16 @@ import { Hyp3eLogger } from "./logger.mjs";
  * @returns {Object} - JSON of update data
  */
 export function migrateActorData(actor) {
-    Hyp3eLogger.info("migrateActorData", `Original ${actor.name} to migrate:`, actor)
+    // Hyp3eLogger.info("migrateActorData", `Original ${actor.name} to migrate:`, actor)
     // let newActor = {...actor};
     let updates = {};
     // Add new default values
     if (!("identified" in actor.system)) {
+        Hyp3eLogger.info("migrateActorData", `Fixing "identified" flag for ${actor.name}...`);
         updates = { ...updates, "system.identified": true };
     }
     if (!("tokenAlias" in actor.system)) {
+        Hyp3eLogger.info("migrateActorData", `Fixing token alias for ${actor.name}...`);
         updates = { ...updates, "system.tokenAlias": "" };
     }
     // Migrate, fix, or delete old data
@@ -68,6 +70,7 @@ export function migrateActorData(actor) {
 
         // Migrate, fix, or delete old data
         if ("explorationSkills" in actor.system) {
+            Hyp3eLogger.info("migrateActorData", `Removing old explorationSkills from ${actor.name}...`);
             updates = { ...updates, "system.-=explorationSkills": null };
         }
         // Alignment is under system instead of system.details
@@ -76,7 +79,6 @@ export function migrateActorData(actor) {
             const fixAlignment = { "system.alignment": actor.system.details.alignment }
             updates = { ...updates, fixAlignment };
         }
-
     }
 
     // NPCs only
@@ -87,7 +89,9 @@ export function migrateActorData(actor) {
 
     }
 
-    Hyp3eLogger.info("migrateActorData", `Updated data for ${actor.name}:`, updates)
+    if (Object.keys(updates).length > 0) { 
+        Hyp3eLogger.info("migrateActorData", `Updated data for ${actor.name}:`, updates);
+    }
     return updates;
 }
 
@@ -97,7 +101,7 @@ export function migrateActorData(actor) {
  * @returns {Object} - JSON of update data
  */
 export function migrateItemData(item) {
-    Hyp3eLogger.info("migrateItemData", `Original ${item.name} to migrate:`, item)
+    // Hyp3eLogger.info("migrateItemData", `Original ${item.name} to migrate:`, item)
     // let newItem = {...item};
     let updates = {};
 
@@ -111,19 +115,19 @@ export function migrateItemData(item) {
 
     // All items, regardless of type
     if (!("identified" in item.system)) {
-        Hyp3eLogger.info("migrateActorData", `Fixing "identified" flag for ${item.name}...`);
+        Hyp3eLogger.info("migrateItemData", `Fixing "identified" flag for ${item.name}...`);
         updates = { ...updates, "system.identified": true };
     }
     if (!("tokenAlias" in item.system)) {
-        Hyp3eLogger.info("migrateActorData", `Fixing token alias for ${item.name}...`);
+        Hyp3eLogger.info("migrateItemData", `Fixing token alias for ${item.name}...`);
         updates = { ...updates, "system.tokenAlias": "" };
     }
     if (!("realName" in item.system) || item.system.realName == "") {
-        Hyp3eLogger.info("migrateActorData", `Fixing real name for ${item.name}...`);
+        Hyp3eLogger.info("migrateItemData", `Fixing real name for ${item.name}...`);
         updates = { ...updates, "system.realName": item.name };
     }
     if (!("realDescription" in item.system) || item.system.realDescription == "") {
-        Hyp3eLogger.info("migrateActorData", `Fixing real description for ${item.name}...`);
+        Hyp3eLogger.info("migrateItemData", `Fixing real description for ${item.name}...`);
         updates = { ...updates, "system.realDescription": item.system.description };
     }
 
@@ -132,15 +136,15 @@ export function migrateItemData(item) {
         // Convert legacy shield to new type
         const shieldUpdate = migrateShield(item);
         if (shieldUpdate) {
-            Hyp3eLogger.info("migrateActorData", `Migrating ${item.name} from armor to shield...`);
+            Hyp3eLogger.info("migrateItemData", `Migrating ${item.name} from armor to shield...`);
             updates = { ...updates, ...shieldUpdate };
         }
         // On actual armor, replace default shield icon with new breastplate icon
         if (item.system.type !== "shield") {
-            Hyp3eLogger.info("migrateActorData", `Fixing armor icon for ${item.name}...`);
             const defaultIcon = "icons/svg/shield.svg"
             const newIcon = "systems/hyp3e/assets/breastplate_wht.svg"
             if (item.img === defaultIcon) {
+                Hyp3eLogger.info("migrateItemData", `Fixing armor icon for ${item.name}...`);
                 updates = { ...updates, "img": newIcon };
             }
         }
@@ -155,7 +159,7 @@ export function migrateItemData(item) {
     if (item.type === "item") {
         // Add the new light source properties if they do not exist yet
         if (item.system.isLightSource === undefined || item.system.isLightSource === null) {
-            Hyp3eLogger.info("migrateActorData", `Fixing light source properties for ${item.name}...`);
+            Hyp3eLogger.info("migrateItemData", `Fixing light source properties for ${item.name}...`);
             const lightSourceProps = item._getLightSourceProperties();
             if (lightSourceProps) {
                 const lightProps = lightSourceUpdates(lightSourceProps);
@@ -185,7 +189,9 @@ export function migrateItemData(item) {
         }
     }
 
-    Hyp3eLogger.info("migrateItemData", `Updated data for ${item.name}:`, updates)
+    if (Object.keys(updates).length > 0) { 
+        Hyp3eLogger.info("migrateItemData", `Updated data for ${item.name}:`, updates);
+    }
     return updates;
 }
 
