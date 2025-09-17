@@ -37,6 +37,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
     constructor(...args) {
         super(...args);
+        this.showAllMoonPhases = game.settings.get("hyp3e", "showAllMoonPhases");
         Hooks.on("calendarDateSet", () => this.render(true));
     }
 
@@ -62,22 +63,30 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
                 const week = [];
                 for (let d = 0; d < 7; d++) {
                     const dayNum = w * 7 + d + 1;
+                    const isToday = dayNum === date.day
                     const isFestival =
                                 festival &&
                                 dayNum >= festival.startDay &&
                                 dayNum <= festival.endDay;
-                    const phobosPhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, dayNum, "Phobos");
-                    const selenePhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, dayNum, "Selene");
+
+                    // Only include moon phases if toggle is ON, or if it's today
+                    const includePhases = this.showAllMoonPhases || isToday;
+                    let phobosPhase = null;
+                    let selenePhase = null;
+                    if (includePhases) {
+                        phobosPhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, dayNum, "Phobos");
+                        selenePhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, dayNum, "Selene");
+                    }
 
                     week.push({
                         number: dayNum,
                         weekday: weekdays[d],
-                        isToday: dayNum === date.day,
+                        isToday,
                         isFestival,
                         phobosPhase,
-                        phobosIcon: HYP3ECalendar.phaseIcons[phobosPhase],
+                        phobosIcon: HYP3ECalendar.phaseIcons[phobosPhase] ?? null,
                         selenePhase,
-                        seleneIcon: HYP3ECalendar.phaseIcons[selenePhase]
+                        seleneIcon: HYP3ECalendar.phaseIcons[selenePhase] ?? null
                     });
                 }
                 days.push(week);
@@ -167,6 +176,16 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
             });
         }
 
+        // Handle toggling the moon phase display to all days / only current day
+        // const toggle = this.element.querySelector("#moonPhaseToggle");
+        // if (toggle) {
+        //     toggle.addEventListener("change", (ev) => {
+        //         const showAll = ev.target.checked;
+        //         this._setShowMoonPhases(showAll);
+        //         this.render(true);
+        //     });
+        // }
+
         if (game.user.isGM) {
             root.querySelector("[data-action='advance']")
                 ?.addEventListener("click", () => {
@@ -197,6 +216,13 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
                     this.render(true);
                 });
         }
+    }
+
+    /** store toggle state and re-render */
+    _setShowMoonPhases(showAll) {
+        this.showAllMoonPhases = showAll;
+        game.settings.set("hyp3e", "showAllMoonPhases", this.showAllMoonPhases);
+        this.render();
     }
 
     /** Example form handler */

@@ -61,6 +61,15 @@ Hooks.once('init', async function() {
         type: Object,
         default: { year: 576, month: 1, day: 1 }
     });
+    // Save the selection of whether to display all moon phases on the calendar
+    game.settings.register(game.system.id, "showAllMoonPhases", {
+        name: "Show All Moon Phases",
+        hint: "If enabled, the calendar grid shows phases on every day. If disabled, only today's phases are shown.",
+        scope: "world",
+        config: false,      // hidden from normal settings UI
+        type: Boolean,
+        default: true
+    });
 
     // Register a world setting to store the current exploration turn
     game.settings.register(game.system.id, "explorationTurn", {

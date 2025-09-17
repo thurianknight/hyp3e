@@ -11,6 +11,13 @@
             <input id="calendar-year" type="number" value="{{currentYear}}" /> 
             <span name="year">(Year of the {{year.name}}, <i>{{year.alt}})</i></span>
         </div>
+        {{!-- <div class="moon-toggle">
+            <label class="switch">
+                <input type="checkbox" id="toggle-moon-phases" {{#if showAllMoonPhases}}checked{{/if}}>
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Show all moon phases</span>
+        </div> --}}
     </div>
 
     <table class="calendar-grid">
@@ -28,28 +35,12 @@
                 <td class="{{#if isFestival}}festival{{/if}} {{#if isToday}}today{{/if}}" data-day="{{number}}">
                     <div class="day-number">{{number}}</div>
                     <div class="moon-icons">
-                      {{!-- {{#if isToday}} --}}
                       {{#if phobosIcon}}
                       <span class="moon-icon" title="Phobos: {{phobosPhase}}">{{phobosIcon}}</span>
                       {{/if}}
                       {{#if seleneIcon}}
                       <span class="moon-icon" title="Selene: {{selenePhase}}">{{seleneIcon}}</span>
                       {{/if}}
-                      {{!-- {{/if}} --}}
-                      {{!-- {{#unless isToday}}
-                      {{#if (eq phobosPhase "Full")}}
-                      <span class="moon-icon" title="Phobos: {{phobosPhase}}">{{phobosIcon}}</span>
-                      {{/if}}
-                      {{#if (eq phobosPhase "New")}}
-                      <span class="moon-icon" title="Phobos: {{phobosPhase}}">{{phobosIcon}}</span>
-                      {{/if}}
-                      {{#if (eq selenePhase "Full")}}
-                      <span class="moon-icon" title="Selene: {{selenePhase}}">{{seleneIcon}}</span>
-                      {{/if}}
-                      {{#if (eq selenePhase "New")}}
-                      <span class="moon-icon" title="Selene: {{selenePhase}}">{{seleneIcon}}</span>
-                      {{/if}}
-                      {{/unless}} --}}
                     </div>
                 </td>
                 {{/each}}
