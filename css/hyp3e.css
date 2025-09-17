@@ -1624,7 +1624,7 @@ textarea {
   height: 35px;
 }
 
-/* Base style for logging to chat */
+/* Base styles for logging to chat */
 .chat-message .hyp3e-log {
   font-family: monospace;
   font-size: 0.9rem;

@@ -1126,7 +1126,8 @@ export class Hyp3eActor extends Actor {
         Hyp3eLogger.info("rollBasic", `Rolling ${dataset.label}...`);
 
         let rollResponse
-        let label = `${dataset.label}...`
+        // let label = `${dataset.label}...`
+        let label = this._createChatLabel(this.img, `${dataset.label}...`)
         dataset.rollButtonLabel = "Roll"
 
         // Log the dataset before the dialog renders
@@ -1160,7 +1161,8 @@ export class Hyp3eActor extends Actor {
         Hyp3eLogger.info("rollReaction", `Rolling ${dataset.label}...`);
 
         let rollResponse
-        let label = `${dataset.label}...`
+        // let label = `${dataset.label}...`
+        let label = this._createChatLabel(this.img, `${dataset.label}...`)
         dataset.rollButtonLabel = "Roll Reaction"
 
         // Log the dataset before the dialog renders
@@ -1203,7 +1205,8 @@ export class Hyp3eActor extends Actor {
         let saveRollParts = []
         let rollFormula = ""
         let rollResponse
-        let label = `${dataset.label}...`
+        // let label = `${dataset.label}...`
+        let label = this._createChatLabel(this.img, `${dataset.label}...`)
 
         if (this.type == "character") {
             // Get the character's saving throw modifiers
@@ -1435,7 +1438,7 @@ export class Hyp3eActor extends Actor {
         const item = this.items.get(itemId) ?? null
         if (item) {
             itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
-            label = this._createChatLabel(item.img, itemName)
+            label = this._createChatLabel(this.img, itemName)
         }
 
         // Determine whether we have a valid target number or formula
@@ -1707,9 +1710,10 @@ export class Hyp3eActor extends Actor {
         }
 
         // Render chat message
-        const chatLabel = this._createChatLabel(item?.img, itemName);
+        const chatLabel = this._createChatLabel(this.img, itemName);
         const finalAttackText = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
 
+        Hyp3eLogger.info("rollAttackOrSpell", `Chat data:`, {chatLabel, finalAttackText, critFooterHTML});
         await renderCustomChat(atkRoll, item, this, attacker?.id, chatLabel, debugAtkRollFormula, finalAttackText, critFooterHTML, rollResponse.rollMode); // Assuming this exists
 
         // Return Roll Result
@@ -2424,9 +2428,9 @@ export class Hyp3eActor extends Actor {
      * @param {string} itemName - Name of the item/action.
      * @returns {string} HTML string for the label.
      */
-    _createChatLabel(itemImg, itemName) {
+    _createChatLabel(chatImg, itemName) {
         // Use a default image if itemImg is missing
-        const imgSrc = itemImg || "icons/svg/mystery-man.svg";
+        const imgSrc = chatImg || "icons/svg/mystery-man.svg";
         return `
             <hr class="plain-hr" />
             <div style="margin: 10px 0;">
