@@ -178,10 +178,10 @@ export function migrateItemData(item) {
 
     // Weapons only
     if (item.type === "weapon") {
-        const friendlyName = fixFriendlyName(item);
-        if (friendlyName) {
-            updates = { ...updates, "system.friendlyName": friendlyName };
-        }
+        // const friendlyName = fixFriendlyName(item);
+        // if (friendlyName) {
+        //     updates = { ...updates, "system.friendlyName": friendlyName };
+        // }
         const handsUpdate = migrateWeaponHands(item);
         if (handsUpdate) {
             Hyp3eLogger.info("migrateItemData", `Updated weapon hands for ${item.name}:`, handsUpdate)
