@@ -834,9 +834,9 @@ export class Hyp3eActorSheet extends ActorSheet {
             this.actor.rollCheck(dataset)
             break
 
-        case "attack":
-            this.actor.rollAttackOrSpell(dataset)
-            break
+        // case "attack":   // NOT USED ANY MORE
+        //     this.actor.rollAttackOrSpell(dataset)
+        //     break
 
         case "save":
             this.actor.rollSave(dataset)

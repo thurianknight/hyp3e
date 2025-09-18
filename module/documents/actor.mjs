@@ -1420,6 +1420,7 @@ export class Hyp3eActor extends Actor {
         let label = ""
         let checkText = dataset.label
         let rollFormula = ""
+        const targetComparison = dataset.comparison ?? "le"
         let rollResponse
 
         // Did we get a token ID?
@@ -1461,6 +1462,9 @@ export class Hyp3eActor extends Actor {
                     break
                 case "feature":
                     dataset.rollButtonLabel = "Use Ability"
+                    break
+                case "spell":
+                    dataset.rollButtonLabel = "Cast Spell"
                     break
                 default:
                     dataset.rollButtonLabel = "Use"
@@ -1543,7 +1547,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Roll the dice!
-        const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, rollData, dataset.rollTarget, "le");
+        const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, rollData, dataset.rollTarget, targetComparison);
 
         // Determine success or failure on a simple check, not turning undead or assassinating
         if (!turnUndead && !assassinate) {
@@ -1581,19 +1585,14 @@ export class Hyp3eActor extends Actor {
         const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
         const actorData = this.getRollData();
 
-        if (!item && !dataset.formula) { // If there's no item and no predefined formula (e.g., basic attack removed)
-            Hyp3eLogger.warn("rollAttackOrSpell", `No item or formula provided for the roll.`);
-            ui.notifications.warn("Cannot perform action: No item or formula specified.");
+        // If item lookup fails, exit with a warning
+        if (!item) {
+            const msg = `No item found for ID ${dataset.itemId}.`;
+            Hyp3eLogger.warn("rollAttackOrSpell", msg);
+            ui.notifications.warn(msg);
             return null;
         }
         dataset.itemName = itemName || "";
-
-        // Early exit if item requires a roll but has no formula (data setup errors)
-        if (item && !itemData.formula && (item.type === "weapon" || (item.type === "spell" && itemData.atkRoll))) {
-            Hyp3eLogger.info("rollAttackOrSpell", `Item has no roll formula, displaying description instead.`);
-            item._displayItemInChat(actorData);
-            return null;
-        }
 
         // Gather Target Information & Calculate Distance/Range
         const { target, targetData, gridDistance } = this._getTargetDetails(attacker);
