@@ -18,6 +18,7 @@ import { HYP3E_CALENDAR } from "./helpers/calendar-data.mjs"
 import { HYP3ECalendar, setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
+import { Hyp3eConfigApp } from "./apps/hyp3e-config-app.js";
 
 // Set this now, to use later
 let trackerInitialized = false;
@@ -43,6 +44,16 @@ Hooks.once('init', async function() {
 
     // Disable legacy effect transferral
     CONFIG.ActiveEffect.legacyTransferral = false;
+
+    // Add a launcher button in System Settings
+    game.settings.registerMenu(game.system.id, "configMenu", {
+        name: "Hyperborea Configuration",
+        label: "Configure Hyperborea",
+        hint: "Open the Hyperborea configuration manager.",
+        icon: "fas fa-cogs",
+        type: Hyp3eConfigApp,
+        restricted: true
+    });
 
     // Register system settings
     game.settings.register(game.system.id, `migration-${currentVersion}-ran`, {

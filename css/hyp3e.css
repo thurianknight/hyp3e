@@ -355,6 +355,23 @@ textarea {
 .hyp3e {
   /* Example style for Hyp3e (can be removed if not needed) */
 }
+
+/* Hyperborea Config app styles */
+.hyp3e-config nav.tabs {
+  margin-bottom: 0.5em;
+  border-bottom: 1px solid #666;
+}
+.hyp3e-config nav.tabs .item {
+  margin-right: 1em;
+  cursor: pointer;
+}
+.hyp3e-config .tab {
+  display: none;
+}
+.hyp3e-config .tab.active {
+  display: block;
+}
+
 /* Sheet-level styles */
 .hyp3e.sheet.actor {
   min-width: 800px;
