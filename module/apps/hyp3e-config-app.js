@@ -16,7 +16,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
         classes: ["hyp3e-config", "scrollable"],
         window: {
             title: "Hyperborea Configuration",
-            icon: "fa-gear",
+            icon: "fa-solid fa-cogs",
             resizable: true,
         },
         position: {
