@@ -49,8 +49,11 @@ Hooks.once('init', async function() {
     // Disable legacy effect transferral
     CONFIG.ActiveEffect.legacyTransferral = false;
 
+    let showConfigOptions = true;
+
     // Add a launcher button in System Settings
     if (majorVersion >= 13) {
+        showConfigOptions = false;
         game.settings.registerMenu(game.system.id, "configMenu", {
             name: "Hyperborea Configuration",
             label: "Configure Hyperborea",
@@ -60,12 +63,12 @@ Hooks.once('init', async function() {
             restricted: true
         });
     }
-
+    console.log("Display config options:", showConfigOptions)
     // Register system settings
     game.settings.register(game.system.id, `migration-${currentVersion}-ran`, {
         name: "Migration Ran",
         scope: "world",
-        config: false,
+        config: false,  // Always hidden from UI
         type: Boolean,
         default: false,
     });
@@ -74,7 +77,7 @@ Hooks.once('init', async function() {
     game.settings.register(game.system.id, "calendarDate", {
         name: "Calendar Date",
         scope: "world",
-        config: false,
+        config: false,  // Always hidden from UI
         type: Object,
         default: { year: 576, month: 1, day: 1 }
     });
@@ -83,7 +86,7 @@ Hooks.once('init', async function() {
         name: "Show All Moon Phases",
         hint: "If enabled, the calendar grid shows phases on every day. If disabled, only today's phases are shown.",
         scope: "world",
-        config: false,      // hidden from normal settings UI
+        config: false,  // Always hidden from UI
         type: Boolean,
         default: true
     });
@@ -92,7 +95,7 @@ Hooks.once('init', async function() {
     game.settings.register(game.system.id, "explorationTurn", {
         name: "Exploration Turn",
         scope: "world",
-        config: false, // Hidden from settings UI
+        config: false,  // Always hidden from UI
         type: Number,
         default: 0
     });
@@ -101,7 +104,7 @@ Hooks.once('init', async function() {
     game.settings.register(game.system.id, "turnAdvanceActions", {
         name: "Turn-Advance Actions",
         scope: "world",
-        config: false, // We'll manage it via our own UI
+        config: false, // Managed via the Turn Tracker Actions app
         type: Array,
         default: []
     });
@@ -111,7 +114,7 @@ Hooks.once('init', async function() {
         name: "Verbose Date Format",
         hint: "When enabled, display the date as 'Sun, the 1 of Aries, Year of the Tempest'. Otherwise just display as '576/1/1'.",
         scope: "world",
-        config: true,
+        config: showConfigOptions,
         type: Boolean,
         default: true
     });
@@ -121,7 +124,7 @@ Hooks.once('init', async function() {
         name: game.i18n.localize("HYP3E.settings.enableTurnTracker"),
         hint: game.i18n.localize("HYP3E.settings.enableTurnTrackerHint"),
         scope: "world",
-        config: true,
+        config: showConfigOptions,
         type: Boolean,
         default: true,
         requiresReload: true
@@ -134,7 +137,7 @@ Hooks.once('init', async function() {
         default: true,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true
     });
 
@@ -145,7 +148,7 @@ Hooks.once('init', async function() {
         default: true,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: false
     });
 
@@ -156,7 +159,7 @@ Hooks.once('init', async function() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true
     });
 
@@ -173,7 +176,7 @@ Hooks.once('init', async function() {
             "4d6dl": "Method III: 4d6 drop lowest",
             "2d6+6": "Method V: 2d6+6"
         },
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -184,7 +187,7 @@ Hooks.once('init', async function() {
         default: "",
         scope: "world",
         type: String,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -192,7 +195,7 @@ Hooks.once('init', async function() {
     game.settings.register(game.system.id, "customClassData", {
         name: "Custom Classes",
         scope: "world",
-        config: false,
+        config: false,  // Always hidden from config UI
         type: Object,
         default: {},
     });
@@ -201,7 +204,7 @@ Hooks.once('init', async function() {
         name: game.i18n.localize("HYP3E.settings.openClassEditor"),
         hint: game.i18n.localize("HYP3E.settings.openClassEditorHint"),
         scope: "world",
-        config: true,
+        config: showConfigOptions,
         type: String, // Doesn't matter since we're intercepting the render
         default: "",
     });
@@ -217,7 +220,7 @@ Hooks.once('init', async function() {
             "": "Disabled",
             "3d6": "3d6 roll-under"
         },
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -228,7 +231,7 @@ Hooks.once('init', async function() {
         default: true,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -239,7 +242,7 @@ Hooks.once('init', async function() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: false,
     });
 
@@ -250,7 +253,7 @@ Hooks.once('init', async function() {
         default: true,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -261,7 +264,7 @@ Hooks.once('init', async function() {
         default: "reset",
         scope: "world",
         type: String,
-        config: true,
+        config: showConfigOptions,
         choices: {
             keep: "HYP3E.settings.initiativeKeep",
             reset: "HYP3E.settings.initiativeReset",
@@ -277,7 +280,7 @@ Hooks.once('init', async function() {
             default: false,
             scope: "world",
             type: Boolean,
-            config: true,
+            config: showConfigOptions,
             requiresReload: true,
         });
     }
@@ -289,7 +292,7 @@ Hooks.once('init', async function() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
     // Force weapon equippage to use
@@ -299,7 +302,7 @@ Hooks.once('init', async function() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
     // Force spell memorization to cast
@@ -309,7 +312,7 @@ Hooks.once('init', async function() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -320,7 +323,7 @@ Hooks.once('init', async function() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -331,7 +334,7 @@ Hooks.once('init', async function() {
         default: true,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
     
@@ -342,7 +345,7 @@ Hooks.once('init', async function() {
         default: true,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -353,7 +356,7 @@ Hooks.once('init', async function() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
     // GM-defined strength multiplier for encumbered status
@@ -363,7 +366,7 @@ Hooks.once('init', async function() {
         default: 10,
         scope: "world",
         type: Number,
-        config: true,
+        config: showConfigOptions,
         requiresReload: false,
     });
     // GM-defined strength multiplier for heavily encumbered status
@@ -373,7 +376,7 @@ Hooks.once('init', async function() {
         default: 15,
         scope: "world",
         type: Number,
-        config: true,
+        config: showConfigOptions,
         requiresReload: false,
     });
 
@@ -384,7 +387,7 @@ Hooks.once('init', async function() {
         default: "",
         scope: "world",
         type: String,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -395,7 +398,7 @@ Hooks.once('init', async function() {
         default: "Common (Mixed), Amazon, Atlantean, Esquimaux, Hyperborean, Ixian, Kelt, Kimmerian, Kimmeri-Kelt, Pict, Pict (Half-Blood), Viking, Anglo-Saxon, Carolingian Frank, Carthaginian, Esquimaux-Ixian, Greek, Lapp, Lemurian, Moor, Mu, Oon, Roman, Tlingit, Yakut",
         scope: "world",
         type: String,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -406,7 +409,7 @@ Hooks.once('init', async function() {
         default: "Common, Berber, Esquimaux (Coastal), Esquimaux (Tundra), Esquimaux-Ixian (pidgin), Hellenic (Amazon), Hellenic (Atlantean), Hellenic (Greek), Hellenic (Hyperborean), Hellenic (Kimmerian), Keltic (Goidelic), Keltic (Pictish), Latin, Lemurian, Muat, Old Norse (Anglo-Saxon), Old Norse (Viking), Oonat, Thracian (Ixian), Thracian (Kimmerian), Tlingit, Uralic (Lapp), Uralic (Yakut)",
         scope: "world",
         type: String,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -417,7 +420,7 @@ Hooks.once('init', async function() {
         default: "Assassin, Barbarian, Bard, Berserker, Cataphract, Cleric, Cryomancer, Druid, Fighter, Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch",
         scope: "world",
         type: String,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -428,7 +431,7 @@ Hooks.once('init', async function() {
         default: "Animal, Automaton, Dæmon, Elemental, Giant-kind, Humanoid, Insect, Lycanthrope, Otherworldly, Plant, Reptile, Undead",
         scope: "world",
         type: String,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -454,7 +457,7 @@ Hooks.once('init', async function() {
             "2": "Errors Only"
         },
         default: "1",
-        config: true,
+        config: showConfigOptions,
         requiresReload: true
     });
 
@@ -465,7 +468,7 @@ Hooks.once('init', async function() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
@@ -476,7 +479,7 @@ Hooks.once('init', async function() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: true,
+        config: showConfigOptions,
         requiresReload: true,
     });
 
