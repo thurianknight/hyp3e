@@ -1,91 +1,305 @@
-<form>
-  <nav class="tabs" data-group="primary">
-    <a class="item" data-tab="ui">UI Options</a>
-    <a class="item" data-tab="rules">Rules Options</a>
-    <a class="item" data-tab="chars">Character & NPC</a>
-    <a class="item" data-tab="tech">Technical</a>
-  </nav>
+<div class="hyp3e-config-app">
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="ui">UI Options</a>
+        <a class="item" data-tab="rules">General Rules</a>
+        <a class="item" data-tab="combat">Combat Rules</a>
+        <a class="item" data-tab="chars">Characters & NPCs</a>
+        <a class="item" data-tab="tech">Technical</a>
+    </nav>
 
-  <section class="content">
-    <!-- UI Options -->
-    <div class="tab" data-tab="ui">
-      <div class="form-group">
-        <label>{{localize "HYP3E.settings.calendarVerbose"}}</label>
-        <input type="checkbox" name="calendarVerbose" {{checked settings.calendarVerbose}} />
-      </div>
+    <section class="content">
+        <!-- UI Options -->
+        <div class="tab" data-tab="ui">
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.calendarVerbose"}}</label>
+                <input type="checkbox" name="calendarVerbose" {{checked settings.calendarVerbose}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.calendarVerboseHint"}}</p>
+            </div>
 
-      <div class="form-group">
-        <label>{{localize "HYP3E.settings.enableTurnTracker"}}</label>
-        <input type="checkbox" name="enableTurnTracker" {{checked settings.enableTurnTracker}} />
-      </div>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.enableTurnTracker"}}</label>
+                <input type="checkbox" name="enableTurnTracker" {{checked settings.enableTurnTracker}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.enableTurnTrackerHint"}}</p>
+            </div>
 
-      <div class="form-group">
-        <label>{{localize "HYP3E.settings.showWeaponOverlay"}}</label>
-        <input type="checkbox" name="showWeaponOverlay" {{checked settings.showWeaponOverlay}} />
-      </div>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.showWeaponOverlay"}}</label>
+                <input type="checkbox" name="showWeaponOverlay" {{checked settings.showWeaponOverlay}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.showWeaponOverlayHint"}}</p>
+            </div>
 
-      <div class="form-group">
-        <label>{{localize "HYP3E.settings.resizeTokens"}}</label>
-        <input type="checkbox" name="resizeTokens" {{checked settings.resizeTokens}} />
-      </div>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.resizeTokens"}}</label>
+                <input type="checkbox" name="resizeTokens" {{checked settings.resizeTokens}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.resizeTokensHint"}}</p>
+            </div>
+        </div>
 
-    </div>
+        <!-- Rules Options -->
+        <div class="tab" data-tab="rules">
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.autoCalcAc"}}</label>
+                <input type="checkbox" name="autoCalcAc" {{checked settings.autoCalcAc}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.autoCalcAcHint"}}</p>
+            </div>
 
-    <!-- Rules Options -->
-    <div class="tab" data-tab="rules">
-      <h3>General</h3>
-      <div class="form-group">
-        <label>{{localize "HYP3E.settings.autoCalcAc"}}</label>
-        <input type="checkbox" name="autoCalcAc" {{checked settings.autoCalcAc}} />
-      </div>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.enforceWeaponEquipRules"}}</label>
+                <input type="checkbox" name="enforceWeaponEquipRules" {{checked settings.enforceWeaponEquipRules}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.enforceWeaponEquipRulesHint"}}</p>
+            </div>
 
-      <!-- Add the rest of the General + Combat options -->
-      <h3>Combat</h3>
-      <div class="form-group">
-        <label>{{localize "HYP3E.settings.isGroupInitiative"}}</label>
-        <input type="checkbox" name="isGroupInitiative" {{checked settings.isGroupInitiative}} />
-      </div>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.flipRollUnderMods"}}</label>
+                <input type="checkbox" name="flipRollUnderMods" {{checked settings.flipRollUnderMods}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.flipRollUnderModsHint"}}</p>
+            </div>
 
-    </div>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.enableEncumbrance"}}</label>
+                <input type="checkbox" name="enableEncumbrance" {{checked settings.enableEncumbrance}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.enableEncumbranceHint"}}</p>
+            </div>
+            <fieldset>
+                <div class="form-group">
+                    <label class="option-label">{{localize "HYP3E.settings.encumberedLabel"}}</label>
+                    <input type="number" name="encumbered" value="{{settings.encumbered}}" />
+                </div>
+                <div class="form-group">
+                    <p class="option-hint">{{localize "HYP3E.settings.encumbranceLabelHint"}}</p>
+                </div>
 
-    <!-- Character & NPC Options -->
-    <div class="tab" data-tab="chars">
-      <div class="form-group">
-        <label>{{localize "HYP3E.settings.quickCreateChars"}}</label>
-        <input type="checkbox" name="quickCreateChars" {{checked settings.quickCreateChars}} />
-      </div>
+                <div class="form-group">
+                    <label class="option-label">{{localize "HYP3E.settings.heavilyEncumberedLabel"}}</label>
+                    <input type="number" name="heavilyEncumbered" value="{{settings.heavilyEncumbered}}" />
+                </div>
+                <div class="form-group">
+                    <p class="option-hint">{{localize "HYP3E.settings.encumbranceLabelHint"}}</p>
+                </div>
+            </fieldset>
+        </div>
 
-      <div class="form-group">
-        <label>{{localize "HYP3E.settings.races"}}</label>
-        <textarea name="races"></textarea>
-      </div>
-      
-      <div class="form-group">
-        <button type="button" data-action="open-class-manager">Manage Custom Classes</button>
-      </div>
-    </div>
+        <!-- Combat Options -->
+        <div class="tab" data-tab="combat"> {{!-- style="max-height: 60vh; overflow-y: auto;" --}}
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.isGroupInitiative"}}</label>
+                <input type="checkbox" name="isGroupInitiative" {{checked settings.isGroupInitiative}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.isGroupInitiativeHint"}}</p>
+            </div>
 
-    <!-- Technical Options -->
-    <div class="tab" data-tab="tech">
-      <div class="form-group">
-        <label>{{localize "HYP3E.settings.logLevel"}}</label>
-        <select name="logLevel">
-          <option value="0">Verbose (Info, Warnings, Errors)</option>
-          <option value="1">Warnings & Errors</option>
-          <option value="2">Errors Only</option>
-        </select>
-      </div>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.rerollInitiative"}}</label>
+                <select name="rerollInitiative">
+                {{#each rerollInitiativeOpts}}
+                    <option value="{{this.value}}" {{#if (eq ../settings.rerollInitiative this.value)}}selected{{/if}}>
+                    {{this.label}}
+                    </option>
+                {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.rerollInitiativeHint"}}</p>
+            </div>
 
-      <div class="form-group">
-        <button type="button" data-action="rerun-migration">Re-run World Migration</button>
-      </div>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.limitMovement"}}</label>
+                <input type="checkbox" name="limitMovement" {{checked settings.limitMovement}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.limitMovementHint"}}</p>
+            </div>
 
-    </div>
-  </section>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.forceRangeLimit"}}</label>
+                <input type="checkbox" name="forceRangeLimit" {{checked settings.forceRangeLimit}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.forceRangeLimitHint"}}</p>
+            </div>
 
-  <footer class="sheet-footer flexrow">
-    <button type="submit" class="dialog-button">
-      <i class="fas fa-save"></i> Save Settings
-    </button>
-  </footer>
-</form>
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.forceWeaponEquip"}}</label>
+                <input type="checkbox" name="forceWeaponEquip" {{checked settings.forceWeaponEquip}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.forceWeaponEquipHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.forceSpellMemorize"}}</label>
+                <input type="checkbox" name="forceSpellMemorize" {{checked settings.forceSpellMemorize}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.forceSpellMemorizeHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.enableCombatSitModDetection"}}</label>
+                <input type="checkbox" name="enableCombatSitModDetection" {{checked settings.enableCombatSitModDetection}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.enableCombatSitModDetectionHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.enableAttrChecks"}}</label>
+                <select name="enableAttrChecks">
+                {{#each attrCheckOpts}}
+                    <option value="{{this.value}}" {{#if (eq ../settings.enableAttrChecks this.value)}}selected{{/if}}>
+                    {{this.label}}
+                    </option>
+                {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.enableAttrChecksHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.critHits"}}</label>
+                <input type="checkbox" name="critHit" {{checked settings.critHit}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.critHitsHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.critMiss"}}</label>
+                <input type="checkbox" name="critMiss" {{checked settings.critMiss}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.critMissHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.damageTypes"}}</label><br>
+                <textarea name="addlDamageTypes">{{settings.addlDamageTypes}}</textarea>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.damageTypesHint"}}</p>
+            </div>
+        </div>
+
+        <!-- Character & NPC Options -->
+        <div class="tab" data-tab="chars">
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.quickCreateChars"}}</label>
+                <select name="quickCreateChars">
+                {{#each quickCreateCharMethods}}
+                    <option value="{{this.value}}" {{#if (eq ../settings.quickCreateChars this.value)}}selected{{/if}}>
+                    {{this.label}}
+                    </option>
+                {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.quickCreateCharsHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.customCompendia"}}</label><br>
+                <textarea name="customCompendia">{{settings.customCompendia}}</textarea>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.customCompendiaHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.races"}}</label><br>
+                <textarea name="races">{{settings.races}}</textarea>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.racesHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.languages"}}</label><br>
+                <textarea name="languages">{{settings.languages}}</textarea>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.languagesHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.characterClasses"}}</label><br>
+                <textarea name="characterClasses">{{settings.characterClasses}}</textarea>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.characterClassesHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.phenotypes"}}</label><br>
+                <textarea name="phenotypes">{{settings.phenotypes}}</textarea>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.phenotypesHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.openClassEditor"}}</label>
+                <button type="button" class="config-btn" data-action="open-class-manager"><i class="fas fa-edit"></i> Open Class Editor</button>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.openClassEditorHint"}}</p>
+            </div>
+        </div>
+
+        <!-- Technical Options -->
+        <div class="tab" data-tab="tech">
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.logLevel"}}</label>
+                <select name="logLevel">
+                {{#each logLevels}}
+                    <option value="{{this.value}}" {{#if (eq ../settings.logLevel this.value)}}selected{{/if}}>
+                    {{this.label}}
+                    </option>
+                {{/each}}
+                </select>
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.logLevelHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.reRunMigration"}}</label>
+                <input type="checkbox" name="reRunMigration" {{checked settings.reRunMigration}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.reRunMigrationHint"}}</p>
+            </div>
+
+            <div class="form-group">
+                <label class="option-label">{{localize "HYP3E.settings.migrateCompendia"}}</label>
+                <input type="checkbox" name="migrateCompendia" {{checked settings.migrateCompendia}} />
+            </div>
+            <div class="form-group">
+                <p class="option-hint">{{localize "HYP3E.settings.migrateCompendiaHint"}}</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="sheet-footer flexrow">
+        <button type="button" class="save-btn">
+            <i class="fa-solid fa-save"></i> Save Settings
+        </button>
+    </footer>
+</div>

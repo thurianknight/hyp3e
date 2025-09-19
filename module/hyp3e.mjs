@@ -39,21 +39,27 @@ Hooks.once('init', async function() {
 
     console.log("Game info:", game);
     console.log("System info:", game.system);
+    console.log("Foundry version:", game.version);
+    // Get the Foundry version for conditional options
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    // Get the Hyperborea system version for conditional options
     const currentVersion = game.system.version;
-    console.log(`System version ${currentVersion}`);
+    console.log(`Hyperborea system version ${currentVersion}`);
 
     // Disable legacy effect transferral
     CONFIG.ActiveEffect.legacyTransferral = false;
 
     // Add a launcher button in System Settings
-    game.settings.registerMenu(game.system.id, "configMenu", {
-        name: "Hyperborea Configuration",
-        label: "Configure Hyperborea",
-        hint: "Open the Hyperborea configuration manager.",
-        icon: "fas fa-cogs",
-        type: Hyp3eConfigApp,
-        restricted: true
-    });
+    if (majorVersion >= 13) {
+        game.settings.registerMenu(game.system.id, "configMenu", {
+            name: "Hyperborea Configuration",
+            label: "Configure Hyperborea",
+            hint: "Open the Hyperborea configuration manager.",
+            icon: "fas fa-cogs",
+            type: Hyp3eConfigApp,
+            restricted: true
+        });
+    }
 
     // Register system settings
     game.settings.register(game.system.id, `migration-${currentVersion}-ran`, {
@@ -192,8 +198,8 @@ Hooks.once('init', async function() {
     });
 
     game.settings.register("hyp3e", "openClassEditor", {
-        name: "Manage Custom Classes",
-        hint: "Open the class editor interface to create or modify custom classes.",
+        name: game.i18n.localize("HYP3E.settings.openClassEditor"),
+        hint: game.i18n.localize("HYP3E.settings.openClassEditorHint"),
         scope: "world",
         config: true,
         type: String, // Doesn't matter since we're intercepting the render
@@ -262,10 +268,6 @@ Hooks.once('init', async function() {
             reroll: "HYP3E.settings.initiativeReroll",
         },
     });
-
-    // Get the Foundry version for conditional options
-    console.log("Foundry version:", game.version);
-    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
     if (majorVersion >= 13) {
         // Limit token movement to actor MV base
@@ -358,21 +360,21 @@ Hooks.once('init', async function() {
     game.settings.register(game.system.id, "encumbered", {
         name: game.i18n.localize("HYP3E.settings.encumberedLabel"),
         hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
-        default: "10",
+        default: 10,
         scope: "world",
         type: Number,
         config: true,
-        requiresReload: true,
+        requiresReload: false,
     });
     // GM-defined strength multiplier for heavily encumbered status
     game.settings.register(game.system.id, "heavilyEncumbered", {
         name: game.i18n.localize("HYP3E.settings.heavilyEncumberedLabel"),
         hint: game.i18n.localize("HYP3E.settings.encumbranceLabelHint"),
-        default: "15",
+        default: 15,
         scope: "world",
         type: Number,
         config: true,
-        requiresReload: true,
+        requiresReload: false,
     });
 
     // Damage types & resistances
@@ -442,17 +444,18 @@ Hooks.once('init', async function() {
     // });
 
     game.settings.register(game.system.id, "logLevel", {
-        name: "Logging Level",
-        hint: "Controls the verbosity of system logs.",
+        name: game.i18n.localize("HYP3E.settings.logLevel"),
+        hint: game.i18n.localize("HYP3E.settings.logLevelHint"),
         scope: "world",
-        config: true,
         type: String,
         choices: {
             "0": "Verbose (Info, Warnings, Errors)",
             "1": "Warnings & Errors",
             "2": "Errors Only"
         },
-        default: "1"
+        default: "1",
+        config: true,
+        requiresReload: true
     });
 
     // Re-run world migration on next launch
