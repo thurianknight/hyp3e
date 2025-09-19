@@ -397,6 +397,16 @@ textarea {
   margin-top: 0;
   margin-bottom: 8px;
 }
+
+/* Left gutter image */
+.hyp3e-config .left-gutter {
+  max-width: 50px;
+  border: none;
+}
+.hyp3e-config .left-gutter img {
+  border: 0;
+}
+
 .hyp3e-config input {
   max-width: 75px;
 }
