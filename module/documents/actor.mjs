@@ -1484,7 +1484,9 @@ export class Hyp3eActor extends Actor {
             // Calculate & override the roll target in the dataset
             const target = this._resolveThiefAbilityTn(itemNameLower);
             if (target === null) {
-                ui.notifications.warn(`At level ${this.system.details.level.value}, ${this.name} has no chance of success to ${itemNameLower}.`)
+                const msg = `At level ${this.system.details.level.value}, ${this.name} has no chance of success to ${itemNameLower}.`;
+                Hyp3eLogger.warn("rollCheck", msg);
+                ui.notifications.warn(msg);
                 return false;
             }
             dataset.rollTarget = target;
@@ -1530,7 +1532,9 @@ export class Hyp3eActor extends Actor {
             // Ensure we have a targeted token
             targetToken = userTargets.length > 0 ? userTargets[0] : null;
             if (!targetToken) {
-                ui.notifications.warn("No target token selected!")
+                const msg = `${this.name} must have a target token selected to assassinate!`;
+                Hyp3eLogger.warn("rollCheck", msg)
+                ui.notifications.warn(msg)
                 return false
             }
         }
