@@ -1519,6 +1519,13 @@ export class Hyp3eActor extends Actor {
         if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
             // This flag is used to determine if we are turning undead
             turnUndead = true;
+            // Ensure we have a valid Turning Ability
+            if (!this.system.ta || this.system.ta === 0) {
+                const msg = `${this.name} must have a Turning Ability of 1 or greater!`;
+                Hyp3eLogger.warn("rollCheck", msg)
+                ui.notifications.warn(msg)
+                return false
+            }
             // Special case: if the user forgot to include @cha.turnUndead in the formula,
             //  we will add it here, so the roll will be correct
             if (dataset.roll.indexOf("@cha.turnUndead") < 0) {
@@ -1544,7 +1551,7 @@ export class Hyp3eActor extends Actor {
                 return false
             }
             // Override the roll target in the dataset, with the most generous possibility
-            dataset.rollTarget = 16
+            dataset.rollTarget = this._resolveAssassinationTn(targetToken)
         }
 
         // If the Target has variables like a roll formula, resolve it to a number
@@ -1595,11 +1602,11 @@ export class Hyp3eActor extends Actor {
                 checkText += "<b>Fail.</b>"
             }
         } else if (turnUndead) {
-            // Ignore the "success" flag and resolve the results of the attempted turning undead
-            htmlContent = this._resolveTurnUndead(roll.total, rollData)
+            // Use the "success" flag and describe the results of the attempted turning undead
+            htmlContent = this._resolveTurnUndead(roll.total, rollData.ta)
         } else if (assassinate) {
-            // Ignore the "success" flag and resolve the results of the attempted assassination
-            htmlContent = this._resolveAssassination(targetToken, roll.total, rollData)
+            // Use the "success" flag to describe the results of the attempted assassination
+            htmlContent = this._resolveAssassination(targetToken, success)
         }
         // Hit must be false so we don't display any damage buttons
         roll.hit = false
@@ -2715,7 +2722,7 @@ export class Hyp3eActor extends Actor {
     /** SPECIALIZED SKILL/TASK RESOLUTION ---------------*/
 
     /**
-     * Resolve a progressive thief ability check
+     * Resolve a progressive thief ability check.
      * @param {*} abilityName - The name of the thief ability.
      * @returns {Number} - The target number required for success.
      */
@@ -2739,20 +2746,36 @@ export class Hyp3eActor extends Actor {
         return abilityData[levelIndex];
     }
 
-    // Build the chat message for assassination
-    _resolveAssassination(target, rollTotal, rollData) {
+    /**
+     * Resolve the target number needed to make an assassination against a selected target.
+     * @param {*} target - The target token, from which we derive the actor's level or hit dice.
+     * @returns {Number} - The target number required for success.
+     */
+    _resolveAssassinationTn(target) {
         /*
         Assassination
         =============
-        The assassin's chance to kill a target outright is based on the difference between the roll 
-        and the target's AC. The table below shows the results of the roll, and the number of levels 
-        of success (or failure) that result from it.
+        The assassin's chance to kill a target outright is shown in the Player's Manual, 
+        Table 56: Assassination. It is based on the level/hit die difference
+        between the assassin and his target [baseSuccess - targetDifficultyMod], and a 
+        negative modifier if the target is also an assassin of a higher level than his 
+        attacker [assassinTargetMod].
+        */
+        const assassinLevel = parseInt(this.system.details.level.value)
+        const baseSuccess = assassinLevel + 4
+        const targetLevel = parseInt(target.actor.type == "npc" ? target.actor.system?.hd.split("d")[0] : target.actor.system?.details.level.value)
+        const targetDifficultyMod = Math.floor(targetLevel/2)
+        const targetIsAssassin = target.actor.type == "character" && target.actor.system?.details.class == "Assassin"
+        const assassinTargetMod = targetIsAssassin && targetLevel > assassinLevel ? (targetLevel - assassinLevel) : 0
+        return (baseSuccess - targetDifficultyMod - assassinTargetMod);
+    }
 
-        Logic:
-        - If the original attack roll was a natural 19 or 20, the target must make a death save or die.
-        - If the attack roll hit but was not a natural 19 or 20, we roll on the Assassination table.
-        - The table uses an unmodified d20 roll, with a success if we roll the target number or lower.
-        - A natural 17 or higher is an automatic fail, as 16 is the highest target number in the table.
+    // Build the chat message for assassination
+    _resolveAssassination(target, success) {
+        /*
+        Assassination
+        =============
+        Logic for Assassination damage:
         - The assassin's damage multiplier is based on his class level, and should be included in the 
         chat message.
         - We should be able to grab the previous damage roll and apply the multiplier automatically...
@@ -2760,23 +2783,11 @@ export class Hyp3eActor extends Actor {
         */
         let assassinationHtml = ''
         let results = []
-        Hyp3eLogger.info("_resolveAssassination", `Assassination roll data:`, rollData)
-        Hyp3eLogger.info("_resolveAssassination", `Assassination target:`, target)
-        const assassinLevel = parseInt(rollData.details.level.value)
-        const baseSuccess = assassinLevel + 4
+        const assassinLevel = parseInt(this.system.details.level.value)
         const targetName = target.actor.name
-        const targetLevel = parseInt(target.actor.type == "npc" ? target.actor.system?.hd.split("d")[0] : target.actor.system?.details.level.value)
-        const targetDifficultyMod = Math.floor(targetLevel/2)
-        const targetIsAssassin = target.actor.type == "character" && target.actor.system?.details.class == "Assassin"
-        const assassinTargetMod = targetIsAssassin && targetLevel > assassinLevel ? (targetLevel - assassinLevel) : 0
-
-        // Was this a complete fail?
-        if (rollTotal > 16) {
-            return `<p>Assassination attempt vs. ${targetName} failed...</p>`
-        }
 
         // From here on, success or failure is based on multiple factors
-        if (rollTotal <= baseSuccess - targetDifficultyMod - assassinTargetMod) {
+        if (success) {
             results.push(`<p>Assassination attempt vs. ${targetName} <b>succeeded</b>!</p>`)
             results.push(`<ul><li>The target must make a <i>death</i> saving throw or die.</li>`)
             results.push(`<ul><li>However, if the original d20 attack roll was a natural 19 or 20, then no saving throw is allowed.</li></ul>`)
@@ -2799,7 +2810,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Build the chat message for turning undead
-    _resolveTurnUndead(rollTotal, rollData) {
+    _resolveTurnUndead(rollTotal, turnAbility) {
         /*
         Turning Undead
         ==============
@@ -2836,37 +2847,37 @@ export class Hyp3eActor extends Actor {
         let rollAffected = '2d6'
 
         // Was this a complete fail?
-        if (rollData.ta <= 1 && rollTotal > 10) {
+        if (turnAbility <= 1 && rollTotal > 10) {
             return '<p>No undead were turned...</p>';
         }
 
         // From here on it's all some level of success
         if (rollTotal <= 1) {
-            if ((rollData.ta+2) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta+2} ${orLess}are <b>turned</b>.</li>`)
+            if ((turnAbility+2) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${turnAbility+2} ${orLess}are <b>turned</b>.</li>`)
         } else if (rollTotal <= 4) {
-            if ((rollData.ta+1) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta+1} ${orLess}are <b>turned</b>.</li>`)
+            if ((turnAbility+1) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${turnAbility+1} ${orLess}are <b>turned</b>.</li>`)
         } else if (rollTotal <= 7) {
-            if ((rollData.ta) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta} ${orLess}are <b>turned</b>.</li>`)
+            if ((turnAbility) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${turnAbility} ${orLess}are <b>turned</b>.</li>`)
         } else if (rollTotal <= 10) {
-            if ((rollData.ta-1) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta-1} ${orLess}are <b>turned</b>.</li>`)
+            if ((turnAbility-1) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${turnAbility-1} ${orLess}are <b>turned</b>.</li>`)
         } else {
             // Even a roll of 11 or 12 is still successful against weaker undead
-            if ((rollData.ta-2) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta-2} ${orLess}are <b>turned</b>.</li>`)
+            if ((turnAbility-2) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${turnAbility-2} ${orLess}are <b>turned</b>.</li>`)
         }
         // Reset orLess
         orLess = ''
         // At TA 4+, the cleric can actually destroy undead
-        if (rollData.ta >= 4) {
-            if ((rollData.ta-4) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${rollData.ta-4} ${orLess}are <b>destroyed</b>.</li>`)
+        if (turnAbility >= 4) {
+            if ((turnAbility-4) > 0) { orLess = 'or less ' }
+            results.push(`<li>Undead of Type ${turnAbility-4} ${orLess}are <b>destroyed</b>.</li>`)
         }
             // At TA 7+, the cleric is so powerful that his number affected is greatly improved
-            if (rollData.ta >= 7) {
+            if (turnAbility >= 7) {
             rollAffected = '1d6+6'
         }
 
