@@ -1524,7 +1524,7 @@ export class Hyp3eActor extends Actor {
             if (dataset.roll.indexOf("@cha.turnUndead") < 0) {
                 dataset.roll = `${dataset.roll} - @cha.turnUndead`
             }
-            // Override the roll target in the dataset
+            // Override the roll target in the dataset, with the most generous possibility
             dataset.rollTarget = 10
         }
 
@@ -1543,6 +1543,8 @@ export class Hyp3eActor extends Actor {
                 ui.notifications.warn(msg)
                 return false
             }
+            // Override the roll target in the dataset, with the most generous possibility
+            dataset.rollTarget = 16
         }
 
         // If the Target has variables like a roll formula, resolve it to a number
@@ -1593,10 +1595,10 @@ export class Hyp3eActor extends Actor {
                 checkText += "<b>Fail.</b>"
             }
         } else if (turnUndead) {
-            // Resolve the results of the attempted turning undead
+            // Ignore the "success" flag and resolve the results of the attempted turning undead
             htmlContent = this._resolveTurnUndead(roll.total, rollData)
         } else if (assassinate) {
-            // Resolve the results of the attempted assassination
+            // Ignore the "success" flag and resolve the results of the attempted assassination
             htmlContent = this._resolveAssassination(targetToken, roll.total, rollData)
         }
         // Hit must be false so we don't display any damage buttons
@@ -2773,7 +2775,7 @@ export class Hyp3eActor extends Actor {
             return `<p>Assassination attempt vs. ${targetName} failed...</p>`
         }
 
-        // From here on it's mostly some level of success
+        // From here on, success or failure is based on multiple factors
         if (rollTotal <= baseSuccess - targetDifficultyMod - assassinTargetMod) {
             results.push(`<p>Assassination attempt vs. ${targetName} <b>succeeded</b>!</p>`)
             results.push(`<ul><li>The target must make a <i>death</i> saving throw or die.</li>`)
