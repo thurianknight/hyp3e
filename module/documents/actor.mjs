@@ -1476,24 +1476,30 @@ export class Hyp3eActor extends Actor {
 
         // Use itemNameLower for ability name comparisons below...
         const itemNameLower = itemName.toLowerCase()
+        // Initialize these for later
+        dataset.sitMod = 0;
+        dataset.sitModList = "";
 
         // Check the ability name to determine if this is a thief ability
         const abilityList = ["climb", "decipher script", "discern noise", "hide", "manipulate traps", "move silently", "open locks", "pick pockets", "read scrolls"];
         const thiefAbility = (abilityList.includes(itemNameLower))
-        if (thiefAbility) {
-            // Calculate & override the roll target in the dataset
-            const target = this._resolveThiefAbilityTn(itemNameLower);
-            if (target === null) {
-                const msg = `At level ${this.system.details.level.value}, ${this.name} has no chance of success to ${itemNameLower}.`;
-                Hyp3eLogger.warn("rollCheck", msg);
-                ui.notifications.warn(msg);
-                return false;
+        // Are we auto-calculating Thief ability target numbers?
+        if (game.settings.get(game.system.id, "autoCalcThiefTn")) {
+            if (thiefAbility) {
+                // Calculate & override the roll target in the dataset
+                const target = this._resolveThiefAbilityTn(itemNameLower);
+                if (target === null) {
+                    const msg = `At level ${this.system.details.level.value}, ${this.name} has no chance of success to ${itemNameLower}.`;
+                    Hyp3eLogger.warn("rollCheck", msg);
+                    ui.notifications.warn(msg);
+                    return false;
+                }
+                dataset.rollTarget = target;
             }
-            dataset.rollTarget = target;
-
+        }
+        // Even without automatic target calculation, we can still do the sit mods
+        if (thiefAbility) {
             // Check to see if we need to add an attribute modifier for thief skills
-            dataset.sitMod = 0;
-            dataset.sitModList = "";
             const actorAttributes = { 
                 dx: this.system.attributes.dex.value, 
                 in: this.system.attributes.int.value, 
@@ -1645,6 +1651,7 @@ export class Hyp3eActor extends Actor {
         }
 
         const carriedAmmo = this._getCarriedAmmo();
+
         dataset.sitMod = 0;
         dataset.sitModList = "";
         if (game.settings.get(game.system.id, "enableCombatSitModDetection")) {

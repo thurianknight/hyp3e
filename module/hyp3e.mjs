@@ -130,6 +130,17 @@ Hooks.once('init', async function() {
         requiresReload: true
     });
 
+    // Automatic Thief ability target calculation
+    game.settings.register(game.system.id, "autoCalcThiefTn", {
+        name: game.i18n.localize("HYP3E.settings.autoCalcThiefTn"),
+        hint: game.i18n.localize("HYP3E.settings.autoCalcThiefTn"),
+        default: true,
+        scope: "world",
+        type: Boolean,
+        config: showConfigOptions,
+        requiresReload: false
+    });
+
     // Automatic Armor Class calculation
     game.settings.register(game.system.id, "autoCalcAc", {
         name: game.i18n.localize("HYP3E.settings.autoCalcAc"),

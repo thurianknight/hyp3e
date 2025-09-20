@@ -42,6 +42,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             showWeaponOverlay: game.settings.get(game.system.id, "showWeaponOverlay"),
             resizeTokens: game.settings.get(game.system.id, "resizeTokens"),
             // Rules Options - General
+            autoCalcThiefTn: game.settings.get(game.system.id, "autoCalcThiefTn"),
             autoCalcAc: game.settings.get(game.system.id, "autoCalcAc"),
             enforceWeaponEquipRules: game.settings.get(game.system.id, "enforceWeaponEquipRules"),
             flipRollUnderMods: game.settings.get(game.system.id, "flipRollUnderMods"),
