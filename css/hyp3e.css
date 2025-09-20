@@ -458,6 +458,43 @@ textarea {
   justify-content: flex-start;
   margin-bottom: 10px;
 }
+/* Background header image div */
+.hyp3e .sheet-header .header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 187px;
+  
+  background-image: 
+    linear-gradient(to bottom, rgba(255,255,255,0) 70%, rgba(255,255,255,1) 100%),
+    url("/systems/hyp3e/assets/hyperborea.jpg");
+  
+  background-size: cover; /* fill the div */
+  background-repeat: no-repeat;
+
+  opacity: 0.20; /* semi-transparent */
+  z-index: 0; /* behind header content */
+  pointer-events: none; /* clicks pass through */
+}
+
+/* Apply to all input fields and textareas where they sit above the header image */
+.hyp3e .sheet-header input,
+.hyp3e .sheet-header textarea,
+.hyp3e .sheet-header select {
+  background-color: rgba(255, 255, 255, 0.45); /* semi-transparent white */
+  border: 1px solid rgba(0,0,0,0.2);           /* soft border */
+  padding: 0.3em 0.5em;
+  border-radius: 4px;
+  /* color: #1a1a1a; /* darker text for contrast */
+}
+/* Give labels a subtle background too */
+.hyp3e .sheet-header label {
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 0 0.2em;
+  border-radius: 3px;
+}
+
 .hyp3e .sheet-header .profile-img {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 100px;
@@ -467,11 +504,13 @@ textarea {
   height: 100px;
   margin-right: 10px;
   border: none;
+  z-index: 1; /* Must sit atop the background image */
 }
 
 /* Sets the position of the health-bar and strain-bar and sets it to the propper size. */
 .hyp3e .health-bar {
   position: absolute;
+  z-index: 2; /* Must sit atop the character image */
   bottom: -5px;
 
   width: 100%;
@@ -482,12 +521,10 @@ textarea {
   box-shadow: 0 0 5px inset rgb(0,0,0,0.4);
   background-color: whitesmoke;
 }
-
 .hyp3e .health-bar .health-fill {
   background: linear-gradient(45deg, rgba(48,121,22,1) 0%, rgba(97,190,80,1) 100%);
   height: 100%;
 }
-
 /* Positions the HP text in the center of the healthbar or strainbar */
 .hyp3e .health-text {
   display: flex;
@@ -500,15 +537,11 @@ textarea {
   justify-content: center;
 }
 
-
 .hyp3e .sheet-header .header-block {
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
-  /* background-image: url("../assets/hyperborea-logo.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat; */
+  z-index: 1; /* Must sit atop the background image */
 }
 .hyp3e .sheet-header h1.charname {
   height: 50px;
@@ -548,6 +581,7 @@ textarea {
 .hyp3e .sheet-body .tab,
 .hyp3e .sheet-body .tab .editor {
   height: 100%;
+  z-index: 1;
 }
 /* Table of contents styles? Not sure if these are used... */
 .hyp3e .tox .tox-editor-container {
