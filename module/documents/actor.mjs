@@ -1442,13 +1442,13 @@ export class Hyp3eActor extends Actor {
             label = this._createChatLabel(this.img, itemName)
         }
 
-        // Determine whether we have a valid target number or formula
-        if (dataset.rollTarget == '' || dataset.rollTarget == undefined || dataset.rollTarget <= 0) {
-            const msg = `Missing or invalid target number, cannot confirm success of check!`
-            Hyp3eLogger.info("rollCheck", msg)
-            ui.notifications.info(msg)
-            return false
-        }
+        // // Determine whether we have a valid target number or formula
+        // if (dataset.rollTarget == '' || dataset.rollTarget == undefined || dataset.rollTarget <= 0) {
+        //     const msg = `Missing or invalid target number, cannot confirm success of check!`
+        //     Hyp3eLogger.info("rollCheck", msg)
+        //     ui.notifications.info(msg)
+        //     return false
+        // }
 
         // Retrieve roll data from the actor
         const rollData = this.getRollData();
@@ -1474,28 +1474,43 @@ export class Hyp3eActor extends Actor {
             dataset.rollButtonLabel = "Roll"
         }
 
-        // Check to see if we need to add an attribute modifier for thief skills
-        dataset.sitMod = 0;
-        dataset.sitModList = "";
-        const actorAttributes = { 
-            dx: this.system.attributes.dex.value, 
-            in: this.system.attributes.int.value, 
-            ws: this.system.attributes.wis.value
-        };
-        const sitModObj = this._getThiefSkillModifier(itemName, actorAttributes)
-        if (sitModObj.modifier > 0) {
-            dataset.sitMod = sitModObj.modifier
-            dataset.sitModList = `${sitModObj.attribute.toUpperCase()} modifier (+${sitModObj.modifier})`
+        // Use itemNameLower for ability name comparisons below...
+        const itemNameLower = itemName.toLowerCase()
+
+        // Check the ability name to determine if this is a thief ability
+        const abilityList = ["climb", "decipher script", "discern noise", "hide", "manipulate traps", "move silently", "open locks", "pick pockets", "read scrolls"];
+        const thiefAbility = (abilityList.includes(itemNameLower))
+        if (thiefAbility) {
+            // Calculate & override the roll target in the dataset
+            const target = this._resolveThiefAbilityTn(itemNameLower);
+            if (target === null) {
+                ui.notifications.warn(`At level ${this.system.details.level.value}, ${this.name} has no chance of success to ${itemNameLower}.`)
+                return false;
+            }
+            dataset.rollTarget = target;
+
+            // Check to see if we need to add an attribute modifier for thief skills
+            dataset.sitMod = 0;
+            dataset.sitModList = "";
+            const actorAttributes = { 
+                dx: this.system.attributes.dex.value, 
+                in: this.system.attributes.int.value, 
+                ws: this.system.attributes.wis.value
+            };
+            const sitModObj = this._getThiefSkillModifier(itemNameLower, actorAttributes)
+            if (sitModObj.modifier > 0) {
+                dataset.sitMod = sitModObj.modifier
+                dataset.sitModList = `${sitModObj.attribute.toUpperCase()} modifier (+${sitModObj.modifier})`
+            }
         }
 
         // This is needed for Turn Undead & Assassinate results
         let htmlContent = ""
         // Use simple word parsing in the ability name to determine if this is a cleric turning undead
-        let turnUndead = false
-        let itemNameLower = itemName.toLowerCase()
+        let turnUndead = false;
         if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
             // This flag is used to determine if we are turning undead
-            turnUndead = true
+            turnUndead = true;
             // Special case: if the user forgot to include @cha.turnUndead in the formula,
             //  we will add it here, so the roll will be correct
             if (dataset.roll.indexOf("@cha.turnUndead") < 0) {
@@ -1506,12 +1521,12 @@ export class Hyp3eActor extends Actor {
         }
 
         // Use simple word parsing in the ability name to determine if this is an assassin plying her trade
-        let assassinate = false
+        let assassinate = false;
         const userTargets = Array.from(game.user.targets);
         let targetToken = null
         if (itemNameLower.indexOf("assassinate") >= 0) {
             // This flag is used to determine if we are assassinating
-            assassinate = true
+            assassinate = true;
             // Ensure we have a targeted token
             targetToken = userTargets.length > 0 ? userTargets[0] : null;
             if (!targetToken) {
@@ -1529,6 +1544,16 @@ export class Hyp3eActor extends Actor {
             // Override rollTarget, even if it has the same value
             dataset.rollTarget = targetRoll.total
         }
+
+        // Determine whether we have a valid target number or formula
+        if (dataset.rollTarget === '' || dataset.rollTarget == null) {
+            const msg = `Missing or invalid target number, cannot confirm success of check!`
+            Hyp3eLogger.warn("rollCheck", msg)
+            ui.notifications.warn(msg)
+            return false
+        }
+
+        // Got through all our logic tests, we have a valid target number
         checkText += ` (target ${dataset.rollTarget})... `
 
         // Log the dataset before the dialog renders
@@ -2675,6 +2700,31 @@ export class Hyp3eActor extends Actor {
     }
 
     /** SPECIALIZED SKILL/TASK RESOLUTION ---------------*/
+
+    /**
+     * Resolve a progressive thief ability check
+     * @param {*} abilityName - The name of the thief ability.
+     * @returns {Number} - The target number required for success.
+     */
+    _resolveThiefAbilityTn(abilityName) {
+        // Just in case the ability name was not sent in lower case already
+        abilityName = abilityName.toLowerCase()
+        const thiefLevel = this.system.details.level.value;
+        const thiefAbilities = {
+            "climb": [8, 8, 9, 9, 10, 10],
+            "decipher script": [0, 1, 2, 3, 4, 5],
+            "discern noise": [4, 5, 6, 7, 8, 9],
+            "hide": [5, 6, 7, 8, 9, 10],
+            "manipulate traps": [3, 4, 5, 6, 7, 8],
+            "move silently": [5, 6, 7, 8, 9, 10],
+            "open locks": [3, 4, 5, 6, 7, 8],
+            "pick pockets": [4, 5, 6, 7, 8, 9],
+            "read scrolls": [null, null, 0, 3, 4, 5]
+        };
+        const abilityData = thiefAbilities[abilityName];
+        const levelIndex = Math.ceil(thiefLevel / 2) - 1;
+        return abilityData[levelIndex];
+    }
 
     // Build the chat message for assassination
     _resolveAssassination(target, rollTotal, rollData) {
