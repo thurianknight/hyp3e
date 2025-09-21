@@ -1419,7 +1419,7 @@ export class Hyp3eActor extends Actor {
         const tokenId = dataset.tokenId ?? null
         let itemName = ""
         let label = ""
-        let checkText = dataset.label
+        let checkHeader = dataset.label
         let rollFormula = ""
         const targetComparison = dataset.comparison ?? "le"
         let rollResponse
@@ -1503,7 +1503,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // This footer is used for Turn Undead & Assassinate results
-        let htmlFooter = ""
+        let checkFooter = ""
         // Use simple word parsing in the ability name to determine if this is a cleric turning undead
         const turnUndead = itemNameLower.includes("turn") && itemNameLower.includes("undead");
         if (turnUndead) {
@@ -1559,7 +1559,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // We should now have a valid target number
-        checkText += ` (target ${dataset.rollTarget})... `
+        checkHeader += ` (target ${dataset.rollTarget})... `
 
         // Log the dataset before the dialog renders
         Hyp3eLogger.info("rollCheck", `${dataset.label} dataset:`, dataset);
@@ -1582,19 +1582,19 @@ export class Hyp3eActor extends Actor {
         // Depending on the type of roll, we add text to the final chat message
         if (turnUndead) {
             // Use the "success" flag to describe the results of the attempted turning undead
-            htmlFooter = this._resolveTurnUndead(roll.total, rollData.ta)
+            checkFooter = this._resolveTurnUndead(roll.total, rollData.ta)
         } else if (assassinate) {
             // Use the "success" flag to describe the results of the attempted assassination
-            htmlFooter = this._resolveAssassination(targetToken, success)
+            checkFooter = this._resolveAssassination(targetToken, success)
         } else {
             // Default option: simple Success/Fail message for a standard check
-            checkText += success ? "<b>Success!</b>" : "<b>Fail.</b>";
+            checkHeader += success ? "<b>Success!</b>" : "<b>Fail.</b>";
         }
         // Hit must be false so we don't display any damage buttons
         roll.hit = false
 
         // Construct a custom chat card for the check
-        await renderCustomChat(roll, item, this, tokenId, label, "", checkText, htmlFooter, rollResponse.rollMode)
+        await renderCustomChat(roll, item, this, tokenId, label, "", checkHeader, checkFooter, rollResponse.rollMode)
 
         return true
     }
@@ -1714,7 +1714,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Determine Hit/Miss Result
-        const { hit, attackTextResult, critFooterHTML } = this._determineHitResult(
+        const { hit, attackTextResult, critFooter } = this._determineHitResult(
             atkRoll,
             naturalRoll,
             itemData,
@@ -1738,10 +1738,10 @@ export class Hyp3eActor extends Actor {
 
         // Render chat message
         const chatLabel = this._createChatLabel(this.img, itemName);
-        const finalAttackText = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
+        const attackHeader = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
 
-        Hyp3eLogger.info("rollAttackOrSpell", `Chat data:`, {chatLabel, finalAttackText, critFooterHTML});
-        await renderCustomChat(atkRoll, item, this, attacker?.id, chatLabel, debugAtkRollFormula, finalAttackText, critFooterHTML, rollResponse.rollMode); // Assuming this exists
+        Hyp3eLogger.info("rollAttackOrSpell", `Chat data:`, {chatLabel, attackHeader, critFooter});
+        await renderCustomChat(atkRoll, item, this, attacker?.id, chatLabel, debugAtkRollFormula, attackHeader, critFooter, rollResponse.rollMode); // Assuming this exists
 
         // Return Roll Result
         return atkRoll;
@@ -2158,12 +2158,12 @@ export class Hyp3eActor extends Actor {
      * @param {string} targetSize - Size category of the target.
      * @param {string} actorBaseClass - Base class for crit/fumble tables.
      * @param {string} actorId - Actor ID for crit/fumble tables.
-     * @returns {{hit: boolean, attackTextResult: string, critFooterHTML: string}}
+     * @returns {{hit: boolean, attackTextResult: string, critFooter: string}}
      */
     _determineHitResult(atkRoll, naturalRoll, itemData, targetAc, targetSize, actorBaseClass, actorId) {
         let hit = false;
         let attackTextResult = "";
-        let critFooterHTML = "";
+        let critFooter = "";
         const total = atkRoll.total;
         const isGrenade = itemData?.isGrenade ?? false;
 
@@ -2194,13 +2194,13 @@ export class Hyp3eActor extends Actor {
                 attackTextResult = `<span style='color:#00b34c'><b>Critical Hit!</b></span>`;
                 Hyp3eLogger.info("_determineHitResult", `Natural 20 Crit Hit!`);
                 if (game.settings.get(game.system.id, "critHit")) {
-                    critFooterHTML = `<div class='critical-hit' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
+                    critFooter = `<div class='critical-hit' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
                 }
             } else if (naturalRoll === 1) {
                 attackTextResult = `<span style='color:#e90000'><b>Critical Miss!</b></span>`;
                 Hyp3eLogger.info("_determineHitResult", `Natural 1 Crit Miss!`);
                 if (game.settings.get(game.system.id, "critMiss")) {
-                    critFooterHTML = `<div class='critical-miss' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
+                    critFooter = `<div class='critical-miss' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
                 }
             } else if (total >= tn) {
                 hit = true;
@@ -2212,7 +2212,7 @@ export class Hyp3eActor extends Actor {
             }
         }
 
-        return { hit, attackTextResult, critFooterHTML };
+        return { hit, attackTextResult, critFooter };
     }
 
     /**
