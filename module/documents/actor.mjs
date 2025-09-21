@@ -1242,6 +1242,7 @@ export class Hyp3eActor extends Actor {
         } else {
             // NPC/monster save, no attribute-based mods
             dataset.rollButtonLabel = "Roll Save"
+            label += `${dataset.label}...`;
             // Log the dataset before the dialog renders
             Hyp3eLogger.info("rollSave", `${dataset.label} dataset:`, dataset);
             try {
