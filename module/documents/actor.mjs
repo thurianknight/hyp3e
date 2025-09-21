@@ -1127,7 +1127,7 @@ export class Hyp3eActor extends Actor {
 
         let rollResponse
         // let label = `${dataset.label}...`
-        let label = this._createChatLabel(this.img, `${dataset.label}...`)
+        let label = this._createChatLabel(this.img, `Rolling ${dataset.label}...`)
         dataset.rollButtonLabel = "Roll"
 
         // Log the dataset before the dialog renders
@@ -1187,7 +1187,7 @@ export class Hyp3eActor extends Actor {
 
         let reaction = this._valueFromTable(this.reactionTable, rollTotal)
         Hyp3eLogger.info("rollReaction", `Reaction:`, reaction);
-        label += `<br /><b>${reaction}</b>`
+        label += `<b>${reaction}</b>`
 
         // Output roll result to a chat message
         sendRollToChat(roll, this, label, "", rollResponse.rollMode)
@@ -1202,13 +1202,14 @@ export class Hyp3eActor extends Actor {
     async rollSave(dataset) {
         Hyp3eLogger.info("rollSave", `Rolling ${dataset.label}...`);
 
-        let saveRollParts = []
-        let rollFormula = ""
-        let rollResponse
-        // let label = `${dataset.label}...`
-        let label = this._createChatLabel(this.img, `${dataset.label}...`)
+        let saveRollParts = [];
+        let rollFormula = "";
+        let rollResponse;
+        // let label = "";
+        // let label = `${dataset.label}...`;
+        let label = this._createChatLabel(this.img, `Rolling Save`);
 
-        if (this.type == "character") {
+        if (this.type === "character") {
             // Get the character's saving throw modifiers
             dataset.avoidMod = this.system.attributes.dex.defMod
             dataset.poisonMod = this.system.attributes.con.poisRadMod
@@ -1226,17 +1227,17 @@ export class Hyp3eActor extends Actor {
             saveRollParts.push(dataset.roll)
 
             // Get saving throw modifer if one was selected
-            if (rollResponse.avoidMod) {
-                saveRollParts.push(rollResponse.avoidMod)
-                label = `${dataset.label} with Avoidance modifier...`
-            }
-            if (rollResponse.poisonMod) {
-                saveRollParts.push(rollResponse.poisonMod)
-                label = `${dataset.label} with Poison/Radiation modifier...`
-            }
-            if (rollResponse.willMod) {
-                saveRollParts.push(rollResponse.willMod)
-                label = `${dataset.label} with Willpower modifier...`
+            if ("avoidMod" in rollResponse) {
+                saveRollParts.push(rollResponse.avoidMod);
+                label += `${dataset.label} with Avoidance modifier...`;
+            } else if ("poisonMod" in rollResponse) {
+                saveRollParts.push(rollResponse.poisonMod);
+                label += `${dataset.label} with Poison/Radiation modifier...`;
+            } else if ("willMod" in rollResponse) {
+                saveRollParts.push(rollResponse.willMod);
+                label += `${dataset.label} with Willpower modifier...`;
+            } else {
+                label += `${dataset.label}...`;
             }
         } else {
             // NPC/monster save, no attribute-based mods
@@ -1262,11 +1263,7 @@ export class Hyp3eActor extends Actor {
 
         // Roll the dice!
         const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, this.getRollData(), dataset.rollTarget, "ge");
-        if (success) {
-            label += "<br /><b>Success!</b>"
-        } else {
-            label += "<br /><b>Fail.</b>"
-        }
+        label += success ? "<b>Success!</b>" : "<b>Fail.</b>";
 
         // Output roll result to a chat message
         sendRollToChat(roll, this, label, "", rollResponse.rollMode)
