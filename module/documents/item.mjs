@@ -370,7 +370,7 @@ export class Hyp3eItem extends Item {
         const itemName = (!itemData.identified && itemData.itemAlias) ? itemData.itemAlias : (itemData.friendlyName || item.name);
 
         // Chat message header text
-        const label = this._renderItemHeader(typeLabel, itemName, item.img);
+        const label = this._renderItemHeader(typeLabel, itemName, actorData.img);
 
         let content = itemData.description || "";
         content += this._renderItemProperties(item, itemData, actorData);
@@ -403,7 +403,7 @@ export class Hyp3eItem extends Item {
             <div style="margin: 10px 0;">
                 <img src="${imgSrc}" style="border: none; float: left;" width="24px" height="24px">
                 <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
-                    ${typeLabel}: ${itemName}
+                    ${itemName}
                 </span>
             </div>
             <hr class="plain-hr" />`;

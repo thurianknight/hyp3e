@@ -1127,7 +1127,7 @@ export class Hyp3eActor extends Actor {
 
         let rollResponse
         // let label = `${dataset.label}...`
-        let label = this._createChatLabel(this.img, `Rolling ${dataset.label}...`)
+        let label = this._createChatLabel(this.img, `Rolling ${dataset.label}... `)
         dataset.rollButtonLabel = "Roll"
 
         // Log the dataset before the dialog renders
@@ -1162,7 +1162,7 @@ export class Hyp3eActor extends Actor {
 
         let rollResponse
         // let label = `${dataset.label}...`
-        let label = this._createChatLabel(this.img, `${dataset.label}...`)
+        let label = this._createChatLabel(this.img, `Rolling ${dataset.label}... `)
         dataset.rollButtonLabel = "Roll Reaction"
 
         // Log the dataset before the dialog renders
@@ -1187,7 +1187,8 @@ export class Hyp3eActor extends Actor {
 
         let reaction = this._valueFromTable(this.reactionTable, rollTotal)
         Hyp3eLogger.info("rollReaction", `Reaction:`, reaction);
-        label += `<b>${reaction}</b>`
+        // label += `<b>${reaction}</b>`
+        label += reaction
 
         // Output roll result to a chat message
         sendRollToChat(roll, this, label, "", rollResponse.rollMode)
@@ -1237,12 +1238,12 @@ export class Hyp3eActor extends Actor {
                 saveRollParts.push(rollResponse.willMod);
                 label += `${dataset.label} with Willpower modifier...`;
             } else {
-                label += `${dataset.label}...`;
+                label += `${dataset.label}... `;
             }
         } else {
             // NPC/monster save, no attribute-based mods
             dataset.rollButtonLabel = "Roll Save"
-            label += `${dataset.label}...`;
+            label += `${dataset.label}... `;
             // Log the dataset before the dialog renders
             Hyp3eLogger.info("rollSave", `${dataset.label} dataset:`, dataset);
             try {
@@ -1376,6 +1377,7 @@ export class Hyp3eActor extends Actor {
                 }
                 if (item.effects.size > 0) {
                     // Only give this (secondary) chat if there are effects to apply
+                    dataset.actorData.img = this.img
                     item._displayItemInChat(dataset.actorData)
                 }
                 return
@@ -1398,6 +1400,7 @@ export class Hyp3eActor extends Actor {
                 this.useItem(item.id)
             }
             // No roll chats were needed, so we show this one chat message
+            dataset.actorData.img = this.img
             item._displayItemInChat(dataset.actorData)
         }
     }
@@ -1457,7 +1460,7 @@ export class Hyp3eActor extends Actor {
                     break
             }
         } else {
-            label = this._createChatLabel(this.img, dataset.label)
+            label = this._createChatLabel(this.img, `Rolling ${dataset.label}`)
             dataset.rollButtonLabel = "Roll"
         }
 
@@ -1683,6 +1686,7 @@ export class Hyp3eActor extends Actor {
         }
         // If there's no item roll formula (typically a spell), send a chat message and exit
         if (!itemData.formula) {
+            actorData.img = this.img
             item._displayItemInChat(actorData);
             return null;
         }
@@ -2877,14 +2881,14 @@ export class Hyp3eActor extends Actor {
      * Reaction lookup table
      */
     reactionTable = {
-        0: "Violent: immediate attack",
-        2: "Violent: immediate attack",
-        3: "Hostile: antagonistic; attack likely",
-        4: "Unfriendly: negative inclination",
-        6: "Neutral: disinterested or uncertain (reroll once)",
-        9: "Friendly: considers ideas/proposals",
-        11: "Agreeable: willing and helpful",
-        12: "Affable: extremely accomodating"
+        0: "<b>Violent</b>: Immediate attack",
+        2: "<b>Violent</b>: Immediate attack",
+        3: "<b>Hostile</b>: Antagonistic; attack likely",
+        4: "<b>Unfriendly</b>: Negative inclination",
+        6: "<b>Neutral</b>: Disinterested or uncertain (reroll once)",
+        9: "<b>Friendly</b>: Considers ideas/proposals",
+        11: "<b>Agreeable</b>: Willing and helpful",
+        12: "<b>Affable</b>: Extremely accomodating"
     }
 
     /**
