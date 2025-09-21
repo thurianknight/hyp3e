@@ -1577,19 +1577,16 @@ export class Hyp3eActor extends Actor {
         // Roll the dice!
         const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, rollData, dataset.rollTarget, targetComparison);
 
-        // Simple Success/Fail message if this is a basic check roll
-        if (!turnUndead && !assassinate) {
-            if (success) {
-                checkText += "<b>Success!</b>"
-            } else {
-                checkText += "<b>Fail.</b>"
-            }
-        } else if (turnUndead) {
+        // Depending on the type of roll, we add text to the final chat message
+        if (turnUndead) {
             // Use the "success" flag to describe the results of the attempted turning undead
             htmlFooter = this._resolveTurnUndead(roll.total, rollData.ta)
         } else if (assassinate) {
             // Use the "success" flag to describe the results of the attempted assassination
             htmlFooter = this._resolveAssassination(targetToken, success)
+        } else {
+            // Default option: simple Success/Fail message for a standard check
+            checkText += success ? "<b>Success!</b>" : "<b>Fail.</b>";
         }
         // Hit must be false so we don't display any damage buttons
         roll.hit = false
