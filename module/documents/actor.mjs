@@ -1456,6 +1456,7 @@ export class Hyp3eActor extends Actor {
                     break
             }
         } else {
+            label = this._createChatLabel(this.img, dataset.label)
             dataset.rollButtonLabel = "Roll"
         }
 
