@@ -1435,27 +1435,15 @@ export class Hyp3eActor extends Actor {
             }
         }
 
+        // Retrieve roll data from the actor
+        const rollData = this.getRollData();
+
         // Is this an item or ability check?
         const item = this.items.get(itemId) ?? null
         if (item) {
             itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
             label = this._createChatLabel(this.img, itemName)
-        }
-
-        // // Determine whether we have a valid target number or formula
-        // if (dataset.rollTarget == '' || dataset.rollTarget == undefined || dataset.rollTarget <= 0) {
-        //     const msg = `Missing or invalid target number, cannot confirm success of check!`
-        //     Hyp3eLogger.info("rollCheck", msg)
-        //     ui.notifications.info(msg)
-        //     return false
-        // }
-
-        // Retrieve roll data from the actor
-        const rollData = this.getRollData();
-
-        // Set the roll button label based on item type
-        if (item) {
-            // Determine the roll-button label to use
+            // Set the roll button label based on item type
             switch (item.type) {
                 case "item":
                     dataset.rollButtonLabel = "Use Item"
@@ -1512,49 +1500,45 @@ export class Hyp3eActor extends Actor {
             }
         }
 
-        // This is needed for Turn Undead & Assassinate results
-        let htmlContent = ""
+        // This footer is used for Turn Undead & Assassinate results
+        let htmlFooter = ""
         // Use simple word parsing in the ability name to determine if this is a cleric turning undead
-        let turnUndead = false;
-        if (itemNameLower.indexOf("turn") >= 0 && itemNameLower.indexOf("undead") >= 0) {
-            // This flag is used to determine if we are turning undead
-            turnUndead = true;
+        const turnUndead = itemNameLower.includes("turn") && itemNameLower.includes("undead");
+        if (turnUndead) {
             // Ensure we have a valid Turning Ability
             if (!this.system.ta || this.system.ta === 0) {
                 const msg = `${this.name} must have a Turning Ability of 1 or greater!`;
-                Hyp3eLogger.warn("rollCheck", msg)
-                ui.notifications.warn(msg)
-                return false
+                Hyp3eLogger.warn("rollCheck", msg);
+                ui.notifications.warn(msg);
+                return false;
             }
             // Special case: if the user forgot to include @cha.turnUndead in the formula,
             //  we will add it here, so the roll will be correct
             if (dataset.roll.indexOf("@cha.turnUndead") < 0) {
-                dataset.roll = `${dataset.roll} - @cha.turnUndead`
+                dataset.roll = `${dataset.roll} - @cha.turnUndead`;
             }
-            // Override the roll target in the dataset, with the most generous possibility
-            dataset.rollTarget = 10
+            // Clerics turn undead on a sliding scale from 10 (lowest level) down to 1 (highest)
+            dataset.rollTarget = 10;
         }
 
         // Use simple word parsing in the ability name to determine if this is an assassin plying her trade
-        let assassinate = false;
+        const assassinate = itemNameLower.includes("assassinat"); // Allow "assassinate" or "assassination"
         const userTargets = Array.from(game.user.targets);
-        let targetToken = null
-        if (itemNameLower.indexOf("assassinate") >= 0) {
-            // This flag is used to determine if we are assassinating
-            assassinate = true;
+        let targetToken = null;
+        if (assassinate) {
             // Ensure we have a targeted token
             targetToken = userTargets.length > 0 ? userTargets[0] : null;
             if (!targetToken) {
                 const msg = `${this.name} must have a target token selected to assassinate!`;
-                Hyp3eLogger.warn("rollCheck", msg)
-                ui.notifications.warn(msg)
-                return false
+                Hyp3eLogger.warn("rollCheck", msg);
+                ui.notifications.warn(msg);
+                return false;
             }
-            // Override the roll target in the dataset, with the most generous possibility
-            dataset.rollTarget = this._resolveAssassinationTn(targetToken)
+            // Calculate the target number, overriding its incoming value if any
+            dataset.rollTarget = this._resolveAssassinationTn(targetToken);
         }
 
-        // If the Target has variables like a roll formula, resolve it to a number
+        // If the Target number has variables like a roll formula, resolve it to a number
         if (isNaN(dataset.rollTarget)) {
             const targetRoll = new Roll(dataset.rollTarget, rollData)
             await targetRoll.roll()
@@ -1572,7 +1556,7 @@ export class Hyp3eActor extends Actor {
             return false
         }
 
-        // Got through all our logic tests, we have a valid target number
+        // We should now have a valid target number
         checkText += ` (target ${dataset.rollTarget})... `
 
         // Log the dataset before the dialog renders
@@ -1593,26 +1577,25 @@ export class Hyp3eActor extends Actor {
         // Roll the dice!
         const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, rollData, dataset.rollTarget, targetComparison);
 
-        // Determine success or failure on a simple check, not turning undead or assassinating
+        // Simple Success/Fail message if this is a basic check roll
         if (!turnUndead && !assassinate) {
-            // if (roll.total <= dataset.rollTarget) {
             if (success) {
                 checkText += "<b>Success!</b>"
             } else {
                 checkText += "<b>Fail.</b>"
             }
         } else if (turnUndead) {
-            // Use the "success" flag and describe the results of the attempted turning undead
-            htmlContent = this._resolveTurnUndead(roll.total, rollData.ta)
+            // Use the "success" flag to describe the results of the attempted turning undead
+            htmlFooter = this._resolveTurnUndead(roll.total, rollData.ta)
         } else if (assassinate) {
             // Use the "success" flag to describe the results of the attempted assassination
-            htmlContent = this._resolveAssassination(targetToken, success)
+            htmlFooter = this._resolveAssassination(targetToken, success)
         }
         // Hit must be false so we don't display any damage buttons
         roll.hit = false
 
         // Construct a custom chat card for the check
-        await renderCustomChat(roll, item, this, tokenId, label, "", checkText, htmlContent, rollResponse.rollMode)
+        await renderCustomChat(roll, item, this, tokenId, label, "", checkText, htmlFooter, rollResponse.rollMode)
 
         return true
     }

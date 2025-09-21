@@ -408,31 +408,27 @@ export class Hyp3eDice {
      */
     static async rollFormulaAndEvaluateSuccess(formula, rollData, target, comparison = "ge") {
         if (!formula || typeof parseInt(target) !== "number") {
-            Hyp3eLogger.warn("rollFormulaAndEvaluateSuccess", "Missing formula or target number.");
+            const msg = `Missing formula or target number.`;
+            Hyp3eLogger.error("rollFormulaAndEvaluateSuccess", `${msg} Incoming formula & target:`, {formula, target});
+            ui.notifications.error(msg);
             return { roll: null, total: null, success: false };
         }
 
-        let roll;
+        let roll = new Roll(formula, rollData);
         try {
-            roll = new Roll(formula, rollData);
             await roll.roll();
         } catch (error) {
-            Hyp3eLogger.error("rollFormulaAndEvaluateSuccess", "Error evaluating roll formula.", error);
+            const msg = `Error evaluating roll formula.`;
+            Hyp3eLogger.error("rollFormulaAndEvaluateSuccess", msg, error);
+            ui.notifications.error(msg);
             return { roll: null, total: null, success: false };
         }
 
         const total = roll.total;
-        let success;
 
-        switch (comparison) {
-            case "ge":
-            success = total >= target;
-            break;
-            case "le":
-            default:
-            success = total <= target;
-            break;
-        }
+        const success = (comparison === "ge")
+            ? total >= target   // if comparison is "ge"
+            : total <= target;  // otherwise (le or default)
 
         Hyp3eLogger.info("rollFormulaAndEvaluateSuccess", `${roll.formula} = ${total} vs. ${comparison} ${target}: ${success ? "Success" : "Failure"}`);
 
