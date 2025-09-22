@@ -115,7 +115,7 @@ Hooks.once('init', async function() {
         name: game.i18n.localize("HYP3E.settings.chatFontSize"),
         hint: game.i18n.localize("HYP3E.settings.chatFontSizeHint"),
         scope: "world",
-        config: showConfigOptions,
+        config: false, // Hidden in Foundry v12, but available via the config app in v13
         type: Number,
         default: 0
     });
