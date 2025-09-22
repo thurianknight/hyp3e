@@ -1,6 +1,7 @@
 import {Hyp3eDice} from "../dice/dice.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3E } from "../helpers/config.mjs"
+import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../chat/chat.mjs"
 
 /**
  * Extend the basic Item with some very simple modifications.
@@ -362,6 +363,9 @@ export class Hyp3eItem extends Item {
         const item = foundry.utils.deepClone(this)
         const itemData = item.system
 
+        // Either use the actor's image if provided, or the item's image if not
+        const image = ("img" in actorData) ? actorData.img : item.img;
+
         // The system uses the term 'feature' under the covers, but Hyperborea uses 'ability'
         const typeLabel = item.type === 'feature' ? 'Ability' : item.type.capitalize();
 
@@ -370,7 +374,7 @@ export class Hyp3eItem extends Item {
         const itemName = (!itemData.identified && itemData.itemAlias) ? itemData.itemAlias : (itemData.friendlyName || item.name);
 
         // Chat message header text
-        const label = this._renderItemHeader(typeLabel, itemName, actorData.img);
+        const label = this._renderItemHeader(typeLabel, itemName, image);
 
         let content = itemData.description || "";
         content += this._renderItemProperties(item, itemData, actorData);

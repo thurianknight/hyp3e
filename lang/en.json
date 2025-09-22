@@ -19,6 +19,8 @@
             "characterClassesHint": "Character classes available to PCs and some NPCs.",
             "openClassEditor": "Manage Custom Classes",
             "openClassEditorHint": "Open the class editor interface to create or modify custom classes.",
+            "chatFontSize": "Chat Relative Font Size",
+            "chatFontSizeHint": "Chat font size, relative to the Foundry default system configuration size. Default is zero.",
             "calendarVerbose": "Verbose Date Format",
             "calendarVerboseHint": "When enabled, display the date as 'Sun, the 1 of Aries, Year of the Tempest'. Otherwise just display as '576/1/1'.",
             "enableTurnTracker": "Enable Turn Tracker",

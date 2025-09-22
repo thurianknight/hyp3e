@@ -1,4 +1,5 @@
 import { HYP3E } from "../helpers/config.mjs"
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { 
     handleDamageRollButtons, 
     handleDamageRoll2hButtons, 
@@ -19,10 +20,11 @@ import { handleSaveButtons, handleEffectButtons } from "./handlers/utility-handl
  * @param {*} content - The main HTML of the message
  */
 export function sendSimpleChat(actor, label, content) {
+    Hyp3eLogger.info("sendSimpleChat", `${actor.name} sent message with flavor "${label}" and content "${content}".`)
     ChatMessage.create({
         author: game.user.id,
-        speaker: ChatMessage.getSpeaker({ actor: this }),
-        label: label,
+        speaker: ChatMessage.getSpeaker({ actor }),
+        flavor: label,
         content: content
     });
 }
@@ -36,9 +38,7 @@ export function sendSimpleChat(actor, label, content) {
  * @param {*} rollMode - Chat mode: public, private gm, blind gm, self
  */
 export function sendRollToChat(roll, actor, label, content, rollMode) {
-    // Prettify label
-    label = "<div class='medium'>" + label + "</div>"
-
+    Hyp3eLogger.info("sendRollToChat", `${actor.name} sent message with flavor "${label}" and content "${content}".`)
     // Send to chat
     roll.toMessage({
         author: game.user_id,
@@ -63,11 +63,7 @@ export function sendRollToChat(roll, actor, label, content, rollMode) {
  * @param {*} rollMode - Chat mode: public, private gm, blind gm, self
  */
 export async function renderCustomChat(roll, item, actor, tokenId, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
-    // Prettify label
-    label = "<div class='medium'>" + label + "</div>"
-    headerHTML = "<div class='medium'>" + headerHTML + "</div>"
-    footerHTML = "<div class='medium'>" + footerHTML + "</div>"
-
+    // Load & render the chat template
     const templateData = {
         roll: roll,
         headerHTML: headerHTML,
@@ -77,7 +73,6 @@ export async function renderCustomChat(roll, item, actor, tokenId, label, debugR
         tokenId: tokenId,
         footerHTML: footerHTML,
     };
-
     const template = `${HYP3E.templatePath}/chat/attack-roll.hbs`;
     let customChat = await renderTemplate(template, templateData);
 
@@ -90,6 +85,24 @@ export async function renderCustomChat(roll, item, actor, tokenId, label, debugR
     },{
         rollMode: rollMode
     })
+}
+
+/**********************************************************
+ * Chat Font Settings
+ **********************************************************/
+export function applyChatFontSizeSetting() {
+    const CHAT_FONT_SCALE = {
+        "-2": 0.8,  // shrink more
+        "-1": 0.9,  // shrink a little
+        "0": 1.0,  // default
+        "1": 1.1,  // bump up a little
+        "2": 1.25  // bump up more
+    };
+    const adj = game.settings.get("hyp3e", "chatFontSize") ?? 0;
+    const scale = CHAT_FONT_SCALE[adj] ?? 1.0;
+
+    document.documentElement.style.setProperty("--hyp3e-chat-scale", scale);
+    console.log("[applyChatFontSizeSetting] scale set globally:", scale);
 }
 
 /**********************************************************

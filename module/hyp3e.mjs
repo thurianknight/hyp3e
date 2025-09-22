@@ -14,11 +14,12 @@ import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
-import { HYP3E_CALENDAR } from "./helpers/calendar-data.mjs"
+// import { HYP3E_CALENDAR } from "./helpers/calendar-data.mjs"
 import { HYP3ECalendar, setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
 import { Hyp3eConfigApp } from "./apps/hyp3e-config-app.js";
+import { applyChatFontSizeSetting } from "./chat/chat.mjs";
 
 // Set this now, to use later
 let trackerInitialized = false;
@@ -109,10 +110,20 @@ Hooks.once('init', async function() {
         default: []
     });
 
+    // Register a world setting for the relative chat font size
+    game.settings.register(game.system.id, "chatFontSize", {
+        name: game.i18n.localize("HYP3E.settings.chatFontSize"),
+        hint: game.i18n.localize("HYP3E.settings.chatFontSizeHint"),
+        scope: "world",
+        config: showConfigOptions,
+        type: Number,
+        default: 0
+    });
+
     // Display Hyperborean date format: short or verbose
     game.settings.register(game.system.id, "calendarVerbose", {
-        name: "Verbose Date Format",
-        hint: "When enabled, display the date as 'Sun, the 1 of Aries, Year of the Tempest'. Otherwise just display as '576/1/1'.",
+        name: game.i18n.localize("HYP3E.settings.calendarVerbose"),
+        hint: game.i18n.localize("HYP3E.settings.calendarVerboseHint"),
         scope: "world",
         config: showConfigOptions,
         type: Boolean,
@@ -513,6 +524,8 @@ Hooks.once('init', async function() {
     // Add custom constants for configuration.
     CONFIG.HYP3E = HYP3E;
 
+    // Set chat font size
+    applyChatFontSizeSetting();
 
     // Define custom Document classes
     CONFIG.Actor.documentClass = Hyp3eActor;
@@ -865,6 +878,15 @@ Hooks.once("ready", async function() {
 /* -------------------------------------------- */
 /*  Additional Hooks                            */
 /* -------------------------------------------- */
+
+/**
+ * When config settings are changed, respond if needed.
+ */
+Hooks.on("updateSetting", (setting) => {
+  if (setting.key === "hyp3e.chatFontSize") {
+    applyChatFontSizeSetting();
+  }
+});
 
 /**
  * Insert the turn tracker app into the chat log.

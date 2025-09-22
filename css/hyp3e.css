@@ -302,6 +302,10 @@ textarea {
   resize: none;
 }
 
+.chat-log .message {
+  font-size: calc(1em * var(--hyp3e-chat-scale, 1));
+}
+
 /* Chat message damage text */
 .dice-damage {
     font-style: italic;
@@ -407,8 +411,13 @@ textarea {
   border: 0;
 }
 
-.hyp3e-config input {
+.hyp3e-config input[type=text] {
   max-width: 75px;
+  text-align: center;
+}
+.hyp3e-config input[type=number] {
+  max-width: 75px;
+  text-align: center;
 }
 .hyp3e-config select {
   max-width: 250px;
@@ -416,6 +425,28 @@ textarea {
 .hyp3e-config textarea {
   width: 90%;
   margin: 3px 15px;
+}
+.hyp3e-config input[type=range] {
+    width: 200px;
+    height: 16px;
+    margin-bottom: 0px;
+}
+.hyp3e-config .slider-wrapper {
+  width: 200px;
+  position: relative;
+}
+.hyp3e-config .ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8em;
+  margin-bottom: 2px;
+}
+
+.hyp3e-config .config-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-right: 20px;
 }
 .hyp3e-config .config-btn {
   display: inline-block;
@@ -1162,7 +1193,7 @@ textarea {
 
 /* Font styling */
 .medium {
-    font-size: medium;
+    font-size: small;
 }
 
 .medium-bold {

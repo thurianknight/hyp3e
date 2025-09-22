@@ -15,7 +15,25 @@
         <section class="content flex-xlarge">
             <!-- UI Options -->
             <div class="tab" data-tab="ui">
+                <div class="form-group config-item">
+                    <label class="option-label">{{localize "HYP3E.settings.chatFontSize"}}</label>
+                    <div class="slider-wrapper">
+                        <input type="range" name="chatFontSize" value="{{settings.chatFontSize}}" min="-2" max="2" step="1" />
+                        <div class="ticks">
+                            <span>-2</span>
+                            <span>-1</span>
+                            <span>0</span>
+                            <span>+1</span>
+                            <span>+2</span>
+                        </div>
+                    </div>
+
+                </div>
                 <div class="form-group">
+                    <p class="option-hint">{{localize "HYP3E.settings.chatFontSizeHint"}}</p>
+                </div>
+
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.calendarVerbose"}}</label>
                     <input type="checkbox" name="calendarVerbose" {{checked settings.calendarVerbose}} />
                 </div>
@@ -23,7 +41,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.calendarVerboseHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.enableTurnTracker"}}</label>
                     <input type="checkbox" name="enableTurnTracker" {{checked settings.enableTurnTracker}} />
                 </div>
@@ -31,7 +49,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.enableTurnTrackerHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.showWeaponOverlay"}}</label>
                     <input type="checkbox" name="showWeaponOverlay" {{checked settings.showWeaponOverlay}} />
                 </div>
@@ -39,7 +57,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.showWeaponOverlayHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.resizeTokens"}}</label>
                     <input type="checkbox" name="resizeTokens" {{checked settings.resizeTokens}} />
                 </div>
@@ -50,7 +68,7 @@
 
             <!-- Rules Options -->
             <div class="tab" data-tab="rules">
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.autoCalcThiefTn"}}</label>
                     <input type="checkbox" name="autoCalcThiefTn" {{checked settings.autoCalcThiefTn}} />
                 </div>
@@ -58,7 +76,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.autoCalcThiefTnHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.autoCalcAc"}}</label>
                     <input type="checkbox" name="autoCalcAc" {{checked settings.autoCalcAc}} />
                 </div>
@@ -66,7 +84,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.autoCalcAcHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.enforceWeaponEquipRules"}}</label>
                     <input type="checkbox" name="enforceWeaponEquipRules" {{checked settings.enforceWeaponEquipRules}} />
                 </div>
@@ -74,7 +92,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.enforceWeaponEquipRulesHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.flipRollUnderMods"}}</label>
                     <input type="checkbox" name="flipRollUnderMods" {{checked settings.flipRollUnderMods}} />
                 </div>
@@ -82,7 +100,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.flipRollUnderModsHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.enableEncumbrance"}}</label>
                     <input type="checkbox" name="enableEncumbrance" {{checked settings.enableEncumbrance}} />
                 </div>
@@ -90,7 +108,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.enableEncumbranceHint"}}</p>
                 </div>
                 <fieldset>
-                    <div class="form-group">
+                    <div class="form-group config-item">
                         <label class="option-label">{{localize "HYP3E.settings.encumberedLabel"}}</label>
                         <input type="number" name="encumbered" value="{{settings.encumbered}}" />
                     </div>
@@ -98,7 +116,7 @@
                         <p class="option-hint">{{localize "HYP3E.settings.encumbranceLabelHint"}}</p>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group config-item">
                         <label class="option-label">{{localize "HYP3E.settings.heavilyEncumberedLabel"}}</label>
                         <input type="number" name="heavilyEncumbered" value="{{settings.heavilyEncumbered}}" />
                     </div>
@@ -110,7 +128,7 @@
 
             <!-- Combat Options -->
             <div class="tab" data-tab="combat"> {{!-- style="max-height: 60vh; overflow-y: auto;" --}}
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.isGroupInitiative"}}</label>
                     <input type="checkbox" name="isGroupInitiative" {{checked settings.isGroupInitiative}} />
                 </div>
@@ -118,7 +136,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.isGroupInitiativeHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.rerollInitiative"}}</label>
                     <select name="rerollInitiative">
                     {{#each rerollInitiativeOpts}}
@@ -132,7 +150,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.rerollInitiativeHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.limitMovement"}}</label>
                     <input type="checkbox" name="limitMovement" {{checked settings.limitMovement}} />
                 </div>
@@ -140,7 +158,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.limitMovementHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.forceRangeLimit"}}</label>
                     <input type="checkbox" name="forceRangeLimit" {{checked settings.forceRangeLimit}} />
                 </div>
@@ -148,7 +166,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.forceRangeLimitHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.forceWeaponEquip"}}</label>
                     <input type="checkbox" name="forceWeaponEquip" {{checked settings.forceWeaponEquip}} />
                 </div>
@@ -156,7 +174,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.forceWeaponEquipHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.forceSpellMemorize"}}</label>
                     <input type="checkbox" name="forceSpellMemorize" {{checked settings.forceSpellMemorize}} />
                 </div>
@@ -164,7 +182,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.forceSpellMemorizeHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.enableCombatSitModDetection"}}</label>
                     <input type="checkbox" name="enableCombatSitModDetection" {{checked settings.enableCombatSitModDetection}} />
                 </div>
@@ -172,7 +190,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.enableCombatSitModDetectionHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.enableAttrChecks"}}</label>
                     <select name="enableAttrChecks">
                     {{#each attrCheckOpts}}
@@ -186,7 +204,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.enableAttrChecksHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.critHits"}}</label>
                     <input type="checkbox" name="critHit" {{checked settings.critHit}} />
                 </div>
@@ -194,7 +212,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.critHitsHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.critMiss"}}</label>
                     <input type="checkbox" name="critMiss" {{checked settings.critMiss}} />
                 </div>
@@ -213,7 +231,7 @@
 
             <!-- Character & NPC Options -->
             <div class="tab" data-tab="chars">
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.quickCreateChars"}}</label>
                     <select name="quickCreateChars">
                     {{#each quickCreateCharMethods}}
@@ -267,7 +285,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.phenotypesHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.openClassEditor"}}</label>
                     <button type="button" class="config-btn" data-action="open-class-manager"><i class="fas fa-edit"></i> Open Class Editor</button>
                 </div>
@@ -278,7 +296,7 @@
 
             <!-- Technical Options -->
             <div class="tab" data-tab="tech">
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.logLevel"}}</label>
                     <select name="logLevel">
                     {{#each logLevels}}
@@ -292,7 +310,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.logLevelHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.reRunMigration"}}</label>
                     <input type="checkbox" name="reRunMigration" {{checked settings.reRunMigration}} />
                 </div>
@@ -300,7 +318,7 @@
                     <p class="option-hint">{{localize "HYP3E.settings.reRunMigrationHint"}}</p>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group config-item">
                     <label class="option-label">{{localize "HYP3E.settings.migrateCompendia"}}</label>
                     <input type="checkbox" name="migrateCompendia" {{checked settings.migrateCompendia}} />
                 </div>

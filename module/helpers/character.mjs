@@ -4119,7 +4119,7 @@ export class Hyp3eCharacter {
         await actor.update(updateData)
 
         // Setup a chat message to show the level-up values
-        let label = `<div class='medium-bold'>Level Up!</div>`
+        let label = `<div><b>Level Up!</b></div>`
         let content = `<ul>`
         content += `<li>New Level: ${nextLevel}</li>`
         content += `<li>XP: ${currentXp} / ${nextLevelXp}</li>`
@@ -4180,14 +4180,14 @@ export class Hyp3eCharacter {
         let getsBonusSpell = false
 
         // Setup chat message variables
-        let label = `<div class='medium-bold'>Values for character updated...</div>`
+        let label = `<div><b>Values for character updated...</b></div>`
         let content = `<ul>`
 
         // Here we modify the cloned data object of the actor...
         Hyp3eLogger.info("setAttributeMods", `Cloned Actor system data:`, data);
         if (data.details.class) {
             // Override label if character class selected
-            label = `<div class='medium-bold'>Values for ${data.details.class} updated...</div>`
+            label = `<div><b>Values for ${data.details.class} updated...</b></div>`
             Hyp3eLogger.info("setAttributeMods", `Setting ${data.details.class} hit die...`);
             thisClass = this.classData[data.details.class] || CONFIG.HYP3E.customClassData[data.details.class];
             Hyp3eLogger.info("setAttributeMods", `Class Data for ${data.details.class}:`, thisClass);

@@ -109,34 +109,34 @@ async function rollCritHit(charType, actorId) {
     let roll = await new Roll("1d6").roll();
     if (charType === "fighter") {
         if (roll.total <= 2) {
-            content = `<div class="dice-damage medium">+2 ${dmg}</div>`;
+            content = `<div class="dice-damage">+2 ${dmg}</div>`;
         } else if (roll.total <= 4) {
-            content = `<div class="dice-damage medium">x2 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
         } else if (roll.total <= 6) {
-            content = `<div class="dice-damage medium">x3 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage">x3 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else if (charType === "magician") {
         if (roll.total <= 2) {
-            content = `<div class="dice-damage medium">+1 ${dmg}</div>`;
+            content = `<div class="dice-damage">+1 ${dmg}</div>`;
         } else if (roll.total <= 4) {
-            content = `<div class="dice-damage medium">+2 ${dmg}</div>`;
+            content = `<div class="dice-damage">+2 ${dmg}</div>`;
         } else if (roll.total <= 6) {
-            content = `<div class="dice-damage medium">x2 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
     } else {
         // cleric/thief/npc-monster
         if (roll.total <= 1) {
-            content = `<div class="dice-damage medium">+1 ${dmg}</div>`;
+            content = `<div class="dice-damage">+1 ${dmg}</div>`;
         } else if (roll.total <= 3) {
-            content = `<div class="dice-damage medium">+2 ${dmg}</div>`;
+            content = `<div class="dice-damage">+2 ${dmg}</div>`;
         } else if (roll.total <= 5) {
-            content = `<div class="dice-damage medium">x2 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage">x2 Dice ${dmg}</div>`;
         }  else if (roll.total <= 6) {
-            content = `<div class="dice-damage medium">x3 Dice ${dmg}</div>`;
+            content = `<div class="dice-damage">x3 Dice ${dmg}</div>`;
         }  else {
             content = "Critical Hit -- Error in getting result";
         }
@@ -155,7 +155,7 @@ async function rollCritHit(charType, actorId) {
         Hyp3eLogger.warn("rollCritHit", `Roll Crit Hit: Actor ${actorId} not found!`)
     }
 
-    const flavor = `<div class="dice-damage medium">` + game.i18n.localize(`HYP3E.attack.critHit.${charType}`) + `</div>`
+    const flavor = `<div class="dice-damage">` + game.i18n.localize(`HYP3E.attack.critHit.${charType}`) + `</div>`
     // Send to chat
     roll.toMessage({
         author: game.user_id,
@@ -258,7 +258,7 @@ async function rollCritMiss(charType, actorId) {
         }
     }
 
-    content = `<div class="dice-damage medium">` + content + `</div>`
+    content = `<div class="dice-damage">` + content + `</div>`
     const templateData = {
         // title: game.i18n.localize(`HYP3E.attack.critMiss.${charType}`),
         title: "",
@@ -273,7 +273,7 @@ async function rollCritMiss(charType, actorId) {
         Hyp3eLogger.warn("rollCritMiss", `Roll Crit Miss: Actor ${actorId} not found!`)
     }
 
-    const flavor = `<div class="dice-damage medium">` + game.i18n.localize(`HYP3E.attack.critMiss.${charType}`) + `</div>`
+    const flavor = `<div class="dice-damage">` + game.i18n.localize(`HYP3E.attack.critMiss.${charType}`) + `</div>`
     // Send to chat
     roll.toMessage({
         author: game.user_id,

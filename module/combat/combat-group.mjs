@@ -142,7 +142,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
 
     #constructInitiativeOutputForGroup(initGroup, roll) {
         return `
-            <p class="medium">${game.i18n.format("HYP3E.combat.rollInitiative", { initGroup })}</p>
+            <p>${game.i18n.format("HYP3E.combat.rollInitiative", { initGroup })}</p>
             <div class="dice-roll" data-action="expandRoll">
                 <div class="dice-result">
                 <div class="dice-formula">${roll.formula}</div>

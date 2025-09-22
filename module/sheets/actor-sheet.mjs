@@ -2,6 +2,7 @@ import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import HYP3EActorSetLanguages from "../apps/character-set-languages.mjs";
 import {enableItemEffectsOnActor, disableItemEffectsOnActor, onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
+import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../chat/chat.mjs"
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -464,11 +465,7 @@ export class Hyp3eActorSheet extends ActorSheet {
             }
         }
         const message = `${this.actor.name} ${equipText} <strong>${itemName}</strong>${containerText}.`
-        const chatData = {
-            author: game.user_id,
-            content: message
-        };
-        ChatMessage.create(chatData, {});
+        sendSimpleChat(this.actor, "", message);
     });
 
     // Active Effect management

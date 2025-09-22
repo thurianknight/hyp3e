@@ -37,6 +37,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     async _prepareContext(_options) {
         const settings = {
             // UI Options
+            chatFontSize: game.settings.get(game.system.id, "chatFontSize"),
             calendarVerbose: game.settings.get(game.system.id, "calendarVerbose"),
             enableTurnTracker: game.settings.get(game.system.id, "enableTurnTracker"),
             showWeaponOverlay: game.settings.get(game.system.id, "showWeaponOverlay"),
@@ -132,7 +133,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     async _handleSave() {
         const html = this.element;
         const data = this.collectFormData(html);
-        Hyp3eLogger.info("_handleSave", `App data`, data);
+        Hyp3eLogger.info("_handleSave", `Collected app data`, data);
 
         let updated = false;
         let requiresReload = false;
@@ -190,18 +191,22 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     collectFormData(container) {
         const data = {};
 
-        container.querySelectorAll("input, select, textarea").forEach(el => {
-            if (!el.name) return; // skip unnamed fields
+        container.querySelectorAll("input, range-picker, select, textarea").forEach(el => {
+            const elementName = el.name || el.getAttribute("name");
+            if (!elementName) {
+                Hyp3eLogger.warn("collectFormData", `Unnamed ${el.tagName} with value ${el.value} in data, cannot process.`);
+                return;
+            }
 
             switch (el.type) {
-            case "checkbox":
-                data[el.name] = el.checked;
-                break;
-            case "radio":
-                if (el.checked) data[el.name] = el.value;
-                break;
-            default:
-                data[el.name] = el.value;
+                case "checkbox":
+                    data[elementName] = el.checked;
+                    break;
+                case "radio":
+                    if (el.checked) data[elementName] = el.value;
+                    break;
+                default:
+                    data[elementName] = el.value;
             }
         });
 
