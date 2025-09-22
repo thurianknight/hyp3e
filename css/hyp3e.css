@@ -510,17 +510,33 @@ textarea {
 }
 
 /* Apply to all input fields and textareas where they sit above the header image */
-.hyp3e .sheet-header input,
-.hyp3e .sheet-header textarea,
-.hyp3e .sheet-header select {
-  background-color: rgba(255, 255, 255, 0.45); /* semi-transparent white */
+.hyp3e .character-header-block input,
+.hyp3e .character-header-block textarea,
+.hyp3e .character-header-block select {
+  background-color: rgba(255, 255, 255, 0.4); /* semi-transparent white */
   border: 1px solid rgba(0,0,0,0.2);           /* soft border */
   padding: 0.3em 0.5em;
   border-radius: 4px;
   /* color: #1a1a1a; /* darker text for contrast */
 }
 /* Give labels a subtle background too */
-.hyp3e .sheet-header label {
+.hyp3e .character-header-block label {
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 0 0.2em;
+  border-radius: 3px;
+}
+/* Apply to all input fields and textareas where they sit above the header image */
+.hyp3e .npc-header-block input,
+.hyp3e .npc-header-block textarea,
+.hyp3e .npc-header-block select {
+  background-color: rgba(255, 255, 255, 0.4); /* semi-transparent white */
+  border: 1px solid rgba(0,0,0,0.2);           /* soft border */
+  padding: 0.3em 0.5em;
+  border-radius: 4px;
+  /* color: #1a1a1a; /* darker text for contrast */
+}
+/* Give labels a subtle background too */
+.hyp3e .npc-header-block label {
   background-color: rgba(255, 255, 255, 0.4);
   padding: 0 0.2em;
   border-radius: 3px;
@@ -624,6 +640,12 @@ textarea {
 
 /* Character header-block styles */
 .hyp3e .character-header-block {
+  padding: 0 2px;
+  margin-right: 5px;
+}
+
+/* NPC header-block styles */
+.hyp3e .npc-header-block {
   padding: 0 2px;
   margin-right: 5px;
 }
