@@ -22,7 +22,12 @@ export function registerHyp3eConfigurations() {
         });
     }
     console.log(`[registerHyp3eConfigurations] Display config options: ${showConfigOptions}`)
-    // Register system settings
+
+    /********************************************
+     * Stored World Data
+     ********************************************/
+
+    // Save the current version's data migration, so it won't run again
     game.settings.register(game.system.id, `migration-${currentVersion}-ran`, {
         name: "Migration Ran",
         scope: "world",
@@ -31,7 +36,7 @@ export function registerHyp3eConfigurations() {
         default: false,
     });
 
-    // Register a world setting to store the current Hyperborean date
+    // Store the current Hyperborean date
     game.settings.register(game.system.id, "calendarDate", {
         name: "Calendar Date",
         scope: "world",
@@ -39,17 +44,8 @@ export function registerHyp3eConfigurations() {
         type: Object,
         default: { year: 576, month: 1, day: 1 }
     });
-    // Save the selection of whether to display all moon phases on the calendar
-    game.settings.register(game.system.id, "showAllMoonPhases", {
-        name: "Show All Moon Phases",
-        hint: "If enabled, the calendar grid shows phases on every day. If disabled, only today's phases are shown.",
-        scope: "world",
-        config: false,  // Always hidden from UI
-        type: Boolean,
-        default: true
-    });
 
-    // Register a world setting to store the current exploration turn
+    // Store the current exploration turn
     game.settings.register(game.system.id, "explorationTurn", {
         name: "Exploration Turn",
         scope: "world",
@@ -58,7 +54,7 @@ export function registerHyp3eConfigurations() {
         default: 0
     });
 
-    // Register a game setting to store turn-advance actions
+    // Store turn-advance actions
     game.settings.register(game.system.id, "turnAdvanceActions", {
         name: "Turn-Advance Actions",
         scope: "world",
@@ -87,6 +83,16 @@ export function registerHyp3eConfigurations() {
         hint: game.i18n.localize("HYP3E.settings.calendarVerboseHint"),
         scope: "world",
         config: showConfigOptions,
+        type: Boolean,
+        default: true
+    });
+
+    // Whether to display all moon phases on the calendar (NOT USED CURRENTLY)
+    game.settings.register(game.system.id, "showAllMoonPhases", {
+        name: "Show All Moon Phases",
+        hint: "If enabled, the calendar grid shows phases on every day. If disabled, only today's phases are shown.",
+        scope: "world",
+        config: false,  // Always hidden from UI
         type: Boolean,
         default: true
     });

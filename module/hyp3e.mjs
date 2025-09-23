@@ -196,8 +196,6 @@ Hooks.once("ready", async function() {
     /**
      * Load system settings
      */
-    // const debugMessages = game.settings.get(game.system.id, "debugMessages");
-    // CONFIG.HYP3E.debugMessages = debugMessages;
     const logLevel = game.settings.get(game.system.id, "logLevel");
     CONFIG.HYP3E.logLevel = logLevel;
 
