@@ -18,7 +18,6 @@ import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
 import { HYP3ECalendar, setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
-import { Hyp3eConfigApp } from "./apps/hyp3e-config-app.js";
 import { registerHyp3eConfigurations } from "./helpers/register-config.mjs";
 import { applyChatFontSizeSetting } from "./chat/chat.mjs";
 
@@ -427,9 +426,10 @@ Hooks.once("ready", async function() {
  * When config settings are changed, respond if needed.
  */
 Hooks.on("updateSetting", (setting) => {
-  if (setting.key === "hyp3e.chatFontSize") {
-    applyChatFontSizeSetting();
-  }
+    if (setting.key === "hyp3e.chatFontSize") {
+        // Immediately apply new font size to chat
+        applyChatFontSizeSetting();
+    }
 });
 
 /**
