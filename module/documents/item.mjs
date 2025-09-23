@@ -15,6 +15,7 @@ export class Hyp3eItem extends Item {
     // Override the base Item _preCreate function
     async _preCreate(data, options, user) {
         await super._preCreate(data, options, user);
+        Hyp3eLogger.info("Hyp3eItem _preCreate", `Starting data:`, data)
         const updateData = {};
 
         // Replace default image for new items, but if an image is defined, leave it be

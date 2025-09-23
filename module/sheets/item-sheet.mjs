@@ -39,7 +39,6 @@ export class Hyp3eItemSheet extends ItemSheet {
         context.isGM = game.user.isGM
 
         // Retrieve the actor's roll data for TinyMCE editors.
-        // context.rollData = {};
         const actor = this.actor;
         context.rollData = this.actor?.getRollData() ?? {};
         Hyp3eLogger.info("getData", `Roll Data in ItemSheet:`, context.rollData);
@@ -98,6 +97,11 @@ export class Hyp3eItemSheet extends ItemSheet {
         context.blindRollOpts = CONFIG.HYP3E.blindRollOpts;
         context.rollModes = CONFIG.Dice.rollModes;
         context.saveThrows = CONFIG.HYP3E.saves;
+
+        // This is mostly an issue with new compendium items
+        if (context.system.realName?.trim() === "") {
+            context.system.realName = context.item.name
+        }
 
         // Set isShield flag for armor items
         if (context.item.type === 'armor') {
