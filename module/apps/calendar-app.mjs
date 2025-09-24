@@ -212,7 +212,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         if (game.user.isGM) {
             root.querySelector("[data-action='reset']")
                 ?.addEventListener("click", () => {
-                    game.hyp3e.resetTurn();
+                    game.hyp3e.turnTracker.resetTurn();
                     this.render(true);
                 });
         }

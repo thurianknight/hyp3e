@@ -376,6 +376,7 @@ Hooks.once("ready", async function() {
         }
     }
 
+    // Setup a hyp3e property to contain our calendar and turn tracker
     game.hyp3e = game.hyp3e || {};
 
     // Initialize the calendar app
@@ -393,13 +394,16 @@ Hooks.once("ready", async function() {
     game.hyp3e.calendar.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
     Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.calendar.formatDate(true)}.`, game.hyp3e.calendar.getCurrentDate());
 
+    // Initialize the turn tracker
+    game.hyp3e.turnTracker = game.hyp3e.turnTracker || new HYP3ETurnTracker();
+
     // Log the start of the turn tracker
     Hyp3eLogger.info("Init", `Current exploration turn is ${HYP3ETurnTracker.getTurn()}`);
     // Import the turn tracker class methods
-    game.hyp3e.advanceTurn = () => HYP3ETurnTracker.advanceTurn();
-    game.hyp3e.retreatTurn = () => HYP3ETurnTracker.retreatTurn();
-    game.hyp3e.resetTurn = () => HYP3ETurnTracker.reset();
-    game.hyp3e.getTurn = () => HYP3ETurnTracker.getTurn();
+    game.hyp3e.turnTracker.advanceTurn = () => HYP3ETurnTracker.advanceTurn();
+    game.hyp3e.turnTracker.retreatTurn = () => HYP3ETurnTracker.retreatTurn();
+    game.hyp3e.turnTracker.resetTurn = () => HYP3ETurnTracker.reset();
+    game.hyp3e.turnTracker.getTurn = () => HYP3ETurnTracker.getTurn();
     // Initialize the turn tracker in the chat log
     if (!trackerInitialized) {
         const chatLog = ui.chat;
