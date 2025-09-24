@@ -2467,16 +2467,6 @@ export class Hyp3eActor extends Actor {
                 </span>
             </div>
             <hr class="plain-hr" />`;
-
-        // return `
-        //     <hr class="plain-hr" />
-        //     <div style="margin: 10px 0;">
-        //         <img src="${imgSrc}" style="border: none; float: left;" width="24px" height="24px">
-        //         <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
-        //             ${itemName}
-        //         </span>
-        //     </div>
-        //     <hr class="plain-hr" />`;
     }
     /** END Helper Functions for item/attack rolls ------*/
 

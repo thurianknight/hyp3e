@@ -306,12 +306,16 @@ textarea {
   font-size: calc(1em * var(--hyp3e-chat-scale, 1));
 }
 
+.chat-log .flavor-text {
+  font-size: calc(1em * var(--hyp3e-chat-scale, 1));
+}
+
 /* Hyp3e chat label header style */
 .chat-label {
   margin: 10px 0;
   span {
     text-align: left;
-    font-size: 12pt;
+    font-size: calc(1.1em * var(--hyp3e-chat-scale, 1));
     font-weight: bold;
     margin-left: 6px;
   }
