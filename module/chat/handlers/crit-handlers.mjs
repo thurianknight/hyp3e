@@ -273,7 +273,8 @@ async function rollCritMiss(charType, actorId) {
         Hyp3eLogger.warn("rollCritMiss", `Roll Crit Miss: Actor ${actorId} not found!`)
     }
 
-    const flavor = `<div class="dice-damage">` + game.i18n.localize(`HYP3E.attack.critMiss.${charType}`) + `</div>`
+    // const flavor = `<div class="dice-damage">` + game.i18n.localize(`HYP3E.attack.critMiss.${charType}`) + `</div>`
+    const flavor = game.i18n.localize(`HYP3E.attack.critMiss.${charType}`)
     // Send to chat
     roll.toMessage({
         author: game.user_id,

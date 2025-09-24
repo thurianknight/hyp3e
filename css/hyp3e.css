@@ -306,6 +306,23 @@ textarea {
   font-size: calc(1em * var(--hyp3e-chat-scale, 1));
 }
 
+/* Hyp3e chat label header style */
+.chat-label {
+  margin: 10px 0;
+  span {
+    text-align: left;
+    font-size: 12pt;
+    font-weight: bold;
+    margin-left: 6px;
+  }
+  img {
+    border: none;
+    float: left;
+    width: 24px;
+    height: 24px;
+  }
+}
+
 /* Chat message damage text */
 .dice-damage {
     font-style: italic;
