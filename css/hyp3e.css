@@ -8,7 +8,7 @@
 }
 
 .rollable:hover, .rollable:focus {
-  color: #000;
+  /* color: #000; */
   text-shadow: 0 0 10px red;
   cursor: pointer;
 }
@@ -282,14 +282,25 @@
 /* End of Mozilla stuff */
 
 /* Default style for input text fields */
-input[type=text] {
+input[type=text],
+input[type="number"] {
   border: none;
   background-color:#bdbdbd7f;
   margin-bottom: 2px;
+  height: 28px;
 }
-input[type=text]:disabled {
+input[type=text]:disabled,
+input[type="number"]:disabled {
   border: none;
   background-color: #bdbdbd43;
+}
+
+input[type=checkbox] {
+  width: 24px;
+  max-width: 24px;
+  height: 24px;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 
 /* Default style for textarea boxes */
@@ -374,11 +385,6 @@ textarea {
     th, td {
         padding: 3px 10px;
     }
-}
-
-/* Styles limited to hyp3e sheets */
-.hyp3e {
-  /* Example style for Hyp3e (can be removed if not needed) */
 }
 
 /* Hyperborea Config app styles */
@@ -481,20 +487,69 @@ textarea {
   padding: 1.2em 1em; /* vertical, horizontal */
 }
 
+/* Styles limited to hyp3e sheets */
+.hyp3e {
+  /* Example style for Hyp3e (can be removed if not needed) */
+}
+.hyp3e .controls-dropdown {
+  z-index: 1000;
+}
+
+.hyp3e .window-content {
+  max-height: 100%;
+  .tab {
+    height: 100%;
+    overflow-y: auto;
+  }
+}
+.hyp3e .icon-btn {
+    width: 32px;
+    max-width: 32px;
+    height: 32px;
+    max-height: 32px;
+    /* line-height: 1px; */
+    padding: 8px 8px;
+    margin: 1px 2px;
+}
+
 /* Sheet-level styles */
 .hyp3e.sheet.actor {
   min-width: 800px;
-  min-height: 650px;
+  min-height: 700px;
 }
 .hyp3e.sheet.item {
-  min-width: 520px;
-  min-height: 500px;
+  min-width: 600px;
+  min-height: 550px;
 }
+
+/* Generic styles used wherever I need them */
+.hyp3e .row-top {
+  display: flex;            /* lay out children in a row */
+  flex-direction: row;      /* default behavior of 'flex' above, but explicit here */
+  align-items: flex-start;  /* align items to the top of the container */
+}
+.hyp3e .row-stretch {
+  display: flex;            /* lay out children in a row */
+  flex-direction: row;      /* default, but explicit */
+  align-items: stretch;     /* evenly space items from top of bottom in the container */
+}
+.hyp3e .column-top {
+  display: flex;
+  flex-direction: column;       /* stack children vertically */
+  justify-content: flex-start;  /* align them at the top of the column */
+}
+.hyp3e .column-stretch {
+  display: flex;
+  flex-direction: column;   /* stack children vertically */
+  justify-content: stretch; /* evenly space items from top of bottom in the container */
+}
+
 /* General sheet-header and body styles */
 .hyp3e .sheet-header {
   -webkit-box-flex: 0;
   -ms-flex: 0 auto;
   flex: 0 auto;
+  /* min-height: 170px; */
   overflow: hidden;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -513,7 +568,7 @@ textarea {
 /* Background header image div */
 .hyp3e .sheet-header .header-bg {
   position: absolute;
-  top: 0;
+  top: 35px;
   left: 0;
   width: 100%;
   height: 187px;
@@ -530,22 +585,6 @@ textarea {
   pointer-events: none; /* clicks pass through */
 }
 
-/* Apply to all input fields and textareas where they sit above the header image */
-.hyp3e .character-header-block input,
-.hyp3e .character-header-block textarea,
-.hyp3e .character-header-block select {
-  background-color: rgba(255, 255, 255, 0.4); /* semi-transparent white */
-  border: 1px solid rgba(0,0,0,0.2);           /* soft border */
-  padding: 0.3em 0.5em;
-  border-radius: 4px;
-  /* color: #1a1a1a; /* darker text for contrast */
-}
-/* Give labels a subtle background too */
-.hyp3e .character-header-block label {
-  background-color: rgba(255, 255, 255, 0.4);
-  padding: 0 0.2em;
-  border-radius: 3px;
-}
 /* Apply to all input fields and textareas where they sit above the header image */
 .hyp3e .npc-header-block input,
 .hyp3e .npc-header-block textarea,
@@ -611,24 +650,42 @@ textarea {
   flex: 1;
   z-index: 1; /* Must sit atop the background image */
 }
-.hyp3e .sheet-header h1.charname {
+
+.hyp3e .sheet-header h2.charname {
   height: 50px;
+  width: 100%;
   padding: 0px;
   margin: 5px 0;
   border-bottom: 0;
+  input {
+    width: 100%;
+    min-width: 300px;
+    height: 48px;
+    margin: 0;
+    font-family: "Herculanum", sans-serif;
+  }
 }
-.hyp3e .sheet-header h1.charname input {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  font-family: "Herculanum", sans-serif;
-}
+
 .hyp3e h1, .hyp3e h2, .hyp3e h3 {
   font-family: "Herculanum", sans-serif;
 }
 .hyp3e h2 {
   font-size: x-large;
+  margin-bottom: 5px;
+  input[type=text] {
+    height: 36px;
+  }
 }
+.hyp3e h3 {
+  font-size: large;
+  /* margin-top: 5px;
+  margin-bottom: 5px; */
+  margin: 5px 0;
+  input[type=text] {
+    height: 32px;
+  }
+}
+
 .hyp3e .hyp3e-metal img {
   border: none;
   max-width: 200px;
@@ -638,6 +695,12 @@ textarea {
   font-weight: bold;
   padding: 5px 5px;
   min-width: 60px;
+}
+.hyp3e .header-label-wide {
+  font-family: "Herculanum", sans-serif;
+  font-weight: bold;
+  padding: 5px 5px;
+  min-width: 90px;
 }
 .hyp3e .sheet-tabs {
   -webkit-box-flex: 0;
@@ -660,17 +723,75 @@ textarea {
 }
 
 /* Character header-block styles */
+.hyp3e .character-header {
+  padding: 0 2px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  flex: 1;
+}
 .hyp3e .character-header-block {
   padding: 0 2px;
   margin-right: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+/* Apply to all input fields and textareas where they sit above the header image */
+.hyp3e .character-header-block input,
+.hyp3e .character-header-block select,
+.hyp3e .character-header-block textarea {
+  background-color: rgba(255, 255, 255, 0.4); /* semi-transparent white */
+  border: 1px solid rgba(0,0,0,0.2);           /* soft border */
+  padding: 0.3em 0.5em;
+  border-radius: 4px;
+  /* color: #1a1a1a; /* darker text for contrast */
+}
+.hyp3e .character-header-block input {
+  text-align: center;
+  min-width: 50px;
+  max-width: 75px;
+  .input-small {
+    text-align: center;
+    max-width: 40px;
+  }
+}
+.hyp3e .character-header-block .input-small {
+  text-align: center;
+  max-width: 40px;
+}
+
+.hyp3e .character-header-block select {
+  text-align: center;
+  width: auto;
+  max-width: 150px;
+}
+.hyp3e .character-header-block textarea {
+  min-width: 190px;
+}
+
+/* Give labels a subtle background too */
+.hyp3e .character-header-block label {
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 0 0.2em;
+  border-radius: 3px;
 }
 
 /* NPC header-block styles */
 .hyp3e .npc-header-block {
-  padding: 0 2px;
+  padding-bottom: 5px;
   margin-right: 5px;
 }
 
+/* All content in an actor-sheet tab */
+.hyp3e .all-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  flex: 1;
+  margin-top: 5px;
+}
 /* Left gutter image */
 .hyp3e .left-gutter {
   max-width: 50px;
@@ -679,17 +800,20 @@ textarea {
 .hyp3e .left-gutter img {
   border: 0;
 }
-
-/* Main content block */
+/* Main content block in the tab */
 .hyp3e .main-content {
-  /* background-image: url("../assets/blood-swipe2.png"); */
   background-position: center;
   background-size: cover;
+  overflow-y: auto;
+  flex: 1;
 }
 
 /* Character Abilities-tab styles */
 .hyp3e .attribute-block {
   min-width: 510px;
+  input {
+    text-align: center;
+  }
 }
 .hyp3e .attribute-row {
   padding-bottom: 5px;
@@ -704,20 +828,23 @@ textarea {
   font-weight: bold;
   min-width: 30px;
   max-width: 50px;
-  /* background-image: url("../assets/blood-swipe-small.png"); */
 }
 
 .hyp3e .attribute-mod {
   margin-left: 2px;
   margin-right: 2px;
-  min-width: 75px;
-  /* max-width: 80px; */
+  min-width: 70px;
+  max-width: 80px;
 }
 .hyp3e .mod-label {
   font-size: x-small;
 }
 .hyp3e .exploration-block {
   min-width: 200px;
+  input {
+    text-align: center;
+    max-width: 50px;
+  }
 }
 .hyp3e .exploration-label {
   font-family: "Herculanum", sans-serif;
@@ -730,10 +857,8 @@ textarea {
 
 /* Character Combat-tab styles */
 .hyp3e .combat-block {
-  /* padding: 0 2px; */
-  /* margin-right: 5px; */
   margin-bottom: 3px;
-  input {
+  input[type=text] {
     text-align: center;
     min-width: 20px;
     max-width: 50px;
@@ -758,7 +883,7 @@ textarea {
   }
   .class-weapons {
     text-align: right;
-    input {
+    input[type=text] {
       min-width: 200px;
       margin-bottom: 2px;
       margin-right: 15px;
@@ -766,7 +891,7 @@ textarea {
   }
   .weapon-field {
     text-align: right;
-    input {
+    input[type=text] {
       min-width: 200px;
       margin-bottom: 2px;
       margin-right: 15px;
@@ -788,23 +913,6 @@ textarea {
     max-width: 300px;
   }
 }
-/* .hyp3e .combat-block .class-weapons {
-  text-align: right;
-  input {
-    min-width: 200px;
-    margin-bottom: 2px;
-    margin-right: 15px;
-  }
-} */
-/* .hyp3e .combat-block .weapon-field {
-  text-align: right;
-  input {
-    min-width: 200px;
-    margin-bottom: 2px;
-    margin-right: 15px;
-  }
-} */
-
 .hyp3e .combat-header {
   font-weight: bold;
   font-size: large;
@@ -828,22 +936,88 @@ textarea {
 }
     
 .hyp3e .movement-other {
-  /* padding: 0 2px;
-  margin-right: 5px; */
-  input {
+  input[type=text] {
     min-width: 100px;
     max-width: 125px;
     margin-bottom: 2px;
   }
 }
 
+.hyp3e .combat-space {
+    img {
+        opacity: 0.40;
+        width: 150px;
+        height: auto;
+    }
+}
+.hyp3e .saves-label {
+  font-family: "Herculanum", sans-serif;
+  font-weight: bold;
+  padding: 5px 5px;
+}
 .hyp3e .saves-block {
   padding: 2px 2px;
   margin-bottom: 5px;
-  input {
+  input[type=text],
+  input[type="number"] {
     text-align: center;
     min-width: 20px;
     max-width: 50px;
+  }
+  .save-death {
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    img {
+        opacity: 0.60;
+        width: 32px; 
+        height: 32px; 
+        margin-right: 3px;
+    }
+  }
+  .save-device {
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    img {
+        opacity: 0.60;
+        width: 32px; 
+        height: 32px; 
+        margin-right: 3px;
+    }
+  }
+  .save-transformation {
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    img {
+        opacity: 0.60;
+        width: 32px; 
+        height: 32px; 
+        margin-right: 3px;
+    }
+  }
+  .save-avoidance {
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    img {
+        opacity: 0.60;
+        width: 32px; 
+        height: 32px; 
+        margin-right: 3px;
+    }
+  }
+  .save-sorcery {
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    img {
+        opacity: 0.60;
+        width: 32px; 
+        height: 32px; 
+        margin-right: 3px;
+    }
   }
 }
 
@@ -851,29 +1025,30 @@ textarea {
 .hyp3e .spells-block {
   padding: 0 5px;
   margin-right: 5px;
-  .spell-list input {
+  .spell-list {
     text-align: center;
-    min-width: 100px;
+    width: 100px;
+    margin-bottom: 2px;
+  }
+  .spells {
+    text-align: center;
+    max-width: 32px;
     margin-bottom: 2px;
   }
 }
 .hyp3e .casting-ability {
   min-width: 100px;
+  input[type=text],
+  input[type=number] {
+    text-align: center;
+    max-width: 50px;
+    margin-bottom: 2px;
+  }
 }
 .hyp3e .spells-label {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
   padding: 5px 5px;
-}
-.hyp3e .spell-list input {
-  text-align: center;
-  min-width: 100px;
-  margin-bottom: 2px;
-}
-.hyp3e .spells input {
-  text-align: center;
-  max-width: 25px;
-  margin-bottom: 2px;
 }
 
 /* Character Items-tab styles */
@@ -881,7 +1056,7 @@ textarea {
   padding: 0 2px;
   margin-right: 5px;
   margin-bottom: 3px;
-  input {
+  input[type=text] {
     text-align: center;
     min-width: 20px;
     max-width: 80px;
@@ -896,9 +1071,26 @@ textarea {
 }
 
 /* Character Description-tab styles */
+.hyp3e .description-header {
+  padding: 5px 5px;
+}
 .hyp3e .description-block {
-  padding: 0 2px;
-  margin-right: 5px;
+  margin: 0 3px;
+}
+
+.hyp3e .description-block {
+  width: 100%;
+  margin-right: 2px;
+  .description-field {
+    width: 100%;
+    input[type=text] {
+      min-width: 85px;
+      margin-bottom: 2px;
+    }
+  }
+  textarea {
+    width: 100%;
+  }
 }
 .hyp3e .description-label {
   font-weight: bold;
@@ -906,16 +1098,13 @@ textarea {
   max-width: 135px;
   font-family: "Herculanum", sans-serif;
 }
-.hyp3e .description-field input {
-  min-width: 85px;
-  margin-bottom: 2px;
-}
 .hyp3e .biography-block {
   padding: 0 2px;
   margin-right: 5px;
-  /* font-family: "Herculanum", sans-serif; */
+  min-height: 350px;
   height: 100%;
   .editor {
+    min-height: 350px;
     height: 100%;
   }
 }
@@ -937,7 +1126,8 @@ textarea {
   margin-right: 5px;
   margin-bottom: 3px;
   min-width: 150px;
-  input {
+  input[type=text],
+  input[type="number"] {
     text-align: center;
     min-width: 50px;
     max-width: 75px;
@@ -946,8 +1136,7 @@ textarea {
 }
 .hyp3e .npc-description-block {
   padding: 0 2px;
-  margin-right: 5px;
-  margin-left: 5px;
+  margin: 0 5px;
   min-width: 550px;
   height: 100%;
   .editor {
@@ -980,7 +1169,7 @@ textarea {
 /* Character "Items" includes the Class Abilities list, Weapons & Armor lists, 
   Spells list, Items (inventory) list, and Effects list */
 .hyp3e .items-header {
-  height: 28px;
+  height: 32px;
   margin: 2px 0;
   padding: 0;
   -webkit-box-align: center;
@@ -1009,7 +1198,11 @@ textarea {
   padding: 0;
   overflow-y: auto;
   scrollbar-width: thin;
-  color: #444;
+  /* color: #444; */
+}
+.hyp3e .item-container.drag-target {
+  outline: 2px dotted var(--color-border-highlight, #2196f3);
+  background: rgba(255, 204, 0, 0.1);
 }
 .hyp3e .items-list .item-list {
   list-style: none;
@@ -1033,6 +1226,8 @@ textarea {
 }
 .hyp3e .items-list .item-name h3, .hyp3e .items-list .item-name h4 {
   /* font-family: "Herculanum", sans-serif; */
+  font-family: "Roboto", sans-serif;
+  font-weight: normal;
   margin: 0;
   white-space: nowrap;
   overflow-x: hidden;
@@ -1069,7 +1264,8 @@ textarea {
   border-bottom: none;
 }
 .hyp3e .items-list .item .item-name {
-  color: #191813;
+  /* color: #191813; */
+  font-size: small;
 }
 .hyp3e .contained-items {
   padding-left: 15px;
@@ -1096,10 +1292,10 @@ textarea {
   justify-content: center;
   border-left: 1px solid #c9c7b8;
   border-right: 1px solid #c9c7b8;
-  font-size: 12px;
+  font-size: small;
 }
 .hyp3e .items-list .items-header {
-  height: 28px;
+  height: 32px;
   margin: 2px 0;
   padding: 0;
   -webkit-box-align: center;
@@ -1107,13 +1303,13 @@ textarea {
   align-items: center;
   background: rgba(0, 0, 0, 0.05);
   border: 2px groove #eeede0;
-  font-weight: bold;
 }
 .hyp3e .items-list .items-header > * {
-  font-size: 12px;
+  font-size: medium;
   text-align: center;
 }
 .hyp3e .items-list .items-header .item-name {
+  font-size: medium;
   padding-left: 5px;
   text-align: left;
 }
@@ -1133,7 +1329,8 @@ textarea {
 }
 .hyp3e .bg-attributes {
   margin-bottom: 5px;
-  input {
+  input[type=text],
+  input[type=number] {
     text-align: center;
     min-width: 25px;
     max-width: 35px;
@@ -1142,7 +1339,8 @@ textarea {
 }
 .hyp3e .bg-attributes-wide {
   margin-bottom: 5px;
-  input {
+  input[type=text],
+  input[type="number"] {
     text-align: center;
     min-width: 40px;
     max-width: 75px;
@@ -1160,12 +1358,17 @@ textarea {
 }
 
 .hyp3e .item-description {
-    padding: 0 10px;
+  flex: 1;
+  /* display: block; */
+  /* justify-content: flex-start; */
+  min-height: 100%;
+  padding: 0 10px;
   .editor {
-    height: 80%;
+    height: 210px;
   }
   textarea {
     resize: vertical;
+    width: 100%;
   }
 }
 .hyp3e .effects .item .effect-source,
@@ -1192,38 +1395,57 @@ textarea {
   .xp {
     min-width: 75px;
     max-width: 100px;
-    input {
-        text-align: center;
+    input[type=text],
+    input[type="number"] {
         min-width: 50px;
         max-width: 75px;
+        padding: 0 3px;
     }
   }
   .qty-wt {
     min-width: 140px;
     max-width: 160px;
-    input {
-        text-align: center;
-        min-width: 25px;
-        max-width: 35px;
+    input[type=text],
+    input[type="number"] {
+        min-width: 20px;
+        max-width: 30px;
+        padding: 0 3px;
     }
   }
   .gp-cost {
     min-width: 90px;
     max-width: 125px;
-    input {
-        text-align: center;
+    input[type=text],
+    input[type="number"] {
         min-width: 75px;
         max-width: 90px;
+        padding: 0 3px;
     }
   }
   .range {
     min-width: 110px;
     max-width: 125px;
-    input {
-        text-align: center;
+    input[type=text],
+    input[type="number"] {
         min-width: 30px;
         max-width: 40px;
     }
+  }
+}
+
+.hyp3e .tab-content {
+  padding: 5px;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  overflow-y: auto;
+}
+
+.hyp3e .item-attributes {
+  select {
+    padding: 0 3px;
+    text-align: center;
   }
 }
 
@@ -1324,7 +1546,8 @@ textarea {
         min-width: 225px;
         max-width: 250px;
     };
-    input {
+    input[type=text],
+    input[type=number] {
         text-align: center;
         min-width: 50px;
         max-width: 150px;
@@ -1636,7 +1859,7 @@ textarea {
 .hyp3e-calendar .calendar-header {
   text-align: center;
   margin-bottom: 0.5rem;
-  input {
+  input[type=text] {
     text-align: center;
     font-weight: bold;
     font-size: large;

@@ -1,0 +1,23 @@
+        {{!-- Class feature sidebar --}}
+        <div class="flexshrink flex-group-center item-attributes">
+          <label class="resource-label">{{localize 'HYP3E.details.class'}}</label>
+          <input class="align-center" type="text" name="system.class" value="{{system.class}}" data-dtype="String"/>
+          <label class="resource-label">{{localize 'HYP3E.details.level'}}</label>
+          <input class="align-center" type="text" name="system.level" value="{{system.level}}" data-dtype="String"/>
+          <label class="resource-label">{{localize 'HYP3E.checkRoll'}}</label>
+          <input class="align-center" type="text" name="system.formula" value="{{system.formula}}" data-dtype="String"/>
+          <label class="resource-label">{{localize 'HYP3E.target'}}</label>
+          <input class="align-center" type="text" name="system.tn" value="{{system.tn}}" data-dtype="String"/>
+          <label class="resource-label">{{localize "HYP3E.rollMode"}}</label>
+          <select name="system.rollMode">
+            <option value=""></option>
+            {{selectOptions rollModes selected=system.rollMode localize=true}}
+          </select>
+          <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
+          <div class="form-fields">
+            <select name="system.save">
+              <option value=""></option>
+              {{selectOptions saveThrows selected=system.save localize=true}}
+            </select>
+          </div>
+        </div>

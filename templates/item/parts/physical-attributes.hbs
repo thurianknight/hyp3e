@@ -1,0 +1,94 @@
+      {{!-- Physical attributes --}}
+      <div class="resource">
+        <h3>Physical Item Attributes</h3>
+        {{#if isGM}}
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.friendlyName'}}</label>
+        <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
+        {{else}}
+          {{#if system.identified}}
+            <label class="resource-label">{{localize 'HYP3E.dataLabel.friendlyName'}}</label>
+            <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
+          {{/if}}
+        {{/if}}
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.equipped'}}</label>
+          <input name="system.equipped" type="checkbox" {{checked system.equipped}} />
+          <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.equipped'}}</div>
+        </div>
+        {{#if (eq item.type "item")}}
+          <div class="flexrow flexshrink flex-group-left bg-attributes">
+            <label class="resource-label">{{localize 'HYP3E.item.consumable'}}</label>
+            <input name="system.isConsumable" type="checkbox" {{checked system.isConsumable}}>
+            <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isConsumable'}}</div>
+          </div>
+          <div class="flexrow flexshrink flex-group-left bg-attributes">
+            <label class="resource-label">{{localize 'HYP3E.item.ammunition'}}</label>
+            <input name="system.isAmmunition" type="checkbox" {{checked system.isAmmunition}}>
+            <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isAmmunition'}}</div>
+          </div>
+        {{/if}}
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.lightSource'}}</label>
+          <input name="system.isLightSource" type="checkbox" {{checked system.isLightSource}} />
+          <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isLightSource'}}</div>
+        </div>
+        {{#if system.isLightSource}}
+          <fieldset>
+            <div class="flexrow flexshrink flex-group-left bg-attributes">
+              <label class="resource-label">{{localize 'HYP3E.item.light.lightRadius'}}</label>
+              <div class="flex-xlarge">
+                {{localize 'HYP3E.item.light.dim'}}:
+                <input type="number" name="system.light.dim" value="{{system.light.dim}}" />
+                {{localize 'HYP3E.item.light.bright'}}:
+                <input type="number" name="system.light.bright" value="{{system.light.bright}}" />
+                {{localize 'HYP3E.item.attributes.lightRadius'}}
+              </div>
+            </div>
+            <div class="flexrow flexshrink flex-group-left bg-attributes-wide">
+              <label class="resource-label">{{localize 'HYP3E.item.duration'}}</label>
+              <input type="text" name="system.light.duration" value="{{system.light.duration}}" />
+              <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.lightDuration'}}</div>
+            </div>
+            <div class="flexrow flexshrink flex-group-left bg-attributes-wide">
+              <label class="resource-label">{{localize 'HYP3E.item.light.angle'}}</label>
+              <input type="number" name="system.light.angle" value="{{system.light.angle}}" />
+              <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.lightAngle'}}</div>
+            </div>
+            <div class="flexrow flexshrink flex-group-left bg-attributes-wide">
+              <label class="resource-label">{{localize 'HYP3E.item.light.color'}}</label>
+              <div class="flexrow flex-xlarge">
+                <color-picker name="system.light.color" value="{{system.light.color}}" />
+                  <input type="text" placeholder="" style="" />
+                  <input type="color" style="" />
+                </color-picker>
+                <span>{{localize 'HYP3E.item.attributes.lightColor'}}</span>
+              </div>
+            </div>
+          </fieldset>
+        {{/if}}
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.duration'}}</label>
+          <input type="text" name="system.duration" value="{{system.duration}}" />
+          <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.duration'}}</div>
+        </div>
+        {{#if isGM}}
+          <div class="flexrow flexshrink flex-group-left bg-attributes">
+            <label class="resource-label">{{localize 'HYP3E.item.hasSpells'}}</label>
+            <input name="system.spellcasting.hasSpells" type="checkbox" {{checked system.spellcasting.hasSpells}} />
+            <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.hasSpells'}}</div>
+          </div>
+          {{#if system.spellcasting.hasSpells}}
+            <fieldset>
+              <div class="flexrow flexshrink flex-group-left bg-attributes">
+                <label class="resource-label">{{localize 'HYP3E.item.hideCharges'}}</label>
+                <input name="system.spellcasting.hideCharges" type="checkbox" {{checked system.spellcasting.hideCharges}} />
+                <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.hideCharges'}}</div>
+              </div>
+            </fieldset>
+          {{/if}}
+        {{/if}}
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.itemId'}}</label>
+        <input type="text" name="item._id" value="{{item._id}}" disabled />
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.containerId'}}</label>
+        <input type="text" name="system.containerId" value="{{system.containerId}}" />
+      </div>

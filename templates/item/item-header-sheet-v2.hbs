@@ -1,0 +1,44 @@
+<section class="{{cssClass}}" autocomplete="off">
+
+  {{!-- Sheet Header --}}
+  <header class="sheet-header item">
+    <img src="{{item.img}}" class="profile-img" data-action="editImage" data-field="img" alt="Portrait" title="{{item.name}}"/>
+    {{!-- Item Type --}}
+    <div class="header-block item-header-block">
+      {{!-- For physical items, we have a realName and an itemAlias --}}
+      {{#if system.isPhysical}}
+        <h2 class="charname">
+          {{#if isGM}}
+            <input class="item-name" name="system.realName" type="text" value="{{item.system.realName}}" placeholder="Name"/>
+          {{else}}
+            {{#if system.identified}}
+              <input class="item-name" name="system.realName" type="text" value="{{item.system.realName}}" placeholder="Name"/>
+            {{else}}
+              <input name="system.itemAlias" type="text" value="{{item.system.itemAlias}}" disabled/>
+            {{/if}}
+          {{/if}}
+        </h2>
+        {{!-- Hidden, but we want this in the form data --}}
+        <input name="name" type="hidden" value="{{item.name}}" />
+      {{else}}
+        {{!-- For non-physical items, we just have a name --}}
+        <h2 class="charname">
+          <input name="name" type="text" value="{{item.name}}" placeholder="Name"/>
+        </h2>
+      {{/if}}
+      {{!-- Show physical item fields (armor, shields, items, weapons) --}}
+      {{#if system.isPhysical}}
+        {{> "physical-header"}}
+      {{/if}}
+      {{!-- Show spell fields --}}
+      {{#if (eq item.type "spell")}}
+        {{> "spell-header"}}
+      {{/if}}
+      {{!-- Show weapon fields --}}
+      {{#if (eq item.type "weapon")}}
+        {{> "weapon-header"}}
+      {{/if}}
+    </div>
+  </header>
+
+</section>

@@ -1,0 +1,32 @@
+        {{#if isGM}}
+        <div class="flexrow">
+            <span class="flexrow">
+                <input class="identified" name="system.identified" type="checkbox" {{checked item.system.identified}} data-action="toggleIdentified"/>
+                <label class="resource-label">{{localize 'HYP3E.identified'}}</label>
+            </span>
+            <span class="flexrow flexlarge flex-group-center">
+                <label class="resource-label">{{localize 'HYP3E.itemAlias'}}</label>
+                <input class="item-alias" type="text" style="text-align: left; min-width: 200px;" name="system.itemAlias" value="{{item.system.itemAlias}}" placeholder="Name if not identified" />
+            </span>
+        </div>
+        {{/if}}
+        <div class="flexrow">
+            <div class="resource flexrow flex-group-center xp">
+            <label class="resource-label">{{localize 'HYP3E.details.xp'}}</label>
+            <input class="align-center" type="text" name="system.xp" value="{{item.system.xp}}"/>
+            </div>
+            <div class="resource flexrow flex-group-center qty-wt">
+            <label class="resource-label">{{localize 'HYP3E.item.qty'}}</label>
+            <input class="align-center" type="number" name="system.quantity.value" value="{{system.quantity.value}}" />
+            {{#if system.isConsumable}}
+            /
+            <input class="align-center" type="number" name="system.quantity.max" value="{{system.quantity.max}}" />
+            {{/if}}
+            <label class="resource-label">{{localize 'HYP3E.item.wt'}}</label>
+            <input class="align-center" type="number" name="system.weight" value="{{system.weight}}" />
+            </div>
+            <div class="resource flexrow flex-group-center gp-cost">
+            <label class="resource-label">{{localize 'HYP3E.item.cost'}}</label>
+            <input class="align-center" type="text" name="system.cost" value="{{system.cost}}" />
+            </div>
+        </div>

@@ -1,0 +1,43 @@
+      {{!-- Weapon attributes --}}
+      <div class="resource">
+        <h3>Weapon-Specific Attributes</h3>
+        <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
+        <input type="text" name="system.formula" value="{{system.formula}}" />
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.consumable'}}</label>
+          <input name="system.isConsumable" type="checkbox" {{checked system.isConsumable}} />
+          <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.isConsumable'}}</div>
+        </div>
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.usesAmmo'}}</label>
+          <input name="system.usesAmmo" type="checkbox" {{checked system.usesAmmo}} />
+          <div class="flex-xlarge">{{localize 'HYP3E.weapon.attributes.usesAmmo'}}</div>
+        </div>
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.grenade'}}</label>
+          <input name="system.isGrenade" type="checkbox" {{checked system.isGrenade}} data-action="setGrenadeOrAreaEffect" data-atkType="grenade" />
+          <div class="flex-xlarge">{{localize 'HYP3E.weapon.attributes.isGrenade'}}</div>
+        </div>
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.areaEffect'}}</label>
+          <input name="system.isAreaEffect" type="checkbox" {{checked system.isAreaEffect}} data-action="setGrenadeOrAreaEffect" data-atkType="areaEffect" />
+          <div class="flex-xlarge">{{localize 'HYP3E.weapon.attributes.isAreaEffect'}}</div>
+        </div>
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.annotations'}}</label>
+        <a class="item-button item-control" aria-label="{{localize 'HYP3E.dataLabel.annotations'}}" role="button" data-tooltip="HYP3E.dataLabel.annotations" data-action="setAnnotations">
+            <i class="fas fa-book" style="font-size: small"></i>
+        </a>
+        <ol class="items-list">
+        {{#each annotList as |annot id|}}
+            <li class="item-entry item" data-item-id="{{annot}}">
+                {{#if ../system.melee}}
+                <i class="fas fa-sword"></i>
+                {{else}}
+                <i class="fas fa-bow-arrow"></i>
+                {{/if}}
+                {{annot}}
+            </li>
+        {{/each}}
+        </ol>
+      </div>
+      <hr class="plain-hr"/>

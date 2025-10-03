@@ -1,8 +1,8 @@
-import { Hyp3eCharacter } from "../helpers/character.mjs";
-import { Hyp3eLogger } from "../helpers/logger.mjs";
-import HYP3EActorSetLanguages from "../apps/character-set-languages.mjs";
-import {enableItemEffectsOnActor, disableItemEffectsOnActor, onManageActiveEffect, prepareActiveEffectCategories} from "../helpers/effects.mjs";
-import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../chat/chat.mjs"
+import { Hyp3eCharacter } from "../../helpers/character.mjs";
+import { Hyp3eLogger } from "../../helpers/logger.mjs";
+import HYP3EActorSetLanguages from "../../apps/character-set-languages.mjs";
+import {enableItemEffectsOnActor, disableItemEffectsOnActor, onManageActiveEffect, prepareActiveEffectCategories} from "../../helpers/effects.mjs";
+import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../../chat/chat.mjs"
 
 /**
  * Extend the basic ActorSheet with some very simple modifications

@@ -1,4 +1,20 @@
 {
+    "TYPES": {
+        "actor": {
+            "npc": "NPC",
+            "character": "Character"
+        },
+        "item": {
+            "armor": "Armour", 
+            "feature": "Feature", 
+            "item": "Item", 
+            "shield": "Shield", 
+            "spell": "Spell", 
+            "weapon": "Weapon",
+            "effectTemplate": "Effect Template"
+        }
+    },
+
     "HYP3E": {
         "settings": {
             "reRunMigration": "Re-run world migration",
@@ -209,7 +225,7 @@
         },
         "saves": {
             "death": {
-                "name": "Death",
+                "name": "Death, Poison, ...",
                 "abbrev": "Death"
             },
             "transformation": {
@@ -240,24 +256,6 @@
         "ca": "CA",
         "turningAbility": "Turning Ability",
         "ta": "TA",
-        "explorationSkills": {
-            "listen": {
-                "name": "Listen at Door",
-                "abbrev": "Listen"
-            },
-            "pickLock": {
-                "name": "Pick Lock",
-                "abbrev": "Lock"
-            },
-            "findSecret": {
-                "name": "Find Secret Door",
-                "abbrev": "Secret Door"
-            },
-            "findTrap": {
-                "name": "Find Trap",
-                "abbrev": "Trap"
-            }
-        },
         "taskResolution": {
             "simple": {
                 "name": "Simple",
@@ -350,6 +348,7 @@
             "consumable": "Consumable",
             "ammunition": "Ammunition",
             "lightSource": "Light Source",
+            "toggleLight": "Toggle Light",
             "light": {
                 "lightRadius": "Light Radius",
                 "dim": "Dim",
@@ -365,6 +364,7 @@
             "duration": "Duration",
             "hasSpells": "Has Spells",
             "hideCharges": "Hide Charges",
+            "castSpell": "Cast Spell",
             "cost": "Cost",
             "value": "GP Value",
             "qty": "Qty",
@@ -556,6 +556,9 @@
             "saveClass": "Save Class"
         },
         "dataLabel": {
+            "levelUp": "Level Up!",
+            "quickCreate": "Quick Create Character",
+            "setAttributeMods": "Set Attribute Modifiers",
             "basicMeleeAtk": "Basic melee attack",
             "attackWith": "Attack with",
             "castSpell": "Cast spell",
@@ -587,7 +590,7 @@
             "lvl4": "L4",
             "lvl5": "L5",
             "lvl6": "L6",
-            "leaveBlank": "Leave blank if not used",
+            "leaveBlank": "Blank if not used",
             "viewRemove": "View/Remove",
             "create": "Create",
             "edit": "Edit",

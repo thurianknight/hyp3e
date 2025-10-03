@@ -1,0 +1,16 @@
+      {{!-- Spell attributes --}}
+      <div class="resource">
+        <h3>Spell Attributes</h3>
+        <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
+        <input type="text" name="system.formula" value="{{system.formula}}" />
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.friendlyName'}}</label>
+        <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
+        <div class="flexrow flexshrink flex-group-left item-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.consumable'}}</label>
+          <input name="system.isConsumable" type="checkbox" {{checked system.isConsumable}}>
+          <div class="flex-xlarge">{{localize 'HYP3E.spell.attributes.isConsumable'}}</div>
+        </div>
+        <label class="resource-label">{{localize 'HYP3E.dataLabel.itemId'}}</label>
+        <input type="text" name="item._id" value="{{item._id}}" disabled/>
+      </div>
+      <hr class="plain-hr"/>

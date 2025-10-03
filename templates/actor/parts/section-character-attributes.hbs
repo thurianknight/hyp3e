@@ -1,9 +1,9 @@
 <div class="abilities flexrow">
   <h2>
     {{localize "HYP3E.headers.attributes"}} 
-    <span class="rollable flex" data-roll="" data-roll-type="setAttr" title="Set Attribute Modifiers">
-      <i class="fa fa-book" style="font-size: small"></i>
-    </span>
+    <a class="icon-btn" aria-label="{{localize 'HYP3E.dataLabel.setAttributeMods'}}" role="button" data-tooltip="HYP3E.dataLabel.setAttributeMods" data-action="setAttributeMods">
+        <i class="fa fa-book" style="font-size: small"></i>
+    </a>
   </h2>
 </div>
 <div class="abilities flexcol">
@@ -25,11 +25,11 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.str.test" value="{{system.attributes.str.test}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.str.test}}" data-label="{{localize 'HYP3E.attributes.str.test'}}">{{localize 'HYP3E.attributes.str.test'}} <i class="fas fa-dice-d6"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.str.test}}" data-label="{{localize 'HYP3E.attributes.str.test'}}">{{localize 'HYP3E.attributes.str.test'}} <i class="fas fa-dice-d6"></i></a>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.str.feat" value="{{system.attributes.str.feat}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.str.feat}}" data-label="{{localize 'HYP3E.attributes.str.feat'}}">{{localize 'HYP3E.attributes.str.feat'}} <i class="fas fa-dice-d10"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.str.feat}}" data-label="{{localize 'HYP3E.attributes.str.feat'}}">{{localize 'HYP3E.attributes.str.feat'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
       <span></span>
@@ -53,11 +53,11 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.dex.test" value="{{system.attributes.dex.test}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.dex.test}}" data-label="{{localize 'HYP3E.attributes.dex.test'}}">{{localize 'HYP3E.attributes.dex.test'}} <i class="fas fa-dice-d6"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.dex.test}}" data-label="{{localize 'HYP3E.attributes.dex.test'}}">{{localize 'HYP3E.attributes.dex.test'}} <i class="fas fa-dice-d6"></i></a>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.dex.feat" value="{{system.attributes.dex.feat}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.dex.feat}}" data-label="{{localize 'HYP3E.attributes.dex.feat'}}">{{localize 'HYP3E.attributes.dex.feat'}} <i class="fas fa-dice-d10"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.dex.feat}}" data-label="{{localize 'HYP3E.attributes.dex.feat'}}">{{localize 'HYP3E.attributes.dex.feat'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
       <span></span>
@@ -81,23 +81,34 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.con.traumaSurvive" value="{{system.attributes.con.traumaSurvive}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.con.traumaSurvive}}" data-label="{{localize 'HYP3E.attributes.con.traumaSurvive'}}">{{localize 'HYP3E.attributes.con.traumaSurvive'}} <i class="fas fa-dice-d10"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.con.traumaSurvive}}" data-label="{{localize 'HYP3E.attributes.con.traumaSurvive'}}">{{localize 'HYP3E.attributes.con.traumaSurvive'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.con.test" value="{{system.attributes.con.test}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.con.test}}" data-label="{{localize 'HYP3E.attributes.con.test'}}">{{localize 'HYP3E.attributes.con.test'}} <i class="fas fa-dice-d6"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.con.test}}" data-label="{{localize 'HYP3E.attributes.con.test'}}">{{localize 'HYP3E.attributes.con.test'}} <i class="fas fa-dice-d6"></i></a>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.con.feat" value="{{system.attributes.con.feat}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.con.feat}}" data-label="{{localize 'HYP3E.attributes.con.feat'}}">{{localize 'HYP3E.attributes.con.feat'}} <i class="fas fa-dice-d10"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.con.feat}}" data-label="{{localize 'HYP3E.attributes.con.feat'}}">{{localize 'HYP3E.attributes.con.feat'}} <i class="fas fa-dice-d10"></i></a>
     </div>
   </div>
   <!-- Intelligence -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="{{#if enableAttrChecks}}rollable{{/if}} flex" data-roll="{{enableAttrChecks}}" data-roll-type="check" data-roll-target="{{system.attributes.int.value}}" data-label="{{localize 'HYP3E.attributes.int.check'}}">
+    {{#if enableAttrChecks}}
+    <a class="flex" role="button" data-action="rollThis" 
+        data-roll="{{enableAttrChecks}}" 
+        data-roll-type="check" 
+        data-roll-target="{{system.attributes.int.value}}" 
+        data-label="{{localize 'HYP3E.attributes.int.check'}}">
       <label for="system.attributes.int.value" class="attribute-label {{#if warnInt}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.int.abbrev'}}</label>
-      {{#if enableAttrChecks}}<i class="fas fa-dice"></i>{{/if}}
+      <i class="fas fa-dice"></i>
+    </a>
+    {{else}}
+    <span class="flex">
+      <label for="system.attributes.int.value" class="attribute-label {{#if warnInt}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.int.abbrev'}}</label>
     </span>
+    {{/if}}
+
     <div class="attribute-value">
       <input type="text" name="system.attributes.int.value" value="{{system.attributes.int.value}}" data-dtype="Number"/>
     </div>
@@ -107,16 +118,16 @@
     </div>
     <div class="attribute-mod">
       <div class="flexrow">
-        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl1}}no-bonus{{/unless}}" data-spell-lvl="intLvl1" title='{{localize "HYP3E.dataLabel.bonusLvl1"}}'><i class="fas fa-scroll"></i></a>
-        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl2}}no-bonus{{/unless}}" data-spell-lvl="intLvl2" title='{{localize "HYP3E.dataLabel.bonusLvl2"}}'><i class="fas fa-scroll"></i></a>
-        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl3}}no-bonus{{/unless}}" data-spell-lvl="intLvl3" title='{{localize "HYP3E.dataLabel.bonusLvl3"}}'><i class="fas fa-scroll"></i></a>
-        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl4}}no-bonus{{/unless}}" data-spell-lvl="intLvl4" title='{{localize "HYP3E.dataLabel.bonusLvl4"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl1}}no-bonus{{/unless}}" data-action="updateBonusSpell" data-spell-lvl="intLvl1" title='{{localize "HYP3E.dataLabel.bonusLvl1"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl2}}no-bonus{{/unless}}" data-action="updateBonusSpell" data-spell-lvl="intLvl2" title='{{localize "HYP3E.dataLabel.bonusLvl2"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl3}}no-bonus{{/unless}}" data-action="updateBonusSpell" data-spell-lvl="intLvl3" title='{{localize "HYP3E.dataLabel.bonusLvl3"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.int.bonusSpells.lvl4}}no-bonus{{/unless}}" data-action="updateBonusSpell" data-spell-lvl="intLvl4" title='{{localize "HYP3E.dataLabel.bonusLvl4"}}'><i class="fas fa-scroll"></i></a>
       </div>
       <span class="mod-label">{{localize 'HYP3E.attributes.int.bonusSpells'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.int.learnSpell" value="{{system.attributes.int.learnSpell}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.int.learnSpell}}" data-label="{{localize 'HYP3E.attributes.int.learnSpell'}}">{{localize 'HYP3E.attributes.int.learnSpell'}} <i class="fas fa-dice-d10"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.int.learnSpell}}" data-label="{{localize 'HYP3E.attributes.int.learnSpell'}}">{{localize 'HYP3E.attributes.int.learnSpell'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
       <span></span>
@@ -127,10 +138,21 @@
   </div>
   <!-- Wisdom -->
   <div class="attribute-row flexrow flex-group-center">
-    <span class="{{#if enableAttrChecks}}rollable{{/if}} flex" data-roll="{{enableAttrChecks}}" data-roll-type="check" data-roll-target="{{system.attributes.wis.value}}" data-label="{{localize 'HYP3E.attributes.wis.check'}}">
+    {{#if enableAttrChecks}}
+    <a class="flex" 
+        role="button" data-action="rollThis" 
+        data-roll="{{enableAttrChecks}}" 
+        data-roll-type="check" 
+        data-roll-target="{{system.attributes.wis.value}}" 
+        data-label="{{localize 'HYP3E.attributes.wis.check'}}">
       <label for="system.attributes.wis.value" class="attribute-label {{#if warnWis}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.wis.abbrev'}}</label>
-      {{#if enableAttrChecks}}<i class="fas fa-dice"></i>{{/if}}
+      <i class="fas fa-dice"></i>
+    </a>
+    {{else}}
+    <span class="flex">
+      <label for="system.attributes.wis.value" class="attribute-label {{#if warnWis}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.wis.abbrev'}}</label>
     </span>
+    {{/if}}
     <div class="attribute-value">
       <input type="text" name="system.attributes.wis.value" value="{{system.attributes.wis.value}}" data-dtype="Number"/>
     </div>
@@ -140,16 +162,16 @@
     </div>
     <div class="attribute-mod">
       <div class="flexrow">
-        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl1}}no-bonus{{/unless}}" data-spell-lvl="wisLvl1" title='{{localize "HYP3E.dataLabel.bonusLvl1"}}'><i class="fas fa-scroll"></i></a>
-        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl2}}no-bonus{{/unless}}" data-spell-lvl="wisLvl2" title='{{localize "HYP3E.dataLabel.bonusLvl2"}}'><i class="fas fa-scroll"></i></a>
-        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl3}}no-bonus{{/unless}}" data-spell-lvl="wisLvl3" title='{{localize "HYP3E.dataLabel.bonusLvl3"}}'><i class="fas fa-scroll"></i></a>
-        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl4}}no-bonus{{/unless}}" data-spell-lvl="wisLvl4" title='{{localize "HYP3E.dataLabel.bonusLvl4"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl1}}no-bonus{{/unless}}" data-action="updateBonusSpell" data-spell-lvl="wisLvl1" title='{{localize "HYP3E.dataLabel.bonusLvl1"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl2}}no-bonus{{/unless}}" data-action="updateBonusSpell" data-spell-lvl="wisLvl2" title='{{localize "HYP3E.dataLabel.bonusLvl2"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl3}}no-bonus{{/unless}}" data-action="updateBonusSpell" data-spell-lvl="wisLvl3" title='{{localize "HYP3E.dataLabel.bonusLvl3"}}'><i class="fas fa-scroll"></i></a>
+        <a class="bonus-spell {{#unless system.attributes.wis.bonusSpells.lvl4}}no-bonus{{/unless}}" data-action="updateBonusSpell" data-spell-lvl="wisLvl4" title='{{localize "HYP3E.dataLabel.bonusLvl4"}}'><i class="fas fa-scroll"></i></a>
       </div>
       <span class="mod-label">{{localize 'HYP3E.attributes.wis.bonusSpells'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.wis.learnSpell" value="{{system.attributes.wis.learnSpell}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.wis.learnSpell}}" data-label="{{localize 'HYP3E.attributes.wis.learnSpell'}}">{{localize 'HYP3E.attributes.wis.learnSpell'}} <i class="fas fa-dice-d10"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.wis.learnSpell}}" data-label="{{localize 'HYP3E.attributes.wis.learnSpell'}}">{{localize 'HYP3E.attributes.wis.learnSpell'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
       <span></span>
@@ -168,7 +190,7 @@
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.cha.reaction" value="{{numberFormat system.attributes.cha.reaction decimals=0 sign=true}}" data-dtype="Number"/>
-      <span class="rollable mod-label" data-roll="2d6+{{system.attributes.cha.reaction}}" data-roll-type="reaction" data-label="{{localize 'HYP3E.attributes.cha.reaction'}}">{{localize 'HYP3E.attributes.cha.reaction'}} <i class="fas fa-dice"></i></span>
+      <a class="mod-label" role="button" data-action="rollThis" data-roll="2d6+{{system.attributes.cha.reaction}}" data-roll-type="reaction" data-label="{{localize 'HYP3E.attributes.cha.reaction'}}">{{localize 'HYP3E.attributes.cha.reaction'}} <i class="fas fa-dice"></i></a>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.cha.maxHenchmen" value="{{system.attributes.cha.maxHenchmen}}" data-dtype="Number"/>

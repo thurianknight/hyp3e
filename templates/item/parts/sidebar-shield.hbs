@@ -1,0 +1,22 @@
+        {{!-- Shield sidebar --}}
+        <div class="flexshrink flex-group-center item-attributes">
+          <label class="resource-label">{{localize 'HYP3E.shield.shieldType'}}</label>
+          <div class="form-fields">
+            <select name="system.type">
+              <option value=""></option>
+              {{selectOptions shieldTypes selected=system.type localize=true}}
+            </select>
+          </div>
+          {{#if isGM}}
+            <label class="resource-label">{{localize 'HYP3E.shield.acMod'}}</label>
+            <input class="align-center" type="text" name="system.ac" value="{{system.ac}}" data-dtype="Number" />
+          {{else}}
+            {{#if system.identified}}
+              <label class="resource-label">{{localize 'HYP3E.shield.acMod'}}</label>
+              <input class="align-center" type="text" name="system.ac" value="{{system.ac}}" data-dtype="Number" />
+            {{else}}
+              <label class="resource-label">{{localize 'HYP3E.shield.acMod'}}</label>
+              <input class="align-center" type="text" value="??" readonly />
+            {{/if}}
+          {{/if}}
+        </div>

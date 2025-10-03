@@ -1,7 +1,7 @@
 import { Hyp3eLogger } from "./logger.mjs";
 
 /**
- * Manage Active Effect instances through the Actor Sheet via effect control buttons.
+ * Manage Active Effect instances through the Actor/Item Sheet via effect control buttons.
  * @param {MouseEvent} event      The left-click event on the effect control
  * @param {Actor|Item} owner      The owning document which manages this effect
  */
@@ -13,67 +13,117 @@ import { Hyp3eLogger } from "./logger.mjs";
     const effect = li.dataset.effectId ? owner.effects.get(li.dataset.effectId) : null;
     Hyp3eLogger.info("onManageActiveEffect", `Effect:`, effect);
     switch ( a.dataset.action ) {
-        case "create":
-            return owner.createEmbeddedDocuments("ActiveEffect", [{
-                name: "New Effect",
-                label: "New Effect",
-                img: "icons/svg/aura.svg",
-                origin: owner.uuid,
-                sourceName: owner.name,
-                "duration.rounds": li.dataset.effectType === "temporary" ? 1 : undefined,
-                disabled: li.dataset.effectType === "inactive"
-            }]);
-        case "edit":
+        case "createEffect":
+            _createEffect(owner, a.dataset);
+            break;
+        case "editEffect":
             if (!effect) {
                 ui.notifications.info("Could not edit effect. Most likely, this is because the effect is coming from an item the actor owns.");
                 return;
             }
             return effect.sheet.render(true);
-        case "delete":
+        case "deleteEffect":
             if (!effect) {
                 ui.notifications.info("Could not delete effect. Most likely, this is because the effect is coming from an item the actor owns.");
                 return;
             }
             return effect.delete();
-        case "toggle":
+        case "toggleEffect":
             if (!effect) {
                 ui.notifications.info("Could not toggle effect. Most likely, this is because the effect is coming from an item the actor owns.");
                 return;
             }
-            let updates = {}
-            if (effect.disabled) {
-                Hyp3eLogger.info("onManageActiveEffect", `Enabling Effect:`, effect);
-                updates = {disabled: !effect.disabled};
-                // Aside from simply toggling the disabled flag, we also want to track the 
-                //  start of the effect if the actor is in combat. And if not in combat, 
-                //  we want to clear the startRound and startTurn values since they are not valid.
-                if (owner.inCombat) {
-                    const combatant = game.combat.turns.find(c => c.actor.id === owner.id);
-                    Hyp3eLogger.info("onManageActiveEffect", `In Combat:`, combatant);
-                    updates.duration = {
-                        startRound: combatant.combat.current.round,
-                        startTurn: combatant.combat.current.turn
-                    }
-                } else {
-                    // If the actor is not in combat, remove the startRound and startTurn values.
-                    updates.duration = {
-                        startRound: null,
-                        startTurn: null
-                    }
-                }
-            } else {
-                Hyp3eLogger.info("onManageActiveEffect", `Disabling Effect:`, effect);
-                // When disabling an effect, also remove the startRound and startTurn values.
-                updates = {
-                    disabled: !effect.disabled,
-                    duration: {
-                        startRound: null,
-                        startTurn: null
-                    }
-                };
-            }
-            return effect.update(updates);
+            _toggleEffect(effect, owner);
+            break;
+        default:
+            Hyp3eLogger.warn("onManageActiveEffect", `Unknown action:`, a.dataset.action);
     }
+}
+
+/**
+ * Manage Active Effect instances through the Actor/Item SheetV2 via effect control buttons.
+ * @param {MouseEvent} target     The selected/clicked effect control
+ * @param {Actor|Item} owner      The owning document which manages this effect
+ */
+export function onManageActiveEffectV2(target, owner) {
+    Hyp3eLogger.info("onManageActiveEffectV2", `Owner of Effect:`, owner);
+    const effectId = $(target).closest(".item-entry").data("effectId")
+    const effect = effectId ? owner.effects.get(effectId) : null;
+    Hyp3eLogger.info("onManageActiveEffectV2", `Effect:`, effect);
+    switch ( target.dataset.action ) {
+        case "createEffect":
+            _createEffect(owner, target.dataset);
+            break;
+        case "editEffect":
+            if (!effect) {
+                ui.notifications.info("Could not edit effect. Most likely, this is because the effect is coming from an item the actor owns.");
+                return;
+            }
+            return effect.sheet.render(true);
+        case "deleteEffect":
+            if (!effect) {
+                ui.notifications.info("Could not delete effect. Most likely, this is because the effect is coming from an item the actor owns.");
+                return;
+            }
+            return effect.delete();
+        case "toggleEffect":
+            if (!effect) {
+                ui.notifications.info("Could not toggle effect. Most likely, this is because the effect is coming from an item the actor owns.");
+                return;
+            }
+            _toggleEffect(effect, owner);
+            break;
+        default:
+            Hyp3eLogger.error("onManageActiveEffectV2", `Unknown action:`, target.dataset.action);
+    }
+}
+
+function _createEffect(owner, dataset) {
+    return owner.createEmbeddedDocuments("ActiveEffect", [{
+        name: "New Effect",
+        label: "New Effect",
+        img: "icons/svg/aura.svg",
+        origin: owner.uuid,
+        sourceName: owner.name,
+        "duration.rounds": dataset.effectType === "temporary" ? 1 : undefined,
+        disabled: dataset.effectType === "inactive"
+    }]);
+}
+
+function _toggleEffect(effect, owner) {
+    let updates = {}
+    if (effect.disabled) {
+        Hyp3eLogger.info("_toggleEffect", `Enabling Effect:`, effect);
+        updates = {disabled: !effect.disabled};
+        // Aside from simply toggling the disabled flag, we also want to track the 
+        //  start of the effect if the actor is in combat. And if not in combat, 
+        //  we want to clear the startRound and startTurn values since they are not valid.
+        if (owner.inCombat) {
+            const combatant = game.combat.turns.find(c => c.actor.id === owner.id);
+            Hyp3eLogger.info("_toggleEffect", `In Combat:`, combatant);
+            updates.duration = {
+                startRound: combatant.combat.current.round,
+                startTurn: combatant.combat.current.turn
+            }
+        } else {
+            // If the actor is not in combat, remove the startRound and startTurn values.
+            updates.duration = {
+                startRound: null,
+                startTurn: null
+            }
+        }
+    } else {
+        Hyp3eLogger.info("_toggleEffect", `Disabling Effect:`, effect);
+        // When disabling an effect, also remove the startRound and startTurn values.
+        updates = {
+            disabled: !effect.disabled,
+            duration: {
+                startRound: null,
+                startTurn: null
+            }
+        };
+    }
+    return effect.update(updates);
 }
 
 /**
@@ -421,7 +471,8 @@ async function sendEffectChatMessage(effect) {
 
     // Source metadata from flag
     const sourceData = effect.getFlag("hyp3e", "source") || {};
-    const sourceName = sourceData.appliedBy ?? "Unknown Source";
+    const sourceName = sourceData.appliedBy ?? effect.sourceName ?? "Unknown Source";
+    Hyp3eLogger.info("sendEffectChatMessage", `Effect being applied:`, effect);
 
     // Start with the effect name
     messageParts.push(`<i>${effectName}</i>`);

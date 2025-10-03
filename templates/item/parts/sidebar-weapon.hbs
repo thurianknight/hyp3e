@@ -1,0 +1,94 @@
+        {{!-- Weapon sidebar --}}
+        <div class="flexshrink flex-group-center item-attributes">
+          <label class="resource-label">{{localize 'HYP3E.headers.hands'}}</label>
+          <div class="flexrow">
+            <a class="{{#unless (eq system.hands 1)}}no-bonus{{/unless}}" data-action="toggleWeaponHands" data-hands="1" title='{{localize "HYP3E.weapon.hands.one"}}'><i class="fas fa-hand"></i></a>
+            <a class="{{#unless (eq system.hands 2)}}no-bonus{{/unless}}" data-action="toggleWeaponHands" data-hands="2" title='{{localize "HYP3E.weapon.hands.two"}}'><i class="fas fa-hands"></i></a>
+          </div>
+          <hr class="plain-hr"/>
+          {{!-- Attack and Damage Modifiers --}}
+          {{!-- GMs always see real values; players see real values only if identified --}}
+          {{#if isGM}}
+          <label class="resource-label">{{localize 'HYP3E.headers.atkMod'}}</label>
+          <input class="align-center" type="text" name="system.atkMod" value="{{numberFormat system.atkMod decimals=0 sign=true}}" />
+          <label class="resource-label">{{localize 'HYP3E.headers.dmgMod'}}</label>
+          <input class="align-center" type="text" name="system.dmgMod" value="{{numberFormat system.dmgMod decimals=0 sign=true}}" />
+          {{else}}
+            {{#if system.identified}}
+            <label class="resource-label">{{localize 'HYP3E.headers.atkMod'}}</label>
+            <input class="align-center" type="text" name="system.atkMod" value="{{numberFormat system.atkMod decimals=0 sign=true}}" />
+            <label class="resource-label">{{localize 'HYP3E.headers.dmgMod'}}</label>
+            <input class="align-center" type="text" name="system.dmgMod" value="{{numberFormat system.dmgMod decimals=0 sign=true}}" />
+            {{else}}
+            <label class="resource-label">{{localize 'HYP3E.headers.atkMod'}}</label>
+            <input class="align-center" type="text" value="??" readonly />
+            <label class="resource-label">{{localize 'HYP3E.headers.dmgMod'}}</label>
+            <input class="align-center" type="text" value="??" readonly />
+            {{/if}}
+          {{/if}}
+          <label class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
+          <a class="item-button item-control" 
+              aria-label="{{localize 'HYP3E.headers.damageTypes'}}" 
+              role="button" 
+              data-tooltip="HYP3E.headers.damageTypes" 
+              data-action="setDmgTypes">
+            <i class="fas fa-book" style="font-size: small"></i>
+          </a>
+          <input class="align-center" type="text" name="system.damage" value="{{system.damage}}" />
+          {{#if system.damage}}
+          <span style="font-weight: bold; font-style: italic;">{{capitalizeWords system.dmgType}}</span>
+          {{/if}}
+          {{#if system.melee}}
+          <br />
+          <label class="resource-label">{{localize 'HYP3E.headers.damage2h'}}</label>
+          <input class="align-center" type="text" name="system.damage2h" value="{{system.damage2h}}" />
+          {{/if}}
+          <hr class="plain-hr"/>
+          {{#if isGM}}
+          <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
+          <ol class="items-list">
+          {{#each system.altDmg as |val key|}}
+            <li class="item-entry item" data-item-id="{{key}}">
+              <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes key}} {{val}}" disabled />
+            </li>
+          {{/each}}
+          </ol>
+          <hr class="plain-hr"/>
+          {{else}}
+            {{#if system.identified}}
+            <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
+            <ol class="items-list">
+            {{#each system.altDmg as |val key|}}
+              <li class="item-entry item" data-item-id="{{key}}">
+                <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes key}} {{val}}" disabled />
+              </li>
+            {{/each}}
+            </ol>
+            <hr class="plain-hr"/>
+            {{/if}}
+          {{/if}}
+          <label class="resource-label">{{localize 'HYP3E.headers.weaponMastery'}}</label>
+          <div class="flexrow">
+            <a class="{{#unless system.wpnMaster}}no-bonus{{/unless}}" data-action="handleWeaponMastery" data-mastery="master" title='{{localize "HYP3E.weapon.master"}}'><i class="fas fa-sword"></i></a>
+            <a class="{{#unless system.wpnGrandmaster}}no-bonus{{/unless}}" data-action="handleWeaponMastery" data-mastery="grandMaster" title='{{localize "HYP3E.weapon.grandMaster"}}'><i class="fas fa-swords"></i></a>
+          </div>
+          {{#if isGM}}
+          <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
+          <div class="form-fields">
+            <select name="system.save">
+              <option value=""></option>
+              {{selectOptions saveThrows selected=system.save localize=true}}
+            </select>
+          </div>
+          {{else}}
+            {{#if system.identified}}
+            <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
+            <div class="form-fields">
+              <select name="system.save">
+                <option value=""></option>
+                {{selectOptions saveThrows selected=system.save localize=true}}
+              </select>
+            </div>
+            {{/if}}
+          {{/if}}
+        </div>

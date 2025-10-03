@@ -1,0 +1,10 @@
+<section class="{{cssClass}} {{actor.type}} flexcol" autocomplete="off">
+
+  {{#if (eq actor.type "character")}}
+    {{> "actor-character-header-v2"}}
+  {{/if}}
+  {{#if (eq actor.type "npc")}}
+    {{> "actor-npc-header-v2"}}
+  {{/if}}
+
+</section>

@@ -1,0 +1,32 @@
+<section 
+    class="tab {{tabs.attributes.cssClass}}"
+    data-tab="{{tabs.attributes.id}}"
+    data-group="primary"
+>
+  <div class="main-content">
+    {{!-- Attributes --}}
+      {{!-- Item-type specific attributes --}}
+      {{#if (eq item.type "armor")}}
+        {{!-- {{> "armor-attributes"}} --}}
+      {{/if}}
+      {{#if (eq item.type "shield")}}
+        {{!-- {{> "shield-attributes"}} --}}
+      {{/if}}
+      {{#if (eq item.type "effectTemplate")}}
+        {{> "effect-attributes"}}
+      {{/if}}
+      {{#if (eq item.type "feature")}}
+        {{> "feature-attributes"}}
+      {{/if}}
+      {{#if (eq item.type "spell")}}
+        {{> "spell-attributes"}}
+      {{/if}}
+      {{#if (eq item.type "weapon")}}
+        {{> "weapon-attributes"}}
+      {{/if}}
+      {{!-- All physical item attributes --}}
+      {{#if system.isPhysical}}
+        {{> "physical-attributes"}}
+      {{/if}}
+  </div>
+</section>

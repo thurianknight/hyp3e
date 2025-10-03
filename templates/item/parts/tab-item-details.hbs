@@ -1,0 +1,88 @@
+<section 
+    class="tab {{tabs.details.cssClass}}"
+    data-tab="{{tabs.details.id}}"
+    data-group="primary"
+>
+  <div class="main-content">
+    {{!-- Main & Description --}}
+      <div class="flexrow tab-content">
+        {{!-- Item-type specific sidebars --}}
+        {{#if (eq item.type "armor")}}
+          {{> "sidebar-armor"}}
+        {{/if}}
+        {{#if (eq item.type "shield")}}
+          {{> "sidebar-shield"}}
+        {{/if}}
+        {{#if (eq item.type "feature")}}
+          {{> "sidebar-feature"}}
+        {{/if}}
+        {{#if (eq item.type "item")}}
+          {{> "sidebar-item"}}
+        {{/if}}
+        {{#if (eq item.type "spell")}}
+          {{> "sidebar-spell"}}
+        {{/if}}
+        {{#if (eq item.type "weapon")}}
+          {{> "sidebar-weapon"}}
+        {{/if}}
+
+        {{!-- Description --}}
+        <div class="item-description">
+          <h3>{{localize 'HYP3E.tabs.description'}}</h3>
+          {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
+          {{#if isGM}}
+            {{#if editable}}
+              <prose-mirror
+                name="system.realDescription"
+                button="true"
+                editable="{{editable}}"
+                toggled="false"
+                value="{{system.realDescription}}">
+                {{{realDescriptionHTML}}}
+              </prose-mirror>
+            {{else}}
+              {{{realDescriptionHTML}}}
+            {{/if}}
+            {{#if system.isPhysical}}
+              <label for="system.aliasDescription" class="resource-label">{{localize 'HYP3E.aliasDescription'}}</label>
+              <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
+            {{/if}}
+          {{else}}
+            {{#if system.isPhysical}}
+              {{#if system.identified}}
+                {{editor enrichedRealDescription target="system.realDescription" editable=editable button=true engine="prosemirror" collaborate=false}}
+                {{#if editable}}
+                  <prose-mirror
+                    name="system.realDescription"
+                    button="true"
+                    editable="{{editable}}"
+                    toggled="false"
+                    value="{{system.realDescription}}">
+                    {{{realDescriptionHTML}}}
+                  </prose-mirror>
+                {{else}}
+                  {{{realDescriptionHTML}}}
+                {{/if}}
+                <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
+              {{else}}
+                <textarea name="system.aliasDescription">{{system.aliasDescription}}</textarea>
+              {{/if}}
+            {{else}}
+              {{#if editable}}
+                <prose-mirror
+                    name="system.realDescription"
+                    button="true"
+                    editable="{{editable}}"
+                    toggled="false"
+                    value="{{system.realDescription}}">
+                    {{{realDescriptionHTML}}}
+                </prose-mirror>
+              {{else}}
+                {{{realDescriptionHTML}}}
+              {{/if}}
+            {{/if}}
+          {{/if}}
+        </div>
+      </div>
+  </div>
+</section>

@@ -23,7 +23,7 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
         tag: "form",
         window: {
             title: "HYP3E.headers.damageTypes",
-            icon: "fa-book",
+            icon: "fas fa-book",
             contentClasses: ["standard-form"]
         },
         actions: {

@@ -27,6 +27,40 @@ export function getAvailableTokenNumber(matchingTokens) {
     return numbers.length + 1;
 }
 
+/**
+ * Get a token's actual or synthetic actor
+ * @param {*} tokenOrId - The token object or ID to find the actor
+ * @returns {Object|null} - Returns an Actor object if possible
+ */
+export function getTokenActor(tokenOrId) {
+  const token = typeof tokenOrId === "string" ? canvas.tokens.get(tokenOrId) : tokenOrId;
+  return token?.actor ?? null;
+}
+
+/**
+ * Check if a token is in the current active combat.
+ * @param {Token} token - The placeable Token object
+ * @returns {boolean}
+ */
+export function isTokenInCombat(token) {
+    const combat = game.combat;
+    if (!combat) return false;
+
+    return combat.combatants.some(c => c.tokenId === token.id);
+}
+
+/**
+ * Optional: get the Combatant for a token
+ * @param {Token} token
+ * @returns {Combatant|null}
+ */
+export function getTokenCombatant(token) {
+    const combat = game.combat;
+    if (!combat) return null;
+
+    return combat.combatants.find(c => c.tokenId === token.id) ?? null;
+}
+
 export async function overlayEquippedWeaponAndShield(token, tokenState) {
     // Remove old overlays
     if (token.weaponOverlay) {
@@ -36,6 +70,9 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
 
     const actor = token.actor;
     if (!actor) return;
+
+    // Only do the overlay if the token is in combat
+    if (!isTokenInCombat(token)) return;
 
     // Get equipped weapons/shields
     const equippedWeapons = actor.items.filter(i =>

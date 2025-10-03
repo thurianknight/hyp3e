@@ -54,6 +54,16 @@ export class Hyp3eItem extends Item {
         // Get the Item's data
         const itemData = this.system;
 
+        // Add isPhysical flag for armor, item, shield, weapon
+        itemData.isPhysical = ["armor", "item", "shield", "weapon"].includes(this.type);
+
+        if (itemData.isPhysical) {
+            // Ensure quantity and weight are numbers
+            itemData.quantity.value = Number(itemData.quantity.value) || 0;
+            itemData.quantity.max = Number(itemData.quantity.max) || 0;
+            itemData.weight = Number(itemData.weight) || 0;
+        }
+
         // Setup the item's realName to be its name, if realName is blank
         if (!itemData.realName?.trim()) itemData.realName = this.name;
         // If the item is identified but has no realDescription, set it to the description
@@ -175,6 +185,10 @@ export class Hyp3eItem extends Item {
      */
     async updateWeaponHands(hands) {
         const updates = {};
+        // Convert hands to integer if it's a string
+        if (typeof hands === "string") {
+            hands = parseInt(hands);
+        }
         switch (hands) {
             case 1:
                 updates["system.hands"] = 1;
@@ -187,6 +201,31 @@ export class Hyp3eItem extends Item {
                 return;
         }
         Hyp3eLogger.info("updateWeaponHands", `Update data:`, updates);
+        await this.update(updates);
+    }
+
+    async updateGrenadeOrAreaEffect(isGrenade, isAreaEffect) {
+        Hyp3eLogger.info("updateGrenadeOrAreaEffect", `Updating grenade/area-effect...`, { isGrenade, isAreaEffect });
+        const updates = {};
+        if (isGrenade !== undefined) {
+            updates["system.isGrenade"] = isGrenade;
+            if (isGrenade) {
+                updates["system.isAreaEffect"] = false;
+                updates["system.melee"] = false;
+                updates["system.missile"] = true;
+                updates["system.type"] = "missile";
+            }
+        }
+        if (isAreaEffect !== undefined) {
+            updates["system.isAreaEffect"] = isAreaEffect;
+            if (isAreaEffect) {
+                updates["system.isGrenade"] = false;
+                updates["system.melee"] = false;
+                updates["system.missile"] = true;
+                updates["system.type"] = "missile";
+            }
+        }
+        Hyp3eLogger.info("updateGrenadeOrAreaEffect", `Update data:`, updates);
         await this.update(updates);
     }
 
@@ -336,7 +375,7 @@ export class Hyp3eItem extends Item {
 
         const [moved] = refs.splice(fromIndex, 1);
         refs.splice(toIndex, 0, moved);
-
+        Hyp3eLogger.info("reorderSpell", `Reordered spell from index ${fromIndex} to ${toIndex}`, { refs });
         return this.update({ "system.spellcasting.spellRefs": refs });
     }
 
@@ -498,6 +537,14 @@ export class Hyp3eItem extends Item {
     }
 
     /** LOOKUP TABLES AND FUNCTIONS ---------------------*/
+
+    /**
+     * Determine whether the item is a container or not
+     * @returns {Boolean}
+     */
+    _isContainer() {
+        return this.system?.isContainer || this.type === "container"
+    }
 
     /**
      * Check if this item is a light source based on its name. Return properties if found.

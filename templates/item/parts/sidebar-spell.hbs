@@ -1,0 +1,35 @@
+        {{!-- Spell sidebar --}}
+        <div class="flexshrink flex-group-center item-attributes">
+          <label class="resource-label">{{localize 'HYP3E.spell.numAffected'}}</label>
+          <input class="align-center" type="text" name="system.affected" value="{{system.affected}}" />
+          <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
+          <div class="form-fields">
+            <select name="system.save">
+              <option value=""></option>
+              {{selectOptions saveThrows selected=system.save localize=true}}
+            </select>
+          </div>
+          <label class="resource-label">{{localize 'HYP3E.attackRoll'}}</label>
+          <input name="system.atkRoll" type="checkbox" {{checked system.atkRoll}}><br />
+          <label for="system.damage" class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
+          <a class="item-button item-control" 
+              aria-label="{{localize 'HYP3E.headers.damageTypes'}}" 
+              role="button" 
+              data-tooltip="HYP3E.headers.damageTypes" 
+              data-action="setDmgTypes">
+            <i class="fas fa-book" style="font-size: small"></i>
+          </a>
+          <input class="align-center" type="text" name="system.damage" value="{{system.damage}}" />
+          {{#if system.damage}}
+          <span style="font-weight: bold; font-style: italic;">{{capitalizeWords system.dmgType}}</span>
+          {{/if}}
+          <hr class="plain-hr"/>
+          <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
+          <ol class="items-list">
+          {{#each system.altDmg as |val key|}}
+            <li class="item-entry item" data-item-id="{{key}}">
+              <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes key}} {{val}}" disabled />
+            </li>
+          {{/each}}
+          </ol>
+        </div>

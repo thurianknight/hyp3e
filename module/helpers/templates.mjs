@@ -8,20 +8,48 @@ import HYP3E from "./config.mjs"
 export const preloadHandlebarsTemplates = async function() {
     // Register Handlebars partials
     const partialPaths = [
-        // Actor partials
-        `${HYP3E.templatePath}/actor/parts/actor-abilities.hbs`,
-        `${HYP3E.templatePath}/actor/parts/actor-attributes.hbs`,
-        `${HYP3E.templatePath}/actor/parts/actor-combat.hbs`,
-        `${HYP3E.templatePath}/actor/parts/actor-items.hbs`,
-        `${HYP3E.templatePath}/actor/parts/actor-spells.hbs`,
-        `${HYP3E.templatePath}/actor/parts/actor-effects.hbs`,
-        `${HYP3E.templatePath}/actor/parts/actor-description.hbs`,
-        `${HYP3E.templatePath}/actor/parts/npc-all-items.hbs`,
-        `${HYP3E.templatePath}/actor/parts/npc-abilities.hbs`,
+        // Actor V1 partials
+        // `${HYP3E.templatePath}/actor/parts/actor-abilities.hbs`,
+        // `${HYP3E.templatePath}/actor/parts/actor-attributes.hbs`,
+        // `${HYP3E.templatePath}/actor/parts/actor-combat.hbs`,
+        // `${HYP3E.templatePath}/actor/parts/actor-items.hbs`,
+        // `${HYP3E.templatePath}/actor/parts/actor-spells.hbs`,
+        // `${HYP3E.templatePath}/actor/parts/actor-effects.hbs`,
+        // `${HYP3E.templatePath}/actor/parts/actor-description.hbs`,
+        // `${HYP3E.templatePath}/actor/parts/npc-all-items.hbs`,
+        // `${HYP3E.templatePath}/actor/parts/npc-abilities.hbs`,
 
-        // Item partials
-        `${HYP3E.templatePath}/item/parts/item-spells.hbs`,
-        `${HYP3E.templatePath}/item/parts/item-effects.hbs`,
+        // Actor V2 partials - main sheets
+        `${HYP3E.templatePath}/actor/actor-character-header-v2.hbs`,
+        `${HYP3E.templatePath}/actor/actor-npc-header-v2.hbs`,
+        // Actor V2 partials - tabs
+        `${HYP3E.templatePath}/actor/parts/tab-character-abilities.hbs`,
+        `${HYP3E.templatePath}/actor/parts/section-character-attributes.hbs`,
+        `${HYP3E.templatePath}/actor/parts/tab-npc-abilities.hbs`,
+        `${HYP3E.templatePath}/actor/parts/tab-character-description.hbs`,
+        `${HYP3E.templatePath}/actor/parts/tab-npc-description.hbs`,
+        `${HYP3E.templatePath}/actor/parts/section-npc-items.hbs`,
+
+        // Item V2 partials - headers
+        `${HYP3E.templatePath}/item/parts/physical-header.hbs`,
+        `${HYP3E.templatePath}/item/parts/spell-header.hbs`,
+        `${HYP3E.templatePath}/item/parts/weapon-header.hbs`,
+        // Item V2 partials - sidebars
+        `${HYP3E.templatePath}/item/parts/sidebar-armor.hbs`,
+        `${HYP3E.templatePath}/item/parts/sidebar-feature.hbs`,
+        `${HYP3E.templatePath}/item/parts/sidebar-item.hbs`,
+        `${HYP3E.templatePath}/item/parts/sidebar-shield.hbs`,
+        `${HYP3E.templatePath}/item/parts/sidebar-spell.hbs`,
+        `${HYP3E.templatePath}/item/parts/sidebar-weapon.hbs`,
+        // Item V2 partials - attributes
+        `${HYP3E.templatePath}/item/parts/effect-attributes.hbs`,
+        `${HYP3E.templatePath}/item/parts/feature-attributes.hbs`,
+        `${HYP3E.templatePath}/item/parts/physical-attributes.hbs`,
+        `${HYP3E.templatePath}/item/parts/spell-attributes.hbs`,
+        `${HYP3E.templatePath}/item/parts/weapon-attributes.hbs`,
+        // Item V1 partials - tabs
+        // `${HYP3E.templatePath}/item/parts/item-spells.hbs`,
+        // `${HYP3E.templatePath}/item/parts/item-effects.hbs`,
 
         // Combat Tab
         `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-ind-v12.hbs`,

@@ -1,25 +1,29 @@
-<section class="all-content flexrow">
-  <section class="main-content">
+<section 
+    class="tab {{cssClass}}"
+    data-tab="spells"
+    data-group="primary"
+>
+  <div class="main-content">
     {{!-- Casting ability --}}
     <h2>{{localize 'HYP3E.tabs.spells'}}</h2>
     <div class="flexrow flex-group-left">
-      <div class="item">
+      <div class="item spells">
         <span class="spells-label">{{localize "HYP3E.castingAbility"}}</span>
-        <input type="text" class="spells" name="system.spellcasting.ca" value="{{system.spellcasting.ca}}" data-dtype="Number" {{#unless isGM}}readonly{{/unless}}/>
+        <input type="text" name="system.spellcasting.ca" value="{{system.spellcasting.ca}}" {{#unless isGM}}readonly{{/unless}}/>
       </div>
-      <div class="item flexlarge">
+      <div class="item flexlarge spells">
         <span class="spells-label">{{localize "HYP3E.item.charges"}}</span>
         {{#if isGM}}
-        <input type="text" class="spells" name="system.spellcasting.charges.value" value="{{system.spellcasting.charges.value}}" data-dtype="Number" />
+        <input type="number" name="system.spellcasting.charges.value" value="{{system.spellcasting.charges.value}}" />
         /
-        <input type="text" class="spells" name="system.spellcasting.charges.max" value="{{system.spellcasting.charges.max}}" data-dtype="Number" />
+        <input type="number" name="system.spellcasting.charges.max" value="{{system.spellcasting.charges.max}}" />
         {{else}}
         {{#if system.spellcasting.hideCharges}}
-        <input type="text" class="spells" value="??" readonly/>
+        <input type="text" value="??" readonly/>
         {{else}}
-        <input type="text" class="spells" name="system.spellcasting.charges.value" value="{{system.spellcasting.charges.value}}" readonly/>
+        <input type="text" name="system.spellcasting.charges.value" value="{{system.spellcasting.charges.value}}" readonly/>
         /
-        <input type="text" class="spells" name="system.spellcasting.charges.max" value="{{system.spellcasting.charges.max}}" readonly/>
+        <input type="text" name="system.spellcasting.charges.max" value="{{system.spellcasting.charges.max}}" readonly/>
         {{/if}}
         {{/if}}
         <span class="spells-label">({{localize "HYP3E.dataLabel.leaveBlank"}})</span>
@@ -43,21 +47,20 @@
                     </div>
                     <a><h4 class="item-drop">{{entry.spell.name}}</h4></a>
                 </div>
-                <div class="item-prop">
+                <div class="item-prop spells">
                     <input type="hidden"
                         name="system.spellcasting.spellRefs.{{idx}}.uuid"
                         value="{{entry.uuid}}" />
-                    <input type="number" class="spells" 
+                    <input type="number" 
                         name="system.spellcasting.spellRefs.{{idx}}.charges" 
                         value="{{entry.charges}}" 
-                        data-dtype="Number"
                         {{#unless @root.isGM}}readonly{{/unless}}
                     />
                 </div>
                 <div class="item-prop">{{entry.spell.system.spellLevel}}</div>
                 <div class="item-controls">
-                    <a class="item-control item-show" title='{{localize "HYP3E.item.show"}}'><i class="fas fa-eye"></i></a>
-                    <a class="item-control item-delete-spell" title="{{localize 'HYP3E.item.delete'}}"><i class="fas fa-trash"></i></a>
+                    <a class="item-control" title='{{localize "HYP3E.item.show"}}' data-action="openItemSheet" data-spell-id="{{entry.spell.uuid}}"><i class="fas fa-eye"></i></a>
+                    <a class="item-control" title="{{localize 'HYP3E.item.delete'}}" data-action="deleteSpell" data-spell-id="{{entry.spell.uuid}}"><i class="fas fa-trash"></i></a>
                 </div>
             </div>
             <div class="item-summary">
@@ -68,5 +71,6 @@
         </li>
         {{/each}}
     </ul>
-  </section>
+  </div>
+
 </section>

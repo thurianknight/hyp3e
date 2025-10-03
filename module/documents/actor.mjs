@@ -1333,6 +1333,7 @@ export class Hyp3eActor extends Actor {
             ui.notifications.warn(`Item ${dataset.itemId} was not found!`)
             return
         }
+        const actorData = this.getRollData()
         // dataset.roll = item.system.formula
         dataset.attackTextBase = attackTextBase
 
@@ -1377,8 +1378,8 @@ export class Hyp3eActor extends Actor {
                 }
                 if (item.effects.size > 0) {
                     // Only give this (secondary) chat if there are effects to apply
-                    dataset.actorData.img = this.img
-                    item._displayItemInChat(dataset.actorData)
+                    actorData.img = this.img
+                    item._displayItemInChat(actorData)
                 }
                 return
             }
@@ -1400,8 +1401,8 @@ export class Hyp3eActor extends Actor {
                 this.useItem(item.id)
             }
             // No roll chats were needed, so we show this one chat message
-            dataset.actorData.img = this.img
-            item._displayItemInChat(dataset.actorData)
+            actorData.img = this.img
+            item._displayItemInChat(actorData)
         }
     }
 
@@ -1831,9 +1832,8 @@ export class Hyp3eActor extends Actor {
         }
 
         // Optionally inject rollData reference for later convenience
-        dataset.actorData = actorData;
+        // dataset.actorData = actorData;
 
-        Hyp3eLogger.info("_prepareRollDataset", `Actor roll data:`, actorData);
         Hyp3eLogger.info("_prepareRollDataset", `Prepared dataset:`, dataset);
 
         return dataset;
@@ -2561,6 +2561,9 @@ export class Hyp3eActor extends Actor {
             return;
         }
 
+        // Get the actor's token
+        const token = this.getAssociatedToken();
+
         const dataset = {
             "rollType": "item",
             "rollMode": "publicroll",
@@ -2568,7 +2571,7 @@ export class Hyp3eActor extends Actor {
             "itemId": spellUuid,
             "actorId": this.id,
             "baseClass": this.system.baseClass,
-            "tokenId": this?.sheet?.token.id,
+            "tokenId": token.id,
             "isItemSpell": true,
             "itemCa": item.system.spellcasting.ca
         }
@@ -2590,7 +2593,8 @@ export class Hyp3eActor extends Actor {
      */
     async toggleLightSource(itemId) {
         Hyp3eLogger.info("toggleLightSource", `Actor ${this.name}:`, this);
-        const token = this?.token ?? this?.sheet?.token;
+        // const token = this?.token ?? this?.sheet?.token;
+        const token = this.getAssociatedToken();
         if (!token) {
             Hyp3eLogger.warn("toggleLightSource", `No token found for actor ${this.name}.`);
             return;
@@ -2874,6 +2878,71 @@ export class Hyp3eActor extends Actor {
         Hyp3eLogger.info("_resolveTurnUndead", `Turn Undead:`, turnUndeadHtml);
         return turnUndeadHtml;
     }
+
+
+    /** ACTOR TOKEN HELPERS ------------------------------*/
+
+    /**
+     * Get a token document associated with an actor.
+     * - If the actor is synthetic (from a token), returns its .token
+     * - Otherwise, tries to find a token on the active canvas for this actor
+     * @returns {TokenDocument|null}
+     */
+    getAssociatedToken() {
+        // Synthetic actor (opened from a token)
+        if (this.token) return this.token;
+
+        // Base actor (opened from sidebar): search canvas
+        const token = canvas.tokens?.placeables.find(t => t.actor?.id === this.id);
+        return token ? token.document : null;
+    }
+
+    /**
+     * Get details about the actor's token linkage.
+     * @returns {Object} info
+     */
+    getActorTokenInfo() {
+        const tokenDoc = this.token; // Only present if synthetic
+        const isSynthetic = !!tokenDoc;
+        const isLinked = isSynthetic ? tokenDoc.actorLink : false;
+        const baseActor = isSynthetic ? tokenDoc.actor : this;
+
+        return {
+            actor: this,     // the actual actor (synthetic or base)
+            baseActor,       // always resolves to the sidebar actor
+            token: tokenDoc, // null if base actor, TokenDocument if synthetic
+            isSynthetic,     // true if this is a token-created actor
+            isLinked,        // true if token is linked to its base actor
+        };
+    }
+
+    /**
+     * Check if this actor is in the current active combat.
+     * Works for both base actors and synthetic (token) actors.
+     * @returns {boolean}
+     */
+    isInCombat() {
+        return this.getCombatant() !== null;
+    }
+
+    /**
+     * Get the Combatant for this actor in the current active combat.
+     * Returns null if the actor is not part of combat.
+     * @returns {Combatant|null}
+     */
+    getCombatant() {
+        const combat = game.combat;
+        if (!combat) return null;
+
+        // Synthetic actor (unlinked or opened from a token)
+        if (this.token) {
+            return combat.combatants.find(c => c.tokenId === this.token.id) ?? null;
+        }
+
+        // Base actor (from sidebar)
+        return combat.combatants.find(c => c.actorId === this.id) ?? null;
+    }
+
 
     /** LOOKUP TABLES AND FUNCTIONS ---------------------*/
 

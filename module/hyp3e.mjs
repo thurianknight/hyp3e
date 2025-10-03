@@ -2,14 +2,16 @@
 import { Hyp3eActor } from "./documents/actor.mjs";
 import { Hyp3eItem } from "./documents/item.mjs";
 // Import sheet classes.
-import { Hyp3eActorSheet } from "./sheets/actor-sheet.mjs";
-import { Hyp3eItemSheet } from "./sheets/item-sheet.mjs";
+// import { Hyp3eActorSheet } from "./sheets/fvtt_v1/actor-sheet.mjs";
+import { Hyp3eActorSheetV2 } from "./sheets/actor-sheet-v2.mjs";
+// import { Hyp3eItemSheet } from "./sheets/fvtt_v1/item-sheet.mjs";
+import { Hyp3eItemSheetV2 } from "./sheets/item-sheet-v2.mjs";
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./chat/chat.mjs";
 import { setupEffectHandlers } from "./helpers/effects.mjs";
-import { getAvailableTokenNumber, overlayEquippedWeaponAndShield } from "./helpers/tokens.mjs";
+import { getAvailableTokenNumber, isTokenInCombat, getTokenActor, overlayEquippedWeaponAndShield } from "./helpers/tokens.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
@@ -78,11 +80,13 @@ Hooks.once('init', async function() {
 
     // Register sheet application classes
     Actors.unregisterSheet("core", ActorSheet);
-    Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: true });
-    Hyp3eLogger.info("Init", "Registered Hyp3eActorSheet");
+    // Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: false });
+    Actors.registerSheet("hyp3e", Hyp3eActorSheetV2, { makeDefault: true });
+    Hyp3eLogger.info("Init", "Registered Hyp3eActorSheetV2");
     Items.unregisterSheet("core", ItemSheet);
-    Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: true });
-    Hyp3eLogger.info("Init", "Registered Hyp3eItemSheet");
+    // Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: false });
+    Items.registerSheet("hyp3e", Hyp3eItemSheetV2, { makeDefault: true });
+    Hyp3eLogger.info("Init", "Registered Hyp3eItemSheetV2");
 
 
     // Get initiative mode: group vs. individual
@@ -376,7 +380,7 @@ Hooks.once("ready", async function() {
         }
     }
 
-    // Setup a hyp3e property to contain our calendar and turn tracker
+    // Setup a game.hyp3e property to contain our calendar and turn tracker
     game.hyp3e = game.hyp3e || {};
 
     // Initialize the calendar app
@@ -498,9 +502,9 @@ Hooks.on("refreshToken", async (token, tokenState) => {
  */
 Hooks.on("preMoveToken", (token, movement, operation) => {
     // We only enforce this rule in combat
-    if (!token.inCombat) return;
+    if (!isTokenInCombat(token)) return;
 
-    const actor = token.actor;
+    const actor = getTokenActor(token);
     if (!actor) {
         Hyp3eLogger.warn("preMoveToken", `Token actor not found!`, token)
         return;

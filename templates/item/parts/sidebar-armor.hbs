@@ -1,0 +1,42 @@
+        {{!-- Armor sidebar --}}
+        <div class="flexshrink flex-group-center item-attributes">
+          <label class="resource-label">{{localize 'HYP3E.armor.wtClass'}}</label>
+          <div class="form-fields">
+            <select name="system.type">
+              <option value=""></option>
+              {{selectOptions armorTypes selected=system.type localize=true}}
+            </select>
+          </div>
+          {{#if isGM}}
+            {{#if system.isShield}}
+              <label class="resource-label">{{localize 'HYP3E.armor.acMod'}}</label>
+            {{else}}
+              <label class="resource-label">{{localize 'HYP3E.armor.armorClass'}}</label>
+            {{/if}}
+            <input class="align-center" type="text" name="system.ac" value="{{system.ac}}" data-dtype="Number" />
+            <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
+            <input class="align-center" type="text" name="system.dr" value="{{system.dr}}" data-dtype="Number" />
+          {{else}}
+            {{#if system.identified}}
+              {{#if system.isShield}}
+                <label class="resource-label">{{localize 'HYP3E.armor.acMod'}}</label>
+              {{else}}
+                <label class="resource-label">{{localize 'HYP3E.armor.armorClass'}}</label>
+              {{/if}}
+              <input class="align-center" type="text" name="system.ac" value="{{system.ac}}" data-dtype="Number" />
+              <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
+              <input class="align-center" type="text" name="system.dr" value="{{system.dr}}" data-dtype="Number" />
+            {{else}}
+              {{#if system.isShield}}
+                <label class="resource-label">{{localize 'HYP3E.armor.acMod'}}</label>
+              {{else}}
+                <label class="resource-label">{{localize 'HYP3E.armor.armorClass'}}</label>
+              {{/if}}
+              <input class="align-center" type="text" value="??" readonly />
+              <label class="resource-label">{{localize 'HYP3E.armor.dmgReduct'}}</label>
+              <input class="align-center" type="text" value="??" readonly />
+            {{/if}}
+          {{/if}}
+          <label class="resource-label">{{localize 'HYP3E.movement.base.name'}}</label>
+          <input class="align-center" type="text" name="system.mv" value="{{system.mv}}" data-dtype="Number" />
+        </div>

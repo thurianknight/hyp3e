@@ -1,0 +1,107 @@
+  {{!-- Sheet Header --}}
+  <header class="sheet-header character">
+    <div class="header-bg"></div>
+    <div class="profile-img"><!-- Profile Image -->
+      <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-field="img" alt="Portrait" title="{{actor.name}}" height="100" width="100"/>
+      <div class="health-bar" style="border-bottom:0px;"><!-- The character health bar -->
+        <div style="width:{{system.hp.percentage}}%" class="health-fill"></div>
+          <div class="health-text">
+            <span
+              class='short-field align-right current-value'
+              style='text-align:right;'>
+              {{system.hp.value}}
+            </span> 
+            <p style="margin:0px">/</p>
+            <span class=' short-field'>
+              {{system.hp.max}}
+            </span> 
+          </div>
+      </div> <!-- End Health Bar -->
+    </div><!-- End Profile Image -->
+
+    <div class="header-block">
+      <div class="character-header">
+        <div class="character-header-block">
+          <h2 class="charname">
+            <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+          </h2>
+          <div class="flexrow">
+            <label for="system.details.class" class="header-label align-left">{{localize "HYP3E.details.class"}}</label>
+            <select name="system.details.class">
+              <option value=""></option>
+              {{selectOptions characterClasses selected=system.details.class localize=false}}
+            </select>
+            {{#if enableQuickCreate}}
+            <a class="icon-btn" 
+                aria-label="{{localize 'HYP3E.dataLabel.quickCreate'}}" 
+                role="button" 
+                data-tooltip="HYP3E.dataLabel.quickCreate" 
+                data-action="quickCreate">
+              <i class="fas fa-book" style="font-size: small"></i>
+            </a>
+            <label for="icon-btn" class="header-label align-left">{{localize "HYP3E.dataLabel.create"}}</label>
+            {{else}}
+            {{/if}}
+          </div>
+          <div class="flexrow">
+            <label for="system.alignment" class="header-label-wide align-left">{{localize "HYP3E.details.alignment"}}</label>
+            <input type="text" name="system.alignment" value="{{system.alignment}}" data-dtype="String" />
+          </div>
+          <div class="flexrow">
+            <label for="system.details.race" class="header-label align-left">{{localize 'HYP3E.details.race'}}</label>
+            <select name="system.details.race">
+              <option value=""></option>
+              {{selectOptions races selected=system.details.race localize=false}}
+            </select>
+          </div>
+        </div>
+        <div class="character-header-block">
+          <div class="flexrow">
+            <label for="system.details.level.value" class="header-label align-left">{{localize "HYP3E.details.level"}}</label>
+            <input class="input-small" type="text" name="system.details.level.value" value="{{system.details.level.value}}" data-dtype="Number" />
+            <a class="icon-btn" 
+                aria-label="{{localize 'HYP3E.dataLabel.levelUp'}}" 
+                role="button" 
+                data-tooltip="HYP3E.dataLabel.levelUp" 
+                data-action="levelUp">
+              <i class="fas fa-book" style="font-size: small"></i>
+            </a>
+            <label for="icon-btn" class="header-label-wide align-left">{{localize "HYP3E.dataLabel.levelUp"}}</label>
+          </div>
+          <div class="flexrow">
+            <div class="flexcol" style="max-width: 125px; margin-right: 10px;">
+                <div class="flexrow">
+                    <label for="system.details.xp.value" class="header-label align-left">{{localize "HYP3E.details.xp"}}</label>
+                    <input type="text" name="system.details.xp.value" value="{{system.details.xp.value}}" />
+                </div>
+                <div class="flexrow">
+                    <label for="system.details.xp.bonus" class="header-label align-left">{{localize "HYP3E.bonus"}}</label>
+                    <input class="input-small" type="text" name="system.details.xp.bonus" value="{{system.details.xp.bonus}}" /> %
+                </div>
+            </div>
+            <div class="flexcol" style="min-width: 175px;">
+                <div class="flexrow">
+                    <label for="system.details.xp.toNextLvl" class="header-label-wide flexlarge align-left">{{localize "HYP3E.details.toNextLvl"}}</label>
+                    <input type="text" name="system.details.xp.toNextLvl" value="{{system.details.xp.toNextLvl}}" />
+                </div>
+                <div class="flexrow">
+                    <label for="system.details.xp.primeAttr" class="header-label-wide flexlarge align-left">{{localize "HYP3E.details.primeAttr"}}</label>
+                    <input type="text" name="system.details.xp.primeAttr" value="{{system.details.xp.primeAttr}}" />
+                </div>
+            </div>
+          </div>
+          <div class="flexrow">
+            <label for="system.knownLanguages" class="header-label-wide align-left">{{localize 'HYP3E.details.languages'}}</label>
+            <a class="languages-button item-control icon-btn" 
+                aria-label="{{localize 'HYP3E.details.languages'}}" 
+                role="button" 
+                data-tooltip="HYP3E.details.languages" 
+                data-action="setLanguages">
+              <i class="fas fa-book" style="font-size: small"></i>
+            </a>
+            <textarea name="system.knownLanguages">{{system.knownLanguages}}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
