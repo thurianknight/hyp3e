@@ -1491,20 +1491,33 @@ textarea {
 }
 
 /* Color transitions */
+.level-up.glow {
+  animation: glow-pulse 1.5s infinite alternate;
+}
+
+@keyframes glow-pulse {
+  0% {
+    filter: drop-shadow(0 0 4px rgba(255, 60, 60, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 1));
+  }
+}
+
 .bg-trans-yellow {
     animation: fadeYellow 3s ease-in-out infinite;
     background-color:lightyellow;
-}
-
-.color-trans-red {
-    animation: fadeRed 2s ease-in-out infinite;
-    color:red;
 }
 
 @keyframes fadeYellow {
     0% {background-color: transparent;}
     50% {background-color: lightyellow;}
     100% {background-color: transparent;}
+}
+
+.color-trans-red {
+    animation: fadeRed 2s ease-in-out infinite;
+    color:red;
 }
 
 @keyframes fadeRed {

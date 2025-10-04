@@ -59,20 +59,22 @@
           <div class="flexrow">
             <label for="system.details.level.value" class="header-label align-left">{{localize "HYP3E.details.level"}}</label>
             <input class="input-small" type="text" name="system.details.level.value" value="{{system.details.level.value}}" data-dtype="Number" />
-            <a class="icon-btn" 
-                aria-label="{{localize 'HYP3E.dataLabel.levelUp'}}" 
-                role="button" 
-                data-tooltip="HYP3E.dataLabel.levelUp" 
-                data-action="levelUp">
-              <i class="fas fa-book" style="font-size: small"></i>
-            </a>
-            <label for="icon-btn" class="header-label-wide align-left">{{localize "HYP3E.dataLabel.levelUp"}}</label>
+            <div class="flexlarge level-up {{#if (gteNum system.details.xp.value system.details.xp.toNextLvl)}}glow{{/if}}">
+                <a class="icon-btn" 
+                    aria-label="{{localize 'HYP3E.dataLabel.levelUp'}}" 
+                    role="button" 
+                    data-tooltip="HYP3E.dataLabel.levelUp" 
+                    data-action="levelUp">
+                <i class="fas fa-book" style="font-size: small"></i>
+                </a>
+                <label for="icon-btn" class="header-label-wide align-left">{{localize "HYP3E.dataLabel.levelUp"}}</label>
+            </div>
           </div>
           <div class="flexrow">
             <div class="flexcol" style="max-width: 125px; margin-right: 10px;">
                 <div class="flexrow">
                     <label for="system.details.xp.value" class="header-label align-left">{{localize "HYP3E.details.xp"}}</label>
-                    <input type="text" name="system.details.xp.value" value="{{system.details.xp.value}}" />
+                    <input type="text" name="system.details.xp.value" value="{{formatNumber system.details.xp.value}}" />
                 </div>
                 <div class="flexrow">
                     <label for="system.details.xp.bonus" class="header-label align-left">{{localize "HYP3E.bonus"}}</label>
@@ -82,7 +84,7 @@
             <div class="flexcol" style="min-width: 175px;">
                 <div class="flexrow">
                     <label for="system.details.xp.toNextLvl" class="header-label-wide flexlarge align-left">{{localize "HYP3E.details.toNextLvl"}}</label>
-                    <input type="text" name="system.details.xp.toNextLvl" value="{{system.details.xp.toNextLvl}}" />
+                    <input type="text" name="system.details.xp.toNextLvl" value="{{formatNumber system.details.xp.toNextLvl}}" />
                 </div>
                 <div class="flexrow">
                     <label for="system.details.xp.primeAttr" class="header-label-wide flexlarge align-left">{{localize "HYP3E.details.primeAttr"}}</label>

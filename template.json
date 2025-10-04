@@ -145,9 +145,9 @@
                     "value": 1
                 },
                 "xp": {
-                    "value": "0",
-                    "toNextLvl": "0",
-                    "bonus": "0",
+                    "value": 0,
+                    "toNextLvl": 0,
+                    "bonus": 0,
                     "primeAttr": ""
                 },
                 "race": "",
