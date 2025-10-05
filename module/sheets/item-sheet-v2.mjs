@@ -31,13 +31,12 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
             width: 600,
             height: 550,
         },
-        // tag: "section",
         form: {
             submitOnChange: true
         },
         window: {
             icon: "fas fa-book",
-            resizable: true
+            resizable: true,
         },
         actions: {
             // This is where we will define the sheet's clickable actions

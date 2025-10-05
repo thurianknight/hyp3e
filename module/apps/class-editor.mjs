@@ -9,7 +9,6 @@ const {
     HandlebarsApplicationMixin 
 } = foundry.applications.api
 
-// export class HYP3EClassEditor extends FormApplication {
 export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     /** @param {string|null} [classKey] - Class key for editing, or null for new class */
     /** @param {Object} [classData] - Existing class data if editing */
@@ -37,7 +36,6 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
             height: "auto",
         },
         form: {
-            // handler: HYP3EClassEditor.#saveClass,
             submitOnChange: false,
             closeOnSubmit: false,
             submitOnClose: true,
@@ -65,11 +63,9 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
         context.classData = foundry.utils.deepClone(this.classData);
 
         const baseClassNames = ["cleric", "fighter", "magician", "thief"];
-        // const baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
         context.baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
 
         const spellcasters = ["Cleric", "Druid", "Magician", "Cryomancer", "Illusionist", "Necromancer", "Pyromancer", "Witch"];
-        // const spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
         context.spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
 
         const attributes = CONFIG.HYP3E.attributes;
@@ -172,7 +168,6 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
         Hyp3eLogger.info("#addItem", `Form data:`, formData);
 
         // Save any other changes in process first
-        // await HYP3EClassEditor.#saveClass(event, target);
         await HYP3EClassEditor.#saveClass.call(this, event, target);
 
         // Now we can merge those same changes in memory
@@ -202,7 +197,6 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
         Hyp3eLogger.info("deleteItem", "Deleting item:", { pack, index });
 
         // Save any other changes in process first
-        // await HYP3EClassEditor.#saveClass(event, target);
         await HYP3EClassEditor.#saveClass.call(this, event, target);
 
         if (!isNaN(index)) this.classData.startingPack[pack].splice(index, 1);

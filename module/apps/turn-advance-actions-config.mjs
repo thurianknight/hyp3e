@@ -1,117 +1,124 @@
+import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 
-export class TurnAdvanceActionsConfig extends FormApplication {
-    static get defaultOptions() {
-        return mergeObject(super.defaultOptions, {
-            id: "turn-advance-actions-config",
-            title: "Turn-Advance Actions",
-            template: "systems/hyp3e/templates/apps/turn-advance-actions-config.hbs",
-            width: 400,
-            classes: ["hyp3e", "turn-advance-actions-config"],
+const { 
+    ApplicationV2, 
+    HandlebarsApplicationMixin 
+} = foundry.applications.api
+
+// export class TurnAdvanceActionsConfig extends FormApplication {
+export class TurnAdvanceActionsConfig extends HandlebarsApplicationMixin(ApplicationV2) {
+
+    get title() {
+        return game.i18n.localize(`Turn-Advance Actions`);
+    }
+
+    /** @inheritDoc */
+    static DEFAULT_OPTIONS = {
+        id: "turn-advance-actions-config",
+        classes: ["hyp3e", "turn-advance-actions-config-window"],
+        tag: "form",
+        window: {
             resizable: true,
-            closeOnSubmit: true
-        });
-  }
-
-    getData() {
-        return {
-            actions: game.settings.get(game.system.id, "turnAdvanceActions") || []
-        };
+        },
+        position: {
+            width: 400,
+        },
+        form: {
+            submitOnChange: false,
+            closeOnSubmit: false,
+            submitOnClose: false,
+        },
+        actions: {
+            addAction: TurnAdvanceActionsConfig.#addAction,
+            removeAction: TurnAdvanceActionsConfig.#removeAction,
+            saveActions: TurnAdvanceActionsConfig.#saveActions,
+        }
+    }
+    /** @inheritDoc */
+    static PARTS = {
+        form: {
+            template: `${HYP3E.templatePath}/apps/turn-advance-actions-config.hbs`,
+            scrollable: [""],
+        }
     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
-
-        // Add a new action
-        html.find(".add-action").on("click", ev => {
-            const list = html.find(".action-list");
-            const li = $(`
-                <li class="action-item">
-                    <div class="flexrow">
-                        <span class="action-label">UUID:</span>
-                        <input type="text" name="uuid" placeholder="UUID">
-                    </div>
-                    <div class="flexrow">
-                        <span class="action-label">Name:</span>
-                        <input type="text" name="label" placeholder="Label (optional)">
-                    </div>
-                    <div class="flexrow">
-                        <span class="action-label">RollTable Results:</span>
-                        <select name="output">
-                            <option value="public">Public</option>
-                            <option value="gm" selected>Whisper to GM</option>
-                        </select>
-                    </div>
-                    <div class="flexrow">
-                        <span class="action-label">Enabled
-                            <input type="checkbox" name="enabled" checked>
-                        </span>
-                        <button type="button" class="remove-action">Remove</button>
-                    </div>
-                </li>
-                <hr>
-            `);
-            list.append(li);
-            li.find(".remove-action").on("click", () => li.remove());
-            // Attach drag/drop listener for the new input
-            this._attachUuidDropListener(li.find("input[name='uuid']"));
-            // Resize window — increase height
-            const pos = this.position;  // current position/size
-            this.setPosition({
-                height: pos.height + 150  // adjust to match new content size
-            });
-        });
-
-        // Remove an action
-        html.find(".remove-action").on("click", ev => {
-            $(ev.currentTarget).closest("li").remove();
-        });
-
-        // Attach drag/drop to existing inputs
-        html.find("input[name='uuid']").each((_, el) => {
-            this._attachUuidDropListener($(el));
-        });
+    /** @override */
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options)
+        context.actions = game.settings.get(game.system.id, "turnAdvanceActions") || [];
+        return context;
     }
 
-    _attachUuidDropListener($input) {
-        $input.on("dragover", ev => {
-            ev.preventDefault();
-            ev.originalEvent.dataTransfer.dropEffect = "copy";
-        });
-
-        $input.on("drop", async ev => {
-            ev.preventDefault();
-            const data = JSON.parse(ev.originalEvent.dataTransfer.getData("text/plain"));
-            if (!data.uuid) {
-                ui.notifications.warn("That item cannot be dropped here. Please drop a Macro or RollTable.");
-                return;
+    /** @override */
+    _onRender(context, options) {
+        // Enable drag & drop functionality
+        new CONFIG.ux.DragDrop({
+            dropSelector: "input[name='uuid']",
+            callbacks: {
+                drop: this._onDrop.bind(this)
             }
-
-            // Resolve the dropped document
-            const doc = await fromUuid(data.uuid);
-            if (!doc) {
-                ui.notifications.warn("Unable to resolve dropped document.");
-                return;
-            }
-
-            // Set the UUID in the field
-            $input.val(data.uuid);
-            // Set the label field to the document's name
-            const $labelInput = $input.closest(".action-item").find('input[name="label"]');
-            $labelInput.val(doc.name);
-
-            // Automatically save the form
-            this.submit({ preventClose: true });
-        });
+        }).bind(this.element);
     }
 
-    async _updateObject(event, formData) {
+    /**
+     * Add a new empty turn-advance action to the data
+     * @param {*} event 
+     * @param {*} target 
+     */
+    static async #addAction(event, target) {
+        // Get the current actions
+        const actions = game.settings.get(game.system.id, "turnAdvanceActions") || [];
+
+        // Create a new, blank action, and update the data
+        actions.push({ uuid: "", label: "", output: "gm", enabled: true });
+        await game.settings.set(game.system.id, "turnAdvanceActions", actions);
+
+        // Refresh the form
+        this.render(true);
+    }
+
+    /**
+     * Delete the specified action from the data
+     * @param {*} event 
+     * @param {*} target 
+     */
+    static async #removeAction(event, target) {
+        const uuidToRemove = target.dataset.uuid;
+        const actions = game.settings.get(game.system.id, "turnAdvanceActions") || [];
+        // Find the UUID, to remove its action
+        const index = actions.findIndex(action => action.uuid === uuidToRemove);
+        if (index !== -1) {
+            actions.splice(index, 1);
+        }
+        // Update the data and refresh the form
+        await game.settings.set(game.system.id, "turnAdvanceActions", actions);
+        this.render(true);
+    }
+
+    /**
+     * Save all valid actions in the form, overwriting the data
+     * @param {*} event 
+     * @param {*} target 
+     */
+    static async #saveActions(event, target) {
+        event.preventDefault();
+
+        // Find the nearest form ancestor
+        const form = target.closest("form");
+        if (!form) return;
+
+        // Collect data
+        const fd = new FormDataExtended(form);
+        const formData = fd.object; // returns a deep object of all form fields
+        Hyp3eLogger.info("#saveActions", `Form data:`, formData);
+
         const actions = [];
         const uuids = formData["uuid"];
         const labels = formData["label"];
         const outputs = formData["output"];
         const enableds = formData["enabled"];
-        Hyp3eLogger.info("_updateObject", "Form data:", formData);
+
         // Normalize in case of single entry (not array)
         const count = Array.isArray(uuids) ? uuids.length : 1;
         for (let i = 0; i < count; i++) {
@@ -122,7 +129,60 @@ export class TurnAdvanceActionsConfig extends FormApplication {
             if (!uuid) continue;
             actions.push({ uuid, label, output, enabled });
         }
-        Hyp3eLogger.info("_updateObject", "Saving turn-advance actions:", actions);
+
+        // Log the data & save
+        const msg = `Saving turn-advance actions`;
+        Hyp3eLogger.info("#saveActions", `${msg}:`, actions);
+        ui.notifications.info(msg)
         await game.settings.set(game.system.id, "turnAdvanceActions", actions);
+
+        // Re-render the form
+        this.render(true);
+    }
+
+    async _onDrop(event) {
+        event.preventDefault();
+        Hyp3eLogger.info("_onDrop", `Drop event triggered:`, event)
+
+        // Read dropped data
+        const dataTransfer = event.dataTransfer?.getData("text/plain");
+        if (!dataTransfer) return;
+
+        let dropData;
+        try {
+            dropData = JSON.parse(dataTransfer);
+            Hyp3eLogger.info("_onDrop", `Data from drop event:`, dropData)
+        } catch {
+            return;
+        }
+
+        // Verify it's an Item drop
+        if (dropData.type !== "Macro" && dropData.type !== "RollTable") {
+            ui.notifications.warn("That item cannot be dropped here. Please drop a Macro or RollTable.");
+            return;
+        }
+
+        if (!dropData.uuid) {
+            ui.notifications.warn("That item cannot be dropped here. Please drop a Macro or RollTable.");
+            return;
+        }
+
+        // Resolve the dropped document
+        const doc = await fromUuid(dropData.uuid);
+        if (!doc) {
+            ui.notifications.warn("Unable to resolve dropped document.");
+            return;
+        }
+
+        // Set the UUID in the field
+        event.target.value = doc.uuid;
+        const $element = $(event.target)
+        // Set the label field to the document's name
+        const $labelInput = $element.closest(".action-item").find('input[name="label"]');
+        $labelInput.val(doc.name);
+
+        // Automatically save the form
+        await TurnAdvanceActionsConfig.#saveActions.call(this, event, event.target);
+
     }
 }

@@ -1,7 +1,7 @@
-<form autocomplete="off">
+<section autocomplete="off">
     <div class="turn-advance-actions-config">
         <div class="form-group">
-            <button type="button" class="add-action">Add Action</button>
+            <button type="button" data-action="addAction">Add Action</button>
         </div>
 
         <ol class="action-list">
@@ -26,7 +26,7 @@
                     <span class="action-label">{{localize 'Enabled'}}
                         <input type="checkbox" name="enabled" {{#if action.enabled}}checked{{/if}}>
                     </span>
-                    <button type="button" class="remove-action">Remove</button>
+                    <button type="button" data-action="removeAction" data-uuid="{{action.uuid}}">Remove</button>
                 </div>
             </li>
             <hr>
@@ -34,7 +34,7 @@
         </ol>
 
         <footer class="sheet-footer flexrow">
-            <button type="submit">Save</button>
+            <button type="button" data-action="saveActions">Save Changes</button>
         </footer>
     </div>
-</form>
+</section>
