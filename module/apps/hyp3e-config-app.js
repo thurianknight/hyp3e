@@ -13,7 +13,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
     // ===========================================================================
     static DEFAULT_OPTIONS = {
         id: "hyp3e-config",
-        classes: ["hyp3e-config", "scrollable"],
+        classes: ["hyp3e-config"],
         window: {
             title: "Hyperborea Configuration",
             icon: "fa-solid fa-cogs",

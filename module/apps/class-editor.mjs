@@ -4,7 +4,13 @@ import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { findItemsByFolderOrCompendiumName } from "../helpers/folders-and-compendia.mjs"
 
-export class HYP3EClassEditor extends FormApplication {
+const { 
+    ApplicationV2, 
+    HandlebarsApplicationMixin 
+} = foundry.applications.api
+
+// export class HYP3EClassEditor extends FormApplication {
+export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     /** @param {string|null} [classKey] - Class key for editing, or null for new class */
     /** @param {Object} [classData] - Existing class data if editing */
     constructor(classKey = null, classData = {}) {
@@ -13,30 +19,61 @@ export class HYP3EClassEditor extends FormApplication {
         this.classData = foundry.utils.deepClone(classData);
     }
 
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            id: "hyp3e-class-editor",
-            title: game.i18n.localize(`HYP3E.classEditor.title`),
-            template: `${HYP3E.templatePath}/apps/class-editor.hbs`,
-            classes: ["hyp3e", "sheet", "class-editor"],
+    get title() {
+        return game.i18n.localize(`HYP3E.classEditor.title`);
+    }
+
+    /** @inheritDoc */
+    static DEFAULT_OPTIONS = {
+        id: "hyp3e-class-editor",
+        tag: 'form',
+        classes: ["hyp3e", "sheet", "class-editor"],
+        window: {
+            icon: "fa-solid fa-book",
+            resizable: true,
+        },
+        position: {
             width: 700,
             height: "auto",
-            resizable: true,
+        },
+        form: {
+            // handler: HYP3EClassEditor.#saveClass,
             submitOnChange: false,
             closeOnSubmit: false,
             submitOnClose: true,
-        });
+        },
+        actions: {
+            addItem: HYP3EClassEditor.#addItem,
+            deleteItem: HYP3EClassEditor.#deleteItem,
+            saveClass: HYP3EClassEditor.#saveClass,
+        }
+    }
+    /** @inheritDoc */
+    static PARTS = {
+        form: {
+            template: `${HYP3E.templatePath}/apps/class-editor.hbs`,
+            scrollable: [""],
+        }
     }
 
-    async getData(options) {
+    // async getData(options) {
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options)
+
         // Prepare data for the template
+        context.classKey = this.classKey;
+        context.classData = foundry.utils.deepClone(this.classData);
+
         const baseClassNames = ["cleric", "fighter", "magician", "thief"];
-        const baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
+        // const baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
+        context.baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
 
         const spellcasters = ["Cleric", "Druid", "Magician", "Cryomancer", "Illusionist", "Necromancer", "Pyromancer", "Witch"];
-        const spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
+        // const spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
+        context.spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
 
         const attributes = CONFIG.HYP3E.attributes;
+        context.attributes = attributes;
         // Attribute requirements
         const attrReqs = {};
         for (const attr of Object.keys(attributes)) {
@@ -45,6 +82,8 @@ export class HYP3EClassEditor extends FormApplication {
                 value: this.classData.attrReqs?.[attr] ?? "",
             };
         }
+        context.attrReqs = attrReqs;
+
         // XP Bonus requirements
         const xpBonusReqs = {};
         for (const attr of Object.keys(attributes)) {
@@ -53,6 +92,7 @@ export class HYP3EClassEditor extends FormApplication {
                 value: this.classData.xpBonusReq?.[attr] ?? "",
             };
         }
+        context.xpBonusReqs = xpBonusReqs;
 
         // Saving throws
         const saves = CONFIG.HYP3E.saves;
@@ -63,6 +103,7 @@ export class HYP3EClassEditor extends FormApplication {
                 value: this.classData.saves?.[save] ?? 16,
             };
         }
+        context.saves = savingThrows;
 
         // If no classData provided, initialize with an empty structure
         if (Object.keys(this.classData).length === 0) {
@@ -91,86 +132,112 @@ export class HYP3EClassEditor extends FormApplication {
                 coreCategories[key] = Array.isArray(value) ? foundry.utils.deepClone(value) : [];
             }
         }
+        context.corePack = coreCategories;
+        context.equipmentPack = equipmentCategories;
 
         const armorNames = await findItemsByFolderOrCompendiumName("armor, armour", "armor");
+        context.armorOptions = Object.fromEntries(armorNames.map(n => [n, n]));
+
         const weaponNames = await findItemsByFolderOrCompendiumName("weapons, melee, missile, ammunition", "weapon");
+        context.weaponOptions = Object.fromEntries(weaponNames.map(n => [n, n]));
+
         const gearNames = await findItemsByFolderOrCompendiumName("equipment, gear, general, clothing, weapons, ammunition", "item", "religious, religion, provisions, provision, food, supplies");
+        context.gearOptions = Object.fromEntries(gearNames.map(n => [n, n]));
+
         const provisionNames = await findItemsByFolderOrCompendiumName("equipment, provision, provisions, food, supplies", "item", "clothing, gear, general, religious, religion");
+        context.provisionOptions = Object.fromEntries(provisionNames.map(n => [n, n]));
+
         const religiousNames = await findItemsByFolderOrCompendiumName("equipment, religious, religion", "item", "clothing, gear, general, provisions, provision, food, supplies");
+        context.religiousOptions = Object.fromEntries(religiousNames.map(n => [n, n]));
 
-        return {
-            classKey: this.classKey,
-            classData: foundry.utils.deepClone(this.classData),
-            baseClasses,
-            attributes,
-            attrReqs,
-            xpBonusReqs,
-            saves: savingThrows,
-            spellLists,
-            corePack: coreCategories,
-            equipmentPack: equipmentCategories,
-            armorOptions: Object.fromEntries(armorNames.map(n => [n, n])),
-            weaponOptions: Object.fromEntries(weaponNames.map(n => [n, n])),
-            gearOptions: Object.fromEntries(gearNames.map(n => [n, n])),
-            provisionOptions: Object.fromEntries(provisionNames.map(n => [n, n])),
-            religiousOptions: Object.fromEntries(religiousNames.map(n => [n, n])),
-        };
+        return context;
     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
+    /**
+     * Add a blank item to the requested items list
+     * @param {*} event 
+     * @param {*} target 
+     */
+    static async #addItem(event, target) {
+        const pack = target.dataset.pack;
+        const newItem = { name: "", quantity: 1 };
 
-        html.find(".delete-item").on("click", async ev => {
-            const pack = ev.currentTarget.dataset.pack;
-            const index = parseInt(ev.currentTarget.dataset.index);
+        // Find the nearest form ancestor
+        const form = target.closest("form");
+        if (!form) return;
 
-            // Get current form state
-            const formData = this._getSubmitData(); // Already expanded
+        // Collect data
+        const fd = new FormDataExtended(form);
+        const formData = fd.object; // returns a deep object of all form fields
+        Hyp3eLogger.info("#addItem", `Form data:`, formData);
 
-            // Save any other changes in process first
-            await this._updateObject(new Event("submit"), formData);
+        // Save any other changes in process first
+        // await HYP3EClassEditor.#saveClass(event, target);
+        await HYP3EClassEditor.#saveClass.call(this, event, target);
 
-            if (!isNaN(index)) this.classData.startingPack[pack].splice(index, 1);
-            this.render(true);
-        });
+        // Now we can merge those same changes in memory
+        Hyp3eLogger.info("#addItem", `Previous changes saved, now we can add the new item...`);
+        this.classData = foundry.utils.mergeObject(this.classData, formData.classData || {}, { inplace: false });
+        Hyp3eLogger.info("#addItem", `Merged class data:`, this.classData);
 
-        html.find(".add-item").on("click", async ev => {
-            const pack = ev.currentTarget.dataset.pack;
-            const newItem = { name: "", quantity: 1 };
+        // Add the new item to the correct pack
+        if (!Array.isArray(this.classData.startingPack[pack])) {
+            this.classData.startingPack[pack] = [];
+        }
+        this.classData.startingPack[pack].push(newItem);
 
-            // Get current form state
-            const formData = this._getSubmitData(); // Already expanded
-
-            // Save any other changes in process first
-            await this._updateObject(new Event("submit"), formData);
-
-            // Now we can merge those same changes in memory
-            Hyp3eLogger.info("add-item click", "Current form data:", formData);
-            this.classData = foundry.utils.mergeObject(this.classData, formData.classData || {}, { inplace: false });
-            Hyp3eLogger.info("add-item click", "Merged class data:", this.classData);
-
-            // Add the new item to the correct pack
-            if (!Array.isArray(this.classData.startingPack[pack])) {
-                this.classData.startingPack[pack] = [];
-            }
-            this.classData.startingPack[pack].push(newItem);
-
-            this.render(true);
-        });
+        this.render(true);
     }
 
-    async _updateObject(event, formData) {
+    /**
+     * Delete an item from the requested items list
+     * @param {*} event 
+     * @param {*} target 
+     */
+    static async #deleteItem(event, target) {
+        const pack = target.dataset.pack;
+        const index = parseInt(target.dataset.index);
+
+        // Log the delete data
+        Hyp3eLogger.info("deleteItem", "Deleting item:", { pack, index });
+
+        // Save any other changes in process first
+        // await HYP3EClassEditor.#saveClass(event, target);
+        await HYP3EClassEditor.#saveClass.call(this, event, target);
+
+        if (!isNaN(index)) this.classData.startingPack[pack].splice(index, 1);
+        this.render(true);
+    }
+
+    /**
+     * Save the complete class data
+     * @param {*} event 
+     * @param {*} target 
+     * @returns 
+     */
+    static async #saveClass(event, target) {
+        event.preventDefault();
+
+        // Find the nearest form ancestor
+        const form = target.closest("form");
+        if (!form) return;
+
+        // Collect data
+        const fd = new FormDataExtended(form);
+        const formData = fd.object; // returns a deep object of all form fields
+        Hyp3eLogger.info("#saveClass", `Form data:`, formData);
+
         const data = foundry.utils.expandObject(formData);
-        Hyp3eLogger.info("_updateObject", "Saving class with form data:", data);
+        Hyp3eLogger.info("#saveClass", "Saving class with expanded data:", data);
         this.name = data.name?.trim() || this.classKey;
         this.classData = foundry.utils.mergeObject(this.classData, data.classData || {}, { inplace: false });
-        Hyp3eLogger.info("_updateObject", "Merged class data:", this.classKey, this.name, this.classData);
+        Hyp3eLogger.info("#saveClass", "Merged class data:", this.classKey, this.name, this.classData);
 
         // If the class has been renamed, flag it here
         let renameClass = false;
         if (this.classKey && this.name != this.classKey) {
             renameClass = true;
-            Hyp3eLogger.info("_updateObject", `Renaming class from ${this.classKey} to ${this.name}...`);
+            Hyp3eLogger.info("#saveClass", `Renaming class from ${this.classKey} to ${this.name}...`);
         } else if (!this.classKey && this.name != "") {
             // This is not renaming, it is giving a name to a new (unnamed) class
             this.classKey = this.name;
@@ -204,7 +271,7 @@ export class HYP3EClassEditor extends FormApplication {
         if (renameClass) delete allClasses[this.classKey];
         await game.settings.set(game.system.id, "customClassData", allClasses);
 
-        // ui.notifications.info(`Class "${key}" saved.`);
+        ui.notifications.info(`Class "${this.name}" saved.`);
 
         // Reload custom classes
         CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");

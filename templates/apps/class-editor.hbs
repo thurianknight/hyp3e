@@ -1,5 +1,5 @@
 {{!-- templates/apps/class-editor.hbs --}}
-<form autocomplete="off">
+<section autocomplete="off">
   <fieldset>
     <legend>{{localize 'HYP3E.classEditor.classInfo'}}</legend>
     <div class="form-group flex flexrow flex-group-center container">
@@ -147,10 +147,10 @@
                         {{/if}}
                     </select>
                     <input type="number" class="input-small" name="classData.startingPack.{{@../key}}.{{@index}}.quantity" value="{{this.quantity}}" placeholder="Qty" />
-                    <button type="button" class="delete-item button-narrow" data-pack="{{@../key}}" data-index="{{@index}}"><i class="fas fa-trash"></i></button>
+                    <button type="button" class="button-narrow" data-action="deleteItem" data-pack="{{@../key}}" data-index="{{@index}}"><i class="fas fa-trash"></i></button>
                 </div>
                 {{/each}}
-                <button type="button" class="add-item" data-pack="{{@key}}"><i class="fas fa-plus"></i> Add</button>
+                <button type="button" class="button-wide" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> Add</button>
             </div>
             <hr />
             {{/each}}
@@ -178,10 +178,10 @@
                         {{/if}}
                     </select>
                     <input type="number" class="input-small" name="classData.startingPack.{{@../key}}.{{@index}}.quantity" value="{{this.quantity}}" placeholder="Qty" />
-                    <button type="button" class="delete-item button-narrow" data-pack="{{@../key}}" data-index="{{@index}}"><i class="fas fa-trash"></i></button>
+                    <button type="button" class="button-narrow" data-action="deleteItem" data-pack="{{@../key}}" data-index="{{@index}}"><i class="fas fa-trash"></i></button>
                 </div>
                 {{/each}}
-                <button type="button" class="add-item" data-pack="{{@key}}"><i class="fas fa-plus"></i> Add</button>
+                <button type="button" class="button-wide" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> Add</button>
                 {{/if}}
                 <hr />
             </div>
@@ -190,5 +190,5 @@
     </div>
   </fieldset>
 
-  <button class="save-class">{{localize 'HYP3E.classEditor.saveClass'}}</button>
-</form>
+  <button type="button" class="button-wide" data-action="saveClass">{{localize 'HYP3E.classEditor.saveClass'}}</button>
+</section>

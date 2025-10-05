@@ -396,7 +396,6 @@ textarea {
 .hyp3e-config.scrollable .app-content {
   flex: 1 1 auto;      /* take remaining space */
   overflow-y: auto;    /* scroll if content overflows */
-  padding-right: 8px;  /* avoids scrollbar overlap */
 }
 .hyp3e-config nav.tabs {
   margin-bottom: 0.5em;
@@ -1542,41 +1541,42 @@ textarea {
     }
 }
 .class-editor {
-    /* display: flex;
-    flex-direction: column;
-    gap: 10px; */
-    padding: 5px;
+    .window-content {
+        flex: 1 1 auto;      /* take remaining space */
+        overflow-y: auto;    /* scroll if content overflows */
+        padding-right: 8px;  /* avoids scrollbar overlap */
+    }
     .container {
         align-items: flex-start;
-    };
+    }
     select {
         width: 100%;
         max-width: 150px;
-        /* margin-bottom: 10px; */
-    };
+    }
     .equipment-select {
         width: 100%;
         min-width: 225px;
         max-width: 250px;
-    };
+    }
     input[type=text],
     input[type=number] {
         text-align: center;
         min-width: 50px;
         max-width: 150px;
-        /* margin-bottom: 5px; */
-    };
+    }
     .input-small {
         text-align: center;
         max-width: 40px;
-        /* margin-bottom: 2px; */
-    };
+    }
     .level-advancement {
         text-align: center;
-    };
+    }
     .button-narrow {
         width: 40px;
-    };
+    }
+    .button-wide {
+        width: 100%;
+    }
 }
 
 /* Styles for item alternate damage app */
