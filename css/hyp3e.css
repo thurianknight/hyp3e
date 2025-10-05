@@ -495,9 +495,8 @@ textarea {
 }
 
 .hyp3e .window-content {
-  max-height: 100%;
+  /* max-height: 100%; */
   .tab {
-    height: 100%;
     overflow-y: auto;
   }
 }
@@ -513,12 +512,12 @@ textarea {
 
 /* Sheet-level styles */
 .hyp3e.sheet.actor {
-  min-width: 800px;
-  min-height: 700px;
+  /* min-width: 800px;
+  min-height: 700px; */
 }
 .hyp3e.sheet.item {
-  min-width: 600px;
-  min-height: 550px;
+  /* min-width: 600px; */
+  /* min-height: 550px; */
 }
 
 /* Generic styles used wherever I need them */
@@ -1827,16 +1826,23 @@ textarea {
 }
 
 /* Styles for the Turn-Advance Actions Config app */
+.turn-advance-actions-config-window {
+  min-width: 400px;
+  max-width: 450px;
+  .window-content {
+    flex: 1 1 auto;      /* take remaining space */
+    overflow-y: auto;    /* scroll if content overflows */
+    padding-right: 8px;  /* avoids scrollbar overlap */
+  }
+}
 .turn-advance-actions-config {
-  /* width: 100%; */
-  min-width: 300px;
-  max-width: 350px;
-  padding: 5px;
+  min-width: 350px;
+  max-width: 450px;
+  padding-right: 5px;
   margin: 0 auto;
   border-radius: 6px;
   .action-label {
     font-weight: bold;
-    /* padding: 5px 5px; */
     padding: 0.25em 0;
     flex: 1 auto;
   }
@@ -1848,11 +1854,7 @@ textarea {
     flex: 2 auto;
   }
   input[type=checkbox] {
-    /* margin: 5px 10px; */
     padding: 0.25em 0;
-    /* margin-top: 5px; */
-    /* padding: 5px 10px; */
-    /* flex: 1 auto; */
   }
   select {
     min-width: 150px;
