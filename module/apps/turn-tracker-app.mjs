@@ -20,7 +20,7 @@ export class HYP3ETurnTrackerApp extends Application {
         if (!$container.length) throw new Error("renderEmbedded: container not found");
 
         // Render the template with current data
-        const htmlString = await renderTemplate(this.options.template, this.getData());
+        const htmlString = await foundry.applications.handlebars.renderTemplate(this.options.template, this.getData());
         const $html = $(htmlString).addClass("turn-tracker");
 
         // Remove a previous embedded instance if present

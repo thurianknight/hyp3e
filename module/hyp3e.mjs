@@ -79,13 +79,13 @@ Hooks.once('init', async function() {
     CONFIG.Item.documentClass = Hyp3eItem;
 
     // Register sheet application classes
-    Actors.unregisterSheet("core", ActorSheet);
+    foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
     // Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: false });
-    Actors.registerSheet("hyp3e", Hyp3eActorSheetV2, { makeDefault: true });
+    foundry.documents.collections.Actors.registerSheet("hyp3e", Hyp3eActorSheetV2, { makeDefault: true });
     Hyp3eLogger.info("Init", "Registered Hyp3eActorSheetV2");
-    Items.unregisterSheet("core", ItemSheet);
+    foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
     // Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: false });
-    Items.registerSheet("hyp3e", Hyp3eItemSheetV2, { makeDefault: true });
+    foundry.documents.collections.Items.registerSheet("hyp3e", Hyp3eItemSheetV2, { makeDefault: true });
     Hyp3eLogger.info("Init", "Registered Hyp3eItemSheetV2");
 
 

@@ -66,7 +66,7 @@ export const preloadHandlebarsTemplates = async function() {
     }));
 
     // Preload Handlebars templates
-    return loadTemplates([
+    return foundry.applications.handlebars.loadTemplates([
         // Dialog templates
         `${HYP3E.templatePath}/dialog/roll-dialog.hbs`,
 

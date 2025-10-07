@@ -3,7 +3,7 @@ import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3EGroupCombat } from "./combat-group.mjs";
 import HYP3ECombatGroupSelector from "./combat-set-groups.mjs";
 
-export class HYP3ECombatTracker extends CombatTracker {
+export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
     // ===========================================================================
     // APPLICATION SETUP
     // ===========================================================================
