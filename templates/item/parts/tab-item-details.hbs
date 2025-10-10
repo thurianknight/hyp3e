@@ -33,6 +33,7 @@
           {{#if isGM}}
             {{#if editable}}
               <prose-mirror
+                class="{{#if system.isPhysical}}prose-item-short{{else}}prose-item-tall{{/if}}"
                 name="system.realDescription"
                 button="true"
                 editable="{{editable}}"
@@ -52,7 +53,8 @@
               {{#if system.identified}}
                 {{editor enrichedRealDescription target="system.realDescription" editable=editable button=true engine="prosemirror" collaborate=false}}
                 {{#if editable}}
-                  <prose-mirror
+                  <prose-mirror 
+                    class="prose-item-short"
                     name="system.realDescription"
                     button="true"
                     editable="{{editable}}"
@@ -70,6 +72,7 @@
             {{else}}
               {{#if editable}}
                 <prose-mirror
+                    class="prose-item-tall"
                     name="system.realDescription"
                     button="true"
                     editable="{{editable}}"

@@ -313,6 +313,7 @@ textarea {
   resize: none;
 }
 
+/* Default chat log styles */
 .chat-log .message {
   font-size: calc(1em * var(--hyp3e-chat-scale, 1));
 }
@@ -497,6 +498,7 @@ textarea {
 .hyp3e .window-content {
   /* max-height: 100%; */
   .tab {
+    height: 100%;
     overflow-y: auto;
   }
 }
@@ -804,6 +806,7 @@ textarea {
   background-size: cover;
   overflow-y: auto;
   flex: 1;
+  height: 100%;
 }
 
 /* Character Abilities-tab styles */
@@ -1355,15 +1358,16 @@ textarea {
   border: 1px solid #000;
 }
 
+/* Prose editor styles for item descriptions */
+.hyp3e .prose-item-short { height: 190px; }
+.hyp3e .prose-item-tall  { height: 270px; }
+
 .hyp3e .item-description {
   flex: 1;
   /* display: block; */
   /* justify-content: flex-start; */
   min-height: 100%;
   padding: 0 10px;
-  .editor {
-    height: 210px;
-  }
   textarea {
     resize: vertical;
     width: 100%;
