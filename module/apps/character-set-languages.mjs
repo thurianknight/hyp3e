@@ -19,7 +19,7 @@ export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMix
     static DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
         id: "character-set-languages",
-        classes: ["character-set-languages", "scrollable"],
+        classes: ["hyp3e", "character-set-languages"],
         tag: "form",
         window: {
             title: "HYP3E.details.languages",

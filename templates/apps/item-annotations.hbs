@@ -1,8 +1,7 @@
 <div>
-    <label class="resource-label">{{item.name}}</label> - 
-    <label class="resource-label">{{localize 'HYP3E.dataLabel.annotations'}}</label>
-    <label class="resource-label"><i>({{localize 'HYP3E.settings.clickToToggle'}})</i></label>
-    {{!-- <p>Item UUID: {{itemUuid}}</p> --}}
+    <h3>{{item.name}}</h3>
+    <hr class="plain-hr"/>
+    <span style="font-weight: bold;">{{localize 'HYP3E.dataLabel.annotations'}} <i>({{localize 'HYP3E.settings.clickToToggle'}})</i></span>
     <ul>
         {{#each annotList as |annot id|}}
         <li class="item-set-annotations" data-item-uuid="{{../itemUuid}}">

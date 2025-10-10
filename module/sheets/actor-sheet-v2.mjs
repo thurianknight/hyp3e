@@ -139,18 +139,24 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
         // Add the actor's data to context.data for easier access, as well as flags
         context.system = actorData.system;
-        context.items = actorData.items;
         context.flags = actorData.flags;
-        
+
+        // Add the actor's items to sheet context, for ease of access
+        // context.items = actorData.items;
+        context.items = this.actor.items.map(i => ({
+            id: i.id,
+            ...i.toObject(),
+        }));
+
         // Prepare character data and items.
         if (actorData.type == 'character') {
-            this._prepareItems(context);
+            await this._prepareItems(context);
             this._prepareCharacterData(context);
         }
         
         // Prepare NPC data and items.
         if (actorData.type == 'npc') {
-            this._prepareItems(context);
+            await this._prepareItems(context);
             this._prepareNpcData(context);
         }
 
@@ -285,28 +291,22 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     /**
      * Organize and classify Data for NPC sheets.
-     *
      * @param {Object} context The actor to prepare.
-     *
      * @return {undefined}
      */
     _prepareNpcData(context) {
-        
         // Load creature sizes
         context.creatureSizes = CONFIG.HYP3E.creatureSizes
         // Load Phenotypes
         context.phenotypes = CONFIG.HYP3E.phenotypes
-    
     }
 
     /**
      * Organize and classify Items for Character sheets.
-     *
      * @param {Object} context The actor to prepare.
-     *
      * @return {undefined}
      */
-    _prepareItems(context) {
+    async _prepareItems(context) {
         // Initialize item types.
         const containers = [];
         const gear = [];
@@ -328,9 +328,19 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         let allTheGold = 0.0
 
         // Iterate through items, adding encumbrance and allocating to tab-groups
-        // for (let i of context.items) {
         for (let i of this.actor.items) {
             i.img = i.img || DEFAULT_TOKEN;
+
+            // Enrich all item Description fields
+            if (i.system?.description) {
+                i.system.enrichedDescription = await TextEditor.enrichHTML(i.system.description, {
+                    async: true,
+                    rollData: this.actor.getRollData(),
+                    rolls: true,          // enable [[roll]] links
+                    documents: true,
+                });
+            }
+
             // Calculate total weight carried by character. For weapons & armor, the equipped
             //  status is ignored and the item weight is always added to encumbrance.
             //  For non-weapon items, the equipped status is used to determine if the item
@@ -371,7 +381,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             // Append to containers.
             if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
                 // Get contained items and add to their container
-                i.contents = this.getContents(i.id, context)
+                i.contents = this.getContents(i.id)
                 Hyp3eLogger.info("_prepareItems", `${i.name} contents:`, i.contents)
                 i.contents.sort((a,b) => (a.sort||0) - (b.sort||0));
                 containers.push(i);
@@ -441,8 +451,14 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         context.spells = spells;
     }
 
-    getContents(id, context) {
-        return context.items.filter(
+    /**
+     * Get the items within a container item
+     * @param {*} id 
+     * @param {*} context 
+     * @returns 
+     */
+    getContents(id) {
+        return this.actor.items.filter(
             ({system: {containerId}}) => id === containerId
         );
     }
@@ -520,12 +536,13 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     /** @override */
     async _onRender(context, options) {
         await super._onRender(context, options);
+        // Hyp3eLogger.info("_onRender", `Rendering Actor Sheet...`, { context, options });
 
         // If the sheet is not editable, exit early
         if (!this.isEditable) return;
     
         // Log render completion
-        Hyp3eLogger.info("_onRender", `Actor Sheet rendered and listeners activated.`, { context, options, sheet: this });
+        Hyp3eLogger.info("_onRender", `Actor Sheet rendered.`, { context, options, sheet: this });
     }
 
     // ===========================================================================

@@ -112,7 +112,7 @@
                               <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                             </a>
                         </div>
-                        <a><span class="item-drop">{{item.name}}</span></a>
+                        <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                     </div>
                     <div class="item-prop">
                         {{#if item.system.isConsumable}}
@@ -152,7 +152,7 @@
                 </div>
                 <div class="item-summary">
                     <div class="item-description">
-                        {{{item.system.description}}}
+                        {{{item.system.enrichedDescription}}}
                     </div>
                 </div>
             </li>

@@ -247,7 +247,7 @@
                         </div>
                         {{/if}}
                     {{/if}}
-                    <a><span class="item-drop">{{item.name}}</span></a>
+                    <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                 </div>
                 <div class="item-prop">
                     {{#if item.system.isConsumable}}
@@ -298,7 +298,7 @@
             </div>
             <div class="item-summary">
                 <div class="item-description">
-                    <div>{{{item.system.description}}}</div>
+                    <div>{{{item.system.enrichedDescription}}}</div>
                 </div>
             </div>
         </li>
@@ -329,7 +329,7 @@
                         <div class="item-image">
                             <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                         </div>
-                        <a><span class="item-drop">{{item.name}}</span></a>
+                        <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                     </div>
                     <div class="item-prop">
                         {{#if item.system.isConsumable}}
@@ -423,7 +423,7 @@
                         </div>
                         {{/if}}
                         {{/if}}
-                        <a><span class="item-drop">{{item.name}}</span></a>
+                        <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                     </div>
                     <div class="item-prop">
                         {{#if item.system.identified}}
@@ -465,7 +465,7 @@
                 </div>
                 <div class="item-summary">
                     <div class="item-description">
-                        <div>{{{item.system.description}}}</div>
+                        <div>{{{item.system.enrichedDescription}}}</div>
                     </div>
                 </div>
             </li>

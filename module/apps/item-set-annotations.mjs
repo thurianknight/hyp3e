@@ -20,7 +20,7 @@ export default class HYP3EItemSetAnnotations extends HandlebarsApplicationMixin(
     static DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
         id: "item-set-annotations",
-        classes: ["item-set-annotations", "scrollable"],
+        classes: ["hyp3e", "item-set-annotations"],
         tag: "form",
         window: {
             title: "HYP3E.dataLabel.annotations",

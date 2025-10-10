@@ -6,7 +6,6 @@ const {
     HandlebarsApplicationMixin 
 } = foundry.applications.api
 
-// export class TurnAdvanceActionsConfig extends FormApplication {
 export class TurnAdvanceActionsConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
     get title() {
@@ -183,6 +182,5 @@ export class TurnAdvanceActionsConfig extends HandlebarsApplicationMixin(Applica
 
         // Automatically save the form
         await TurnAdvanceActionsConfig.#saveActions.call(this, event, event.target);
-
     }
 }

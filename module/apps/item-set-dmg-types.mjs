@@ -19,7 +19,7 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     static DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
         id: "item-set-dmg-types",
-        classes: ["item-set-dmg-types", "scrollable"],
+        classes: ["hyp3e", "item-set-dmg-types"],
         tag: "form",
         window: {
             title: "HYP3E.headers.damageTypes",

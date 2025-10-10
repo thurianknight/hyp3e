@@ -32,15 +32,7 @@
                     <div class="item-header flexrow">
                         <div class="item-name">
                             <div class="item-image">
-                                {{#if container.system.formula}}
-                                <a class="rollable" 
-                                    data-action="rollThis" 
-                                    data-item-id="{{container.id}}" 
-                                    data-roll-type="item" 
-                                    data-label="{{localize 'HYP3E.dataLabel.use'}} {{container.name}}">
-                                  <img src="{{container.img}}" title="{{container.name}}" width="24" height="24"/>
-                                </a>
-                                {{else if container.effects}}
+                                {{#if (or container.system.formula container.effects.size)}}
                                 <a class="rollable" 
                                     data-action="rollThis" 
                                     data-item-id="{{container.id}}" 
@@ -75,7 +67,7 @@
                             </div>
                             {{/if}}
                             {{/if}}
-                            <a><span class="item-drop">{{container.name}}</span></a>
+                            <a data-action="dropItemDescription"><span class="item-drop">{{container.name}}</span></a>
                         </div>
                         <div class="item-prop">{{container.system.quantity.value}}
                             {{#if container.system.quantity.max}}
@@ -110,32 +102,24 @@
                     </div>
                     <div class="item-summary">
                         <div class="item-description">
-                            {{{container.system.description}}}
+                            {{{container.system.enrichedDescription}}}
                         </div>
                     </div>
                 </li>
                 {{!-- Items in a container --}}
                 <ol class="items-list" data-drop="item">
                     {{#each container.contents as |item id|}}
-                    <li class="item-entry item draggable" data-item-id="{{item._id}}">
+                    <li class="item-entry item draggable" data-item-id="{{item.id}}">
                         <div class="item-header flexrow">
                             <div class="item-name contained-items">
                                 <div class="item-image">
-                                    {{#if item.system.formula}}
+                                    {{#if (or item.system.formula item.effects.size)}}
                                     <a class="rollable" 
                                         data-action="rollThis" 
                                         data-item-id="{{item.id}}" 
                                         data-roll-type="item" 
                                         data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
-                                    <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-                                    </a>
-                                    {{else if item.effects}}
-                                    <a class="rollable" 
-                                        data-action="rollThis" 
-                                        data-item-id="{{item.id}}" 
-                                        data-roll-type="item" 
-                                        data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
-                                    <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                                      <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
                                     </a>
                                     {{else}}
                                     <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
@@ -164,7 +148,7 @@
                                 </div>
                                 {{/if}}
                                 {{/if}}
-                                <a><span class="item-drop">{{item.name}}</span></a>
+                                <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                             </div>
                             <div class="item-prop">
                                 {{#if item.system.quantity.max}}
@@ -212,7 +196,7 @@
                         </div>
                         <div class="item-summary">
                             <div class="item-description">
-                                <div class="contained-items">{{{item.system.description}}}</div>
+                                <div class="contained-items">{{{item.system.enrichedDescription}}}</div>
                             </div>
                         </div>
                     </li>
@@ -225,15 +209,7 @@
                     <div class="item-header flexrow">
                         <div class="item-name">
                             <div class="item-image">
-                                {{#if item.system.formula}}
-                                <a class="rollable" 
-                                    data-action="rollThis" 
-                                    data-item-id="{{item.id}}" 
-                                    data-roll-type="item" 
-                                    data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
-                                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-                                </a>
-                                {{else if item.effects}}
+                                {{#if (or item.system.formula item.effects.size)}}
                                 <a class="rollable" 
                                     data-action="rollThis" 
                                     data-item-id="{{item.id}}" 
@@ -268,7 +244,7 @@
                             </div>
                             {{/if}}
                             {{/if}}
-                            <a><span class="item-drop">{{item.name}}</span></a>
+                            <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                         </div>
                         <div class="item-prop">
                             {{#if item.system.isConsumable}}
@@ -316,7 +292,7 @@
                     </div>
                     <div class="item-summary">
                         <div class="item-description">
-                            {{{item.system.description}}}
+                            {{{item.system.enrichedDescription}}}
                         </div>
                     </div>
                 </li>

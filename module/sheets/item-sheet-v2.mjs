@@ -164,6 +164,9 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
             context.item.system.realName = context.item.name
         }
 
+        // Add isPhysical flag for armor, item, shield, weapon
+        context.item.system.isPhysical = ["armor", "item", "shield", "weapon"].includes(context.item.type);
+
         // Set isShield flag for armor items
         if (context.item.type === 'armor') {
             context.item.system.isShield = context.item.system.type === "shield" ? true : false

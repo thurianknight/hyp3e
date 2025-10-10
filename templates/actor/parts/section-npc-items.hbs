@@ -18,7 +18,7 @@
       <div class="item-header flexrow">
         <div class="item-name">
           <div class="item-image">
-            {{#if item.system.formula}}
+            {{#if (or item.system.formula item.effects.size)}}
             <a class="rollable" 
                 data-action="rollThis" 
                 data-roll-type="item" 
@@ -29,7 +29,7 @@
             <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
             {{/if}}
           </div>
-          <a><span class="item-drop">{{item.name}}</span></a>
+          <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
         </div>
         <div class="item-prop">{{item.system.formula}}</div>
         <div class="item-prop">{{item.system.tn}}</div>
@@ -53,7 +53,7 @@
       </div>
       <div class="item-summary">
         <div class="item-description">
-          {{{item.system.description}}}
+          {{{item.system.enrichedDescription}}}
         </div>
       </div>
     </li>
@@ -86,7 +86,7 @@
               <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
             </a>
           </div>
-          <a><span class="item-drop">{{item.name}}</span></a>
+          <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
         </div>
         <div class="item-prop">{{item.system.rof}}</div>
         <div class="item-prop">{{item.system.damage}}</div>
@@ -115,7 +115,7 @@
       </div>
       <div class="item-summary">
         <div class="item-description">
-          {{{item.system.description}}}
+          {{{item.system.enrichedDescription}}}
         </div>
       </div>
     </li>
@@ -144,7 +144,7 @@
           <div class="item-image">
             <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
           </div>
-          <a><span class="item-drop">{{item.name}}</span></a>
+          <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
         </div>
         <div class="item-prop">{{item.system.quantity.value}}
           {{#if item.system.quantity.max}}
@@ -178,7 +178,7 @@
       </div>
       <div class="item-summary">
         <div class="item-description">
-          {{{item.system.description}}}
+          {{{item.system.enrichedDescription}}}
         </div>
       </div>
     </li>
@@ -190,9 +190,18 @@
       <div class="item-header flexrow">
         <div class="item-name">
           <div class="item-image">
+            {{#if (or item.system.formula item.effects.size)}}
+            <a class="rollable" 
+                data-action="rollThis" 
+                data-roll-type="item" 
+                data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
+              <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+            </a>
+            {{else}}
             <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+            {{/if}}
           </div>
-          <a><span class="item-drop">{{item.name}}</span></a>
+          <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
         </div>
         <div class="item-prop">
           {{#if item.system.isConsumable}}
@@ -234,7 +243,7 @@
       </div>
       <div class="item-summary">
         <div class="item-description">
-          {{{item.system.description}}}
+          {{{item.system.enrichedDescription}}}
         </div>
       </div>
     </li>
@@ -269,11 +278,11 @@
               <a class="rollable" 
                   data-action="rollThis" 
                   data-roll-type="item" 
-                  data-label="Attack with {{item.name}}">
+                  data-label="Cast spell {{item.name}}">
                 <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
               </a>
             </div>
-            <a><span class="item-drop">{{item.name}}</span></a>
+            <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
           </div>
           <div class="item-prop">
             {{#if item.system.isConsumable}}
@@ -313,7 +322,7 @@
       </div>
       <div class="item-summary">
         <div class="item-description">
-          {{{item.system.description}}}
+          {{{item.system.enrichedDescription}}}
         </div>
       </div>
       </li>
