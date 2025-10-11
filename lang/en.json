@@ -1,10 +1,10 @@
 {
     "TYPES": {
-        "actor": {
+        "Actor": {
             "npc": "NPC",
             "character": "Character"
         },
-        "item": {
+        "Item": {
             "armor": "Armour", 
             "feature": "Feature", 
             "item": "Item", 

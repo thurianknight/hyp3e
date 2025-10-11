@@ -23,7 +23,8 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
             template: `${HYP3E.templatePath}/sidebar/combat-header-v13.hbs`
         },
         tracker: {
-            template: `${HYP3E.templatePath}/sidebar/combat-tracker-v13.hbs`
+            template: `${HYP3E.templatePath}/sidebar/combat-tracker-v13.hbs`,
+            scrollable: [""],
         },
         footer: {
             template: `${HYP3E.templatePath}/sidebar/combat-footer-v13.hbs`

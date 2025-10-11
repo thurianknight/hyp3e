@@ -495,18 +495,14 @@ async function sendEffectChatMessage(effect) {
     messageParts.push(`<strong>${targetName}</strong>`);
 
     // If it's being added or applied, add source name
-    if (sourceName != targetName) messageParts.push(`by ${sourceName}`);
-
-    // Optional: resolve UUIDs to documents if you want links
-    // let sourceLink = sourceName;
-    // if (sourceData.itemUuid) {
-    //     const item = await fromUuid(sourceData.itemUuid);
-    //     if (item) sourceLink = item.link; // clickable
-    // }
+    if (sourceName != targetName && sourceName !== "None") messageParts.push(`by ${sourceName}`);
 
     // Build consistently styled content
+    // const content = `
+    //     <p><strong>${effect.sourceName}:</strong></p>
+    //     <ul><li>${messageParts.join(" ")}.</li></ul>
+    // `;
     const content = `
-        <p><strong>${effect.sourceName}:</strong></p>
         <ul><li>${messageParts.join(" ")}.</li></ul>
     `;
     Hyp3eLogger.info("sendEffectChatMessage", `Chat Content:`, content);
