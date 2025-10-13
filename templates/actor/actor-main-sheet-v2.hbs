@@ -6,5 +6,11 @@
   {{#if (eq actor.type "npc")}}
     {{> "actor-npc-header-v2"}}
   {{/if}}
+  {{#if (eq actor.type "merchant")}}
+    {{> "actor-merchant-header-v2"}}
+  {{/if}}
+  {{#if (eq actor.type "treasure")}}
+    {{> "actor-treasure-header-v2"}}
+  {{/if}}
 
 </section>

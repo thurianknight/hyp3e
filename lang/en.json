@@ -1,8 +1,25 @@
 {
     "TYPES": {
+        "actor": {
+            "npc": "NPC",
+            "character": "Character",
+            "merchant": "Merchant",
+            "treasure": "Treasure"
+        },
+        "item": {
+            "armor": "Armour", 
+            "feature": "Feature", 
+            "item": "Item", 
+            "shield": "Shield", 
+            "spell": "Spell", 
+            "weapon": "Weapon",
+            "effectTemplate": "Effect Template"
+        },
         "Actor": {
             "npc": "NPC",
-            "character": "Character"
+            "character": "Character",
+            "merchant": "Merchant",
+            "treasure": "Treasure"
         },
         "Item": {
             "armor": "Armour", 
@@ -98,7 +115,9 @@
             "items": "Items",
             "description": "Description",
             "details": "Details",
-            "attributes": "Attributes"
+            "attributes": "Attributes",
+            "equipment": "General Equipment & Provisions",
+            "fightingGear": "Fighting Gear"
         },
         "headers": {
             "name": "Name",
@@ -367,6 +386,7 @@
             "castSpell": "Cast Spell",
             "cost": "Cost",
             "value": "GP Value",
+            "unitPrice": "GP Each",
             "qty": "Qty",
             "weight": "Weight",
             "wt": "Wt",
@@ -595,7 +615,9 @@
             "create": "Create",
             "edit": "Edit",
             "delete": "Delete",
-            "createClass": "Create New Class"
+            "createClass": "Create New Class",
+            "buyMultiplier": "Buy/Offer Fraction",
+            "sellMultiplier": "Sell/Cost Multiplier"
         },
         "combat": {
             "rollInitiative": "Group {initGroup} rolls for Initiative!",

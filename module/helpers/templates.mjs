@@ -22,6 +22,8 @@ export const preloadHandlebarsTemplates = async function() {
         // Actor V2 partials - main sheets
         `${HYP3E.templatePath}/actor/actor-character-header-v2.hbs`,
         `${HYP3E.templatePath}/actor/actor-npc-header-v2.hbs`,
+        `${HYP3E.templatePath}/actor/actor-merchant-header-v2.hbs`,
+        `${HYP3E.templatePath}/actor/actor-treasure-header-v2.hbs`,
         // Actor V2 partials - tabs
         `${HYP3E.templatePath}/actor/parts/tab-character-abilities.hbs`,
         `${HYP3E.templatePath}/actor/parts/section-character-attributes.hbs`,
@@ -29,6 +31,7 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/actor/parts/tab-character-description.hbs`,
         `${HYP3E.templatePath}/actor/parts/tab-npc-description.hbs`,
         `${HYP3E.templatePath}/actor/parts/section-npc-items.hbs`,
+        `${HYP3E.templatePath}/actor/parts/tab-placeholder.hbs`,
 
         // Item V2 partials - headers
         `${HYP3E.templatePath}/item/parts/physical-header.hbs`,

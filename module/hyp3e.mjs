@@ -1,23 +1,27 @@
-// Import document classes.
+// Import document classes
 import { Hyp3eActor } from "./documents/actor.mjs";
 import { Hyp3eItem } from "./documents/item.mjs";
-// Import sheet classes.
-// import { Hyp3eActorSheet } from "./sheets/fvtt_v1/actor-sheet.mjs";
+// Import sheet classes
 import { Hyp3eActorSheetV2 } from "./sheets/actor-sheet-v2.mjs";
-// import { Hyp3eItemSheet } from "./sheets/fvtt_v1/item-sheet.mjs";
 import { Hyp3eItemSheetV2 } from "./sheets/item-sheet-v2.mjs";
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons } from "./chat/chat.mjs";
 import { setupEffectHandlers } from "./helpers/effects.mjs";
-import { getAvailableTokenNumber, isTokenInCombat, getTokenActor, overlayEquippedWeaponAndShield } from "./helpers/tokens.mjs";
+import { getAvailableTokenNumber, 
+            isTokenInCombat, 
+            getTokenActor, 
+            overlayEquippedWeaponAndShield } from "./helpers/tokens.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
-import { migrateActorData, migrateItemData, fixTokenSize } from "./helpers/data-migrations.mjs"
-import { HYP3ETurnTracker, setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
+import { migrateActorData, 
+            migrateItemData, 
+            fixTokenSize } from "./helpers/data-migrations.mjs"
+import { HYP3ETurnTracker, 
+            setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
-// import { HYP3E_CALENDAR } from "./helpers/calendar-data.mjs"
-import { HYP3ECalendar, setupCalendarHooks } from "./helpers/calendar.mjs";
+import { HYP3ECalendar, 
+            setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
 import { registerHyp3eConfigurations } from "./helpers/register-config.mjs";

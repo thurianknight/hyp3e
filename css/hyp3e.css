@@ -1056,7 +1056,7 @@ textarea {
   padding: 0 2px;
   margin-right: 5px;
   margin-bottom: 3px;
-  input[type=text] {
+  input {
     text-align: center;
     min-width: 20px;
     max-width: 80px;

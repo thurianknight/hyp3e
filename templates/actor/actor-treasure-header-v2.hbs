@@ -1,0 +1,44 @@
+  {{!-- Sheet Header --}}
+  <header class="sheet-header merchant">
+    <div class="header-bg"></div>
+    <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+    <div class="header-block">
+      <div class="npc-header-block flexcol">
+        <div class="npc-header-block flexrow">
+            <h2 class="charname">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+            </h2>
+        </div>
+        <div class="npc-header-block flexrow">
+          <div class="npc-field align-center">
+            <input type="text" name="system.sellMultiplier" value="{{system.sellMultiplier}}" />
+            <label for="system.sellMultiplier" class="small-label">{{localize 'HYP3E.sellMultiplier'}}</label>
+          </div>
+          <div class="npc-field align-center">
+            <input type="text" name="system.buyMultiplier" value="{{system.buyMultiplier}}" />
+            <label for="system.buyMultiplier" class="small-label">{{localize 'HYP3E.buyMultiplier'}}</label>
+          </div>
+          <div class="npc-field align-center">
+            .
+          </div>
+          <div class="npc-field align-center">
+            .
+          </div>
+        </div>
+        <div class="npc-header-block flexrow">
+          <div class="npc-field align-center">
+            .
+          </div>
+          <div class="npc-field align-center">
+            .
+          </div>
+          <div class="npc-field align-center">
+            .
+          </div>
+          <div class="npc-field align-center">
+            .
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>

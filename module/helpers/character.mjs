@@ -4625,45 +4625,45 @@ export class Hyp3eCharacter {
         return true;
     }
 
-    /**
-     * Parse a monetary value string into a GP value, if possible
-     * @param {String} coinString 
-     */
-    static parseGpValue(coinString) {
-        // Set coin values vs. gp
-        const PP_VAL = 5
-        const EP_VAL = 0.5
-        const SP_VAL = 0.1
-        const CP_VAL = 0.02
+    // /**
+    //  * Parse a monetary value string into a GP value, if possible
+    //  * @param {String} coinString 
+    //  */
+    // static parseGpValue(coinString) {
+    //     // Set coin values vs. gp
+    //     const PP_VAL = 5
+    //     const EP_VAL = 0.5
+    //     const SP_VAL = 0.1
+    //     const CP_VAL = 0.02
 
-        let value = 0.0
-        let coin = ""
+    //     let value = 0.0
+    //     let coin = ""
 
-        // Strip off the coin type, if it exists
-        const cleaned = String(coinString).trim();
-        const match = cleaned.match(/^([\d,]+(?:\.\d+)?)\s*(pp|gp|ep|sp|cp)$/i);
-        if (match) {
-            const numeric = match[1].replace(/,/g, "");
-            value = parseFloat(numeric);
-            coin = match[2].toLowerCase();
-        } else {
-            const numericFallback = cleaned.replace(/,/g, "");
-            value = parseFloat(numericFallback);
-            coin = "gp"
-        }
-        // Were we able to get a numeric value?
-        if (isNaN(value)) return null
+    //     // Strip off the coin type, if it exists
+    //     const cleaned = String(coinString).trim();
+    //     const match = cleaned.match(/^([\d,]+(?:\.\d+)?)\s*(pp|gp|ep|sp|cp)$/i);
+    //     if (match) {
+    //         const numeric = match[1].replace(/,/g, "");
+    //         value = parseFloat(numeric);
+    //         coin = match[2].toLowerCase();
+    //     } else {
+    //         const numericFallback = cleaned.replace(/,/g, "");
+    //         value = parseFloat(numericFallback);
+    //         coin = "gp"
+    //     }
+    //     // Were we able to get a numeric value?
+    //     if (isNaN(value)) return null
 
-        // Convert to gp, and return
-        let gpValue;
-        switch (coin) {
-            case "pp": gpValue = Math.round((value * PP_VAL)*100)/100; break;
-            case "gp": gpValue = Math.round((value)*100)/100; break;
-            case "ep": gpValue = Math.round((value * EP_VAL)*100)/100; break;
-            case "sp": gpValue = Math.round((value * SP_VAL)*100)/100; break;
-            case "cp": gpValue = Math.round((value * CP_VAL)*100)/100; break;
-            default: gpValue = null;
-        }
-        return gpValue;
-    }
+    //     // Convert to gp, and return
+    //     let gpValue;
+    //     switch (coin) {
+    //         case "pp": gpValue = Math.round((value * PP_VAL)*100)/100; break;
+    //         case "gp": gpValue = Math.round((value)*100)/100; break;
+    //         case "ep": gpValue = Math.round((value * EP_VAL)*100)/100; break;
+    //         case "sp": gpValue = Math.round((value * SP_VAL)*100)/100; break;
+    //         case "cp": gpValue = Math.round((value * CP_VAL)*100)/100; break;
+    //         default: gpValue = null;
+    //     }
+    //     return gpValue;
+    // }
 }

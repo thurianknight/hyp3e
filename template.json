@@ -1,6 +1,6 @@
 {
     "Actor": {
-        "types": ["character", "npc"],
+        "types": ["character", "npc", "merchant"],
         "templates": {
             "base": {
                 "hd": "",
@@ -203,6 +203,28 @@
             "dx": 11,
             "rollHD": true,
             "phenotype": ""
+        },
+        "merchant": {
+            "templates": ["base"],
+            "money" : {
+                "cp": {
+                    "value": 0
+                },
+                "sp": {
+                    "value": 0
+                },
+                "ep": {
+                    "value": 0
+                },
+                "gp": {
+                    "value": 0
+                },
+                "pp": {
+                    "value": 0
+                }
+            },
+            "buyMultiplier": 0.5,
+            "sellMultiplier": 1.0
         }
     },
     "Item": {

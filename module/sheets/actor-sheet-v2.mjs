@@ -1,9 +1,19 @@
 import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eCharacter } from "../helpers/character.mjs";
+import { parseGpValue, 
+            getItemBasePrice, 
+            getTotalMoney, 
+            adjustMoney,
+            handleMerchantPurchase } from "../helpers/money.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
+import { enableItemEffectsOnActor, 
+            disableItemEffectsOnActor, 
+            onManageActiveEffectV2, 
+            prepareActiveEffectCategories } from "../helpers/effects.mjs";
+import { sendSimpleChat, 
+            sendRollToChat, 
+            renderCustomChat } from "../chat/chat.mjs"
 import HYP3EActorSetLanguages from "../apps/character-set-languages.mjs";
-import {enableItemEffectsOnActor, disableItemEffectsOnActor, onManageActiveEffectV2, prepareActiveEffectCategories} from "../helpers/effects.mjs";
-import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../chat/chat.mjs"
 
 const { HandlebarsApplicationMixin } = foundry.applications.api
 const { ActorSheetV2 } = foundry.applications.sheets
@@ -69,13 +79,21 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         },
     }
 
+    // static TABS = {
+    //     primary: {
+    //         tabs: [
+    //             { id: 'abilities' },
+    //             { id: 'description' },
+    //             { id: 'effects' }
+    //         ],
+    //         labelPrefix: 'HYP3E.tabs',
+    //         initial: 'abilities'
+    //     }
+    // }
+    // Start with an empty tabs array, and during _getTabsConfig we customize for each actor type
     static TABS = {
         primary: {
-            tabs: [
-                { id: 'abilities' },
-                { id: 'description' },
-                { id: 'effects' }
-            ],
+            tabs: [],
             labelPrefix: 'HYP3E.tabs',
             initial: 'abilities'
         }
@@ -107,7 +125,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             template: `${HYP3E.templatePath}/actor/parts/tab-character-items.hbs`,
             scrollable: ["", ".tab", ".main-content"],
         },
-        // Everyone gets Description and Effects, just like everyone gets Abilities, above.
+        // All PCs and NPCs gets Description and Effects, same as Abilities, above.
         description: {
             template: `${HYP3E.templatePath}/actor/parts/tab-actor-description.hbs`,
             scrollable: ["", ".tab", ".main-content"],
@@ -115,6 +133,15 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         effects: {
             template: `${HYP3E.templatePath}/actor/parts/tab-actor-effects.hbs`,
             scrollable: ["", ".tab", ".main-content"],
+        },
+        // Merchants get equipment and fighting gear, and none of the prior tabs
+        equipment: {
+            template: `${HYP3E.templatePath}/actor/parts/tab-merchant-equipment.hbs`,
+            scrollable: ["", ".tab", ".main-content"],           
+        },
+        fightingGear: {
+            template: `${HYP3E.templatePath}/actor/parts/tab-merchant-fighting-gear.hbs`,
+            scrollable: ["", ".tab", ".main-content"],           
         },
     }
 
@@ -132,32 +159,44 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Retrieve base data structure.
         const context = await super._prepareContext(options);
         context.actor = this.actor;
+        context.isGM = game.user.isGM
 
         // Use a safe clone of the actor data for further operations
         const actorData = this.actor.toObject(false);
         Hyp3eLogger.info("_prepareContext", `Actor data for sheet:`, actorData);
 
-        // Add the actor's data to context.data for easier access, as well as flags
+        // Add the actor's system data and flags to context root for easier access
         context.system = actorData.system;
         context.flags = actorData.flags;
 
         // Add the actor's items to sheet context, for ease of access
-        // context.items = actorData.items;
         context.items = this.actor.items.map(i => ({
             id: i.id,
             ...i.toObject(),
         }));
 
-        // Prepare character data and items.
+        // Prepare character data and items
         if (actorData.type == 'character') {
             await this._prepareItems(context);
             this._prepareCharacterData(context);
         }
         
-        // Prepare NPC data and items.
+        // Prepare NPC data and items
         if (actorData.type == 'npc') {
             await this._prepareItems(context);
             this._prepareNpcData(context);
+        }
+
+        // Prepare merchant data and items
+        if (actorData.type == 'merchant') {
+            await this._prepareItems(context);
+            this._prepareMerchantData(context);
+        }
+
+        // Prepare treasure data and items
+        if (actorData.type == 'treasure') {
+            await this._prepareItems(context);
+            this._prepareTreasureData(context);
         }
 
         // Add roll data for TinyMCE editors.
@@ -179,6 +218,104 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         Hyp3eLogger.info("_prepareContext", `Actor sheet data complete:`, context);
 
         return context;
+    }
+
+    /** @override */
+    async _preparePartContext(partId, context) {
+        context = await super._preparePartContext(partId, context);
+
+        if (partId === "header" || partId === "tabs") {
+            // Header and tabs parts do not need special tab handling
+            return context;
+        }
+        if (!context.tabs || !context.tabs[partId]) {
+            Hyp3eLogger.info("_preparePartContext", `No tab data found for part "${partId}".`);
+            return context;
+        }
+        // Remove parts that aren't for this actor type
+        if (this.actor.type === "npc" && ["combat","spells","items"].includes(partId)) {
+            return null; // returning null skips rendering this part
+        }
+
+        // Remove parts that aren't for this actor type
+        if (this.actor.type === "merchant" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
+            return null; // returning null skips rendering this part
+        }
+        // Also we need to reset the default tab for merchants
+        if (this.actor.type === "merchant" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
+            context.tabs["equipment"].active = true;
+            context.tabs["equipment"].cssClass = "active";
+        }
+
+        // Process tabs
+        Hyp3eLogger.info("_preparePartContext", `Preparing tab part "${partId}"...`, context);
+        if (context.tabs[partId].active) {
+            context.tab = context.tabs[partId];
+        }
+
+        // Enrich text editor fields as needed
+        switch (partId) {
+            case 'abilities':
+                break;
+            case 'combat':
+                break;
+            case 'spells':
+                break;
+            case 'items':
+                // Enrich content for display
+                context.enrichedTreasure = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+                    this.document.system.treasure,
+                    {
+                        secrets: this.document.isOwner,
+                        relativeTo: this.document
+                    }
+                )
+                break;
+            case 'description':
+                context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+                    this.document.system.biography,
+                    {
+                        secrets: this.document.isOwner,
+                        relativeTo: this.document
+                    }
+                )
+                break;
+            case 'effects':
+                break;
+            case "equipment":
+                break;
+            case "fightingGear":
+                break;
+            default:
+        }
+        return context;
+    }
+
+    /** @override */
+    _getTabsConfig(group) {
+        const tabs = foundry.utils.deepClone(super._getTabsConfig(group))
+
+        // Common PC & NPC tabs
+        if (this.document.type === "character" || this.document.type === "npc") {
+            tabs.tabs.push({ id: 'abilities', group: group });
+            tabs.tabs.push({ id: 'description', group: group });
+            tabs.tabs.push({ id: 'effects', group: group });
+        }
+
+        // Insert PC-specific tabs
+        if (this.document.type === "character") {
+            tabs.tabs.splice(1, 0, { id: 'combat', group: group });
+            tabs.tabs.splice(2, 0, { id: 'spells', group: group });
+            tabs.tabs.splice(3, 0, { id: 'items', group: group });
+        }
+
+        // Merchant tabs
+        if (this.document.type === "merchant") {
+            tabs.tabs.push({ id: 'equipment', group: group });
+            tabs.tabs.push({ id: 'fightingGear', group: group });
+        }
+
+        return tabs
     }
 
     /**
@@ -302,6 +439,27 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     /**
+     * Organize and classify Data for NPC sheets.
+     * @param {Object} context The actor to prepare.
+     * @return {undefined}
+     */
+    _prepareMerchantData(context) {
+        // Handle money types
+        for (let [k, v] of Object.entries(context.system.money)) {
+            v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
+        }
+    }
+
+    /**
+     * Organize and classify Data for NPC sheets.
+     * @param {Object} context The actor to prepare.
+     * @return {undefined}
+     */
+    _prepareTreasureData(context) {
+        // Not sure what will go here
+    }
+
+    /**
      * Organize and classify Items for Character sheets.
      * @param {Object} context The actor to prepare.
      * @return {undefined}
@@ -333,7 +491,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
             // Enrich all item Description fields
             if (i.system?.description) {
-                i.system.enrichedDescription = await TextEditor.enrichHTML(i.system.description, {
+                i.system.enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(i.system.description, {
                     async: true,
                     rollData: this.actor.getRollData(),
                     rolls: true,          // enable [[roll]] links
@@ -352,7 +510,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                         i.system.carriedWt = (i.system.weight * i.system.quantity.value)
                         i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
                         encumbrance += i.system.carriedWt
-                    } else if (i.type === 'weapon' || i.type === 'armor') {
+                    } else if (i.type === 'weapon' || i.type === 'armor' || i.type === 'shield') {
                         i.system.carriedWt = (i.system.weight * i.system.quantity.value)
                         i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
                         encumbrance += i.system.carriedWt
@@ -367,14 +525,19 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             // Calculate the gp value of the item, taking qty x cost. If qty is empty, assume 1.
             //  If cost is empty, assume 0.
             if (i.system.cost) {
-                const baseGpVal = Hyp3eCharacter.parseGpValue(i.system.cost)
+                const baseGpVal = parseGpValue(i.system.cost)
                 if (baseGpVal) {
+                    // For merchants, show unit selling price
+                    i.system.unitPrice = Math.round(baseGpVal * (this.actor.system.sellMultiplier ?? 1) * 100) / 100;
+                    // Normal characters show total value of item qty
                     i.system.value = Math.round((baseGpVal * (i.system.quantity.value ? i.system.quantity.value : 1))*100)/100
                     allTheGold += i.system.value
                 } else {
+                    i.system.unitPrice = null
                     i.system.value = null
                 }
             } else {
+                i.system.unitPrice = 0
                 i.system.value = 0
             }
 
@@ -461,76 +624,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         return this.actor.items.filter(
             ({system: {containerId}}) => id === containerId
         );
-    }
-
-    /** @override */
-    async _preparePartContext(partId, context) {
-        context = await super._preparePartContext(partId, context);
-
-        if (partId === "header" || partId === "tabs") {
-            // Header and tabs parts do not need special tab handling
-            return context;
-        }
-        if (!context.tabs || !context.tabs[partId]) {
-            Hyp3eLogger.info("_preparePartContext", `No tab data found for part "${partId}".`);
-            return context;
-        }
-        // Remove parts that aren't for this actor type
-        if (this.actor.type === "npc" && ["combat","spells","items"].includes(partId)) {
-            return null; // returning null skips rendering this part
-        }
-
-        // Process tabs
-        Hyp3eLogger.info("_preparePartContext", `Preparing tab part "${partId}"...`, context);
-        if (context.tabs[partId].active) {
-            context.tab = context.tabs[partId];
-        }
-
-        // Enrich text editor fields as needed
-        switch (partId) {
-            case 'abilities':
-                break;
-            case 'combat':
-                break;
-            case 'spells':
-                break;
-            case 'items':
-                // Enrich content for display
-                context.enrichedTreasure = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-                    this.document.system.treasure,
-                    {
-                        secrets: this.document.isOwner,
-                        relativeTo: this.document
-                    }
-                )
-                break;
-            case 'description':
-                context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-                    this.document.system.biography,
-                    {
-                        secrets: this.document.isOwner,
-                        relativeTo: this.document
-                    }
-                )
-                break;
-            case 'effects':
-                break;
-            default:
-        }
-        return context;
-    }
-
-    /** @override */
-    _getTabsConfig(group) {
-        const tabs = foundry.utils.deepClone(super._getTabsConfig(group))
-
-        // Insert Combat, Spells, and Items tabs if this is a character
-        if (this.document.type === "character") {
-            tabs.tabs.splice(1, 0, { id: 'combat', group: 'primary' });
-            tabs.tabs.splice(2, 0, { id: 'spells', group: 'primary' });
-            tabs.tabs.splice(3, 0, { id: 'items', group: 'primary' });
-        }
-        return tabs
     }
 
     /** @override */
@@ -1055,8 +1148,17 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         return super._onDropDocument(event, document)
     }
 
-    _onDropItem(event, item) {
+    async _onDropItem(event, item) {
         Hyp3eLogger.info("_onDropItem", `Item dropped event:`, { event, item })
+        // Handle merchant → character drag
+        const sourceActor = item?.parent;
+        if (sourceActor?.type === "merchant") {
+            // Perform the merchant transaction and return early
+            await handleMerchantPurchase(this.actor, sourceActor, item);
+            return; // stops Foundry from calling super._onDropItem()
+        }
+
+        // Otherwise let normal copy-item behavior proceed
         return super._onDropItem(event, item)
     }
 

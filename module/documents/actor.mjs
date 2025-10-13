@@ -136,6 +136,8 @@ export class Hyp3eActor extends Actor {
      */
     async _preCreate(data, options, user) {
         await super._preCreate(data, options, user);
+        Hyp3eLogger.info("Hyp3eActor _preCreate", `Starting data:`, data)
+
         if (data.type === "character") {
             this.updateSource({
                 "prototypeToken.actorLink": true,
@@ -147,6 +149,12 @@ export class Hyp3eActor extends Actor {
         // if (data.type === "npc") {
             // Do nothing for now
         // }
+        if (data.type === "merchant") {
+            // Set the default image
+            this.updateSource({
+                "img": "icons/svg/coins.svg"
+            });
+        }
     }
 
     /**
