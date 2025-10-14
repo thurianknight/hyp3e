@@ -5,20 +5,24 @@
     <div class="header-block">
       <div class="npc-header-block flexcol">
         <div class="npc-header-block flexrow">
-            <h2 class="charname">
-                <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
-            </h2>
+          <h2 class="charname">
+            <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+          </h2>
         </div>
         <div class="npc-header-block flexrow">
           {{#if isGM}}
           <div class="npc-header-block">
             <div class="money-block flexrow">
-                {{#each system.money as |coin key|}}
-                <div class="ability align-center">
-                    <label for="system.money.{{key}}.value" class="exploration-label">{{coin.label}}</label>
-                    <input type="text" name="system.money.{{key}}.value" value="{{coin.value}}" />
-                </div>
-                {{/each}}
+              {{#each system.money as |coin key|}}
+              <div class="ability align-center">
+                <label for="system.money.{{key}}.value" class="exploration-label">{{coin.label}}</label>
+                <input type="text" name="system.money.{{key}}.value" value="{{coin.value}}" />
+              </div>
+              {{/each}}
+            </div>
+            <div class="money-block align-left">
+              <input type="checkbox" name="system.ignoreQty" {{checked system.ignoreQty}} />
+              <label for="system.ignoreQty" class="small-label">{{localize 'Ignore merchant qty'}}</label>
             </div>
           </div>
           <div class="npc-header-block">

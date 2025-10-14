@@ -47,6 +47,7 @@ export const preloadHandlebarsTemplates = async function() {
         // Item V2 partials - attributes
         `${HYP3E.templatePath}/item/parts/effect-attributes.hbs`,
         `${HYP3E.templatePath}/item/parts/feature-attributes.hbs`,
+        `${HYP3E.templatePath}/item/parts/item-attributes.hbs`,
         `${HYP3E.templatePath}/item/parts/physical-attributes.hbs`,
         `${HYP3E.templatePath}/item/parts/spell-attributes.hbs`,
         `${HYP3E.templatePath}/item/parts/weapon-attributes.hbs`,

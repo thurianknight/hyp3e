@@ -295,11 +295,10 @@ input[type="number"]:disabled {
 }
 
 input[type=checkbox] {
+  padding: 0.25em 0;
   width: 24px;
   max-width: 24px;
   height: 24px;
-  margin-right: 5px;
-  margin-left: 5px;
 }
 
 /* Default style for textarea boxes */
@@ -585,7 +584,8 @@ textarea {
 }
 
 /* Apply to all input fields and textareas where they sit above the header image */
-.hyp3e .npc-header-block input,
+.hyp3e .npc-header-block input[type=text],
+.hyp3e .npc-header-block input[type=number],
 .hyp3e .npc-header-block textarea,
 .hyp3e .npc-header-block select {
   background-color: rgba(255, 255, 255, 0.4); /* semi-transparent white */
@@ -1056,7 +1056,8 @@ textarea {
   padding: 0 2px;
   margin-right: 5px;
   margin-bottom: 3px;
-  input {
+  input[type=text],
+  input[type=number] {
     text-align: center;
     min-width: 20px;
     max-width: 80px;

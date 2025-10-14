@@ -12,8 +12,9 @@
         {{!-- Inventory --}}
         <h2>{{localize 'HYP3E.headers.equipmentItems'}}</h2>
         <ol class="items-list" data-drop="item">
+            {{!-- Container items --}}
             <li class="item flexrow items-header">
-                <div class="item-name">{{localize "HYP3E.headers.items"}}</div>
+                <div class="item-name">{{localize "HYP3E.headers.containers"}}</div>
                 <div class="item-prop">{{localize "HYP3E.item.qty"}}</div>
                 <div class="item-prop">{{localize "HYP3E.item.weight"}}</div>
                 <div class="item-prop">{{localize "HYP3E.item.unitPrice"}}</div>
@@ -25,7 +26,6 @@
                     </a>
                 </div>
             </li>
-            {{!-- Container items --}}
             {{#each containers as |container id|}}
             <li class="item-entry item-container item draggable" data-item-id="{{container.id}}">
                 <div class="item-header flexrow">
@@ -68,6 +68,19 @@
             </li>
             {{/each}}
             {{!-- Non-container items --}}
+            <li class="item flexrow items-header">
+                <div class="item-name">{{localize "HYP3E.headers.equipmentItemsEtc"}}</div>
+                <div class="item-prop">{{localize "HYP3E.item.qty"}}</div>
+                <div class="item-prop">{{localize "HYP3E.item.weight"}}</div>
+                <div class="item-prop">{{localize "HYP3E.item.unitPrice"}}</div>
+                <div class="item-controls">
+                    <a class="item-control item-create" 
+                        data-action="createItem" 
+                        data-type="item">
+                      <i class="fas fa-plus"></i> {{localize "HYP3E.item.add"}}
+                    </a>
+                </div>
+            </li>
             {{#each gear as |item id|}}
             <li class="item-entry item draggable" data-item-id="{{item.id}}">
                 <div class="item-header flexrow">

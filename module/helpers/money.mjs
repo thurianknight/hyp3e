@@ -198,7 +198,10 @@ export async function handleMerchantPurchase(buyer, merchant, item) {
  * @param {number} cost - Total cost in gp
  */
 export async function adjustMoney(actor, cost) {
-    // NOTE: 'cost' may be a decimal number, not just an integer!
+    // Exit early if cost = 0, which shouldn't happen if items are setup correctly
+    if (cost === 0) return true;
+
+    // Clone the actor's money so we can work with it
     const money = foundry.utils.duplicate(actor.system.money);
 
     // Convert all holdings to copper for internal math
@@ -207,9 +210,20 @@ export async function adjustMoney(actor, cost) {
     );
     Hyp3eLogger.info("adjustMoney", `${actor.name} has ${totalCp} cp value in coin.`);
 
+    // NOTE: 'cost' in gp may be a decimal number, not just an integer!
+    //  But it must be an integer when converted to cp.
     const costCp = Math.round(cost / CP_VAL); // convert gp → cp (1 gp = 50 cp)
     const absCostCp = Math.abs(costCp);
     Hyp3eLogger.info("adjustMoney", `Item cost in cp: ${absCostCp}`);
+
+    // Easy case: adding income to the seller, and exit here
+    if (cost > 0) {
+        const newTotalCp = totalCp + costCp;
+        const newMoney = distributeCopperToCoins(newTotalCp);
+        Hyp3eLogger.info("adjustMoney", `Adding coins to seller's purse:`, newMoney);
+        await actor.update({ "system.money": newMoney });
+        return true;
+    }
 
     // Ensure affordability for negative cost (spending)
     if (cost < 0 && absCostCp > totalCp) {
@@ -217,15 +231,6 @@ export async function adjustMoney(actor, cost) {
         Hyp3eLogger.warn("adjustMoney", msg)
         ui.notifications.warn(msg);
         return false;
-    }
-
-    // Easy case: adding income to the seller
-    if (cost > 0) {
-        const newTotalCp = totalCp + costCp;
-        const newMoney = distributeCopperToCoins(newTotalCp);
-        Hyp3eLogger.info("adjustMoney", `Adding coins to seller's purse:`, newMoney);
-        await actor.update({ "system.money": newMoney });
-        return true;
     }
 
     // Spending money: smallest denominations first
@@ -258,7 +263,7 @@ export async function adjustMoney(actor, cost) {
 }
 
 /**
- * Distribute a copper total into the optimal mix of coins.
+ * Distribute a copper total into the optimal mix of coins, favoring gold as the standard.
  * Returns a money object matching the system format.
  */
 export function distributeCopperToCoins(totalCp) {
@@ -271,11 +276,24 @@ export function distributeCopperToCoins(totalCp) {
     };
 
     const coins = ["pp", "gp", "ep", "sp", "cp"];
+    let remaining = totalCp;
+    const PP_CAP = 0.1;
 
+    // Process coins from highest to lowest value.
+    //  Platinum is capped at 10% of total; gold absorbs the rest of the high-value share.
     for (let c of coins) {
         const coinValue = COIN_TO_CP[c];
-        result[c].value = Math.floor(totalCp / coinValue);
-        totalCp = totalCp % coinValue;
+        if (c === "pp") {
+            // We could make this 10% cap a config option...
+            const maxPlatinumInCp = Math.floor(totalCp * PP_CAP);
+            const availableForPlatinum = Math.min(remaining, maxPlatinumInCp);
+
+            result[c].value = Math.floor(availableForPlatinum / coinValue);
+            remaining -= result[c].value * coinValue;
+        } else {
+            result[c].value = Math.floor(remaining / coinValue);
+            remaining = remaining % coinValue;
+        }
     }
 
     return result;

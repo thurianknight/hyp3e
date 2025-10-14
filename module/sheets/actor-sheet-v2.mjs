@@ -1138,16 +1138,16 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     // DRAG AND DROP HANDLERS
     // ===========================================================================
 
-    _onDropDocument(event, document) {
-        Hyp3eLogger.info("_onDropDocument", `Document dropped event:`, { event, document })
-        return super._onDropDocument(event, document)
-    }
+    // _onDropDocument(event, document) {
+    //     Hyp3eLogger.info("_onDropDocument", `Document dropped event:`, { event, document })
+    //     return super._onDropDocument(event, document)
+    // }
 
     async _onDropItem(event, item) {
         Hyp3eLogger.info("_onDropItem", `Item dropped event:`, { event, item })
         // Handle merchant → character drag
         const sourceActor = item?.parent;
-        if (sourceActor?.type === "merchant") {
+        if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
             // Perform the merchant transaction and return early
             await handleMerchantPurchase(this.actor, sourceActor, item);
             return; // stops Foundry from calling super._onDropItem()
@@ -1164,12 +1164,13 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         const dragged = this.actor.items.get(item.id);
         const targetItem = target ? this.actor.items.get(target.dataset.itemId) : null;
 
-        // Special case 0: container item dragged over another container → no action
+        // Special case 0: container item dragged over another container → sort them
         if (dragged.system.isContainer && targetItem?.system.isContainer) {
-            return false;
+            return super._onSortItem(event, item)
+            // return false;
         }
 
-        // Special case 1: dragged over a container → assign containerId
+        // Special case 1: item dragged over a container → assign containerId
         if (targetItem && (targetItem.system.isContainer || targetItem.type === "container")) {
             return dragged.update({ "system.containerId": targetItem.id });
         }
@@ -1188,10 +1189,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         return super._onSortItem(event, item)
     }
 
-    _onDragStart(event) {
-        Hyp3eLogger.info("_onDragStart", `Drag-start event:`, event)
-        return super._onDragStart(event)
-    }
+    // _onDragStart(event) {
+    //     Hyp3eLogger.info("_onDragStart", `Drag-start event:`, event)
+    //     return super._onDragStart(event)
+    // }
 
     _onDragOver(event) {
         Hyp3eLogger.info("_onDragOver", `Drag-over event:`, event)

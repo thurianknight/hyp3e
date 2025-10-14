@@ -224,7 +224,8 @@
                 }
             },
             "buyMultiplier": 0.5,
-            "sellMultiplier": 1.0
+            "sellMultiplier": 1.0,
+            "ignoreQty": false
         }
     },
     "Item": {

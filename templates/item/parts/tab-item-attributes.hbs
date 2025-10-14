@@ -18,6 +18,9 @@
       {{#if (eq item.type "feature")}}
         {{> "feature-attributes"}}
       {{/if}}
+      {{#if (eq item.type "item")}}
+        {{!-- {{> "item-attributes"}} --}}
+      {{/if}}
       {{#if (eq item.type "spell")}}
         {{> "spell-attributes"}}
       {{/if}}
