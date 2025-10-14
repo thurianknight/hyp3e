@@ -1,11 +1,20 @@
 import { Hyp3eLogger } from "./logger.mjs";
 
-// Set coin values vs. gp
+// Coin value constants (in gp-equivalents)
 export const PP_VAL = 5     // Platinum = 1:5 for gold
 export const GP_VAL = 1     // Gold is our standard
 export const EP_VAL = 0.5   // Electrum is 2:1 for gold
 export const SP_VAL = 0.1   // Silver is 10:1 for gold
 export const CP_VAL = 0.02  // Copper is 50:1 for gold
+
+// Helper: relative coin values in CP
+export const COIN_TO_CP = {
+    cp: 1,
+    sp: 5,
+    ep: 25,
+    gp: 50,
+    pp: 250
+};
 
 /**
  * Parse a monetary value string into a GP value, if possible
@@ -44,6 +53,22 @@ export function parseGpValue(coinString) {
 }
 
 /**
+ * Take any valid number or numeric string and return a pure number
+ * @param {*} value 
+ * @returns 
+ */
+export function toNumber(value) {
+  if (value == null) return 0;
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    // Remove commas, currency symbols, and trim spaces
+    value = value.replace(/[^0-9.\-]/g, "");
+  }
+  const n = Number(value);
+  return isNaN(n) ? 0 : n;
+}
+
+/**
  * Extract and convert the base price of an item to GP.
  */
 export function getItemBasePrice(itemData) {
@@ -57,11 +82,11 @@ export function getItemBasePrice(itemData) {
 export function getTotalMoney(money) {
     if (!money) return 0;
     return (
-        parseInt(money.pp?.value ?? 0) * PP_VAL +
-        parseInt(money.gp?.value ?? 0) * GP_VAL +
-        parseInt(money.ep?.value ?? 0) * EP_VAL +
-        parseInt(money.sp?.value ?? 0) * SP_VAL +
-        parseInt(money.cp?.value ?? 0) * CP_VAL
+        toNumber(money.pp?.value) * PP_VAL +
+        toNumber(money.gp?.value) * GP_VAL +
+        toNumber(money.ep?.value) * EP_VAL +
+        toNumber(money.sp?.value) * SP_VAL +
+        toNumber(money.cp?.value) * CP_VAL
     );
 }
 
@@ -75,10 +100,10 @@ export function getTotalMoney(money) {
 export async function handleMerchantPurchase(buyer, merchant, item) {
     const itemData = item.toObject();
     const basePrice = getItemBasePrice(itemData);
-    const sellMult = merchant.system?.sellMultiplier ?? 1.0;
+    const sellMult = parseFloat(merchant.system?.sellMultiplier) ?? 1.0;
     // Final price is rounded to the nearest .01, or half a copper piece
     const sellPrice = Math.round(basePrice * sellMult * 100)/100;
-    const merchantQty = item.system.quantity?.value ?? 1;
+    const merchantQty = parseInt(item.system.quantity?.value) ?? 1;
     Hyp3eLogger.info("handleMerchantPurchase", `Seller's price in gp:`, sellPrice)
 
     const buyerFunds = getTotalMoney(buyer.system.money);
@@ -150,8 +175,8 @@ export async function handleMerchantPurchase(buyer, merchant, item) {
 
     // Add to buyer's existing qty or create new
     if (existing) {
-        const newQty = (existing.system.quantity.value ?? 1) + qty;
-        await existing.update({ "system.quantity": newQty });
+        const newQty = toNumber(existing.system.quantity.value) + qty;
+        await existing.update({ "system.quantity.value": newQty });
         ui.notifications.info(
             `${buyer.name} buys ${qty} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`
         );
@@ -165,100 +190,93 @@ export async function handleMerchantPurchase(buyer, merchant, item) {
 }
 
 /**
- * Deducts an amount (in gp) from an actor's money, spending smallest coins first.
+ * Adjusts an actor's money by a given amount (in gp-equivalent), spending smallest denominations first.
+ * Handles proper denomination exchange and change-making.
+ * Negative cost = spend money
+ * Positive cost = gain money
  * @param {Actor} actor - Buyer
  * @param {number} cost - Total cost in gp
  */
 export async function adjustMoney(actor, cost) {
+    // NOTE: 'cost' may be a decimal number, not just an integer!
     const money = foundry.utils.duplicate(actor.system.money);
-    const totalFunds = getTotalMoney(money);
-    const absCost = Math.abs(cost);
 
-    if (cost < 0 && absCost > totalFunds) {
-        ui.notifications.warn(`${actor.name} cannot afford ${absCost} gp!`);
+    // Convert all holdings to copper for internal math
+    const totalCp = Object.entries(money).reduce(
+        (sum, [k, v]) => sum + (toNumber(v.value)) * COIN_TO_CP[k], 0
+    );
+    Hyp3eLogger.info("adjustMoney", `${actor.name} has ${totalCp} cp value in coin.`);
+
+    const costCp = Math.round(cost / CP_VAL); // convert gp → cp (1 gp = 50 cp)
+    const absCostCp = Math.abs(costCp);
+    Hyp3eLogger.info("adjustMoney", `Item cost in cp: ${absCostCp}`);
+
+    // Ensure affordability for negative cost (spending)
+    if (cost < 0 && absCostCp > totalCp) {
+        const msg = `${actor.name} cannot afford ${Math.abs(cost)} gp!`;
+        Hyp3eLogger.warn("adjustMoney", msg)
+        ui.notifications.warn(msg);
         return false;
     }
 
-    // Coin denominations (smallest to largest)
-    const coins = [
-        { key: "cp", relativeGpValue: CP_VAL },
-        { key: "sp", relativeGpValue: SP_VAL },
-        { key: "ep", relativeGpValue: EP_VAL },
-        { key: "gp", relativeGpValue: GP_VAL },
-        { key: "pp", relativeGpValue: PP_VAL }
-    ];
-
-    // Deducting (cost is negative)
-    if (cost < 0) {
-        let remaining = absCost;
-
-        // Make change if needed
-        for (let i = 0; i < coins.length - 1; i++) {
-            const { key, relativeGpValue } = coins[i];
-            if (money[key].value * relativeGpValue < remaining) {
-                // Not enough of this coin; break 1 of next larger coin down to this one
-                const next = coins[i + 1];
-                while (money[key].value * relativeGpValue < remaining && money[next.key].value > 0) {
-                    // Break one larger coin into equivalent smaller coins
-                    money[next.key].value -= 1;
-                    const smallerCoins = next.relativeGpValue / relativeGpValue;
-                    money[key].value += smallerCoins;
-                }
-            }
-        }
-
-        // Spend from smallest denomination to largest
-        for (let { key, relativeGpValue } of coins) {
-            const coinWorth = money[key].value * relativeGpValue;
-            if (coinWorth >= remaining) {
-                const coinsToSpend = Math.ceil(remaining / relativeGpValue);
-                money[key].value -= coinsToSpend;
-                remaining = 0;
-                break;
-            } else {
-                money[key].value = 0;
-                remaining -= coinWorth;
-            }
-        }
-
-        if (remaining > 0.0001) {
-            // Floating point tolerance
-            ui.notifications.warn(`${actor.name} lacks enough coin denominations to pay ${absCost} gp.`);
-            return false;
-        }
-
-    } else if (cost > 0) {
-        // Adding money (merchant income) — simple
-        const gpToAdd = cost; // in gold-equivalent
-        money.gp.value += gpToAdd;
+    // Easy case: adding income to the seller
+    if (cost > 0) {
+        const newTotalCp = totalCp + costCp;
+        const newMoney = distributeCopperToCoins(newTotalCp);
+        Hyp3eLogger.info("adjustMoney", `Adding coins to seller's purse:`, newMoney);
+        await actor.update({ "system.money": newMoney });
+        return true;
     }
 
-    // Round coins to nearest integer to prevent fractions
-    for (let c of coins) { money[c.key].value = Math.floor(money[c.key].value); }
+    // Spending money: smallest denominations first
+    let accumulator = 0;
+    const coins = ["cp", "sp", "ep", "gp", "pp"];
+
+    // Zero out coins as we accumulate value toward the cost
+    for (let c of coins) {
+        accumulator += (toNumber(money[c].value)) * COIN_TO_CP[c];
+        Hyp3eLogger.info("adjustMoney", `Converted ${c} to copper piece value: ${(toNumber(money[c].value)) * COIN_TO_CP[c]}`);
+        money[c].value = 0;
+        if (accumulator >= absCostCp) break;
+    }
+
+    // Subtract the cost
+    let changeCp = accumulator - absCostCp;
+    Hyp3eLogger.info("adjustMoney", `Remaining cp after purchase: ${changeCp}`);
+
+    // Redistribute change into denominations
+    const redistributed = distributeCopperToCoins(changeCp);
+    Hyp3eLogger.info("adjustMoney", `Buyer's redistributed coin after purchase:`, redistributed);
+
+    // Merge redistributed change into cleared money object
+    for (let c of coins) {
+        money[c].value = toNumber(money[c].value) + redistributed[c].value;
+    }
 
     await actor.update({ "system.money": money });
     return true;
 }
 
 /**
- * Adjust actor's money by a given amount in gold.
- * Will distribute across gp primarily, but you can expand this to rebalance coins.
+ * Distribute a copper total into the optimal mix of coins.
+ * Returns a money object matching the system format.
  */
-// export async function adjustMoney(actor, amountGP) {
-//     const money = foundry.utils.duplicate(actor.system.money);
+export function distributeCopperToCoins(totalCp) {
+    const result = {
+        cp: { value: 0 },
+        sp: { value: 0 },
+        ep: { value: 0 },
+        gp: { value: 0 },
+        pp: { value: 0 }
+    };
 
-//     // Convert the actor's entire purse to gp first
-//     let totalGP = getTotalMoney(money);
-//     totalGP += amountGP; // add or subtract
+    const coins = ["pp", "gp", "ep", "sp", "cp"];
 
-//     if (totalGP < 0) totalGP = 0;
+    for (let c of coins) {
+        const coinValue = COIN_TO_CP[c];
+        result[c].value = Math.floor(totalCp / coinValue);
+        totalCp = totalCp % coinValue;
+    }
 
-//     // simplify back into gp (you could later re-expand if desired)
-//     money.cp.value = 0;
-//     money.sp.value = 0;
-//     money.ep.value = 0;
-//     money.pp.value = Math.floor(totalGP / PP_VAL);
-//     money.gp.value = Math.floor(totalGP % PP_VAL);
-
-//     await actor.update({ "system.money": money });
-// }
+    return result;
+}
