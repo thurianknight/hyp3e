@@ -159,10 +159,11 @@ export async function handleMerchantPurchase(buyer, merchant, item) {
     await adjustMoney(merchant, totalPrice);
 
     // Adjust the merchant's qty on hand
-    const newMerchantQty = merchantQty - qty;
-    if (newMerchantQty <= 0) {
-        await item.delete(); // merchant sold out
-    } else {
+    if (!merchant.system.ignoreQty) {
+        const newMerchantQty = Math.ceil(merchantQty - qty, 0);
+        // if (newMerchantQty <= 0) {
+        //     await item.delete(); // merchant sold out
+        // } else {
         await item.update({ "system.quantity.value": newMerchantQty });
     }
 
@@ -170,6 +171,7 @@ export async function handleMerchantPurchase(buyer, merchant, item) {
     const existing = buyer.items.find(i =>
         i.name === item.name &&
         i.type === item.type &&
+        !i.system.isContainer &&
         !['armor','shield','weapon'].includes(i.type) // Don’t merge armor, shields, or weapons
     );
 
