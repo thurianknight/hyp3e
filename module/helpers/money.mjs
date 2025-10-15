@@ -100,6 +100,7 @@ export function getTotalMoney(money) {
 export async function handleMerchantPurchase(buyer, merchant, item) {
     const itemData = item.toObject();
     const basePrice = getItemBasePrice(itemData);
+    const itemName = itemData.name;
     const sellMult = parseFloat(merchant.system?.sellMultiplier) ?? 1.0;
     // Final price is rounded to the nearest .01, or half a copper piece
     const sellPrice = Math.round(basePrice * sellMult * 100)/100;
@@ -109,13 +110,26 @@ export async function handleMerchantPurchase(buyer, merchant, item) {
     const buyerFunds = getTotalMoney(buyer.system.money);
     Hyp3eLogger.info("handleMerchantPurchase", `Buyer's available funds in gp:`, buyerFunds)
 
-    const maxQty = Math.min(merchantQty, Math.floor(buyerFunds / sellPrice));
-    if (maxQty <= 0) {
-        return ui.notifications.warn(`${buyer.name} cannot afford ${sellPrice} gp or the merchant is out of stock.`);
+    let maxQty = 1000;
+    if (!merchant.system.ignoreQty) {
+        // Handle max purchase qty based on merchant qty on hand and buyer wealth
+        if (merchantQty <= 0) {
+            return ui.notifications.warn(`Merchant has no ${itemName} in inventory.`);
+        }
+        maxQty = Math.min(merchantQty, Math.floor(buyerFunds / sellPrice));
+        if (maxQty <= 0) {
+            return ui.notifications.warn(`${buyer.name} cannot afford ${sellPrice} gp.`);
+        }
+    } else {
+        // Ignore merchant qty on hand, only consider buyer wealth
+        maxQty = Math.floor(buyerFunds / sellPrice);
+        if (maxQty <= 0) {
+            return ui.notifications.warn(`${buyer.name} cannot afford ${sellPrice} gp.`);
+        }
     }
 
     const qty = await Dialog.prompt({
-        title: "Purchase Quantity",
+        title: `${itemName} Purchase Quantity`,
         content: `
             <p>${merchant.name} has <strong>${merchantQty}</strong> ${item.name}(s) in stock at <strong>${sellPrice}</strong> gp each.</p>
             <p>
