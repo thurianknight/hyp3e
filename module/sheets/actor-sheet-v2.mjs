@@ -1138,11 +1138,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     // DRAG AND DROP HANDLERS
     // ===========================================================================
 
-    // _onDropDocument(event, document) {
-    //     Hyp3eLogger.info("_onDropDocument", `Document dropped event:`, { event, document })
-    //     return super._onDropDocument(event, document)
-    // }
-
     async _onDropItem(event, item) {
         Hyp3eLogger.info("_onDropItem", `Item dropped event:`, { event, item })
         // Handle merchant → character drag
@@ -1167,7 +1162,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Special case 0: container item dragged over another container → sort them
         if (dragged.system.isContainer && targetItem?.system.isContainer) {
             return super._onSortItem(event, item)
-            // return false;
         }
 
         // Special case 1: item dragged over a container → assign containerId
@@ -1188,11 +1182,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Default: fall back to built-in sorting
         return super._onSortItem(event, item)
     }
-
-    // _onDragStart(event) {
-    //     Hyp3eLogger.info("_onDragStart", `Drag-start event:`, event)
-    //     return super._onDragStart(event)
-    // }
 
     _onDragOver(event) {
         Hyp3eLogger.info("_onDragOver", `Drag-over event:`, event)
