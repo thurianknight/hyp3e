@@ -235,6 +235,7 @@ export async function adjustMoney(actor, cost) {
     // Easy case: adding income to the seller, and exit here
     if (cost > 0) {
         const newTotalCp = totalCp + costCp;
+        // Merchants are automatically upgraded to higher coin denominations
         const newMoney = distributeCopperToCoins(newTotalCp);
         Hyp3eLogger.info("adjustMoney", `Adding coins to seller's purse:`, newMoney);
         await actor.update({ "system.money": newMoney });
@@ -252,22 +253,29 @@ export async function adjustMoney(actor, cost) {
     // Spending money: smallest denominations first
     let accumulator = 0;
     const coins = ["cp", "sp", "ep", "gp", "pp"];
+    const coinsUsed = [];
 
     // Zero out coins as we accumulate value toward the cost
     for (let c of coins) {
         accumulator += (toNumber(money[c].value)) * COIN_TO_CP[c];
         Hyp3eLogger.info("adjustMoney", `Converted ${c} to copper piece value: ${(toNumber(money[c].value)) * COIN_TO_CP[c]}`);
         money[c].value = 0;
+        coinsUsed.push(c);
         if (accumulator >= absCostCp) break;
     }
+    Hyp3eLogger.info("adjustMoney", `Coins used:`, coinsUsed);
 
     // Subtract the cost
     let changeCp = accumulator - absCostCp;
     Hyp3eLogger.info("adjustMoney", `Remaining cp after purchase: ${changeCp}`);
 
+    // Redistribute change only among the used denominations
+    const redistributed = distributeChangeToCoins(changeCp, coinsUsed);
+    Hyp3eLogger.info("adjustMoney", `Buyer's localized change returned in same denominations:`, redistributed);
+
     // Redistribute change into denominations
-    const redistributed = distributeCopperToCoins(changeCp);
-    Hyp3eLogger.info("adjustMoney", `Buyer's redistributed coin after purchase:`, redistributed);
+    // const redistributed = distributeCopperToCoins(changeCp);
+    // Hyp3eLogger.info("adjustMoney", `Buyer's redistributed coin after purchase:`, redistributed);
 
     // Merge redistributed change into cleared money object
     for (let c of coins) {
@@ -279,8 +287,30 @@ export async function adjustMoney(actor, cost) {
 }
 
 /**
+ * Distribute change (in copper) back to the payer using the same denominations that were spent.
+ * This assumes coins were cleared starting from smallest → largest.
+ */
+export function distributeChangeToCoins(changeCp, coinsUsed) {
+    const result = { cp:{value:0}, sp:{value:0}, ep:{value:0}, gp:{value:0}, pp:{value:0} };
+
+    // Work backward from the last denomination used to pay
+    for (let i = coinsUsed.length - 1; i >= 0; i--) {
+        const c = coinsUsed[i];
+        const coinValue = COIN_TO_CP[c];
+        result[c].value = Math.floor(changeCp / coinValue);
+        changeCp = changeCp % coinValue;
+        if (changeCp <= 0) break;
+    }
+
+    // Any leftover rounding cp (should be zero) goes to cp
+    if (changeCp > 0) result.cp.value += changeCp;
+
+    return result;
+}
+
+/**
  * Distribute a copper total into the optimal mix of coins, favoring gold as the standard.
- * Returns a money object matching the system format.
+ * Returns a money object matching the format used by characters and merchants.
  */
 export function distributeCopperToCoins(totalCp) {
     const result = {

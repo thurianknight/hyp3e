@@ -1166,17 +1166,26 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
         // Special case 1: item dragged over a container → assign containerId
         if (targetItem && (targetItem.system.isContainer || targetItem.type === "container")) {
-            return dragged.update({ "system.containerId": targetItem.id });
+            return dragged.update({ 
+                                    "system.location": targetItem.name,
+                                    "system.containerId": targetItem.id
+                                });
         }
 
         // Special case 2: contained item dragged onto a non-contained item → clear containerId
         if (dragged.system.containerId !== "" && targetItem && targetItem.system.containerId === "") {
-            return dragged.update({ "system.containerId": "" });
+            return dragged.update({ 
+                                    "system.location": "",
+                                    "system.containerId": ""
+                                });
         }
 
         // Special case 3: contained item dropped into empty space → clear containerId
         if (dragged.system.containerId && !targetItem) {
-            return dragged.update({ "system.containerId": "" });
+            return dragged.update({ 
+                                    "system.location": "",
+                                    "system.containerId": ""
+                                });
         }
 
         // Default: fall back to built-in sorting
