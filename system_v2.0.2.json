@@ -1,0 +1,50 @@
+{
+  "id": "hyp3e",
+  "title": "Hyperborea 3rd Edition",
+  "description": "The Hyperborea 3rd Edition system for FoundryVTT!",
+  "version": "2.0.2",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13.350",
+    "maximum": "13"
+  },
+  "authors": [
+    {
+      "name": "ThurianKnight",
+      "email": "thurianknight@gmail.com",
+      "url": "https://github.com/thurianknight",
+      "flags": {}
+    },
+    {
+        "name": "wintersleepAI",
+        "flags": {}
+    },
+    {
+        "name": "Xander-Carroll",
+        "flags": {}
+    }
+  ],
+  "esmodules": [
+    "module/hyp3e.mjs"
+  ],
+  "styles": [
+    "css/hyp3e.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json",
+      "flags": {}
+    }
+  ],
+  "primaryTokenAttribute": "hp",
+  "secondaryTokenAttribute": "None",
+  "url": "https://github.com/thurianknight/hyp3e",
+  "manifest": "https://github.com/thurianknight/hyp3e/releases/download/v2.0.2/system.json",
+  "download": "https://github.com/thurianknight/hyp3e/releases/download/v2.0.2/hyp3e.zip",
+  "background": "systems/hyp3e/assets/hyperborea.jpg",
+  "bugs": "https://github.com/thurianknight/hyp3e/issues",
+  "license": "LICENSE.txt",
+  "changelog": "CHANGELOG.md"
+}
