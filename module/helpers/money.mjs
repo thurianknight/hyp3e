@@ -273,10 +273,6 @@ export async function adjustMoney(actor, cost) {
     const redistributed = distributeChangeToCoins(changeCp, coinsUsed);
     Hyp3eLogger.info("adjustMoney", `Buyer's localized change returned in same denominations:`, redistributed);
 
-    // Redistribute change into denominations
-    // const redistributed = distributeCopperToCoins(changeCp);
-    // Hyp3eLogger.info("adjustMoney", `Buyer's redistributed coin after purchase:`, redistributed);
-
     // Merge redistributed change into cleared money object
     for (let c of coins) {
         money[c].value = toNumber(money[c].value) + redistributed[c].value;
