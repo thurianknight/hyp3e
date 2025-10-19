@@ -80,7 +80,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
         },
         details: {
             template: `${HYP3E.templatePath}/item/parts/tab-item-details.hbs`,
-            scrollable: ["", ".main-content"],
+            scrollable: ["", ".main-content", ".tab-content"],
         },
         attributes: {
             template: `${HYP3E.templatePath}/item/parts/tab-item-attributes.hbs`,
