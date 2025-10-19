@@ -19,7 +19,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         },
         classes: ["hyp3e-calendar"],
         position: {
-            width: 550,
+            width: 560,
             height: "auto"
         },
         form: {

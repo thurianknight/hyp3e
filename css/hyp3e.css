@@ -1295,7 +1295,7 @@ textarea {
   -ms-flex-pack: end;
   justify-content: flex-end;
   .item-unequipped {
-    color: rgba(0, 0, 0, 0.2);
+    color: rgba(0, 0, 0, 0.3);
   }
 }
 .hyp3e .items-list .item-controls a {
@@ -1927,12 +1927,12 @@ textarea {
 .hyp3e-calendar .calendar-header {
   text-align: center;
   margin-bottom: 0.5rem;
-  input[type=text] {
+  input[type=number] {
     text-align: center;
     font-weight: bold;
     font-size: large;
-    min-width: 20px;
-    max-width: 50px;
+    min-width: 50px;
+    max-width: 70px;
     margin-right: 5px;
   };
   select {
