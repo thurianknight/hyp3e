@@ -261,6 +261,11 @@ Hooks.once("ready", async function() {
     CONFIG.HYP3E.enforceWeaponEquipRules = enforceWeaponEquipRules;
     Hyp3eLogger.info("Init", "CONFIG Enforce weapon equippage rules:", CONFIG.HYP3E.enforceWeaponEquipRules);
 
+    // Show weapon/shield overlay
+    const showWeaponOverlay = game.settings.get(game.system.id, "showWeaponOverlay");
+    CONFIG.HYP3E.showWeaponOverlay = showWeaponOverlay;
+    Hyp3eLogger.info("Init", "CONFIG Show weapon/shield token overlay:", CONFIG.HYP3E.showWeaponOverlay);
+
     // Enable basic attribute checks
     const enableAttrChecks = game.settings.get(game.system.id, "enableAttrChecks");
     CONFIG.HYP3E.enableAttrChecks = enableAttrChecks;
@@ -559,7 +564,7 @@ Hooks.on("renderTokenHUD", (hud, html, data) => {
  */
 Hooks.on("refreshToken", async (token, tokenState) => {
     // Check config setting
-    if (!game.settings.get(game.system.id, "showWeaponOverlay")) {
+    if (!CONFIG.HYP3E.showWeaponOverlay) {
         if (token.weaponOverlay) {
             token.weaponOverlay.destroy({ children: true });
             token.weaponOverlay = null;
