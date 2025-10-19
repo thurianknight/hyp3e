@@ -14,6 +14,8 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
             icon: "fas fa-swords"
         },
         position: { width: 500, height: "auto" },
+        popOut: true,
+        anchor: null,
         actions: {
             equipItem: HYP3EQuickEquipApp.#equipItem
         }
@@ -65,10 +67,10 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
     _onControlToken(token, controlled) {
         // If our actor’s token is no longer controlled, or if a different token is now controlled
         const selectedTokens = canvas.tokens.controlled; // currently selected tokens
-        Hyp3eLogger.info("_onControlToken", `Currently controlled tokens:`, selectedTokens)
         // If our actor's token is not among the currently selected tokens, close the app
         const ourTokenStillSelected = selectedTokens.some(t => t.actor?.uuid === this.actor.uuid);
         if (!ourTokenStillSelected) {
+            Hyp3eLogger.info("_onControlToken", `${this.actor.name} token is no longer selected, closing Quick-Equip app:`, selectedTokens)
             this.close();
         }
     }
@@ -80,7 +82,6 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
     }
 
     async _prepareContext(options) {
-        Hyp3eLogger.info("_prepareContext", `Actor:`, this.actor);
         const dex = this.actor.system.attributes.dex.value ?? 0;
 
         const weapons = this.actor.items.filter(i => i.type === "weapon");
@@ -116,11 +117,45 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
         return { mainHand, offHand };
     }
 
+    async render(...args) {
+        await super.render(...args);
+
+        // Wait until the app is in the DOM
+        if (!this.rendered) return;
+
+        // Get the token for this actor
+        const token = this.actor.getActiveTokens()[0];
+        if (!token) {
+            Hyp3eLogger.warn("render", `Could not get token for actor ${this.actor.name}!`)
+            return;
+        }
+
+        // Token center in world coordinates
+        const tokenCenter = token.center;
+
+        // Convert to screen coordinates
+        const screen = canvas.stage.worldTransform.apply(tokenCenter);
+
+        // App size (fallback if height not yet calculated)
+        // const appWidth = this.position.width ?? 500;
+        const appWidth = this.element.getBoundingClientRect().width || 500;
+        const appHeight = this.element.getBoundingClientRect().height || 300;
+
+        // Position app left of token, vertically centered
+        const left = screen.x - appWidth - 50;
+        const top = screen.y - appHeight / 2;
+
+        // Apply position
+        this.setPosition({ left, top });
+    }
+
     static async #equipItem(event, target) {
-        Hyp3eLogger.info("#equipItem", `Incoming parameters:`, {event, target});
         const itemId = target.dataset.itemId;
         const item = this.actor.items.get(itemId);
-        if (!item) return;
+        if (!item) {
+            Hyp3eLogger.warn("#equipItem", `Could not get item with ID ${itemId}! Target supplied:`, target);
+            return;
+        }
 
         const currentlyEquipped = item.system.equipped;
         await item.update({ "system.equipped": !currentlyEquipped });

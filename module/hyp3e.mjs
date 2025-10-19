@@ -530,7 +530,7 @@ Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
 Hooks.on("renderTokenHUD", (hud, html, data) => {
     Hyp3eLogger.info("renderTokenHUD", `Incoming parameters for token HUD:`, {hud, html, data})
     const token = hud.object; // Token object
-    const actor = token.actor;
+    const actor = getTokenActor(token);
     // Convert html to jquery
     let $html = $(html)
     // Prevent duplicates
@@ -543,14 +543,13 @@ Hooks.on("renderTokenHUD", (hud, html, data) => {
         </button>
     `);
 
-    // Add to the "status effects" or another section of the HUD
+    // Add to the left side of the HUD
     $html.find(".col.left").append(btn);
 
     // Click handler
     btn.on("click", async (event) => {
         event.preventDefault();
-        Hyp3eLogger.info("renderTokenHUD", `Quick-Equip button clicked!`)
-        // Open your equipment app
+        // Open the quick-equip app
         HYP3EQuickEquipApp.openForActor(actor);
     });
 });

@@ -104,9 +104,9 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
     if (equippedWeapons.length > 2) {
         equippedWeapons.splice(2);
     }
-    // Log the equipped weapon/shield, and token size
+    // Log the equipped weapon/shield, and token
     Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has equipped gear:`, equippedWeapons);
-    Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has token:`, token);
+    // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has token:`, token);
 
     // Create overlay container
     const container = new PIXI.Container();
@@ -116,16 +116,13 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
 
     // Compute pixel dimensions of token
     const gridSize = canvas.grid.size;
-    Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Scene grid size ${gridSize}.`);
-    // const tokenWidth = token.document.width * gridSize * token.scale.x;
-    // const tokenHeight = token.document.height * gridSize * token.scale.y;
-    // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has token size ${tokenWidth} x ${tokenHeight}.`);
+    // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Scene grid size ${gridSize}.`);
     const tokenRenderWidth  = token.mesh.width;
     const tokenRenderHeight = token.mesh.height;
-    Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${actor.name} token rendered size ${tokenRenderWidth} x ${tokenRenderHeight}.`);
+    // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${actor.name} token rendered size ${tokenRenderWidth} x ${tokenRenderHeight}.`);
     const meshScaleX = token.mesh.scale.x;  // usually same for x and y
     const meshScaleY = token.mesh.scale.y;  // usually same for x and y
-    Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${actor.name} token mesh scale ${meshScaleX} x ${meshScaleY}.`);
+    // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${actor.name} token mesh scale ${meshScaleX} x ${meshScaleY}.`);
 
     // Load and add sprites
     for (let [idx, item] of equippedWeapons.entries()) {
@@ -150,20 +147,20 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
                     sprite.anchor.set(0, 0); // Anchor to dead center of token
                     sprite.x = (-tokenRenderWidth / meshScaleX) / 2 + offset;
                     sprite.y = (tokenRenderHeight / meshScaleY) / 2 - spriteSize - offset;
-                    Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #1 (lower left):`, sprite);
+                    // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #1 (lower left):`, sprite);
                 } else {
                     // Secondary weapon: bottom-right corner
                     sprite.anchor.set(0, 0); // Anchor to dead center of token
                     sprite.x = (tokenRenderWidth / meshScaleX) / 2 - spriteSize - offset;
                     sprite.y = (tokenRenderHeight / meshScaleY) / 2 - spriteSize - offset;
-                    Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #2 (lower right):`, sprite);
+                    // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #2 (lower right):`, sprite);
                 }
             } else if (item.type === "shield" || (item.type === "armor" && item.system.type === "shield")) {
                 // Shield: bottom-right corner
                 sprite.anchor.set(0, 0); // Anchor to dead center of token
                 sprite.x = (tokenRenderWidth / meshScaleX) / 2 - spriteSize - offset;
                 sprite.y = (tokenRenderHeight / meshScaleY) / 2 - spriteSize - offset;
-                Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #2 (lower right):`, sprite);
+                // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #2 (lower right):`, sprite);
             }
 
             sprite.alpha = 1.0;
