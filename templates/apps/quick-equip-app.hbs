@@ -1,0 +1,22 @@
+<div class="quick-equip-app row-top">
+  <div class="quick-equip-column main-hand">
+    <h3>Main Hand</h3>
+    <h4>(or dual-wielding)</h4>
+    {{#each mainHand}}
+    <div class="quick-equip-item {{#if equipped}}equipped{{/if}}" data-item-id="{{id}}" data-action="equipItem">
+      <img src="{{img}}" width="32" height="32"/>
+      <span>{{name}}</span>
+    </div>
+    {{/each}}
+  </div>
+
+  <div class="quick-equip-column off-hand">
+    <h3>Off-Hand</h3>
+    {{#each offHand}}
+    <div class="quick-equip-item {{#if equipped}}equipped{{/if}}" data-item-id="{{id}}" data-action="equipItem">
+      <img src="{{img}}" width="32" height="32"/>
+      <span>{{name}}</span>
+    </div>
+    {{/each}}
+  </div>
+</div>

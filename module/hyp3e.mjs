@@ -23,6 +23,7 @@ import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
 import { HYP3ECalendar, 
             setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
+import { HYP3EQuickEquipApp } from "./apps/quick-equip-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
 import { registerHyp3eConfigurations } from "./helpers/register-config.mjs";
 import { applyChatFontSizeSetting } from "./chat/chat.mjs";
@@ -524,6 +525,34 @@ Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
         });
         settingRow.find("input").replaceWith(button);
     }
+});
+
+Hooks.on("renderTokenHUD", (hud, html, data) => {
+    Hyp3eLogger.info("renderTokenHUD", `Incoming parameters for token HUD:`, {hud, html, data})
+    const token = hud.object; // Token object
+    const actor = token.actor;
+    // Convert html to jquery
+    let $html = $(html)
+    // Prevent duplicates
+    if ($html.find(".hyp3e-equip-btn").length) return;
+
+    // Create the new button
+    const btn = $(`
+        <button type="button" class="control-icon hyp3e-equip-btn" data-tooltip="Quick-Equip">
+            <i class="fa-solid fa-swords"></i>
+        </button>
+    `);
+
+    // Add to the "status effects" or another section of the HUD
+    $html.find(".col.left").append(btn);
+
+    // Click handler
+    btn.on("click", async (event) => {
+        event.preventDefault();
+        Hyp3eLogger.info("renderTokenHUD", `Quick-Equip button clicked!`)
+        // Open your equipment app
+        HYP3EQuickEquipApp.openForActor(actor);
+    });
 });
 
 /**

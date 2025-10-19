@@ -485,6 +485,52 @@ textarea {
   padding: 1.2em 1em; /* vertical, horizontal */
 }
 
+.quick-equip-app {
+  gap: 1rem;
+  justify-content: space-between;
+  .window-content {
+    padding: 0 8px;
+    padding-bottom: 8px;
+  }
+}
+
+.quick-equip-column {
+  flex: 1;
+  /* background: rgba(0,0,0,0.25); */
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.quick-equip-column h3 {
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+.quick-equip-column h4 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+}
+
+.quick-equip-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.quick-equip-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.quick-equip-item.equipped {
+  background: rgba(33,150,243,0.4);
+  border: 1px solid var(--color-border-highlight);
+}
+
 /* Styles limited to hyp3e sheets */
 .hyp3e {
   /* Example style for Hyp3e (can be removed if not needed) */
@@ -665,7 +711,7 @@ textarea {
   }
 }
 
-.hyp3e h1, .hyp3e h2, .hyp3e h3 {
+.hyp3e h1, .hyp3e h2, .hyp3e h3, .hyp3e h4 {
   font-family: "Herculanum", sans-serif;
 }
 .hyp3e h2 {
@@ -683,6 +729,9 @@ textarea {
   input[type=text] {
     height: 32px;
   }
+}
+.hyp3e h4 {
+    font-size: small;
 }
 
 .hyp3e .hyp3e-metal img {
