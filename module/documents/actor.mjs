@@ -97,7 +97,6 @@ export class Hyp3eActor extends Actor {
 
         // // Auto-calculate AC, DR, MV if configuration is enabled
         if (CONFIG.HYP3E.autoCalcAc) {
-            // this.getCharacterAcAndMv(this, systemData)
             this.updateCharacterAcAndMv(this, systemData)
         }
 
@@ -340,7 +339,7 @@ export class Hyp3eActor extends Actor {
                 }
             }
         }
-        if (game.settings.get(game.system.id, "enableEncumbrance")) {
+        if (CONFIG.HYP3E.enableEncumbrance) {
             // Encumbered and Heavily Encumbered negatively impact both AC and MV
             if (this.getFlag(game.system.id, "isEncumbered")) {
                 tempAC += 1
@@ -416,7 +415,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Encumbrance
-        if (game.settings.get(game.system.id, "enableEncumbrance")) {
+        if (CONFIG.HYP3E.enableEncumbrance) {
             if (this.getFlag(game.system.id, "isEncumbered")) {
                 ac += 1; mv -= 10;
             } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
@@ -1483,7 +1482,7 @@ export class Hyp3eActor extends Actor {
         const abilityList = ["climb", "decipher script", "discern noise", "hide", "manipulate traps", "move silently", "open locks", "pick pockets", "read scrolls"];
         const thiefAbility = (abilityList.includes(itemNameLower))
         // Are we auto-calculating Thief ability target numbers?
-        if (game.settings.get(game.system.id, "autoCalcThiefTn")) {
+        if (CONFIG.HYP3E.autoCalcThiefTn) {
             if (thiefAbility) {
                 // Calculate & override the roll target in the dataset
                 const target = this._resolveThiefAbilityTn(itemNameLower);
@@ -1654,7 +1653,7 @@ export class Hyp3eActor extends Actor {
 
         dataset.sitMod = 0;
         dataset.sitModList = "";
-        if (game.settings.get(game.system.id, "enableCombatSitModDetection")) {
+        if (CONFIG.HYP3E.enableCombatSitModDetection) {
             const sitModObj = this._getCombatantSitMods(attacker, target); // Assuming this function exists
             dataset.sitMod = parseInt(sitModObj?.sitMod || 0);
             dataset.sitModList = sitModObj?.sitModList || "";
@@ -2201,13 +2200,13 @@ export class Hyp3eActor extends Actor {
                 hit = true;
                 attackTextResult = `<span style='color:#00b34c'><b>Critical Hit!</b></span>`;
                 Hyp3eLogger.info("_determineHitResult", `Natural 20 Crit Hit!`);
-                if (game.settings.get(game.system.id, "critHit")) {
+                if (CONFIG.HYP3E.critHit) {
                     critFooter = `<div class='critical-hit' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
                 }
             } else if (naturalRoll === 1) {
                 attackTextResult = `<span style='color:#e90000'><b>Critical Miss!</b></span>`;
                 Hyp3eLogger.info("_determineHitResult", `Natural 1 Crit Miss!`);
-                if (game.settings.get(game.system.id, "critMiss")) {
+                if (CONFIG.HYP3E.critMiss) {
                     critFooter = `<div class='critical-miss' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
                 }
             } else if (total >= tn) {

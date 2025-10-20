@@ -396,9 +396,9 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         context.rollModes = CONFIG.Dice.rollModes
 
         // We can set these two constants even if they aren't used (when encumbrance is disabled)
-        const encumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "encumbered")
-        const heavilyEncumberedWt = this.actor.system.attributes.str.value * game.settings.get(game.system.id, "heavilyEncumbered")
-        if (game.settings.get(game.system.id, "enableEncumbrance")) {
+        const encumberedWt = this.actor.system.attributes.str.value * CONFIG.HYP3E.encumbered
+        const heavilyEncumberedWt = this.actor.system.attributes.str.value * CONFIG.HYP3E.heavilyEncumbered
+        if (CONFIG.HYP3E.enableEncumbrance) {
             if (context.encumbrance > heavilyEncumberedWt) {
                 Hyp3eLogger.info("_prepareCharacterData", `${this.actor.name} is Heavily Encumbered!`);
                 this.actor.setFlag(game.system.id, "isHeavilyEncumbered", true)

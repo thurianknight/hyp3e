@@ -251,6 +251,11 @@ Hooks.once("ready", async function() {
     const logLevel = game.settings.get(game.system.id, "logLevel");
     CONFIG.HYP3E.logLevel = logLevel;
 
+    // Automatic Thief ability target calculation
+    const autoCalcThiefTn = game.settings.get(game.system.id, "autoCalcThiefTn");
+    CONFIG.HYP3E.autoCalcThiefTn = autoCalcThiefTn;
+    Hyp3eLogger.info("Init", "CONFIG Automatic Thief ability target calculation:", CONFIG.HYP3E.autoCalcThiefTn);
+
     // Automatically calculate AC
     const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");
     CONFIG.HYP3E.autoCalcAc = autoCalcAc;
@@ -275,6 +280,21 @@ Hooks.once("ready", async function() {
     const flipRollUnderMods = game.settings.get(game.system.id, "flipRollUnderMods");
     CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
     Hyp3eLogger.info("Init", "CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods);
+
+    // Enable encumbrance calculations applied to characters
+    const enableEncumbrance = game.settings.get(game.system.id, "enableEncumbrance");
+    CONFIG.HYP3E.enableEncumbrance = enableEncumbrance;
+    Hyp3eLogger.info("Init", "CONFIG Enable encumbrance calculations applied to characters:", CONFIG.HYP3E.enableEncumbrance);
+    
+    // GM-defined strength multiplier for encumbered status
+    const encumbered = game.settings.get(game.system.id, "encumbered");
+    CONFIG.HYP3E.encumbered = encumbered;
+    Hyp3eLogger.info("Init", "CONFIG Strength multiplier for encumbered status:", CONFIG.HYP3E.encumbered);
+
+    // GM-defined strength multiplier for heavily encumbered status
+    const heavilyEncumbered = game.settings.get(game.system.id, "heavilyEncumbered");
+    CONFIG.HYP3E.heavilyEncumbered = heavilyEncumbered;
+    Hyp3eLogger.info("Init", "CONFIG Strength multiplier for heavily encumbered status:", CONFIG.HYP3E.heavilyEncumbered);
 
     // Enable/disable group-based initiative
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
@@ -303,8 +323,20 @@ Hooks.once("ready", async function() {
     CONFIG.HYP3E.forceSpellMemorize = forceSpellMemorize;
     Hyp3eLogger.info("Init", "CONFIG Force spell memorization to cast:", CONFIG.HYP3E.forceSpellMemorize);
 
-    // Set crit configs
-    //const critHits = game.settings.get(game.system.id, "critHits");
+    // Enable combat situational modifier detection
+    const enableCombatSitModDetection = game.settings.get(game.system.id, "enableCombatSitModDetection");
+    CONFIG.HYP3E.enableCombatSitModDetection = enableCombatSitModDetection;
+    Hyp3eLogger.info("Init", "CONFIG Enable combat situational modifier detection:", CONFIG.HYP3E.enableCombatSitModDetection);
+
+    // Enable critical hit rolls
+    const critHit = game.settings.get(game.system.id, "critHit");
+    CONFIG.HYP3E.critHit = critHit;
+    Hyp3eLogger.info("Init", "CONFIG Enable critical hit rolls:", CONFIG.HYP3E.critHit);
+
+    // Enable critical miss rolls
+    const critMiss = game.settings.get(game.system.id, "critMiss");
+    CONFIG.HYP3E.critMiss = critMiss;
+    Hyp3eLogger.info("Init", "CONFIG Enable critical miss rolls:", CONFIG.HYP3E.critMiss);
 
     // Load races list
     const races = game.settings.get(game.system.id, "races");
@@ -703,12 +735,12 @@ Hooks.on("preUpdateItem", async (item, update) => {
     // When a armor or weapons are equipped, ensure that any others are unequipped
 
     // Check config setting for weapons & shields
-    if (game.settings.get(game.system.id, "enforceWeaponEquipRules")) {
+    if (CONFIG.HYP3E.enforceWeaponEquipRules) {
         await actor.enforceWeaponEquipRules(item);
     }
 
     // Check config setting for armor
-    if (item.type === "armor" && game.settings.get(game.system.id, "autoCalcAc")) {
+    if (item.type === "armor" && CONFIG.HYP3E.autoCalcAc) {
         await actor.enforceSingleArmor(item);
     }
 });

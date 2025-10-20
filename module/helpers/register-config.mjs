@@ -116,7 +116,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.showWeaponOverlay = value;
+        }
     });
 
     // Resize tokens for small & large NPCs
@@ -127,7 +130,7 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: false,
+        requiresReload: true,
     });
 
     /********************************************
@@ -142,7 +145,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: false
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.autoCalcThiefTn = value;
+        }
     });
 
     // Automatic Armor Class calculation
@@ -153,7 +159,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.autoCalcAc = value;
+        }
     });
 
     // Enforce weapon equippage rules
@@ -164,7 +173,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: false
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.enforceWeaponEquipRules = value;
+        }
     });
 
     // Reverse situational modifiers on roll-under checks
@@ -175,7 +187,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.flipRollUnderMods = value;
+        }
     });
 
     // Enable encumbrance calculations applied to characters
@@ -186,7 +201,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.enableEncumbrance = value;
+        }
     });
     // GM-defined strength multiplier for encumbered status
     game.settings.register(game.system.id, "encumbered", {
@@ -197,6 +215,9 @@ export function registerHyp3eConfigurations() {
         type: Number,
         config: showConfigOptions,
         requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.encumbered = value;
+        }
     });
     // GM-defined strength multiplier for heavily encumbered status
     game.settings.register(game.system.id, "heavilyEncumbered", {
@@ -207,6 +228,9 @@ export function registerHyp3eConfigurations() {
         type: Number,
         config: showConfigOptions,
         requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.heavilyEncumbered = value;
+        }
     });
 
     /********************************************
@@ -232,6 +256,7 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: String,
         config: showConfigOptions,
+        requiresReload: true,
         choices: {
             keep: "HYP3E.settings.initiativeKeep",
             reset: "HYP3E.settings.initiativeReset",
@@ -248,7 +273,10 @@ export function registerHyp3eConfigurations() {
             scope: "world",
             type: Boolean,
             config: showConfigOptions,
-            requiresReload: true,
+            requiresReload: false,
+            onChange: value => {
+                CONFIG.HYP3E.limitMovement = value;
+            }
         });
     }
 
@@ -260,7 +288,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.forceRangeLimit = value;
+        }
     });
 
     // Force weapon equippage to use
@@ -271,7 +302,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.forceWeaponEquip = value;
+        }
     });
 
     // Force spell memorization to cast
@@ -282,7 +316,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.forceSpellMemorize = value;
+        }
     });
 
     // Enable combat situational modifier detection
@@ -293,7 +330,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.enableCombatSitModDetection = value;
+        }
     });
 
     // Enable basic attribute checks
@@ -308,7 +348,10 @@ export function registerHyp3eConfigurations() {
             "3d6": "3d6 roll-under"
         },
         config: showConfigOptions,
-        requiresReload: true,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.enableAttrChecks = value;
+        }
     });
 
     // Critical hit
@@ -319,7 +362,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.critHit = value;
+        }
     });
     
     // Critical Miss
@@ -330,7 +376,10 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         type: Boolean,
         config: showConfigOptions,
-        requiresReload: true,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.critMiss = value;
+        }
     });
 
     // Damage types & resistances
