@@ -179,6 +179,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             }).render(true);
         } else if (updated) {
             ui.notifications.info("Hyperborea Configuration Settings saved.");
+            this.close();
         }
 
         return false;

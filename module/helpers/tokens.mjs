@@ -127,7 +127,7 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
     // Load and add sprites
     for (let [idx, item] of equippedWeapons.entries()) {
         try {
-            const texture = await loadTexture(item.img);  // works with svg/webp/png/jpg
+            const texture = await foundry.canvas.loadTexture(item.img);  // works with svg/webp/png/jpg
             const sprite = new PIXI.Sprite(texture);
 
             // Compute 1/3 of visible token width for sprite size
