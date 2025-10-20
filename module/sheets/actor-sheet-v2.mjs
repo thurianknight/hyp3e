@@ -1,8 +1,8 @@
 import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { parseGpValue, 
-            handleMerchantPurchase,
-            handleMerchantSale } from "../helpers/money.mjs";
+            buyFromMerchant,
+            sellToMerchant } from "../helpers/money.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { enableItemEffectsOnActor, 
             disableItemEffectsOnActor, 
@@ -1145,13 +1145,13 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         const sourceActor = item?.parent;
         if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
             // Perform the merchant transaction and return early
-            await handleMerchantPurchase(this.actor, sourceActor, item);
+            await buyFromMerchant(this.actor, sourceActor, item);
             return; // stops Foundry from calling super._onDropItem()
         }
         // Handle character → merchant drag
         if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "merchant") {
             // Perform the sale to merchant and return early
-            await handleMerchantSale(this.actor, sourceActor, item);
+            await sellToMerchant(this.actor, sourceActor, item);
             return; // stops Foundry from calling super._onDropItem()
         }
 

@@ -91,13 +91,13 @@ export function getTotalMoney(money) {
 }
 
 /**
- * Logic to handle buying an item from a merchant-actor
+ * Handle buying an item from a merchant-actor
  * @param {*} buyer 
  * @param {*} merchant 
  * @param {*} item 
  * @returns 
  */
-export async function handleMerchantPurchase(buyer, merchant, item) {
+export async function buyFromMerchant(buyer, merchant, item) {
     const itemData = item.toObject();
     const basePrice = getItemBasePrice(itemData);
     const itemName = itemData.name;
@@ -105,10 +105,10 @@ export async function handleMerchantPurchase(buyer, merchant, item) {
     // Final price is rounded to the nearest .01, or half a copper piece
     const sellPrice = Math.round(basePrice * sellMult * 100)/100;
     const merchantQty = parseInt(item.system.quantity?.value) ?? 1;
-    Hyp3eLogger.info("handleMerchantPurchase", `Seller's price in gp:`, sellPrice)
+    Hyp3eLogger.info("buyFromMerchant", `Seller's price in gp:`, sellPrice)
 
     const buyerFunds = getTotalMoney(buyer.system.money);
-    Hyp3eLogger.info("handleMerchantPurchase", `Buyer's available funds in gp:`, buyerFunds)
+    Hyp3eLogger.info("buyFromMerchant", `Buyer's available funds in gp:`, buyerFunds)
 
     let maxQty = 1000;
     if (!merchant.system.ignoreQty) {
@@ -206,13 +206,13 @@ export async function handleMerchantPurchase(buyer, merchant, item) {
 }
 
 /**
- * Logic to handle selling an item to a merchant-actor
+ * Handle selling an item to a merchant-actor
  * @param {*} buyer 
  * @param {*} merchant 
  * @param {*} item 
  * @returns 
  */
-export async function handleMerchantSale(merchant, seller, item) {
+export async function sellToMerchant(merchant, seller, item) {
     const itemData = item.toObject();
     const basePrice = getItemBasePrice(itemData);
     const itemName = itemData.name;
@@ -220,27 +220,18 @@ export async function handleMerchantSale(merchant, seller, item) {
     // Final price is rounded to the nearest .01, or half a copper piece
     const buyPrice = Math.round(basePrice * buyMult * 100)/100;
     const sellerQty = parseInt(item.system.quantity?.value) ?? 1;
-    Hyp3eLogger.info("handleMerchantSale", `Merchant's buying price in gp:`, buyPrice)
+    Hyp3eLogger.info("sellToMerchant", `Merchant's buying price in gp:`, buyPrice)
 
     const merchantFunds = getTotalMoney(merchant.system.money);
-    Hyp3eLogger.info("handleMerchantSale", `Merchant's available funds in gp:`, merchantFunds)
+    Hyp3eLogger.info("sellToMerchant", `Merchant's available funds in gp:`, merchantFunds)
 
-    let maxQty = 1000;
-    if (!merchant.system.ignoreQty) {
-        // Handle max purchase qty based on seler qty and merchant wealth
-        if (sellerQty <= 0) {
-            return ui.notifications.warn(`${seller.name} has no ${itemName} to sell!`);
-        }
-        maxQty = Math.min(sellerQty, Math.floor(merchantFunds / buyPrice));
-        if (maxQty <= 0) {
-            return ui.notifications.warn(`${merchant.name} cannot afford ${buyPrice} gp.`);
-        }
-    } else {
-        // Ignore merchant available coin, only consider seller's qty
-        maxQty = sellerQty;
-        if (maxQty <= 0) {
-            return ui.notifications.warn(`${merchant.name} cannot afford ${sellPrice} gp.`);
-        }
+    // Handle max purchase qty based on seller qty and merchant wealth
+    if (sellerQty <= 0) {
+        return ui.notifications.warn(`${seller.name} has no ${itemName} to sell!`);
+    }
+    const maxQty = Math.min(sellerQty, Math.floor(merchantFunds / buyPrice));
+    if (maxQty <= 0) {
+        return ui.notifications.warn(`${merchant.name} cannot afford ${buyPrice} gp.`);
     }
 
     const qty = await Dialog.prompt({
@@ -278,11 +269,9 @@ export async function handleMerchantSale(merchant, seller, item) {
 
     const totalPrice = Math.round(buyPrice * qty * 100) / 100;
 
-    if (!merchant.system.ignoreQty) {
-        // Check again whether the merchant can afford this item at this qty
-        if (merchantFunds < totalPrice) {
-            return ui.notifications.warn(`${merchant.name} cannot afford ${totalPrice} gp!`);
-        }
+    // Check again whether the merchant can afford this item at this qty
+    if (merchantFunds < totalPrice) {
+        return ui.notifications.warn(`${merchant.name} cannot afford ${totalPrice} gp!`);
     }
 
     // Update money for buyer & seller
@@ -348,16 +337,12 @@ export async function adjustMoney(actor, cost) {
 
     // Easy case: adding income to the seller, and exit here
     if (cost > 0) {
-        const newTotalCp = totalCp + costCp;
-        // Buyers are automatically upgraded toward gold pieces when possible
-        const newMoney = distributeCopperToCoins(newTotalCp);
+        // Convert the purchase cp value to distributed coin, and add to the seller's purse
+        const newMoney = distributeCopperToCoins(costCp);
         Hyp3eLogger.info("adjustMoney", `Adding coins to seller's purse:`, newMoney);
-        await actor.update({ "system.money": newMoney });
-        return true;
-    }
-
-    // If we are ignoring the merchant's inventory, we also ignore spending money
-    if (actor.system.ignoreQty) {
+        const mergeMoney = mergeStructuredMoney(money, newMoney);
+        console.log(mergeMoney);
+        await actor.update({ "system.money": mergeMoney });
         return true;
     }
 
@@ -436,7 +421,8 @@ export function distributeCopperToCoins(totalCp) {
         pp: { value: 0 }
     };
 
-    const coins = ["pp", "gp", "ep", "sp", "cp"];
+    // const coins = ["pp", "gp", "ep", "sp", "cp"];
+    const coins = ["gp", "ep", "sp", "cp"];
     let remaining = totalCp;
     const PP_CAP = 0.1;
 
@@ -458,4 +444,21 @@ export function distributeCopperToCoins(totalCp) {
     }
 
     return result;
+}
+
+/**
+ * Safely merge two structured money objects (e.g. from Foundry actor.system.money).
+ * Does not mutate inputs.
+ */
+export function mergeStructuredMoney(a, b) {
+    const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+    const merged = {};
+
+    for (const k of allKeys) {
+        const aVal = Number(a[k]?.value) ?? 0;
+        const bVal = Number(b[k]?.value) ?? 0;
+        merged[k] = { value: aVal + bVal };
+    }
+
+    return merged;
 }
