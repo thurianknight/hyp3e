@@ -2663,6 +2663,15 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
+     * Determine whether this container has any items inside
+     */
+    _itemContainsStuff(itemId) {
+        Hyp3eLogger.info("_itemContainsStuff", `Item id ${itemId} contains items:`, this.items.filter(i => i.system.containerId === itemId));
+        const containsItems = this.items.some(i => i.system.containerId == itemId);
+        return containsItems;
+    }
+
+    /**
      * Handle active effects that might expire, or events that occur, with a new turn.
      * @param {*} turn - The current game-world turn number.
      */

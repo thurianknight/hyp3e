@@ -1150,6 +1150,13 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         }
         // Handle character → merchant drag
         if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "merchant") {
+            // If selling a container, it must be empty
+            if (item._isContainer() && item.contents.length > 0) {
+                const msg = `Container ${item.name} is not empty! Remove all items from it first, before selling it.`;
+                Hyp3eLogger.warn("_onDropItem", msg);
+                ui.notifications.warn(msg);
+                return;
+            }
             // Perform the sale to merchant and return early
             await sellToMerchant(this.actor, sourceActor, item);
             return; // stops Foundry from calling super._onDropItem()
@@ -1172,11 +1179,19 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         }
 
         // Special case 1: item dragged over a container → assign containerId
+        //  But we only do this for characters & npcs, not merchants
         if (targetItem && (targetItem.system.isContainer || targetItem.type === "container")) {
-            return dragged.update({ 
-                                    "system.location": targetItem.name,
-                                    "system.containerId": targetItem.id
-                                });
+            if (this.actor.type !== "merchant") {
+                return dragged.update({ 
+                                        "system.location": targetItem.name,
+                                        "system.containerId": targetItem.id
+                                    });
+            } else {
+                const msg = `Merchant inventory must be stand-alone, not in containers.`;
+                Hyp3eLogger.warn("_onSortItem", msg);
+                ui.notifications.warn(msg);
+                return;
+            }
         }
 
         // Special case 2: contained item dragged onto a non-contained item → clear containerId
