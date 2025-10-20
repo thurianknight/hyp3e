@@ -206,6 +206,120 @@ export async function handleMerchantPurchase(buyer, merchant, item) {
 }
 
 /**
+ * Logic to handle selling an item to a merchant-actor
+ * @param {*} buyer 
+ * @param {*} merchant 
+ * @param {*} item 
+ * @returns 
+ */
+export async function handleMerchantSale(merchant, seller, item) {
+    const itemData = item.toObject();
+    const basePrice = getItemBasePrice(itemData);
+    const itemName = itemData.name;
+    const buyMult = parseFloat(merchant.system?.buyMultiplier) ?? 1.0;
+    // Final price is rounded to the nearest .01, or half a copper piece
+    const buyPrice = Math.round(basePrice * buyMult * 100)/100;
+    const sellerQty = parseInt(item.system.quantity?.value) ?? 1;
+    Hyp3eLogger.info("handleMerchantSale", `Merchant's buying price in gp:`, buyPrice)
+
+    const merchantFunds = getTotalMoney(merchant.system.money);
+    Hyp3eLogger.info("handleMerchantSale", `Merchant's available funds in gp:`, merchantFunds)
+
+    let maxQty = 1000;
+    if (!merchant.system.ignoreQty) {
+        // Handle max purchase qty based on seler qty and merchant wealth
+        if (sellerQty <= 0) {
+            return ui.notifications.warn(`${seller.name} has no ${itemName} to sell!`);
+        }
+        maxQty = Math.min(sellerQty, Math.floor(merchantFunds / buyPrice));
+        if (maxQty <= 0) {
+            return ui.notifications.warn(`${merchant.name} cannot afford ${buyPrice} gp.`);
+        }
+    } else {
+        // Ignore merchant available coin, only consider seller's qty
+        maxQty = sellerQty;
+        if (maxQty <= 0) {
+            return ui.notifications.warn(`${merchant.name} cannot afford ${sellPrice} gp.`);
+        }
+    }
+
+    const qty = await Dialog.prompt({
+        title: `${itemName} Sell Quantity`,
+        content: `
+            <p>${seller.name} has <strong>${sellerQty}</strong> ${item.name}(s) to sell at <strong>${buyPrice}</strong> gp each.</p>
+            <p>
+                <label>How many would you like to sell? (Max: ${maxQty})</label>
+                <input type="number" id="qty" min="1" max="${maxQty}" value="1" 
+                    style="width:80px; text-align: center;">
+            </p>
+            <p id="total" style="font-weight:bold;">Total: ${buyPrice.toFixed(2)} gp</p>
+        `,
+        label: "Sell",
+        callback: html => {
+            const val = parseInt(html.find("#qty").val() ?? "1");
+            if (isNaN(val) || val < 0) return 0;
+            return Math.clamped(val, 1, maxQty);
+        },
+        rejectClose: false,
+        render: html => {
+            const $input = html.find("#qty");
+            const $total = html.find("#total");
+            const updateTotal = () => {
+                const val = Number($input.val());
+                const qty = Math.clamped(Math.floor(val || 1), 1, maxQty);
+                const total = Math.round(qty * buyPrice * 100) / 100;
+                $total.text(`Total: ${total.toFixed(2)} gp`);
+            };
+            $input.on("input", updateTotal);
+            $input.focus();
+        }
+    });
+    if (!qty) return;
+
+    const totalPrice = Math.round(buyPrice * qty * 100) / 100;
+
+    if (!merchant.system.ignoreQty) {
+        // Check again whether the merchant can afford this item at this qty
+        if (merchantFunds < totalPrice) {
+            return ui.notifications.warn(`${merchant.name} cannot afford ${totalPrice} gp!`);
+        }
+    }
+
+    // Update money for buyer & seller
+    await adjustMoney(seller, totalPrice);
+    await adjustMoney(merchant, -totalPrice);
+
+    // Adjust the seller's qty on hand
+    const newSellerQty = Math.ceil(sellerQty - qty, 0);
+    if (newSellerQty <= 0) {
+        await item.delete(); // Seller sold it all
+    } else {
+        await item.update({ "system.quantity.value": newSellerQty });
+    }
+
+    // Check if the merchant already has this item (match by name & type)
+    const existing = merchant.items.find(i =>
+        i.name === item.name &&
+        i.type === item.type
+    );
+
+    // Add to merchant's existing qty or create new
+    if (existing) {
+        const newQty = toNumber(existing.system.quantity.value) + qty;
+        await existing.update({ "system.quantity.value": newQty });
+        ui.notifications.info(
+            `${merchant.name} buys ${qty} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`
+        );
+    } else {
+        itemData.system.quantity.value = qty;
+        await merchant.createEmbeddedDocuments("Item", [itemData]);
+        ui.notifications.info(
+            `${merchant.name} buys ${qty} ${item.name}(s) for ${totalPrice} gp from ${seller.name}.`
+        );
+    }
+}
+
+/**
  * Adjusts an actor's money by a given amount (in gp-equivalent), spending smallest denominations first.
  * Handles proper denomination exchange and change-making.
  * Negative cost = spend money
@@ -235,10 +349,15 @@ export async function adjustMoney(actor, cost) {
     // Easy case: adding income to the seller, and exit here
     if (cost > 0) {
         const newTotalCp = totalCp + costCp;
-        // Merchants are automatically upgraded to higher coin denominations
+        // Buyers are automatically upgraded toward gold pieces when possible
         const newMoney = distributeCopperToCoins(newTotalCp);
         Hyp3eLogger.info("adjustMoney", `Adding coins to seller's purse:`, newMoney);
         await actor.update({ "system.money": newMoney });
+        return true;
+    }
+
+    // If we are ignoring the merchant's inventory, we also ignore spending money
+    if (actor.system.ignoreQty) {
         return true;
     }
 
