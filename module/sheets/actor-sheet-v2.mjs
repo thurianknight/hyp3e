@@ -1144,7 +1144,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Handle merchant → character drag
         const sourceActor = item?.parent;
         if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
-            // Perform the merchant transaction and return early
+            // Perform the merchant transaction and exit early
             await buyFromMerchant(this.actor, sourceActor, item);
             return; // stops Foundry from calling super._onDropItem()
         }
@@ -1157,9 +1157,9 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 ui.notifications.warn(msg);
                 return;
             }
-            // Perform the sale to merchant and return early
+            // Perform the sale to merchant and exit early
             await sellToMerchant(this.actor, sourceActor, item);
-            return; // stops Foundry from calling super._onDropItem()
+            return;
         }
 
         // Otherwise let normal copy-item behavior proceed
