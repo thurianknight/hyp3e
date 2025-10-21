@@ -330,37 +330,37 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 switch (k) {
                     case "str":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.warn("_prepareCharacterData", `ST is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.info("_prepareCharacterData", `ST is too low for ${context.system.details.class}!`)
                             context.warnStr = true
                         }
                         break
                     case "dex":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.warn("_prepareCharacterData", `DX is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.info("_prepareCharacterData", `DX is too low for ${context.system.details.class}!`)
                             context.warnDex = true
                         }
                         break
                     case "con":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.warn("_prepareCharacterData", `CN is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.info("_prepareCharacterData", `CN is too low for ${context.system.details.class}!`)
                             context.warnCon = true
                         }
                         break
                     case "int":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.warn("_prepareCharacterData", `IN is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.info("_prepareCharacterData", `IN is too low for ${context.system.details.class}!`)
                             context.warnInt = true
                         }
                         break
                     case "wis":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.warn("_prepareCharacterData", `WS is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.info("_prepareCharacterData", `WS is too low for ${context.system.details.class}!`)
                             context.warnWis = true
                         }
                         break
                     case "cha":
                         if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.warn("_prepareCharacterData", `CH is too low for ${context.system.details.class}!`)
+                            Hyp3eLogger.info("_prepareCharacterData", `CH is too low for ${context.system.details.class}!`)
                             context.warnCha = true
                         }
                         break
