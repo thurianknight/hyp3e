@@ -3871,7 +3871,7 @@ export class Hyp3eCharacter {
 
         const startingItems = classData.startingPack?.[packKey];
         if (!Array.isArray(startingItems) || startingItems.length === 0) {
-            Hyp3eLogger.warn("getDefaultItemsForClass", `No starting ${itemType} defined for class ${charClass}.`);
+            Hyp3eLogger.info("getDefaultItemsForClass", `No starting ${itemType} of type ${packKey} defined for class ${charClass}.`);
             return [];
         }
 
