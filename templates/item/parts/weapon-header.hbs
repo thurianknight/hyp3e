@@ -6,8 +6,8 @@
           <div class="resource flexrow flex-group-center">
             <label class="resource-label">{{localize 'HYP3E.weapon.atkType'}}</label>
             <div class="flexrow">
-              <a class="{{#unless system.melee}}no-bonus{{/unless}}" data-action="toggleWeaponType" data-attack-type="melee" title='{{localize "HYP3E.weapon.type.melee"}}'><i class="fas fa-sword"></i></a>
-              <a class="{{#unless system.missile}}no-bonus{{/unless}}" data-action="toggleWeaponType" data-attack-type="missile" title='{{localize "HYP3E.weapon.type.missile"}}'><i class="fas fa-bow-arrow"></i></a>
+              <a class="{{#unless system.melee}}not-selected{{/unless}}" data-action="toggleWeaponType" data-attack-type="melee" title='{{localize "HYP3E.weapon.type.melee"}}'><i class="fas fa-sword"></i></a>
+              <a class="{{#unless system.missile}}not-selected{{/unless}}" data-action="toggleWeaponType" data-attack-type="missile" title='{{localize "HYP3E.weapon.type.missile"}}'><i class="fas fa-bow-arrow"></i></a>
             </div>
           </div>
           {{#if system.melee}}

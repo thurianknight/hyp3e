@@ -900,8 +900,8 @@ textarea {
   font-weight: bold;
   padding: 5px 5px;
 }
-.no-bonus {
-  color: rgba(0, 0, 0, 0.2);
+.not-selected {
+  opacity: 0.3;
 }
 
 /* Character Combat-tab styles */
@@ -1295,7 +1295,7 @@ textarea {
   -ms-flex-pack: end;
   justify-content: flex-end;
   .item-unequipped {
-    color: rgba(0, 0, 0, 0.3);
+    opacity: 0.3;
   }
 }
 .hyp3e .items-list .item-controls a {

@@ -58,8 +58,8 @@
         <div class="resource flexrow flex-group-center">
           <label class="resource-label">{{localize 'HYP3E.weapon.atkType'}}</label>
           <div class="flexrow">
-            <a class="weapon-type {{#unless system.melee}}no-bonus{{/unless}}" data-attack-type="melee" title='{{localize "HYP3E.weapon.type.melee"}}'><i class="fas fa-sword"></i></a>
-            <a class="weapon-type {{#unless system.missile}}no-bonus{{/unless}}" data-attack-type="missile" title='{{localize "HYP3E.weapon.type.missile"}}'><i class="fas fa-bow-arrow"></i></a>
+            <a class="weapon-type {{#unless system.melee}}not-selected{{/unless}}" data-attack-type="melee" title='{{localize "HYP3E.weapon.type.melee"}}'><i class="fas fa-sword"></i></a>
+            <a class="weapon-type {{#unless system.missile}}not-selected{{/unless}}" data-attack-type="missile" title='{{localize "HYP3E.weapon.type.missile"}}'><i class="fas fa-bow-arrow"></i></a>
           </div>
         </div>
         {{#if system.melee}}
@@ -109,8 +109,8 @@
         <div class="flexshrink flex-group-center item-attributes">
           <label class="resource-label">{{localize 'HYP3E.headers.hands'}}</label>
           <div class="flexrow">
-            <a class="weapon-hands {{#unless (eq system.hands 1)}}no-bonus{{/unless}}" data-hands="1" title='{{localize "HYP3E.weapon.hands.one"}}'><i class="fas fa-hand"></i></a>
-            <a class="weapon-hands {{#unless (eq system.hands 2)}}no-bonus{{/unless}}" data-hands="2" title='{{localize "HYP3E.weapon.hands.two"}}'><i class="fas fa-hands"></i></a>
+            <a class="weapon-hands {{#unless (eq system.hands 1)}}not-selected{{/unless}}" data-hands="1" title='{{localize "HYP3E.weapon.hands.one"}}'><i class="fas fa-hand"></i></a>
+            <a class="weapon-hands {{#unless (eq system.hands 2)}}not-selected{{/unless}}" data-hands="2" title='{{localize "HYP3E.weapon.hands.two"}}'><i class="fas fa-hands"></i></a>
           </div>
           <hr class="plain-hr"/>
           {{!-- Attack and Damage Modifiers --}}
@@ -170,8 +170,8 @@
           {{/if}}
           <label class="resource-label">{{localize 'HYP3E.headers.weaponMastery'}}</label>
           <div class="flexrow">
-            <a class="weapon-mastery {{#unless system.wpnMaster}}no-bonus{{/unless}}" data-mastery="master" title='{{localize "HYP3E.weapon.master"}}'><i class="fas fa-sword"></i></a>
-            <a class="weapon-mastery {{#unless system.wpnGrandmaster}}no-bonus{{/unless}}" data-mastery="grandMaster" title='{{localize "HYP3E.weapon.grandMaster"}}'><i class="fas fa-swords"></i></a>
+            <a class="weapon-mastery {{#unless system.wpnMaster}}not-selected{{/unless}}" data-mastery="master" title='{{localize "HYP3E.weapon.master"}}'><i class="fas fa-sword"></i></a>
+            <a class="weapon-mastery {{#unless system.wpnGrandmaster}}not-selected{{/unless}}" data-mastery="grandMaster" title='{{localize "HYP3E.weapon.grandMaster"}}'><i class="fas fa-swords"></i></a>
           </div>
           {{#if isGM}}
           <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
