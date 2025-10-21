@@ -26,9 +26,10 @@ export async function handleDamageRollButtons(html) {
         const itemUuid = $(b).data('itemUuid');
         const actorId = $(b).data('actorId');
         const tokenId = $(b).data('tokenId');
+        const buttonText = damageType.toLowerCase().includes("heal") ? "Healing" : "Damage"
 
         let dmgButton = $(
-            `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>Damage: ${dmgFormula}</button>`
+            `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>${buttonText}: ${dmgFormula}</button>`
         );
         dmgRollElement.append(dmgButton);
 
@@ -278,7 +279,8 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
         naturalDmgRoll = dmgRoll.total
     }
 
-    const title = "Rolling Damage..."
+    const damageText = damageType.toLowerCase().includes("heal") ? "Healing" : "Damage"
+    const title = `Rolling ${damageText}...`
     const templateData = {
         title: title,
         dmgRoll: dmgRoll,

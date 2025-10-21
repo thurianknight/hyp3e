@@ -29,7 +29,11 @@
         </div>
         <div class="dice-roll">
             <div class="dice-formula flexrow">
+                {{#if (eq damageType "healing")}}
+                <span class="dice-damage">{{dmgRoll.total}} HP healing!</span>
+                {{else}}
                 <span class="dice-damage">{{dmgRoll.total}} HP damage!</span>
+                {{/if}}
                 <span class="damage-button flexrow" data-total="{{dmgRoll.total}}"  
                     data-natural="{{naturalDmgRoll}}" 
                     data-roll="{{dmgBaseRoll}}" 

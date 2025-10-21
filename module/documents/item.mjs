@@ -76,9 +76,16 @@ export class Hyp3eItem extends Item {
         }
 
         // Fix weapon & spell missing or invalid damage type
+        // if (["weapon", "spell"].includes(this.type)) {
+        //     if (!CONFIG.HYP3E.damageTypes[itemData.dmgType]) {
+        //         Hyp3eLogger.warn("prepareData", `Invalid damage type ${itemData.dmgType} on ${this.name}. Setting to Basic...`)
+        //         itemData.dmgType = "basic"
+        //     }
+        // }
+        // Fix weapon & spell missing damage type
         if (["weapon", "spell"].includes(this.type)) {
-            if (!CONFIG.HYP3E.damageTypes[itemData.dmgType]) {
-                Hyp3eLogger.warn("prepareData", `Invalid damage type on ${this.name}. Setting to Basic...`)
+            if (itemData?.dmgType.trim() === "") {
+                Hyp3eLogger.warn("prepareData", `No damage type set on ${this.name}. Setting to Basic...`)
                 itemData.dmgType = "basic"
             }
         }

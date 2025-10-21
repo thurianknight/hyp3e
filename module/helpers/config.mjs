@@ -206,6 +206,7 @@ HYP3E.damageTypes = {
     "pain": "HYP3E.weapon.damageTypes.pain",
     "poison": "HYP3E.weapon.damageTypes.poison",
     "positive": "HYP3E.weapon.damageTypes.positive",
+    "healing": "HYP3E.weapon.damageTypes.healing",
 }
 
 /**

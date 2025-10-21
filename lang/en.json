@@ -464,7 +464,8 @@
                 "negative": "Negative Energy",
                 "pain": "Pain",
                 "poison": "Poison",
-                "positive": "Positive Energy"
+                "positive": "Positive Energy",
+                "healing": "Healing"
             },
             "attributes": {
                 "usesAmmo": "The Uses Ammo tag allows this item to decrement ammunition on attacks.",
