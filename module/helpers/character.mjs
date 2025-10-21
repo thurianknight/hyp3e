@@ -3811,7 +3811,7 @@ export class Hyp3eCharacter {
             if (metReqs) {
                 Hyp3eLogger.info("rollAttributesForClass", `Character meets class requirements for ${charClass}, attributes rolled:`, attributes);
             } else {
-                Hyp3eLogger.warn("rollAttributesForClass", `Character does not meet class requirements for ${charClass}, rolling again...`)
+                Hyp3eLogger.info("rollAttributesForClass", `Character does not meet class requirements for ${charClass}, rolling again...`)
             }
         }
         // If we reach here, we have a set of attributes that meets the class requirements
@@ -3845,7 +3845,7 @@ export class Hyp3eCharacter {
         for (const [attr, minValue] of Object.entries(classData.attrReqs)) {
             Hyp3eLogger.info("_checkAttrRequirements", `Checking ${attr} requirement for class ${charClass}: Required: ${minValue}, Rolled: ${attributes[attr]}`);
             if (attributes[attr] < minValue) {
-                Hyp3eLogger.warn("_checkAttrRequirements", `Character does not meet ${attr} requirement for class ${charClass}. Required: ${minValue}, Rolled: ${attributes[attr]}`);
+                Hyp3eLogger.info("_checkAttrRequirements", `Character does not meet ${attr} requirement for class ${charClass}. Required: ${minValue}, Rolled: ${attributes[attr]}`);
                 return false;
             }
         }
@@ -3933,7 +3933,7 @@ export class Hyp3eCharacter {
 
             // Fallback item
             if (!newItem) {
-            Hyp3eLogger.warn("getDefaultItemsForClass", `Item ${entry.name} not found. Creating fallback.`);
+            Hyp3eLogger.info("getDefaultItemsForClass", `Item ${entry.name} not found. Creating fallback.`);
             newItem = {
                 name: entry.name,
                 type: itemType,
@@ -4246,7 +4246,7 @@ export class Hyp3eCharacter {
                             if (thisClass.attrReqs.str) {
                                 Hyp3eLogger.info("setAttributeMods", `Checking ST requirements for ${data.details.class}...`);
                                 if (data.attributes.str.value < thisClass.attrReqs.str) {
-                                    ui.notifications.warn(`ST is too low for ${data.details.class}!`)
+                                    ui.notifications.info(`ST is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.str) {
@@ -4287,7 +4287,7 @@ export class Hyp3eCharacter {
                             if (thisClass.attrReqs.dex) {
                                 Hyp3eLogger.info("setAttributeMods", `Checking DX requirements for ${data.details.class}...`);
                                 if (data.attributes.dex.value < thisClass.attrReqs.dex) {
-                                    ui.notifications.warn(`DX is too low for ${data.details.class}!`)
+                                    ui.notifications.info(`DX is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.dex) {
@@ -4330,7 +4330,7 @@ export class Hyp3eCharacter {
                             if (thisClass.attrReqs.con) {
                                 Hyp3eLogger.info("setAttributeMods", `Checking CN requirements for ${data.details.class}...`);
                                 if (data.attributes.con.value < thisClass.attrReqs.con) {
-                                    ui.notifications.warn(`CN is too low for ${data.details.class}!`)
+                                    ui.notifications.info(`CN is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.con) {
@@ -4394,7 +4394,7 @@ export class Hyp3eCharacter {
                             if (thisClass.attrReqs.int) {
                                 Hyp3eLogger.info("setAttributeMods", `Checking IN requirements for ${data.details.class}...`);
                                 if (data.attributes.int.value < thisClass.attrReqs.int) {
-                                    ui.notifications.warn(`IN is too low for ${data.details.class}!`)
+                                    ui.notifications.info(`IN is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.int) {
@@ -4453,7 +4453,7 @@ export class Hyp3eCharacter {
                             if (thisClass.attrReqs.wis) {
                                 Hyp3eLogger.info("setAttributeMods", `Checking WS requirements for ${data.details.class}...`);
                                 if (data.attributes.wis.value < thisClass.attrReqs.wis) {
-                                    ui.notifications.warn(`WS is too low for ${data.details.class}!`)
+                                    ui.notifications.info(`WS is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.wis) {
@@ -4487,7 +4487,7 @@ export class Hyp3eCharacter {
                             if (thisClass.attrReqs.cha) {
                                 Hyp3eLogger.info("setAttributeMods", `Checking CH requirements for ${data.details.class}...`);
                                 if (data.attributes.cha.value < thisClass.attrReqs.cha) {
-                                    ui.notifications.warn(`CH is too low for ${data.details.class}!`)
+                                    ui.notifications.info(`CH is too low for ${data.details.class}!`)
                                 }
                             }
                             if (thisClass.xpBonusReq.cha) {
