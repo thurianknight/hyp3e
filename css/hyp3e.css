@@ -1382,8 +1382,8 @@ textarea {
   input[type=text],
   input[type=number] {
     text-align: center;
-    min-width: 25px;
-    max-width: 35px;
+    min-width: 30px;
+    max-width: 40px;
     margin-right: 10px;
   }
 }
