@@ -1692,6 +1692,25 @@ export class Hyp3eActor extends Actor {
         if (!dataset.isItemSpell && item?.type === "spell" && itemData?.quantity?.value > 0) {
             await this._consumeSpellSlot(item);
         }
+
+        if (item?.type === "spell") {
+            // Save the caster's (or item's) casting ability in the spell's effect flags
+            for (const effect of item.effects.contents) {
+                const data = effect.toObject();
+
+                data.flags ??= {};
+                data.flags.hyp3e ??= {};
+                data.flags.hyp3e.sourceActorUuid = this.uuid;
+
+                // Optionally store spell-level data, too
+                data.flags.hyp3e.spellUuid = item.uuid;
+                data.flags.hyp3e.spellLevel = item.system.spellLevel ?? null;
+
+                // Update the temporary copy before rendering to chat
+                effect.updateSource(data);
+            }
+        }
+
         // If there's no item roll formula (typically a spell), send a chat message and exit
         if (!itemData.formula) {
             actorData.img = this.img

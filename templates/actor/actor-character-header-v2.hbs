@@ -59,7 +59,7 @@
           <div class="flexrow">
             <label for="system.details.level.value" class="header-label align-left">{{localize "HYP3E.details.level"}}</label>
             <input class="input-small" type="text" name="system.details.level.value" value="{{system.details.level.value}}" data-dtype="Number" />
-            <div class="flexlarge level-up {{#if (gteNum system.details.xp.value system.details.xp.toNextLvl)}}glow{{/if}}">
+            <div class="flex-xlarge level-up {{#if (gteNum system.details.xp.value system.details.xp.toNextLvl)}}glow{{/if}}">
                 <a class="icon-btn" 
                     aria-label="{{localize 'HYP3E.dataLabel.levelUp'}}" 
                     role="button" 
@@ -67,7 +67,7 @@
                     data-action="levelUp">
                 <i class="fas fa-book" style="font-size: small"></i>
                 </a>
-                <label for="icon-btn" class="header-label-wide align-left">{{localize "HYP3E.dataLabel.levelUp"}}</label>
+                <span class="header-label-wide align-left">{{localize "HYP3E.dataLabel.levelUp"}}</span>
             </div>
           </div>
           <div class="flexrow">

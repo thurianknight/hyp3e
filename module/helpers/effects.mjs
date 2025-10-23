@@ -204,11 +204,17 @@ export async function setupEffectHandlers() {
         if (!game.user.isGM) return;
         Hyp3eLogger.info("createActiveEffect", `Create event fired:`, effect);
 
+        // Get data stored in the effect's flags
+        const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
+        const sourceActor = sourceUuid ? await fromUuid(sourceUuid) : effect.parent;
+        const sourceActorData = sourceActor?.system ?? {};
+        Hyp3eLogger.info("createActiveEffect", `Actor applying the effect:`, sourceActorData);
+
         // Flag to track whether anything needs to be updated
         let didUpdate = false;
 
         // Check to see if we have a rollable duration formula, and resolve it if so
-        const { updatedDuration, updated } = await checkAndResolveDuration(effect);
+        const { updatedDuration, updated } = await checkAndResolveDuration(effect, sourceActorData);
         Hyp3eLogger.info("createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
         if (updated) didUpdate = true;
 
@@ -396,24 +402,64 @@ export async function parseAndResolveChangeValue(changeValue, actor) {
     }
 }
 
-export async function checkAndResolveDuration(effect) {
+export async function checkAndResolveDuration(effect, sourceActorData) {
     // Store duration for update
     let updatedDuration = {...effect.duration};  // Start with a shallow copy
     // Flag to track whether anything needs to be updated
     let updated = false;
-    // Check to see if we have a rollable duration formula
+    // Check to see if we have a rollable duration formula, exit here if not
     const formula = effect.getFlag("hyp3e", "durationFormula");
+    if (!formula) return { updatedDuration, updated };
+    Hyp3eLogger.info("checkAndResolveDuration", `Actor applying the effect:`, sourceActorData);
+
+    // Resolve the formula to a number
     if (formula) {
         try {
-            // Only roll if the parent is an Actor
-            if (effect.parent instanceof Actor) {
-                const roll = await new Roll(formula).evaluate({ evaluateSync: true });
-                updatedDuration = { "rounds": roll.total, "turns": roll.total };
-                Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" resolved duration "${formula}" to ${roll.total} rounds`);
-            } else {
-                updatedDuration = { "rounds": 1, "turns": 1 };
+            // Only roll if the parent (target) is an Actor
+            if (!(effect.parent instanceof Actor)) {
+                updatedDuration = { rounds: 1, turns: 1 };
+                updated = true;
+                return { updatedDuration, updated };
             }
+
+            // Replace @variables
+            let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
+                return foundry.utils.getProperty(sourceActorData, key) ?? 0;
+            });
+            Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" expanded duration formula: "${expanded}".`);
+
+            // Evaluate any dice expressions
+            const diceRegex = /\b(\d*d\d+(?:[+-]\d+)*)\b/g;
+            const diceMatches = [...expanded.matchAll(diceRegex)];
+            for (const match of diceMatches) {
+                try {
+                    // Use async evaluation
+                    const roll = await (new Roll(match[1])).evaluate({ async: true });
+                    expanded = expanded.replace(match[0], roll.total);
+                } catch (err) {
+                    Hyp3eLogger.warn("checkAndResolveDuration", `Invalid dice segment "${match[1]}" in formula "${formula}"`, err);
+                }
+            }
+            Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" formula roll resolved: "${expanded}".`);
+
+            // Evaluate final JS expression (allow Math)
+            let result = 0;
+            try {
+                // eslint-disable-next-line no-new-func
+                const func = new Function("Math", `return (${expanded});`);
+                result = func(Math);
+            } catch (err) {
+                Hyp3eLogger.error("checkAndResolveDuration", `Error evaluating JS expression in formula "${expanded}"`, err);
+                result = 1; // fallback to 1 round
+            }
+            const rounds = Math.max(1, Math.floor(result)); // at least 1 round
+            updatedDuration = { rounds, turns: rounds };
             updated = true;
+
+            // const roll = await new Roll(formula).evaluate({ evaluateSync: true });
+            // const rounds = roll.total;
+            // updatedDuration = { "rounds": rounds, "turns": rounds };
+            Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" resolved duration "${formula}" to ${rounds} rounds`);
         } catch (err) {
             Hyp3eLogger.error("checkAndResolveDuration", `Invalid duration formula: ${formula}`, err);
         }
