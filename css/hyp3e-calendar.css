@@ -1,0 +1,174 @@
+/* Calendar app styling */
+
+.hyp3e-calendar .calendar-header {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  input[type=number] {
+    text-align: center;
+    font-weight: bold;
+    font-size: large;
+    min-width: 50px;
+    max-width: 70px;
+    margin-right: 5px;
+  };
+  select {
+    text-align: center;
+    font-weight: bold;
+    font-size: large;
+    min-width: 100px;
+    max-width: 125px;
+    margin-right: 5px;
+  };
+  span {
+    text-align: left;
+    font-weight: bold;
+    font-size: large;
+  };
+  .moon-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #555; /* off color */
+    transition: 0.4s;
+    border-radius: 24px;
+  }
+
+  .slider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  .switch input:checked + .slider {
+    background-color: #2196F3; /* on color */
+  }
+
+  .switch input:checked + .slider::before {
+    transform: translateX(20px);
+  }
+}
+
+.hyp3e-calendar .calendar-grid {
+  border-collapse: collapse;
+  width: 100%;
+  text-align: center;
+  margin: 16px 0;
+}
+
+.hyp3e-calendar .calendar-grid th,
+.hyp3e-calendar .calendar-grid td {
+  border: 1px solid var(--color-border-light-tertiary);
+  padding: 4px;
+  width: 14.2%; /* 100/7 */
+  text-align: center;
+}
+
+.hyp3e-calendar .calendar-grid td.today {
+  color: #0f7ed8;
+  background-color: rgba(223, 55, 55, 0.2);
+  font-weight: bold;
+  padding: 4px;
+}
+
+.hyp3e-calendar .calendar-grid td.festival {
+  color: #7a39e4;
+  background-color: rgba(120, 80, 160, 0.2);
+  font-weight: bold;
+  padding: 4px;
+}
+
+.hyp3e-calendar .calendar-grid td.today.festival {
+  color: #0f59d8;
+  background-color: rgba(223, 55, 55, 0.2);
+  font-weight: bold;
+  padding: 4px;
+}
+
+.hyp3e-calendar .calendar-grid td {
+  cursor: pointer;
+}
+
+.moon-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5em;
+  margin-top: 0.25em;
+  font-size: 0.85em;
+}
+
+.moon-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.festival-container {
+  margin-top: 0.5em;
+}
+
+.festival-banner {
+  padding: 0.3em 0.6em;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.season-banner {
+  font-weight: bold;
+  justify-content: center;
+  margin: 0 0.5em;
+  font-size: 1.5em;
+}
+
+.hyp3e-calendar .calendar-footer {
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.hyp3e-calendar .calendar-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    margin: 0.25em;
+    width: 70px;
+    height: 35px;
+  }
+}
+
+.hyp3e-calendar .calendar-toolbar .controls-label {
+  padding: 0.5rem 0.25rem 0.25rem 0.5rem;
+  font-size: 0.9rem;
+  margin: 0.25em;
+  width: 75px;
+  height: 35px;
+}

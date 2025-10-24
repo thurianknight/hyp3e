@@ -31,6 +31,28 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         return `${typeLabel}: ${this.actor.name}`;
     }
 
+    static get themes() {
+        // Set Foundry's system Light and Dark themes
+        const globalThemes = {
+            light: "Light",
+            dark: "Dark",
+        };
+
+        const customThemes = {
+            warlord: "Warlord",
+            cryomancer: "Cryomancer",
+            necromancer: "Necromancer",
+            pyromancer: "Pyromancer",
+            beastmaster: "Beastmaster",
+            shadowmaster: "Shadowmaster",
+        };
+
+        // Merge and log for verification
+        const allThemes = { ...globalThemes, ...customThemes };
+        Hyp3eLogger.info("HYP3EActorSheetV2 get themes", "Available themes:", allThemes);
+        return allThemes;
+    }
+
     /** @override */
     static DEFAULT_OPTIONS = {
         classes: ["hyp3e", "actor"],
@@ -152,6 +174,18 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     /** @override */
     async _prepareContext(options) {
+
+        const document = this.document;
+        const { documentName, type=CONST.BASE_DOCUMENT_TYPE } = document;
+        const {
+            sheetClasses, defaultClasses, defaultClass
+        } = DocumentSheetConfig.getSheetClassesForSubType(documentName, type);
+        const sheetClass = document.flags.core?.sheetClass ?? "";
+        const config = CONFIG[documentName].sheetClasses[type] ?? {};
+        const themes = game.settings.get("core", "sheetThemes");
+        const currentClass = sheetClass || defaultClass;
+        Hyp3eLogger.info("_prepareContext", `Document data:`, { document, sheetClass, config, themes, currentClass });
+
         // Retrieve base data structure.
         const context = await super._prepareContext(options);
         context.actor = this.actor;

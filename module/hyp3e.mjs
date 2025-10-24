@@ -86,7 +86,11 @@ Hooks.once('init', async function() {
     // Register sheet application classes
     foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
     // Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: false });
-    foundry.documents.collections.Actors.registerSheet("hyp3e", Hyp3eActorSheetV2, { makeDefault: true });
+    foundry.documents.collections.Actors.registerSheet("hyp3e", Hyp3eActorSheetV2, { 
+        makeDefault: true,
+        defaultTheme: "default",
+        themes: Hyp3eActorSheetV2.themes
+    });
     Hyp3eLogger.info("Init", "Registered Hyp3eActorSheetV2");
     foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
     // Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: false });

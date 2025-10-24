@@ -16,7 +16,7 @@ export default class HYP3ECombatGroupSelector extends HandlebarsApplicationMixin
     // ===========================================================================
     static DEFAULT_OPTIONS = {
         id: "combat-set-groups-{id}",
-        classes: ["combat-set-groups", "scrollable"],
+        classes: ["combat-set-groups"],
         tag: "form",
         window: {
             frame: true,

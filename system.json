@@ -28,7 +28,14 @@
     "module/hyp3e.mjs"
   ],
   "styles": [
-    "css/hyp3e.css"
+    "css/hyp3e.css",
+    "css/hyp3e-calendar.css",
+    "css/hyp3e-chat.css",
+    "css/hyp3e-combat.css",
+    "css/hyp3e-config.css",
+    "css/hyp3e-pc-classes.css",
+    "css/hyp3e-quick-equip.css",
+    "css/hyp3e-turn-tracker.css"
   ],
   "languages": [
     {

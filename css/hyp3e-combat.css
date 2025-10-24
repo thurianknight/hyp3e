@@ -1,0 +1,156 @@
+/* Styles for the custom Combat Tracker */
+
+.combat-set-groups {
+    container-name: combat-set-groups;
+    container-type: inline-size;
+
+    --grid: 1fr;
+
+    @container combat-set-groups (min-width: 80ch) {
+        ol {
+            --grid: repeat(2, 1fr);
+        }
+    }
+
+    @container combat-set-groups (min-width: 160ch) {
+        ol {
+            --grid: repeat(3, 1fr);
+        }
+    }
+
+    @container combat-set-groups (min-width: 240ch) {
+        ol {
+            --grid: repeat(4, 1fr);
+        }
+    }
+
+    .window-content {
+        overflow-y: scroll;
+        max-height: 700px;
+        color: var(--color-light-3);
+        background-color: var(--color-cool-5-90);
+    }
+
+    ol {
+        list-style-type: none;
+        display: grid;
+        grid-template-columns: var(--grid);
+        gap: 0.75em 2em;
+        margin: 0;
+        padding: 0;
+    }
+  
+    .combatant {
+        display: grid;
+        grid-template-columns: 1fr fit-content;
+        align-items: center;
+        gap: 0.25em;
+        font-size: var(--font-size-16);
+    
+        .header {
+            display: flex;
+            gap: 0.5em;
+            align-items: center;
+
+            .name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+        
+        img {
+            max-width: 32px;
+            height: auto;
+        }
+    
+        .group-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5em 1em;
+    
+            label.checkbox {
+                align-items: baseline;
+                opacity: 0.5;
+                display: block;
+                padding: 0.25em;
+                border-radius: 4px;
+                text-align: center;
+                background-color: var(--combat-set-option-bg);
+                color: var(--combat-set-option-font-color, white);
+                font-weight: bold;
+                cursor: pointer;
+                line-height: 1.5em;
+
+                input {
+                    display: none;
+                }
+        
+                &:has(input:checked) {
+                    opacity: 1;
+                }
+
+                &:has(input[value="green"]) {
+                    --combat-set-option-bg: green;
+                }
+        
+                &:has(input[value="red"]) {
+                    --combat-set-option-bg: red;
+                }
+        
+                &:has(input[value="yellow"]) {
+                    --combat-set-option-bg: yellow;
+                    --combat-set-option-font-color: black;
+                }
+        
+                &:has(input[value="purple"]) {
+                    --combat-set-option-bg: purple;
+                }
+        
+                &:has(input[value="blue"]) {
+                    --combat-set-option-bg: blue;
+                }
+        
+                &:has(input[value="orange"]) {
+                    --combat-set-option-bg: orange;
+                    --combat-set-option-font-color: black;
+                }
+        
+                &:has(input[value="white"]) {
+                    --combat-set-option-bg: white;
+                    --combat-set-option-font-color: black;
+                }
+            }
+        }
+    }
+}
+/* Tooltip container */
+.combatant-controls {
+  position: relative;
+}
+/* Tooltip text */
+.combatant-controls .tooltip-initiative {
+  visibility: hidden;
+  width: 125px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 50%;
+  left: 50%;
+  margin-left: 25px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+/* Show the tooltip text when you mouse over the combatant controls */
+.combatant-controls:hover .tooltip-initiative {
+  visibility: visible;
+  opacity: 1;
+}

@@ -1,0 +1,104 @@
+/* Chat log styles */
+
+.chat-log .message {
+  font-size: calc(1em * var(--hyp3e-chat-scale, 1));
+}
+
+.chat-log .flavor-text {
+  font-size: calc(1em * var(--hyp3e-chat-scale, 1));
+}
+
+/* Hyp3e chat label header style */
+.chat-label {
+  margin: 10px 0;
+  span {
+    text-align: left;
+    font-size: calc(1.1em * var(--hyp3e-chat-scale, 1));
+    font-weight: bold;
+    margin-left: 6px;
+  }
+  img {
+    border: none;
+    float: left;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Chat card styling defaults */
+.dice-damage {
+    font-style: italic;
+    font-weight: bold;
+}
+
+.damage-button {
+    flex-direction: row;
+}
+
+.chat-button-small {
+    width: 28px;
+    max-width: 32px;
+    height: 28px;
+    max-height: 32px;
+    line-height: 1px;
+    padding: 1px 1px;
+    margin: 1px 2px;
+}
+
+.chat-button-crit {
+    min-width: 130px;
+    max-width: 150px;
+    height: 28px;
+    max-height: 32px;
+    line-height: 1px;
+    padding: 1px 1px;
+    margin: 1px 2px;
+}
+
+.chat-btn-full-width {
+    width: 100%;
+}
+
+.roll-chat-buttons {
+    justify-content: flex-end; /* align right */
+}
+
+.chat-table {
+    width: 100%;
+    border-top: 1px solid #8d896d;
+    border-bottom: 1px solid #8d896d;
+    border-collapse: collapse;
+    margin: 3px 10px;
+    th, td {
+        padding: 3px 10px;
+    }
+}
+
+
+/* Styles for Hyp3eLogger chat cards */
+
+.chat-message .hyp3e-log {
+  font-family: monospace;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  border-left: 4px solid #666;
+  background: rgba(0,0,0,0.05);
+}
+
+/* Severity-specific overrides */
+.chat-message .hyp3e-info {
+  border-color: #4da6ff;   /* light blue */
+  color: #4da6ff;
+}
+
+.chat-message .hyp3e-warning {
+  border-color: #ffcc00;   /* amber */
+  color: #cc9900;
+  font-weight: bold;
+}
+
+.chat-message .hyp3e-error {
+  border-color: #ff3333;   /* red */
+  color: #b30000;
+  font-weight: bold;
+}

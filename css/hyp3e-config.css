@@ -1,0 +1,99 @@
+/* Hyperborea Config app styles */
+
+.hyp3e-config.scrollable {
+  display: flex;
+  flex-direction: column;
+  /* height: 100%;        fill the window height */
+}
+.hyp3e-config.scrollable .app-content {
+  flex: 1 1 auto;      /* take remaining space */
+  overflow-y: auto;    /* scroll if content overflows */
+}
+.hyp3e-config nav.tabs {
+  margin-bottom: 0.5em;
+  border-bottom: 1px solid #666;
+}
+.hyp3e-config nav.tabs .item {
+  margin-right: 1em;
+  cursor: pointer;
+}
+.hyp3e-config nav.tabs .item.active {
+  font-weight: bold;    /* Make the active tab bold */
+}
+
+.hyp3e-config .tab {
+  display: none;
+  min-height: 200px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.hyp3e-config .tab.active {
+  display: block;
+}
+.hyp3e-config .option-label {
+  font-weight: bold;
+  padding: 5px 5px;
+}
+.hyp3e-config .option-hint {
+  padding: 5px 15px;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+/* Left gutter image */
+.hyp3e-config .left-gutter {
+  max-width: 50px;
+  border: none;
+}
+.hyp3e-config .left-gutter img {
+  border: 0;
+}
+
+.hyp3e-config input[type=text] {
+  max-width: 75px;
+  text-align: center;
+}
+.hyp3e-config input[type=number] {
+  max-width: 75px;
+  text-align: center;
+}
+.hyp3e-config select {
+  max-width: 250px;
+}
+.hyp3e-config textarea {
+  width: 90%;
+  margin: 3px 15px;
+}
+.hyp3e-config input[type=range] {
+    width: 200px;
+    height: 16px;
+    margin-bottom: 0px;
+}
+.hyp3e-config .slider-wrapper {
+  width: 200px;
+  position: relative;
+}
+.hyp3e-config .ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8em;
+  margin-bottom: 2px;
+}
+
+.hyp3e-config .config-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-right: 20px;
+}
+.hyp3e-config .config-btn {
+  display: inline-block;
+  min-width: 200px;
+  padding: 4px 8px;
+}
+.hyp3e-config .sheet-footer {
+  margin-top: 10px;
+}
+.hyp3e-config .sheet-footer .save-btn {
+  padding: 1.2em 1em; /* vertical, horizontal */
+}

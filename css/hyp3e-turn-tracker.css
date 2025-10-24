@@ -1,0 +1,126 @@
+/* Styles for the Turn Tracker app */
+
+.turn-tracker {
+  width: 292px;
+  max-height: 50px;
+  padding: 4px;
+  margin: 4px;
+  border-radius: 6px;
+  text-align: center;
+  display: flex;
+  z-index: 30;
+  position: relative;
+  pointer-events: auto;
+}
+
+.theme-dark .turn-tracker {
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  .turn-label {
+    color: #fff;
+  };
+  controls {
+    button {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    button:active {
+      background: rgba(255, 255, 255, 0.3);
+      color: #fff;
+    }
+  }
+}
+.theme-light .turn-tracker {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #2a2a2a;
+    .turn-label {
+      color: #2a2a2a;
+    };
+    controls {
+      button {
+        background: rgba(0, 0, 0, 0.1);
+          color: #2a2a2a;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+      button:hover {
+        background: rgba(0, 0, 0, 0.2);
+        color: #2a2a2a;
+      }
+      button:active {
+        background: rgba(0, 0, 0, 0.3);
+        color: #2a2a2a;
+      }
+    }
+}
+
+.turn-tracker .turn-label {
+  margin: 0.5em 0;
+  text-align: center;
+  text-decoration: none;
+  font-size: large;
+}
+
+.turn-tracker .controls {
+  display: flex;
+  flex: auto;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.turn-tracker .controls button {
+  margin: 0.25em;
+  width: 32px;
+  height: 32px;
+}
+
+/* Styles for the Turn-Advance Actions Config app */
+.turn-advance-actions-config-window {
+  min-width: 400px;
+  max-width: 450px;
+  .window-content {
+    flex: 1 1 auto;      /* take remaining space */
+    overflow-y: auto;    /* scroll if content overflows */
+    padding-right: 8px;  /* avoids scrollbar overlap */
+  }
+}
+.turn-advance-actions-config {
+  min-width: 350px;
+  max-width: 450px;
+  padding-right: 5px;
+  margin: 0 auto;
+  border-radius: 6px;
+  .action-label {
+    font-weight: bold;
+    padding: 0.25em 0;
+    flex: 1 auto;
+  }
+  input[type=text] {
+    text-align: center;
+    min-width: 150px;
+    max-width: 200px;
+    margin-bottom: 5px;
+    flex: 2 auto;
+  }
+  input[type=checkbox] {
+    padding: 0.25em 0;
+  }
+  select {
+    min-width: 150px;
+    max-width: 200px;
+    margin-bottom: 5px;
+    flex: 2 auto;
+  }
+  button {
+    min-width: 125px;
+    margin: 0.25em 0;
+    font-size: medium;
+    font-weight: bold;
+  }
+}
