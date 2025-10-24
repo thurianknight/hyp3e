@@ -118,10 +118,10 @@
       <div class="saves-block flexrow flex-between">
         <div class="combat-block flex-group-center" style="min-width: 150px;">
             <div class="save-death">
-                {{!-- I thought it would be cool to have little saving throw icons for each type... --}}
-                <a data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.death.value}}" data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
-                    <img src="systems/hyp3e/assets/skull-crossed-bones.png">
-                </a>
+                <div class="save-icon death">
+                    <a class="save-icon-button" data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.death.value}}" data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
+                    </a>
+                </div>
                 <input type="text" name="system.saves.death.value" value="{{system.saves.death.value}}" data-dtype="Number"/>
             </div>
             <div class="save-death">
@@ -133,9 +133,10 @@
         </div>
         <div class="combat-block flex-group-center">
             <div class="save-device">
-                <a data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.device.value}}" data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
-                    <img src="systems/hyp3e/assets/lunar-wand.png">
-                </a>
+                <div class="save-icon device">
+                    <a class="save-icon-button" data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.device.value}}" data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
+                    </a>
+                </div>
                 <input type="text" name="system.saves.device.value" value="{{system.saves.device.value}}" data-dtype="Number"/>
             </div>
             <div class="save-device">
@@ -147,9 +148,10 @@
         </div>
         <div class="combat-block flex-group-center" style="min-width: 170px;">
             <div class="save-transformation">
-                <a data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.transformation.value}}" data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
-                    <img src="systems/hyp3e/assets/transportation-rings.png">
-                </a>
+                <div class="save-icon transformation">
+                    <a class="save-icon-button" data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.transformation.value}}" data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
+                    </a>
+                </div>
                 <input type="text" name="system.saves.transformation.value" value="{{system.saves.transformation.value}}" data-dtype="Number"/>
             </div>
             <div class="save-transformation">
@@ -161,9 +163,10 @@
         </div>
         <div class="combat-block flex-group-center">
             <div class="save-avoidance">
-                <a data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.avoidance.value}}" data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
-                    <img src="systems/hyp3e/assets/dodging.png">
-                </a>
+                <div class="save-icon avoidance">
+                    <a class="save-icon-button" data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.avoidance.value}}" data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
+                    </a>
+                </div>
                 <input type="text" name="system.saves.avoidance.value" value="{{system.saves.avoidance.value}}" data-dtype="Number"/>
             </div>
             <div class="save-avoidance">
@@ -175,9 +178,10 @@
         </div>
         <div class="combat-block flex-group-center">
             <div class="save-sorcery">
-                <a data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.sorcery.value}}" data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
-                    <img src="systems/hyp3e/assets/magic-swirl.png">
-                </a>
+                <div class="save-icon sorcery">
+                    <a class="save-icon-button" data-action="rollThis" data-roll-type="save" data-roll="1d20" data-roll-mode="publicroll" data-roll-target="{{system.saves.sorcery.value}}" data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
+                    </a>
+                </div>
                 <input type="text" name="system.saves.sorcery.value" value="{{system.saves.sorcery.value}}" data-dtype="Number"/>
             </div>
             <div class="save-sorcery">
