@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
 @import url("../assets/Herculanum.ttf");
 
-/* Global styles */
+/* Global styles included with the boilerplate system */
 /* .window-app {
   font-family: "Roboto", sans-serif;
 } */
@@ -225,9 +225,20 @@
 
 /* Default theme options */
 .theme-light {
-  --hyp3e-color-primary: var(--color-primary);
-  --hyp3e-color-accent: var(--color-accent);
+  --hyp3e-color-primary: var(--color-text-primary);
+  --hyp3e-color-primary-10: rgba(34, 34, 34, 0.05);
+  --hyp3e-color-primary-25: rgba(34, 34, 34, 0.15);
+  --hyp3e-color-accent: var(--color-text-emphatic);
+  --hyp3e-color-accent-25: rgba(0, 0, 0, 0.25);
   --hyp3e-color-bg: var(--color-bg);
+  --hyp3e-color-bg-50: var(--color-light-5-50);
+  --hyp3e-color-bg-75: var(--color-light-5-75);
+  --hyp3e-color-subtle-border: rgba(0, 0, 0, 0.2);
+  --hyp3e-color-text-primary: var(--color-text-primary);
+  --hyp3e-input-text-color: var(--input-text-color);
+  --hyp3e-color-shadow-primary: var(--color-shadow-primary);
+  --hyp3e-color-shadow-highlight: var(--color-shadow-highlight);
+  --hyp3e-color-select-option-bg: var(--color-select-option-bg);
   --hyp3e-d20-icon: url("/icons/svg/d20-black.svg");
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-black.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-black.png");
@@ -236,9 +247,20 @@
   --hyp3e-saves-sorcery-icon: url("../assets/magic-swirl-black.png");
 }
 .theme-dark {
-  --hyp3e-color-primary: var(--color-primary);
-  --hyp3e-color-accent: var(--color-accent);
+  --hyp3e-color-primary: var(--color-text-primary);
+  --hyp3e-color-primary-10: rgba(239, 230, 216, 0.05);
+  --hyp3e-color-primary-25: rgba(239, 230, 216, 0.15);
+  --hyp3e-color-accent: var(--color-text-emphatic);
+  --hyp3e-color-accent-25: rgba(255, 255, 255, 0.25);
   --hyp3e-color-bg: var(--color-bg);
+  --hyp3e-color-bg-50: var(--color-cool-5-75);
+  --hyp3e-color-bg-75: var(--color-cool-5-75);
+  --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
+  --hyp3e-color-text-primary: var(--color-text-primary);
+  --hyp3e-input-text-color: var(--input-text-color);
+  --hyp3e-color-shadow-primary: var(--color-shadow-primary);
+  --hyp3e-color-shadow-highlight: var(--color-shadow-highlight);
+  --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-50);
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
@@ -247,13 +269,22 @@
   --hyp3e-saves-sorcery-icon: url("../assets/magic-swirl-white.png");
 }
 
-/* Custom Actor sheet theme styles */
+/* Custom Hyp3e Actor/Item Sheet theme styles */
 .theme-warlord {
-  --hyp3e-color-primary: #7A1C1C;
-  --hyp3e-color-accent: #C8A27B;
-  --hyp3e-color-bg: #1B0A0A;
+  --hyp3e-color-primary: rgba(122, 28, 28, 1);
+  --hyp3e-color-primary-10: rgba(122, 28, 28, 0.10);
+  --hyp3e-color-primary-25: rgba(122, 28, 28, 0.25);
+  --hyp3e-color-accent: rgba(200, 162, 123, 1);
+  --hyp3e-color-accent-25: rgba(200, 162, 123, 0.25);
+  --hyp3e-color-bg: rgba(27, 10, 10, 1);
+  --hyp3e-color-bg-50: rgba(27, 10, 10, 0.5);
+  --hyp3e-color-bg-75: rgba(27, 10, 10, 0.75);
+  --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
   --hyp3e-color-text-primary: #C8A27B;
   --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
+  --hyp3e-color-shadow-primary: #C04040;     /* glowing blood red */
+  --hyp3e-color-shadow-highlight: #FF6B6B;   /* bright, fiery red */
+  --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-75);
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
@@ -261,27 +292,167 @@
   --hyp3e-saves-avoidance-icon: url("../assets/dodging-white.png");
   --hyp3e-saves-sorcery-icon: url("../assets/magic-swirl-white.png");
 }
+/* WARLORD FRAME DECORATION */
+.hyp3e.actor.themed.theme-warlord {
+  /* position: relative; */
+  overflow: visible;
+}
+.hyp3e.actor.themed.theme-warlord .window-content {
+  position: relative;
+  overflow-y: auto;
+  /* overflow: visible; */
+}
+
+/* Ornate corner blades */
+/* Lower left corner */
+.hyp3e.actor.themed.theme-warlord .window-content::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 48px;
+  height: 48px;
+  background: url("/systems/hyp3e/assets/frames/warlord-corner.png") no-repeat center;
+  background-size: contain;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 6px rgba(200, 162, 123, 0.8));
+}
+/* Lower right corner */
+.hyp3e.actor.themed.theme-warlord .window-content::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 48px;
+  height: 48px;
+  background: url("/systems/hyp3e/assets/frames/warlord-corner.png") no-repeat center;
+  background-size: contain;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 6px rgba(200, 162, 123, 0.8));
+  transform: scaleX(-1); /* flip horizontally for symmetry */
+}
+
+/* Heavy blood-red base strip */
+/* .hyp3e.actor.themed.theme-warlord .window-content::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(
+    to top,
+    rgba(122, 28, 28, 1),
+    rgba(122, 28, 28, 0.3)
+  );
+  box-shadow: 0 0 12px rgba(200, 162, 123, 0.8);
+} */
 
 .theme-cryomancer {
-  --hyp3e-color-primary: #78BFEF;
-  --hyp3e-color-accent: #D6F3FF;
-  --hyp3e-color-bg: #0B1E2B;
+  --hyp3e-color-primary: rgba(120, 191, 239, 1);
+  --hyp3e-color-primary-10: rgba(120, 191, 239, 0.10);
+  --hyp3e-color-primary-25: rgba(120, 191, 239, 0.25);
+  --hyp3e-color-accent: rgba(214, 243, 255, 1);
+  --hyp3e-color-accent-25: rgba(214, 243, 255, 0.25);
+  --hyp3e-color-bg: rgba(11, 30, 43, 1);
+  --hyp3e-color-bg-50: rgba(11, 30, 43, 0.5);
+  --hyp3e-color-bg-75: rgba(11, 30, 43, 0.75);
+  --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
   --hyp3e-color-text-primary: #D6F3FF;
   --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
+  --hyp3e-color-shadow-primary: #3C9DDE;     /* deeper frost blue */
+  --hyp3e-color-shadow-highlight: #B8E8FF;   /* bright, shimmering ice */
+  --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-75);
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
   --hyp3e-saves-transformation-icon: url("../assets/transportation-rings-white.png");
   --hyp3e-saves-avoidance-icon: url("../assets/dodging-white.png");
   --hyp3e-saves-sorcery-icon: url("../assets/magic-swirl-white.png");
+}
+/* CRYOMANCER FRAME DECORATION */
+.theme-cryomancer .window-content {
+  position: relative;
+  overflow: visible;
+}
+
+/* Frosted corners */
+.theme-cryomancer .window-content::before,
+.theme-cryomancer .window-content::after {
+  content: "";
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background: url("/systems/hyp3e/assets/frames/cryomancer-corner.svg") no-repeat center;
+  background-size: contain;
+  pointer-events: none;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 6px var(--hyp3e-color-accent));
+}
+
+.theme-cryomancer .window-content::before {
+  bottom: 0;
+  left: 0;
+}
+
+.theme-cryomancer .window-content::after {
+  bottom: 0;
+  right: 0;
+  transform: scaleX(-1);
+}
+
+/* Glowing frost bar */
+.theme-cryomancer .window-content::after {
+  box-shadow: none; /* reset inherited shadow */
+}
+
+.theme-cryomancer .window-content::before,
+.theme-cryomancer .window-content::after {
+  animation: cryo-frost-pulse 2.5s infinite alternate;
+}
+
+@keyframes cryo-frost-pulse {
+  0% {
+    filter: drop-shadow(0 0 4px var(--hyp3e-color-shadow-primary));
+  }
+  100% {
+    filter: drop-shadow(0 0 10px var(--hyp3e-color-shadow-highlight));
+  }
+}
+
+/* Subtle glow line at bottom */
+.theme-cryomancer .window-content::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(
+    to top,
+    rgba(214, 243, 255, 0.6),
+    transparent
+  );
+  animation: glow-pulse 3s infinite alternate;
 }
 
 .theme-necromancer {
-  --hyp3e-color-primary: #1A1A1A;
-  --hyp3e-color-accent: #9AE66E;
-  --hyp3e-color-bg: #0A0D0A;
+  --hyp3e-color-primary: rgba(26, 26, 26, 1);
+  --hyp3e-color-primary-10: rgba(26, 26, 26, 0.10);
+  --hyp3e-color-primary-25: rgba(26, 26, 26, 0.25);
+  --hyp3e-color-accent: rgba(154, 230, 110, 1);
+  --hyp3e-color-accent-25: rgba(154, 230, 110, 0.25);
+  --hyp3e-color-bg: rgba(10, 13, 10, 1);
+  --hyp3e-color-bg-50: rgba(10, 13, 10, 0.5);
+  --hyp3e-color-bg-75: rgba(10, 13, 10, 0.75);
+  --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
   --hyp3e-color-text-primary: #9AE66E;
   --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
+  --hyp3e-color-shadow-primary: #5DAF47;     /* eerie green glow */
+  --hyp3e-color-shadow-highlight: #B4FF88;   /* sickly luminous green */
+  --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-75);
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
@@ -291,11 +462,20 @@
 }
 
 .theme-pyromancer {
-  --hyp3e-color-primary: #E8451C;
-  --hyp3e-color-accent: #FFD25F;
-  --hyp3e-color-bg: #250A00;
+  --hyp3e-color-primary: rgba(232, 69, 28, 1);
+  --hyp3e-color-primary-10: rgba(232, 69, 28, 0.10);
+  --hyp3e-color-primary-25: rgba(232, 69, 28, 0.25);
+  --hyp3e-color-accent: rgba(255, 210, 95, 1);
+  --hyp3e-color-accent-25: rgba(255, 210, 95, 0.25);
+  --hyp3e-color-bg: rgba(37, 10, 0, 1);
+  --hyp3e-color-bg-50: rgba(37, 10, 0, 0.5);
+  --hyp3e-color-bg-75: rgba(37, 10, 0, 0.75);
+  --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
   --hyp3e-color-text-primary: #FFD25F;
   --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
+  --hyp3e-color-shadow-primary: #FF7518;     /* molten orange-red */
+  --hyp3e-color-shadow-highlight: #FFD580;   /* blazing yellow fire */
+  --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-75);
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
@@ -305,11 +485,20 @@
 }
 
 .theme-beastmaster {
-  --hyp3e-color-primary: #3B6B2C;
-  --hyp3e-color-accent: #A4C34E;
-  --hyp3e-color-bg: #141F0F;
+  --hyp3e-color-primary: rgba(59, 107, 44, 1);
+  --hyp3e-color-primary-10: rgba(59, 107, 44, 0.10);
+  --hyp3e-color-primary-25: rgba(59, 107, 44, 0.25);
+  --hyp3e-color-accent: rgba(164, 195, 78, 1);
+  --hyp3e-color-accent-25: rgba(164, 195, 78, 0.25);
+  --hyp3e-color-bg: rgba(20, 31, 15, 1);
+  --hyp3e-color-bg-50: rgba(20, 31, 15, 0.5);
+  --hyp3e-color-bg-75: rgba(20, 31, 15, 0.75);
+  --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
   --hyp3e-color-text-primary: #A4C34E;
   --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
+  --hyp3e-color-shadow-primary: #4DA83C;     /* glowing jungle green */
+  --hyp3e-color-shadow-highlight: #C6FF91;   /* sunlit leaf */
+  --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-75);
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
@@ -319,11 +508,20 @@
 }
 
 .theme-shadowmaster {
-  --hyp3e-color-primary: #2B2B2B;
-  --hyp3e-color-accent: #7E7E7E;
-  --hyp3e-color-bg: #0E0E0E;
+  --hyp3e-color-primary: rgba(43, 43, 43, 1);
+  --hyp3e-color-primary-10: rgba(43, 43, 43, 0.10);
+  --hyp3e-color-primary-25: rgba(43, 43, 43, 0.25);
+  --hyp3e-color-accent: rgba(126, 126, 126, 1);
+  --hyp3e-color-accent-25: rgba(126, 126, 126, 0.25);
+  --hyp3e-color-bg: rgba(14, 14, 14, 1);
+  --hyp3e-color-bg-50: rgba(14, 14, 14, 0.5);
+  --hyp3e-color-bg-75: rgba(14, 14, 14, 0.75);
+  --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
   --hyp3e-color-text-primary: #7E7E7E;
   --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
+  --hyp3e-color-shadow-primary: #444444;     /* subtle inner smoke */
+  --hyp3e-color-shadow-highlight: #BBBBBB;   /* silvery outer shimmer */
+  --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-75);
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
@@ -335,27 +533,57 @@
 
 /* Styles limited to hyp3e sheets */
 .hyp3e {
+  /* Mouse-over 'a' elements */
+  a:hover, a:focus {
+    text-shadow: 0 0 5px var(--hyp3e-color-shadow-highlight), 0 0 10px var(--hyp3e-color-shadow-highlight), 0 0 15px var(--hyp3e-color-shadow-highlight);
+    cursor: pointer;
+  }
   /* Mouse-over on rollable icons or buttons */
   .rollable:hover, .rollable:focus {
-    text-shadow: 0 0 10px var(--hyp3e-color-accent);
+    text-shadow: 0 0 5px var(--hyp3e-color-shadow-highlight), 0 0 10px var(--hyp3e-color-shadow-highlight), 0 0 15px var(--hyp3e-color-shadow-highlight);
     cursor: pointer;
   }
 
-  /* Default style for input text fields */
-  input[type=text],
-  input[type="number"] {
-    border: none;
-    background-color: rgba(189, 189, 189, 0.25);
-    margin-bottom: 2px;
-    height: 28px;
+  /* Default styles for input/select/textarea fields */
+  input[type=text], input[type="number"],
+  select,
+  textarea {
     color: var(--hyp3e-input-text-color);
-  }
-  input[type=text]:disabled,
-  input[type="number"]:disabled {
-    border: none;
-    background-color: rgba(189, 189, 189, 0.15);
+    background-color: var(--hyp3e-color-primary-25);
+    border: 1px solid var(--hyp3e-color-subtle-border);
+    border-radius: 4px;
+    margin-bottom: 2px;
+    padding: 0.3em 0.5em;
   }
 
+  /* Specific styles for input fields */
+  input[type=text], input[type="number"] {
+    text-align: center;
+  }
+  input[type=text]:disabled, input[type="number"]:disabled {
+    /* We could use a slightly different background color here */
+    background-color: var(--hyp3e-color-primary-10);
+    border: none;
+  }
+
+  /* Specific styles for textarea boxes */
+  textarea {
+    font-size: 0.9em;
+    resize: none;
+  }
+
+  /* Specific styles for select boxes */
+  select {
+    /* text-align: center; */
+    width: auto;
+    max-width: 200px;
+  }
+  select option, select optgroup {
+    color: var(--hyp3e-input-text-color);
+    background-color: var(--hyp3e-color-select-option-bg);
+  }
+
+  /* Default styles for checkboxes */
   input[type=checkbox] {
     padding: 0.25em 0;
     width: 24px;
@@ -363,15 +591,12 @@
     height: 24px;
   }
 
-  /* Default style for textarea boxes */
-  textarea {
-    border: none;
-    /* border-bottom: none; */
-    font-family: "Roboto", sans-serif;
-    /* font-family: "Herculanum", sans-serif; */
-    background-color: rgba(189, 189, 189, 0.25);
+  /* Default styles for labels */
+  label {
     color: var(--hyp3e-input-text-color);
-    resize: none;
+    border: none;
+    border-radius: 3px;
+    /* padding: 0 0.2em; */
   }
 
   .save-icon {
@@ -418,6 +643,10 @@
 
 .hyp3e .controls-dropdown {
   z-index: 1000;
+}
+
+.hyp3e .window-title {
+  color: var(--color-light-2);
 }
 
 .hyp3e .window-content {
@@ -519,23 +748,25 @@
 }
 
 /* Apply to all input fields and textareas where they sit above the header image */
-.hyp3e .npc-header-block input[type=text],
+/* .hyp3e .npc-header-block input[type=text],
 .hyp3e .npc-header-block input[type=number],
 .hyp3e .npc-header-block textarea,
 .hyp3e .npc-header-block select {
-  /* background-color: rgba(255, 255, 255, 0.4); semi-transparent white */
-  background-color: rgba(189, 189, 189, 0.25);
-  border: 1px solid rgba(0, 0, 0, 0.2);        /* soft border */
+  color: var(--hyp3e-input-text-color);
+  background-color: var(--hyp3e-color-primary-25);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   padding: 0.3em 0.5em;
   border-radius: 4px;
-  /* color: #1a1a1a; /* darker text for contrast */
 }
-/* Give labels a subtle background too */
+.hyp3e .npc-header-block select option,
+.hyp3e .npc-header-block select optgroup {
+  color: var(--hyp3e-input-text-color);
+  background-color: var(--hyp3e-color-select-option-bg);
+} */
+
+/* Give labels a subtle background where there is an underlying image */
 .hyp3e .npc-header-block label {
-  /* background-color: rgba(255, 255, 255, 0.4); */
-  background-color: rgba(189, 189, 189, 0.25);
-  padding: 0 0.2em;
-  border-radius: 3px;
+  background-color: var(--hyp3e-color-primary-25);
 }
 
 .hyp3e .sheet-header .profile-img {
@@ -637,13 +868,15 @@
 .hyp3e .header-label {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
-  padding: 5px 5px;
+  margin: 5px 5px;
+  padding: 0 0;
   min-width: 60px;
 }
 .hyp3e .header-label-wide {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
-  padding: 5px 5px;
+  margin: 5px 5px;
+  padding: 0 0;
   min-width: 90px;
 }
 .hyp3e .sheet-tabs {
@@ -657,7 +890,11 @@
   a.active {
     font-weight: bold;
     font-size: 1.2em;
-    text-shadow: 0 0 5px var(--hyp3e-color-text-primary), 0 0 10px var(--hyp3e-color-text-primary), 0 0 15px var(--hyp3e-color-text-primary);
+    text-shadow: 0 0 5px var(--hyp3e-color-shadow-primary), 0 0 10px var(--hyp3e-color-shadow-primary), 0 0 15px var(--hyp3e-color-shadow-primary);
+  }
+  a:hover {
+    text-shadow: 0 0 5px var(--hyp3e-color-shadow-highlight), 0 0 10px var(--hyp3e-color-shadow-highlight), 0 0 15px var(--hyp3e-color-shadow-highlight);
+    cursor: pointer;
   }
 }
 .hyp3e .sheet-body,
@@ -691,19 +928,17 @@
   flex: 1;
 }
 /* Apply to all input fields and textareas where they sit above the header image */
-.hyp3e .character-header-block input,
+/* .hyp3e .character-header-block input,
 .hyp3e .character-header-block select,
 .hyp3e .character-header-block textarea {
-  /* background-color: rgba(255, 255, 255, 0.4); semi-transparent white */
-  background-color: rgba(189, 189, 189, 0.25);
-  border: 1px solid rgba(0, 0, 0, 0.2);        /* soft border */
+  background-color: var(--hyp3e-color-primary-25);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   padding: 0.3em 0.5em;
   border-radius: 4px;
   color: var(--hyp3e-input-text-color);
-  /* color: #1a1a1a; /* darker text for contrast */
-}
+} */
+/* Input-specific styles */
 .hyp3e .character-header-block input {
-  text-align: center;
   min-width: 50px;
   max-width: 75px;
   .input-small {
@@ -711,26 +946,29 @@
     max-width: 40px;
   }
 }
+/* Select-specific styles */
+/* .hyp3e .character-header-block select {
+  width: auto;
+  max-width: 150px;
+} */
+/* .hyp3e .character-header-block select option,
+.hyp3e .character-header-block select optgroup {
+  color: var(--hyp3e-input-text-color);
+  background-color: var(--hyp3e-color-select-option-bg);
+} */
+
+.hyp3e .character-header-block textarea {
+  min-width: 190px;
+}
+
 .hyp3e .character-header-block .input-small {
   text-align: center;
   max-width: 40px;
 }
 
-.hyp3e .character-header-block select {
-  text-align: center;
-  width: auto;
-  max-width: 150px;
-}
-.hyp3e .character-header-block textarea {
-  min-width: 190px;
-}
-
 /* Give labels a subtle background too */
 .hyp3e .character-header-block label {
-  /* background-color: rgba(255, 255, 255, 0.4); */
-  background-color: rgba(189, 189, 189, 0.25);
-  padding: 0 0.2em;
-  border-radius: 3px;
+  /* background-color: var(--hyp3e-color-primary-25); */
 }
 
 /* NPC header-block styles */
@@ -1138,7 +1376,7 @@
   font-weight: bold;
 }
 .hyp3e .items-header > * {
-  font-size: 14px;
+  font-size: large;
   text-align: center;
 }
 .hyp3e .items-header .item-name {
@@ -1172,7 +1410,7 @@
   flex: 2;
   margin: 0;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 1.2em;
   text-align: left;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1182,8 +1420,6 @@
   display: flex;
 }
 .hyp3e .items-list .item-name h3, .hyp3e .items-list .item-name h4 {
-  /* font-family: "Herculanum", sans-serif; */
-  font-family: "Roboto", sans-serif;
   font-weight: normal;
   margin: 0;
   white-space: nowrap;
@@ -1206,7 +1442,7 @@
   }
 }
 .hyp3e .items-list .item-controls a {
-  font-size: 12px;
+  font-size: 0.75em;
   text-align: center;
   margin: 0 6px;
 }
@@ -1215,13 +1451,13 @@
   -ms-flex-align: center;
   align-items: center;
   padding: 0 2px;
-  border-bottom: 1px solid #c9c7b8;
+  border-bottom: 1px solid var(--hyp3e-color-accent-25);
 }
-.hyp3e .items-list .item:last-child {
+/* .hyp3e .items-list .item:last-child {
   border-bottom: none;
-}
+} */
 .hyp3e .items-list .item .item-name {
-  font-size: small;
+  font-size: 1em;
 }
 .hyp3e .contained-items {
   padding-left: 15px;
@@ -1247,9 +1483,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-left: 1px solid #c9c7b8;
-  border-right: 1px solid #c9c7b8;
   font-size: small;
+  /* border-left: 1px solid #c9c7b8; */
+  /* border-left: 1px solid var(--hyp3e-color-accent); */
+  /* border-right: 1px solid var(--hyp3e-color-accent); */
 }
 .hyp3e .items-list .items-header {
   height: 32px;
@@ -1258,8 +1495,9 @@
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.05);
-  border: 2px groove #eeede0;
+  /* background: rgba(0, 0, 0, 0.05); */
+  background: var(--hyp3e-color-primary-10);
+  border: 2px groove var(--hyp3e-color-accent-25);
 }
 .hyp3e .items-list .items-header > * {
   font-size: medium;
@@ -1343,7 +1581,7 @@
 
 /* Item sheet styles */
 .hyp3e .item-form {
-  font-family: "Roboto", sans-serif;
+  /* font-family: "Roboto", sans-serif; */
   /* font-family: "Herculanum", sans-serif; */
 }
 /* Item header-block styles */
@@ -1437,10 +1675,10 @@
 
 @keyframes glow-pulse {
   0% {
-    filter: drop-shadow(0 0 4px rgba(255, 60, 60, 0.5));
+    text-shadow: 0 0 5px var(--hyp3e-color-shadow-primary), 0 0 10px var(--hyp3e-color-shadow-primary), 0 0 15px var(--hyp3e-color-shadow-primary);
   }
   100% {
-    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 1));
+    text-shadow: 0 0 5px var(--hyp3e-color-shadow-highlight), 0 0 10px var(--hyp3e-color-shadow-highlight), 0 0 15px var(--hyp3e-color-shadow-highlight);
   }
 }
 
