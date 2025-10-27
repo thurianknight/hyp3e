@@ -1,0 +1,54 @@
+/* Default theme options */
+.theme-dark {
+  --hyp3e-color-primary: var(--color-text-primary);
+  --hyp3e-color-primary-10: rgba(239, 230, 216, 0.05);
+  --hyp3e-color-primary-25: rgba(239, 230, 216, 0.15);
+  --hyp3e-color-accent: var(--color-text-emphatic);
+  --hyp3e-color-accent-25: rgba(255, 255, 255, 0.25);
+  --hyp3e-color-bg: rgba(11, 10, 19, 0.9);
+  --hyp3e-color-bg-01: rgba(11, 10, 19, 0.01);
+  --hyp3e-color-bg-50: var(--color-cool-5-75);
+  --hyp3e-color-bg-75: var(--color-cool-5-75);
+  --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
+  --hyp3e-color-text-primary: var(--color-text-primary);
+  --hyp3e-input-text-color: var(--input-text-color);
+  --hyp3e-color-shadow-primary: var(--color-shadow-primary);
+  --hyp3e-color-shadow-highlight: var(--color-shadow-highlight);
+  --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-50);
+  --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
+  --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
+  --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
+  --hyp3e-saves-transformation-icon: url("../assets/transportation-rings-white.png");
+  --hyp3e-saves-avoidance-icon: url("../assets/dodging-white.png");
+  --hyp3e-saves-sorcery-icon: url("../assets/magic-swirl-white.png");
+}
+
+/* Dark frame decoration */
+.hyp3e.actor.themed.theme-dark .window-content {
+  position: relative;
+  overflow-y: auto;
+}
+
+/* Full-width background footer image */
+.hyp3e.actor.themed.theme-dark .window-content::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+
+  background-image: 
+    linear-gradient(to bottom, 
+      var(--hyp3e-color-bg) 0%, 
+      var(--hyp3e-color-bg-01) 100%),
+      url("/systems/hyp3e/assets/thief_footer.png");
+  
+  background-size: cover; /* fill the div */
+  background-repeat: no-repeat;
+  /* background-position: bottom; */
+
+  opacity: 0.2; /* semi-transparent */
+  z-index: 0;
+  pointer-events: none; /* clicks pass through */
+}

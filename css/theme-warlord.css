@@ -1,0 +1,101 @@
+/* Custom Hyp3e Actor/Item Sheet theme styles */
+.theme-warlord {
+  --hyp3e-color-primary: rgba(122, 28, 28, 1);
+  --hyp3e-color-primary-10: rgba(122, 28, 28, 0.10);
+  --hyp3e-color-primary-25: rgba(122, 28, 28, 0.25);
+  --hyp3e-color-accent: rgba(200, 162, 123, 1);
+  --hyp3e-color-accent-25: rgba(200, 162, 123, 0.25);
+  --hyp3e-color-bg: rgba(27, 10, 10, 1);
+  --hyp3e-color-bg-01: rgba(27, 10, 10, 0.01);
+  --hyp3e-color-bg-50: rgba(27, 10, 10, 0.5);
+  --hyp3e-color-bg-75: rgba(27, 10, 10, 0.75);
+  --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
+  --hyp3e-color-text-primary: #C8A27B;
+  --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
+  --hyp3e-color-shadow-primary: #C04040;     /* glowing blood red */
+  --hyp3e-color-shadow-highlight: #FF6B6B;   /* bright, fiery red */
+  --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-75);
+  --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
+  --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
+  --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
+  --hyp3e-saves-transformation-icon: url("../assets/transportation-rings-white.png");
+  --hyp3e-saves-avoidance-icon: url("../assets/dodging-white.png");
+  --hyp3e-saves-sorcery-icon: url("../assets/magic-swirl-white.png");
+}
+
+/* Warlord frame decoration */
+.hyp3e.actor.themed.theme-warlord .window-content {
+  position: relative;
+  overflow-y: auto;
+}
+
+/* Full-width background footer image */
+.hyp3e.actor.themed.theme-warlord .window-content::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+
+  background-image: 
+    linear-gradient(to bottom, 
+      var(--hyp3e-color-bg) 0%, 
+      var(--hyp3e-color-bg-01) 100%),
+      url("/systems/hyp3e/assets/warlord_footer.png");
+  
+  background-size: cover; /* fill the div */
+  background-repeat: no-repeat;
+  /* background-position: bottom; */
+
+  opacity: 0.2; /* semi-transparent */
+  z-index: 0;
+  pointer-events: none; /* clicks pass through */
+}
+
+/* Ornate corner blades */
+/* Lower left corner */
+/* .hyp3e.actor.themed.theme-warlord .window-content::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 48px;
+  height: 48px;
+  background: url("/systems/hyp3e/assets/frames/warlord-corner.png") no-repeat center;
+  background-size: contain;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 6px rgba(200, 162, 123, 0.8));
+} */
+/* Lower right corner */
+/* .hyp3e.actor.themed.theme-warlord .window-content::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 48px;
+  height: 48px;
+  background: url("/systems/hyp3e/assets/frames/warlord-corner.png") no-repeat center;
+  background-size: contain;
+  pointer-events: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 6px rgba(200, 162, 123, 0.8));
+  transform: scaleX(-1); /* flip horizontally for symmetry 
+} */
+
+/* Heavy blood-red base strip */
+/* .hyp3e.actor.themed.theme-warlord .window-content::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(
+    to top,
+    rgba(122, 28, 28, 1),
+    rgba(122, 28, 28, 0.3)
+  );
+  box-shadow: 0 0 12px rgba(200, 162, 123, 0.8);
+} */
