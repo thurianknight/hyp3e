@@ -19,7 +19,9 @@
 @import url("hyp3e-quick-equip.css");
 @import url("hyp3e-turn-tracker.css");
 
-/* Global styles included with the boilerplate system */
+/* ------------------------------------------------------------------------- */
+/* Global styles included with the boilerplate system                        */
+/* ------------------------------------------------------------------------- */
 /* .window-app {
   font-family: "Roboto", sans-serif;
 } */
@@ -242,8 +244,40 @@
 }
 
 
-/* Styles limited to hyp3e sheets */
+/* ------------------------------------------------------------------------- */
+/* Styles limited to hyp3e sheets                                            */
+/* ------------------------------------------------------------------------- */
+
 .hyp3e {
+
+  /* ------------------------------------------------------------------------- */
+  /* Generic styles used wherever I need them                                  */
+  /* ------------------------------------------------------------------------- */
+  .row-top {
+    display: flex;            /* lay out children in a row */
+    flex-direction: row;      /* default behavior of 'flex' above, but explicit here */
+    align-items: flex-start;  /* align items to the top of the container */
+  }
+  .row-stretch {
+    display: flex;            /* lay out children in a row */
+    flex-direction: row;      /* default, but explicit */
+    align-items: stretch;     /* evenly space items from left to right in the container */
+  }
+  .column-top {
+    display: flex;
+    flex-direction: column;       /* stack children vertically */
+    justify-content: flex-start;  /* align them at the top of the column */
+  }
+  .column-stretch {
+    display: flex;
+    flex-direction: column;   /* stack children vertically */
+    justify-content: stretch; /* evenly space items from top to bottom in the container */
+  }
+  
+  /* ------------------------------------------------------------------------- */
+  /* Element styles applied to all sheets                                      */
+  /* ------------------------------------------------------------------------- */
+
   /* Mouse-over 'a' elements */
   a:hover, a:focus {
     text-shadow: 0 0 5px var(--hyp3e-color-shadow-highlight), 0 0 10px var(--hyp3e-color-shadow-highlight), 0 0 15px var(--hyp3e-color-shadow-highlight);
@@ -255,7 +289,7 @@
     cursor: pointer;
   }
 
-  /* Default styles for input/select/textarea fields */
+  /* Input/select/textarea fields */
   input[type=text], input[type="number"],
   select,
   textarea {
@@ -266,26 +300,20 @@
     margin-bottom: 2px;
     padding: 0.3em 0.5em;
   }
-
-  /* Specific styles for input fields */
   input[type=text], input[type="number"] {
-    text-align: center;
+    text-align: left;
   }
   input[type=text]:disabled, input[type="number"]:disabled {
-    /* We could use a slightly different background color here */
+    /* We use a more transparent background color here */
     background-color: var(--hyp3e-color-primary-10);
     border: none;
   }
-
-  /* Specific styles for textarea boxes */
   textarea {
     font-size: 0.9em;
     resize: none;
   }
-
-  /* Specific styles for select boxes */
   select {
-    /* text-align: center; */
+    text-align: left;
     width: auto;
     max-width: 200px;
   }
@@ -294,7 +322,7 @@
     background-color: var(--hyp3e-color-select-option-bg);
   }
 
-  /* Default styles for checkboxes */
+  /* Checkbox styles */
   input[type=checkbox] {
     padding: 0.25em 0;
     width: 24px;
@@ -302,7 +330,7 @@
     height: 24px;
   }
 
-  /* Default styles for labels */
+  /* Label styles */
   label {
     color: var(--hyp3e-input-text-color);
     border: none;
@@ -310,6 +338,71 @@
     /* padding: 0 0.2em; */
   }
 
+  .controls-dropdown {
+    z-index: 1000;
+  }
+  
+  .window-title {
+    color: var(--color-light-2);
+  }
+  
+  .window-content {
+    /* max-height: 100%; */
+    background-color: var(--hyp3e-color-bg);
+    color: var(--hyp3e-color-text-primary);
+    .tab {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .tab.active {
+      /* background: var(--hyp3e-color-primary); */
+    }
+    .button {
+      background: var(--hyp3e-color-primary);
+    }
+  }
+  .icon-btn {
+      width: 32px;
+      max-width: 32px;
+      height: 32px;
+      max-height: 32px;
+      /* line-height: 1px; */
+      padding: 8px 8px;
+      margin: 1px 2px;
+  }
+
+  /* ------------------------------------------------------------------------- */
+  /* General sheet-header styles                                               */
+  /* ------------------------------------------------------------------------- */
+  .sheet-header {
+    flex: 0 auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-bottom: 7px;
+  }
+
+  /* ------------------------------------------------------------------------- */
+  /* Actor Sheet styles applied to all Actor types                             */
+  /* ------------------------------------------------------------------------- */
+
+  /* Sheet-level styles */
+  .actor {
+    min-width: 810px;
+    min-height: 700px;
+  }
+  .actor .main-content {
+    margin-left: 30px;  /* slightly less than left gutter width */
+  }
+  
+
+  /* ------------------------------------------------------------------------- */
+  /* Actor Sheet styles applied to only to characters                          */
+  /* ------------------------------------------------------------------------- */
+
+  /* Saving throw icon styles */
   .save-icon {
     margin-right: 5px;
     /* Icon container */
@@ -329,115 +422,54 @@
       opacity: 1;
     }
   }
-
   .save-icon.death .save-icon-button {
     background-image: var(--hyp3e-saves-death-icon);
   }
-
   .save-icon.device .save-icon-button {
     background-image: var(--hyp3e-saves-device-icon);
   }
-
   .save-icon.transformation .save-icon-button {
     background-image: var(--hyp3e-saves-transformation-icon);
   }
-
   .save-icon.avoidance .save-icon-button {
     background-image: var(--hyp3e-saves-avoidance-icon);
   }
-
   .save-icon.sorcery .save-icon-button {
     background-image: var(--hyp3e-saves-sorcery-icon);
   }
 
-}
 
-.hyp3e .controls-dropdown {
-  z-index: 1000;
-}
+  /* ------------------------------------------------------------------------- */
+  /* Actor Sheet styles applied to only to NPCs                                */
+  /* ------------------------------------------------------------------------- */
 
-.hyp3e .window-title {
-  color: var(--color-light-2);
-}
 
-.hyp3e .window-content {
-  /* max-height: 100%; */
-  background-color: var(--hyp3e-color-bg);
-  color: var(--hyp3e-color-text-primary);
-  .tab {
-    height: 100%;
-    overflow-y: auto;
+
+
+
+
+  /* ------------------------------------------------------------------------- */
+  /* Item Sheet styles applied to all item types                               */
+  /* ------------------------------------------------------------------------- */
+
+  .item {
+    min-width: 600px;
+    min-height: 550px;
   }
-  .tab.active {
-    /* background: var(--hyp3e-color-primary); */
-  }
-  .button {
-    background: var(--hyp3e-color-primary);
-  }
-}
-.hyp3e .icon-btn {
-    width: 32px;
-    max-width: 32px;
-    height: 32px;
-    max-height: 32px;
-    /* line-height: 1px; */
-    padding: 8px 8px;
-    margin: 1px 2px;
+  
+
+
 }
 
-/* Sheet-level styles */
-.hyp3e.sheet.actor {
-  /* min-width: 800px;
-  min-height: 700px; */
-}
-.hyp3e.sheet.item {
-  /* min-width: 600px; */
-  /* min-height: 550px; */
-}
 
-/* Generic styles used wherever I need them */
-.hyp3e .row-top {
-  display: flex;            /* lay out children in a row */
-  flex-direction: row;      /* default behavior of 'flex' above, but explicit here */
-  align-items: flex-start;  /* align items to the top of the container */
-}
-.hyp3e .row-stretch {
-  display: flex;            /* lay out children in a row */
-  flex-direction: row;      /* default, but explicit */
-  align-items: stretch;     /* evenly space items from left to right in the container */
-}
-.hyp3e .column-top {
-  display: flex;
-  flex-direction: column;       /* stack children vertically */
-  justify-content: flex-start;  /* align them at the top of the column */
-}
-.hyp3e .column-stretch {
-  display: flex;
-  flex-direction: column;   /* stack children vertically */
-  justify-content: stretch; /* evenly space items from top to bottom in the container */
-}
 
-/* General sheet-header and body styles */
-.hyp3e .sheet-header {
-  -webkit-box-flex: 0;
-  -ms-flex: 0 auto;
-  flex: 0 auto;
-  /* min-height: 170px; */
-  overflow: hidden;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-  margin-bottom: 7px;
-}
+
+
+
+
+
+
+
 /* Background header image div */
 .hyp3e .sheet-header .header-bg {
   position: absolute;
@@ -460,27 +492,10 @@
   pointer-events: none; /* clicks pass through */
 }
 
-/* Apply to all input fields and textareas where they sit above the header image */
-/* .hyp3e .npc-header-block input[type=text],
-.hyp3e .npc-header-block input[type=number],
-.hyp3e .npc-header-block textarea,
-.hyp3e .npc-header-block select {
-  color: var(--hyp3e-input-text-color);
-  background-color: var(--hyp3e-color-primary-25);
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  padding: 0.3em 0.5em;
-  border-radius: 4px;
-}
-.hyp3e .npc-header-block select option,
-.hyp3e .npc-header-block select optgroup {
-  color: var(--hyp3e-input-text-color);
-  background-color: var(--hyp3e-color-select-option-bg);
-} */
-
 /* Give labels a subtle background where there is an underlying image */
-.hyp3e .npc-header-block label {
+/* .hyp3e .npc-header-block label {
   background-color: var(--hyp3e-color-primary-25);
-}
+} */
 
 .hyp3e .sheet-header .profile-img {
   -webkit-box-flex: 0;
@@ -523,6 +538,35 @@
   height: 100%;
 
   justify-content: center;
+}
+
+/* Left gutter w/ floating image */
+.hyp3e .left-gutter {
+  position: absolute;
+  top: 250px;
+  left: 0;
+  width: 40px;
+  height: auto;
+  overflow: visible;
+  z-index: 1;
+}
+.hyp3e .left-gutter img {
+  display: block;
+  width: 50px;
+  height: auto;
+  object-fit: cover;
+}
+.hyp3e .left-gutter::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--hyp3e-color-bg-50) 0%,
+    /* var(--hyp3e-color-bg-50) 60%, */
+    transparent 100%
+  );
 }
 
 .hyp3e .sheet-header .header-block {
@@ -579,6 +623,7 @@
   border: none;
   max-width: 200px;
 }
+
 .hyp3e .header-label {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
@@ -641,18 +686,10 @@
   align-items: flex-start;
   flex: 1;
 }
-/* Apply to all input fields and textareas where they sit above the header image */
-/* .hyp3e .character-header-block input,
-.hyp3e .character-header-block select,
-.hyp3e .character-header-block textarea {
-  background-color: var(--hyp3e-color-primary-25);
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  padding: 0.3em 0.5em;
-  border-radius: 4px;
-  color: var(--hyp3e-input-text-color);
-} */
+
 /* Input-specific styles */
 .hyp3e .character-header-block input {
+  text-align: center;
   min-width: 50px;
   max-width: 75px;
   .input-small {
@@ -660,38 +697,27 @@
     max-width: 40px;
   }
 }
-/* Select-specific styles */
-/* .hyp3e .character-header-block select {
-  width: auto;
-  max-width: 150px;
-} */
-/* .hyp3e .character-header-block select option,
-.hyp3e .character-header-block select optgroup {
-  color: var(--hyp3e-input-text-color);
-  background-color: var(--hyp3e-color-select-option-bg);
-} */
 
 .hyp3e .character-header-block textarea {
   min-width: 190px;
 }
 
-.hyp3e .character-header-block .input-small {
-  text-align: center;
-  max-width: 40px;
-}
-
 /* Give labels a subtle background too */
-.hyp3e .character-header-block label {
-  /* background-color: var(--hyp3e-color-primary-25); */
-}
+/* .hyp3e .character-header-block label {
+  background-color: var(--hyp3e-color-primary-25);
+} */
 
 /* NPC header-block styles */
 .hyp3e .npc-header-block {
   padding-bottom: 5px;
   margin-right: 5px;
 }
+/* Input-specific styles */
+.hyp3e .npc-header-block input {
+  text-align: center;
+}
 
-/* All content in an actor-sheet tab */
+/* Content in an actor-sheet tab */
 .hyp3e .all-content {
   display: flex;
   flex-direction: row;
@@ -699,14 +725,7 @@
   flex: 1;
   margin-top: 5px;
 }
-/* Left gutter image */
-.hyp3e .left-gutter {
-  max-width: 50px;
-  border: none;
-}
-.hyp3e .left-gutter img {
-  border: 0;
-}
+
 /* Main content block in the tab */
 .hyp3e .main-content {
   background-position: center;
@@ -1235,7 +1254,15 @@
   min-width: 125px;
   padding: 0 10px;
   margin-right: 10px;
+  input {
+    text-align: center;
+  }
+  select {
+    padding: 0 3px;
+    text-align: center;
+  }
 }
+
 .hyp3e .bg-attributes {
   margin-bottom: 5px;
   input[type=text],
@@ -1302,6 +1329,10 @@
 .hyp3e .item-header-block {
   padding: 0 2px;
   margin-right: 5px;
+  input[type=text],
+  input[type="number"] {
+    text-align: center;
+  }
   .xp {
     min-width: 75px;
     max-width: 100px;
@@ -1350,13 +1381,6 @@
   justify-content: flex-start;
   align-items: flex-start;
   overflow-y: auto;
-}
-
-.hyp3e .item-attributes {
-  select {
-    padding: 0 3px;
-    text-align: center;
-  }
 }
 
 /* Horizontal rule plain style */

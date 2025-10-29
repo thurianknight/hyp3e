@@ -65,7 +65,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         },
         window: {
             icon: "fas fa-book",
-            resizable: true,
+            resizable: false,
         },
         actions: {
             // These actions are shared on multiple tabs
@@ -127,39 +127,39 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         },
         abilities: {
             template: `${HYP3E.templatePath}/actor/parts/tab-actor-abilities.hbs`,
-            scrollable: ["", ".tab", ".main-content"],
+            scrollable: [".tab"],
         },
         // Combat, Spells, and Items are only used by Characters. We use conditional rendering
         //  in the handlebars templates, so these three will not appear on the NPC sheet.
         combat: {
             template: `${HYP3E.templatePath}/actor/parts/tab-character-combat.hbs`,
-            scrollable: ["", ".tab", ".main-content"],
+            scrollable: [".tab"],
         },
         spells: {
             template: `${HYP3E.templatePath}/actor/parts/tab-character-spells.hbs`,
-            scrollable: ["", ".tab", ".main-content"],
+            scrollable: [".tab"],
         },
         items: {
             template: `${HYP3E.templatePath}/actor/parts/tab-character-items.hbs`,
-            scrollable: ["", ".tab", ".main-content"],
+            scrollable: [".tab"],
         },
         // All PCs and NPCs gets Description and Effects, same as Abilities, above.
         description: {
             template: `${HYP3E.templatePath}/actor/parts/tab-actor-description.hbs`,
-            scrollable: ["", ".tab", ".main-content"],
+            scrollable: [".tab"],
         },
         effects: {
             template: `${HYP3E.templatePath}/actor/parts/tab-actor-effects.hbs`,
-            scrollable: ["", ".tab", ".main-content"],
+            scrollable: [".tab"],
         },
         // Merchants get equipment and fighting gear, and none of the prior tabs
         equipment: {
             template: `${HYP3E.templatePath}/actor/parts/tab-merchant-equipment.hbs`,
-            scrollable: ["", ".tab", ".main-content"],           
+            scrollable: [".tab"],
         },
         fightingGear: {
             template: `${HYP3E.templatePath}/actor/parts/tab-merchant-fighting-gear.hbs`,
-            scrollable: ["", ".tab", ".main-content"],           
+            scrollable: [".tab"],
         },
     }
 
