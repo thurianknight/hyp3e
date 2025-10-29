@@ -113,37 +113,6 @@
   pointer-events: none; /* clicks pass through */
 }
 
-/* Ornate corner blades */
-/* Lower left corner */
-/* .hyp3e.actor.themed.theme-warlord .window-content::before {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 48px;
-  height: 48px;
-  background: url("/systems/hyp3e/assets/frames/warlord-corner.png") no-repeat center;
-  background-size: contain;
-  pointer-events: none;
-  opacity: 0.9;
-  filter: drop-shadow(0 0 6px rgba(200, 162, 123, 0.8));
-} */
-/* Lower right corner */
-/* .hyp3e.actor.themed.theme-warlord .window-content::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 48px;
-  height: 48px;
-  background: url("/systems/hyp3e/assets/frames/warlord-corner.png") no-repeat center;
-  background-size: contain;
-  pointer-events: none;
-  opacity: 0.9;
-  filter: drop-shadow(0 0 6px rgba(200, 162, 123, 0.8));
-  transform: scaleX(-1); /* flip horizontally for symmetry 
-} */
-
 /* Heavy blood-red base strip */
 /* .hyp3e.actor.themed.theme-warlord .window-content::after {
   content: "";

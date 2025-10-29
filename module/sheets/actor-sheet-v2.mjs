@@ -65,7 +65,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         },
         window: {
             icon: "fas fa-book",
-            resizable: false,
+            resizable: true,
         },
         actions: {
             // These actions are shared on multiple tabs
