@@ -1,7 +1,25 @@
   {{!-- Sheet Header --}}
   <header class="sheet-header npc">
     <div class="header-bg"></div>
-    <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+    <div class="profile-img">
+      <!-- The character profile image -->
+      <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+      <!-- The character health bar -->
+      <div class="health-bar" style="border-bottom:0px;">
+        <div style="width:{{system.hp.percentage}}%" class="health-fill"></div>
+          <div class="health-text">
+            <span
+              class='short-field align-right current-value'
+              style='text-align:right;'>
+              {{system.hp.value}}
+            </span> 
+            <p style="margin:0px">/</p>
+            <span class=' short-field'>
+              {{system.hp.max}}
+            </span> 
+          </div>
+      </div> <!-- End Health Bar -->
+    </div><!-- End Profile Image -->
     <div class="header-block">
       <div class="npc-header-block flexcol">
         <div class="npc-header-block flexrow">

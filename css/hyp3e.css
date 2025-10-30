@@ -414,14 +414,9 @@
   pointer-events: none; /* clicks pass through */
 }
 
-/* Give labels a subtle background where there is an underlying image */
-/* .hyp3e .npc-header-block label {
-  background-color: var(--hyp3e-color-primary-25);
-} */
-
 .hyp3e .sheet-header .profile-img {
-  -webkit-box-flex: 0;
-  -ms-flex: 0 0 100px;
+  /* -webkit-box-flex: 0;
+  -ms-flex: 0 0 100px; */
   flex: 0 0 100px;
   position: relative;
   top: 0px;
@@ -431,9 +426,33 @@
   z-index: 1; /* Must sit atop the background image */
 }
 
+.hyp3e .sheet-header .header-block {
+  /* -webkit-box-flex: 1;
+  -ms-flex: 1; */
+  flex: 1;
+  z-index: 1; /* Must sit atop the background image */
+}
+
+.hyp3e .sheet-header h2.charname {
+  height: 50px;
+  width: 100%;
+  padding: 0px;
+  margin: 5px 0;
+  border-bottom: 0;
+}
+.hyp3e .sheet-header h2.charname input {
+  width: 100%;
+  min-width: 300px;
+  height: 48px;
+  margin: 0;
+  font-family: "Herculanum", sans-serif;
+  color: var(--hyp3e-input-text-color);
+}
+
+/* Tabs row on any sheet */
 .hyp3e .sheet-tabs {
-  -webkit-box-flex: 0;
-  -ms-flex: 0;
+  /* -webkit-box-flex: 0;
+  -ms-flex: 0; */
   flex: 0;
   font-family: "Herculanum", sans-serif;
 }
@@ -462,14 +481,46 @@
 /* ------------------------------------------------------------------------- */
 
 /* Sheet-level styles */
-.hyp3e.actor {
-  min-width: 810px;
-  min-height: 700px;
-}
+/* .hyp3e.actor {
+  min-width: 810px;   /* These prevent the window from minimizing to the title
+  min-height: 700px;  /*   bar, so we can't use them here.
+} */
 
 /* .hyp3e.actor .sheet-header {
-  margin-bottom: 10px;
+  margin-bottom: 10px;  /* Pretty sure we don't need this...
 } */
+
+/* Sets the position of the health bar and sets it to the proper size. */
+.hyp3e.actor .health-bar {
+  position: absolute;
+  z-index: 2; /* Must sit atop the character image */
+  bottom: -5px;
+
+  width: 100%;
+  height: 15px;
+
+  border: 1px solid rgb(170,170,170);
+
+  box-shadow: 0 0 5px inset rgb(0,0,0,0.4);
+  background-color: whitesmoke;
+}
+.hyp3e.actor .health-bar .health-fill {
+  background: linear-gradient(45deg, rgba(48,121,22,1) 0%, rgba(97,190,80,1) 100%);
+  height: 100%;
+}
+/* Positions the HP text in the center of the health bar */
+.hyp3e.actor .health-text {
+  color: var(--color-light-2);;
+  display: flex;
+  position: relative;
+  top: -100%;
+  
+  width: 100%;
+  height: 100%;
+
+  justify-content: center;
+}
+
 /* The all-content block is the top-level container in a tab */
 .hyp3e.actor .all-content{
   display: flex;
@@ -508,7 +559,7 @@
 }
 
 /* Main content block (right side) in the tab */
-.hyp3e.actor .tab .main-content {
+.hyp3e.actor .main-content {
   margin-left: 30px;  /* slightly less than left gutter width */
   background-position: center;
   background-size: cover;
@@ -567,17 +618,14 @@
 
 
 
-
-
-
 /* ------------------------------------------------------------------------- */
 /* Item Sheet styles applied to all item types                               */
 /* ------------------------------------------------------------------------- */
 
-.hyp3e.item {
-  min-width: 600px;
-  min-height: 550px;
-}
+/* .hyp3e.item {
+  min-width: 600px;   /* These prevent the window from minimizing to the title
+  min-height: 550px;  /*   bar, so we can't use them here.
+} */
 
 
 
@@ -586,60 +634,6 @@
 
 
 
-/* Sets the position of the health-bar and strain-bar and sets it to the propper size. */
-.hyp3e .health-bar {
-  position: absolute;
-  z-index: 2; /* Must sit atop the character image */
-  bottom: -5px;
-
-  width: 100%;
-  height: 15px;
-
-  border: 1px solid rgb(170,170,170);
-
-  box-shadow: 0 0 5px inset rgb(0,0,0,0.4);
-  background-color: whitesmoke;
-}
-.hyp3e .health-bar .health-fill {
-  background: linear-gradient(45deg, rgba(48,121,22,1) 0%, rgba(97,190,80,1) 100%);
-  height: 100%;
-}
-/* Positions the HP text in the center of the healthbar or strainbar */
-.hyp3e .health-text {
-  color: var(--color-light-2);;
-  display: flex;
-  position: relative;
-  top: -100%;
-  
-  width: 100%;
-  height: 100%;
-
-  justify-content: center;
-}
-
-
-.hyp3e .sheet-header .header-block {
-  -webkit-box-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-  z-index: 1; /* Must sit atop the background image */
-}
-
-.hyp3e .sheet-header h2.charname {
-  height: 50px;
-  width: 100%;
-  padding: 0px;
-  margin: 5px 0;
-  border-bottom: 0;
-  input {
-    width: 100%;
-    min-width: 300px;
-    height: 48px;
-    margin: 0;
-    font-family: "Herculanum", sans-serif;
-    color: var(--hyp3e-input-text-color);
-  }
-}
 
 .hyp3e h1, .hyp3e h2, .hyp3e h3, .hyp3e h4 {
   font-family: "Herculanum", sans-serif;

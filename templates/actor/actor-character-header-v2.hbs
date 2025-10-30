@@ -1,8 +1,10 @@
   {{!-- Sheet Header --}}
   <header class="sheet-header character">
     <div class="header-bg"></div>
-    <div class="profile-img"><!-- Profile Image -->
+    <div class="profile-img">
+      <!-- The character profile image -->
       <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-field="img" alt="Portrait" title="{{actor.name}}" height="100" width="100"/>
+      <!-- The character health bar -->
       <div class="health-bar" style="border-bottom:0px;"><!-- The character health bar -->
         <div style="width:{{system.hp.percentage}}%" class="health-fill"></div>
           <div class="health-text">
