@@ -8,15 +8,12 @@
   --hyp3e-color-accent: rgba(200, 162, 123, 1);
   --hyp3e-color-accent-25: rgba(200, 162, 123, 0.25);
 
-  /* --hyp3e-color-accent: rgba(255, 217, 24, 1);
-  --hyp3e-color-accent-25: rgba(255, 217, 24, 0.25); */
-
-  /* Original background color */
-  --hyp3e-color-bg: rgba(27, 10, 10, 1);
+  /* Main background color */
+  /* --hyp3e-color-bg: rgba(27, 10, 10, 1);
   --hyp3e-color-bg-01: rgba(27, 10, 10, 0.01);
   --hyp3e-color-bg-50: rgba(27, 10, 10, 0.5);
   --hyp3e-color-bg-75: rgba(27, 10, 10, 0.75);
-  --hyp3e-color-bg-90: rgba(27, 10, 10, 0.90);
+  --hyp3e-color-bg-90: rgba(27, 10, 10, 0.90); */
   /* Test 1 */
   /* --hyp3e-color-bg: rgba(44, 12, 12, 1);
   --hyp3e-color-bg-01: rgba(44, 12, 12, 0.01);
@@ -28,26 +25,25 @@
   --hyp3e-color-bg-01: rgba(36, 9, 9, 0.01);
   --hyp3e-color-bg-50: rgba(36, 9, 9, 0.5);
   --hyp3e-color-bg-75: rgba(36, 9, 9, 0.75);
-  --hyp3e-color-bg-90: rgba(36, 9, 9, 0.90);
+  --hyp3e-color-bg-90: rgba(36, 9, 9, 0.9);
 
   --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
 
   --hyp3e-color-text-primary: rgba(200, 162, 123, 1);
   --hyp3e-color-text-primary-25: rgba(200, 162, 123, 0.25);
-  --hyp3e-color-text-primary-50: rgba(200, 162, 123, 0.50);
-
-  /* --hyp3e-color-text-primary: rgba(255, 217, 24, 1);
-  --hyp3e-color-text-primary-25: rgba(255, 217, 24, 1);
-  --hyp3e-color-text-primary-50: rgba(255, 217, 24, 1); */
+  --hyp3e-color-text-primary-50: rgba(200, 162, 123, 0.5);
 
   --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
   --hyp3e-input-text-color-25: var(--hyp3e-color-text-primary-25);
   --hyp3e-input-text-color-50: var(--hyp3e-color-text-primary-50);
+
   --hyp3e-color-shadow-primary: #C04040;     /* glowing blood red */
   --hyp3e-color-shadow-highlight: #FF6B6B;   /* bright, fiery red */
   --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-90);
   --hyp3e-color-menu-bg: var(--hyp3e-color-bg-90);
+
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
+
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
   --hyp3e-saves-transformation-icon: url("../assets/transportation-rings-white.png");
@@ -93,6 +89,7 @@
   --button-hover-border-color: var(--button-border-color);
   --button-hover-text-color: var(--button-text-color);
 } */
+
 .themed.theme-warlord .prosemirror,
 .themed.theme-warlord prose-mirror,
 .themed.theme-warlord #prosemirror-dropdown,
