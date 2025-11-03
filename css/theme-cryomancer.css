@@ -6,22 +6,24 @@
   --hyp3e-color-primary-25: rgba(120, 191, 239, 0.25);
   --hyp3e-color-accent: rgba(214, 243, 255, 1);
   --hyp3e-color-accent-25: rgba(214, 243, 255, 0.25);
-  /* Original colors */
-  --hyp3e-color-bg: rgba(11, 30, 43, 1);
+  /* Original background color */
+  /* --hyp3e-color-bg: rgba(11, 30, 43, 1);
   --hyp3e-color-bg-01: rgba(11, 30, 43, 0.01);
   --hyp3e-color-bg-50: rgba(11, 30, 43, 0.5);
   --hyp3e-color-bg-75: rgba(11, 30, 43, 0.75);
-  --hyp3e-color-bg-90: rgba(11, 30, 43, 0.90);
+  --hyp3e-color-bg-90: rgba(11, 30, 43, 0.90); */
   /* Test 1 */
-  /* --hyp3e-color-bg: rgb(10, 76, 120);
+  /* --hyp3e-color-bg: rgba(10, 76, 120, 1);
   --hyp3e-color-bg-01: rgba(10, 76, 120, 0.01);
   --hyp3e-color-bg-50: rgba(10, 76, 120, 0.5);
-  --hyp3e-color-bg-75: rgba(10, 76, 120, 0.75); */
-  /* Test 2 */
-  /* --hyp3e-color-bg: rgb(51, 121, 168);
-  --hyp3e-color-bg-01: rgba(51, 121, 168, 0.01);
-  --hyp3e-color-bg-50: rgba(51, 121, 168, 0.5);
-  --hyp3e-color-bg-75: rgba(51, 121, 168, 0.75); */
+  --hyp3e-color-bg-75: rgba(10, 76, 120, 0.75);
+  --hyp3e-color-bg-90: rgba(10, 76, 120, 0.90); */
+/* Test 2 */
+  --hyp3e-color-bg: rgba(16, 97, 150, 1);
+  --hyp3e-color-bg-01: rgba(16, 97, 150, 0.01);
+  --hyp3e-color-bg-50: rgba(16, 97, 150, 0.5);
+  --hyp3e-color-bg-75: rgba(16, 97, 150, 0.75);
+  --hyp3e-color-bg-90: rgba(16, 97, 150, 0.90);
 
   --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
   --hyp3e-color-text-primary: rgba(214, 243, 255, 1);
