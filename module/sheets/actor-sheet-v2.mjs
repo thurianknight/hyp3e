@@ -41,10 +41,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         const customThemes = {
             warlord: "Warlord",
             cryomancer: "Cryomancer",
-            // necromancer: "Necromancer",
-            // pyromancer: "Pyromancer",
-            // beastmaster: "Beastmaster",
-            // shadowmaster: "Shadowmaster",
+            necromancer: "Necromancer",
+            pyromancer: "Pyromancer",
+            beastmaster: "Beastmaster",
+            shadowmaster: "Shadowmaster",
         };
 
         // Merge and log for verification

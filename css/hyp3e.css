@@ -510,10 +510,10 @@
 }
 /* Positions the HP text in the center of the health bar */
 .hyp3e.actor .health-text {
-  color: var(--color-light-2);;
+  color: var(--color-dark-3);
   display: flex;
   position: relative;
-  top: -100%;
+  top: -110%;
   
   width: 100%;
   height: 100%;
