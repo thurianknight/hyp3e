@@ -246,7 +246,8 @@
             "physical": {
                 "quantity": {
                     "value": 1,
-                    "max": 0
+                    "max": 0,
+                    "bundle": null
                 },
                 "isConsumable": false,
                 "isLightSource": null,
