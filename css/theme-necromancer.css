@@ -39,6 +39,7 @@
   --hyp3e-saves-sorcery-icon: url("../assets/magic-swirl-white.png");
 }
 
+/* Prose-mirror rich text editor */
 .themed.theme-necromancer .prosemirror,
 .themed.theme-necromancer prose-mirror,
 .themed.theme-necromancer #prosemirror-dropdown,

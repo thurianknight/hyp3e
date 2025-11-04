@@ -1,26 +1,74 @@
 /* Custom Hyp3e Actor/Item Sheet theme styles */
 .theme-shadowmaster {
+  /* Core colors */
   --hyp3e-color-primary: rgba(43, 43, 43, 1);
   --hyp3e-color-primary-10: rgba(43, 43, 43, 0.10);
   --hyp3e-color-primary-25: rgba(43, 43, 43, 0.25);
-  --hyp3e-color-accent: rgba(126, 126, 126, 1);
-  --hyp3e-color-accent-25: rgba(126, 126, 126, 0.25);
+
+  /* --hyp3e-color-accent: rgba(126, 126, 126, 1);
+  --hyp3e-color-accent-25: rgba(126, 126, 126, 0.25); */
+  --hyp3e-color-accent: rgba(139, 26, 26, 1);
+  --hyp3e-color-accent-25: rgba(139, 26, 26, 0.25);
+
+  /* Main background color */
   --hyp3e-color-bg: rgba(14, 14, 14, 1);
   --hyp3e-color-bg-01: rgba(14, 14, 14, 0.01);
   --hyp3e-color-bg-50: rgba(14, 14, 14, 0.5);
   --hyp3e-color-bg-75: rgba(14, 14, 14, 0.75);
+  --hyp3e-color-bg-90: rgba(14, 14, 14, 0.9);
+
   --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
-  --hyp3e-color-text-primary: #7E7E7E;
+
+  /* --hyp3e-color-text-primary: rgba(126, 126, 126, 1);
+  --hyp3e-color-text-primary-25: rgba(126, 126, 126, 0.25);
+  --hyp3e-color-text-primary-50: rgba(126, 126, 126, 0.5); */
+  --hyp3e-color-text-primary: rgba(190, 190, 190, 1);
+  --hyp3e-color-text-primary-25: rgba(190, 190, 190, 0.25);
+  --hyp3e-color-text-primary-50: rgba(190, 190, 190, 0.5);
+
   --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
-  --hyp3e-color-shadow-primary: #444444;     /* subtle inner smoke */
+  --hyp3e-input-text-color-25: var(--hyp3e-color-text-primary-25);
+  --hyp3e-input-text-color-50: var(--hyp3e-color-text-primary-50);
+
+  /* --hyp3e-color-shadow-primary: #444444;     /* subtle inner smoke
   --hyp3e-color-shadow-highlight: #BBBBBB;   /* silvery outer shimmer */
+  --hyp3e-color-shadow-primary: #2a2a2a;
+  --hyp3e-color-shadow-highlight: #990000;   /* faint red shimmer */
   --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-75);
+  --hyp3e-color-menu-bg: var(--hyp3e-color-bg-75);
+
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
+
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
   --hyp3e-saves-transformation-icon: url("../assets/transportation-rings-white.png");
   --hyp3e-saves-avoidance-icon: url("../assets/dodging-white.png");
   --hyp3e-saves-sorcery-icon: url("../assets/magic-swirl-white.png");
+}
+
+/* Prose-mirror rich text editor */
+.themed.theme-shadowmaster .prosemirror,
+.themed.theme-shadowmaster prose-mirror,
+.themed.theme-shadowmaster #prosemirror-dropdown,
+.themed.theme-shadowmaster .menu-dialog.prosemirror,
+.themed.theme-shadowmaster#prosemirror-dropdown,
+.themed.theme-shadowmaster.menu-dialog.prosemirror {
+  --menu-background: var(--hyp3e-color-menu-bg);
+  --dropdown-background: var(--hyp3e-color-select-option-bg);
+  --dropdown-border: var(--hyp3e-color-subtle-border);
+  --dialog-background: var(--hyp3e-color-menu-bg);
+  --dialog-border: var(--hyp3e-color-subtle-border);
+  --color-control-hover: rgba(255, 255, 255, 0.25);
+  --color-form-label-hover: var(--hyp3e-color-text-primary);
+  --button-text-color: var(--hyp3e-color-text-primary);
+}
+.themed.theme-shadowmaster .prosemirror menu {
+  background-color: var(--hyp3e-color-menu-bg);
+  color: var(--hyp3e-color-text-primary)
+}
+.themed.theme-shadowmaster .prosemirror menu button {
+  background-color: var(--hyp3e-color-menu-bg);
+  color: var(--hyp3e-color-text-primary)
 }
 
 /* Shadowmaster frame decoration */

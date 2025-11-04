@@ -4,39 +4,34 @@
   --hyp3e-color-primary: rgba(120, 191, 239, 1);
   --hyp3e-color-primary-10: rgba(120, 191, 239, 0.10);
   --hyp3e-color-primary-25: rgba(120, 191, 239, 0.25);
+
   --hyp3e-color-accent: rgba(214, 243, 255, 1);
   --hyp3e-color-accent-25: rgba(214, 243, 255, 0.25);
-  /* Original background color */
-  /* --hyp3e-color-bg: rgba(11, 30, 43, 1);
-  --hyp3e-color-bg-01: rgba(11, 30, 43, 0.01);
-  --hyp3e-color-bg-50: rgba(11, 30, 43, 0.5);
-  --hyp3e-color-bg-75: rgba(11, 30, 43, 0.75);
-  --hyp3e-color-bg-90: rgba(11, 30, 43, 0.90); */
-  /* Test 1 */
-  /* --hyp3e-color-bg: rgba(10, 76, 120, 1);
-  --hyp3e-color-bg-01: rgba(10, 76, 120, 0.01);
-  --hyp3e-color-bg-50: rgba(10, 76, 120, 0.5);
-  --hyp3e-color-bg-75: rgba(10, 76, 120, 0.75);
-  --hyp3e-color-bg-90: rgba(10, 76, 120, 0.90); */
-/* Test 2 */
+
+  /* Main background color */
   --hyp3e-color-bg: rgba(16, 97, 150, 1);
   --hyp3e-color-bg-01: rgba(16, 97, 150, 0.01);
   --hyp3e-color-bg-50: rgba(16, 97, 150, 0.5);
   --hyp3e-color-bg-75: rgba(16, 97, 150, 0.75);
-  --hyp3e-color-bg-90: rgba(16, 97, 150, 0.90);
+  --hyp3e-color-bg-90: rgba(16, 97, 150, 0.9);
 
   --hyp3e-color-subtle-border: rgba(255, 255, 255, 0.1);
+
   --hyp3e-color-text-primary: rgba(214, 243, 255, 1);
   --hyp3e-color-text-primary-25: rgba(214, 243, 255, 0.25);
-  --hyp3e-color-text-primary-50: rgba(214, 243, 255, 0.50);
+  --hyp3e-color-text-primary-50: rgba(214, 243, 255, 0.5);
+
   --hyp3e-input-text-color: var(--hyp3e-color-text-primary);
   --hyp3e-input-text-color-25: var(--hyp3e-color-text-primary-25);
   --hyp3e-input-text-color-50: var(--hyp3e-color-text-primary-50);
+
   --hyp3e-color-shadow-primary: #3C9DDE;     /* deeper frost blue */
   --hyp3e-color-shadow-highlight: #B8E8FF;   /* bright, shimmering ice */
   --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-90);
   --hyp3e-color-menu-bg: var(--hyp3e-color-bg-90);
+
   --hyp3e-d20-icon: url("/icons/svg/d20-grey.svg");
+
   --hyp3e-saves-death-icon: url("../assets/skull-crossed-bones-white.png");
   --hyp3e-saves-device-icon: url("../assets/lunar-wand-white.png");
   --hyp3e-saves-transformation-icon: url("../assets/transportation-rings-white.png");
@@ -44,6 +39,7 @@
   --hyp3e-saves-sorcery-icon: url("../assets/magic-swirl-white.png");
 }
 
+/* Prose-mirror rich text editor */
 .themed.theme-cryomancer .prosemirror,
 .themed.theme-cryomancer prose-mirror,
 .themed.theme-cryomancer #prosemirror-dropdown,
@@ -97,32 +93,3 @@
   z-index: 0;
   pointer-events: none; /* clicks pass through */
 }
-
-/* Cryomancer Frost Bar */
-/* .hyp3e.actor.themed.theme-cryomancer .window-content::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 6px;
-  background: linear-gradient(
-    to top,
-    rgba(214, 243, 255, 0.6),
-    transparent
-  );
-  box-shadow: 0 0 12px rgba(214, 243, 255, 0.8);
-  animation: cryo-frost-pulse 2.5s infinite alternate;
-} */
-
-/* Frost Pulse Animation */
-/* @keyframes cryo-frost-pulse {
-  0% {
-    filter: drop-shadow(0 0 4px var(--hyp3e-color-shadow-primary));
-    opacity: 0.6;
-  }
-  100% {
-    filter: drop-shadow(0 0 12px var(--hyp3e-color-shadow-highlight));
-    opacity: 1;
-  }
-} */
