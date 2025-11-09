@@ -243,6 +243,13 @@
   text-align: center;
 }
 
+/* Horizontal rule plain style */
+.plain-hr {
+    border: 0;
+    border-top: 1px solid #8d896d;
+    margin: 5px 0;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* Styles limited to hyp3e sheets                                            */
@@ -274,6 +281,13 @@
   display: flex;
   flex-direction: column;   /* stack children vertically */
   justify-content: stretch; /* evenly space items from top to bottom in the container */
+}
+
+
+/* Custom dialog styles */
+.hyp3e .dialog-label {
+  font-weight: bold;
+  padding: 5px 5px;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -386,6 +400,31 @@
     padding: 8px 8px;
     margin: 1px 2px;
 }
+
+/* Toggle button/icons that go dim when false or unselected */
+.hyp3e .not-selected {
+  opacity: 0.3;
+}
+
+/* Shrink font size for some field labels */
+.hyp3e .small-label {
+  font-family: "Herculanum", sans-serif;
+  font-size: small;
+  font-weight: bold;
+}
+
+
+/* .hyp3e .effects .item .effect-source,
+.hyp3e .effects .item .effect-duration,
+.hyp3e .effects .item .effect-controls {
+  text-align: center;
+  border-left: 1px solid #c9c7b8;
+  border-right: 1px solid #c9c7b8;
+  font-size: 12px;
+}
+.hyp3e .effects .item .effect-controls {
+  border: none;
+} */
 
 /* ------------------------------------------------------------------------- */
 /* Global sheet styles                                                       */
@@ -502,16 +541,6 @@
   min-width: 90px;
 }
 
-.hyp3e .not-selected {
-  opacity: 0.3;
-}
-
-.hyp3e .small-label {
-  font-family: "Herculanum", sans-serif;
-  font-size: small;
-  font-weight: bold;
-}
-
 /* Tabs row on any sheet */
 .hyp3e .sheet-tabs {
   /* -webkit-box-flex: 0;
@@ -543,6 +572,22 @@
 .hyp3e .sheet-body .tab .editor {
   height: 100%;
   z-index: 1;
+}
+
+/* General resource-field styles */
+.hyp3e .resource {
+  padding: 0 2px;
+  margin-right: 5px;
+}
+.hyp3e .resource-header {
+  font-weight: bold;
+  font-size: large;
+  padding: 5px 5px;
+}
+.hyp3e .resource-label {
+  font-family: "Herculanum", sans-serif;
+  font-weight: bold;
+  padding: 5px 5px;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -782,6 +827,176 @@
     }
   }
 }
+
+/* Items-list styles used on all sheets & tabs.
+  "Items" includes the Class & NPC Abilities lists, Weapons & Armor lists, 
+    Spells list, Items (inventory) list, and Effects list. */
+.hyp3e .items-header {
+  height: 32px;
+  margin: 2px 0;
+  padding: 0;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05);
+  border: 2px groove var(--hyp3e-color-subtle-border);
+  font-family: "Herculanum", sans-serif;
+  font-weight: bold;
+}
+.hyp3e .items-header > * {
+  font-size: large;
+  text-align: center;
+}
+.hyp3e .items-header .item-name {
+  font-weight: bold;
+  padding-left: 5px;
+  text-align: left;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.hyp3e .items-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  /* color: #444; */
+}
+.hyp3e .item-container.drag-target {
+  outline: 2px dotted var(--color-border-highlight, #2196f3);
+  background: rgba(255, 204, 0, 0.1);
+}
+.hyp3e .items-list .item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hyp3e .items-list .item-name {
+  -webkit-box-flex: 2;
+  -ms-flex: 2;
+  flex: 2;
+  margin: 0;
+  overflow: hidden;
+  font-size: 1.2em;
+  text-align: left;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.hyp3e .items-list .item-name h3, .hyp3e .items-list .item-name h4 {
+  font-weight: normal;
+  margin: 0;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+.hyp3e .items-list .item-controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 100px;
+  flex: 0 0 100px;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+  .item-unequipped {
+    opacity: 0.3;
+  }
+}
+.hyp3e .items-list .item-controls a {
+  font-size: 0.75em;
+  text-align: center;
+  margin: 0 6px;
+}
+.hyp3e .items-list .item {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 0 2px;
+  border-bottom: 1px solid var(--hyp3e-color-accent-25);
+}
+/* .hyp3e .items-list .item:last-child {
+  border-bottom: none;
+} */
+.hyp3e .items-list .item .item-name {
+  font-size: 1em;
+}
+.hyp3e .contained-items {
+  padding-left: 15px;
+}
+.hyp3e .items-list .item .item-name .item-image {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 30px;
+  flex: 0 0 30px;
+  height: 30px;
+  background-size: 30px;
+  border: none;
+  margin-right: 5px;
+  img {
+    border: none;
+  }
+  .rollable img:hover {
+    content: var(--hyp3e-d20-icon);
+    /* opacity: 0.3; */
+  }
+}
+.hyp3e .items-list .item-prop {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: small;
+  /* border-left: 1px solid var(--hyp3e-color-accent); */
+  /* border-right: 1px solid var(--hyp3e-color-accent); */
+}
+.hyp3e .items-list .items-header {
+  height: 32px;
+  margin: 2px 0;
+  padding: 0;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  /* background: rgba(0, 0, 0, 0.05); */
+  background: var(--hyp3e-color-primary-10);
+  border: 2px groove var(--hyp3e-color-accent-25);
+}
+.hyp3e .items-list .items-header > * {
+  font-size: medium;
+  text-align: center;
+}
+.hyp3e .items-list .items-header .item-name {
+  font-size: medium;
+  padding-left: 5px;
+  text-align: left;
+}
+.hyp3e .items-list .item-summary {
+  display: none;
+}
+.hyp3e .item-formula {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 200px;
+  flex: 0 0 200px;
+  padding: 0 8px;
+}
+.hyp3e .item-attributes {
+  min-width: 125px;
+  padding: 0 10px;
+  margin-right: 10px;
+  input {
+    text-align: center;
+  }
+  select {
+    padding: 0 3px;
+    text-align: center;
+  }
+}
+
 
 
 /* ------------------------------------------------------------------------- */
@@ -1069,263 +1284,6 @@
   min-height: 550px;  /*   bar, so we can't use them here.
 } */
 
-
-
-
-
-
-
-
-/* Custom dialog styles */
-.hyp3e .dialog-label {
-  font-weight: bold;
-  padding: 5px 5px;
-}
-
-/* General resource-field styles */
-.hyp3e .resource {
-  padding: 0 2px;
-  margin-right: 5px;
-}
-.hyp3e .resource-header {
-  font-weight: bold;
-  font-size: large;
-  padding: 5px 5px;
-}
-.hyp3e .resource-label {
-  font-family: "Herculanum", sans-serif;
-  font-weight: bold;
-  padding: 5px 5px;
-}
-
-/* Character "Items" includes the Class Abilities list, Weapons & Armor lists, 
-  Spells list, Items (inventory) list, and Effects list */
-.hyp3e .items-header {
-  height: 32px;
-  margin: 2px 0;
-  padding: 0;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.05);
-  border: 2px groove var(--hyp3e-color-subtle-border);
-  font-family: "Herculanum", sans-serif;
-  font-weight: bold;
-}
-.hyp3e .items-header > * {
-  font-size: large;
-  text-align: center;
-}
-.hyp3e .items-header .item-name {
-  font-weight: bold;
-  padding-left: 5px;
-  text-align: left;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-}
-.hyp3e .items-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  /* color: #444; */
-}
-.hyp3e .item-container.drag-target {
-  outline: 2px dotted var(--color-border-highlight, #2196f3);
-  background: rgba(255, 204, 0, 0.1);
-}
-.hyp3e .items-list .item-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.hyp3e .items-list .item-name {
-  -webkit-box-flex: 2;
-  -ms-flex: 2;
-  flex: 2;
-  margin: 0;
-  overflow: hidden;
-  font-size: 1.2em;
-  text-align: left;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-}
-.hyp3e .items-list .item-name h3, .hyp3e .items-list .item-name h4 {
-  font-weight: normal;
-  margin: 0;
-  white-space: nowrap;
-  overflow-x: hidden;
-}
-.hyp3e .items-list .item-controls {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  -webkit-box-flex: 0;
-  -ms-flex: 0 0 100px;
-  flex: 0 0 100px;
-  -webkit-box-pack: end;
-  -ms-flex-pack: end;
-  justify-content: flex-end;
-  .item-unequipped {
-    opacity: 0.3;
-  }
-}
-.hyp3e .items-list .item-controls a {
-  font-size: 0.75em;
-  text-align: center;
-  margin: 0 6px;
-}
-.hyp3e .items-list .item {
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  padding: 0 2px;
-  border-bottom: 1px solid var(--hyp3e-color-accent-25);
-}
-/* .hyp3e .items-list .item:last-child {
-  border-bottom: none;
-} */
-.hyp3e .items-list .item .item-name {
-  font-size: 1em;
-}
-.hyp3e .contained-items {
-  padding-left: 15px;
-}
-.hyp3e .items-list .item .item-name .item-image {
-  -webkit-box-flex: 0;
-  -ms-flex: 0 0 30px;
-  flex: 0 0 30px;
-  height: 30px;
-  background-size: 30px;
-  border: none;
-  margin-right: 5px;
-  img {
-    border: none;
-  }
-  .rollable img:hover {
-    content: var(--hyp3e-d20-icon);
-    /* opacity: 0.3; */
-  }
-}
-.hyp3e .items-list .item-prop {
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: small;
-  /* border-left: 1px solid #c9c7b8; */
-  /* border-left: 1px solid var(--hyp3e-color-accent); */
-  /* border-right: 1px solid var(--hyp3e-color-accent); */
-}
-.hyp3e .items-list .items-header {
-  height: 32px;
-  margin: 2px 0;
-  padding: 0;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  /* background: rgba(0, 0, 0, 0.05); */
-  background: var(--hyp3e-color-primary-10);
-  border: 2px groove var(--hyp3e-color-accent-25);
-}
-.hyp3e .items-list .items-header > * {
-  font-size: medium;
-  text-align: center;
-}
-.hyp3e .items-list .items-header .item-name {
-  font-size: medium;
-  padding-left: 5px;
-  text-align: left;
-}
-.hyp3e .items-list .item-summary {
-  display: none;
-}
-.hyp3e .item-formula {
-  -webkit-box-flex: 0;
-  -ms-flex: 0 0 200px;
-  flex: 0 0 200px;
-  padding: 0 8px;
-}
-.hyp3e .item-attributes {
-  min-width: 125px;
-  padding: 0 10px;
-  margin-right: 10px;
-  input {
-    text-align: center;
-  }
-  select {
-    padding: 0 3px;
-    text-align: center;
-  }
-}
-
-.hyp3e .bg-attributes {
-  margin-bottom: 5px;
-  input[type=text],
-  input[type=number] {
-    text-align: center;
-    min-width: 30px;
-    max-width: 40px;
-    margin-right: 10px;
-  }
-}
-.hyp3e .bg-attributes-wide {
-  margin-bottom: 5px;
-  input[type=text],
-  input[type="number"] {
-    text-align: center;
-    min-width: 40px;
-    max-width: 75px;
-    margin-right: 10px;
-  }
-}
-.hyp3e .color-preview {
-  display: inline-block;
-  width: 20px;
-  max-width: 20px;
-  height: 20px;
-  margin-left: 5px;
-  margin-right: 5px;
-  border: 1px solid #000;
-}
-
-/* Prose editor styles for item descriptions */
-.hyp3e .prose-item-short { height: 190px; }
-.hyp3e .prose-item-tall  { height: 270px; }
-
-.hyp3e .item-description {
-  flex: 1;
-  /* display: block; */
-  /* justify-content: flex-start; */
-  min-height: 100%;
-  padding: 0 10px;
-  textarea {
-    resize: vertical;
-    width: 100%;
-  }
-}
-.hyp3e .effects .item .effect-source,
-.hyp3e .effects .item .effect-duration,
-.hyp3e .effects .item .effect-controls {
-  text-align: center;
-  border-left: 1px solid #c9c7b8;
-  border-right: 1px solid #c9c7b8;
-  font-size: 12px;
-}
-.hyp3e .effects .item .effect-controls {
-  border: none;
-}
-
-/* Item sheet styles */
-
 /* Item header-block styles */
 .hyp3e .item-header-block {
   padding: 0 2px;
@@ -1375,6 +1333,7 @@
   }
 }
 
+/* Item sheet tab styles */
 .hyp3e .tab-content {
   padding: 5px;
   height: 100%;
@@ -1384,28 +1343,56 @@
   overflow-y: auto;
 }
 
-/* Horizontal rule plain style */
-.plain-hr {
-    border: 0;
-    border-top: 1px solid #8d896d;
-    margin: 5px 0;
+.hyp3e .bg-attributes {
+  margin-bottom: 5px;
+  input[type=text],
+  input[type=number] {
+    text-align: center;
+    min-width: 30px;
+    max-width: 40px;
+    margin-right: 10px;
+  }
+}
+.hyp3e .bg-attributes-wide {
+  margin-bottom: 5px;
+  input[type=text],
+  input[type="number"] {
+    text-align: center;
+    min-width: 40px;
+    max-width: 75px;
+    margin-right: 10px;
+  }
+}
+.hyp3e .color-preview {
+  display: inline-block;
+  width: 20px;
+  max-width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border: 1px solid #000;
 }
 
-/* Font styling */
-.medium {
-    font-size: small;
+/* Prose editor styles for item descriptions */
+.hyp3e .prose-item-short { height: 190px; }
+.hyp3e .prose-item-tall  { height: 270px; }
+
+.hyp3e .item-description {
+  flex: 1;
+  /* display: block; */
+  /* justify-content: flex-start; */
+  min-height: 100%;
+  padding: 0 10px;
+  textarea {
+    resize: vertical;
+    width: 100%;
+  }
 }
 
-.medium-bold {
-    font-weight: bold;
-    font-size: medium;
-}
 
-.medium-italic {
-    font-style: italic;
-    font-size: medium;
-}
-
+/* ------------------------------------------------------------------------- */
+/* Additional styles for various apps and features                           */
+/* ------------------------------------------------------------------------- */
 
 /* Color transitions */
 .level-up.glow {
