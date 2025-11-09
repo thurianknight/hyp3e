@@ -74,12 +74,12 @@
             <div class="npc-description-block">
                 {{!-- Saving throws here --}}
                 <div class="combat-block flexrow">
-                <div class="resource-content flexrow flex-group-center">
-                    <h3>{{localize "HYP3E.headers.savingThrows"}}</h3>
-                </div>  
+                  <div class="resource-content flexrow flex-group-center">
+                      <h3>{{localize "HYP3E.headers.savingThrows"}}</h3>
+                  </div>  
                 </div>
                 <div class="saves-block flexrow flex-between">
-                <div class="combat-block flexrow flex-group-center">
+                  <div class="combat-block flexrow flex-group-center">
                     <a class="rollable" 
                         data-action="rollThis" 
                         data-roll-type="save" 
@@ -90,8 +90,8 @@
                       <i class="fas fa-dice-d20"></i>
                     </a>
                     <input type="text" name="system.saves.death.value" value="{{system.saves.death.value}}" data-dtype="Number"/>
-                </div>
-                <div class="combat-block flexrow flex-group-center">
+                  </div>
+                  <div class="combat-block flexrow flex-group-center">
                     <a class="rollable" 
                         data-action="rollThis" 
                         data-roll-type="save" 
@@ -102,8 +102,8 @@
                       <i class="fas fa-dice-d20"></i>
                     </a>
                     <input type="text" name="system.saves.device.value" value="{{system.saves.device.value}}" data-dtype="Number"/>
-                </div>
-                <div class="combat-block flexrow flex-group-center">
+                  </div>
+                  <div class="combat-block flexrow flex-group-center">
                     <a class="rollable" 
                         data-action="rollThis" 
                         data-roll-type="save" 
@@ -114,8 +114,8 @@
                       <i class="fas fa-dice-d20"></i>
                     </a>
                     <input type="text" name="system.saves.transformation.value" value="{{system.saves.transformation.value}}" data-dtype="Number"/>
-                </div>
-                <div class="combat-block flexrow flex-group-center">
+                  </div>
+                  <div class="combat-block flexrow flex-group-center">
                     <a class="rollable" 
                         data-action="rollThis" 
                         data-roll-type="save" 
@@ -126,8 +126,8 @@
                       <i class="fas fa-dice-d20"></i>
                     </a>
                     <input type="text" name="system.saves.avoidance.value" value="{{system.saves.avoidance.value}}" data-dtype="Number"/>
-                </div>
-                <div class="combat-block flexrow flex-group-center">
+                  </div>
+                  <div class="combat-block flexrow flex-group-center">
                     <a class="rollable" 
                         data-action="rollThis" 
                         data-roll-type="save" 
@@ -138,7 +138,7 @@
                       <i class="fas fa-dice-d20"></i>
                     </a>
                     <input type="text" name="system.saves.sorcery.value" value="{{system.saves.sorcery.value}}" data-dtype="Number"/>
-                </div>
+                  </div>
                 </div>
                 {{!-- Natural abilities, weapons, spells, and other items here --}}
                 {{> "section-npc-items"}}
