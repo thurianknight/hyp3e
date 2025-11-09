@@ -1,17 +1,26 @@
 /* Default theme options */
 .theme-light {
+  /* Core colors */
   --hyp3e-color-primary: var(--color-text-primary);
   --hyp3e-color-primary-10: rgba(34, 34, 34, 0.05);
   --hyp3e-color-primary-25: rgba(34, 34, 34, 0.15);
+
   --hyp3e-color-accent: var(--color-text-emphatic);
   --hyp3e-color-accent-25: rgba(0, 0, 0, 0.25);
+
+  /* Main background color */
   --hyp3e-color-bg: rgba(217, 216, 200, 0.9);
   --hyp3e-color-bg-01: rgba(217, 216, 200, 0.01);
   --hyp3e-color-bg-50: rgba(217, 216, 200, 0.5);
   --hyp3e-color-bg-75: rgba(217, 216, 200, 0.75);
+  --hyp3e-color-bg-90: rgba(217, 216, 200, 0.9);
+
   --hyp3e-color-subtle-border: rgba(0, 0, 0, 0.2);
+
   --hyp3e-color-text-primary: var(--color-text-primary);
+
   --hyp3e-input-text-color: var(--input-text-color);
+
   --hyp3e-color-shadow-primary: var(--color-shadow-primary);
   --hyp3e-color-shadow-highlight: var(--color-shadow-highlight);
   --hyp3e-color-select-option-bg: var(--color-select-option-bg);
