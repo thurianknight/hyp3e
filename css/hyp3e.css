@@ -957,52 +957,6 @@
   margin: 0 6px;
 }
 
-/* .hyp3e .items-list .item {
-  align-items: center;
-  padding: 0 2px;
-  border-bottom: 1px solid var(--hyp3e-color-accent-25);
-} */
-/* .hyp3e .items-list .item:last-child {
-  border-bottom: none;
-} */
-/* .hyp3e .items-list .item .item-name {
-  font-size: 1em;
-} */
-
-/* .hyp3e .items-list .item .item-name .item-image {
-  -webkit-box-flex: 0;
-  -ms-flex: 0 0 30px;
-  flex: 0 0 30px;
-  height: 30px;
-  background-size: 30px;
-  border: none;
-  margin-right: 5px;
-  img {
-    border: none;
-  }
-  .rollable img:hover {
-    content: var(--hyp3e-d20-icon);
-    /* opacity: 0.3; 
-  }
-} */
-
-
-
-
-.hyp3e .item-attributes {
-  min-width: 125px;
-  padding: 0 10px;
-  margin-right: 10px;
-  input {
-    text-align: center;
-  }
-  select {
-    padding: 0 3px;
-    text-align: center;
-  }
-}
-
-
 
 /* ------------------------------------------------------------------------- */
 /* Actor Sheet styles applied to characters                                  */
@@ -1349,6 +1303,19 @@
   overflow-y: auto;
 }
 
+.hyp3e .item-attributes {
+  min-width: 125px;
+  padding: 0 10px;
+  margin-right: 10px;
+  input {
+    text-align: center;
+  }
+  select {
+    padding: 0 3px;
+    text-align: center;
+  }
+}
+
 .hyp3e .bg-attributes {
   margin-bottom: 5px;
   input[type=text],
@@ -1369,6 +1336,7 @@
     margin-right: 10px;
   }
 }
+
 .hyp3e .color-preview {
   display: inline-block;
   width: 20px;
