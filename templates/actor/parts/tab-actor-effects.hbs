@@ -13,29 +13,29 @@
         <ol class="items-list effects-list" data-drop="active-effect">
             {{#each effects as |section sid|}}
             <li class="items-header flexrow" data-effect-type="{{section.type}}">
-                <h3 class="item-name effect-name flexrow">{{localize section.label}}</h3>
-                <div class="effect-source">{{localize "HYP3E.effect.source"}}</div>
-                <div class="effect-source">{{localize "HYP3E.spell.duration"}}</div>
-                <div class="item-controls effect-controls flexrow">
+                <h3 class="item-name effect-name">{{localize section.label}}</h3>
+                <h3>{{localize "HYP3E.effect.source"}}</h3>
+                <h3>{{localize "HYP3E.spell.duration"}}</h3>
+                <h4 class="item-controls effect-controls">
                     <a class="effect-control" 
                         data-action="createEffect" 
                         title="{{localize 'HYP3E.effect.create'}}">
                       <i class="fas fa-plus"></i> {{localize "HYP3E.effect.add"}}
                     </a>
-                </div>
+                </h4>
             </li>
 
-            <ol class="item-list">
+            <ol class="items-list">
                 {{#each section.effects as |effect|}}
                 <li class="item-entry item draggable" data-effect-id="{{effect.id}}">
-                    <div class="item-header flexrow">
+                    <div class="flexrow">
                         <div class="item-name effect-name">
                             <img class="item-image" src="{{effect.img}}"/>
                             <span>{{effect.name}}</span>
                         </div>
                         <div class="item-prop">{{effect.sourceName}}</div>
                         <div class="item-prop">{{effect.duration.label}}</div>
-                        <div class="item-controls effect-controls flexrow">
+                        <div class="item-controls effect-controls">
                             <a class="effect-control" 
                                 data-action="toggleEffect" 
                                 title="{{localize 'HYP3E.effect.toggle'}}">

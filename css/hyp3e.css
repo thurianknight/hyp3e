@@ -957,6 +957,13 @@
   margin: 0 6px;
 }
 
+/* Weapon annotations are a simplified kind of items-list */
+.hyp3e .items-list .annot-entry {
+  font-size: 1em;
+  text-align: left;
+  padding: 0 2px;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* Actor Sheet styles applied to characters                                  */
