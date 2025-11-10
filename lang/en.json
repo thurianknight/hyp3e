@@ -379,7 +379,7 @@
                 "angle": "Emission Angle",
                 "color": "Light Color"
             },
-            "addAmmo": "Add Ammunition",
+            "addAmmo": "Ammunition",
             "usesAmmo": "Uses ammo",
             "grenade": "Grenade-like item",
             "areaEffect": "Area effect attack",
