@@ -26,7 +26,7 @@
   --hyp3e-input-text-color-50: var(--hyp3e-color-text-primary-50);
 
   --hyp3e-color-shadow-primary: #C04040;     /* glowing blood red */
-  --hyp3e-color-shadow-highlight: #FF6B6B;   /* bright, fiery red */
+  --hyp3e-color-shadow-highlight: #ffaa32;   /* bright, fiery yellow-orange */
   --hyp3e-color-select-option-bg: var(--hyp3e-color-bg-90);
   --hyp3e-color-menu-bg: var(--hyp3e-color-bg-90);
 
