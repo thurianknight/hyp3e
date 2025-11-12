@@ -8,48 +8,46 @@
         align-items: center;
         padding: 5px 10px;
         border-bottom: 1px solid #ccc;
-    };
-    .class-name {
-        font-weight: bold;
-        padding-top: 8px;
     }
 }
+.class-list .class-name {
+    font-weight: bold;
+    padding-top: 8px;
+}
 
-.class-editor {
-    .window-content {
-        flex: 1 1 auto;      /* take remaining space */
-        overflow-y: auto;    /* scroll if content overflows */
-        padding-right: 8px;  /* avoids scrollbar overlap */
-    }
-    .container {
-        align-items: flex-start;
-    }
-    select {
-        width: 100%;
-        max-width: 150px;
-    }
-    .equipment-select {
-        width: 100%;
-        min-width: 225px;
-        max-width: 250px;
-    }
-    input[type=text],
-    input[type=number] {
-        text-align: center;
-        min-width: 50px;
-        max-width: 150px;
-    }
-    .input-small {
-        text-align: center;
-        max-width: 40px;
-    }
-    .level-advancement {
-        text-align: center;
-    }
-    .button-narrow {
-        width: 40px;
-    }
-    .button-wide {
-        width: 100%;
-    }
+.hyp3e.class-editor .window-content {
+    flex: 1 1 auto;      /* take remaining space */
+    overflow-y: auto;    /* scroll if content overflows */
+    padding-right: 8px;  /* avoids scrollbar overlap */
+}
+.hyp3e.class-editor .container {
+    align-items: flex-start;
+}
+.hyp3e.class-editor select {
+    width: auto;
+    max-width: 150px;
+}
+.hyp3e.class-editor .equipment-select {
+    width: 100%;
+    min-width: 225px;
+    max-width: 250px;
+}
+.hyp3e.class-editor input[type=text],
+.hyp3e.class-editor input[type=number] {
+    text-align: center;
+    min-width: 50px;
+    max-width: 150px;
+}
+.hyp3e.class-editor .input-small {
+    text-align: center;
+    max-width: 40px;
+}
+.hyp3e.class-editor .level-advancement {
+    text-align: center;
+}
+.hyp3e.class-editor .button-narrow {
+    width: 40px;
+}
+.hyp3e.class-editor .button-wide {
+    width: 100%;
 }
