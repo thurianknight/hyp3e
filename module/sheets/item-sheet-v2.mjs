@@ -45,6 +45,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
             toggleWeaponType: Hyp3eItemSheetV2._toggleWeaponType,
             toggleWeaponHands: Hyp3eItemSheetV2._toggleWeaponHands,
             handleWeaponMastery: Hyp3eItemSheetV2._handleWeaponMastery,
+            toggleAtkRoll: Hyp3eItemSheetV2._toggleAtkRoll,
             openItemSheet: Hyp3eItemSheetV2._openItemSheet,
             deleteSpell: Hyp3eItemSheetV2._handleSpellDelete,
             setGrenadeOrAreaEffect: Hyp3eItemSheetV2._onSetGrenadeOrAreaEffect,
@@ -390,6 +391,21 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
         Hyp3eLogger.info("_handleWeaponMastery", `Updating weapon mastery...`, { event, target });
         const mastery = target.dataset["mastery"];
         await this.item.updateWeaponMastery(mastery);
+    }
+
+    /**
+     * Handle attack roll checkbox toggle
+     * @param {*} event 
+     * @param {*} target 
+     */
+    static async _toggleAtkRoll(event, target) {
+        Hyp3eLogger.info("_toggleAtkRoll", `Toggling attack roll...`, { event, target });
+        if (target.checked) {
+            const atkRoll = "1d20 + @fa";
+            await this.item.update({ "system.formula": atkRoll });
+        } else {
+            await this.item.update({ "system.formula": "" });
+        }
     }
 
     /**

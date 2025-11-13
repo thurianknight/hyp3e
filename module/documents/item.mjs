@@ -12,7 +12,7 @@ export class Hyp3eItem extends Item {
      * Augment the basic Item data model with additional dynamic data.
      */
 
-    // Override the base Item _preCreate function
+    /** @override */
     async _preCreate(data, options, user) {
         await super._preCreate(data, options, user);
         Hyp3eLogger.info("Hyp3eItem _preCreate", `Starting data:`, data)
@@ -40,6 +40,20 @@ export class Hyp3eItem extends Item {
         }
         Hyp3eLogger.info("Hyp3eItem _preCreate", `Update data:`, updateData);
         this.updateSource(updateData);
+    }
+
+    /** @override */
+    async _onCreate(data, options, user) {
+        await super._onCreate(data, options, user);
+        // If this is a weapon, add a basic roll formula if none is set
+        if (this.type === "weapon") {
+            const itemData = this.system;
+            if (!itemData.formula?.trim()) {
+                const formula = "1d20 + @str.atkMod";
+                await this.update({ "system.formula": formula });
+            }
+        }
+        Hyp3eLogger.info("Hyp3eItem _onCreate", `Created item:`, this);
     }
 
     /** @override */

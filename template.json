@@ -271,6 +271,7 @@
                 }
             },
             "rollable": {
+                "formula": "",
                 "atkRoll": false,
                 "tn": "",
                 "save": "",
