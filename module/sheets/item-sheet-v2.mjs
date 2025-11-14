@@ -399,8 +399,9 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
      * @param {*} target 
      */
     static async _toggleAtkRoll(event, target) {
-        Hyp3eLogger.info("_toggleAtkRoll", `Toggling attack roll...`, { event, target });
+        Hyp3eLogger.info("_toggleAtkRoll", `Toggling spell attack roll...`, { event, target });
         if (target.checked) {
+            // Set a default spell attack roll formula
             const atkRoll = "1d20 + @fa";
             await this.item.update({ "system.formula": atkRoll });
         } else {

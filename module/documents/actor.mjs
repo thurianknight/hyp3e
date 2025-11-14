@@ -1688,7 +1688,7 @@ export class Hyp3eActor extends Actor {
         if (dataset.isItemSpell) {
             actorData.ca = dataset.itemCa
         }
-        // Handle spell slot consumption if applicable
+        // Handle spell memorization/slot consumption if applicable
         if (!dataset.isItemSpell && item?.type === "spell" && itemData?.quantity?.value > 0) {
             await this._consumeSpellSlot(item);
         }
@@ -1727,7 +1727,11 @@ export class Hyp3eActor extends Actor {
         // Update dataset with final situational mods and roll mode from dialog
         dataset.sitMod = rollResponse.sitMod;
         dataset.rollMode = rollResponse.rollMode;
-        dataset.rangeMod = this._getRangeModifier(rollResponse.rangeGroup); // Calculate range mod based on selection
+        // Only for missile weapons
+        if (item.type === "weapon" && itemData.missile) {
+            // Calculate range mod based on range to target
+            dataset.rangeMod = this._getRangeModifier(rollResponse.rangeGroup);
+        }
 
         // Build Roll Formula
         const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData); // Assuming this exists

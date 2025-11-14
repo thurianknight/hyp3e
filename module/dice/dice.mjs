@@ -64,7 +64,7 @@ export class Hyp3eDice {
         }
 
         // Apply the item attack mod if needed
-        if (itemData.atkMod) {
+        if (itemData.atkMod && parseInt(itemData.atkMod) != 0) {
             if (atkRollParts.length > 1) {
                 atkRollParts.splice(1, 0, itemData.atkMod)
                 debugAtkRollParts.splice(1, 0, `<tr><td>Item Atk Mod</td><td>${itemData.atkMod}</td></tr>`)
