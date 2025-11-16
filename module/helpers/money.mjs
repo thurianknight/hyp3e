@@ -205,7 +205,7 @@ export async function buyFromMerchant(buyer, merchant, item) {
         let bundlesOf = "";
         if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
             // For bundled items, increase qty based on number of bundles bought
-            bundlesOf = `bundles of ${item.system.quantity.bundle}`;
+            bundlesOf = `bundle(s) of ${item.system.quantity.bundle}`;
             const unitsBought = qty * item.system.quantity.bundle;
             newQty = toNumber(existing.system.quantity.value) + unitsBought;
         } else {
@@ -264,12 +264,17 @@ export async function sellToMerchant(merchant, seller, item) {
         return ui.notifications.warn(`${merchant.name} cannot afford ${buyPrice} gp.`);
     }
 
+    // Is the item sold in bundles?
+    const bundleAmt = item.system.quantity?.bundle && item.system.quantity.bundle > 1
+        ? `bundles of ${item.system.quantity.bundle}`
+        : "";
+
     const qty = await Dialog.prompt({
         title: `${itemName} Sell Quantity`,
         content: `
             <p>${seller.name} has <strong>${sellerQty}</strong> ${item.name}(s) to sell at <strong>${buyPrice}</strong> gp each.</p>
             <p>
-                <label>How many would you like to sell? (Max: ${maxQty})</label>
+                <label>How many ${bundleAmt} to sell? (Max: ${maxQty})</label>
                 <input type="number" id="qty" min="1" max="${maxQty}" value="1" 
                     style="width:80px; text-align: center;">
             </p>
@@ -309,11 +314,19 @@ export async function sellToMerchant(merchant, seller, item) {
     await adjustMoney(merchant, -totalPrice);
 
     // Adjust the seller's qty on hand
-    const newSellerQty = Math.ceil(sellerQty - qty, 0);
+    let newSellerQty = 0;
+    if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+        // For bundled items, reduce qty based on number of bundles sold
+        const unitsSold = qty * item.system.quantity.bundle;
+        newSellerQty = Math.ceil(sellerQty - unitsSold, 0);
+    } else {
+        // Normal unbundled item
+        newSellerQty = Math.ceil(sellerQty - qty, 0);
+    }
     if (newSellerQty <= 0) {
         await item.delete(); // Seller sold it all
     } else {
-        await item.update({ "system.quantity.value": newSellerQty });
+        await item.update({ "system.quantity.value": newSellerQty, "system.quantity.max": newSellerQty });
     }
 
     // Check if the merchant already has this item (match by name & type)
@@ -324,16 +337,35 @@ export async function sellToMerchant(merchant, seller, item) {
 
     // Add to merchant's existing qty or create new
     if (existing) {
-        const newQty = toNumber(existing.system.quantity.value) + qty;
-        await existing.update({ "system.quantity.value": newQty });
+        let newQty = 0;
+        let bundlesOf = "";
+        if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+            // For bundled items, increase qty based on number of bundles bought
+            bundlesOf = `bundle(s) of ${item.system.quantity.bundle}`;
+            const unitsBought = qty * item.system.quantity.bundle;
+            newQty = toNumber(existing.system.quantity.value) + unitsBought;
+        } else {
+            newQty = toNumber(existing.system.quantity.value) + qty;
+        }
+        await existing.update({ "system.quantity.value": newQty, "system.quantity.max": newQty });
         ui.notifications.info(
-            `${merchant.name} buys ${qty} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`
+            `${merchant.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`
         );
     } else {
-        itemData.system.quantity.value = qty;
+        if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+            // For bundled items, set qty based on number of bundles bought
+            bundlesOf = `bundles of ${item.system.quantity.bundle}`;
+            const unitsBought = qty * item.system.quantity.bundle;
+            itemData.system.quantity.value = unitsBought;
+            itemData.system.quantity.max = unitsBought;
+        } else {
+            // Normal unbundled item
+            itemData.system.quantity.value = qty;
+            itemData.system.quantity.max = qty;
+        }
         await merchant.createEmbeddedDocuments("Item", [itemData]);
         ui.notifications.info(
-            `${merchant.name} buys ${qty} ${item.name}(s) for ${totalPrice} gp from ${seller.name}.`
+            `${merchant.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${seller.name}.`
         );
     }
 }
