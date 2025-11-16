@@ -150,7 +150,7 @@
                                 <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                             </div>
                             <div class="item-prop">
-                                {{#if item.system.quantity.max}}
+                                {{#if item.system.isConsumable}}
                                 <a data-action="itemQtySub" 
                                     title='{{localize "HYP3E.item.decr"}}'>
                                   <i class="fa fa-minus-circle" aria-hidden="true" style="margin-right: 5px;"></i>
@@ -161,7 +161,7 @@
                                 </a>
                                 {{/if}}
                                 {{item.system.quantity.value}}
-                                {{#if item.system.quantity.max}}
+                                {{#if item.system.isConsumable}}
                                 / {{item.system.quantity.max}}
                                 {{/if}}
                             </div>

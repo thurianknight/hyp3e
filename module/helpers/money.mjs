@@ -128,12 +128,18 @@ export async function buyFromMerchant(buyer, merchant, item) {
         }
     }
 
+    // Is the item sold in bundles?
+    const bundleAmt = item.system.quantity?.bundle && item.system.quantity.bundle > 1
+        ? `bundles of ${item.system.quantity.bundle}`
+        : "";
+
+    // Prompt for quantity to buy
     const qty = await Dialog.prompt({
         title: `${itemName} Purchase Quantity`,
         content: `
             <p>${merchant.name} has <strong>${merchantQty}</strong> ${item.name}(s) in stock at <strong>${sellPrice}</strong> gp each.</p>
             <p>
-                <label>How many would you like to buy? (Max: ${maxQty})</label>
+                <label>How many ${bundleAmt} to buy? (Max: ${maxQty})</label>
                 <input type="number" id="qty" min="1" max="${maxQty}" value="1" 
                     style="width:80px; text-align: center;">
             </p>
@@ -174,10 +180,14 @@ export async function buyFromMerchant(buyer, merchant, item) {
 
     // Adjust the merchant's qty on hand
     if (!merchant.system.ignoreQty) {
-        const newMerchantQty = Math.ceil(merchantQty - qty, 0);
-        // if (newMerchantQty <= 0) {
-        //     await item.delete(); // merchant sold out
-        // } else {
+        let newMerchantQty = 0;
+        if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+            // For bundled items, reduce qty based on number of bundles sold
+            const unitsSold = qty * item.system.quantity.bundle;
+            newMerchantQty = Math.ceil(merchantQty - unitsSold, 0);
+        } else {
+            newMerchantQty = Math.ceil(merchantQty - qty, 0);
+        }
         await item.update({ "system.quantity.value": newMerchantQty });
     }
 
@@ -191,16 +201,36 @@ export async function buyFromMerchant(buyer, merchant, item) {
 
     // Add to buyer's existing qty or create new
     if (existing) {
-        const newQty = toNumber(existing.system.quantity.value) + qty;
-        await existing.update({ "system.quantity.value": newQty });
+        let newQty = 0;
+        let bundlesOf = "";
+        if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+            // For bundled items, increase qty based on number of bundles bought
+            bundlesOf = `bundles of ${item.system.quantity.bundle}`;
+            const unitsBought = qty * item.system.quantity.bundle;
+            newQty = toNumber(existing.system.quantity.value) + unitsBought;
+        } else {
+            newQty = toNumber(existing.system.quantity.value) + qty;
+        }
+        await existing.update({ "system.quantity.value": newQty, "system.quantity.max": newQty });
         ui.notifications.info(
-            `${buyer.name} buys ${qty} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`
+            `${buyer.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`
         );
     } else {
-        itemData.system.quantity.value = qty;
+        let bundlesOf = "";
+        if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+            // For bundled items, set qty based on number of bundles bought
+            bundlesOf = `bundles of ${item.system.quantity.bundle}`;
+            const unitsBought = qty * item.system.quantity.bundle;
+            itemData.system.quantity.value = unitsBought;
+            itemData.system.quantity.max = unitsBought;
+        } else {
+            // Normal unbundled item
+            itemData.system.quantity.value = qty;
+            itemData.system.quantity.max = qty;
+        }
         await buyer.createEmbeddedDocuments("Item", [itemData]);
         ui.notifications.info(
-            `${buyer.name} buys ${qty} ${item.name}(s) for ${totalPrice} gp from ${merchant.name}.`
+            `${buyer.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${merchant.name}.`
         );
     }
 }

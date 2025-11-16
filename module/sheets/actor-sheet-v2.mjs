@@ -537,12 +537,23 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 if (i.system.quantity.value) {
                     // Is this a normal item, and is it carried?
                     if ((i.type === 'item' || i.type === 'container') && i.system.equipped) {
-                        i.system.carriedWt = (i.system.weight * i.system.quantity.value)
-                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
+                        if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
+                            // For bundled items, we calculate weight based on number of bundles
+                            i.system.carriedWt = (i.system.weight * (i.system.quantity.value / i.system.quantity.bundle))
+                        } else {
+                            // Normal unbundled item
+                            i.system.carriedWt = (i.system.weight * i.system.quantity.value)
+                        }
+                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10    
                         encumbrance += i.system.carriedWt
                     } else if (i.type === 'weapon' || i.type === 'armor' || i.type === 'shield') {
-                        i.system.carriedWt = (i.system.weight * i.system.quantity.value)
-                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
+                        if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
+                            // For bundled items, we calculate weight based on number of bundles
+                            i.system.carriedWt = (i.system.weight * (i.system.quantity.value / i.system.quantity.bundle))
+                        } else {
+                            i.system.carriedWt = (i.system.weight * i.system.quantity.value)
+                        }
+                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10    
                         encumbrance += i.system.carriedWt
                     } else {
                         i.system.carriedWt = 0
@@ -557,10 +568,16 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             if (i.system.cost) {
                 const baseGpVal = parseGpValue(i.system.cost)
                 if (baseGpVal) {
-                    // For merchants, show unit selling price
+                    // For merchants, show item selling price (unit or bundle)
                     i.system.unitPrice = Math.round(baseGpVal * (this.actor.system.sellMultiplier ?? 1) * 100) / 100;
                     // Normal characters show total value of item qty
-                    i.system.value = Math.round((baseGpVal * (i.system.quantity.value ? i.system.quantity.value : 1))*100)/100
+                    if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
+                        // Calculate value based on number of bundles
+                        i.system.value = Math.round((baseGpVal * (i.system.quantity.value ? (i.system.quantity.value / i.system.quantity.bundle) : 1))*100)/100    
+                    } else {
+                        // Calculate value based on total qty
+                        i.system.value = Math.round((baseGpVal * (i.system.quantity.value ? i.system.quantity.value : 1))*100)/100    
+                    }
                     allTheGold += i.system.value
                 } else {
                     i.system.unitPrice = null
