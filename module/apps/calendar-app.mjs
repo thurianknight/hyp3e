@@ -112,7 +112,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
                 todaySelene: {
                     phase: selenePhase,
                     icon: HYP3ECalendar.phaseIcons[selenePhase] || ""
-                }
+                },
+                isGM: game.user.isGM
             };
         } catch (err) {
             Hyp3eLogger.error("_prepareContext", `Error preparing context:`, err);
