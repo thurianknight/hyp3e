@@ -498,6 +498,8 @@ Hooks.once("ready", async function() {
     game.hyp3e.turnTracker.retreatTurn = () => HYP3ETurnTracker.retreatTurn();
     game.hyp3e.turnTracker.resetTurn = () => HYP3ETurnTracker.reset();
     game.hyp3e.turnTracker.getTurn = () => HYP3ETurnTracker.getTurn();
+    game.hyp3e.turnTracker.turnStartTime = () => HYP3ETurnTracker.getTurnStartTime();
+    game.hyp3e.turnTracker.currentTime = () => HYP3ETurnTracker.getTime();
     // Initialize the turn tracker in the chat log
     if (!trackerInitialized) {
         const chatLog = ui.chat;

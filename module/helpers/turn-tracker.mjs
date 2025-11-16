@@ -90,8 +90,21 @@ export class HYP3ETurnTracker {
         return game.settings.get("hyp3e", "explorationTurn") || 1;
     }
 
+    static get turnStartTime() {
+        return game.settings.get("hyp3e", "turnStartTime") || "8:00";
+    }
+
     static set currentTurn(value) {
         game.settings.set("hyp3e", "explorationTurn", value);
+    }
+
+    static get currentTime() {
+        const startTime = this.turnStartTime;
+        const [startHour, startMinute] = startTime.split(":").map(Number);
+        const totalMinutes = startHour * 60 + startMinute + (this.currentTurn - 1) * 10;
+        const currentHour = Math.floor(totalMinutes / 60) % 24;
+        const currentMinute = totalMinutes % 60;
+        return `${currentHour.toString()}:${currentMinute.toString().padStart(2, '0')}`;
     }
 
     static async advanceTurn() {
@@ -124,6 +137,14 @@ export class HYP3ETurnTracker {
 
     static getTurn() {
         return this.currentTurn;
+    }
+
+    static getTurnStartTime() {
+        return this.turnStartTime;
+    }
+
+    static getTime() {
+        return this.currentTime;
     }
 
 }

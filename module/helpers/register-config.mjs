@@ -54,6 +54,15 @@ export function registerHyp3eConfigurations() {
         default: 0
     });
 
+    // Store the turn-counter starting time
+    game.settings.register(game.system.id, "turnStartTime", {
+        name: "Turn Start Time",
+        scope: "world",
+        config: false,  // Always hidden from UI
+        type: String,
+        default: "8:00"
+    });
+
     // Store turn-advance actions
     game.settings.register(game.system.id, "turnAdvanceActions", {
         name: "Turn-Advance Actions",

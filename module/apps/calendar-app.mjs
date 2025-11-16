@@ -94,6 +94,10 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
             const phobosPhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, date.day, "Phobos");
             const selenePhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, date.day, "Selene");
 
+            // Get turn-related time data
+            const turnStartTime = game.hyp3e.turnTracker.turnStartTime();
+            const currentTime = game.hyp3e.turnTracker.currentTime();
+
             return {
                 date,
                 year,
@@ -113,6 +117,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
                     phase: selenePhase,
                     icon: HYP3ECalendar.phaseIcons[selenePhase] || ""
                 },
+                turnStartTime,
+                currentTime,
                 isGM: game.user.isGM
             };
         } catch (err) {
@@ -187,6 +193,29 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         //     });
         // }
 
+        // Handle Turn Start Time input
+        const timeInput = root.querySelector("#start-time");
+        if (timeInput) {
+            if (!game.user.isGM) {
+                // Disable time input for players
+                timeInput.disabled = true;
+            }
+            timeInput.addEventListener("change", async (ev) => {
+                const newTime = ev.target.value;
+                // Basic validation of H:mm format
+                const timePattern = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/;
+                if (timePattern.test(newTime)) {
+                    await game.settings.set("hyp3e", "turnStartTime", newTime);
+                    this.render(true);
+                } else {
+                    ui.notifications.error("Invalid time format. Please use H:mm (e.g., 8:00).");
+                    // Reset to previous valid value
+                    ev.target.value = game.hyp3e.turnTracker.turnStartTime();
+                }
+            });
+        }
+
+        // Button listeners
         if (game.user.isGM) {
             root.querySelector("[data-action='advance']")
                 ?.addEventListener("click", () => {
@@ -226,8 +255,29 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
     //     this.render();
     // }
 
+    activateListeners(html) {
+        super.activateListeners(html);
+
+        Hooks.on("explorationTurnAdvanced", this._rerender);
+        Hooks.on("explorationTurnRetreat", this._rerender);
+        Hooks.on("explorationTurnReset", this._rerender);
+    }
+
+    _rerender = () => {
+        this.render();
+    };
+
     /** Example form handler */
     static async onSubmit(event, form, formData) {
         Hyp3eLogger.info("onSubmit", `Form submitted`, formData);
-    }    
+    }
+
+    async close(options = {}) {
+        Hooks.off("explorationTurnAdvanced", this._rerender);
+        Hooks.off("explorationTurnRetreat", this._rerender);
+        Hooks.off("explorationTurnReset", this._rerender);
+      
+        return super.close(options);
+    }
+  
 }

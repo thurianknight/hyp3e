@@ -98,17 +98,27 @@ export class HYP3ETurnTrackerApp extends Application {
         });
         html.find(".advance-turn").on("click", async ev => {
             await game.hyp3e.turnTracker.advanceTurn();
+            if (game.hyp3e?.calendar) {
+                game.hyp3e.calendar.render(false);
+            }
         });
         html.find(".retreat-turn").on("click", async ev => {
             await game.hyp3e.turnTracker.retreatTurn();
+            if (game.hyp3e?.calendar) {
+                game.hyp3e.calendar.render(false);
+            }
         });
         html.find(".reset").on("click", async ev => {
             await game.hyp3e.turnTracker.resetTurn();
+            if (game.hyp3e?.calendar) {
+                game.hyp3e.calendar.render(false);
+            }
         });
         html.find(".show-turn").on("click", async ev => {
             const turn = game.hyp3e.turnTracker.getTurn();
+            const currentTime = game.hyp3e.turnTracker.currentTime();
             ChatMessage.create({
-                content: `Current exploration turn: ${turn}.`,
+                content: `Current exploration turn: ${turn}, time is ${currentTime}.`,
                 type: CONST.CHAT_MESSAGE_TYPES.OTHER
             });
         });

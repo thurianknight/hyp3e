@@ -8,7 +8,7 @@
                 </option>
                 {{/each}}
             </select> 
-            <input id="calendar-year" type="number" value="{{currentYear}}" /> 
+            <input id="calendar-year" type="number" value="{{currentYear}}" />
             <span name="year">(Year of the {{year.name}}, <i>{{year.alt}})</i></span>
         </div>
         {{!-- <div class="moon-toggle">
@@ -75,6 +75,19 @@
                 </div>
 
             </div>
+        </div>
+    </div>
+
+    <div class="calendar-footer">
+        <div class="flex flexrow">
+                <div class="flexrow time-banner">
+                    Turn Start Time (H:mm) 
+                    <input id="start-time" type="text" value="{{turnStartTime}}" placeholder="ex: 8:00" /> 
+                </div>
+                <div class="time-banner">
+                    Current Time: 
+                    <input id="current-time" type="text" value="{{currentTime}}" disabled /> 
+                </div>
         </div>
     </div>
 

@@ -139,6 +139,19 @@
   margin-bottom: 0.5em;
 }
 
+.hyp3e-calendar .calendar-footer {
+  text-align: left;
+  margin-bottom: 0.5rem;
+  input[type=text] {
+    text-align: center;
+    font-weight: normal;
+    font-size: 1em;
+    min-width: 50px;
+    max-width: 70px;
+    margin: 0 5px;
+  }
+}
+
 .season-banner {
   font-weight: bold;
   justify-content: center;
@@ -146,9 +159,11 @@
   font-size: 1.5em;
 }
 
-.hyp3e-calendar .calendar-footer {
-  text-align: left;
-  margin-bottom: 0.5rem;
+.time-banner {
+  font-weight: normal;
+  justify-content: center;
+  margin: 0 0.5em;
+  font-size: 1em;
 }
 
 .hyp3e-calendar .calendar-toolbar {
