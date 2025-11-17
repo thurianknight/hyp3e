@@ -6,10 +6,11 @@ export async function setupTurnTrackerHooks() {
      */
     Hooks.on("explorationTurnReset", (turn) => {
         Hyp3eLogger.info("explorationTurnReset", `Exploration turn reset to ${turn}`);
-        // Update the turn tracker display in the chat log
+        // Update the turn tracker display (if it exists) in the chat log
         const tracker = $(".turn-tracker");
         if (!tracker.length) return;
-        tracker.find(".turn-label").text(`Turn: ${turn}`);
+        // tracker.find(".turn-label").text(`Turn: ${turn}`);
+        $("#current-turn").val(turn);
     });
 
     /**
@@ -18,10 +19,12 @@ export async function setupTurnTrackerHooks() {
     Hooks.on("explorationTurnAdvanced", async (turn) => {
         Hyp3eLogger.info("explorationTurnAdvanced", `Exploration turn ${turn} triggered.`);
 
-        // Update the turn tracker display in the chat log
+        // Update the turn tracker display (if it exists) in the chat log
         const tracker = $(".turn-tracker");
         if (!tracker.length) return;
-        tracker.find(".turn-label").text(`Turn: ${turn}`);
+        // tracker.find(".turn-label").text(`Turn: ${turn}`);
+        $("#current-turn").val(turn);
+
 
         // Process all tokens on the canvas
         for (const token of canvas.tokens.placeables) {
@@ -63,10 +66,12 @@ export async function setupTurnTrackerHooks() {
     Hooks.on("explorationTurnRetreat", (turn) => {
         Hyp3eLogger.info("explorationTurnRetreat", `Exploration turn ${turn} triggered.`);
 
-        // Update the turn tracker display in the chat log
+        // Update the turn tracker display (if it exists) in the chat log
         const tracker = $(".turn-tracker");
         if (!tracker.length) return;
-        tracker.find(".turn-label").text(`Turn: ${turn}`);
+        // tracker.find(".turn-label").text(`Turn: ${turn}`);
+        $("#current-turn").val(turn);
+
 
         // Process all tokens on the canvas
         for (const token of canvas.tokens.placeables) {
@@ -112,7 +117,12 @@ export class HYP3ETurnTracker {
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
         this.currentTurn = newTurn;
         Hyp3eLogger.info("advanceTurn", `Turn tracker advanced to turn ${newTurn}`);
-        Hooks.call("explorationTurnAdvanced", newTurn);
+        Hooks.callAll("explorationTurnAdvanced", newTurn);
+        // Broadcast to all clients
+        game.socket.emit("system.hyp3e", {
+          type: "explorationTurnAdvanced",
+          newTurn
+        });
         return newTurn;
     }
 
@@ -122,7 +132,12 @@ export class HYP3ETurnTracker {
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
         this.currentTurn = newTurn;
         Hyp3eLogger.info("retreatTurn", `Turn tracker retreated to turn ${newTurn}`);
-        Hooks.call("explorationTurnRetreat", newTurn);
+        Hooks.callAll("explorationTurnRetreat", newTurn);
+        // Broadcast to all clients
+        game.socket.emit("system.hyp3e", {
+          type: "explorationTurnRetreat",
+          newTurn
+        });
         return newTurn;
     }
 
@@ -131,7 +146,12 @@ export class HYP3ETurnTracker {
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
         this.currentTurn = newTurn;
         Hyp3eLogger.info("reset", `Turn tracker reset to turn ${newTurn}.`);
-        Hooks.call("explorationTurnReset", newTurn);
+        Hooks.callAll("explorationTurnReset", newTurn);
+        // Broadcast to all clients
+        game.socket.emit("system.hyp3e", {
+          type: "explorationTurnReset",
+          newTurn
+        });
         return newTurn;
     }
 

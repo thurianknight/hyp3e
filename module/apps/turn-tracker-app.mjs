@@ -21,6 +21,7 @@ export class HYP3ETurnTrackerApp extends Application {
 
         // Render the template with current data
         const htmlString = await foundry.applications.handlebars.renderTemplate(this.options.template, this.getData());
+        Hyp3eLogger.info("HYP3ETurnTrackerApp renderEmbedded", "Rendering turn tracker:", htmlString);
         const $html = $(htmlString).addClass("turn-tracker");
 
         // Remove a previous embedded instance if present
@@ -67,26 +68,23 @@ export class HYP3ETurnTrackerApp extends Application {
 
     getData() {
         const currentTurn = game.hyp3e.turnTracker.getTurn();
-        return { currentTurn };
+        Hyp3eLogger.info("HYP3ETurnTrackerApp getData", "Getting turn tracker data:", { currentTurn });
+        return { currentTurn, isGM: game.user.isGM };
     }
 
     _onTurnAdvanced(data) {
-        Hyp3eLogger.info("_onTurnAdvanced", "Turn advanced:", data);
-        // Update the turn tracker display in the chat log
-        const tracker = $(".turn-tracker");
-        if (!tracker.length) return;
-        tracker.find(".turn-label").text(`Turn: ${data}`);
+        Hyp3eLogger.info("HYP3ETurnTrackerApp _onTurnAdvanced", "Turn advanced:", data);
         this.render(false); // Update the tracker
     }
 
     _onTurnRetreat(data) {
-        Hyp3eLogger.info("_onTurnRetreat", "Turn retreat:", data);
+        Hyp3eLogger.info("HYP3ETurnTrackerApp _onTurnRetreat", "Turn retreat:", data);
         this.render(false); // Update the tracker
     }
 
     _onTurnReset(data) {
-        Hyp3eLogger.info("_onTurnReset", "Turn reset:", data);
-        this.render(false); // Update/reset display
+        Hyp3eLogger.info("HYP3ETurnTrackerApp _onTurnReset", "Turn reset:", data);
+        this.render(false); // Update the tracker
     }
 
     activateListeners(htmlData) {

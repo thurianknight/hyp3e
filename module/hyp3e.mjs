@@ -20,6 +20,7 @@ import { migrateActorData,
 import { HYP3ETurnTracker, 
             setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
+import { HYP3ETurnTrackerSync } from "./helpers/turn-tracker-sync.mjs";
 import { HYP3ECalendar, 
             setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
@@ -516,6 +517,9 @@ Hooks.once("ready", async function() {
             resizeTokenPrototypes()
         }
     }
+
+    HYP3ETurnTrackerSync.init();
+
 });
 
 /* -------------------------------------------- */
@@ -767,7 +771,7 @@ await setupTurnTrackerHooks();
  * It also pushes the current turn to the chat log when requested.
  */
 async function initTurnTrackerInChatLog(app, html, data) {
-    if (!game.user.isGM) return; // Only render for GMs
+    // if (!game.user.isGM) return; // Only render for GMs
     if (!game.settings.get(game.system.id, "enableTurnTracker")) {
         Hyp3eLogger.info("initTurnTrackerInChatLog", "Turn Tracker is disabled, not rendering the app.");
         return; // Exit early if the turn tracker is disabled

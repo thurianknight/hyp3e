@@ -95,7 +95,7 @@ export class HYP3ECalendar {
         await this.setCurrentDate({ year, month, day });
 
         Hyp3eLogger.info("advanceDay", `Calendar advanced to ${this.formatDate()}`);
-        Hooks.call("calendarDayAdvanced", { year, month, day });
+        Hooks.callAll("calendarDayAdvanced", { year, month, day });
 
         if (resetTurns && game.hyp3e?.turnTrackerApp) {
             await game.hyp3e.turnTracker.resetTurn();

@@ -11,6 +11,13 @@
   z-index: 30;
   position: relative;
   pointer-events: auto;
+  input[type=text] {
+    text-align: center;
+    font-weight: normal;
+    font-size: 1em;
+    max-width: 50px;
+    margin: 5px 5px;
+  }
 }
 
 .theme-dark .turn-tracker {
@@ -18,21 +25,24 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
   .turn-label {
-    color: #fff;
+    /* color: #fff; */
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
   };
   controls {
     button {
       background: rgba(255, 255, 255, 0.1);
-      color: #fff;
+      /* color: #fff; */
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
     button:hover {
       background: rgba(255, 255, 255, 0.2);
-      color: #fff;
+      /* color: #fff; */
     }
     button:active {
       background: rgba(255, 255, 255, 0.3);
-      color: #fff;
+      /* color: #fff; */
     }
   }
 }
