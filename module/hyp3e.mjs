@@ -20,7 +20,7 @@ import { migrateActorData,
 import { HYP3ETurnTracker, 
             setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
-import { HYP3ETurnTrackerSync } from "./helpers/turn-tracker-sync.mjs";
+// import { HYP3ETurnTrackerSync } from "./helpers/turn-tracker-sync.mjs";
 import { HYP3ECalendar, 
             setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
@@ -491,6 +491,7 @@ Hooks.once("ready", async function() {
 
     // Initialize the turn tracker
     game.hyp3e.turnTracker = game.hyp3e.turnTracker || new HYP3ETurnTracker();
+    HYP3ETurnTracker.initSync();
 
     // Log the start of the turn tracker
     Hyp3eLogger.info("Init", `Current exploration turn is ${HYP3ETurnTracker.getTurn()}`);
@@ -518,7 +519,7 @@ Hooks.once("ready", async function() {
         }
     }
 
-    HYP3ETurnTrackerSync.init();
+    // HYP3ETurnTrackerSync.init();
 
 });
 

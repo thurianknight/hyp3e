@@ -1,6 +1,8 @@
 import { Hyp3eLogger } from "./logger.mjs";
 
 export async function setupTurnTrackerHooks() {
+    console.log("[HYP3E] HYP3ETurnTracker: Initializing Turn Tracker hooks...");
+
     /**
      * Custom hook for handling exploration turn reset to 1.
      */
@@ -25,6 +27,8 @@ export async function setupTurnTrackerHooks() {
         // tracker.find(".turn-label").text(`Turn: ${turn}`);
         $("#current-turn").val(turn);
 
+        // The rest is for GMs only
+        if (!game.user.isGM) return;
 
         // Process all tokens on the canvas
         for (const token of canvas.tokens.placeables) {
@@ -72,6 +76,8 @@ export async function setupTurnTrackerHooks() {
         // tracker.find(".turn-label").text(`Turn: ${turn}`);
         $("#current-turn").val(turn);
 
+        // The rest is for GMs only
+        if (!game.user.isGM) return;
 
         // Process all tokens on the canvas
         for (const token of canvas.tokens.placeables) {
@@ -112,17 +118,44 @@ export class HYP3ETurnTracker {
         return `${currentHour.toString()}:${currentMinute.toString().padStart(2, '0')}`;
     }
 
+    /** Call this once during system ready */
+    static initSync() {
+        // Initialize previous turn on load
+        this._lastTurn = this.currentTurn;
+
+        /**
+         * Hook into setting updates to monitor changes to the exploration turn.
+         */
+        Hyp3eLogger.info("HYP3ETurnTracker initSync", `Initializing updateSetting hook...`);
+        Hooks.on("updateSetting", (setting, value, options, userId) => {
+            Hyp3eLogger.info("HYP3ETurnTracker", `Setting updated:`, { setting, value, options, userId });
+            if (setting.key !== "hyp3e.explorationTurn") return;
+
+            const oldTurn = this._lastTurn;
+            const newTurn = value.value;
+            Hyp3eLogger.info("HYP3ETurnTracker", `Turn changed from ${oldTurn} to ${newTurn} by user ${userId}`);
+            // update cache
+            this._lastTurn = newTurn;
+    
+            if (newTurn > oldTurn) {
+                Hooks.callAll("explorationTurnAdvanced", newTurn);
+            } else if (newTurn === 1 && oldTurn !== 1) {
+                Hooks.callAll("explorationTurnReset", newTurn);
+            } else if (newTurn < oldTurn) {
+                Hooks.callAll("explorationTurnRetreat", newTurn);
+            } else {
+                Hooks.callAll("explorationTurnUpdated", newTurn);
+            }
+        });
+    }
+
     static async advanceTurn() {
+        Hyp3eLogger.info("advanceTurn", `advanceTurn() fired on: ${game.user.id}, GM? ${game.user.isGM}`);
         const newTurn = this.currentTurn + 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
-        this.currentTurn = newTurn;
+        // this.currentTurn = newTurn;
         Hyp3eLogger.info("advanceTurn", `Turn tracker advanced to turn ${newTurn}`);
-        Hooks.callAll("explorationTurnAdvanced", newTurn);
-        // Broadcast to all clients
-        game.socket.emit("system.hyp3e", {
-          type: "explorationTurnAdvanced",
-          newTurn
-        });
+        // Hooks.callAll("explorationTurnAdvanced", newTurn);
         return newTurn;
     }
 
@@ -130,28 +163,18 @@ export class HYP3ETurnTracker {
         if (this.currentTurn <= 1) return;  // Don't let turn go below 1
         const newTurn = this.currentTurn - 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
-        this.currentTurn = newTurn;
+        // this.currentTurn = newTurn;
         Hyp3eLogger.info("retreatTurn", `Turn tracker retreated to turn ${newTurn}`);
-        Hooks.callAll("explorationTurnRetreat", newTurn);
-        // Broadcast to all clients
-        game.socket.emit("system.hyp3e", {
-          type: "explorationTurnRetreat",
-          newTurn
-        });
+        // Hooks.callAll("explorationTurnRetreat", newTurn);
         return newTurn;
     }
 
     static async reset() {
         const newTurn = 1;
         await game.settings.set("hyp3e", "explorationTurn", newTurn);
-        this.currentTurn = newTurn;
+        // this.currentTurn = newTurn;
         Hyp3eLogger.info("reset", `Turn tracker reset to turn ${newTurn}.`);
-        Hooks.callAll("explorationTurnReset", newTurn);
-        // Broadcast to all clients
-        game.socket.emit("system.hyp3e", {
-          type: "explorationTurnReset",
-          newTurn
-        });
+        // Hooks.callAll("explorationTurnReset", newTurn);
         return newTurn;
     }
 
