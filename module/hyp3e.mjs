@@ -20,7 +20,6 @@ import { migrateActorData,
 import { HYP3ETurnTracker, 
             setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
-// import { HYP3ETurnTrackerSync } from "./helpers/turn-tracker-sync.mjs";
 import { HYP3ECalendar, 
             setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
@@ -518,8 +517,6 @@ Hooks.once("ready", async function() {
             resizeTokenPrototypes()
         }
     }
-
-    // HYP3ETurnTrackerSync.init();
 
 });
 
