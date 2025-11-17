@@ -4,13 +4,19 @@ import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { TurnAdvanceActionsConfig } from "./turn-advance-actions-config.mjs";
 
 export class HYP3ETurnTrackerApp extends Application {
+
+    static _hooksRegistered = false;
+
     constructor(options = {}) {
         super(options);
 
         // Only register once
-        Hooks.on("explorationTurnAdvanced", this._onTurnAdvanced.bind(this));
-        Hooks.on("explorationTurnRetreat", this._onTurnRetreat.bind(this));
-        Hooks.on("explorationTurnReset", this._onTurnReset.bind(this));
+        if (!HYP3ETurnTrackerApp._hooksRegistered) {
+            Hooks.on("explorationTurnAdvanced", this._onTurnAdvanced.bind(this));
+            Hooks.on("explorationTurnRetreat", this._onTurnRetreat.bind(this));
+            Hooks.on("explorationTurnReset", this._onTurnReset.bind(this));
+            HYP3ETurnTrackerApp._hooksRegistered = true;
+        }
     }
 
     /** Render this app embedded into a given container (jQuery element or selector). */
@@ -34,7 +40,6 @@ export class HYP3ETurnTrackerApp extends Application {
 
         // Keep a reference so closeEmbedded can remove it later (NOT USED YET)
         this._embeddedElement = $html;
-        this._embedded = true;
 
         // Activate listeners (activateListeners expects a jQuery element)
         this.activateListeners($html);
@@ -48,7 +53,6 @@ export class HYP3ETurnTrackerApp extends Application {
         if (this._embeddedElement) {
             this._embeddedElement.remove();
             this._embeddedElement = null;
-            this._isEmbedded = false;
         }
     }
 
