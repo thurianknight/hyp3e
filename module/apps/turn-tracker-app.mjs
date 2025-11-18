@@ -72,23 +72,27 @@ export class HYP3ETurnTrackerApp extends Application {
 
     getData() {
         const currentTurn = game.hyp3e.turnTracker.getTurn();
-        Hyp3eLogger.info("HYP3ETurnTrackerApp getData", "Getting turn tracker data:", { currentTurn });
-        return { currentTurn, isGM: game.user.isGM };
+        const currentTime = game.hyp3e.turnTracker.currentTime;
+        Hyp3eLogger.info("HYP3ETurnTrackerApp getData", "Getting turn tracker data:", { currentTurn, currentTime });
+        return { currentTurn, currentTime, isGM: game.user.isGM };
     }
 
     _onTurnAdvanced(data) {
         Hyp3eLogger.info("HYP3ETurnTrackerApp _onTurnAdvanced", "Turn advanced:", data);
-        this.render(false); // Update the tracker
+        // this.render(false); // Update the tracker
+        this.updateTurnDisplay(data);
     }
 
     _onTurnRetreat(data) {
         Hyp3eLogger.info("HYP3ETurnTrackerApp _onTurnRetreat", "Turn retreat:", data);
-        this.render(false); // Update the tracker
+        // this.render(false); // Update the tracker
+        this.updateTurnDisplay(data);
     }
 
     _onTurnReset(data) {
         Hyp3eLogger.info("HYP3ETurnTrackerApp _onTurnReset", "Turn reset:", data);
-        this.render(false); // Update the tracker
+        // this.render(false); // Update the tracker
+        this.updateTurnDisplay(data);
     }
 
     activateListeners(htmlData) {
@@ -128,5 +132,21 @@ export class HYP3ETurnTrackerApp extends Application {
             ev.preventDefault();
             new TurnAdvanceActionsConfig().render(true);
         });
+    }
+
+    updateTurnDisplay(turn) {
+        if (!this._embeddedElement) return;
+    
+        // Update the turn field
+        const turnField = this._embeddedElement.find("#current-turn");
+        turnField.val(turn);
+    
+        // Trigger visual flash
+        turnField.addClass("turn-advance-flash");
+        setTimeout(() => turnField.removeClass("turn-advance-flash"), 600);
+        
+        // Not used yet but maybe useful later
+        const currentTime = game.hyp3e.turnTracker.currentTime;
+        this._embeddedElement.find("#current-time")?.val(currentTime);
     }
 }

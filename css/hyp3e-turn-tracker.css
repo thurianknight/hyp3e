@@ -14,35 +14,29 @@
   input[type=text] {
     text-align: center;
     font-weight: normal;
-    font-size: 1em;
+    font-size: 0.9em;
     max-width: 50px;
-    margin: 5px 5px;
+    max-height: 20px;
+    /* margin: 5px 5px; */
+    margin: 0 5px;
+    padding: 0 2px;
   }
 }
 
 .theme-dark .turn-tracker {
   background: rgba(0, 0, 0, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  .turn-label {
-    /* color: #fff; */
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-  };
+  /* color: #fff; */
   controls {
     button {
       background: rgba(255, 255, 255, 0.1);
-      /* color: #fff; */
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
     button:hover {
       background: rgba(255, 255, 255, 0.2);
-      /* color: #fff; */
     }
     button:active {
       background: rgba(255, 255, 255, 0.3);
-      /* color: #fff; */
     }
   }
 }
@@ -71,10 +65,18 @@
 }
 
 .turn-tracker .turn-label {
-  margin: 0.5em 0;
+  /* margin: 0.5em 0; */
   text-align: center;
   text-decoration: none;
-  font-size: large;
+  font-size: 0.9em;
+  padding: 2px 0;
+}
+.turn-tracker .time-label {
+  /* margin: 0.5em 0; */
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.9em;
+  padding: 2px 0;
 }
 
 .turn-tracker .controls {
@@ -85,9 +87,19 @@
 }
 
 .turn-tracker .controls button {
-  margin: 0.25em;
+  margin: 0.15em;
   width: 32px;
   height: 32px;
+}
+
+/* Visual indicator when turn is advanced */
+.turn-advance-flash {
+  animation: turnflash 0.6s ease-out;
+}
+
+@keyframes turnflash {
+  0%   { background-color: rgba(255, 255, 0, 0.4); }
+  100% { background-color: transparent; }
 }
 
 /* Styles for the Turn-Advance Actions Config app */

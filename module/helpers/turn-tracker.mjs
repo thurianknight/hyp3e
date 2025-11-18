@@ -9,9 +9,9 @@ export async function setupTurnTrackerHooks() {
     Hooks.on("explorationTurnReset", (turn) => {
         Hyp3eLogger.info("explorationTurnReset", `Exploration turn reset to ${turn}`);
         // Update the turn tracker display (if it exists) in the chat log
-        const tracker = $(".turn-tracker");
-        if (!tracker.length) return;
-        $("#current-turn").val(turn);
+        // const tracker = $(".turn-tracker");
+        // if (!tracker.length) return;
+        // $("#current-turn").val(turn);
     });
 
     /**
@@ -21,9 +21,9 @@ export async function setupTurnTrackerHooks() {
         Hyp3eLogger.info("explorationTurnAdvanced", `Exploration turn ${turn} triggered.`);
 
         // Update the turn tracker display (if it exists) in the chat log
-        const tracker = $(".turn-tracker");
-        if (!tracker.length) return;
-        $("#current-turn").val(turn);
+        // const tracker = $(".turn-tracker");
+        // if (!tracker.length) return;
+        // $("#current-turn").val(turn);
 
         // The rest is for GMs only
         if (!game.user.isGM) return;
@@ -69,9 +69,9 @@ export async function setupTurnTrackerHooks() {
         Hyp3eLogger.info("explorationTurnRetreat", `Exploration turn ${turn} triggered.`);
 
         // Update the turn tracker display (if it exists) in the chat log
-        const tracker = $(".turn-tracker");
-        if (!tracker.length) return;
-        $("#current-turn").val(turn);
+        // const tracker = $(".turn-tracker");
+        // if (!tracker.length) return;
+        // $("#current-turn").val(turn);
 
         // The rest is for GMs only
         if (!game.user.isGM) return;

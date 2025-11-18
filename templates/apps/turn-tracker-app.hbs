@@ -8,9 +8,15 @@
         {{/if}}
         <button class="show-turn" title="Display in Chat"><i class="fas fa-comment"></i></button>
     </div>
-    <div class="controls">
-        <span class="turn-label">Turn:</span>
-        <input id="current-turn" type="text" value="{{currentTurn}}" disabled />
+    <div class="column-top">
+        <div class="controls">
+            <span class="turn-label">Turn:</span>
+            <input id="current-turn" type="text" value="{{currentTurn}}" disabled />
+        </div>
+        <div class="controls">
+            <span class="time-label">Time:</span>
+            <input id="current-time" type="text" value="{{currentTime}}" disabled />
+        </div>
     </div>
     <div class="controls">
         {{#if isGM}}
