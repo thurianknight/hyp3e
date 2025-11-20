@@ -42,7 +42,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     _prepareContext(partId, context, options) {
-        Hyp3eLogger.info("_prepareContext", `Calendar parameters:`, {partId, context, options})
+        Hyp3eLogger.info("HYP3ECalendar _prepareContext", `Calendar parameters:`, {partId, context, options})
         const date = HYP3ECalendar.getCurrentDate();
         const currentYear = date.year;
         const monthIndex = date.month - 1;

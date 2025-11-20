@@ -20,6 +20,7 @@ import { migrateActorData,
 import { HYP3ETurnTracker, 
             setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
+// import { HYP3ETurnTrackerAppV2 } from "./apps/turn-tracker-app-v2.mjs";
 import { HYP3ECalendar, 
             setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
@@ -785,13 +786,15 @@ async function initTurnTrackerInChatLog(app, html, data) {
     } else {
         container = html.find("#chat-controls");
     }
-    Hyp3eLogger.info("initTurnTrackerInChatLog", "Container for app:", container);
+    const $container = $(container);
+    Hyp3eLogger.info("initTurnTrackerInChatLog", "Container for app:", $container);
     if (container.length === 0) {
         Hyp3eLogger.warn("initTurnTrackerInChatLog", "Could not find chat controls container, cannot render Turn Tracker app.");
         return;
     }
     game.hyp3e = game.hyp3e || {};
     game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerApp();
+    // game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerAppV2();
 
     // Embed into chat (this will call activateListeners on the injected app)
     game.hyp3e.turnTrackerApp.renderEmbedded(container);
