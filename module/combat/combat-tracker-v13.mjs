@@ -39,6 +39,9 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     // ===========================================================================
 
     async _prepareCombatContext(context, options) {
+        if (!context?.combat || !(context.combat instanceof foundry.documents.Combat)) {
+            return;
+        }
         // Log incoming parameters
         Hyp3eLogger.info("_prepareCombatContext", `Incoming combat context:`, context)
         // Prepare the combat context
@@ -50,6 +53,9 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     }
 
     async _prepareTrackerContext(context, options) {
+        if (!this.viewed || !(this.viewed instanceof foundry.documents.Combat)) {
+            return;
+        }
         // Log incoming parmeters
         Hyp3eLogger.info("_prepareTrackerContext", `Tracker Context:`, context)
         // Log the combat object
