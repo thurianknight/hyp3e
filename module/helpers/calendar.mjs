@@ -130,7 +130,7 @@ export class HYP3ECalendar {
 
     static sendDateToChat() {
         // Get the current time from the turn tracker
-        const currentTime = game.hyp3e.turnTracker.currentTime();
+        const currentTime = game.hyp3e.turnTracker.getTime();
         ChatMessage.create({
             user: game.user.id,
             content: `<div class="hyp3e-calendar-date">${this.formatDate(

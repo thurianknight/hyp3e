@@ -19,8 +19,8 @@ import { migrateActorData,
             fixTokenSize } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, 
             setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
-import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
-// import { HYP3ETurnTrackerAppV2 } from "./apps/turn-tracker-app-v2.mjs";
+// import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
+import { HYP3ETurnTrackerAppV2 } from "./apps/turn-tracker-app-v2.mjs";
 import { HYP3ECalendar, 
             setupCalendarHooks } from "./helpers/calendar.mjs";
 import { HYP3ECalendarApp } from "./apps/calendar-app.mjs";
@@ -501,7 +501,7 @@ Hooks.once("ready", async function() {
     game.hyp3e.turnTracker.resetTurn = () => HYP3ETurnTracker.reset();
     game.hyp3e.turnTracker.getTurn = () => HYP3ETurnTracker.getTurn();
     game.hyp3e.turnTracker.turnStartTime = () => HYP3ETurnTracker.getTurnStartTime();
-    game.hyp3e.turnTracker.currentTime = () => HYP3ETurnTracker.getTime();
+    game.hyp3e.turnTracker.getTime = () => HYP3ETurnTracker.getTime();
     // Initialize the turn tracker in the chat log
     if (!trackerInitialized) {
         const chatLog = ui.chat;
@@ -793,8 +793,8 @@ async function initTurnTrackerInChatLog(app, html, data) {
         return;
     }
     game.hyp3e = game.hyp3e || {};
-    game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerApp();
-    // game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerAppV2();
+    // game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerApp();
+    game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerAppV2();
 
     // Embed into chat (this will call activateListeners on the injected app)
     game.hyp3e.turnTrackerApp.renderEmbedded(container);

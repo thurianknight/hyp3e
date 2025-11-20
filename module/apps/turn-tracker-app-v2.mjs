@@ -40,6 +40,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
             Hooks.on("explorationTurnRetreat", this._onTurnRetreat.bind(this));
             Hooks.on("explorationTurnReset", this._onTurnReset.bind(this));
             HYP3ETurnTrackerAppV2._hooksRegistered = true;
+            Hyp3eLogger.info("HYP3ETurnTrackerAppV2 constructor", "Registered turn tracker hooks");
         }
     }
 
@@ -48,9 +49,10 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
         // Resolve container as jQuery
         const $container = $(container);
         if (!$container.length) throw new Error("HYP3ETurnTrackerAppV2 renderEmbedded: container not found");
+        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 renderEmbedded", "Rendering into container:", $container);
 
         // Render the template with current data
-        const htmlString = await foundry.applications.handlebars.renderTemplate(this.options.template, this.context);
+        const htmlString = await foundry.applications.handlebars.renderTemplate(HYP3ETurnTrackerAppV2.PARTS.content.template, this._prepareContext());
         Hyp3eLogger.info("HYP3ETurnTrackerAppV2 renderEmbedded", "Rendering turn tracker:", htmlString);
         const $html = $(htmlString).addClass("turn-tracker");
 
@@ -95,10 +97,10 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     // }
 
     // getData() {
-    _prepareContext(partId, context, options) {
-        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Turn Tracker parameters:`, {partId, context, options})
+    _prepareContext(_options) {
+        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Turn Tracker options:`, _options)
         const currentTurn = game.hyp3e.turnTracker.getTurn();
-        const currentTime = game.hyp3e.turnTracker.currentTime;
+        const currentTime = game.hyp3e.turnTracker.getTime();
         Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", "Current turn and time:", { currentTurn, currentTime });
         return { currentTurn, currentTime, isGM: game.user.isGM };
     }
@@ -127,7 +129,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     }
 
     activateListeners(htmlData) {
-        super.activateListeners(htmlData);
+        // super.activateListeners(htmlData);
         const html = $(htmlData); // Wrap in jQuery
 
         html.find(".open-calendar").on("click", ev => {
@@ -153,7 +155,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
         });
         html.find(".show-turn").on("click", async ev => {
             const turn = game.hyp3e.turnTracker.getTurn();
-            const currentTime = game.hyp3e.turnTracker.currentTime();
+            const currentTime = game.hyp3e.turnTracker.getTime();
             ChatMessage.create({
                 content: `Current exploration turn: ${turn}, time is ${currentTime}.`,
                 type: CONST.CHAT_MESSAGE_TYPES.OTHER
@@ -177,7 +179,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
         setTimeout(() => turnField.removeClass("turn-advance-flash"), 600);
 
         // Update the time field
-        const currentTime = game.hyp3e.turnTracker.currentTime;
+        const currentTime = game.hyp3e.turnTracker.getTime();
         this._embeddedElement.find("#current-time")?.val(currentTime);
     }
 }

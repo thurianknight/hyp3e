@@ -96,7 +96,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
             // Get turn-related time data
             const turnStartTime = game.hyp3e.turnTracker.turnStartTime();
-            const currentTime = game.hyp3e.turnTracker.currentTime();
+            const currentTime = game.hyp3e.turnTracker.getTime();
             Hyp3eLogger.info("_prepareContext", `Turn start time: ${turnStartTime}, current time: ${currentTime}`);
 
             return {
