@@ -482,7 +482,7 @@ export class Hyp3eItem extends Item {
         if (item.type === 'spell') parts.push(this._renderSpellSection(itemData, item, actorData));
         if (item.type === 'item') parts.push(this._renderItemCheckSection(itemData));
         // Currently only weapons have annotations, but keep this generic for future use
-        parts.push(this._renderAnnotations(itemData));
+        // parts.push(this._renderAnnotations(itemData));
 
         return parts.join("");
     }
@@ -502,6 +502,9 @@ export class Hyp3eItem extends Item {
         } else {
             parts.push(`<p>Wpn Class: ${itemData.wc}</p>`);
         }
+        // If the weapon has annotations, render them before the Damage button
+        parts.push(this._renderAnnotations(itemData));
+        // Add the damage-roll button
         parts.push(this._renderDamageRoll(itemData, item, actorData));
         return parts.join("");
     }
@@ -517,16 +520,19 @@ export class Hyp3eItem extends Item {
             parts.push(itemData.affected.match(/.*d[1-9].*/) && Roll.validate(itemData.affected) ?
                 `<p># Affected: [[/r ${itemData.affected}]]</p>` : `<p># Affected: ${itemData.affected}</p>`);
         }
+        // Add the damage-roll button
         parts.push(this._renderDamageRoll(itemData, item, actorData));
         return parts.join("");
     }
 
     _renderDamageRoll(itemData, item, actorData) {
-        if (!itemData.damage || !Roll.validate(itemData.damage)) return `<p>Damage: ${itemData.damage || ""}</p>`;
+        if (!itemData.damage) return "";
+        if (!Roll.validate(itemData.damage)) return `<p>Damage: ${itemData.damage || ""}</p>`;
 
         const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData);
         const roll = new Roll(dmgObj.formula, actorData);
-        return `<div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' 
+        return `<hr class='plain-hr' />
+            <div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' 
             data-actor-id='${actorData.actorId}' data-formula='${roll.formula}' 
             data-damage-type='${itemData.dmgType}' data-debug-formula='${dmgObj.debugFormula}' 
             data-source-type='${item.type}'></div>`;
