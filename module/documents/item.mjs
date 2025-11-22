@@ -481,6 +481,8 @@ export class Hyp3eItem extends Item {
         if (item.type === 'weapon') parts.push(this._renderWeaponSection(itemData, item, actorData));
         if (item.type === 'spell') parts.push(this._renderSpellSection(itemData, item, actorData));
         if (item.type === 'item') parts.push(this._renderItemCheckSection(itemData));
+        // Currently only weapons have annotations, but keep this generic for future use
+        parts.push(this._renderAnnotations(itemData));
 
         return parts.join("");
     }
@@ -535,6 +537,21 @@ export class Hyp3eItem extends Item {
             return `<p>Item Check: ${itemData.formula} equal or under ${itemData.tn}</p>`;
         }
         return "";
+    }
+
+    _renderAnnotations(itemData) {
+        const parts = [];
+        if (itemData.annotations && itemData.annotations.length > 0) {
+            const weaponAnnotations = CONFIG.HYP3E.weaponAnnotations;
+            parts.push("<hr class='plain-hr' />");
+            parts.push("<h4>Annotations:</h4>");
+            parts.push("<ul>");
+            itemData.annotations.forEach(annotation => {
+                parts.push(`<li>${weaponAnnotations[annotation]}</li>`);
+            });
+            parts.push("</ul>");
+        }
+        return parts.join("");
     }
 
     /**

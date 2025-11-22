@@ -8,6 +8,11 @@
   font-size: calc(1em * var(--hyp3e-chat-scale, 1));
 }
 
+.chat-log h4 {
+  font-size: calc(1em * var(--hyp3e-chat-scale, 1));
+  margin: 0.2em 0;
+}
+
 /* Hyp3e chat label header style */
 .chat-label {
   margin: 10px 0;
