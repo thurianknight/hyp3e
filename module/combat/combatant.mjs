@@ -7,14 +7,16 @@ export class HYP3ECombatant extends Combatant {
     static GROUP_INIT_MOD_MISSILE = 0.60
     static GROUP_INIT_MOD_MAGIC = 0.40
     static GROUP_INIT_MOD_MOVEMENT = 0.20
-    static GROUP_INIT_MOD_OTHER = 0
+    static GROUP_INIT_MOD_OTHER = 0.025
+    static GROUP_INIT_MOD_MOVE_OTHER = 0.001
 
     // Phased initiative mods
     static PHASED_INIT_MOD_MELEE = 80
     static PHASED_INIT_MOD_MISSILE = 60
     static PHASED_INIT_MOD_MAGIC = 40
     static PHASED_INIT_MOD_MOVEMENT = 20
-    static PHASED_INIT_MOD_OTHER = 0
+    static PHASED_INIT_MOD_OTHER = 2.5
+    static PHASED_INIT_MOD_MOVE_OTHER = 0.1
 
     // Status-based initiative mods
     static INITIATIVE_MOD_DEAF = -2;
@@ -110,7 +112,7 @@ export class HYP3ECombatant extends Combatant {
 
     getInitiativeRoll(formula) {
         let rollTerms = formula || CONFIG.Combat.initiative.formula;
-        
+
         // Get the actor's roll data now, so we can use the DX value
         const rollData = this.actor?.getRollData() || {};
         const name = this.actor?.name || ""
@@ -119,7 +121,7 @@ export class HYP3ECombatant extends Combatant {
         // Movement partially overrides the other combat actions for initiative order
         this.getActionModifiers();
         // Add the action values to rollTerms
-        rollTerms += `+ ${this.moveInit + this.meleeInit + this.missileInit + this.magicInit}`
+        rollTerms += `+ ${this.moveInit + this.meleeInit + this.missileInit + this.magicInit + this.otherInit}`
         // Add the actor's DX value
         rollTerms += `+ ${(rollData.attributes?.dex?.value/1000)}`
 
@@ -144,29 +146,31 @@ export class HYP3ECombatant extends Combatant {
         const PREFIX = CONFIG.HYP3E.initiativeType === "phased" ? "PHASED" : "GROUP"
         // Movement partially overrides the other combat actions for initiative order
         // this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.GROUP_INIT_MOD_MOVEMENT : 0;
-        this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVEMENT`] : 0;
-
+        this.moveInit = this.getFlag(game.system.id, "isMovement") ? parseInt(HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVEMENT`]) : 0;
+        Hyp3eLogger.info("getActionModifiers", `${this.name} Move Init Mod: ${this.moveInit}`)
         if (this.moveInit == 0) {
-            // this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.GROUP_INIT_MOD_MELEE : 0;
             this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MELEE`] : 0;
-            // this.missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.GROUP_INIT_MOD_MISSILE : 0;
+            Hyp3eLogger.info("getActionModifiers", `${this.name} Melee Init Mod: ${this.meleeInit}`)
             this.missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MISSILE`] : 0;
-            // this.magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.GROUP_INIT_MOD_MAGIC : 0;
+            Hyp3eLogger.info("getActionModifiers", `${this.name} Missile Init Mod: ${this.missileInit}`)
             this.magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MAGIC`] : 0;
-            // this.otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant.GROUP_INIT_MOD_OTHER : 0;
+            Hyp3eLogger.info("getActionModifiers", `${this.name} Magic Init Mod: ${this.magicInit}`)
             this.otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_OTHER`] : 0;
+            Hyp3eLogger.info("getActionModifiers", `${this.name} Other Init Mod: ${this.otherInit}`)
         } else {
-            // this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.GROUP_INIT_MOD_MELEE : 0)/10;
             this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MELEE`] : 0)/10;
-            // this.missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.GROUP_INIT_MOD_MISSILE : 0)/10;
+            Hyp3eLogger.info("getActionModifiers", `${this.name} Melee Init Mod: ${this.meleeInit}`)
             this.missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MISSILE`] : 0)/10;
-            // this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.GROUP_INIT_MOD_MAGIC : 0)/10;
+            Hyp3eLogger.info("getActionModifiers", `${this.name} Missile Init Mod: ${this.missileInit}`)
             this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MAGIC`] : 0)/10;
-            // this.otherInit = (this.getFlag(game.system.id, "isOther") ? HYP3ECombatant.GROUP_INIT_MOD_OTHER : 0)/10;
-            this.otherInit = (this.getFlag(game.system.id, "isOther") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_OTHER`] : 0)/10;
+            Hyp3eLogger.info("getActionModifiers", `${this.name} Magic Init Mod: ${this.magicInit}`)
+            // We treat Move + Other specially to ensure it falls in the correct order
+            this.otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVE_OTHER`] : 0;
+            Hyp3eLogger.info("getActionModifiers", `${this.name} Other Init Mod: ${this.otherInit}`)
             // If move is combined with another action, reduce its modifier value to 1/10
             if (this.meleeInit > 0 || this.missileInit > 0 || this.magicInit > 0 || this.otherInit > 0) {
                 this.moveInit = this.moveInit/10;
+                Hyp3eLogger.info("getActionModifiers", `${this.name} Updated Move Init Mod: ${this.moveInit}`)
             }
         }
     }

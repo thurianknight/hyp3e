@@ -62,6 +62,8 @@ export class HYP3EGroupCombat extends HYP3ECombat {
             c.initRoll = results[c.initGroup].initiative
             // Movement partially overrides the other combat actions for initiative order
             c.getActionModifiers();
+            const rollTerms = `${c.initRoll} + ${c.moveInit} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.otherInit}`
+            Hyp3eLogger.info("rollInitiative", `${c.name} initiative roll terms: ${rollTerms}`);
 
             // Add the actor's temporary initiative modifier, if one exists
             c.getTempInitMod();
@@ -84,6 +86,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                                         + c.missileInit
                                         + c.magicInit
                                         + c.moveInit
+                                        + c.otherInit
                                         + c.statusInit
                                         + c.defeatedInit) * 1000) / 1000
                 })
