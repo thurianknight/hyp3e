@@ -2063,10 +2063,17 @@ export class Hyp3eActor extends Actor {
             if (gridDistance > 0 && gridDistance <= meleeRange) {
                 // If gridDistance == 0, then we assume no target and allow the attack to go through
                 chosenRange = "short"; // Set to Short even if too close
-                const msg = `Target is in melee range! (${gridDistance} ${canvas.scene.grid.units})`;
-                Hyp3eLogger.info("_prepareRangeData", msg);
-                rangeMessages.push(msg);
-                isOutOfRange = true;
+                // For certain missile attacks, prevent attacks to an adjacent square:
+                //  Physical weapons
+                //  NOT grenades
+                //  NOT area effect attacks
+                //  NOT weapons conjured by spells (i.e. no propulsion required)
+                if (!itemData.isGrenade && !itemData.isAreaEffect && (!itemData?.duration || !Number.isFinite(Number(itemData.duration)))) {
+                    const msg = `Target is in melee range! (${gridDistance} ${canvas.scene.grid.units})`;
+                    Hyp3eLogger.info("_prepareRangeData", msg);
+                    rangeMessages.push(msg);
+                    isOutOfRange = true;
+                }
             } else if (gridDistance <= itemData.range.short) {
                 chosenRange = "short";
             } else if (gridDistance <= itemData.range.medium) {
