@@ -28,6 +28,7 @@ export class HYP3ECombatTracker extends CombatTracker {
     async getData(options) {
         const context = await super.getData(options);
         const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
+        const initiativeType = CONFIG.HYP3E.initiativeType;
 
         // @ts-expect-error - We don't have type data for the combat tracker turn object
         const turns = context.turns.map((turn) => {
@@ -36,6 +37,7 @@ export class HYP3ECombatTracker extends CombatTracker {
             turn.isMissile = !!combatant.getFlag(game.system.id, "isMissile")
             turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
             turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
+            turn.isOther = !!combatant.getFlag(game.system.id, "isOther")
             turn.isSlowed = !!combatant.isSlowed;
             turn.logLevel = CONFIG.HYP3E.logLevel;
             turn.isOwnedByUser = !!combatant.actor.isOwner;
@@ -69,7 +71,8 @@ export class HYP3ECombatTracker extends CombatTracker {
         return foundry.utils.mergeObject(context, {
             turns,
             initGroups,
-            isGroupInitiative
+            isGroupInitiative,
+            initiativeType
         })
     }
 
@@ -104,7 +107,7 @@ export class HYP3ECombatTracker extends CombatTracker {
         // Get the flag's current value so we know what to flip it to
         const isActive = !!combatant.getFlag(game.system.id, flag);
         // These combat actions require special logic
-        const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement']
+        const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement', 'isOther']
         if (combatActions.some(f => f == flag)) {
             // Combat actions can be mutually exclusive, so we may need to toggle multiple flags
             await combatant.setCombatAction(flag, !isActive)            
@@ -136,6 +139,8 @@ export class HYP3ECombatTracker extends CombatTracker {
                 return this.#toggleFlag(c, "isMagic");
             case "movement":
                 return this.#toggleFlag(c, "isMovement");
+            case "other":
+                return this.#toggleFlag(c, "isOther");
             // Fall back to the superclass's button events
             default:
                 return super._onCombatantControl(event);

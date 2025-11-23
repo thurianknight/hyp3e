@@ -36,6 +36,14 @@
                     >
                         <i class='fas fa-walking'></i>
                     </a>
+                    <a
+                        class='combatant-control move-combat{{#if this.isOther}} active{{/if}}'
+                        data-tooltip="{{localize 'HYP3E.combat.otherDeclared'}}"
+                        role="button"
+                        {{#if this.isOwnedByUser}}data-control="other"{{/if}}
+                    >
+                        <i class='fas fa-hands'></i>
+                    </a>
                     {{!-- {{/if}} --}}
                     {{#if @root.user.isGM}}
                     <a class="combatant-control {{#if this.hidden}}active{{/if}}" aria-label="{{localize 'COMBAT.ToggleVis'}}" role="button" data-tooltip="COMBAT.ToggleVis" data-control="toggleHidden">

@@ -101,12 +101,14 @@ export class HYP3ECombat extends Combat {
                 "flags.hyp3e.isMissile": null,
                 "flags.hyp3e.isMagic": null,
                 "flags.hyp3e.isMovement": null,
+                "flags.hyp3e.isOther": null,
                 initRoll: null,
                 initiative: null,
                 meleeInit: null,
                 missileInit: null,
                 magicInit: null,
                 moveInit: null,
+                otherInit: null,
                 statusInit: null,
                 defeatedInit: null
             })

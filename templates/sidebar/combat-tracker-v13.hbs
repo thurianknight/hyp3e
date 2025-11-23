@@ -1,5 +1,6 @@
 <ol id="combat-tracker" class="combat-tracker plain">
-    {{#if isGroupInitiative}}
+    {{!-- {{#if isGroupInitiative}} --}}
+    {{#if (or (eq initiativeType "group") (eq initiativeType "phased"))}}
         {{#each initGroups}}
             {{> "combat-tracker-combatant-group-v13" }}
         {{/each}}

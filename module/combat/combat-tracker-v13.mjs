@@ -15,6 +15,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
             missile: HYP3ECombatTracker._onCombatantControl,
             magic: HYP3ECombatTracker._onCombatantControl,
             movement: HYP3ECombatTracker._onCombatantControl,
+            other: HYP3ECombatTracker._onCombatantControl,
         }
     })
     // Load the new combat-tracker templates
@@ -39,9 +40,6 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     // ===========================================================================
 
     async _prepareCombatContext(context, options) {
-        if (!context?.combat || !(context.combat instanceof foundry.documents.Combat)) {
-            return;
-        }
         // Log incoming parameters
         Hyp3eLogger.info("_prepareCombatContext", `Incoming combat context:`, context)
         // Prepare the combat context
@@ -50,6 +48,10 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
         this.isGroupInitiative = isGroupInitiative;
         context.isGroupInitiative = isGroupInitiative;
+        // Add initiative type
+        const initiativeType = CONFIG.HYP3E.initiativeType;
+        this.initiativeType = initiativeType;
+        context.initiativeType = initiativeType;
     }
 
     async _prepareTrackerContext(context, options) {
@@ -64,7 +66,8 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         await super._prepareTrackerContext(context, options);
 
         // Only needed for group initiative
-        if (CONFIG.HYP3E.isGroupInitiative) {
+        // if (CONFIG.HYP3E.isGroupInitiative) {
+        if (CONFIG.HYP3E.initiativeType === "group" || CONFIG.HYP3E.initiativeType === "phased") {
             if (context.turns && context.turns.length > 0) {
                 const initGroups = context.turns.reduce((arr, turn) => {
                     const idx = arr.findIndex(r => r.initGroup === turn.initGroup);
@@ -103,20 +106,35 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         // Add group initiative flag
         const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
         turn.isGroupInitiative = isGroupInitiative;
+        // Add initiative type
+        const initiativeType = CONFIG.HYP3E.initiativeType;
+        turn.initiativeType = initiativeType;
 
         // Add all of our custom flags to the combatant context
         turn.isMelee = !!combatant.getFlag(game.system.id, "isMelee")
         turn.isMissile = !!combatant.getFlag(game.system.id, "isMissile")
         turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
         turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
+        turn.isOther = !!combatant.getFlag(game.system.id, "isOther")
         turn.isSlowed = !!combatant.isSlowed;
         turn.logLevel = CONFIG.HYP3E.logLevel;
         turn.isOwnedByUser = !!combatant.actor.isOwner;
 
-        // Only needed for group initiative
-        if (isGroupInitiative) turn.initGroup = combatant.initGroup;
-        // Otherwise...
-        if (!isGroupInitiative) turn.initRoll = Math.floor(combatant.initiative)
+        // if (isGroupInitiative) turn.initGroup = combatant.initGroup;
+        switch (initiativeType) {
+            case "group":
+                // For group initiative...
+                turn.initGroup = combatant.initGroup;
+            case "phased":
+                // For phased initiative...
+                turn.initGroup = combatant.initGroup;
+            case "individual":
+                // For individual initiative...
+                turn.initRoll = Math.floor(combatant.initiative)
+            default:
+                // Default to Hyperborea 3E standard group init
+                turn.initGroup = combatant.initGroup;
+        }        
 
         // Log the updated turn
         Hyp3eLogger.info("_prepareTurnContext", `This turn:`, turn);
@@ -159,7 +177,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         // Get the flag's current value so we know what to flip it to
         const isActive = !!combatant.getFlag(game.system.id, flag);
         // These combat actions require special logic
-        const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement']
+        const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement', 'isOther']
         if (combatActions.some(f => f == flag)) {
             // Combat actions can be mutually exclusive, so we may need to toggle multiple flags
             await combatant.setCombatAction(flag, !isActive)            
@@ -208,6 +226,8 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
                 return this._toggleFlag(combatant, "isMagic");
             case "movement":
                 return this._toggleFlag(combatant, "isMovement");
+            case "other":
+                return this._toggleFlag(combatant, "isOther");
             // Fall back to the superclass's button events
             default:
                 return super._onCombatantControl(event, target);

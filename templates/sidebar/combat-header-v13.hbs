@@ -54,7 +54,8 @@
     <div class="encounter-controls {{#if hasCombat}}combat{{/if}}">
         {{!-- GM initiative and group controls --}}
         {{#if user.isGM}}
-            {{#if isGroupInitiative}}
+            {{!-- {{#if isGroupInitiative}} --}}
+            {{#if (or (eq initiativeType "group") (eq initiativeType "phased"))}}
             <button type="button" class="inline-control combat-control icon fa-solid fa-dice" data-action="rollAll"
                 {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="{{ localize 'COMBAT.RollAll' }}"
                 aria-label="{{ localize 'COMBAT.RollAll' }}"></button>
@@ -71,13 +72,14 @@
             {{/if}}
         {{/if}}
         {{!-- Player-group initiative control --}}
-        {{#if isGroupInitiative}}
+        {{!-- {{#if isGroupInitiative}} --}}
         {{#unless user.isGM}}
-            <button type="button" class="inline-control combat-control icon fa-solid fa-dice" data-action="rollGroup"
-                {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="{{ localize "HYP3E.rollGroup" }}"
-                aria-label="{{ localize "HYP3E.rollGroup" }}"></button>
+            {{#if (or (eq initiativeType "group") (eq initiativeType "phased"))}}
+                <button type="button" class="inline-control combat-control icon fa-solid fa-dice" data-action="rollGroup"
+                    {{#unless combat.turns.length}}disabled{{/unless}} data-tooltip="{{ localize "HYP3E.rollGroup" }}"
+                    aria-label="{{ localize "HYP3E.rollGroup" }}"></button>
+            {{/if}}
         {{/unless}}
-        {{/if}}
 
         {{!-- Combat Status --}}
         <strong class="encounter-title">

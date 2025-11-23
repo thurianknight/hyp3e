@@ -1,11 +1,22 @@
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 
 export class HYP3ECombatant extends Combatant {
-    // These are added to the initiative roll + DX of an actor, to position them in order high to low
-    static INITIATIVE_MOD_MELEE = 0.80
-    static INITIATIVE_MOD_MISSILE = 0.60
-    static INITIATIVE_MOD_MAGIC = 0.40
-    static INITIATIVE_MOD_MOVEMENT = 0.20
+    // All mods are added to the initiative roll + DX of an actor, to position them in order high to low
+    // Group initiative mods
+    static GROUP_INIT_MOD_MELEE = 0.80
+    static GROUP_INIT_MOD_MISSILE = 0.60
+    static GROUP_INIT_MOD_MAGIC = 0.40
+    static GROUP_INIT_MOD_MOVEMENT = 0.20
+    static GROUP_INIT_MOD_OTHER = 0
+
+    // Phased initiative mods
+    static PHASED_INIT_MOD_MELEE = 80
+    static PHASED_INIT_MOD_MISSILE = 60
+    static PHASED_INIT_MOD_MAGIC = 40
+    static PHASED_INIT_MOD_MOVEMENT = 20
+    static PHASED_INIT_MOD_OTHER = 0
+
+    // Status-based initiative mods
     static INITIATIVE_MOD_DEAF = -2;
     static INITIATIVE_MOD_BLIND = -95;
     static INITIATIVE_MOD_SLOWED = 0;
@@ -31,6 +42,10 @@ export class HYP3ECombatant extends Combatant {
         return this.getFlag(game.system.id, "isMovement");
     }
 
+    get isOther() {
+        return this.getFlag(game.system.id, "isOther");
+    }
+
     // A combatant is defeated if their HP go to zero or negative
     get isDefeated() {
         if (this.defeated)
@@ -52,6 +67,7 @@ export class HYP3ECombatant extends Combatant {
                     // Set these to false
                     this.setFlag(game.system.id, 'isMissile', !value)
                     this.setFlag(game.system.id, 'isMagic', !value)
+                    this.setFlag(game.system.id, 'isOther', !value)
                 }
                 break;
             case "isMissile":
@@ -59,6 +75,7 @@ export class HYP3ECombatant extends Combatant {
                     // Set these to false
                     this.setFlag(game.system.id, 'isMelee', !value)
                     this.setFlag(game.system.id, 'isMagic', !value)
+                    this.setFlag(game.system.id, 'isOther', !value)
                 }
                 break;
             case "isMagic":
@@ -66,10 +83,19 @@ export class HYP3ECombatant extends Combatant {
                     // Set these to false
                     this.setFlag(game.system.id, 'isMelee', !value)
                     this.setFlag(game.system.id, 'isMissile', !value)
+                    this.setFlag(game.system.id, 'isOther', !value)
                 }
                 break;
             case "isMovement":
                 // isMovement can stack with the other combat actions
+                break;
+            case "isOther":
+                if (value === true) {
+                    // Set these to false
+                    this.setFlag(game.system.id, 'isMelee', !value)
+                    this.setFlag(game.system.id, 'isMissile', !value)
+                    this.setFlag(game.system.id, 'isMagic', !value)
+                }
                 break;
             default:
                 // This should never happen
@@ -116,15 +142,17 @@ export class HYP3ECombatant extends Combatant {
 
     getActionModifiers() {
         // Movement partially overrides the other combat actions for initiative order
-        this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.INITIATIVE_MOD_MOVEMENT : 0;
+        this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.GROUP_INIT_MOD_MOVEMENT : 0;
         if (this.moveInit == 0) {
-            this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_MOD_MELEE : 0;
-            this.missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_MOD_MISSILE : 0;
-            this.magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_MOD_MAGIC : 0;
+            this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.GROUP_INIT_MOD_MELEE : 0;
+            this.missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.GROUP_INIT_MOD_MISSILE : 0;
+            this.magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.GROUP_INIT_MOD_MAGIC : 0;
+            this.otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant.GROUP_INIT_MOD_OTHER : 0;
         } else {
-            this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.INITIATIVE_MOD_MELEE : 0)/10;
-            this.missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.INITIATIVE_MOD_MISSILE : 0)/10;
-            this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.INITIATIVE_MOD_MAGIC : 0)/10;
+            this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant.GROUP_INIT_MOD_MELEE : 0)/10;
+            this.missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant.GROUP_INIT_MOD_MISSILE : 0)/10;
+            this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant.GROUP_INIT_MOD_MAGIC : 0)/10;
+            this.otherInit = (this.getFlag(game.system.id, "isOther") ? HYP3ECombatant.GROUP_INIT_MOD_OTHER : 0)/10;
             // If move is combined with another action, reduce its modifier value to 1/10
             if (this.meleeInit > 0 || this.missileInit > 0 || this.magicInit > 0) {
                 this.moveInit = this.moveInit/10;

@@ -22,6 +22,9 @@
                 <button type="button" class="inline-control combatant-control icon fa-solid fa-walking {{#if isMovement}}active{{/if}}"
                         data-action="movement" data-tooltip="{{localize 'HYP3E.combat.moveDeclared'}}"
                         aria-label="{{localize 'HYP3E.combat.moveDeclared'}}"></button>
+                <button type="button" class="inline-control combatant-control icon fa-solid fa-hands {{#if isOther}}active{{/if}}"
+                        data-action="other" data-tooltip="{{localize 'HYP3E.combat.otherDeclared'}}"
+                        aria-label="{{localize 'HYP3E.combat.otherDeclared'}}"></button>
                 <span class="tooltip-initiative">Initiative: {{ initiative }}</span>
                 {{!-- {{/if}} --}}
             </div>
@@ -74,17 +77,21 @@
                 <i class="fa fa-dizzy"></i>
 
                 {{else}}
-                    {{#unless isGroupInitiative}}
+                    {{!-- {{#unless isGroupInitiative}} --}}
+                    {{#if (eq initiativeType "individual")}}
                     <span class="initiative">{{ initiative }}</span>
-                    {{/unless}}
+                    {{/if}}
+                    {{!-- {{/unless}} --}}
                 {{/if}}
             {{!-- Roll Initiative --}}
             {{else if isOwner}}
-                {{#unless isGroupInitiative}}
+                {{!-- {{#unless isGroupInitiative}} --}}
+                {{#if (eq initiativeType "individual")}}
                 <button type="button" class="combatant-control roll" data-action="rollInitiative"
                     data-tooltip="COMBAT.InitiativeRoll" aria-label="{{ localize "COMBAT.InitiativeRoll" }}"
                     style="--initiative-icon: url('{{ @root.initiativeIcon.icon }}'); --initiative-icon-hover: url('{{ @root.initiativeIcon.hover }}');"></button>
-                {{/unless}}
+                {{/if}}
+                {{!-- {{/unless}} --}}
             {{/if}}
         </div>
 

@@ -52,6 +52,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             heavilyEncumbered: game.settings.get(game.system.id, "heavilyEncumbered"),
             // Rules Options - Combat
             isGroupInitiative: game.settings.get(game.system.id, "isGroupInitiative"),
+            initiativeType: game.settings.get(game.system.id, "initiativeType"),
             rerollInitiative: game.settings.get(game.system.id, "rerollInitiative"),
             limitMovement: game.settings.get(game.system.id, "limitMovement"),
             forceRangeLimit: game.settings.get(game.system.id, "forceRangeLimit"),
@@ -76,6 +77,11 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             migrateCompendia: game.settings.get(game.system.id, "migrateCompendia"),
         };
         // Add values for select lists
+        const initiativeTypeOpts = [
+            { value: "group", label: "Group-based initiative" },
+            { value: "phased", label: "Phased initiative" },
+            { value: "individual", label: "Individual initiative" }
+        ];
         const rerollInitiativeOpts = [
             { value: "keep", label: "Keep same for each round" },
             { value: "reset", label: "Reset to blank each round" },
@@ -97,7 +103,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             { value: "2", label: "Errors Only" }
         ];
         Hyp3eLogger.info("_prepareContext", `Loaded configuration settings:`, settings);
-        return { settings, rerollInitiativeOpts, attrCheckOpts, quickCreateCharMethods, logLevels };
+        return { settings, initiativeTypeOpts, rerollInitiativeOpts, attrCheckOpts, quickCreateCharMethods, logLevels };
     }
 
     /**

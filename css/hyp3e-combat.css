@@ -131,7 +131,7 @@
 /* Tooltip text */
 .combatant-controls .tooltip-initiative {
   visibility: hidden;
-  width: 125px;
+  width: 110px;
   background-color: #555;
   color: #fff;
   text-align: center;
@@ -141,9 +141,9 @@
   /* Position the tooltip text */
   position: absolute;
   z-index: 1;
-  bottom: 50%;
-  left: 50%;
-  margin-left: 25px;
+  bottom: 1.5em;
+  left: 80%;
+  /* margin-left: 25px; */
 
   /* Fade in tooltip */
   opacity: 0;

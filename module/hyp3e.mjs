@@ -101,6 +101,7 @@ Hooks.once('init', async function() {
 
     // Get initiative mode: group vs. individual
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
+    const initiativeType = game.settings.get(game.system.id, "initiativeType");
 
     // Load combat classes
     const { HYP3ECombat } = await import( "./combat/combat.mjs");
@@ -110,14 +111,24 @@ Hooks.once('init', async function() {
     // Initiative roll is the same d6, regardless of group/individual
     CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
     // Set the Combat and Combatant document classes based on initiative mode
-    if (isGroupInitiative) {
-        Hyp3eLogger.info("Init", "Group-based combat initiative:", CONFIG.Combat.initiative);
-        CONFIG.Combat.documentClass = HYP3EGroupCombat;
-        CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
-    } else {
-        Hyp3eLogger.info("Init", "Individual combat initiative:", CONFIG.Combat.initiative);
-        CONFIG.Combat.documentClass = HYP3ECombat;
-        CONFIG.Combatant.documentClass = HYP3ECombatant;
+    // if (isGroupInitiative) {
+    switch (initiativeType) {
+        case "group":
+            Hyp3eLogger.info("Init", "Group-based combat initiative:", CONFIG.Combat.initiative);
+            CONFIG.Combat.documentClass = HYP3EGroupCombat;
+            CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
+            break;
+    // } else {
+        case "phased":
+            Hyp3eLogger.info("Init", "Phased combat initiative:", CONFIG.Combat.initiative);
+            CONFIG.Combat.documentClass = HYP3EGroupCombat;
+            CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
+            break;
+        case "individual":
+            Hyp3eLogger.info("Init", "Individual combat initiative:", CONFIG.Combat.initiative);
+            CONFIG.Combat.documentClass = HYP3ECombat;
+            CONFIG.Combatant.documentClass = HYP3ECombatant;
+            break;
     }
 
     if (majorVersion >= 13) {
@@ -305,6 +316,11 @@ Hooks.once("ready", async function() {
     const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
     CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
     Hyp3eLogger.info("Init", "CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative);
+
+    // Initiative type: group, phased, or individual
+    const initiativeType = game.settings.get(game.system.id, "initiativeType");
+    CONFIG.HYP3E.initiativeType = initiativeType;
+    Hyp3eLogger.info("Init", "CONFIG combat initiative type:", CONFIG.HYP3E.initiativeType);
 
     // Limit token movement to actor MV base
     if (majorVersion >= 13) {

@@ -257,6 +257,22 @@ export function registerHyp3eConfigurations() {
         requiresReload: true,
     });
 
+    // Select initiative type: group, phased, or individual
+    game.settings.register(game.system.id, "initiativeType", {
+        name: game.i18n.localize("HYP3E.settings.initiativeType"),
+        hint: game.i18n.localize("HYP3E.settings.initiativeTypeHint"),
+        default: "group",
+        scope: "world",
+        type: String,
+        choices: {
+            group: "HYP3E.settings.initiativeGroup",
+            phased: "HYP3E.settings.initiativePhased",
+            individual: "HYP3E.settings.initiativeIndividual",
+        },
+        config: showConfigOptions,
+        requiresReload: true,
+    });
+
     // Re-roll Initiative action
     game.settings.register(game.system.id, "rerollInitiative", {
         name: game.i18n.localize("HYP3E.settings.rerollInitiative"),
