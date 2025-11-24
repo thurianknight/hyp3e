@@ -2064,10 +2064,9 @@ export class Hyp3eActor extends Actor {
                 // If gridDistance == 0, then we assume no target and allow the attack to go through
                 chosenRange = "short"; // Set to Short even if too close
                 // For certain missile attacks, prevent attacks to an adjacent square:
-                //  Physical weapons
-                //  NOT grenades
-                //  NOT area effect attacks
-                //  NOT weapons conjured by spells (i.e. no propulsion required)
+                //  Physical weapons only, not spells (filtered by the itemData.missile check above)
+                //  - Not grenades, not area effect attacks
+                //  - Not weapons conjured by spells (e.g. Exploding Skull, Magic Ice Dart)
                 if (!itemData.isGrenade && !itemData.isAreaEffect && (!itemData?.duration || !Number.isFinite(Number(itemData.duration)))) {
                     const msg = `Target is in melee range! (${gridDistance} ${canvas.scene.grid.units})`;
                     Hyp3eLogger.info("_prepareRangeData", msg);
