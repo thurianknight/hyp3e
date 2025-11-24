@@ -121,7 +121,8 @@ export class HYP3ECombatant extends Combatant {
         // Movement partially overrides the other combat actions for initiative order
         this.getActionModifiers();
         // Add the action values to rollTerms
-        rollTerms += `+ ${this.moveInit + this.meleeInit + this.missileInit + this.magicInit + this.otherInit}`
+        rollTerms += `+ ${this.meleeInit + this.missileInit + this.magicInit + this.moveInit + this.otherInit}`
+        Hyp3eLogger.info("getInitiativeRoll", `${this.name} initiative roll terms (roll + melee + missile + magic + move + other): ${rollTerms}`);
         // Add the actor's DX value
         rollTerms += `+ ${(rollData.attributes?.dex?.value/1000)}`
 

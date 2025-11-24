@@ -56,14 +56,14 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         Hyp3eLogger.info("rollInitiative", `Initiative roll per group:`, rollPerGroup);
 
         const results = await this.#prepareGroupInitiativeDice(rollPerGroup);
-        
+
         // Add the combat action value to each combatant for initiative calculation
         combatantsAffected.forEach(c => {
             c.initRoll = results[c.initGroup].initiative
             // Movement partially overrides the other combat actions for initiative order
             c.getActionModifiers();
-            const rollTerms = `${c.initRoll} + ${c.moveInit} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.otherInit}`
-            Hyp3eLogger.info("rollInitiative", `${c.name} initiative roll terms: ${rollTerms}`);
+            const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit}`
+            Hyp3eLogger.info("rollInitiative", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other): ${rollTerms}`);
 
             // Add the actor's temporary initiative modifier, if one exists
             c.getTempInitMod();
