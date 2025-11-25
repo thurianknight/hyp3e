@@ -290,81 +290,6 @@ export class Hyp3eActor extends Actor {
     }
 
     /**
-     * Calculate the character's AC, DR, and MV
-     * @param {*} actorData // The actor data object
-     * @param {*} systemData // The actor's system data object
-     */
-    getCharacterAcAndMv(actorData, systemData) {
-        // Calculate current AC, DR, and MV based on equipped armor, shield, and DX defense mod
-        let tempAC = 9
-        let tempMV = 40
-        let shieldMod = 0
-        let tempDR = 0
-        // Loop through all inventory item types to find armor
-        for (let itmType of Object.entries(actorData.itemTypes)) {
-            if (itmType[0] === "armor") {
-                // Armor as an item type can include armor, shields, and some protective magic items
-                for (let [key, obj] of Object.entries(itmType[1])) {
-                    Hyp3eLogger.info("getCharacterAcAndMv", `Armor data:`, obj);
-                    // Only count an item if it is equipped... but also note that only 1 suit of armor 
-                    //   will ever be counted -- no stacking of armor.
-                    // The logic here should use the best AC if multiple armor types are equipped, as in 
-                    //   the case where someone is wearing both armor and a ring of protection.
-                    // HOWEVER, this logic is partially broken. Need to map out all possibilities for magical
-                    //   protection items, what stacks & when, then we can fix this logic.
-                    if (obj.system.equipped) {
-                        // DR can be updated by armor or shield (not in core rules, but...)
-                        if (obj.system.dr > tempDR) {
-                            // Only update DR if this equipped item is superior to the current DR
-                            tempDR = obj.system.dr
-                        }
-                        if (obj.system.type != "shield") {
-                            // Armor AC overrides the unarmored AC of 9 (DX mod subtracted later)
-                            if (obj.system.ac < tempAC) {
-                                // Only update AC if this equipped item is superior to the current AC
-                                tempAC = obj.system.ac
-                                tempMV = obj.system.mv
-                            }
-                            Hyp3eLogger.info("getCharacterAcAndMv", `Armor equipped: ${obj.name}, Base AC: ${tempAC}, Base DR: ${tempDR}, Base MV: ${tempMV}`)
-                        } else {
-                            // Shield AC is a modifier subtracted from base AC.
-                            // We allow shield modifiers to stack because many protective magic items give an AC bonus
-                            //  similar to shields, and they should stack.
-                            shieldMod += obj.system.ac
-                            Hyp3eLogger.info("getCharacterAcAndMv", `Shield equipped: ${obj.name}, shield mod: ${shieldMod}`)
-                        }
-                    } else {
-                        Hyp3eLogger.info("getCharacterAcAndMv", `${obj.name} not equipped.`);
-                    }
-                }
-            }
-        }
-        if (CONFIG.HYP3E.enableEncumbrance) {
-            // Encumbered and Heavily Encumbered negatively impact both AC and MV
-            if (this.getFlag(game.system.id, "isEncumbered")) {
-                tempAC += 1
-                tempMV -= 10
-                Hyp3eLogger.info("getCharacterAcAndMv", `Encumbered: AC ${tempAC}, MV ${tempMV}`);
-            } else if (this.getFlag(game.system.id, "isHeavilyEncumbered")) {
-                tempAC += 2
-                tempMV -= 20
-                Hyp3eLogger.info("getCharacterAcAndMv", `Heavily Encumbered: AC ${tempAC}, MV ${tempMV}`);
-            } else {
-                Hyp3eLogger.info("getCharacterAcAndMv", `Not Encumbered: AC ${tempAC}, MV ${tempMV}`);
-            }
-        }
-
-        // Now calculate & set the final values...
-        tempAC = tempAC - systemData.attributes.dex.defMod - shieldMod
-        // tempAC = Math.max(-9, Math.min(9, tempAC));
-
-        // AC must be between 9 and -9, regardless of modifiers
-        systemData.ac.value = Math.clamp(tempAC, -9, 9);
-        systemData.ac.dr = tempDR
-        systemData.movement.base.value = tempMV
-    }
-
-    /**
      * Mutate the character's AC, DR, and MV in the actor's system data
      * @param {*} actorData - The actor data object
      * @param {*} systemData - The actor system data object
@@ -384,7 +309,7 @@ export class Hyp3eActor extends Actor {
      */
     _calculateAcDrMv(actorData, systemData) {
         let ac = 9;
-        let mv = 40;
+        let mv = 60; // Default movement is 40, but Monks can get up to 60
         let dr = 0;
         let shieldMod = 0;
 

@@ -106,12 +106,33 @@ export class Hyp3eCharacter {
                     "fa": 8,
                 },
             },
+            "abilities": [
+                { "name": "Agile" },
+                { "name": "Assassinate (Backstab)" },
+                { "name": "Detect Secret Doors" },
+                { "name": "Disguise" },
+                { "name": "Extraordinary Dexterity" },
+                { "name": "Harvest Venom" },
+                { "name": "Poison Resistance" },
+                { "name": "Poison Use" },
+                { "name": "Poison Manufacture" },
+                { "name": "Climb" },
+                { "name": "Discern Noise" },
+                { "name": "Hide" },
+                { "name": "Manipulate Traps" },
+                { "name": "Move Silently" },
+                { "name": "Open Locks" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Leather armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
                     { "name": "Sword, short", "quantity": 1 },
                     { "name": "Crossbow, light", "quantity": 1 },
@@ -224,6 +245,28 @@ export class Hyp3eCharacter {
                     "fa": 12,
                 },
             },
+            "abilities": [
+                { "name": "Agile" },
+                { "name": "Alertness" },
+                { "name": "Ambusher" },
+                { "name": "Climb" },
+                { "name": "Draw Poison" },
+                { "name": "Extraordinary Dexterity" },
+                { "name": "Extraordinary Strength" },
+                { "name": "Hardy" },
+                { "name": "Horsemanship" },
+                { "name": "Leap" },
+                { "name": "Move Silently" },
+                { "name": "Run" },
+                { "name": "Sense Magic" },
+                { "name": "Sorcerous Distrust" },
+                { "name": "Track" },
+                { "name": "Weapon Mastery" },
+                { "name": "Wilderness Survival" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Melee Expert" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
@@ -231,6 +274,7 @@ export class Hyp3eCharacter {
                     { "name": "Shield, small", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Bow, short", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
                     { "name": "Sword, bastard", "quantity": 1 },
@@ -355,12 +399,31 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Countersong" },
+                { "name": "Extraordinary Dexterity" },
+                { "name": "Folklore" },
+                { "name": "Inspirit Allies" },
+                { "name": "Magic Item Use" },
+                { "name": "Mesmerize" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Decipher Script" },
+                { "name": "Discern Noise" },
+                { "name": "Hide" },
+                { "name": "Move Silently" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Bow, short", "quantity": 1 },
                     { "name": "Dagger", "quantity": 2 },
                     { "name": "Mace, footman's", "quantity": 1 },
@@ -477,12 +540,26 @@ export class Hyp3eCharacter {
                     "fa": 12,
                 },
             },
+            "abilities": [
+                { "name": "Berserk Rage" },
+                { "name": "Climb" },
+                { "name": "Extraordinary Str and Con" },
+                { "name": "Hardy" },
+                { "name": "Leap" },
+                { "name": "Thick Skin" },
+                { "name": "Weapon Mastery" },
+                { "name": "Bestial Form" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Melee Expert" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Scale mail", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Axe, battle", "quantity": 1 },
                     { "name": "Axe, hand", "quantity": 2 },
                     { "name": "Sword, broad", "quantity": 1 },
@@ -589,6 +666,19 @@ export class Hyp3eCharacter {
                     "fa": 12,
                 },
             },
+            "abilities": [
+                { "name": "Extraordinary Strength" },
+                { "name": "Honour" },
+                { "name": "Horsemanship" },
+                { "name": "Mounted Charge" },
+                { "name": "Shield Sacrifice" },
+                { "name": "Skillful Defender" },
+                { "name": "Unbreakable Willpower" },
+                { "name": "Weapon Mastery" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Melee Expert" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
@@ -596,6 +686,7 @@ export class Hyp3eCharacter {
                     { "name": "Shield, small", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Flail, horseman's", "quantity": 1 },
                     { "name": "Sword, long", "quantity": 1 },
                 ],
@@ -721,12 +812,22 @@ export class Hyp3eCharacter {
                     "ta": 12,
                 },
             },
+            "abilities": [
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Turn Undead" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
                     { "name": "Hammer, war", "quantity": 1 },
                 ],
@@ -846,9 +947,23 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Alchemy" },
+                { "name": "Fire/Heat Vulnerability" },
+                { "name": "Ice/Cold Affinity" },
+                { "name": "Icicle" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Axe, hand", "quantity": 2 },
                     { "name": "Dagger, silver", "quantity": 1 },
                     { "name": "Spear, short", "quantity": 1 },
@@ -978,12 +1093,29 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Druidic Tongue" },
+                { "name": "Fire/Heat Affinity" },
+                { "name": "Natural Identifications" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Traverse Overgrowth" },
+                { "name": "Charm Immunity" },
+                { "name": "Shapechange" },
+                { "name": "Druidic Hierarchy" },
+                { "name": "Longevity" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Bow, short", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
                     { "name": "Spear, short", "quantity": 1 },
@@ -1097,6 +1229,15 @@ export class Hyp3eCharacter {
                     "fa": 12,
                 },
             },
+            "abilities": [
+                { "name": "Extraordinary Strength" },
+                { "name": "Heroic Fighting" },
+                { "name": "Weapon Mastery" },
+                { "name": "Grand Mastery" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Melee Expert" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
@@ -1104,6 +1245,7 @@ export class Hyp3eCharacter {
                     { "name": "Shield, large", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Bow, short", "quantity": 1 },
                     { "name": "Sword, broad", "quantity": 1 },
                 ],
@@ -1215,12 +1357,32 @@ export class Hyp3eCharacter {
                     "fa": 12,
                 },
             },
+            "abilities": [
+                { "name": "Alertness" },
+                { "name": "Ambusher" },
+                { "name": "Climb" },
+                { "name": "Extraordinary Strength" },
+                { "name": "Harvest Venom" },
+                { "name": "Hide" },
+                { "name": "Move Silently" },
+                { "name": "Predator" },
+                { "name": "Subdue Animal" },
+                { "name": "Track" },
+                { "name": "Weapon Mastery" },
+                { "name": "Wilderness Survival" },
+                { "name": "Wilderness Traps" },
+                { "name": "Werewolf Slayer" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Melee Expert" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Leather armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Axe, hand", "quantity": 1 },
                     { "name": "Bow, long", "quantity": 1 },
                     { "name": "Net, fighting", "quantity": 1 },
@@ -1343,9 +1505,24 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Alchemy" },
+                { "name": "Coloured Globe" },
+                { "name": "Extraordinary Dexterity" },
+                { "name": "Perceive Illusion" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Vizard" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dagger, silver", "quantity": 1 },
                     { "name": "Quarterstaff", "quantity": 1 },
                     { "name": "Sling", "quantity": 1 },
@@ -1474,6 +1651,29 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Agile" },
+                { "name": "Backstab" },
+                { "name": "Detect Secret Doors" },
+                { "name": "Extraordinary Dexterity" },
+                { "name": "Magic Item Use" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Thieves' Cant" },
+                { "name": "Climb" },
+                { "name": "Decipher Script" },
+                { "name": "Discern Noise" },
+                { "name": "Hide" },
+                { "name": "Manipulate Traps" },
+                { "name": "Move Silently" },
+                { "name": "Open Locks" },
+                { "name": "Pick Pockets" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
@@ -1481,6 +1681,7 @@ export class Hyp3eCharacter {
                     { "name": "Shield, small", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dagger", "quantity": 2 },
                     { "name": "Falcata", "quantity": 1 },
                     { "name": "Sling", "quantity": 1 },
@@ -1601,9 +1802,21 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Alchemy" },
+                { "name": "Familiar" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dagger, silver", "quantity": 1 },
                     { "name": "Quarterstaff", "quantity": 1 },
                     { "name": "Sling", "quantity": 1 },
@@ -1719,12 +1932,33 @@ export class Hyp3eCharacter {
                     "fa": 11,
                 },
             },
+            "abilities": [
+                { "name": "Block Missile" },
+                { "name": "Cellular Adjustment" },
+                { "name": "Controlled Fall" },
+                { "name": "Defensive Ability" },
+                { "name": "Detect Secret Doors" },
+                { "name": "Empty Hand" },
+                { "name": "Extraordinary Dexterity" },
+                { "name": "Run" },
+                { "name": "Superior Willpower" },
+                { "name": "Speak With Nature" },
+                { "name": "Simulate Death" },
+                { "name": "Climb" },
+                { "name": "Discern Noise" },
+                { "name": "Hide" },
+                { "name": "Move Silently" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Monk's Defensive Ability", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Cæstuses", "quantity": 1 },
                     { "name": "Dagger, silver", "quantity": 1 },
                     { "name": "Halberd", "quantity": 1 },
@@ -1861,9 +2095,21 @@ export class Hyp3eCharacter {
                     "ta": 10,
                 },
             },
+            "abilities": [
+                { "name": "Alchemy" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Command Undead" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Sickle", "quantity": 1 },
                     { "name": "Sling", "quantity": 1 },
                     { "name": "Whip", "quantity": 1 },
@@ -2009,6 +2255,24 @@ export class Hyp3eCharacter {
                     "ta": 8,
                 },
             },
+            "abilities": [
+                { "name": "Divine Protection" },
+                { "name": "Extraordinary Strength" },
+                { "name": "Healing Hands" },
+                { "name": "Honour" },
+                { "name": "Horsemanship" },
+                { "name": "Sense Evil" },
+                { "name": "Valiant Resolve" },
+                { "name": "Weapon Mastery" },
+                { "name": "Righteous Wrath" },
+                { "name": "Sacred Mount" },
+                { "name": "Turn Undead" },
+                { "name": "Scroll Use" },
+                { "name": "Sorcery" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Melee Expert" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
@@ -2016,6 +2280,7 @@ export class Hyp3eCharacter {
                     { "name": "Shield, large", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
                     { "name": "Mace, footman's", "quantity": 1 },
                     { "name": "Sword, long", "quantity": 1 },
@@ -2144,9 +2409,21 @@ export class Hyp3eCharacter {
                     "ta": 12,
                 },
             },
+            "abilities": [
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Turn Undead" },
+                { "name": "Daemonwrack" },
+                { "name": "Specialized Faith (optional)" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dagger, silver", "quantity": 1 },
                     { "name": "Quarterstaff", "quantity": 1 },
                     { "name": "Whip", "quantity": 1 },
@@ -2285,12 +2562,36 @@ export class Hyp3eCharacter {
                     "ta": 10,
                 },
             },
+            "abilities": [
+                { "name": "Agile" },
+                { "name": "Backstab" },
+                { "name": "Detect Secret Doors" },
+                { "name": "Extraordinary Dexterity" },
+                { "name": "Magic Item Use" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Thieves' Cant" },
+                { "name": "Turn Undead" },
+                { "name": "Climb" },
+                { "name": "Decipher Script" },
+                { "name": "Discern Noise" },
+                { "name": "Hide" },
+                { "name": "Manipulate Traps" },
+                { "name": "Move Silently" },
+                { "name": "Open Locks" },
+                { "name": "Pick Pockets" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Leather armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
                     { "name": "Morning star", "quantity": 1 },
                     { "name": "Sling", "quantity": 1 },
@@ -2415,9 +2716,23 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Alchemy" },
+                { "name": "Candle" },
+                { "name": "Fire/Heat Affinity" },
+                { "name": "Ice/Cold Vulnerability" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dart", "quantity": 4 },
                     { "name": "Quarterstaff", "quantity": 1 },
                     { "name": "Scimitar, long", "quantity": 1 },
@@ -2546,12 +2861,33 @@ export class Hyp3eCharacter {
                     "ca": 6,
                 },
             },
+            "abilities": [
+                { "name": "Alertness" },
+                { "name": "Ambusher" },
+                { "name": "Climb" },
+                { "name": "Discern Noise" },
+                { "name": "Extraordinary Strength" },
+                { "name": "Hide" },
+                { "name": "Move Silently" },
+                { "name": "Otherworldly Enemies" },
+                { "name": "Track" },
+                { "name": "Track Concealment" },
+                { "name": "Traverse Overgrowth" },
+                { "name": "Weapon Mastery" },
+                { "name": "Wilderness Survival" },
+                { "name": "Scroll Use" },
+                { "name": "Sorcery" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Melee Expert" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Bow, long", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
                     { "name": "Sword, long", "quantity": 1 },
@@ -2671,12 +3007,23 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Extraordinary Strength" },
+                { "name": "Grave Runes" },
+                { "name": "Ale Horn" },
+                { "name": "Casting of Lots" },
+                { "name": "Nithing Pole" },
+                { "name": "Berserker Horde" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Axe, battle", "quantity": 1 },
                     { "name": "Bow, short", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
@@ -2791,6 +3138,27 @@ export class Hyp3eCharacter {
                     "fa": 8,
                 },
             },
+            "abilities": [
+                { "name": "Agile" },
+                { "name": "Alertness" },
+                { "name": "Backstab" },
+                { "name": "Controlled Fall" },
+                { "name": "Detect Secret Doors" },
+                { "name": "Determine Depth and Grade" },
+                { "name": "Disguise" },
+                { "name": "Extraordinary Dexterity" },
+                { "name": "Run" },
+                { "name": "Track" },
+                { "name": "Climb" },
+                { "name": "Discern Noise" },
+                { "name": "Hide" },
+                { "name": "Manipulate Traps" },
+                { "name": "Move Silently" },
+                { "name": "Open Locks" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
@@ -2798,6 +3166,7 @@ export class Hyp3eCharacter {
                     { "name": "Shield, small", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Axe, hand", "quantity": 2 },
                     { "name": "Dart", "quantity": 4 },
                 ],
@@ -2935,12 +3304,29 @@ export class Hyp3eCharacter {
                     "ta": 10,
                 },
             },
+            "abilities": [
+                { "name": "Draw Poison" },
+                { "name": "Harvest Venom" },
+                { "name": "Magic Item Use" },
+                { "name": "Medicine Man" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Totem" },
+                { "name": "Turn Undead" },
+                { "name": "Longevity" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Studded armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Club, war", "quantity": 1 },
                     { "name": "Dagger", "quantity": 1 },
                 ],
@@ -3053,12 +3439,32 @@ export class Hyp3eCharacter {
                     "fa": 8,
                 },
             },
+            "abilities": [
+                { "name": "Agile" },
+                { "name": "Backstab" },
+                { "name": "Detect Secret Doors" },
+                { "name": "Extraordinary Dexterity" },
+                { "name": "Thieves' Cant" },
+                { "name": "Climb" },
+                { "name": "Decipher Script" },
+                { "name": "Discern Noise" },
+                { "name": "Hide" },
+                { "name": "Manipulate Traps" },
+                { "name": "Move Silently" },
+                { "name": "Open Locks" },
+                { "name": "Pick Pockets" },
+                { "name": "Read Scrolls" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Leather armour", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Dart", "quantity": 2 },
                     { "name": "Sword, short", "quantity": 1 },
                 ],
@@ -3185,12 +3591,25 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Extraordinary Strength" },
+                { "name": "Magic Item Use" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Weapon Mastery" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Melee Expert" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "armour": [
                     { "name": "Scale mail", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Axe, battle", "quantity": 1 },
                     { "name": "Crossbow, light", "quantity": 1 },
                 ],
@@ -3310,9 +3729,25 @@ export class Hyp3eCharacter {
                     "ca": 12,
                 },
             },
+            "abilities": [
+                { "name": "Alchemy" },
+                { "name": "Brew Decoction" },
+                { "name": "Familiar" },
+                { "name": "Read Magic" },
+                { "name": "Scroll Use" },
+                { "name": "Scroll Writing" },
+                { "name": "Sorcery" },
+                { "name": "Dance of Beguilement" },
+                { "name": "Effigy" },
+                { "name": "Animate Broom" },
+                { "name": "New Weapon Skill" },
+                { "name": "Enlist Henchmen" },
+                { "name": "Lordship" },
+            ],
             "startingPack": {
                 "gold": "1d4+1",
                 "weapons": [
+                    { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Blowgun", "quantity": 1 },
                     { "name": "Dagger, silver", "quantity": 1 },
                 ],
@@ -3713,7 +4148,21 @@ export class Hyp3eCharacter {
             Hyp3eLogger.error("quickCreateCharacter", `Attributes roll failed.`);
             return false;
         }
-        // Now we check to see if the Items directory has the folders & items we need.
+
+        // Check to see if the Items directory has the class abilities/features that we need.
+        // Alternatively, we can also check for compendia with class abilities.
+        const abilities = await this.getClassAbilities({
+            actor: actor,
+            itemType: "feature",
+            folderNames: ["features", "abilities", "class features", "class abilities", "class abilities & features"],
+            abilitiesKey: "abilities"
+        });
+        if (abilities && abilities.length > 0) {
+            // Add the features to the actor's list
+            await actor.createEmbeddedDocuments("Item", abilities);
+        }
+
+        // Check to see if the Items directory has the folders & items we need.
         // Alternatively, we can also check for compendia with the items we need.
         // Start with armor...
         const armorItems = await this.getDefaultItemsForClass({
@@ -3853,9 +4302,119 @@ export class Hyp3eCharacter {
     }
 
     /**
-     * Get the default armor for a class, based on the starting pack defined in the class data.
+     * Get the abilities for a class, based on whatever is listed in the class data.
      * @param {Actor} actor - The actor object to get the default items for
-     * @param {string} itemType - The type of item to get (e.g., "armour", "weapons")
+     * @param {string} itemType - The type of item to get (e.g., "feature")
+     * @param {Array<string>} folderNames - The names of the folders to search for items in
+     * @param {string} abilitiesKey - The key for the abilities list in the class data
+     * @returns {Promise<Array>} - Returns a promise that resolves to an array of abilities
+     */
+    static async getClassAbilities({ actor, itemType, folderNames, abilitiesKey }) {
+        const charClass = actor.system.details.class;
+        const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+
+        if (!classData) {
+            Hyp3eLogger.error("getClassAbilities", `Class data not found for class ${charClass}!`);
+            return [];
+        }
+
+        const abilities = classData?.[abilitiesKey];
+        if (!Array.isArray(abilities) || abilities.length === 0) {
+            Hyp3eLogger.info("getClassAbilities", `No starting ${itemType}(s) of type ${abilitiesKey} defined for class ${charClass}.`);
+            return [];
+        }
+
+        Hyp3eLogger.info("getClassAbilities", `Getting ${itemType}s for ${charClass}:`, abilities);
+
+        // Build compendium list
+        let compendiaList = [];
+        const builtInCompendia = game.packs.filter(p => 
+            folderNames.includes(p.metadata.label.toLowerCase())
+        );
+        if (builtInCompendia) compendiaList.push(...builtInCompendia);
+
+        const customList = game.settings.get(game.system.id, "customCompendia");
+        if (customList) {
+            const customNames = customList.split(",").map(s => s.trim().toLowerCase());
+            const matchingPacks = game.packs.filter(p =>
+                customNames.includes(p.metadata.label.toLowerCase())
+            );
+            compendiaList.push(...matchingPacks);
+        }
+        Hyp3eLogger.info("getClassAbilities", `Compendium list for ${itemType}:`, compendiaList.map(p => p.metadata.label));
+
+        const results = [];
+
+        for (const entry of abilities) {
+            const abilityName = entry.name.toLowerCase();
+            let newItem;
+
+            // Search in the world Items directory for ann items matching the ability name
+            const matches = game.items.filter(i => i.name.toLowerCase() === abilityName);
+            for (let item of matches) {
+                const folder = item.folder;
+                if (!folder) continue;
+
+                const parent = folder.parent;
+                const folderName = folder.name.toLowerCase();
+                const parentName = parent?.name?.toLowerCase() ?? "";
+            
+                // Verify parent folder and item folder match search parameters
+                if (folderNames.includes(parentName) && folderName === charClass.toLowerCase()) {
+                    newItem = item.toObject();
+                    Hyp3eLogger.info("getClassAbilities", `Found ${itemType} in folder ${folder}:`, newItem);
+                    break;
+                }
+            }
+
+            // Search through previously-discovered compendia if not found in directory
+            if (!newItem && compendiaList.length) {
+                for (const pack of compendiaList) {
+                    await pack.getIndex(); // Ensure index is loaded
+                    const matches = pack.index.filter(i => i.name.toLowerCase() === abilityName);
+                    // Iterate through matches and take the first exact match in the correct class folder
+                    for (const entry of matches) {
+                        if (!entry.folder) continue;    // Doc not in a folder, skip
+
+                        // Resolve compendium folder holding this item/doc
+                        const folder = pack.folders.get(entry.folder);
+                        if (!folder) continue;
+
+                        const folderName = folder.name.toLowerCase();
+                        if (folderName === charClass.toLowerCase()) {
+                            const doc = await pack.getDocument(entry._id);
+                            newItem = doc.toObject();
+                            Hyp3eLogger.info("getClassAbilities", `Found ${itemType} in compendium ${pack.metadata.label}, folder ${folder.name}:`, newItem);
+                        }
+                        if (newItem) break;
+                    }
+                    if (newItem) break;
+                }
+            }
+
+            // Fallback item
+            if (!newItem) {
+                Hyp3eLogger.info("getClassAbilities", `Item ${entry.name} not found. Creating fallback.`);
+                newItem = {
+                    name: entry.name,
+                    type: itemType,
+                    img: "icons/svg/target.svg",
+                    system: {
+                        realName: entry.name,
+                    }
+                };
+            }
+
+            results.push(newItem);
+        }
+
+        return results;
+    }
+
+    /**
+     * Get the default items for a class, based on whatever is listed in the class data.
+     * @param {Actor} actor - The actor object to get the default items for
+     * @param {string} itemType - The type of item to get (e.g., "armor", "weapons")
      * @param {Array<string>} folderNames - The names of the folders to search for items in
      * @param {string} packKey - The key for the starting pack in the class data
      * @returns {Promise<Array>} - Returns a promise that resolves to an array of armor items
@@ -3871,7 +4430,7 @@ export class Hyp3eCharacter {
 
         const startingItems = classData.startingPack?.[packKey];
         if (!Array.isArray(startingItems) || startingItems.length === 0) {
-            Hyp3eLogger.info("getDefaultItemsForClass", `No starting ${itemType} of type ${packKey} defined for class ${charClass}.`);
+            Hyp3eLogger.info("getDefaultItemsForClass", `No starting ${itemType}(s) of type ${packKey} defined for class ${charClass}.`);
             return [];
         }
 
@@ -3879,9 +4438,6 @@ export class Hyp3eCharacter {
 
         // Build compendium list
         let compendiaList = [];
-        // const builtInCompendium = game.packs.find(p =>
-        //     folderNames.includes(p.metadata.label.toLowerCase())
-        // );
         const builtInCompendia = game.packs.filter(p => 
             folderNames.includes(p.metadata.label.toLowerCase())
         );
@@ -3904,7 +4460,7 @@ export class Hyp3eCharacter {
             const quantity = entry.quantity ?? 1;
             let newItem;
 
-            // Search in world Items directory
+            // Search in the world Items directory
             const matches = game.items.filter(i => i.name.toLowerCase() === itemName);
             for (let item of matches) {
                 const folder = item.folder?.name?.toLowerCase() ?? "";
@@ -3916,7 +4472,7 @@ export class Hyp3eCharacter {
                 }
             }
 
-            // Search through all compendia if not found in directory
+            // Search through previously-discovered compendia if not found in directory
             if (!newItem && compendiaList.length) {
                 for (const pack of compendiaList) {
                     await pack.getIndex(); // Ensure index is loaded
@@ -3933,18 +4489,18 @@ export class Hyp3eCharacter {
 
             // Fallback item
             if (!newItem) {
-            Hyp3eLogger.info("getDefaultItemsForClass", `Item ${entry.name} not found. Creating fallback.`);
-            newItem = {
-                name: entry.name,
-                type: itemType,
-                img: "icons/svg/item-bag.svg",
-                system: {
-                quantity: {
-                    value: quantity,
-                    max: quantity
-                }
-                }
-            };
+                Hyp3eLogger.info("getDefaultItemsForClass", `Item ${entry.name} not found. Creating fallback.`);
+                newItem = {
+                    name: entry.name,
+                    type: itemType,
+                    img: "icons/svg/item-bag.svg",
+                    system: {
+                        quantity: {
+                            value: quantity,
+                            max: quantity
+                        }
+                    }
+                };
             }
 
             results.push(newItem);
