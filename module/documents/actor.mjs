@@ -197,6 +197,7 @@ export class Hyp3eActor extends Actor {
                 Hyp3eLogger.info("applyActiveEffects", `${effect.name} ${change.key}:`, change);
                 return c;
             }));
+            // If the effect includes any status icons, add it/them to the actor
             for ( const statusId of effect.statuses ) this.statuses.add(statusId);
         }
         changes.sort((a, b) => a.priority - b.priority);
@@ -370,6 +371,7 @@ export class Hyp3eActor extends Actor {
         const changes = [];
         for ( const effect of this.allApplicableEffects() ) {
             if ( effect.disabled || !effect.active ) continue;
+            // Only include changes to allowed keys
             const filtered = effect.changes
                 .filter(change => allowedKeys.includes(change.key))
                 .map(change => {
@@ -379,16 +381,8 @@ export class Hyp3eActor extends Actor {
                     return c;
                 });
             changes.push(...filtered);
-            // changes.push(...effect.changes.map(change => {
-            //     const c = foundry.utils.deepClone(change);
-            //     c.effect = effect;
-            //     c.priority = c.priority ?? (c.mode * 10);
-            //     Hyp3eLogger.info("_calculateAcDrMv", `${effect.name} ${change.key}:`, change);
-            //     return c;
-            // }));
-            for ( const statusId of effect.statuses ) this.statuses.add(statusId);
         }
-        // Organize non-disabled effects by their application priority
+        // Organize effects by their priority (though it probably doesn't matter)
         changes.sort((a, b) => a.priority - b.priority);
         Hyp3eLogger.info("_calculateAcDrMv", `Prioritized changes to ${this.name}:`, changes);
 
