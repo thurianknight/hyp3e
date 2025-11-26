@@ -1958,6 +1958,7 @@ export class Hyp3eCharacter {
                     { "name": "Monk's Defensive Ability", "quantity": 1 },
                 ],
                 "weapons": [
+                    { "name": "Monk's Empty Hand Attack", "quantity": 1 },
                     { "name": "Unarmed attack", "quantity": 1 },
                     { "name": "Cæstuses", "quantity": 1 },
                     { "name": "Dagger, silver", "quantity": 1 },
@@ -4466,7 +4467,7 @@ export class Hyp3eCharacter {
                 const folder = item.folder?.name?.toLowerCase() ?? "";
                 if (folderNames.includes(folder)) {
                     newItem = item.toObject();
-                    newItem.system.quantity = { value: quantity, max: quantity };
+                    newItem.system.quantity = { value: quantity, max: quantity, bundle: newItem.system.quantity?.bundle ?? null };
                     Hyp3eLogger.info("getDefaultItemsForClass", `Found ${itemType} in folder ${folder}:`, newItem);
                     break;
                 }
@@ -4480,7 +4481,7 @@ export class Hyp3eCharacter {
                     if (compMatch) {
                         const doc = await pack.getDocument(compMatch._id);
                         newItem = doc.toObject();
-                        newItem.system.quantity = { value: quantity, max: quantity };
+                        newItem.system.quantity = { value: quantity, max: quantity, bundle: newItem.system.quantity?.bundle ?? null };
                         Hyp3eLogger.info("getDefaultItemsForClass", `Found ${itemType} in compendium ${pack.metadata.label}:`, newItem);
                         break;
                     }
@@ -4497,7 +4498,8 @@ export class Hyp3eCharacter {
                     system: {
                         quantity: {
                             value: quantity,
-                            max: quantity
+                            max: quantity,
+                            bundle: null
                         }
                     }
                 };

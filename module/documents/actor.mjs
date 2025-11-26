@@ -96,8 +96,8 @@ export class Hyp3eActor extends Actor {
         this._setupTaskResolution(systemData);
 
         // // Auto-calculate AC, DR, MV if configuration is enabled
-        if (CONFIG.HYP3E.autoCalcAc) {
-            this.updateCharacterAcAndMv(this, systemData)
+        if (game.settings.get(game.system.id, "autoCalcAc")) {
+            this.updateCharacterAcAndMv(systemData)
         }
 
         // Apply temp AC, DR, and MV modifiers
@@ -189,7 +189,7 @@ export class Hyp3eActor extends Actor {
         const changes = [];
         for ( const effect of this.allApplicableEffects() ) {
             if ( effect.disabled || !effect.active ) continue;
-            Hyp3eLogger.info("applyActiveEffects", `${effect.name}:`, effect);
+            // Hyp3eLogger.info("applyActiveEffects", `${effect.name}:`, effect);
             changes.push(...effect.changes.map(change => {
                 const c = foundry.utils.deepClone(change);
                 c.effect = effect;
@@ -202,9 +202,18 @@ export class Hyp3eActor extends Actor {
         changes.sort((a, b) => a.priority - b.priority);
         Hyp3eLogger.info("applyActiveEffects", `Prioritized changes to ${this.name}:`, changes);
 
-        // Apply all changes
+        // Apply active/enabled changes
         for ( const change of changes ) {
-            if ( !change.key ) continue;
+            if ( !change.key ) continue;    // This should never happen
+
+            // Explicitly skip changes to AC, DR, and MV, if autoCalcAc is true
+            if (game.settings.get(game.system.id, "autoCalcAc")) {
+                if (["system.ac.value", "system.ac.dr", "system.movement.base.value"].includes(change.key)) {
+                    Hyp3eLogger.info("applyActiveEffects", `Skipping AC/DR/MV change:`, change);
+                    continue;
+                }
+            }
+
             // Here is where we resolve roll formulas and data paths to a number, if needed
             // if (isNaN(change.value)) {
             //     change.value = await parseAndResolveChangeValue(change.value, this)
@@ -291,11 +300,11 @@ export class Hyp3eActor extends Actor {
 
     /**
      * Mutate the character's AC, DR, and MV in the actor's system data
-     * @param {*} actorData - The actor data object
      * @param {*} systemData - The actor system data object
      */
-    updateCharacterAcAndMv(actorData, systemData) {
-        const { ac, dr, mv } = this._calculateAcDrMv(actorData, systemData);
+    updateCharacterAcAndMv(systemData) {
+        Hyp3eLogger.info("updateCharacterAcAndMv", `Calculating AC, DR, and MV for actor ${this.name}...`);
+        const { ac, dr, mv } = this._calculateAcDrMv(systemData);
         systemData.ac.value = ac;
         systemData.ac.dr = dr;
         systemData.movement.base.value = mv;
@@ -303,17 +312,17 @@ export class Hyp3eActor extends Actor {
 
     /**
      * Calculate the character's AC, DR, and MV based on equipped armor, shields, etc.
-     * @param {*} actorData - The actor data object
      * @param {*} systemData - The actor system data object
      * @returns 
      */
-    _calculateAcDrMv(actorData, systemData) {
+    _calculateAcDrMv(systemData) {
         let ac = 9;
-        let mv = 60; // Default movement is 40, but Monks can get up to 60
+        let mv = 40;
         let dr = 0;
         let shieldMod = 0;
 
-        const items = this._getEquippedProtectionItems(actorData);
+        const items = this._getEquippedProtectionItems();
+        Hyp3eLogger.info("_calculateAcDrMv", `${this.name} has equipped protection items:`, items);
 
         for (const item of items) {
             const sys = item.system ?? {};
@@ -332,8 +341,8 @@ export class Hyp3eActor extends Actor {
                     ac = sys.ac;
                     dr = sys.dr || dr;
                 }
-                // Movement = pick the worst
-                if (sys.mv < mv) {
+                // Movement
+                if (sys.mv !== mv) {
                     mv = sys.mv ?? mv;
                 }
             }
@@ -351,6 +360,83 @@ export class Hyp3eActor extends Actor {
         // Dex and shields
         ac -= (systemData.attributes.dex.defMod || 0) + shieldMod;
 
+        // Active effects can modify AC, DR, and MV after this point...
+        const allowedKeys = [
+            "system.ac.value",
+            "system.ac.dr",
+            "system.movement.base.value"
+        ];
+
+        const changes = [];
+        for ( const effect of this.allApplicableEffects() ) {
+            if ( effect.disabled || !effect.active ) continue;
+            const filtered = effect.changes
+                .filter(change => allowedKeys.includes(change.key))
+                .map(change => {
+                    const c = foundry.utils.deepClone(change);
+                    c.effect = effect;
+                    c.priority = c.priority ?? (c.mode * 10);
+                    return c;
+                });
+            changes.push(...filtered);
+            // changes.push(...effect.changes.map(change => {
+            //     const c = foundry.utils.deepClone(change);
+            //     c.effect = effect;
+            //     c.priority = c.priority ?? (c.mode * 10);
+            //     Hyp3eLogger.info("_calculateAcDrMv", `${effect.name} ${change.key}:`, change);
+            //     return c;
+            // }));
+            for ( const statusId of effect.statuses ) this.statuses.add(statusId);
+        }
+        // Organize non-disabled effects by their application priority
+        changes.sort((a, b) => a.priority - b.priority);
+        Hyp3eLogger.info("_calculateAcDrMv", `Prioritized changes to ${this.name}:`, changes);
+
+        // Apply Active Effects to AC, DR, MV
+        let finalAc = ac;
+        let finalDr = dr;
+        let finalMv = mv;
+        // Accumulate AE changes
+        for (const change of changes) {
+            if (change.key === "system.ac.value") {
+                Hyp3eLogger.info("_calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
+                // Apply change based on mode
+                const val = Number(change.value) || 0;
+                switch (change.mode) {
+                    case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = val; break;
+                    // Extend as needed
+                }
+            } else
+            if (change.key === "system.ac.dr") {
+                Hyp3eLogger.info("_calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s DR:`, change);
+                // Apply change based on mode
+                const val = Number(change.value) || 0;
+                switch (change.mode) {
+                    case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = val; break;
+                    // Extend as needed
+                }
+            } else
+            if (change.key === "system.movement.base.value") {
+                Hyp3eLogger.info("_calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s MV:`, change);
+                // Apply change based on mode
+                const val = Number(change.value) || 0;
+                switch (change.mode) {
+                    case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = val; break;
+                    // Extend as needed
+                }
+            }
+        }
+        // Store the final results
+        ac = finalAc;
+        dr = finalDr;
+        mv = finalMv;
+
         return {
             ac: Math.clamp(ac, -9, 9),
             dr,
@@ -361,9 +447,9 @@ export class Hyp3eActor extends Actor {
     /**
      * Gather equipped protection items (armor, shields, passives).
      */
-    _getEquippedProtectionItems(actorData) {
+    _getEquippedProtectionItems() {
         const items = [];
-        for (const [type, collection] of Object.entries(actorData.itemTypes)) {
+        for (const [type, collection] of Object.entries(this.itemTypes)) {
             if (type === "armor" || type === "shield") {
             for (const obj of Object.values(collection)) {
                 if (obj.system?.equipped) items.push(obj);
