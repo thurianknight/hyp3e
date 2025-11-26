@@ -543,7 +543,8 @@ export class Hyp3eCharacter {
             "abilities": [
                 { "name": "Berserk Rage" },
                 { "name": "Climb" },
-                { "name": "Extraordinary Str and Con" },
+                { "name": "Extraordinary Strength" },
+                { "name": "Extraordinary Constitution" },
                 { "name": "Hardy" },
                 { "name": "Leap" },
                 { "name": "Thick Skin" },
@@ -986,7 +987,7 @@ export class Hyp3eCharacter {
                     { "name": "Pouch, soft leather (small)", "quantity": 1 },
                     { "name": "Rope, silk", "quantity": 1 },
                     { "name": "Sack, large", "quantity": 1 },
-                    { "name": "Spikes, iron", "quantity": 12 },
+                    { "name": "Spikes, iron (x4)", "quantity": 12 },
                     { "name": "Tinderbox", "quantity": 1 },
                     { "name": "Water-/wineskin", "quantity": 1 },
                     { "name": "Writing stick", "quantity": 1 },
@@ -1951,12 +1952,11 @@ export class Hyp3eCharacter {
                 { "name": "New Weapon Skill" },
                 { "name": "Enlist Henchmen" },
                 { "name": "Lordship" },
+                { "name": "Longevity" },
             ],
             "startingPack": {
                 "gold": "1d4+1",
-                "armour": [
-                    { "name": "Monk's Defensive Ability", "quantity": 1 },
-                ],
+                "armour": [],
                 "weapons": [
                     { "name": "Monk's Empty Hand Attack", "quantity": 1 },
                     { "name": "Unarmed attack", "quantity": 1 },
