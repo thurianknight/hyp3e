@@ -336,8 +336,7 @@ export class Hyp3eActor extends Actor {
                 shieldMod += sys.ac || 0;
             } else {
                 // Armor (or passive AC) = pick the best
-                //  The assumption here is that if multiple armor items are equipped, only
-                //  the best one counts (no stacking).
+                //  It shouldn't even be possible to equip multiple armors, but just in case...
                 if (sys.ac < ac) {
                     ac = sys.ac;
                     dr = sys.dr || dr;
@@ -426,15 +425,12 @@ export class Hyp3eActor extends Actor {
                 }
             }
         }
-        // Store the final results
-        ac = finalAc;
-        dr = finalDr;
-        mv = finalMv;
 
+        // Return the final results
         return {
-            ac: Math.clamp(ac, -9, 9),
-            dr,
-            mv
+            ac: Math.clamp(finalAc, -9, 9),
+            dr: finalDr,
+            mv: finalMv
         };
     }
 
