@@ -2766,6 +2766,7 @@ export class Hyp3eCharacter {
             "hitDie": "1d10",
             "fa": 1,
             "ca": null,
+            "spellLists": ["Druid", "Magician"],
             "ta": null,
             "unskilled": 0,
             "attrReqs": {
@@ -2914,6 +2915,7 @@ export class Hyp3eCharacter {
             "hitDie": "1d8",
             "fa": 1,
             "ca": 1,
+            "spellLists": ["Runes"],
             "ta": null,
             "unskilled": 0,
             "attrReqs": {
