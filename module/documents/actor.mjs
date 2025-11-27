@@ -84,9 +84,10 @@ export class Hyp3eActor extends Actor {
         // Calculated fields go here...
 
         // Add actor type & base class, used for crit hit & crit miss tables
+        const customClassData = game.settings.get(game.system.id, "customClassData");
         try {
             systemData.actorType = this.type
-            systemData.baseClass = Hyp3eCharacter.classData[systemData.details.class].baseClass || CONFIG.HYP3E.customClassData[charClass].baseClass;
+            systemData.baseClass = Hyp3eCharacter.classData[systemData.details.class]?.baseClass ?? customClassData[systemData.details.class]?.baseClass;
         } catch (err) {
             // No match found (happens with custom classes), use "npc"
             systemData.baseClass = "npc"
@@ -103,8 +104,22 @@ export class Hyp3eActor extends Actor {
         // Apply temp AC, DR, and MV modifiers
         this._applyTempModifiers(systemData);
 
+        // What weight-class of armor (if any) is worn?
+        const items = this._getEquippedProtectionItems();
+        let armorType = "unarmored";
+        for (const item of items) {
+            const sys = item.system ?? {};
+            if (item.type === "armor" && sys.type !== "shield") {
+                armorType = sys.type || "unarmored";
+                break; // Only one armor can be worn, so stop after the first
+            }
+        }
+        systemData.wornArmorType = armorType;
+        // Get encumbered status
+        systemData.encumbered = this._getEncumberedStatus();
+
         // Log the prepared data
-        Hyp3eLogger.info("_prepareCharacterData", `Character Data:`, systemData);
+        Hyp3eLogger.info("_prepareCharacterData", `${this.name} system data:`, systemData);
 
     }
 
@@ -441,9 +456,9 @@ export class Hyp3eActor extends Actor {
         const items = [];
         for (const [type, collection] of Object.entries(this.itemTypes)) {
             if (type === "armor" || type === "shield") {
-            for (const obj of Object.values(collection)) {
-                if (obj.system?.equipped) items.push(obj);
-            }
+                for (const obj of Object.values(collection)) {
+                    if (obj.system?.equipped) items.push(obj);
+                }
             }
         }
         return items;
@@ -464,6 +479,28 @@ export class Hyp3eActor extends Actor {
      */
     _isPassiveAc(item) {
         return (item.type === "shield" && item.system.type === "passive");
+    }
+
+    /**
+     * Determine the actor's encumbrance status based on weight carried and strength.
+     * @returns String - "unencumbered", "encumbered", or "heavilyEncumbered"
+     */
+    _getEncumberedStatus() {
+        // Calc constants for encumbrance thresholds
+        const encumberedWt = this.system.attributes.str.value * CONFIG.HYP3E.encumbered
+        const heavilyEncumberedWt = this.system.attributes.str.value * CONFIG.HYP3E.heavilyEncumbered
+        if (CONFIG.HYP3E.enableEncumbrance) {
+            // this.encumbrance is currently calculated by the ActorSheet, though I would
+            //  like to move that to the Actor data preparation phase eventually.
+            if (this?.encumbrance > heavilyEncumberedWt) {
+                return "heavilyEncumbered";
+            } else if (this?.encumbrance > encumberedWt) {
+                return "encumbered";
+            } else {
+                return "unencumbered";
+            }
+        }
+        return "unencumbered";
     }
 
     /**
