@@ -2908,12 +2908,12 @@ export class Hyp3eActor extends Actor {
         // Reset orLess
         orLess = ''
         // At TA 4+, the cleric can actually destroy undead
-        if (turnAbility >= 4) {
+        if (turnAbility >= 4 && turnOrCommand == 'turn') {
             if ((turnAbility-4) > 0) { orLess = 'or less ' }
             results.push(`<li>Undead of Type ${turnAbility-4} ${orLess}are <b>destroyed</b>.</li>`)
         }
-            // At TA 7+, the cleric is so powerful that his number affected is greatly improved
-            if (turnAbility >= 7) {
+        // At TA 7+, the cleric is so powerful that his number affected is greatly improved
+        if (turnAbility >= 7) {
             rollAffected = '1d6+6'
         }
 
@@ -2921,7 +2921,7 @@ export class Hyp3eActor extends Actor {
         if (turnOrCommand == 'turn') {
             turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
         } else {
-            turnUndeadHtml = `<p>The total hit dice value of undead commanded is ${this.system.ta * 2} HD (2 HD per TA level). Starting from the weakest (lowest Type)...</p><ul>`
+            turnUndeadHtml = `<p>The total hit dice value of undead affected is ${this.system.ta * 2} HD (2 HD per TA level). Starting from the weakest (lowest Type)...</p><ul>`
         }
         for (let i = results.length-1; i >=0; i--) {
             turnUndeadHtml += results[i]
