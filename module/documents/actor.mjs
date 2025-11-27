@@ -1515,7 +1515,9 @@ export class Hyp3eActor extends Actor {
         let checkFooter = ""
         // Use simple word parsing in the ability name to determine if this is a cleric turning undead
         const turnUndead = itemNameLower.includes("turn") && itemNameLower.includes("undead");
-        if (turnUndead) {
+        // Same idea here, but for a necromancer commanding undead
+        const commandUndead = itemNameLower.includes("command") && itemNameLower.includes("undead");
+        if (turnUndead || commandUndead) {
             // Ensure we have a valid Turning Ability
             if (!this.system.ta || this.system.ta === 0) {
                 const msg = `${this.name} must have a Turning Ability of 1 or greater!`;
@@ -1589,9 +1591,10 @@ export class Hyp3eActor extends Actor {
         const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, rollData, dataset.rollTarget, targetComparison);
 
         // Depending on the type of roll, we add text to the final chat message
-        if (turnUndead) {
-            // Use the "success" flag to describe the results of the attempted turning undead
-            checkFooter = this._resolveTurnUndead(roll.total, rollData.ta)
+        if (turnUndead || commandUndead) {
+            const turnOrCommand = turnUndead ? "turn" : "command"
+            // Use the "success" flag to describe the results of the attempted turning/commanding undead
+            checkFooter = this._resolveTurnUndead(roll.total, rollData.ta, turnOrCommand)
         } else if (assassinate) {
             // Use the "success" flag to describe the results of the attempted assassination
             checkFooter = this._resolveAssassination(targetToken, success)
@@ -2843,7 +2846,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Build the chat message for turning undead
-    _resolveTurnUndead(rollTotal, turnAbility) {
+    _resolveTurnUndead(rollTotal, turnAbility, turnOrCommand) {
         /*
         Turning Undead
         ==============
@@ -2881,26 +2884,26 @@ export class Hyp3eActor extends Actor {
 
         // Was this a complete fail?
         if (turnAbility <= 1 && rollTotal > 10) {
-            return '<p>No undead were turned...</p>';
+            return `<p>No undead were affected...</p>`;
         }
 
         // From here on it's all some level of success
         if (rollTotal <= 1) {
             if ((turnAbility+2) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${turnAbility+2} ${orLess}are <b>turned</b>.</li>`)
+            results.push(`<li>Undead of Type ${turnAbility+2} ${orLess}are <b>${turnOrCommand}ed</b>.</li>`)
         } else if (rollTotal <= 4) {
             if ((turnAbility+1) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${turnAbility+1} ${orLess}are <b>turned</b>.</li>`)
+            results.push(`<li>Undead of Type ${turnAbility+1} ${orLess}are <b>${turnOrCommand}ed</b>.</li>`)
         } else if (rollTotal <= 7) {
             if ((turnAbility) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${turnAbility} ${orLess}are <b>turned</b>.</li>`)
+            results.push(`<li>Undead of Type ${turnAbility} ${orLess}are <b>${turnOrCommand}ed</b>.</li>`)
         } else if (rollTotal <= 10) {
             if ((turnAbility-1) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${turnAbility-1} ${orLess}are <b>turned</b>.</li>`)
+            results.push(`<li>Undead of Type ${turnAbility-1} ${orLess}are <b>${turnOrCommand}ed</b>.</li>`)
         } else {
             // Even a roll of 11 or 12 is still successful against weaker undead
             if ((turnAbility-2) > 0) { orLess = 'or less ' }
-            results.push(`<li>Undead of Type ${turnAbility-2} ${orLess}are <b>turned</b>.</li>`)
+            results.push(`<li>Undead of Type ${turnAbility-2} ${orLess}are <b>${turnOrCommand}ed</b>.</li>`)
         }
         // Reset orLess
         orLess = ''
@@ -2915,7 +2918,11 @@ export class Hyp3eActor extends Actor {
         }
 
         // Now we can setup our description output from the results
-        turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
+        if (turnOrCommand == 'turn') {
+            turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
+        } else {
+            turnUndeadHtml = `<p>The total hit dice value of undead commanded is ${this.system.ta * 2} HD (2 HD per TA level). Starting from the weakest (lowest Type)...</p><ul>`
+        }
         for (let i = results.length-1; i >=0; i--) {
             turnUndeadHtml += results[i]
         }
