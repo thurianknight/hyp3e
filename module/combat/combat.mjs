@@ -31,7 +31,7 @@ export class HYP3ECombat extends Combat {
         if (this.#rerollBehavior !== "reset")
             await this.#rollAbsolutelyEveryone();
         // Log the combat object
-        Hyp3eLogger.info("startCombat", `Combat Started:`, this);
+        Hyp3eLogger.info("HYP3ECombat startCombat", `Combat Started:`, this);
         return this;
     }
 
@@ -40,7 +40,7 @@ export class HYP3ECombat extends Combat {
         for (const combatant of this.combatants) {
             combatant.actor.effects.forEach(effect => {
                 if (effect.disabled && effect.isTemporary) {
-                    Hyp3eLogger.info("endCombat", `Deleting effect ${effect.name} from ${combatant.name}:`, effect);
+                    Hyp3eLogger.info("HYP3ECombat endCombat", `Deleting effect ${effect.name} from ${combatant.name}:`, effect);
                     return effect.delete();
                 }
             });
@@ -69,7 +69,7 @@ export class HYP3ECombat extends Combat {
     async _onEndTurn(combatant, context) {
         await super._onEndTurn(combatant, context);
         // Log the combatant whose turn is ending
-        Hyp3eLogger.info("_onEndTurn", `End-Turn Combatant:`, combatant)
+        Hyp3eLogger.info("HYP3ECombat _onEndTurn", `End-Turn Combatant:`, combatant)
 
         if (foundry.utils.isNewerVersion(game.version, "13")) {
             // Clear the movement history to prevent any movement restrictions on its next turn
@@ -83,7 +83,7 @@ export class HYP3ECombat extends Combat {
             await combatant.actor.processTemporaryItems(1);
             await combatant.updateStatus();
         } else {
-            Hyp3eLogger.warn("_onEndTurn", `Combatant has no actor, cannot process temporary effects!`);
+            Hyp3eLogger.warn("HYP3ECombat _onEndTurn", `Combatant has no actor, cannot process temporary effects!`);
         }
     }
 

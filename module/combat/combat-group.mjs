@@ -40,20 +40,20 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         let groupsToRollFor
         let combatantsAffected = []
         if (combatantIds !== null && combatantIds.length > 0) {
-            Hyp3eLogger.info("rollInitiative", `Combatant IDs for group initiative:`, combatantIds);
+            Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Combatant IDs for group initiative:`, combatantIds);
             groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
         } else {
             groupsToRollFor = this.availableGroups;
         }
         combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.initGroup))
-        Hyp3eLogger.info("rollInitiative", `Groups to roll for:`, groupsToRollFor);
+        Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Groups to roll for:`, groupsToRollFor);
 
         // Take the groups array and append a roll object to each group
         const rollPerGroup = groupsToRollFor.reduce((prev, curr) => ({
             ...prev,
             [curr]: new Roll(HYP3ECombat.FORMULA) 
         }), {});
-        Hyp3eLogger.info("rollInitiative", `Initiative roll per group:`, rollPerGroup);
+        Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Initiative roll per group:`, rollPerGroup);
 
         const results = await this.#prepareGroupInitiativeDice(rollPerGroup);
 
@@ -63,7 +63,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
             // Movement partially overrides the other combat actions for initiative order
             c.getActionModifiers();
             const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit}`
-            Hyp3eLogger.info("rollInitiative", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other): ${rollTerms}`);
+            Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other): ${rollTerms}`);
 
             // Add the actor's temporary initiative modifier, if one exists
             c.getTempInitMod();
@@ -112,7 +112,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     }
 
     async #prepareGroupInitiativeDice(rollPerGroup) {
-        Hyp3eLogger.info("#prepareGroupInitiativeDice", `Roll per group:`, rollPerGroup);
+        Hyp3eLogger.info("HYP3EGroupCombat #prepareGroupInitiativeDice", `Roll per group:`, rollPerGroup);
         const pool = foundry.dice.terms.PoolTerm.fromRolls(Object.values(rollPerGroup));
         const evaluatedRolls = await Roll.fromTerms([pool]).roll()
         const rollValues = evaluatedRolls.dice.map(d => d.total);

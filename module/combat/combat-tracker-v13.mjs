@@ -41,7 +41,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
 
     async _prepareCombatContext(context, options) {
         // Log incoming parameters
-        Hyp3eLogger.info("_prepareCombatContext", `Incoming combat context:`, context)
+        Hyp3eLogger.info("HYP3ECombatTracker _prepareCombatContext", `Incoming combat context:`, context)
         // Prepare the combat context
         await super._prepareCombatContext(context, options);
         // Add group initiative flag
@@ -59,14 +59,13 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
             return;
         }
         // Log incoming parmeters
-        Hyp3eLogger.info("_prepareTrackerContext", `Tracker Context:`, context)
+        Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Tracker Context:`, context)
         // Log the combat object
-        Hyp3eLogger.info("_prepareTrackerContext", `Tracker Combat:`, this.viewed)
+        Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Tracker Combat:`, this.viewed)
         // Prepare the combat tracker context
         await super._prepareTrackerContext(context, options);
 
-        // Only needed for group initiative
-        // if (CONFIG.HYP3E.isGroupInitiative) {
+        // Only needed for group or phased initiative
         if (CONFIG.HYP3E.initiativeType === "group" || CONFIG.HYP3E.initiativeType === "phased") {
             if (context.turns && context.turns.length > 0) {
                 const initGroups = context.turns.reduce((arr, turn) => {
@@ -77,8 +76,8 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
                         return arr;
                     }
 
-                    Hyp3eLogger.info("_prepareTrackerContext", `Group init scores:`, game.combat.groupInitiativeScores);
-                    const initiative = game.combat.groupInitiativeScores?.get(turn.initGroup) ? game.combat.groupInitiativeScores.get(turn.initGroup) : null
+                    Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Group init scores:`, game.combat.groupInitiativeScores);
+                    const initiative = game.combat.groupInitiativeScores?.get(turn.initGroup) ?? null;
 
                     return [...arr, {
                         initGroup: turn.initGroup,
@@ -89,16 +88,15 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
                 }, []);
 
                 // Log the initiative groups
-                Hyp3eLogger.info("_prepareTrackerContext", `Initiative groups:`, initGroups);
+                Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Initiative groups:`, initGroups);
                 context.initGroups = initGroups;
             }    
         }
-
     }
 
     async _prepareTurnContext(combat, combatant, index) {
-        // Log incoming parameters
-        Hyp3eLogger.info("_prepareTurnContext", `This turn combatant:`, combatant)
+        // Log the current combatant
+        Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${combatant.name} combatant:`, combatant)
 
         // Prepare the combatant context
         const turn = await super._prepareTurnContext(combat, combatant, index);
@@ -137,7 +135,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         }        
 
         // Log the updated turn
-        Hyp3eLogger.info("_prepareTurnContext", `This turn:`, turn);
+        Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${turn.name} turn:`, turn);
 
         return turn;
     }
@@ -185,7 +183,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
             // Non-combat actions are toggled normally
             await combatant.setFlag(game.system.id, flag, !isActive);
         }
-        Hyp3eLogger.info("_toggleFlag", `Combatant flag: ${flag}`, combatant);
+        Hyp3eLogger.info("HYP3ECombatTracker _toggleFlag", `Combatant flag: ${flag}`, combatant);
     }
 
     /**
@@ -197,14 +195,14 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         // event.preventDefault();
         // event.stopPropagation();
         // Log the target
-        Hyp3eLogger.info("_onCombatantControl", `Combatant control target:`, target);
+        Hyp3eLogger.info("HYP3ECombatTracker _onCombatantControl", `Combatant control target:`, target);
 
         // Get the combatant from the target
         const { combatantId } = target.closest("[data-combatant-id]")?.dataset ?? {};
         const combatant = this.viewed?.combatants.get(combatantId);
         // If no combatant, exit
         if ( !combatant ) {
-            Hyp3eLogger.warn("_onCombatantControl", `No actor found matching ID ${combatantId}!`);
+            Hyp3eLogger.warn("HYP3ECombatTracker _onCombatantControl", `No actor found matching ID ${combatantId}!`);
             return;
         }
         // If user is not the owner, exit
@@ -213,8 +211,8 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         }
 
         // Log the combatant & action
-        Hyp3eLogger.info("_onCombatantControl", `Combatant: `, combatant);
-        Hyp3eLogger.info("_onCombatantControl", `Action:`, target.dataset.action);
+        Hyp3eLogger.info("HYP3ECombatTracker _onCombatantControl", `Combatant: `, combatant);
+        Hyp3eLogger.info("HYP3ECombatTracker _onCombatantControl", `Action:`, target.dataset.action);
 
         // Handle the combatant control
         switch ( target.dataset.action ) {
