@@ -126,6 +126,20 @@
   </fieldset>
 
   <fieldset>
+    <legend>{{localize 'HYP3E.classEditor.classFeatures'}}</legend>
+        <p>{{localize 'HYP3E.classEditor.classFeaturesNote'}}</p>
+        <div class="flex">
+            {{#each classData.abilities}}
+            <div class="flex flexrow flex-group-center form-group container">
+                <input class="input-big" type="text" name="classData.abilities.{{@index}}.name" value="{{this.name}}" placeholder="{{localize 'HYP3E.classEditor.featureNamePlaceholder'}}" /><br />
+                <button type="button" class="button-narrow" data-action="deleteFeature" data-index="{{@index}}"><i class="fas fa-trash"></i> {{localize 'HYP3E.classEditor.delete'}}</button>
+            </div>
+            {{/each}}
+        </div>
+        <button type="button" class="button-wide" data-action="addFeature"><i class="fas fa-plus"></i> {{localize 'HYP3E.classEditor.add'}}</button>
+  </fieldset>
+
+  <fieldset>
     <legend>{{localize 'HYP3E.classEditor.startingPack'}}</legend>
     <p>{{localize 'HYP3E.classEditor.startingPackNote'}}</p>
     <div class="flex flexrow flex-group-center form-group container">
@@ -150,7 +164,7 @@
                     <button type="button" class="button-narrow" data-action="deleteItem" data-pack="{{@../key}}" data-index="{{@index}}"><i class="fas fa-trash"></i></button>
                 </div>
                 {{/each}}
-                <button type="button" class="button-wide" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> Add</button>
+                <button type="button" class="button-wide" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> {{localize 'HYP3E.classEditor.add'}}</button>
             </div>
             <hr />
             {{/each}}
@@ -181,7 +195,7 @@
                     <button type="button" class="button-narrow" data-action="deleteItem" data-pack="{{@../key}}" data-index="{{@index}}"><i class="fas fa-trash"></i></button>
                 </div>
                 {{/each}}
-                <button type="button" class="button-wide" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> Add</button>
+                <button type="button" class="button-wide" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> {{localize 'HYP3E.classEditor.add'}}</button>
                 {{/if}}
                 <hr />
             </div>

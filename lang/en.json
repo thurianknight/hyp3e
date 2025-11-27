@@ -580,8 +580,13 @@
             "saveThrowsNote": "Note: Most classes get a +2 bonus on two of their saving throws.",
             "levelAdvancement": "Level Advancement",
             "hpRoll": "HP Roll",
+            "classFeatures": "Class Abilities & Features",
+            "classFeaturesNote": "Add the class abilities and features here.",
+            "featureNamePlaceholder": "Ability Name",
             "startingPack": "Starting Pack",
             "startingPackNote": "Define the starting equipment pack for this class.",
+            "add": "Add",
+            "delete": "Delete",
             "saveClass": "Save Class"
         },
         "dataLabel": {

@@ -41,7 +41,9 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
             submitOnClose: true,
         },
         actions: {
+            addFeature: HYP3EClassEditor.#addFeature,
             addItem: HYP3EClassEditor.#addItem,
+            deleteFeature: HYP3EClassEditor.#deleteFeature,
             deleteItem: HYP3EClassEditor.#deleteItem,
             saveClass: HYP3EClassEditor.#saveClass,
         }
@@ -111,9 +113,16 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
                 spellLists: ["", ""],
                 saves: saves,
                 levelAdvancement: this.buildEmptyLevelAdvancement(),
+                abilities: [
+                    { "name": "" }
+                ],
                 startingPack: this.buildEmptyStartingPack(),
             };
         }
+
+        // Class abilities
+        const abilities = this.classData.abilities || [];
+        context.abilities = Object.fromEntries(abilities.map(n => [n, n]));
 
         // Split startingPack into separate display components
         const startingPack = this.classData.startingPack ?? {};
@@ -150,6 +159,39 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     /**
+     * Add a blank class feature
+     * @param {*} event 
+     * @param {*} target 
+     * @returns 
+     */
+    static async #addFeature(event, target) {
+        // Find the nearest form ancestor
+        const form = target.closest("form");
+        if (!form) return;
+
+        // Collect data
+        const fd = new FormDataExtended(form);
+        const formData = fd.object; // returns a deep object of all form fields
+        Hyp3eLogger.info("#addFeature", `Form data:`, formData);
+
+        // Save any other changes in process first
+        await HYP3EClassEditor.#saveClass.call(this, event, target);
+
+        // Now we can merge those same changes in memory
+        Hyp3eLogger.info("#addFeature", `Previous changes saved, now we can add the new feature...`);
+        this.classData = foundry.utils.mergeObject(this.classData, formData.classData || {}, { inplace: false });
+        Hyp3eLogger.info("#addFeature", `Merged class data:`, this.classData);
+
+        // Add the new feature
+        if (!Array.isArray(this.classData.abilities)) {
+            this.classData.abilities = [];
+        }
+        this.classData.abilities.push({ name: "" });
+
+        this.render(true);
+    }
+
+    /**
      * Add a blank item to the requested items list
      * @param {*} event 
      * @param {*} target 
@@ -181,6 +223,24 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
         }
         this.classData.startingPack[pack].push(newItem);
 
+        this.render(true);
+    }
+
+    /**
+     * Delete a feature from the class features list
+     * @param {*} event 
+     * @param {*} target 
+     */
+    static async #deleteFeature(event, target) {
+        const index = parseInt(target.dataset.index);
+
+        // Log the delete data
+        Hyp3eLogger.info("deleteFeature", "Deleting feature:", { index });
+
+        // Save any other changes in process first
+        await HYP3EClassEditor.#saveClass.call(this, event, target);
+
+        if (!isNaN(index)) this.classData.abilities.splice(index, 1);
         this.render(true);
     }
 
@@ -246,6 +306,14 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
         // spellLists must be stored as an array, but it comes from the form as an indexed object
         this.classData.spellLists = Object.values(this.classData.spellLists);
 
+        // Class features must be stored as an array, but it comes from the form as an indexed object
+        if (this.classData.abilities) {
+            this.classData.abilities = Object.values(this.classData.abilities);
+        } else {
+            this.classData.abilities = [];
+        }
+
+        // Gather starting pack data into the correct structure
         let { startingPack } = this.classData;
         const result = {
             gold: startingPack.gold,

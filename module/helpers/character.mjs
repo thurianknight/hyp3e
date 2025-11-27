@@ -4355,12 +4355,14 @@ export class Hyp3eCharacter {
             // Search in the world Items directory for ann items matching the ability name
             const matches = game.items.filter(i => i.name.toLowerCase() === abilityName);
             for (let item of matches) {
+                Hyp3eLogger.info("getClassAbilities", `Possible match for ${abilityName}:`, item);
                 const folder = item.folder;
                 if (!folder) continue;
 
-                const parent = folder.parent;
                 const folderName = folder.name.toLowerCase();
+                const parent = folder.folder;
                 const parentName = parent?.name?.toLowerCase() ?? "";
+                Hyp3eLogger.info("getClassAbilities", `Ability folder: ${folderName}, parent folder: ${parentName}`);
             
                 // Verify parent folder and item folder match search parameters
                 if (folderNames.includes(parentName) && folderName === charClass.toLowerCase()) {

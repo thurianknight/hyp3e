@@ -26,28 +26,37 @@
 .hyp3e.class-editor select {
     width: auto;
     max-width: 150px;
+    margin: 0 2px;
 }
 .hyp3e.class-editor .equipment-select {
     width: 100%;
-    min-width: 225px;
-    max-width: 250px;
+    min-width: 220px;
+    max-width: 240px;
 }
 .hyp3e.class-editor input[type=text],
 .hyp3e.class-editor input[type=number] {
     text-align: center;
     min-width: 50px;
     max-width: 150px;
+    margin: 0 2px;
 }
-.hyp3e.class-editor .input-small {
+.hyp3e.class-editor input.input-small {
     text-align: center;
     max-width: 40px;
+}
+.hyp3e.class-editor input.input-big {
+    text-align: left;
+    min-width: 400px;
+    max-width: 500px;
 }
 .hyp3e.class-editor .level-advancement {
     text-align: center;
 }
-.hyp3e.class-editor .button-narrow {
+.hyp3e.class-editor button.button-narrow {
     width: 40px;
+    margin: 2px 2px;
 }
-.hyp3e.class-editor .button-wide {
+.hyp3e.class-editor button.button-wide {
     width: 100%;
+    margin: 2px 2px;
 }
