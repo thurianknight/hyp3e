@@ -196,55 +196,61 @@ export class Hyp3eActor extends Actor {
    * to a final number that can be applied to the actor.
    */
   async applyActiveEffects() {
-      // For items that apply effects with variables, we resolve those variables 
-      //  on the item effect rather than the actor
-      this.updateItemEffects()
+    // For items that apply effects with variables, we resolve those variables 
+    //  on the item effect rather than the actor
+    this.updateItemEffects()
 
-      const overrides = {};
-      this.statuses.clear();
+    const overrides = {};
+    this.statuses.clear();
 
-      // Organize non-disabled effects by their application priority
-      const changes = [];
-      for ( const effect of this.allApplicableEffects() ) {
-          if ( effect.disabled || !effect.active ) continue;
-          // Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${effect.name}:`, effect);
-          changes.push(...effect.changes.map(change => {
-              const c = foundry.utils.deepClone(change);
-              c.effect = effect;
-              c.priority = c.priority ?? (c.mode * 10);
-              Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${effect.name} ${change.key}:`, change);
-              return c;
-          }));
-          // If the effect includes any status icons, add it/them to the actor
-          for ( const statusId of effect.statuses ) this.statuses.add(statusId);
-      }
-      changes.sort((a, b) => a.priority - b.priority);
-      Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Prioritized changes to ${this.name}:`, changes);
+    // Organize non-disabled effects by their application priority
+    const changes = [];
+    for ( const effect of this.allApplicableEffects() ) {
+      // Skip if disabled or not active
+      if ( effect.disabled || !effect.active ) continue;
 
-      // Apply active/enabled changes
-      for ( const change of changes ) {
-          if ( !change.key ) continue;    // This should never happen
-
-          // Explicitly skip changes to AC, DR, and MV, if autoCalcAc is true
-          if (game.settings.get(game.system.id, "autoCalcAc")) {
-              if (["system.ac.value", "system.ac.dr", "system.movement.base.value"].includes(change.key)) {
-                  Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping AC/DR/MV change:`, change);
-                  continue;
-              }
-          }
-
-          // Here is where we resolve roll formulas and data paths to a number, if needed
-          // if (isNaN(change.value)) {
-          //     change.value = await parseAndResolveChangeValue(change.value, this)
-          // }
-          // Now we can apply the resolved change
-          const changes = change.effect.apply(this, change);
-          Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Updated changes object:`, changes);
-          Object.assign(overrides, changes);
+      // Validate conditions required to apply this effect
+      if (!this._effectApplies(effect)) {
+        Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping effect "${effect.name}" — condition not met:`, effect.flags.hyp3e?.condition);
+        continue;
       }
 
-      // Expand the set of final overrides
-      this.overrides = foundry.utils.expandObject(overrides);
+      Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${effect.name}:`, effect);
+      changes.push(...effect.changes.map(change => {
+        const c = foundry.utils.deepClone(change);
+        c.effect = effect;
+        c.priority = c.priority ?? (c.mode * 10);
+        Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${effect.name} ${change.key}:`, change);
+        return c;
+      }));
+      // If the effect includes any status icons, add it/them to the actor
+      for ( const statusId of effect.statuses ) this.statuses.add(statusId);
+    }
+    if ( changes.length === 0 ) return;
+
+    changes.sort((a, b) => a.priority - b.priority);
+    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Prioritized changes to ${this.name}:`, changes);
+
+    // Apply active/enabled changes
+    for ( const change of changes ) {
+      if ( !change.key ) continue;    // This should never happen
+
+      // Explicitly skip changes to AC, DR, and MV, if autoCalcAc is true
+      if (game.settings.get(game.system.id, "autoCalcAc")) {
+        if (["system.ac.value", "system.ac.dr", "system.movement.base.value"].includes(change.key)) {
+          Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping AC/DR/MV change:`, change);
+          continue;
+        }
+      }
+
+      // Now we can apply updates to the change itself
+      const changes = change.effect.apply(this, change);
+      Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Updated changes object:`, changes);
+      Object.assign(overrides, changes);
+    }
+
+    // Expand the set of final overrides
+    this.overrides = foundry.utils.expandObject(overrides);
   }
 
   /** ACTOR DATA HELPERS ------------------------------*/
@@ -449,10 +455,22 @@ export class Hyp3eActor extends Actor {
           "system.ac.dr",
           "system.movement.base.value"
       ];
+      // Use these to update AC, DR, MV from effects
+      let finalAc = ac;
+      let finalDr = dr;
+      let finalMv = mv;
 
       const changes = [];
       for ( const effect of this.allApplicableEffects() ) {
+          // Skip if disabled or not active
           if ( effect.disabled || !effect.active ) continue;
+
+          // Validate conditions required to apply this effect
+          if (!this._effectApplies(effect)) {
+            Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Skipping effect "${effect.name}" — condition not met:`, effect.flags.hyp3e?.condition);
+            continue;
+          }
+
           // Only include changes to allowed keys
           const filtered = effect.changes
               .filter(change => allowedKeys.includes(change.key))
@@ -464,49 +482,48 @@ export class Hyp3eActor extends Actor {
               });
           changes.push(...filtered);
       }
-      // Organize effects by their priority (though it probably doesn't matter)
-      changes.sort((a, b) => a.priority - b.priority);
-      Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Prioritized changes to ${this.name}:`, changes);
+      // Do we have any changes to apply?
+      if ( changes.length > 0 ) {
+        // Organize effects by their priority (though it probably doesn't matter)
+        changes.sort((a, b) => a.priority - b.priority);
+        Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Prioritized changes to ${this.name}:`, changes);
 
-      // Apply Active Effects to AC, DR, MV
-      let finalAc = ac;
-      let finalDr = dr;
-      let finalMv = mv;
-      // Accumulate AE changes
-      for (const change of changes) {
-          if (change.key === "system.ac.value") {
-              Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
-              // Apply change based on mode
-              const val = Number(change.value) || 0;
-              switch (change.mode) {
-                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = val; break;
-                  // Extend as needed
-              }
-          } else
-          if (change.key === "system.ac.dr") {
-              Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s DR:`, change);
-              // Apply change based on mode
-              const val = Number(change.value) || 0;
-              switch (change.mode) {
-                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = val; break;
-                  // Extend as needed
-              }
-          } else
-          if (change.key === "system.movement.base.value") {
-              Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s MV:`, change);
-              // Apply change based on mode
-              const val = Number(change.value) || 0;
-              switch (change.mode) {
-                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = val; break;
-                  // Extend as needed
-              }
-          }
+        // Accumulate AE changes
+        for (const change of changes) {
+            if (change.key === "system.ac.value") {
+                Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
+                // Apply change based on mode
+                const val = Number(change.value) || 0;
+                switch (change.mode) {
+                    case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = val; break;
+                    // Extend to other modes if needed
+                }
+            } else
+            if (change.key === "system.ac.dr") {
+                Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s DR:`, change);
+                // Apply change based on mode
+                const val = Number(change.value) || 0;
+                switch (change.mode) {
+                    case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = val; break;
+                    // Extend to other modes if needed
+                }
+            } else
+            if (change.key === "system.movement.base.value") {
+                Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s MV:`, change);
+                // Apply change based on mode
+                const val = Number(change.value) || 0;
+                switch (change.mode) {
+                    case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= val; break;
+                    case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = val; break;
+                    // Extend to other modes if needed
+                }
+            }
+        }
       }
 
       // Return the final results
@@ -777,6 +794,77 @@ export class Hyp3eActor extends Actor {
 
   /** ACTIVE EFFECTS HELPERS --------------------------*/
 
+  /**
+   * Determine whether an ActiveEffect should apply to this Actor
+   *  based on conditional rules stored in flags.hyp3e.condition.
+   * @param {ActiveEffect} effect
+   * @returns {boolean}
+   */
+  _effectApplies(effect) {
+    const condition = effect.flags.hyp3e?.condition;
+    // No condition, always apply
+    if (!condition) return true;
+    // No tests configured (invalid or missing data), always apply
+    const tests = condition.tests;
+    if (!Array.isArray(tests) || tests.length === 0) return true;
+
+    const actor = this;
+    const rollData = actor.getRollData();
+
+    // Internal function to evaluate a single test
+    const evalTest = (test) => {
+      if (!test || !test.key || !test.op) return false;
+
+      // Get the left-hand value from actor
+      const left = foundry.utils.getProperty(actor, test.key);
+
+      // Resolve the right-hand value from the effect test
+      let right = test.value;
+
+      // If right is a formula starting with "@", evaluate it using actor data
+      if (typeof right === "string" && right.trim().startsWith("@")) {
+        try {
+          // Remove leading "@"
+          const expr = right.trim().slice(1);
+          const replaced = Roll.replaceFormulaData(expr, rollData);
+          right = Roll.safeEval(replaced);
+        } catch (err) {
+          Hyp3eLogger.warn("Hyp3eActor _effectApplies", "Conditional effect formula error:", right, err);
+          return false;
+        }
+      }
+
+      // Apply condition operators
+      switch (test.op) {
+        case "==":  return left == right;
+        case "!=":  return left != right;
+
+        case "<":   return Number(left) <  Number(right);
+        case "<=":  return Number(left) <= Number(right);
+        case ">":   return Number(left) >  Number(right);
+        case ">=":  return Number(left) >= Number(right);
+
+        case "in":  return Array.isArray(right) && right.includes(left);
+        case "!in": return Array.isArray(right) && !right.includes(left);
+
+        default:
+          Hyp3eLogger.warn("Hyp3eActor _effectApplies", `Unknown operator '${test.op}' in conditional effect.`);
+          return false;
+      }
+    };
+
+    // Evaluate all tests through the above function
+    const results = tests.map(evalTest);
+
+    // Combine results based on mode
+    switch (condition.mode) {
+      case "any":  return results.some(r => r);
+      case "none": return results.every(r => !r);
+      default:     // "all" or anything else
+        return results.every(r => r);
+    }
+  }
+  
   /**
    * Resolve item effects and changes that include data paths or roll formulas.
    * Then update the item's effect/change with a number, so it becomes "permanent".

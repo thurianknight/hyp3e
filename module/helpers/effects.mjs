@@ -1,4 +1,5 @@
 import { Hyp3eLogger } from "./logger.mjs";
+import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
 
 /**
  * Manage Active Effect instances through the Actor/Item Sheet via effect control buttons.
@@ -177,7 +178,7 @@ export async function setupEffectHandlers() {
         const current = effect.getFlag("hyp3e", "durationFormula") ?? "";
         // const current = "";
 
-        // Build the new form group
+        // Build the html for Duration Formula
         const field = $(`
             <div class="form-group">
                 <label>Duration Formula</label>
@@ -191,6 +192,26 @@ export async function setupEffectHandlers() {
 
         // Insert just after the rounds input
         html$.find('input[name="duration.rounds"]').closest(".form-group").after(field);
+
+        // Don't insert the Condition Editor button if one already exists
+        if (html$.find("button.hyp3e-condition-edit").length) return;
+
+        // Find a suitable place to inject the Condition Editor button
+        const footer = html$.find("footer");
+        if (!footer.length) return;
+
+        // Button html
+        const btn = $(`<button type="button" class="hyp3e-condition-edit">
+                        Conditionally Apply Effect…
+                      </button>`);
+
+        // Insert just ahead of the sheet footer
+        btn.insertBefore(footer);
+      
+        btn.click(ev => {
+          Hyp3eLogger.info("renderActiveEffectConfig", `Opening Condition Editor for effect:`, effect);
+          new HYP3EConditionEditor({ effect }).render(true);
+        });
     });
 
     /**
