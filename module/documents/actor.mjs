@@ -106,13 +106,13 @@ export class Hyp3eActor extends Actor {
       const sys = item.system ?? {};
       if (item.type === "armor" && sys.type !== "shield") {
         armorType = sys.type || "unarmored";
-        break; // Only one armor can be worn, so stop after the first
+        break; // We assume only one armor will be worn, so break after the first match
       }
     }
     systemData.wornArmorType = armorType;
 
     // Get encumbered status
-    systemData.encumbered = this._getEncumberedStatus(systemData);
+    systemData.encumberedState = this._getEncumberedStatus(systemData);
 
     // Auto-calculate AC, DR, MV if configuration is enabled
     if (game.settings.get(game.system.id, "autoCalcAc")) {
@@ -433,9 +433,9 @@ export class Hyp3eActor extends Actor {
 
       // Encumbrance
       if (CONFIG.HYP3E.enableEncumbrance) {
-        if (systemData.encumbered === "encumbered") {
+        if (systemData.encumberedState === "encumbered") {
           ac += 1; mv -= 10;
-        } else if (systemData.encumbered === "heavilyEncumbered") {
+        } else if (systemData.encumberedState === "heavilyEncumbered") {
           ac += 2; mv -= 20;
         }
       }

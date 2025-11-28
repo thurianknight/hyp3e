@@ -174,80 +174,79 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     /** @override */
     async _prepareContext(options) {
+      const document = this.document;
+      const { documentName, type=CONST.BASE_DOCUMENT_TYPE } = document;
+      const {
+          sheetClasses, defaultClasses, defaultClass
+      } = DocumentSheetConfig.getSheetClassesForSubType(documentName, type);
+      const sheetClass = document.flags.core?.sheetClass ?? "";
+      const config = CONFIG[documentName].sheetClasses[type] ?? {};
+      const themes = game.settings.get("core", "sheetThemes");
+      const currentClass = sheetClass || defaultClass;
+      Hyp3eLogger.info("_prepareContext", `Document data:`, { document, sheetClass, config, themes, currentClass });
 
-        const document = this.document;
-        const { documentName, type=CONST.BASE_DOCUMENT_TYPE } = document;
-        const {
-            sheetClasses, defaultClasses, defaultClass
-        } = DocumentSheetConfig.getSheetClassesForSubType(documentName, type);
-        const sheetClass = document.flags.core?.sheetClass ?? "";
-        const config = CONFIG[documentName].sheetClasses[type] ?? {};
-        const themes = game.settings.get("core", "sheetThemes");
-        const currentClass = sheetClass || defaultClass;
-        Hyp3eLogger.info("_prepareContext", `Document data:`, { document, sheetClass, config, themes, currentClass });
+      // Retrieve base data structure.
+      const context = await super._prepareContext(options);
+      context.actor = this.actor;
+      context.isGM = game.user.isGM
 
-        // Retrieve base data structure.
-        const context = await super._prepareContext(options);
-        context.actor = this.actor;
-        context.isGM = game.user.isGM
+      // Use a safe clone of the actor data for further operations
+      const actorData = this.actor.toObject(false);
+      Hyp3eLogger.info("_prepareContext", `Actor data for sheet:`, actorData);
 
-        // Use a safe clone of the actor data for further operations
-        const actorData = this.actor.toObject(false);
-        Hyp3eLogger.info("_prepareContext", `Actor data for sheet:`, actorData);
+      // Add the actor's system data and flags to context root for easier access
+      context.system = actorData.system;
+      context.flags = actorData.flags;
 
-        // Add the actor's system data and flags to context root for easier access
-        context.system = actorData.system;
-        context.flags = actorData.flags;
+      // Add the actor's items to sheet context, for ease of access
+      context.items = this.actor.items.map(i => ({
+          id: i.id,
+          ...i.toObject(),
+      }));
 
-        // Add the actor's items to sheet context, for ease of access
-        context.items = this.actor.items.map(i => ({
-            id: i.id,
-            ...i.toObject(),
-        }));
+      // Prepare character data and items
+      if (actorData.type == 'character') {
+          await this._prepareItems(context);
+          this._prepareCharacterData(context);
+      }
+      
+      // Prepare NPC data and items
+      if (actorData.type == 'npc') {
+          await this._prepareItems(context);
+          this._prepareNpcData(context);
+      }
 
-        // Prepare character data and items
-        if (actorData.type == 'character') {
-            await this._prepareItems(context);
-            this._prepareCharacterData(context);
-        }
-        
-        // Prepare NPC data and items
-        if (actorData.type == 'npc') {
-            await this._prepareItems(context);
-            this._prepareNpcData(context);
-        }
+      // Prepare merchant data and items
+      if (actorData.type == 'merchant') {
+          await this._prepareItems(context);
+          this._prepareMerchantData(context);
+      }
 
-        // Prepare merchant data and items
-        if (actorData.type == 'merchant') {
-            await this._prepareItems(context);
-            this._prepareMerchantData(context);
-        }
+      // Prepare treasure data and items
+      if (actorData.type == 'treasure') {
+          await this._prepareItems(context);
+          this._prepareTreasureData(context);
+      }
 
-        // Prepare treasure data and items
-        if (actorData.type == 'treasure') {
-            await this._prepareItems(context);
-            this._prepareTreasureData(context);
-        }
+      // Add roll data for TinyMCE editors.
+      context.rollData = this.actor.getRollData();
 
-        // Add roll data for TinyMCE editors.
-        context.rollData = this.actor.getRollData();
+      // Enable/disable character quick-create button
+      if (game.settings.get(game.system.id, "quickCreateChars") != "" && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
+          context.enableQuickCreate = true;
+      } else {
+          context.enableQuickCreate = false;
+      };
 
-        // Enable/disable character quick-create button
-        if (game.settings.get(game.system.id, "quickCreateChars") != "" && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
-            context.enableQuickCreate = true;
-        } else {
-            context.enableQuickCreate = false;
-        };
+      // Prepare active effects
+      Hyp3eLogger.info("_prepareContext", `Actor applied effects: `, this.actor.appliedEffects);
+      Hyp3eLogger.info("_prepareContext", `Actor applicable effects: `, this.actor.allApplicableEffects());
+      context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
 
-        // Prepare active effects
-        Hyp3eLogger.info("_prepareContext", `Actor applied effects: `, this.actor.appliedEffects);
-        Hyp3eLogger.info("_prepareContext", `Actor applicable effects: `, this.actor.allApplicableEffects());
-        context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
+      // Log the complete actor sheet data
+      Hyp3eLogger.info("_prepareContext", `Actor sheet data complete:`, context);
 
-        // Log the complete actor sheet data
-        Hyp3eLogger.info("_prepareContext", `Actor sheet data complete:`, context);
-
-        return context;
+      return context;
     }
 
     /** @override */
@@ -405,7 +404,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       // If the attribute is NOT at its default 10, set disableQuickCreate to true
       if (v.value != 10 && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
           this.actor.setFlag(game.system.id, "disableQuickCreate", true)
-          Hyp3eLogger.info("_prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
+          // Hyp3eLogger.info("_prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
       }
     }
 
@@ -431,10 +430,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     // Set encumbrance flags for the sheet
     if (CONFIG.HYP3E.enableEncumbrance) {
-      if (this.actor.system.encumbered === "heavilyEncumbered") {
+      if (this.actor.system.encumberedState === "heavilyEncumbered") {
         context.isHeavilyEncumbered = true
         context.isEncumbered = false
-      } else if (this.actor.system.encumbered === "encumbered") {
+      } else if (this.actor.system.encumberedState === "encumbered") {
         context.isEncumbered = true
         context.isHeavilyEncumbered = false
       } else {
