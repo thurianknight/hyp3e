@@ -14,7 +14,7 @@
   <div class="tests">
     {{#each tests as |test idx|}}
     <div class="flex test-row" data-idx="{{idx}}">
-      <input type="text" style="width: 35%" name="key-{{idx}}" value="{{test.key}}" placeholder="actor.system.wornArmorType">
+      <input type="text" style="width: 35%" name="key-{{idx}}" value="{{test.key}}" placeholder="e.g. system.wornArmorType">
       <select style="width: 75px" name="op-{{idx}}">
         <option value="==" {{#if (eq test.op "==")}}selected{{/if}}>==</option>
         <option value="!=" {{#if (eq test.op "!=")}}selected{{/if}}>!=</option>
@@ -25,7 +25,7 @@
         <option value="in" {{#if (eq test.op "in")}}selected{{/if}}>in</option>
         <option value="!in" {{#if (eq test.op "!in")}}selected{{/if}}>not in</option>
       </select>
-      <input type="text" style="width: 35%" name="value-{{idx}}" value="{{test.value}}" placeholder="e.g. unarmored or @actor.system.attributes.str.value * 15">
+      <input type="text" style="width: 35%" name="value-{{idx}}" value="{{test.value}}" placeholder="e.g. unarmored or system.attributes.str.value * 15">
       <button type="button" style="width: 50px" class="remove-test" data-action="delTest" data-idx="{{idx}}"><i class="fas fa-trash"></i></button>
     </div>
     {{/each}}

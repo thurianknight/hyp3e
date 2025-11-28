@@ -211,7 +211,7 @@ export class Hyp3eActor extends Actor {
 
       // Validate conditions required to apply this effect
       if (!this._effectApplies(effect)) {
-        Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping effect "${effect.name}" — condition not met:`, effect.flags.hyp3e?.condition);
+        Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
         continue;
       }
 
@@ -238,14 +238,14 @@ export class Hyp3eActor extends Actor {
       // Explicitly skip changes to AC, DR, and MV, if autoCalcAc is true
       if (game.settings.get(game.system.id, "autoCalcAc")) {
         if (["system.ac.value", "system.ac.dr", "system.movement.base.value"].includes(change.key)) {
-          Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping AC/DR/MV change:`, change);
+          Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping AC/DR/MV change to ${this.name}:`, change);
           continue;
         }
       }
 
       // Now we can apply updates to the change itself
       const changes = change.effect.apply(this, change);
-      Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Updated changes object:`, changes);
+      Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Updated changes to ${effect.name}:`, changes);
       Object.assign(overrides, changes);
     }
 
@@ -467,7 +467,7 @@ export class Hyp3eActor extends Actor {
 
           // Validate conditions required to apply this effect
           if (!this._effectApplies(effect)) {
-            Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Skipping effect "${effect.name}" — condition not met:`, effect.flags.hyp3e?.condition);
+            Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
             continue;
           }
 

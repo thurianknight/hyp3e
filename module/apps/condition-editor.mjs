@@ -72,24 +72,27 @@ export class HYP3EConditionEditor extends HandlebarsApplicationMixin(Application
 
   static async onSubmit(event, form, formData) {
     const app = this; // Application instance
+    Hyp3eLogger.info("HYP3EConditionEditor onSubmit", `Submitting condition editor form data:`, formData);
 
     const condition = {
-      mode: formData["mode"],
+      mode: formData.object["mode"],
       tests: []
     };
 
     // Collect tests by index
     const testCount = form.querySelectorAll(".test-row").length;
-
     for (let i = 0; i < testCount; i++) {
       condition.tests.push({
-        key: formData[`key-${i}`],
-        op: formData[`op-${i}`],
-        value: formData[`value-${i}`]
+        key: formData.object[`key-${i}`],
+        op: formData.object[`op-${i}`],
+        value: formData.object[`value-${i}`]
       });
     }
 
-    await app.effect.update({"flags.hyp3e.condition": condition});
-    ui.notifications.info(`Conditions updated for: ${app.effect.name}`);
+    // await app.effect.update({"flags.hyp3e.condition": condition});
+    await this.effect.setFlag("hyp3e", "condition", condition);
+    const msg = `Updated conditions for effect: ${app.effect.name}`;
+    ui.notifications.info(msg);
+    Hyp3eLogger.info("HYP3EConditionEditor onSubmit", msg, condition);
   }
 }
