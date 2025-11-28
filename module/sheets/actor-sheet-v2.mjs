@@ -348,113 +348,101 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         return tabs
     }
 
-    /**
-     * Organize and classify Data for Character sheets.
-     * @param {Object} context The actor to prepare.
-     * @return {undefined}
-     */
-    _prepareCharacterData(context) {
-        // Handle attribute scores
-        for (let [k, v] of Object.entries(context.system.attributes)) {
-            v.label = game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[k]) ?? k;
-            const actorData = context.system
-            // Have we selected a class yet?
-            if (context.system.details.class) {
-                // Flag attributes that are too low for the character class
-                switch (k) {
-                    case "str":
-                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.info("_prepareCharacterData", `ST is too low for ${context.system.details.class}!`)
-                            context.warnStr = true
-                        }
-                        break
-                    case "dex":
-                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.info("_prepareCharacterData", `DX is too low for ${context.system.details.class}!`)
-                            context.warnDex = true
-                        }
-                        break
-                    case "con":
-                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.info("_prepareCharacterData", `CN is too low for ${context.system.details.class}!`)
-                            context.warnCon = true
-                        }
-                        break
-                    case "int":
-                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.info("_prepareCharacterData", `IN is too low for ${context.system.details.class}!`)
-                            context.warnInt = true
-                        }
-                        break
-                    case "wis":
-                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.info("_prepareCharacterData", `WS is too low for ${context.system.details.class}!`)
-                            context.warnWis = true
-                        }
-                        break
-                    case "cha":
-                        if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-                            Hyp3eLogger.info("_prepareCharacterData", `CH is too low for ${context.system.details.class}!`)
-                            context.warnCha = true
-                        }
-                        break
-                    default:
-                        break
-                }
+  /**
+   * Organize and classify Data for Character sheets.
+   * @param {Object} context The actor to prepare.
+   * @return {undefined}
+   */
+  _prepareCharacterData(context) {
+    // Handle attribute scores
+    for (let [k, v] of Object.entries(context.system.attributes)) {
+      v.label = game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[k]) ?? k;
+      const actorData = context.system
+      // Have we selected a class yet?
+      if (context.system.details.class) {
+        // Flag attributes that are too low for the character class
+        switch (k) {
+          case "str":
+            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+              Hyp3eLogger.info("_prepareCharacterData", `ST is too low for ${context.system.details.class}!`)
+              context.warnStr = true
             }
-            // If the attribute is NOT at its default 10, set disableQuickCreate to true
-            if (v.value != 10 && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
-                this.actor.setFlag(game.system.id, "disableQuickCreate", true)
-                Hyp3eLogger.info("_prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
+            break
+          case "dex":
+            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+              Hyp3eLogger.info("_prepareCharacterData", `DX is too low for ${context.system.details.class}!`)
+              context.warnDex = true
             }
-        }
-
-        // Handle movement types
-        for (let [k, v] of Object.entries(context.system.movement)) {
-            if (k == "tempMvMod") continue;
-            v.label = game.i18n.localize(CONFIG.HYP3E.movement[k]) ?? k;
-        }
-
-        // Handle money types
-        for (let [k, v] of Object.entries(context.system.money)) {
-            v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
-        }
-
-        // Global system settings
-        context.enableAttrChecks = CONFIG.HYP3E.enableAttrChecks
-        context.characterClasses = CONFIG.HYP3E.characterClasses
-        context.races = CONFIG.HYP3E.races
-        context.languages = CONFIG.HYP3E.languages
-
-        // System-defined roll modes
-        context.rollModes = CONFIG.Dice.rollModes
-
-        // We can set these two constants even if they aren't used (when encumbrance is disabled)
-        const encumberedWt = this.actor.system.attributes.str.value * CONFIG.HYP3E.encumbered
-        const heavilyEncumberedWt = this.actor.system.attributes.str.value * CONFIG.HYP3E.heavilyEncumbered
-        if (CONFIG.HYP3E.enableEncumbrance) {
-            if (context.encumbrance > heavilyEncumberedWt) {
-                Hyp3eLogger.info("_prepareCharacterData", `${this.actor.name} is Heavily Encumbered!`);
-                this.actor.setFlag(game.system.id, "isHeavilyEncumbered", true)
-                this.actor.setFlag(game.system.id, "isEncumbered", false)
-                context.isHeavilyEncumbered = true
-                context.isEncumbered = false
-            } else if (context.encumbrance > encumberedWt) {
-                Hyp3eLogger.info("_prepareCharacterData", `${this.actor.name} is Encumbered!`);
-                this.actor.setFlag(game.system.id, "isEncumbered", true)
-                this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
-                context.isEncumbered = true
-                context.isHeavilyEncumbered = false
-            } else {
-                Hyp3eLogger.info("_prepareCharacterData", `${this.actor.name} is not Encumbered. :-)`);
-                this.actor.setFlag(game.system.id, "isEncumbered", false)
-                this.actor.setFlag(game.system.id, "isHeavilyEncumbered", false)
-                context.isEncumbered = false
-                context.isHeavilyEncumbered = false
+            break
+          case "con":
+            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+              Hyp3eLogger.info("_prepareCharacterData", `CN is too low for ${context.system.details.class}!`)
+              context.warnCon = true
             }
+            break
+          case "int":
+            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+              Hyp3eLogger.info("_prepareCharacterData", `IN is too low for ${context.system.details.class}!`)
+              context.warnInt = true
+            }
+            break
+          case "wis":
+            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+              Hyp3eLogger.info("_prepareCharacterData", `WS is too low for ${context.system.details.class}!`)
+              context.warnWis = true
+            }
+            break
+          case "cha":
+            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+              Hyp3eLogger.info("_prepareCharacterData", `CH is too low for ${context.system.details.class}!`)
+              context.warnCha = true
+            }
+            break
+          default:
+            break
         }
-
+      }
+      // If the attribute is NOT at its default 10, set disableQuickCreate to true
+      if (v.value != 10 && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
+          this.actor.setFlag(game.system.id, "disableQuickCreate", true)
+          Hyp3eLogger.info("_prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
+      }
     }
+
+    // Handle movement types
+    for (let [k, v] of Object.entries(context.system.movement)) {
+      if (k == "tempMvMod") continue;
+      v.label = game.i18n.localize(CONFIG.HYP3E.movement[k]) ?? k;
+    }
+
+    // Handle money types
+    for (let [k, v] of Object.entries(context.system.money)) {
+      v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
+    }
+
+    // Global system settings
+    context.enableAttrChecks = CONFIG.HYP3E.enableAttrChecks
+    context.characterClasses = CONFIG.HYP3E.characterClasses
+    context.races = CONFIG.HYP3E.races
+    context.languages = CONFIG.HYP3E.languages
+
+    // System-defined roll modes
+    context.rollModes = CONFIG.Dice.rollModes
+
+    // Set encumbrance flags for the sheet
+    if (CONFIG.HYP3E.enableEncumbrance) {
+      if (this.actor.system.encumbered === "heavilyEncumbered") {
+        context.isHeavilyEncumbered = true
+        context.isEncumbered = false
+      } else if (this.actor.system.encumbered === "encumbered") {
+        context.isEncumbered = true
+        context.isHeavilyEncumbered = false
+      } else {
+        context.isEncumbered = false
+        context.isHeavilyEncumbered = false
+      }
+    }
+  }
 
     /**
      * Organize and classify Data for NPC sheets.
@@ -491,7 +479,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     /**
      * Organize and classify Items for Character sheets.
-     * @param {Object} context The actor to prepare.
+     * @param {Object} context The actor sheet context to prepare.
      * @return {undefined}
      */
     async _prepareItems(context) {
@@ -545,7 +533,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                             i.system.carriedWt = (i.system.weight * i.system.quantity.value)
                         }
                         i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10    
-                        encumbrance += i.system.carriedWt
+                        // encumbrance += i.system.carriedWt
                     } else if (i.type === 'weapon' || i.type === 'armor' || i.type === 'shield') {
                         if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
                             // For bundled items, we calculate weight based on number of bundles
@@ -554,13 +542,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                             i.system.carriedWt = (i.system.weight * i.system.quantity.value)
                         }
                         i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10    
-                        encumbrance += i.system.carriedWt
+                        // encumbrance += i.system.carriedWt
                     } else {
                         i.system.carriedWt = 0
                     }
-                // } else { // Assume quantity of 1
-                //     i.system.carriedWt = i.system.weight
-                //     encumbrance += i.system.weight
                 }
             }
             // Calculate the gp value of the item, taking qty x cost. If qty is empty, assume 1.
@@ -632,7 +617,8 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 }
             }
         }
-        encumbrance = Math.round(encumbrance * 10)/10
+        // encumbrance = Math.round(encumbrance * 10)/10
+        encumbrance = this.actor.system.weightCarried
         allTheGold = Math.round(allTheGold * 100)/100
         // Now convert allTheGold to a string and add " gp" to the end
         allTheGold = allTheGold.toLocaleString("en-US", {
