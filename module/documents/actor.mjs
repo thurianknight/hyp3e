@@ -66,6 +66,9 @@ export class Hyp3eActor extends Actor {
       // Hyp3eLogger.info("Hyp3eActor prepareDerivedData", `tempModifiers[${id}]:`, obj);
     })
 
+    // Initialize ephemeral effect condition state object
+    systemData._hyp3eEffectConditionState = systemData._hyp3eEffectConditionState || {};
+
     // Make separate methods for each Actor type (character vs. npc) to keep
     // things organized.
     this._prepareCharacterData();
@@ -209,13 +212,17 @@ export class Hyp3eActor extends Actor {
       // Skip if disabled or not active
       if ( effect.disabled || !effect.active ) continue;
 
-      // Validate conditions required to apply this effect
-      if (!this._effectApplies(effect)) {
+      // Validate effect condition is met before applying changes
+      const conditionPasses = this._effectApplies(effect);
+      // Store temporary effect condition state in actor (used by actor sheet)
+      this.system._hyp3eEffectConditionState = this.system._hyp3eEffectConditionState || {};
+      this.system._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
+
+      if (!conditionPasses) {
         Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
         continue;
       }
 
-      Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${effect.name}:`, effect);
       changes.push(...effect.changes.map(change => {
         const c = foundry.utils.deepClone(change);
         c.effect = effect;
@@ -238,14 +245,13 @@ export class Hyp3eActor extends Actor {
       // Explicitly skip changes to AC, DR, and MV, if autoCalcAc is true
       if (game.settings.get(game.system.id, "autoCalcAc")) {
         if (["system.ac.value", "system.ac.dr", "system.movement.base.value"].includes(change.key)) {
-          Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping AC/DR/MV change to ${this.name}:`, change);
+          Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping AC/DR/MV change:`, change);
           continue;
         }
       }
 
       // Now we can apply updates to the change itself
       const changes = change.effect.apply(this, change);
-      Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Updated changes to ${effect.name}:`, changes);
       Object.assign(overrides, changes);
     }
 
@@ -406,132 +412,137 @@ export class Hyp3eActor extends Actor {
    * @returns 
    */
   _calculateAcDrMv(systemData) {
-      let ac = 9;
-      let mv = 40;
-      let dr = 0;
-      let shieldMod = 0;
+    let ac = 9;
+    let mv = 40;
+    let dr = 0;
+    let shieldMod = 0;
 
-      const items = this._getEquippedProtectionItems();
-      Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `${this.name} has equipped protection items:`, items);
+    const items = this._getEquippedProtectionItems();
+    Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `${this.name} has equipped protection items:`, items);
 
-      for (const item of items) {
-          const sys = item.system ?? {};
+    for (const item of items) {
+        const sys = item.system ?? {};
 
-          if (this._isHandShield(item)) {
-              // Shield = stacking AC mod
-              shieldMod += sys.ac || 0;
-          } else if (this._isPassiveAc(item)) {
-              // Passive protection items (rings, cloaks, etc) stack too
-              shieldMod += sys.ac || 0;
-          } else {
-              // Armor (or passive AC) = pick the best
-              //  It shouldn't even be possible to equip multiple armors, but just in case...
-              if (sys.ac < ac) {
-                  ac = sys.ac;
-                  dr = sys.dr || dr;
-              }
-              // Movement
-              if (sys.mv !== mv) {
-                  mv = sys.mv ?? mv;
-              }
-          }
-      }
-
-      // Encumbrance
-      if (CONFIG.HYP3E.enableEncumbrance) {
-        if (systemData.encumberedState === "encumbered") {
-          ac += 1; mv -= 10;
-        } else if (systemData.encumberedState === "heavilyEncumbered") {
-          ac += 2; mv -= 20;
-        }
-      }
-
-      // Dex and shields
-      ac -= (systemData.attributes.dex.defMod || 0) + shieldMod;
-
-      // Active effects can modify AC, DR, and MV after this point...
-      const allowedKeys = [
-          "system.ac.value",
-          "system.ac.dr",
-          "system.movement.base.value"
-      ];
-      // Use these to update AC, DR, MV from effects
-      let finalAc = ac;
-      let finalDr = dr;
-      let finalMv = mv;
-
-      const changes = [];
-      for ( const effect of this.allApplicableEffects() ) {
-          // Skip if disabled or not active
-          if ( effect.disabled || !effect.active ) continue;
-
-          // Validate conditions required to apply this effect
-          if (!this._effectApplies(effect)) {
-            Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
-            continue;
-          }
-
-          // Only include changes to allowed keys
-          const filtered = effect.changes
-              .filter(change => allowedKeys.includes(change.key))
-              .map(change => {
-                  const c = foundry.utils.deepClone(change);
-                  c.effect = effect;
-                  c.priority = c.priority ?? (c.mode * 10);
-                  return c;
-              });
-          changes.push(...filtered);
-      }
-      // Do we have any changes to apply?
-      if ( changes.length > 0 ) {
-        // Organize effects by their priority (though it probably doesn't matter)
-        changes.sort((a, b) => a.priority - b.priority);
-        Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Prioritized changes to ${this.name}:`, changes);
-
-        // Accumulate AE changes
-        for (const change of changes) {
-            if (change.key === "system.ac.value") {
-                Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
-                // Apply change based on mode
-                const val = Number(change.value) || 0;
-                switch (change.mode) {
-                    case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += val; break;
-                    case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= val; break;
-                    case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = val; break;
-                    // Extend to other modes if needed
-                }
-            } else
-            if (change.key === "system.ac.dr") {
-                Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s DR:`, change);
-                // Apply change based on mode
-                const val = Number(change.value) || 0;
-                switch (change.mode) {
-                    case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += val; break;
-                    case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= val; break;
-                    case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = val; break;
-                    // Extend to other modes if needed
-                }
-            } else
-            if (change.key === "system.movement.base.value") {
-                Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s MV:`, change);
-                // Apply change based on mode
-                const val = Number(change.value) || 0;
-                switch (change.mode) {
-                    case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += val; break;
-                    case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= val; break;
-                    case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = val; break;
-                    // Extend to other modes if needed
-                }
+        if (this._isHandShield(item)) {
+            // Shield = stacking AC mod
+            shieldMod += sys.ac || 0;
+        } else if (this._isPassiveAc(item)) {
+            // Passive protection items (rings, cloaks, etc) stack too
+            shieldMod += sys.ac || 0;
+        } else {
+            // Armor (or passive AC) = pick the best
+            //  It shouldn't even be possible to equip multiple armors, but just in case...
+            if (sys.ac < ac) {
+                ac = sys.ac;
+                dr = sys.dr || dr;
+            }
+            // Movement
+            if (sys.mv !== mv) {
+                mv = sys.mv ?? mv;
             }
         }
-      }
+    }
 
-      // Return the final results
-      return {
-          ac: Math.clamp(finalAc, -9, 9),
-          dr: finalDr,
-          mv: finalMv
-      };
+    // Encumbrance
+    if (CONFIG.HYP3E.enableEncumbrance) {
+      if (systemData.encumberedState === "encumbered") {
+        ac += 1; mv -= 10;
+      } else if (systemData.encumberedState === "heavilyEncumbered") {
+        ac += 2; mv -= 20;
+      }
+    }
+
+    // Dex and shields
+    ac -= (systemData.attributes.dex.defMod || 0) + shieldMod;
+
+    // Active effects can modify AC, DR, and MV after this point...
+    const allowedKeys = [
+        "system.ac.value",
+        "system.ac.dr",
+        "system.movement.base.value"
+    ];
+    // Use these to update AC, DR, MV from effects
+    let finalAc = ac;
+    let finalDr = dr;
+    let finalMv = mv;
+
+    const changes = [];
+    for ( const effect of this.allApplicableEffects() ) {
+        // Skip if disabled or not active
+        if ( effect.disabled || !effect.active ) continue;
+
+        // Validate effect condition is met before applying changes
+        const conditionPasses = this._effectApplies(effect);
+        // Store temporary effect condition state in actor (used by actor sheet)
+        systemData._hyp3eEffectConditionState = systemData._hyp3eEffectConditionState || {};
+        systemData._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
+
+        if (!conditionPasses) {
+          Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
+          continue;
+        }
+
+        // Only include changes to allowed keys
+        const filtered = effect.changes
+            .filter(change => allowedKeys.includes(change.key))
+            .map(change => {
+                const c = foundry.utils.deepClone(change);
+                c.effect = effect;
+                c.priority = c.priority ?? (c.mode * 10);
+                return c;
+            });
+        changes.push(...filtered);
+    }
+    // Do we have any changes to apply?
+    if ( changes.length > 0 ) {
+      // Organize effects by their priority (though it probably doesn't matter)
+      changes.sort((a, b) => a.priority - b.priority);
+      Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Prioritized changes to ${this.name}:`, changes);
+
+      // Accumulate AE changes
+      for (const change of changes) {
+          if (change.key === "system.ac.value") {
+              Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
+              // Apply change based on mode
+              const val = Number(change.value) || 0;
+              switch (change.mode) {
+                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += val; break;
+                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= val; break;
+                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = val; break;
+                  // Extend to other modes if needed
+              }
+          } else
+          if (change.key === "system.ac.dr") {
+              Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s DR:`, change);
+              // Apply change based on mode
+              const val = Number(change.value) || 0;
+              switch (change.mode) {
+                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += val; break;
+                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= val; break;
+                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = val; break;
+                  // Extend to other modes if needed
+              }
+          } else
+          if (change.key === "system.movement.base.value") {
+              Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s MV:`, change);
+              // Apply change based on mode
+              const val = Number(change.value) || 0;
+              switch (change.mode) {
+                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += val; break;
+                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= val; break;
+                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = val; break;
+                  // Extend to other modes if needed
+              }
+          }
+      }
+    }
+    Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Final calculated AC, DR, MV for ${this.name}:`, { ac: finalAc, dr: finalDr, mv: finalMv });
+    // Return the final results
+    return {
+        ac: Math.clamp(finalAc, -9, 9),
+        dr: finalDr,
+        mv: finalMv
+    };
   }
 
   /**
@@ -829,8 +840,22 @@ export class Hyp3eActor extends Actor {
           const replaced = Roll.replaceFormulaData(expr, rollData);
           right = Roll.safeEval(replaced);
         } catch (err) {
-          Hyp3eLogger.warn("Hyp3eActor _effectApplies", "Conditional effect formula error:", right, err);
-          return false;
+          Hyp3eLogger.warn("Hyp3eActor _effectApplies", "Conditional effect formula error:", { right, err });
+          // Allow the effect if we can't evaluate the formula
+          return true;
+        }
+      }
+      // If right looks like an array literal, parse it
+      if (typeof right === "string") {
+        const trimmed = right.trim();
+        if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+          try {
+            right = JSON.parse(trimmed);
+          } catch (err) {
+            console.warn("Hyp3eActor _effectApplies", "Conditional effect: invalid array literal:", { right, err });
+            // Allow the effect if we can't evaluate the array
+            return true;
+          }
         }
       }
 

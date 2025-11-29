@@ -183,7 +183,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       const config = CONFIG[documentName].sheetClasses[type] ?? {};
       const themes = game.settings.get("core", "sheetThemes");
       const currentClass = sheetClass || defaultClass;
-      Hyp3eLogger.info("_prepareContext", `Document data:`, { document, sheetClass, config, themes, currentClass });
+      Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Document data:`, { document, sheetClass, config, themes, currentClass });
 
       // Retrieve base data structure.
       const context = await super._prepareContext(options);
@@ -192,7 +192,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
       // Use a safe clone of the actor data for further operations
       const actorData = this.actor.toObject(false);
-      Hyp3eLogger.info("_prepareContext", `Actor data for sheet:`, actorData);
+      Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Actor data for sheet:`, actorData);
 
       // Add the actor's system data and flags to context root for easier access
       context.system = actorData.system;
@@ -239,12 +239,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       };
 
       // Prepare active effects
-      Hyp3eLogger.info("_prepareContext", `Actor applied effects: `, this.actor.appliedEffects);
-      Hyp3eLogger.info("_prepareContext", `Actor applicable effects: `, this.actor.allApplicableEffects());
       context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
 
       // Log the complete actor sheet data
-      Hyp3eLogger.info("_prepareContext", `Actor sheet data complete:`, context);
+      Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Actor sheet data complete:`, context);
 
       return context;
     }
@@ -258,7 +256,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             return context;
         }
         if (!context.tabs || !context.tabs[partId]) {
-            Hyp3eLogger.info("_preparePartContext", `No tab data found for part "${partId}".`);
+            Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `No tab data found for part "${partId}".`);
             return context;
         }
         // Remove parts that aren't for this actor type
@@ -277,7 +275,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         }
 
         // Process tabs
-        Hyp3eLogger.info("_preparePartContext", `Preparing tab part "${partId}"...`, context);
+        Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `Preparing tab part "${partId}"...`, context);
         if (context.tabs[partId].active) {
             context.tab = context.tabs[partId];
         }
@@ -363,37 +361,37 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         switch (k) {
           case "str":
             if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-              Hyp3eLogger.info("_prepareCharacterData", `ST is too low for ${context.system.details.class}!`)
+              Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `ST is too low for ${context.system.details.class}!`)
               context.warnStr = true
             }
             break
           case "dex":
             if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-              Hyp3eLogger.info("_prepareCharacterData", `DX is too low for ${context.system.details.class}!`)
+              Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `DX is too low for ${context.system.details.class}!`)
               context.warnDex = true
             }
             break
           case "con":
             if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-              Hyp3eLogger.info("_prepareCharacterData", `CN is too low for ${context.system.details.class}!`)
+              Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `CN is too low for ${context.system.details.class}!`)
               context.warnCon = true
             }
             break
           case "int":
             if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-              Hyp3eLogger.info("_prepareCharacterData", `IN is too low for ${context.system.details.class}!`)
+              Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `IN is too low for ${context.system.details.class}!`)
               context.warnInt = true
             }
             break
           case "wis":
             if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-              Hyp3eLogger.info("_prepareCharacterData", `WS is too low for ${context.system.details.class}!`)
+              Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `WS is too low for ${context.system.details.class}!`)
               context.warnWis = true
             }
             break
           case "cha":
             if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
-              Hyp3eLogger.info("_prepareCharacterData", `CH is too low for ${context.system.details.class}!`)
+              Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `CH is too low for ${context.system.details.class}!`)
               context.warnCha = true
             }
             break
@@ -404,7 +402,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       // If the attribute is NOT at its default 10, set disableQuickCreate to true
       if (v.value != 10 && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
           this.actor.setFlag(game.system.id, "disableQuickCreate", true)
-          // Hyp3eLogger.info("_prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
+          // Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
       }
     }
 
@@ -576,7 +574,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
                 // Get contained items and add to their container
                 i.contents = this.getContents(i.id)
-                Hyp3eLogger.info("_prepareItems", `${i.name} contents:`, i.contents)
+                Hyp3eLogger.info("HYP3EActorSheetV2 _prepareItems", `${i.name} contents:`, i.contents)
                 i.contents.sort((a,b) => (a.sort||0) - (b.sort||0));
                 containers.push(i);
                 // Migrate 'container' type to 'item' & set isContainer flag
@@ -661,13 +659,23 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     /** @override */
     async _onRender(context, options) {
         await super._onRender(context, options);
-        // Hyp3eLogger.info("_onRender", `Rendering Actor Sheet...`, { context, options });
 
         // If the sheet is not editable, exit early
         if (!this.isEditable) return;
-    
+
+        const $html = this.element;
+        for (const effect of this.actor.allApplicableEffects()) {
+          const state = this.actor.system?._hyp3eEffectConditionState?.[effect.uuid];
+          if (state === "inactive") {
+            const li = $html.querySelector(`li[data-effect-id="${effect.id}"]`);
+            if (li) {
+              li.classList.add("inactive");
+            }
+          }
+        }
+
         // Log render completion
-        Hyp3eLogger.info("_onRender", `Actor Sheet rendered.`, { context, options, sheet: this });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onRender", `Actor Sheet rendered.`, { context, options, sheet: this });
     }
 
     // ===========================================================================
@@ -716,7 +724,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @private
      */
     static async _updateBonusSpell(event, target) {
-        Hyp3eLogger.info("_updateBonusSpell", `Bonus spell clicked:`, target);
+        Hyp3eLogger.info("HYP3EActorSheetV2 _updateBonusSpell", `Bonus spell clicked:`, target);
         const spellLvl = target.dataset.spellLvl;
         switch (spellLvl) {
             case "intLvl1":
@@ -745,7 +753,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 break
         }
         this.render(true)
-        Hyp3eLogger.info("_updateBonusSpell", `Actor after update:`, this.actor.system);
+        Hyp3eLogger.info("HYP3EActorSheetV2 _updateBonusSpell", `Actor after update:`, this.actor.system);
     }
 
     /**
@@ -755,7 +763,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      */
     static async _itemToggleLight(event, target) {
         event.preventDefault()
-        Hyp3eLogger.info("_itemToggleLight", `Toggling item light...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _itemToggleLight", `Toggling item light...`, { event, target });
         const itemId = $(target).closest(".item-entry").data("itemId")
         const item = this.actor.items.get(itemId)
         // Toggle the light source
@@ -779,7 +787,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      */
     static async _itemCastSpell(event, target) {
         event.preventDefault();
-        Hyp3eLogger.info("_itemCastSpell", `Casting item spell...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _itemCastSpell", `Casting item spell...`, { event, target });
 
         const itemId = $(target).closest(".item-entry").data("itemId")
         const item = this.actor.items.get(itemId)
@@ -835,7 +843,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      */
     static async _decrementItemQty(event, target) {
         event.preventDefault()
-        Hyp3eLogger.info("_decrementItemQty", `Decrementing item qty...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _decrementItemQty", `Decrementing item qty...`, { event, target });
         const itemId = $(target).closest(".item-entry").data("itemId")
         const item = this.actor.items.get(itemId)
         if (item.system.quantity.value > 0) {
@@ -853,7 +861,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      */
     static async _incrementItemQty(event, target) {
         event.preventDefault()
-        Hyp3eLogger.info("_incrementItemQty", `Incrementing item qty...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _incrementItemQty", `Incrementing item qty...`, { event, target });
         const itemId = $(target).closest(".item-entry").data("itemId")
         const item = this.actor.items.get(itemId)
         if (item.system.quantity.value < item.system.quantity.max) {
@@ -872,7 +880,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      */
     static async _onItemCreate(event, target) {
         event.preventDefault();
-        Hyp3eLogger.info("_onItemCreate", `Creating new item...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onItemCreate", `Creating new item...`, { event, target });
         // Get the type of item to create
         const type = target.dataset.type;
         // Grab any data associated with this control
@@ -900,14 +908,14 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      */
     static _toggleItemSummary(event, target) {
         event.preventDefault()
-        Hyp3eLogger.info("_toggleItemSummary", `Toggling item summary...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _toggleItemSummary", `Toggling item summary...`, { event, target });
         const summary = target.closest(".item-entry.item").querySelector(".item-summary");
         summary.style.display = summary.style.display === "block" ? "" : "block";
     }
 
     static async _toggleItemEquip(event, target) {
         event.preventDefault()
-        Hyp3eLogger.info("_toggleItemEquip", `Toggling equipped status of item...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _toggleItemEquip", `Toggling equipped status of item...`, { event, target });
         const itemId = $(target).closest(".item-entry").data("itemId")
         const item = this.actor.items.get(itemId)
         // Do the equip/unequip
@@ -950,7 +958,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      */
     static async _displayItemInChat(event, target) {
         event.preventDefault()
-        Hyp3eLogger.info("_displayItemInChat", `Displaying item in chat...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _displayItemInChat", `Displaying item in chat...`, { event, target });
         const itemId = $(target).closest(".item-entry").data("itemId")
         const item = this.actor.items.get(itemId)
         // Use actor's system data to pass to item._displayItemInChat()
@@ -967,7 +975,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      */
     static async _editItem(event, target) {
         event.preventDefault()
-        Hyp3eLogger.info("_editItem", `Editing item...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _editItem", `Editing item...`, { event, target });
         const itemId = $(target).closest(".item-entry").data("itemId")
         const item = this.actor.items.get(itemId)
         item.sheet.render(true)
@@ -981,7 +989,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      */
     static async _deleteItem(event, target) {
         event.preventDefault()
-        Hyp3eLogger.info("_deleteItem", `Deleting item...`, { event, target });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _deleteItem", `Deleting item...`, { event, target });
         const itemId = $(target).closest(".item-entry").data("itemId")
         const item = this.actor.items.get(itemId)
         // Delete the item (active effects are deleted automatically at the same time)
@@ -1007,7 +1015,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         dataset.actorId = this.actor.id
         dataset.baseClass = this.actor.system.baseClass
         // Log the dataset
-        Hyp3eLogger.info("_onLevelUp", `Level up dataset:`, dataset);
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onLevelUp", `Level up dataset:`, dataset);
         let createOk = await Hyp3eCharacter.quickCreateCharacter(dataset);
         if (createOk) {
             ui.notifications.info("Character created!")
@@ -1029,7 +1037,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         dataset.actorId = this.actor.id
         dataset.baseClass = this.actor.system.baseClass
         // Log the dataset
-        Hyp3eLogger.info("_onLevelUp", `Level up dataset:`, dataset);
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onLevelUp", `Level up dataset:`, dataset);
         // Check current XP, and level up if possible
         let levelUpOk = await Hyp3eCharacter.levelUp(dataset)
         if (levelUpOk) {
@@ -1053,7 +1061,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         dataset.actorId = this.actor.id
         dataset.baseClass = this.actor.system.baseClass
 
-        Hyp3eLogger.info("_onSetAttributeMods", `Set attribute mods dataset:`, dataset);
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onSetAttributeMods", `Set attribute mods dataset:`, dataset);
 
         // Take the attribute scores and class, and lookup/calculate modifiers
         const setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset, false)
@@ -1080,7 +1088,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // const element = event.currentTarget
         // const dataset = { ...event.currentTarget.dataset };
         const dataset = target.dataset;
-        Hyp3eLogger.info("_onRoll", `Roll dataset:`, dataset);
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onRoll", `Roll dataset:`, dataset);
 
         // How many different roll types do we have?
         //  Test of Attribute: d6 roll-under target
@@ -1164,7 +1172,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         event.stopPropagation();
         const action = target.dataset["action"];
         // Log the action and then handle it
-        Hyp3eLogger.info("_onManageActiveEffect", `Managing active effect...`, { event, target, action });
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onManageActiveEffect", `Managing active effect...`, { event, target, action });
         await onManageActiveEffectV2(target, this.actor);
 
         // Re-render the sheet to reflect changes
@@ -1176,7 +1184,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     // ===========================================================================
 
     async _onDropItem(event, item) {
-        Hyp3eLogger.info("_onDropItem", `Item dropped event:`, { event, item })
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onDropItem", `Item dropped event:`, { event, item })
         // Handle merchant → character drag
         const sourceActor = item?.parent;
         if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
@@ -1203,7 +1211,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     _onSortItem(event, item) {
-        Hyp3eLogger.info("_onSortItem", `Item sort event:`, { event, item })
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onSortItem", `Item sort event:`, { event, item })
 
         const target = event.target.closest("[data-item-id]");
         const dragged = this.actor.items.get(item.id);
@@ -1251,7 +1259,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     _onDragOver(event) {
-        Hyp3eLogger.info("_onDragOver", `Drag-over event:`, event)
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onDragOver", `Drag-over event:`, event)
         super._onDragOver(event)
 
         const li = event.target.closest("[data-item-id]");
@@ -1269,7 +1277,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     _onDrop(event) {
-        Hyp3eLogger.info("_onDrop", `Drop event:`, event)
+        Hyp3eLogger.info("HYP3EActorSheetV2 _onDrop", `Drop event:`, event)
         super._onDrop(event)
         this.element.querySelectorAll(".drag-target").forEach(el => el.classList.remove("drag-target"));
     }

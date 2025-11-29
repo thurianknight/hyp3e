@@ -888,6 +888,16 @@
   border-bottom: 1px solid var(--hyp3e-color-accent-25);
 }
 
+/* A conditionally-disabled ActiveEffect */
+.hyp3e .items-list .item-entry.inactive {
+  opacity: 0.5;
+}
+.hyp3e .items-list .item-entry.inactive .item-name::after {
+  margin-left: 5px;
+  content: " (inactive)";
+  color: var(--hyp3e-color-shadow-highlight);
+}
+
 /* Handle item name & icon specially */
 .hyp3e .items-list .item-entry .item-name {
   display: flex;
