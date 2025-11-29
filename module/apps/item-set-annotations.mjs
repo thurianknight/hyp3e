@@ -77,8 +77,8 @@ export default class HYP3EItemSetAnnotations extends HandlebarsApplicationMixin(
     }
 
     _onRender(context, options) {
-        Hyp3eLogger.info("_onRender", `Item Annotations render context: `, context);
-        Hyp3eLogger.info("_onRender", `Item Annotations render options: `, options);
+        // Hyp3eLogger.info("_onRender", `Item Annotations render context: `, context);
+        // Hyp3eLogger.info("_onRender", `Item Annotations render options: `, options);
         super._onRender(context, options);
     }
 

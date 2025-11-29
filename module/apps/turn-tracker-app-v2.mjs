@@ -107,7 +107,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
 
     _onRender(context, options) {
         super._onRender(context, options);
-        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onRender", `Turn Tracker parameters:`, {context, options})
+        // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onRender", `Turn Tracker parameters:`, {context, options})
     }
 
     _onTurnAdvanced(data) {

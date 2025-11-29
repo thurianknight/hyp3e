@@ -109,8 +109,8 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     }
 
     _onRender(context, options) {
-        Hyp3eLogger.info("_onRender", `Render context: `, context);
-        Hyp3eLogger.info("_onRender", `Render options: `, options);
+        // Hyp3eLogger.info("_onRender", `Render context: `, context);
+        // Hyp3eLogger.info("_onRender", `Render options: `, options);
         super._onRender(context, options);
     }
 

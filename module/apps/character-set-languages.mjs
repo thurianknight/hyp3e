@@ -76,8 +76,8 @@ export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMix
     }
 
     _onRender(context, options) {
-        Hyp3eLogger.info("_onRender", `Character Languages render context: `, context);
-        Hyp3eLogger.info("_onRender", `Character Languages render options: `, options);
+        // Hyp3eLogger.info("_onRender", `Character Languages render context: `, context);
+        // Hyp3eLogger.info("_onRender", `Character Languages render options: `, options);
         super._onRender(context, options);
     }
 
