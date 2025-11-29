@@ -235,7 +235,7 @@ export async function setupEffectHandlers() {
         let didUpdate = false;
 
         // Check to see if we have a rollable duration formula, and resolve it if so
-        const { updatedDuration, updated } = await checkAndResolveDuration(effect, sourceActorData);
+        const { updatedDuration, updated } = checkAndResolveDuration(effect, sourceActorData);
         Hyp3eLogger.info("createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
         if (updated) didUpdate = true;
 
@@ -245,7 +245,7 @@ export async function setupEffectHandlers() {
         for (let i = 0; i < updatedChanges.length; i++) {
             const change = updatedChanges[i];
             // Parse the change.value string and resolve it into a number if possible
-            const resolvedChange = await parseAndResolveChangeValue(change.value, actor)
+            const resolvedChange = parseAndResolveChangeValue(change.value, actor)
             if (updatedChanges[i].value !== resolvedChange) {
                 updatedChanges[i] = {
                     ...change,
@@ -376,17 +376,20 @@ export async function setupEffectHandlers() {
  * @param {*} actor 
  * @returns 
  */
-export async function parseAndResolveChangeValue(changeValue, actor) {
+export function parseAndResolveChangeValue(changeValue, actor) {
     Hyp3eLogger.info("parseAndResolveChangeValue", `Change String:`, changeValue);
     if (!changeValue) return
+
     // Split the string into parts & resolve each part
-    const parts = changeValue.split(/(\+|\-|\*|\/)/).map(part => part.trim());
-    const resolvedParts = await Promise.all(parts.map(async part => {
+    const parts = changeValue.split(/(\+|\-|\*|\/|\%|\(|\))/).map(part => part.trim());
+    // const resolvedParts = await Promise.all(parts.map(async part => {
+    const resolvedParts = parts.map(part => {
         // Check if the part is a roll formula
         if (Roll.validate(part)) {
             Hyp3eLogger.info("parseAndResolveChangeValue", `Roll Detected:`, part);
             const roll = new Roll(part, actor?.getRollData?.());
-            await roll.evaluate({ evaluateSync: true });
+            // await roll.evaluate({ evaluateSync: true });
+            roll.evaluateSync();
             Hyp3eLogger.info("parseAndResolveChangeValue", `Roll Total:`, roll.total);
             return roll.total;
         }
@@ -399,7 +402,7 @@ export async function parseAndResolveChangeValue(changeValue, actor) {
         }
         // If it's neither, return the original part
         return part;
-    }));
+    });
     // Reassemble the resolved parts into a string of additions
     const resolvedString = resolvedParts.join("");
     Hyp3eLogger.info("parseAndResolveChangeValue", `Resolved String:`, resolvedString);
@@ -423,7 +426,7 @@ export async function parseAndResolveChangeValue(changeValue, actor) {
     }
 }
 
-export async function checkAndResolveDuration(effect, sourceActorData) {
+export function checkAndResolveDuration(effect, sourceActorData) {
     // Store duration for update
     let updatedDuration = {...effect.duration};  // Start with a shallow copy
     // Flag to track whether anything needs to be updated
@@ -455,7 +458,8 @@ export async function checkAndResolveDuration(effect, sourceActorData) {
             for (const match of diceMatches) {
                 try {
                     // Use async evaluation
-                    const roll = await (new Roll(match[1])).evaluate({ async: true });
+                    // const roll = await (new Roll(match[1])).evaluate({ async: true });
+                    const roll = new Roll(match[1]).evaluateSync();
                     expanded = expanded.replace(match[0], roll.total);
                 } catch (err) {
                     Hyp3eLogger.warn("checkAndResolveDuration", `Invalid dice segment "${match[1]}" in formula "${formula}"`, err);
@@ -594,88 +598,88 @@ async function sendEffectChatMessage(effect) {
  * @param {disabled} boolean   Whether to disable the effect when applying it
  */
 export async function applyEffect(item, effectId, actorId, disabled = false) {
-    // Get selected tokens
-    const tokens = canvas?.tokens?.controlled;
-    if (!tokens || tokens.length == 0) {
-        ui.notifications?.error("Apply Effect: Please select at least one token.");
-        return;
-    }
-    // Get the source actor
-    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
-    if (!actor) {
-        ui.notifications?.error(`Apply Effect: Actor ${actorId} not found!`)
-        return
-    }
-    const actorData = actor.getRollData();
-    Hyp3eLogger.info("applyEffect", `Source item:`, item);
-    const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
-    // Get the item effect to be applied
-    const effect = item.effects.find(e => e.id === effectId);
-    if (!effect) {
-        const msg = `Apply Effect: Effect ${effectId} on item ${itemName} not found!`
-        Hyp3eLogger.error("applyEffect", msg)
-        ui.notifications?.error(msg);
-        return;
-    }
+  // Get selected tokens
+  const tokens = canvas?.tokens?.controlled;
+  if (!tokens || tokens.length == 0) {
+    ui.notifications?.error("Apply Effect: Please select at least one token.");
+    return;
+  }
+  // Get the source actor
+  const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+  if (!actor) {
+    ui.notifications?.error(`Apply Effect: Actor ${actorId} not found!`)
+    return
+  }
+  const actorData = actor.getRollData();
+  Hyp3eLogger.info("applyEffect", `Source item:`, item);
+  const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+  // Get the item effect to be applied
+  const effect = item.effects.find(e => e.id === effectId);
+  if (!effect) {
+    const msg = `Apply Effect: Effect ${effectId} on item ${itemName} not found!`
+    Hyp3eLogger.error("applyEffect", msg)
+    ui.notifications?.error(msg);
+    return;
+  }
 
-    // Clone the effect, then work from that clone
-    const effectData = new Object({...effect});
-    effectData.origin = item.uuid;
-    if (disabled) effectData.disabled = true;
-    Hyp3eLogger.info("applyEffect", `Cloned Effect:`, effectData);
+  // Clone the effect, then work from that clone
+  const effectData = new Object({...effect});
+  effectData.origin = item.uuid;
+  if (disabled) effectData.disabled = true;
+  Hyp3eLogger.info("applyEffect", `Cloned Effect:`, effectData);
 
-    // Check persistent damage effects for a valid roll formula, and resolve variables if needed
-    const persistentDamage = effectData.changes.find(c => c.key === "system.tempPersistentDamage");
-    let damageType, damageRoll
+  // Check persistent damage effects for a valid roll formula, and resolve variables if needed
+  const persistentDamage = effectData.changes.find(c => c.key === "system.tempPersistentDamage");
+  let damageType, damageRoll
+  if (persistentDamage) {
+    Hyp3eLogger.info("applyEffect", `${effectData.name} causes persistent damage:`, persistentDamage);
+    damageType = persistentDamage.value.split(",")[0];
+    damageRoll = persistentDamage.value.split(",")[1];
+    damageRoll = damageRoll.replace(";", "");
+    // Check if the damage roll is a valid formula
+    if (!Roll.validate(damageRoll, actorData)) {
+      const msg = `Apply Effect: Invalid damage roll formula: ${damageRoll}`;
+      Hyp3eLogger.error("applyEffect", msg);
+      ui.notifications?.error(msg);
+      return;
+    }
+    // Resolve variables in the damage roll formula
+    const roll = new Roll(damageRoll, actor.getRollData());
+    Hyp3eLogger.info("applyEffect", `${effectData.name} Roll: `, roll);
+    roll.evaluate({ evaluateSync: true });
+    // Save the resolved roll formula for later use
+    damageRoll = roll.formula;
+  }
+
+  // Apply the effect to selected tokens/actors
+  for (const t of tokens) {
+    Hyp3eLogger.info("applyEffect", `Target Token:`, t);
+    const result = await t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
+    const childEffect = result[0];
+    Hyp3eLogger.info("applyEffect", `Created effect on token actor ${t.actor.name}:`, childEffect)
+
+    // Set flag to store metadata about the effect source & target actor
+    await childEffect.setFlag("hyp3e", "source", {
+      srcItemUuid: item.uuid,
+      srcActorUuid: actor.uuid,
+      appliedBy: actor.name
+    });
+    // // Send a chat message that the effect was applied
+    // sendEffectChatMessage(childEffect)
+    // Now we get the newly-created effect, and modify the persistent damage roll if needed
     if (persistentDamage) {
-        Hyp3eLogger.info("applyEffect", `${effectData.name} causes persistent damage:`, persistentDamage);
-        damageType = persistentDamage.value.split(",")[0];
-        damageRoll = persistentDamage.value.split(",")[1];
-        damageRoll = damageRoll.replace(";", "");
-        // Check if the damage roll is a valid formula
-        if (!Roll.validate(damageRoll, actorData)) {
-            const msg = `Apply Effect: Invalid damage roll formula: ${damageRoll}`;
-            Hyp3eLogger.error("applyEffect", msg);
-            ui.notifications?.error(msg);
-            return;
+      Hyp3eLogger.info("applyEffect", `New Effect:`, childEffect);
+      if (childEffect) {
+        // If the effect has a persistent damage value, we need to update the effect with that value
+        const newPersistentDamage = childEffect.changes.find(c => c.key === "system.tempPersistentDamage");
+        if (newPersistentDamage) {
+          newPersistentDamage.value = `${damageType},${damageRoll}`;
+          Hyp3eLogger.info("applyEffect", `${effectData.name} new persistent damage:`, newPersistentDamage);
+          childEffect.update({ changes: [newPersistentDamage] });
         }
-        // Resolve variables in the damage roll formula
-        const roll = new Roll(damageRoll, actor.getRollData());
-        Hyp3eLogger.info("applyEffect", `${effectData.name} Roll: `, roll);
-        roll.evaluate({ evaluateSync: true });
-        // Save the resolved roll formula for later use
-        damageRoll = roll.formula;
+      }
     }
-
-    // Apply the effect to selected tokens/actors
-    for (const t of tokens) {
-        Hyp3eLogger.info("applyEffect", `Target Token:`, t);
-        const result = await t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
-        const childEffect = result[0];
-        Hyp3eLogger.info("applyEffect", `Created effect on token actor ${t.actor.name}:`, childEffect)
-
-        // Set flag to store metadata about the effect source & target actor
-        await childEffect.setFlag("hyp3e", "source", {
-            srcItemUuid: item.uuid,
-            srcActorUuid: actor.uuid,
-            appliedBy: actor.name
-        });
-        // // Send a chat message that the effect was applied
-        // sendEffectChatMessage(childEffect)
-        // Now we get the newly-created effect, and modify the persistent damage roll if needed
-        if (persistentDamage) {
-            Hyp3eLogger.info("applyEffect", `New Effect:`, childEffect);
-            if (childEffect) {
-                // If the effect has a persistent damage value, we need to update the effect with that value
-                const newPersistentDamage = childEffect.changes.find(c => c.key === "system.tempPersistentDamage");
-                if (newPersistentDamage) {
-                    newPersistentDamage.value = `${damageType},${damageRoll}`;
-                    Hyp3eLogger.info("applyEffect", `${effectData.name} new persistent damage:`, newPersistentDamage);
-                    childEffect.update({ changes: [newPersistentDamage] });
-                }
-            }
-        }
-    }
+  }
 }
 
 /**

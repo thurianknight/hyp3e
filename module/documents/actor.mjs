@@ -38,7 +38,7 @@ export class Hyp3eActor extends Actor {
    * available both inside and outside of character sheets (such as if an actor
    * is queried and has a roll executed directly from it).
    */
-  prepareDerivedData() {
+  async prepareDerivedData() {
     const systemData = this.system;
     const flags = this.flags.hyp3e || {};
     systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
@@ -71,7 +71,7 @@ export class Hyp3eActor extends Actor {
 
     // Make separate methods for each Actor type (character vs. npc) to keep
     // things organized.
-    this._prepareCharacterData();
+    await this._prepareCharacterData();
     this._prepareNpcData();
   }
 
@@ -503,34 +503,58 @@ export class Hyp3eActor extends Actor {
       for (const change of changes) {
           if (change.key === "system.ac.value") {
               Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
+              // Parse the change.value string and resolve it into a number if possible
+              let resolvedChange = 0
+              if (isNaN(change.value)) {
+                  // Parse the change.value string and resolve it into a number if possible
+                  resolvedChange = parseAndResolveChangeValue(change.value, this)
+              } else {
+                  resolvedChange = Number(change.value) || 0;
+              }
+              // const val = Number(change.value) || 0;
               // Apply change based on mode
-              const val = Number(change.value) || 0;
               switch (change.mode) {
-                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = val; break;
+                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += resolvedChange; break;
+                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= resolvedChange; break;
+                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = resolvedChange; break;
                   // Extend to other modes if needed
               }
           } else
           if (change.key === "system.ac.dr") {
               Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s DR:`, change);
+              // Parse the change.value string and resolve it into a number if possible
+              let resolvedChange = 0
+              if (isNaN(change.value)) {
+                  // Parse the change.value string and resolve it into a number if possible
+                  resolvedChange = parseAndResolveChangeValue(change.value, this)
+              } else {
+                resolvedChange = Number(change.value) || 0;
+              }
+              // const val = Number(change.value) || 0;
               // Apply change based on mode
-              const val = Number(change.value) || 0;
               switch (change.mode) {
-                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = val; break;
+                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += resolvedChange; break;
+                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= resolvedChange; break;
+                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = resolvedChange; break;
                   // Extend to other modes if needed
               }
           } else
           if (change.key === "system.movement.base.value") {
               Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s MV:`, change);
+              // Parse the change.value string and resolve it into a number if possible
+              let resolvedChange = 0
+              if (isNaN(change.value)) {
+                  // Parse the change.value string and resolve it into a number if possible
+                  resolvedChange = parseAndResolveChangeValue(change.value, this)
+              } else {
+                resolvedChange = Number(change.value) || 0;
+              }
+              // const val = Number(change.value) || 0;
               // Apply change based on mode
-              const val = Number(change.value) || 0;
               switch (change.mode) {
-                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= val; break;
-                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = val; break;
+                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += resolvedChange; break;
+                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= resolvedChange; break;
+                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = resolvedChange; break;
                   // Extend to other modes if needed
               }
           }
@@ -904,7 +928,7 @@ export class Hyp3eActor extends Actor {
               let didUpdate = false;
 
               // Check to see if we have a rollable duration formula, and resolve it if so
-              const { updatedDuration, updated } = await checkAndResolveDuration(effect);
+              const { updatedDuration, updated } = checkAndResolveDuration(effect);
               Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Effect "${effect.name}" duration:`, updatedDuration);
               if (updated) didUpdate = true;
 
@@ -916,7 +940,7 @@ export class Hyp3eActor extends Actor {
                   let resolvedChange = change.value
                   if (isNaN(change.value)) {
                       // Parse the change.value string and resolve it into a number if possible
-                      resolvedChange = await parseAndResolveChangeValue(change.value, this)
+                      resolvedChange = parseAndResolveChangeValue(change.value, this)
                   }
                   if (updatedChanges[i].value !== resolvedChange) {
                       updatedChanges[i] = {
@@ -944,64 +968,64 @@ export class Hyp3eActor extends Actor {
    *  Disable any expired effects.
    */
   async processTemporaryEffects() {
-      let totalDamage = 0;
-      let damageType = ""
-      let rawDamageRoll = ""
-      let damageMessages = [];
+    let totalDamage = 0;
+    let damageType = ""
+    let rawDamageRoll = ""
+    let damageMessages = [];
 
-      // Collect updates to disable expired effects
-      const expiredEffectUpdates = [];
+    // Collect updates to disable expired effects
+    const expiredEffectUpdates = [];
 
-      for (const effect of this.effects) {
-          if (effect.isTemporary && !effect.disabled) {
-              const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
-              if (persistentDamage) {
-                  Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name}:`, persistentDamage);
+    for (const effect of this.effects) {
+      if (effect.isTemporary && !effect.disabled) {
+        const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
+        if (persistentDamage) {
+          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name}:`, persistentDamage);
 
-                  [damageType, rawDamageRoll] = persistentDamage.value.split(",");
-                  const damageRollFormula = rawDamageRoll.replace(";", "").trim();
+          [damageType, rawDamageRoll] = persistentDamage.value.split(",");
+          const damageRollFormula = rawDamageRoll.replace(";", "").trim();
 
-                  Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType}`);
+          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType}`);
 
-                  const roll = new Roll(damageRollFormula);
-                  await roll.evaluate({ evaluateSync: true });
+          const roll = new Roll(damageRollFormula);
+          await roll.evaluate({ evaluateSync: true });
 
-                  Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Roll result:`, roll);
+          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Roll result:`, roll);
 
-                  totalDamage += roll.total;
+          totalDamage += roll.total;
 
-                  damageMessages.push(`${this.name} takes ${roll.total} ${damageType} damage!`);
-              }
+          damageMessages.push(`${this.name} takes ${roll.total} ${damageType} damage!`);
+        }
 
-              if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-                  expiredEffectUpdates.push(effect);
-              }
-          }
+        if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
+          expiredEffectUpdates.push(effect);
+        }
       }
+    }
 
-      // Apply total damage once
-      if (totalDamage > 0) {
-          await this.applyHealthChange(totalDamage, damageType, false);
-          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} took ${totalDamage} total damage!`);
-          // Post all the damage messages together
-          const persistentDamageMsg = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
-          sendSimpleChat(this, "", persistentDamageMsg)
-      }
+    // Apply total damage once
+    if (totalDamage > 0) {
+      await this.applyHealthChange(totalDamage, damageType, false);
+      Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} took ${totalDamage} total damage!`);
+      // Post all the damage messages together
+      const persistentDamageMsg = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
+      sendSimpleChat(this, "", persistentDamageMsg)
+    }
 
-      // Update all expired effects
-      if (expiredEffectUpdates.length > 0) {
-          const updates = expiredEffectUpdates.map(effect => ({
-              _id: effect.id,
-              disabled: true,
-              "duration.startRound": null,
-              "duration.startTurn": null
-          }));
-          await this.updateEmbeddedDocuments("ActiveEffect", updates);
-          // Post all the expirations together
-          const effectNames = expiredEffectUpdates.map(effect => effect.name)
-          const expiredEffectsMsg = `Active effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
-          sendSimpleChat(this, "", expiredEffectsMsg)
-      }
+    // Update all expired effects
+    if (expiredEffectUpdates.length > 0) {
+      const updates = expiredEffectUpdates.map(effect => ({
+        _id: effect.id,
+        disabled: true,
+        "duration.startRound": null,
+        "duration.startTurn": null
+      }));
+      await this.updateEmbeddedDocuments("ActiveEffect", updates);
+      // Post all the expirations together
+      const effectNames = expiredEffectUpdates.map(effect => effect.name)
+      const expiredEffectsMsg = `Active effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
+      sendSimpleChat(this, "", expiredEffectsMsg)
+    }
   }
 
   /**
