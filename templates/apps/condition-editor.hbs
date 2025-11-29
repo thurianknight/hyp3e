@@ -8,14 +8,15 @@
       <option value="any" {{#if (eq condition.mode "any")}}selected{{/if}}>Any test</option>
       <option value="none" {{#if (eq condition.mode "none")}}selected{{/if}}>No tests</option>
     </select>
+    <div class="hint">Choose how the tests are evaluated to determine if the condition passes.</div>
   </div>
 
   <h3>Tests</h3>
   <div class="tests">
     {{#each tests as |test idx|}}
-    <div class="flex test-row" data-idx="{{idx}}">
-      <input type="text" style="width: 35%" name="key-{{idx}}" value="{{test.key}}" placeholder="e.g. system.wornArmorType">
-      <select style="width: 75px" name="op-{{idx}}">
+    <div class="test-row" data-idx="{{idx}}">
+      <input type="text" name="key-{{idx}}" value="{{test.key}}" placeholder="e.g. system.wornArmorType">
+      <select name="op-{{idx}}">
         <option value="==" {{#if (eq test.op "==")}}selected{{/if}}>==</option>
         <option value="!=" {{#if (eq test.op "!=")}}selected{{/if}}>!=</option>
         <option value="<" {{#if (eq test.op "<")}}selected{{/if}}>&lt;</option>
@@ -25,12 +26,12 @@
         <option value="in" {{#if (eq test.op "in")}}selected{{/if}}>in</option>
         <option value="!in" {{#if (eq test.op "!in")}}selected{{/if}}>not in</option>
       </select>
-      <input type="text" style="width: 35%" name="value-{{idx}}" value="{{test.value}}" placeholder="e.g. unarmored or system.attributes.str.value * 15">
-      <button type="button" style="width: 50px" class="remove-test" data-action="delTest" data-idx="{{idx}}"><i class="fas fa-trash"></i></button>
+      <input type="text" name="value-{{idx}}" value="{{test.value}}" placeholder="e.g. unarmored or system.attributes.str.value * 15">
+      <button type="button" class="remove-test" data-action="delTest" data-idx="{{idx}}"><i class="fas fa-trash"></i></button>
     </div>
     {{/each}}
   </div>
 
   <button type="button" class="add-test" data-action="addTest"><i class="fas fa-plus"></i> Add Test</button>
-  <button type="submit" class="save">Save</button>
+  <button type="submit" class="save">Save Changes</button>
 </div>

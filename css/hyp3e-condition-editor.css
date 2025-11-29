@@ -1,0 +1,46 @@
+.hyp3e.condition-editor .field {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: center;
+  margin: 10px 0;
+}
+.hyp3e.condition-editor .field .hint {
+  font-size: 1em;
+  color: var(--color-text-secondary);
+}
+.hyp3e.condition-editor .field label {
+  font-weight: bold;
+  display: block;
+}
+.hyp3e.condition-editor .tests {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+ }
+.hyp3e.condition-editor .test-row {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: center;
+}
+.hyp3e.condition-editor .test-row input[type=text] {
+  flex-grow: 1;
+  width: 35%;
+}
+.hyp3e.condition-editor .test-row select {
+  flex-shrink: 0;
+  max-width: 75px;
+}
+.hyp3e.condition-editor .test-row button.remove-test {
+  flex-shrink: 0;
+  max-width: 50px;
+}
+.hyp3e.condition-editor button.add-test {
+  margin-top: 10px;
+  min-width: 200px;
+}
+.hyp3e.condition-editor button.save {
+  margin-top: 20px;
+  width: 100%;
+}
