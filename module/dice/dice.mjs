@@ -176,7 +176,7 @@ export class Hyp3eDice {
         }
 
         // Add situational modifier from the roll dialog
-        if (rollData?.sitMod) {
+        if (rollData?.sitMod && parseInt(rollData.sitMod) != 0) {
             atkRollParts.push(rollData.sitMod)
             debugAtkRollParts.push(`<tr><td>Sit Mod</td><td>${rollData.sitMod}</td></tr>`)
         }
@@ -284,7 +284,7 @@ export class Hyp3eDice {
         }
 
         // Apply the item damage mod if needed
-        if (itemData.dmgMod) {
+        if (itemData?.dmgMod && parseInt(itemData.dmgMod) != 0) {
             dmgRollParts.push(itemData.dmgMod)
             debugDmgRollParts.push(`<tr><td>Item Dmg Mod</td><td>${itemData.dmgMod}</td></tr>`)
             if (itemData.damage2h) {
@@ -294,7 +294,7 @@ export class Hyp3eDice {
         }
 
         // Apply the ammunition damage mod if needed
-        if (ammoData?.dmgMod) {
+        if (ammoData?.dmgMod && parseInt(ammoData.dmgMod) != 0) {
             dmgRollParts.push(ammoData.dmgMod)
             debugDmgRollParts.push(`<tr><td>Ammo Dmg Mod</td><td>${ammoData.dmgMod}</td></tr>`)
             if (itemData.damage2h) {
@@ -356,7 +356,7 @@ export class Hyp3eDice {
         }
 
         // Does the actor have a temporary damage mod applied?
-        if (actorData?.tempDmgMod) {
+        if (actorData?.tempDmgMod && parseInt(actorData.tempDmgMod) != 0) {
             dmgRollParts.push(actorData.tempDmgMod)
             debugDmgRollParts.push(`<tr><td>Effect Mod</td><td>${actorData.tempDmgMod}</td></tr>`)
             if (itemData.damage2h) {

@@ -750,7 +750,7 @@ export async function applyAllEffects(item, actorId, disabled = false) {
 
 /**
  * Enable specified effect from the item, on the actor
- * @param {itemId} string      The item that has the effect
+ * @param {itemId} string      The item that causes the effect
  * @param {effectId} string    The effect ID to enable
  * @param {actorId} string     The actor that owns the item and will receive/enable the effect
  */
@@ -801,7 +801,7 @@ export async function enableEffect(item, effectId, actorId) {
 
 /**
  * Enable all effects from the item, on the actor
- * @param {itemId} string      The item that has the effects to enable
+ * @param {itemId} string      The item that causes the effects to enable
  * @param {actorId} string     The actor that owns the item and will receive/enable the effects
  */
 export async function enableItemEffectsOnActor(item, actorId) {
@@ -865,7 +865,7 @@ export async function enableItemEffectsOnActor(item, actorId) {
 
 /**
  * Disable specified effect from the item, on the actor
- * @param {itemId} string      The item that has the effect
+ * @param {itemId} string      The item that causes the effect
  * @param {effectId} string    The effect ID to disable
  * @param {actorId} string     The actor that owns the item and will disable the effect
  */
@@ -917,7 +917,7 @@ export async function disableEffect(item, effectId, actorId) {
 
 /**
  * Disable all effects from the item, on the actor
- * @param {itemId} string      The item that has the effects to disable
+ * @param {itemId} string      The item that causes the effects to disable
  * @param {actorId} string     The actor that owns the item and will disable the effects
  */
 export async function disableItemEffectsOnActor(item, actorId) {

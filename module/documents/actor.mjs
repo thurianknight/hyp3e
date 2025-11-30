@@ -623,7 +623,6 @@ export class Hyp3eActor extends Actor {
           effects = this.effects
       } else if (foundry.utils.isNewerVersion(game.version, "13")) {
           // For Foundry v13...
-          // effects = this._getAllApplicableEffects()
           effects = this.allApplicableEffects()
       }
       return this.effects.map(e => e.name);
@@ -965,7 +964,8 @@ export class Hyp3eActor extends Actor {
 
   /**
    * Process temporary effects on the actor, including persistent damage.
-   *  Disable any expired effects.
+   *  Disable any expired effects. This only works on effects that are directly 
+   *  applied to the actor, not effects coming from an item or ability.
    */
   async processTemporaryEffects() {
     let totalDamage = 0;
@@ -975,8 +975,7 @@ export class Hyp3eActor extends Actor {
 
     // Collect updates to disable expired effects
     const expiredEffectUpdates = [];
-
-    for (const effect of this.effects) {
+    for (const effect of this.allApplicableEffects()) {
       if (effect.isTemporary && !effect.disabled) {
         const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
         if (persistentDamage) {
@@ -998,7 +997,14 @@ export class Hyp3eActor extends Actor {
         }
 
         if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-          expiredEffectUpdates.push(effect);
+          // Effect expired, handle it
+          if (effect.origin) {
+            // Effects applied from an item/ability must be disabled immediately
+            await effect.update({ disabled: true });
+          } else {
+            // Effects applied directly to the actor can be queued for disabling
+            expiredEffectUpdates.push(effect);
+          }
         }
       }
     }
@@ -2972,7 +2978,7 @@ export class Hyp3eActor extends Actor {
    */
   async advanceExplorationTurn(turn) {
       // Process active effects
-      for (const effect of this.effects) {
+      for (const effect of this.allApplicableEffects()) {
           if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
           Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
           // Check if the effect has a remaining turns flag
@@ -2981,7 +2987,14 @@ export class Hyp3eActor extends Actor {
           if (typeof remainingTurns === "number") {
               const newRemaining = remainingTurns - 1;
               if (newRemaining <= 0) {
-                  effect.delete();
+                  // Effect has expired -- for effects applied directly to the actor, we delete them...
+                  //  but for effects applied via items, we just disable them
+                  if (effect.origin) {
+                      effect.update({ disabled: true });
+                  } else {
+                      await effect.delete();
+                  }
+                  Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Effect ${effect.name} has expired for actor ${this.name}.`);
                   const msg = `The effect <b>${effect.name}</b> on ${this.name} has expired.`;
                   ui.notifications.info(msg);
                   sendSimpleChat(this, "", msg);
