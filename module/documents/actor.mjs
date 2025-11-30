@@ -1705,11 +1705,21 @@ export class Hyp3eActor extends Actor {
       // Are we auto-calculating Thief ability target numbers?
       if (CONFIG.HYP3E.autoCalcThiefTn) {
           if (thiefAbility) {
-              // Calculate & override the roll target in the dataset
+            // If wearing heavy armor, prevent certain thief skills
+            const skillsPreventedByHeavyArmor = ["climb", "hide", "move silently"];
+            const armorType = this.system.wornArmorType;
+            if (armorType === "heavy" && skillsPreventedByHeavyArmor.includes(itemNameLower)) {
+                const msg = `${this.name} cannot attempt to ${itemNameLower} while wearing heavy armor.`;
+                Hyp3eLogger.warn("Hyp3eActor rollCheck", msg);
+                ui.notifications.warn(msg);
+                return false;
+            }
+
+            // Calculate & override the roll target in the dataset
               const target = this._resolveThiefAbilityTn(itemNameLower);
               if (target === null) {
                   const msg = `At level ${this.system.details.level.value}, ${this.name} has no chance of success to ${itemNameLower}.`;
-                  Hyp3eLogger.warn("rollCheck", msg);
+                  Hyp3eLogger.warn("Hyp3eActor rollCheck", msg);
                   ui.notifications.warn(msg);
                   return false;
               }
@@ -1725,9 +1735,23 @@ export class Hyp3eActor extends Actor {
               ws: this.system.attributes.wis.value
           };
           const sitModObj = this._getThiefSkillModifier(itemNameLower, actorAttributes)
-          if (sitModObj.modifier > 0) {
-              dataset.sitMod = sitModObj.modifier
-              dataset.sitModList = `${sitModObj.attribute.toUpperCase()} modifier (+${sitModObj.modifier})`
+          for (const [sitModKey, sitModData] of Object.entries(sitModObj)) {
+            if (sitModData.modifier === 0) continue;
+            dataset.sitMod = Number(dataset.sitMod) + Number(sitModData.modifier);
+            // Separate multiple situational mods with commas
+            if (dataset.sitModList !== "") {
+                dataset.sitModList += ", "
+            }
+            // Customize how the modifier is displayed
+            let sitModText = ""
+            if (sitModData.modifier >= 0) {
+                sitModText = `(+${sitModData.modifier})`
+            } else if (sitModData.modifier === -99) {
+                sitModText = `makes this skill impossible to use!`
+            } else {
+                sitModText = `(${sitModData.modifier})`
+            }
+            dataset.sitModList += `${sitModData.attribute} ${sitModText}`
           }
       }
 
@@ -2699,14 +2723,32 @@ export class Hyp3eActor extends Actor {
           // WS-based
           "discern noise": "ws"
       };
+      const skillsAffectedByArmor = ["climb", "hide", "move silently"];
 
+      const skillMods = {};
+      // Validate whether this is even a Thief skill listed in skillMap
       const attrKey = skillMap[skillName.toLowerCase()];
-      if (!attrKey) return { modifier: 0, attribute: null }; // not a thief progressive skill
+      if (!attrKey) return { skillMods: { modifier: 0, attribute: null } }; // not a thief progressive skill
 
+      // Check attribute score for a bonus
       const score = attributes[attrKey] ?? 0;
       const modifier = score >= 16 ? 1 : 0;
+      skillMods["attribute"] = { modifier: modifier, attribute: attrKey.toUpperCase() };
 
-      return { modifier: modifier, attribute: attrKey };
+      // Check for armor penalties
+      if (skillsAffectedByArmor.includes(skillName.toLowerCase())) {
+          const wornArmor = this.system.wornArmorType;
+          if (wornArmor === "medium") {
+              Hyp3eLogger.info("Hyp3eActor _getThiefSkillModifier", `Thief skill ${skillName} penalized by ${wornArmor} armor.`);
+              skillMods["armor"] = { modifier: -4, attribute: `Medium armour` };
+          } else if (wornArmor === "heavy") {
+              Hyp3eLogger.info("Hyp3eActor _getThiefSkillModifier", `Thief skill ${skillName} prevented by ${wornArmor} armor.`);
+              skillMods["armor"] = { modifier: -99, attribute: `Heavy armour` };
+          }
+      }
+      Hyp3eLogger.info("Hyp3eActor _getThiefSkillModifier", `${skillName} skill modifiers:`, skillMods);
+      return skillMods;
+      // return { modifier: modifier, attribute: attrKey };
   }
 
   /**
