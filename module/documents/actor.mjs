@@ -1156,6 +1156,7 @@ export class Hyp3eActor extends Actor {
    * Apply a hit point change (damage or healing) to the actor, optionally considering Damage Reduction (DR).
    * Handles HP clamping, DR application, and prevents updates if no actual change occurs.
    * @param {number} amount - The amount of HP change. Positive values represent damage, negative values represent healing.
+   * @param {string} [damageType="basic"] - The type of damage being applied (for logging/chat purposes).
    * @param {boolean} [applyDr=true] - If true (default), apply the actor's Damage Reduction (system.ac.dr) against positive (damage) amounts.
    * @returns {Promise<void|Error>} Returns nothing on success or early exit, or the Error object if the actor update fails.
    */
@@ -1938,31 +1939,44 @@ export class Hyp3eActor extends Actor {
           return null;
       }
 
-      // Temporarily override the actor's CA
-      if (dataset.isItemSpell) {
-          actorData.ca = dataset.itemCa
-      }
-      // Handle spell memorization/slot consumption if applicable
-      if (!dataset.isItemSpell && item?.type === "spell" && itemData?.quantity?.value > 0) {
-          await this._consumeSpellSlot(item);
-      }
+      /**
+       *  
+       * If we have reached this point, the attack has been made or the spell cast 
+       * 
+       * **/
 
       if (item?.type === "spell") {
-          // Save the caster's (or item's) casting ability in the spell's effect flags
-          for (const effect of item.effects.contents) {
-              const data = effect.toObject();
 
-              data.flags ??= {};
-              data.flags.hyp3e ??= {};
-              data.flags.hyp3e.sourceActorUuid = this.uuid;
+        // Temporarily override the actor's CA
+        if (dataset.isItemSpell) {
+            actorData.ca = dataset.itemCa
+        }
 
-              // Optionally store spell-level data, too
-              data.flags.hyp3e.spellUuid = item.uuid;
-              data.flags.hyp3e.spellLevel = item.system.spellLevel ?? null;
+        // Handle spell memorization/slot consumption if applicable
+        if (!dataset.isItemSpell && itemData?.quantity?.value > 0) {
+            await this._consumeSpellSlot(item);
+        }
 
-              // Update the temporary copy before rendering to chat
-              effect.updateSource(data);
-          }
+        // Handle Runegraver spellcasting hit point burn if applicable
+        if (this.system.details.class.toLowerCase() === "runegraver" && item.name.toLowerCase().includes("rune")) {
+          await this.applyHealthChange(parseInt(item.system.spellLevel), "basic", false);
+        }
+
+        // Save the caster's (or item's) casting ability in the spell's effect flags
+        for (const effect of item.effects.contents) {
+            const data = effect.toObject();
+
+            data.flags ??= {};
+            data.flags.hyp3e ??= {};
+            data.flags.hyp3e.sourceActorUuid = this.uuid;
+
+            // Optionally store spell-level data, too
+            data.flags.hyp3e.spellUuid = item.uuid;
+            data.flags.hyp3e.spellLevel = item.system.spellLevel ?? null;
+
+            // Update the temporary copy before rendering to chat
+            effect.updateSource(data);
+        }
       }
 
       // If there's no item roll formula (typically a spell), send a chat message and exit
