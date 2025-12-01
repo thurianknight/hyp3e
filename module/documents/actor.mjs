@@ -912,7 +912,7 @@ export class Hyp3eActor extends Actor {
         return results.every(r => r);
     }
   }
-  
+
   /**
    * Resolve item effects and changes that include data paths or roll formulas.
    * Then update the item's effect/change with a number, so it becomes "permanent".
@@ -1573,11 +1573,16 @@ export class Hyp3eActor extends Actor {
 
       // Are we enforcing the item equippage rule for PCs?
       if (CONFIG.HYP3E.forceWeaponEquip && this.type === "character") {
-          // Only apply to physical items: armor, items, weapons
-          if (["armor", "item", "weapon"].includes(item.type)) {
-              // Check if the item is equipped & has available quantity
-              if (!this._checkItemPreconditions(item, { checkEquipped: true, checkQuantity: true })) return;
-          }
+        // Only apply to physical items: armor, items, weapons
+        if (["armor", "item", "weapon"].includes(item.type)) {
+          // Check if the item is equipped & has available quantity
+          if (!this._checkItemPreconditions(item, { checkEquipped: true, checkQuantity: true })) return;
+        }
+      }
+      // Are we enforcing the spell memorization rule for PCs?
+      if (item.type === "spell" && CONFIG.HYP3E.forceSpellMemorize && this.type === "character" && !dataset.isItemSpell) {
+        // Check if the spell is memorized
+        if (!this._checkItemPreconditions(item, { checkMemorized: true })) return;
       }
 
       // Gather dataset properties from the item and actor
@@ -1589,11 +1594,6 @@ export class Hyp3eActor extends Actor {
           // Attack with the weapon
           this.rollAttackOrSpell(dataset)
       } else if (item.type === "spell") {
-          // Are we enforcing the spell memorization rule for PCs?
-          if (CONFIG.HYP3E.forceSpellMemorize && this.type === "character" && !dataset.isItemSpell) {
-              // Check if the spell is memorized
-              if (!this._checkItemPreconditions(item, { checkMemorized: true })) return;
-          }
           // Cast the spell
           this.rollAttackOrSpell(dataset)
       } else {  // ==> Neither a weapon nor a spell (armor, feature, item)
@@ -2061,7 +2061,8 @@ export class Hyp3eActor extends Actor {
           return false;
       }
 
-      if (checkMemorized && (item.system?.quantity?.value ?? 0) <= 0) {
+      // Some spells do not require memorization, so we check the isConsumable flag
+      if (item.system.isConsumable && checkMemorized && (item.system?.quantity?.value ?? 0) <= 0) {
           ui.notifications.warn(`${itemName} is not memorized!`);
           return false;
       }
