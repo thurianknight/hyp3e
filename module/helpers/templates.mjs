@@ -24,6 +24,7 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/actor/actor-npc-header-v2.hbs`,
         `${HYP3E.templatePath}/actor/actor-merchant-header-v2.hbs`,
         `${HYP3E.templatePath}/actor/actor-treasure-header-v2.hbs`,
+        `${HYP3E.templatePath}/actor/actor-itemToken-header-v2.hbs`,
         // Actor V2 partials - tabs
         `${HYP3E.templatePath}/actor/parts/tab-character-abilities.hbs`,
         `${HYP3E.templatePath}/actor/parts/section-character-attributes.hbs`,

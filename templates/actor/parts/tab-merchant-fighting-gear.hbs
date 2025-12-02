@@ -3,7 +3,7 @@
     data-tab="{{tabs.fightingGear.id}}"
     data-group="primary"
 >
-{{#if (eq actor.type "merchant")}}
+
   <section class="all-content">
     <section class="left-gutter">
         <img src="systems/hyp3e/assets/serpent-spear.png">
@@ -35,12 +35,7 @@
                             </div>
                             <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                         </div>
-                        <div class="item-prop">
-                            {{item.system.quantity.value}}
-                            {{#if item.system.isConsumable}}
-                            / {{item.system.quantity.max}}
-                            {{/if}}
-                        </div>
+                        <div class="item-prop">{{item.system.quantity.value}}</div>
                         <div class="item-prop">{{item.system.weight}}</div>
                         <div class="item-prop">{{item.system.unitPrice}}</div>
                         <div class="item-controls">
@@ -91,12 +86,7 @@
                             </div>
                             <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                         </div>
-                        <div class="item-prop">
-                            {{item.system.quantity.value}}
-                            {{#if item.system.isConsumable}}
-                            / {{item.system.quantity.max}}
-                            {{/if}}
-                        </div>
+                        <div class="item-prop">{{item.system.quantity.value}}</div>
                         <div class="item-prop">{{item.system.weight}}</div>
                         <div class="item-prop">{{item.system.unitPrice}}</div>
                         <div class="item-controls">
@@ -174,5 +164,5 @@
         </ol>
     </section>
   </section>
-{{/if}}
+
 </section>

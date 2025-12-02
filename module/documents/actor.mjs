@@ -155,26 +155,32 @@ export class Hyp3eActor extends Actor {
    * Set token defaults when actor is created
    */
   async _preCreate(data, options, user) {
-      await super._preCreate(data, options, user);
-      Hyp3eLogger.info("Hyp3eActor _preCreate", `Starting data:`, data)
+    await super._preCreate(data, options, user);
+    Hyp3eLogger.info("Hyp3eActor _preCreate", `Starting data:`, data)
 
-      if (data.type === "character") {
-          this.updateSource({
-              "prototypeToken.actorLink": true,
-              "prototypeToken.sight.enabled": true,
-              "prototypeToken.disposition": 0
-          });
-      }
-      // POSSIBLE FUTURE USE
-      // if (data.type === "npc") {
-          // Do nothing for now
-      // }
-      if (data.type === "merchant") {
-          // Set the default image
-          this.updateSource({
-              "img": "icons/svg/coins.svg"
-          });
-      }
+    if (data.type === "character") {
+      this.updateSource({
+        "prototypeToken.actorLink": true,
+        "prototypeToken.sight.enabled": true,
+        "prototypeToken.disposition": 0
+      });
+    }
+    // POSSIBLE FUTURE USE
+    // if (data.type === "npc") {
+      // Do nothing for now
+    // }
+    if (data.type === "merchant" || data.type === "treasure") {
+      // Set the default image
+      this.updateSource({
+        "img": "icons/svg/coins.svg"
+      });
+    }
+    if (data.type === "itemToken") {
+      // Set the default image
+      this.updateSource({
+        "img": "icons/svg/item-bag.svg"
+      });
+    }
   }
 
   /**

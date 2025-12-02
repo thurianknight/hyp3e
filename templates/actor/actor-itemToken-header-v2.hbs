@@ -1,5 +1,5 @@
   {{!-- Sheet Header --}}
-  <header class="sheet-header treasure">
+  <header class="sheet-header itemToken">
     <div class="header-bg"></div>
     <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
     <div class="header-block">
@@ -11,14 +11,7 @@
         </div>
         <div class="npc-header-block flexrow">
           <div class="npc-header-block">
-            <div class="money-block flexrow">
-              {{#each system.money as |coin key|}}
-              <div class="ability align-center">
-                <label for="system.money.{{key}}.value" class="exploration-label">{{coin.label}}</label>
-                <input type="text" name="system.money.{{key}}.value" value="{{coin.value}}" {{#unless @root.isGM}}disabled{{/unless}} />
-              </div>
-              {{/each}}
-            </div>
+
           </div>
         </div>
       </div>

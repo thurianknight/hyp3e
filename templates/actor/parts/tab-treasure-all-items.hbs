@@ -1,0 +1,219 @@
+<section 
+  class="tab {{tabs.treasureAll.cssClass}}"
+  data-tab="{{tabs.treasureAll.id}}"
+  data-group="primary"
+>
+
+  <section class="all-content">
+    <section class="left-gutter">
+      <img src="systems/hyp3e/assets/serpent-spear.png">
+    </section>
+    <section class="main-content">
+      {{!-- Inventory --}}
+      <h2>{{localize 'HYP3E.headers.equipmentItems'}}</h2>
+      {{!-- Container items --}}
+      <ol class="items-list" data-drop="item">
+        <li class="flexrow items-header">
+          <h3 class="item-name">{{localize "HYP3E.headers.containers"}}</h3>
+          <h3>{{localize "HYP3E.item.qty"}}</h3>
+          <h3>{{localize "HYP3E.item.weight"}}</h3>
+          <h3>{{localize "HYP3E.item.cost"}}</h3>
+          <h4 class="item-controls">
+            <a data-action="createItem" 
+                data-type="item"
+                data-is-container="true">
+              <i class="fas fa-plus"></i> {{localize "HYP3E.item.add"}}
+            </a>
+          </h4>
+        </li>
+        {{#each containers as |container id|}}
+        <li class="item-entry item-container item draggable" data-item-id="{{container.id}}">
+          <div class="flexrow">
+            <div class="item-name">
+              <div class="item-image">
+                <img src="{{container.img}}" title="{{container.name}}" width="24" height="24"/>
+              </div>
+              <a data-action="dropItemDescription"><span class="item-drop">{{container.name}}</span></a>
+            </div>
+            <div class="item-prop">{{container.system.quantity.value}}</div>
+            <div class="item-prop">{{container.system.weight}}</div>
+            <div class="item-prop">{{container.system.cost}}</div>
+            <div class="item-controls">
+              <a data-action="displayItem" 
+                  title='{{localize "HYP3E.item.show"}}'>
+                <i class="fas fa-eye"></i>
+              </a>
+              <a data-action="editItem" 
+                  title="{{localize 'HYP3E.item.edit'}}">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a data-action="deleteItem" 
+                  title="{{localize 'HYP3E.item.delete'}}">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          </div>
+          {{!-- Pop-down item description --}}
+          <div class="item-summary">
+            <div class="item-description">
+              {{{container.system.enrichedDescription}}}
+            </div>
+          </div>
+        </li>
+        {{/each}}
+      </ol>
+      {{!-- Non-container items --}}
+      <ol class="items-list" data-drop="item">
+        <li class="item flexrow items-header">
+          <h3 class="item-name">{{localize "HYP3E.headers.equipmentItemsEtc"}}</h3>
+          <h3>{{localize "HYP3E.item.qty"}}</h3>
+          <h3>{{localize "HYP3E.item.weight"}}</h3>
+          <h3>{{localize "HYP3E.item.cost"}}</h3>
+          <h4 class="item-controls">
+            <a data-action="createItem" 
+                data-type="item">
+              <i class="fas fa-plus"></i> {{localize "HYP3E.item.add"}}
+            </a>
+          </h4>
+        </li>
+        {{#each gear as |item id|}}
+        <li class="item-entry item draggable" data-item-id="{{item.id}}">
+          <div class="flexrow">
+            <div class="item-name">
+              <div class="item-image">
+                <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+              </div>
+              <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+            </div>
+            <div class="item-prop">{{item.system.quantity.value}}</div>
+            <div class="item-prop">{{item.system.weight}}</div>
+            <div class="item-prop">{{item.system.cost}}</div>
+            <div class="item-controls">
+              <a data-action="displayItem" 
+                  title='{{localize "HYP3E.item.show"}}'>
+                <i class="fas fa-eye"></i>
+              </a>
+              <a data-action="editItem" 
+                  title="{{localize 'HYP3E.item.edit'}}">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a data-action="deleteItem" 
+                  title="{{localize 'HYP3E.item.delete'}}">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          </div>
+          <div class="item-summary">
+            <div class="item-description">
+              {{{item.system.enrichedDescription}}}
+            </div>
+          </div>
+        </li>
+        {{/each}}
+      </ol>
+
+      <h2>{{localize 'HYP3E.headers.weaponsAndArmor'}}</h2>
+      {{!-- Weapons --}}
+      <ol class="items-list" data-drop="item">
+        <li class="flexrow items-header">
+          <h3 class="item-name">{{localize "HYP3E.headers.weapons"}}</h3>
+          <h3>{{localize "HYP3E.item.qty"}}</h3>
+          <h3>{{localize "HYP3E.item.weight"}}</h3>
+          <h3>{{localize "HYP3E.item.cost"}}</h3>
+          <h4 class="item-controls">
+            <a data-action="createItem" 
+                data-type="weapon">
+              <i class="fas fa-plus"></i> {{localize "HYP3E.weapon.add"}}
+            </a>
+          </h4>
+        </li>
+        {{#each weapons as |item id|}}
+        <li class="item-entry item draggable" data-item-id="{{item.id}}">
+          <div class="flexrow">
+              <div class="item-name">
+                <div class="item-image">
+                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                </div>
+                <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+              </div>
+              <div class="item-prop">{{item.system.quantity.value}}</div>
+              <div class="item-prop">{{item.system.weight}}</div>
+              <div class="item-prop">{{item.system.cost}}</div>
+              <div class="item-controls">
+                <a data-action="displayItem" 
+                    title='{{localize "HYP3E.item.show"}}'>
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a data-action="editItem" 
+                    title="{{localize 'HYP3E.item.edit'}}">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a data-action="deleteItem" 
+                    title="{{localize 'HYP3E.item.delete'}}">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </div>
+            <div class="item-summary">
+              <div class="item-description">
+                {{{item.system.enrichedDescription}}}
+              </div>
+            </div>
+        </li>
+        {{/each}}
+      </ol>
+
+      {{!-- Armor and shields --}}
+      <ol class="items-list" data-drop="item">
+        <li class="flexrow items-header">
+          <h3 class="item-name">{{localize "HYP3E.headers.armorAndShields"}}</h3>
+          <h3>{{localize "HYP3E.item.qty"}}</h3>
+          <h3>{{localize "HYP3E.item.weight"}}</h3>
+          <h3>{{localize "HYP3E.item.cost"}}</h3>
+          <h4 class="item-controls">
+            <a data-action="createItem" 
+                data-type="armor">
+              <i class="fas fa-plus"></i> {{localize "HYP3E.armor.add"}}
+            </a>
+          </h4>
+        </li>
+        {{#each armor as |item id|}}
+        <li class="item-entry item draggable" data-item-id="{{item.id}}">
+          <div class="flexrow">
+            <div class="item-name">
+              <div class="item-image">
+                <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+              </div>
+              <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+            </div>
+            <div class="item-prop">{{item.system.quantity.value}}</div>
+            <div class="item-prop">{{item.system.weight}}</div>
+            <div class="item-prop">{{item.system.cost}}</div>
+            <div class="item-controls">
+              <a data-action="displayItem" 
+                  title='{{localize "HYP3E.item.show"}}'>
+                <i class="fas fa-eye"></i>
+              </a>
+              <a data-action="editItem" 
+                  title="{{localize 'HYP3E.item.edit'}}">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a data-action="deleteItem" 
+                  title="{{localize 'HYP3E.item.delete'}}">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          </div>
+          <div class="item-summary">
+            <div class="item-description">
+              <div>{{{item.system.enrichedDescription}}}</div>
+            </div>
+          </div>
+        </li>
+        {{/each}}
+      </ol>
+
+    </section>
+  </section>
+
+</section>

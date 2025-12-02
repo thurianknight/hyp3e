@@ -2,7 +2,8 @@ import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { parseGpValue, 
             buyFromMerchant,
-            sellToMerchant } from "../helpers/money.mjs";
+            sellToMerchant,
+            transferFromTreasure } from "../helpers/money.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { enableItemEffectsOnActor, 
             disableItemEffectsOnActor, 
@@ -143,14 +144,15 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             template: `${HYP3E.templatePath}/actor/parts/tab-character-items.hbs`,
             scrollable: ["", ".tab"],
         },
-        // All PCs and NPCs gets Description and Effects, same as Abilities, above.
+        // All PCs and NPCs gets Description, same as Abilities, above.
         description: {
             template: `${HYP3E.templatePath}/actor/parts/tab-actor-description.hbs`,
             scrollable: ["", ".tab"],
         },
+        // We load Effects last so that any active effects from items are already applied
         effects: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-actor-effects.hbs`,
-            scrollable: ["", ".tab"],
+          template: `${HYP3E.templatePath}/actor/parts/tab-actor-effects.hbs`,
+          scrollable: ["", ".tab"],
         },
         // Merchants get equipment and fighting gear, and none of the prior tabs
         equipment: {
@@ -159,6 +161,11 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         },
         fightingGear: {
             template: `${HYP3E.templatePath}/actor/parts/tab-merchant-fighting-gear.hbs`,
+            scrollable: ["", ".tab"],
+        },
+        // Treasure hoards get one combined list of all items
+        treasureAll: {
+            template: `${HYP3E.templatePath}/actor/parts/tab-treasure-all-items.hbs`,
             scrollable: ["", ".tab"],
         },
     }
@@ -250,32 +257,49 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     /** @override */
     async _preparePartContext(partId, context) {
         context = await super._preparePartContext(partId, context);
+        Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `Part context for "${partId}":`, context);
 
         if (partId === "header" || partId === "tabs") {
             // Header and tabs parts do not need special tab handling
             return context;
         }
-        if (!context.tabs || !context.tabs[partId]) {
+        if (!context.tabs) {
+            Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `No tabs data found in context!`);
+            return context;
+        }
+        if (!context.tabs[partId]) {
             Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `No tab data found for part "${partId}".`);
             return context;
         }
-        // Remove parts that aren't for this actor type
-        if (this.actor.type === "npc" && ["combat","spells","items"].includes(partId)) {
-            return null; // returning null skips rendering this part
-        }
 
-        // Remove parts that aren't for this actor type
-        if (this.actor.type === "merchant" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
-            return null; // returning null skips rendering this part
-        }
-        // Also we need to reset the default tab for merchants
+        // Remove parts that aren't for the NPC actor type
+        // if (this.actor.type === "npc" && ["combat","spells","items"].includes(partId)) {
+        //     return null; // returning null skips rendering this part
+        // }
+
+        // Remove parts that aren't for the Merchant actor type
+        // if (this.actor.type === "merchant" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
+        //     return null; // returning null skips rendering this part
+        // }
+
+        // Reset the default tab for Merchants
         if (this.actor.type === "merchant" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
             context.tabs["equipment"].active = true;
             context.tabs["equipment"].cssClass = "active";
         }
 
+        // Remove parts that aren't for the Treasure actor type
+        // if (this.actor.type === "treasure" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
+        //     return null; // returning null skips rendering this part
+        // }
+
+        // Reset the default tab for Treasure
+        if (this.actor.type === "treasure" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
+            context.tabs["treasureAll"].active = true;
+            context.tabs["treasureAll"].cssClass = "active";
+        }
+
         // Process tabs
-        Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `Preparing tab part "${partId}"...`, context);
         if (context.tabs[partId].active) {
             context.tab = context.tabs[partId];
         }
@@ -289,6 +313,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             case 'spells':
                 break;
             case 'items':
+              if (this.document.type === "character") {
                 // Enrich content for display
                 context.enrichedTreasure = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
                     this.document.system.treasure,
@@ -297,8 +322,11 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                         relativeTo: this.document
                     }
                 )
-                break;
+              }
+              break;
             case 'description':
+              if (this.document.type === "character" || this.document.type === "npc") {
+                // Enrich content for display
                 context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
                     this.document.system.biography,
                     {
@@ -306,12 +334,15 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                         relativeTo: this.document
                     }
                 )
-                break;
+              }
+              break;
             case 'effects':
                 break;
             case "equipment":
                 break;
             case "fightingGear":
+                break;
+            case "treasureAll":
                 break;
             default:
         }
@@ -342,6 +373,12 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             tabs.tabs.push({ id: 'fightingGear', group: group });
         }
 
+        // Treasure tab
+        if (this.document.type === "treasure") {
+            tabs.tabs.push({ id: 'treasureAll', group: group });
+        }
+
+        Hyp3eLogger.info("HYP3EActorSheetV2 _getTabsConfig", `Tabs config for ${this.actor.name}:`, tabs);
         return tabs
     }
 
@@ -459,10 +496,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @return {undefined}
      */
     _prepareMerchantData(context) {
-        // Handle money types
-        for (let [k, v] of Object.entries(context.system.money)) {
-            v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
-        }
+      // Handle money types
+      for (let [k, v] of Object.entries(context.system.money)) {
+        v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
+      }
     }
 
     /**
@@ -471,7 +508,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @return {undefined}
      */
     _prepareTreasureData(context) {
-        // Not sure what will go here
+      // Handle money types
+      for (let [k, v] of Object.entries(context.system.money)) {
+        v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
+      }
     }
 
     /**
@@ -1172,7 +1212,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         event.stopPropagation();
         const action = target.dataset["action"];
         // Log the action and then handle it
-        Hyp3eLogger.info("HYP3EActorSheetV2 _onManageActiveEffect", `Managing active effect...`, { event, target, action });
+        // Hyp3eLogger.info("HYP3EActorSheetV2 _onManageActiveEffect", `Managing active effect...`, { event, target, action });
         await onManageActiveEffectV2(target, this.actor);
 
         // Re-render the sheet to reflect changes
@@ -1184,13 +1224,14 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     // ===========================================================================
 
     async _onDropItem(event, item) {
-        Hyp3eLogger.info("HYP3EActorSheetV2 _onDropItem", `Item dropped event:`, { event, item })
+        // Hyp3eLogger.info("HYP3EActorSheetV2 _onDropItem", `Item dropped event:`, { event, item })
+
         // Handle merchant → character drag
         const sourceActor = item?.parent;
         if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
             // Perform the merchant transaction and exit early
             await buyFromMerchant(this.actor, sourceActor, item);
-            return; // stops Foundry from calling super._onDropItem()
+            return; // Prevent super._onDropItem()
         }
         // Handle character → merchant drag
         if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "merchant") {
@@ -1199,11 +1240,25 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 const msg = `Container ${item.name} is not empty! Remove all items from it first, before selling it.`;
                 Hyp3eLogger.warn("_onDropItem", msg);
                 ui.notifications.warn(msg);
-                return;
+                return; // Prevent super._onDropItem()
             }
             // Perform the sale to merchant and exit early
             await sellToMerchant(this.actor, sourceActor, item);
-            return;
+            return; // Prevent super._onDropItem()
+        }
+
+        // Handle treasure → character drag
+        if (sourceActor?.type === "treasure" && this.actor.type !== "treasure") {
+            // Perform the treasure acquisition and exit early
+            await transferFromTreasure(this.actor, sourceActor, item);
+            return; // Prevent super._onDropItem()
+        }
+        // Handle character → treasure drag
+        if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "treasure") {
+          const msg = `Why would you want to put items INTO a treasure trove? That makes no sense!`;
+          Hyp3eLogger.warn("_onDropItem", msg);
+          ui.notifications.warn(msg);
+          return; // Prevent super._onDropItem()
         }
 
         // Otherwise let normal copy-item behavior proceed
@@ -1211,7 +1266,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     _onSortItem(event, item) {
-        Hyp3eLogger.info("HYP3EActorSheetV2 _onSortItem", `Item sort event:`, { event, item })
+        // Hyp3eLogger.info("HYP3EActorSheetV2 _onSortItem", `Item sort event:`, { event, item })
 
         const target = event.target.closest("[data-item-id]");
         const dragged = this.actor.items.get(item.id);
@@ -1225,13 +1280,13 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Special case 1: item dragged over a container → assign containerId
         //  But we only do this for characters & npcs, not merchants
         if (targetItem && (targetItem.system.isContainer || targetItem.type === "container")) {
-            if (this.actor.type !== "merchant") {
+            if (this.actor.type !== "merchant" && this.actor.type !== "treasure") {
                 return dragged.update({ 
                                         "system.location": targetItem.name,
                                         "system.containerId": targetItem.id
                                     });
             } else {
-                const msg = `Merchant inventory must be stand-alone, not in containers.`;
+                const msg = `Merchant or treasure inventory must be stand-alone, not in containers.`;
                 Hyp3eLogger.warn("_onSortItem", msg);
                 ui.notifications.warn(msg);
                 return;
@@ -1259,7 +1314,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     _onDragOver(event) {
-        Hyp3eLogger.info("HYP3EActorSheetV2 _onDragOver", `Drag-over event:`, event)
+        // Hyp3eLogger.info("HYP3EActorSheetV2 _onDragOver", `Drag-over event:`, event)
         super._onDragOver(event)
 
         const li = event.target.closest("[data-item-id]");
@@ -1277,7 +1332,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     _onDrop(event) {
-        Hyp3eLogger.info("HYP3EActorSheetV2 _onDrop", `Drop event:`, event)
+        // Hyp3eLogger.info("HYP3EActorSheetV2 _onDrop", `Drop event:`, event)
         super._onDrop(event)
         this.element.querySelectorAll(".drag-target").forEach(el => el.classList.remove("drag-target"));
     }

@@ -524,3 +524,106 @@ export function mergeStructuredMoney(a, b) {
 
     return merged;
 }
+
+/**
+ * Handle taking an item from a treasure hoard
+ * @param {*} recipient 
+ * @param {*} treasure 
+ * @param {*} item 
+ * @returns 
+ */
+export async function transferFromTreasure(recipient, treasure, item) {
+  const itemData = item.toObject();
+  const itemName = itemData.name;
+  const treasureQty = parseInt(item.system.quantity?.value) ?? 1;
+
+  // Handle max transfer qty based on treasure qty on hand
+  if (treasureQty <= 0) {
+      return ui.notifications.warn(`Treasure has no ${itemName} in inventory.`);
+  }
+  let maxQty = treasureQty;
+
+  // Is the item sold in bundles?
+  const bundleAmt = item.system.quantity?.bundle && item.system.quantity.bundle > 1
+    ? `bundles of ${item.system.quantity.bundle}`
+    : "";
+
+  // Prompt for quantity to transfer
+  const qty = await Dialog.prompt({
+    title: `${itemName} Transfer Quantity`,
+    content: `
+      <p>${treasure.name} has <strong>${treasureQty}</strong> ${item.name}(s).</p>
+      <p>
+        <label>How many ${bundleAmt} to transfer? (Max: ${maxQty})</label>
+        <input type="number" id="qty" min="1" max="${maxQty}" value="1" 
+          style="width:80px; text-align: center;">
+      </p>
+    `,
+    label: "Transfer",
+    callback: html => {
+      const val = parseInt(html.find("#qty").val() ?? "1");
+      if (isNaN(val) || val < 0) return 0;
+      return Math.clamped(val, 1, maxQty);
+    },
+    rejectClose: false,
+    render: html => {
+      const $input = html.find("#qty");
+      $input.focus();
+    }
+  });
+  if (!qty) return;
+
+  // Adjust the treasure's qty on hand
+  let newtreasureQty = 0;
+  if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+    // For bundled items, reduce qty based on number of bundles sold
+    const unitsTransferred = qty * item.system.quantity.bundle;
+    newtreasureQty = Math.ceil(treasureQty - unitsTransferred, 0);
+  } else {
+    newtreasureQty = Math.ceil(treasureQty - qty, 0);
+  }
+  await item.update({ "system.quantity.value": newtreasureQty });
+
+  // Check if the recipient already has this item (match by name & type)
+  const existing = recipient.items.find(i =>
+    i.name === item.name &&
+    i.type === item.type &&
+    !i.system.isContainer &&
+    !['armor','shield','weapon'].includes(i.type) // Don’t merge armor, shields, or weapons
+  );
+
+  // Add to recipient's existing qty or create new
+  if (existing) {
+    let newQty = 0;
+    let bundlesOf = "";
+    if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+      // For bundled items, increase qty based on number of bundles bought
+      bundlesOf = `bundle(s) of ${item.system.quantity.bundle}`;
+      const unitsTaken = qty * item.system.quantity.bundle;
+      newQty = toNumber(existing.system.quantity.value) + unitsTaken;
+    } else {
+      newQty = toNumber(existing.system.quantity.value) + qty;
+    }
+    await existing.update({ "system.quantity.value": newQty, "system.quantity.max": newQty });
+    ui.notifications.info(
+      `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) (now owns ${newQty}).`
+    );
+  } else {
+    let bundlesOf = "";
+    if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+      // For bundled items, set qty based on number of bundles bought
+      bundlesOf = `bundles of ${item.system.quantity.bundle}`;
+      const unitsTaken = qty * item.system.quantity.bundle;
+      itemData.system.quantity.value = unitsTaken;
+      itemData.system.quantity.max = unitsTaken;
+    } else {
+      // Normal unbundled item
+      itemData.system.quantity.value = qty;
+      itemData.system.quantity.max = qty;
+    }
+    await recipient.createEmbeddedDocuments("Item", [itemData]);
+    ui.notifications.info(
+      `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) from ${treasure.name}.`
+    );
+  }
+}

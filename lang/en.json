@@ -1,10 +1,11 @@
 {
     "TYPES": {
         "actor": {
-            "npc": "NPC",
-            "character": "Character",
-            "merchant": "Merchant",
-            "treasure": "Treasure"
+          "character": "Character",
+          "npc": "NPC",
+          "merchant": "Merchant",
+          "treasure": "Treasure",
+          "itemToken": "Item Token"
         },
         "item": {
             "armor": "Armour", 
@@ -16,10 +17,11 @@
             "effectTemplate": "Effect Template"
         },
         "Actor": {
-            "npc": "NPC",
-            "character": "Character",
-            "merchant": "Merchant",
-            "treasure": "Treasure"
+          "character": "Character",
+          "npc": "NPC",
+          "merchant": "Merchant",
+          "treasure": "Treasure",
+          "itemToken": "Item Token"
         },
         "Item": {
             "armor": "Armour", 
@@ -119,7 +121,8 @@
             "details": "Details",
             "attributes": "Attributes",
             "equipment": "General Equipment & Provisions",
-            "fightingGear": "Fighting Gear"
+            "fightingGear": "Fighting Gear",
+            "treasureAll": "Items in Treasure"
         },
         "headers": {
             "name": "Name",
