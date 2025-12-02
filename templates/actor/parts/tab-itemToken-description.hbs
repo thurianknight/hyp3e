@@ -1,0 +1,30 @@
+<section 
+    class="tab {{tabs.itemTokenDescription.cssClass}}"
+    data-tab="{{tabs.itemTokenDescription.id}}"
+    data-group="primary"
+>
+
+  <section class="all-content">
+    <section class="left-gutter">
+        <img src="systems/hyp3e/assets/serpent-spear.png">
+    </section>
+    <section class="main-content">
+      <div class="flex biography-block">
+        <h2>{{localize 'HYP3E.headers.descNotes'}}</h2>
+        {{#if editable}}
+        <prose-mirror
+          name="system.biography"
+          button="true"
+          editable="{{editable}}"
+          toggled="false"
+          value="{{system.biography}}">
+          {{{enrichedBiography}}}
+        </prose-mirror>
+        {{else}}
+        {{{enrichedBiography}}}
+        {{/if}}        
+      </div>
+    </section>
+  </section>
+
+</section>

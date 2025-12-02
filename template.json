@@ -1,6 +1,6 @@
 {
   "Actor": {
-      "types": ["character", "npc", "merchant", "treasure"],
+      "types": ["character", "npc", "merchant", "treasure", "itemToken"],
       "templates": {
           "base": {
               "hd": "",

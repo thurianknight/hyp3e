@@ -168,6 +168,15 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             template: `${HYP3E.templatePath}/actor/parts/tab-treasure-all-items.hbs`,
             scrollable: ["", ".tab"],
         },
+        // Item tokens get NPC-styled abilities and description tabs
+        itemTokenAbilities: {
+            template: `${HYP3E.templatePath}/actor/parts/tab-itemToken-abilities.hbs`,
+            scrollable: ["", ".tab"],
+        },
+        itemTokenDescription: {
+            template: `${HYP3E.templatePath}/actor/parts/tab-itemToken-description.hbs`,
+            scrollable: ["", ".tab"],
+        },
     }
 
     // ===========================================================================
@@ -235,6 +244,12 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           this._prepareTreasureData(context);
       }
 
+      // Prepare itemToken data
+      if (actorData.type == 'itemToken') {
+        await this._prepareItems(context);
+        await this._prepareItemTokenData(context);
+      }
+
       // Add roll data for TinyMCE editors.
       context.rollData = this.actor.getRollData();
 
@@ -299,6 +314,12 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             context.tabs["treasureAll"].cssClass = "active";
         }
 
+        // Reset the default tab for Item Tokens
+        if (this.actor.type === "itemToken" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
+            context.tabs["itemTokenAbilities"].active = true;
+            context.tabs["itemTokenAbilities"].cssClass = "active";
+        }
+
         // Process tabs
         if (context.tabs[partId].active) {
             context.tab = context.tabs[partId];
@@ -328,22 +349,36 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
               if (this.document.type === "character" || this.document.type === "npc") {
                 // Enrich content for display
                 context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-                    this.document.system.biography,
-                    {
-                        secrets: this.document.isOwner,
-                        relativeTo: this.document
-                    }
+                  this.document.system.biography,
+                  {
+                    secrets: this.document.isOwner,
+                    relativeTo: this.document
+                  }
                 )
               }
               break;
             case 'effects':
-                break;
+              break;
             case "equipment":
-                break;
+              break;
             case "fightingGear":
-                break;
+              break;
             case "treasureAll":
-                break;
+              break;
+            case "itemTokenAbilities":
+              break;
+            case "itemTokenDescription":
+              if (this.document.type === "itemToken") {
+                // Enrich content for display
+                context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+                  this.document.system.biography,
+                  {
+                    secrets: this.document.isOwner,
+                    relativeTo: this.document
+                  }
+                )
+              }
+              break;
             default:
         }
         return context;
@@ -351,35 +386,42 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     /** @override */
     _getTabsConfig(group) {
-        const tabs = foundry.utils.deepClone(super._getTabsConfig(group))
+      const tabs = foundry.utils.deepClone(super._getTabsConfig(group))
 
-        // Common PC & NPC tabs
-        if (this.document.type === "character" || this.document.type === "npc") {
-            tabs.tabs.push({ id: 'abilities', group: group });
-            tabs.tabs.push({ id: 'description', group: group });
-            tabs.tabs.push({ id: 'effects', group: group });
-        }
+      // Common PC & NPC tabs
+      if (this.document.type === "character" || this.document.type === "npc") {
+        tabs.tabs.push({ id: 'abilities', group: group });
+        tabs.tabs.push({ id: 'description', group: group });
+        tabs.tabs.push({ id: 'effects', group: group });
+      }
 
-        // Insert PC-specific tabs
-        if (this.document.type === "character") {
-            tabs.tabs.splice(1, 0, { id: 'combat', group: group });
-            tabs.tabs.splice(2, 0, { id: 'spells', group: group });
-            tabs.tabs.splice(3, 0, { id: 'items', group: group });
-        }
+      // Insert PC-specific tabs
+      if (this.document.type === "character") {
+        tabs.tabs.splice(1, 0, { id: 'combat', group: group });
+        tabs.tabs.splice(2, 0, { id: 'spells', group: group });
+        tabs.tabs.splice(3, 0, { id: 'items', group: group });
+      }
 
-        // Merchant tabs
-        if (this.document.type === "merchant") {
-            tabs.tabs.push({ id: 'equipment', group: group });
-            tabs.tabs.push({ id: 'fightingGear', group: group });
-        }
+      // Merchant tabs
+      if (this.document.type === "merchant") {
+        tabs.tabs.push({ id: 'equipment', group: group });
+        tabs.tabs.push({ id: 'fightingGear', group: group });
+      }
 
-        // Treasure tab
-        if (this.document.type === "treasure") {
-            tabs.tabs.push({ id: 'treasureAll', group: group });
-        }
+      // Treasure tab
+      if (this.document.type === "treasure") {
+        tabs.tabs.push({ id: 'treasureAll', group: group });
+      }
 
-        Hyp3eLogger.info("HYP3EActorSheetV2 _getTabsConfig", `Tabs config for ${this.actor.name}:`, tabs);
-        return tabs
+      // Item Token tabs
+      if (this.document.type === "itemToken") {
+        tabs.tabs.push({ id: 'itemTokenAbilities', group: group });
+        tabs.tabs.push({ id: 'itemTokenDescription', group: group });
+        tabs.tabs.push({ id: 'effects', group: group });
+      }
+
+      Hyp3eLogger.info("HYP3EActorSheetV2 _getTabsConfig", `Tabs config for ${this.actor.name}:`, tabs);
+      return tabs
     }
 
   /**
@@ -512,6 +554,15 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       for (let [k, v] of Object.entries(context.system.money)) {
         v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
       }
+    }
+
+    /**
+     * Organize and classify Data for Item Token sheets.
+     * @param {Object} context The actor to prepare.
+     * @return {undefined}
+     */
+    _prepareItemTokenData(context) {
+      // No special data preparation needed for item tokens at this time
     }
 
     /**
@@ -703,6 +754,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // If the sheet is not editable, exit early
         if (!this.isEditable) return;
 
+        // Flag ActiveEffects as inactive, if applicable
         const $html = this.element;
         for (const effect of this.actor.allApplicableEffects()) {
           const state = this.actor.system?._hyp3eEffectConditionState?.[effect.uuid];
@@ -1259,6 +1311,34 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           Hyp3eLogger.warn("_onDropItem", msg);
           ui.notifications.warn(msg);
           return; // Prevent super._onDropItem()
+        }
+
+        // Handle any item dragged to an ItemToken
+        if (this.actor.type === "itemToken") {
+          if (this.actor.system?.linkedItemUuid && this.actor.system.linkedItemUuid !== "") {
+            const msg = `This Item Token is already linked to an item.`;
+            Hyp3eLogger.warn("_onDropItem", msg);
+            ui.notifications.warn(msg);
+            return; // Prevent super._onDropItem()
+          }
+          const updates = {
+            "name": item.name,
+            "img": item.img,
+            "system.linkedItemUuid": item.uuid,
+            "system.biography": item.system.description,
+            "system.fa": item?.parent?.system.fa || 0,
+            "system.ca": item?.parent?.system.ca || null,
+            "system.ta": item?.parent?.system.ta || null,
+            "system.attributes.dex.value": item?.parent?.system.attributes.dex.value || 10,
+            "prototypeToken.name": item.name,
+            "prototypeToken.texture.src": item.img,
+            // "prototypeToken.light...."
+          };
+          await this.actor.update(updates);
+          const msg = `Item Token linked to item ${item.name}.`;
+          Hyp3eLogger.info("_onDropItem", msg);
+          ui.notifications.info(msg);
+          return super._onDropItem(event, item) // Copy the item to the itemToken actor
         }
 
         // Otherwise let normal copy-item behavior proceed

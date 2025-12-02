@@ -33,6 +33,9 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/actor/parts/tab-npc-description.hbs`,
         `${HYP3E.templatePath}/actor/parts/section-npc-items.hbs`,
         `${HYP3E.templatePath}/actor/parts/tab-placeholder.hbs`,
+        `${HYP3E.templatePath}/actor/parts/tab-itemToken-abilities.hbs`,
+        `${HYP3E.templatePath}/actor/parts/tab-itemToken-description.hbs`,
+        `${HYP3E.templatePath}/actor/parts/section-itemToken-item.hbs`,
 
         // Item V2 partials - headers
         `${HYP3E.templatePath}/item/parts/physical-header.hbs`,

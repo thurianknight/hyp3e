@@ -1,37 +1,37 @@
 {
     "TYPES": {
-        "actor": {
-          "character": "Character",
-          "npc": "NPC",
-          "merchant": "Merchant",
-          "treasure": "Treasure",
-          "itemToken": "Item Token"
-        },
-        "item": {
-            "armor": "Armour", 
-            "feature": "Feature", 
-            "item": "Item", 
-            "shield": "Shield", 
-            "spell": "Spell", 
-            "weapon": "Weapon",
-            "effectTemplate": "Effect Template"
-        },
-        "Actor": {
-          "character": "Character",
-          "npc": "NPC",
-          "merchant": "Merchant",
-          "treasure": "Treasure",
-          "itemToken": "Item Token"
-        },
-        "Item": {
-            "armor": "Armour", 
-            "feature": "Feature", 
-            "item": "Item", 
-            "shield": "Shield", 
-            "spell": "Spell", 
-            "weapon": "Weapon",
-            "effectTemplate": "Effect Template"
-        }
+      "actor": {
+        "character": "Character",
+        "npc": "NPC",
+        "merchant": "Merchant",
+        "treasure": "Treasure",
+        "itemToken": "Item Token"
+      },
+      "item": {
+          "armor": "Armour", 
+          "feature": "Feature", 
+          "item": "Item", 
+          "shield": "Shield", 
+          "spell": "Spell", 
+          "weapon": "Weapon",
+          "effectTemplate": "Effect Template"
+      },
+      "Actor": {
+        "character": "Character",
+        "npc": "NPC",
+        "merchant": "Merchant",
+        "treasure": "Treasure",
+        "itemToken": "Item Token"
+      },
+      "Item": {
+        "armor": "Armour", 
+        "feature": "Feature", 
+        "item": "Item", 
+        "shield": "Shield", 
+        "spell": "Spell", 
+        "weapon": "Weapon",
+        "effectTemplate": "Effect Template"
+      }
     },
 
     "HYP3E": {
@@ -122,7 +122,9 @@
             "attributes": "Attributes",
             "equipment": "General Equipment & Provisions",
             "fightingGear": "Fighting Gear",
-            "treasureAll": "Items in Treasure"
+            "treasureAll": "Items in Treasure",
+            "itemTokenAbilities": "Item Details",
+            "itemTokenDescription": "Item Description"
         },
         "headers": {
             "name": "Name",
@@ -146,6 +148,8 @@
             "weaponsAndArmor": "Weapons & Armour",
             "items": "Items",
             "ability": "Ability",
+            "linkedWeapon": "Linked Weapon",
+            "linkedItem": "Linked Item",
             "atkRate": "Atk Rate",
             "rof": "RoF",
             "classRange": "Class/Range",
