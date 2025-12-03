@@ -1329,6 +1329,8 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             "system.fa": item?.parent?.system.fa || 0,
             "system.ca": item?.parent?.system.ca || null,
             "system.ta": item?.parent?.system.ta || null,
+            "system.hp.value": 1,
+            "system.hp.max": 1,
             "system.attributes.dex.value": item?.parent?.system.attributes.dex.value || 10,
             "prototypeToken.name": item.name,
             "prototypeToken.texture.src": item.img,

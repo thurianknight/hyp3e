@@ -105,7 +105,7 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
         equippedWeapons.splice(2);
     }
     // Log the equipped weapon/shield, and token
-    Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has equipped gear:`, equippedWeapons);
+    // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has equipped gear:`, equippedWeapons);
     // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has token:`, token);
 
     // Create overlay container

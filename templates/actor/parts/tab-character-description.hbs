@@ -3,81 +3,81 @@
   data-tab="{{tabs.description.id}}"
   data-group="primary"
 >
-{{#if (eq actor.type "character")}}
-<section class="all-content">
-  <section class="left-gutter">
-    <img src="systems/hyp3e/assets/serpent-spear.png">
-  </section>
-  <section class="main-content">
-    {{!-- Character Description & Background --}}
-    <div class="description-header row-top">
-      <div class="description-block row-top">
-        <div class="description-block col-top">
-          <div class="description-block flexrow description-field">
-            <label for="system.details.gender" class="description-label">{{localize 'HYP3E.details.gender'}}</label>
-            <input type="text" name="system.details.gender" value="{{system.details.gender}}"/>        
+  {{#if (eq actor.type "character")}}
+  <section class="all-content">
+    <section class="left-gutter">
+      <img src="systems/hyp3e/assets/serpent-spear.png">
+    </section>
+    <section class="main-content">
+      {{!-- Character Description & Background --}}
+      <div class="description-header row-top">
+        <div class="description-block row-top">
+          <div class="description-block col-top">
+            <div class="description-block flexrow description-field">
+              <label for="system.details.gender" class="description-label">{{localize 'HYP3E.details.gender'}}</label>
+              <input type="text" name="system.details.gender" value="{{system.details.gender}}"/>        
+            </div>
+            <div class="description-block flexrow description-field">
+              <label for="system.details.age" class="description-label">{{localize 'HYP3E.details.age'}}</label>
+              <input type="text" name="system.details.age" value="{{system.details.age}}"/>
+            </div>
+            <div class="description-block flexrow description-field">
+              <label for="system.details.religion" class="description-label">{{localize 'HYP3E.details.religion'}}</label>
+              <input type="text" name="system.details.religion" value="{{system.details.religion}}"/>         
+            </div>
           </div>
-          <div class="description-block flexrow description-field">
-            <label for="system.details.age" class="description-label">{{localize 'HYP3E.details.age'}}</label>
-            <input type="text" name="system.details.age" value="{{system.details.age}}"/>
-          </div>
-          <div class="description-block flexrow description-field">
-            <label for="system.details.religion" class="description-label">{{localize 'HYP3E.details.religion'}}</label>
-            <input type="text" name="system.details.religion" value="{{system.details.religion}}"/>         
+          <div class="description-block col-top">
+            <div class="description-block flexrow description-field">
+              <label for="system.details.height" class="description-label">{{localize 'HYP3E.details.height'}}</label>
+              <input type="text" name="system.details.height" value="{{system.details.height}}"/>
+            </div>
+            <div class="description-block flexrow description-field">
+              <label for="system.details.weight" class="description-label">{{localize 'HYP3E.details.weight'}}</label>
+              <input type="text" name="system.details.weight" value="{{system.details.weight}}"/>
+            </div>
+            <div class="description-block flexrow description-field">
+              <label for="system.details.hair" class="description-label">{{localize 'HYP3E.details.hair'}}</label>
+              <input type="text" name="system.details.hair" value="{{system.details.hair}}"/>
+            </div>
+            <div class="description-block flexrow description-field">
+              <label for="system.details.eyes" class="description-label">{{localize 'HYP3E.details.eyes'}}</label>
+              <input type="text" name="system.details.eyes" value="{{system.details.eyes}}"/>
+            </div>
           </div>
         </div>
         <div class="description-block col-top">
           <div class="description-block flexrow description-field">
-            <label for="system.details.height" class="description-label">{{localize 'HYP3E.details.height'}}</label>
-            <input type="text" name="system.details.height" value="{{system.details.height}}"/>
+            <label for="system.details.complexion" class="description-label">{{localize 'HYP3E.details.complexion'}}</label>
+            <input type="text" name="system.details.complexion" value="{{system.details.complexion}}"/>
+          </div>
+          <div class="description-block">
+            <label for="system.details.physicalFeatures" class="description-label">{{localize 'HYP3E.details.physFeatures'}}</label>
+            <br />
+            <textarea name="system.details.physicalFeatures">{{system.details.physicalFeatures}}</textarea>
           </div>
           <div class="description-block flexrow description-field">
-            <label for="system.details.weight" class="description-label">{{localize 'HYP3E.details.weight'}}</label>
-            <input type="text" name="system.details.weight" value="{{system.details.weight}}"/>
-          </div>
-          <div class="description-block flexrow description-field">
-            <label for="system.details.hair" class="description-label">{{localize 'HYP3E.details.hair'}}</label>
-            <input type="text" name="system.details.hair" value="{{system.details.hair}}"/>
-          </div>
-          <div class="description-block flexrow description-field">
-            <label for="system.details.eyes" class="description-label">{{localize 'HYP3E.details.eyes'}}</label>
-            <input type="text" name="system.details.eyes" value="{{system.details.eyes}}"/>
+            <label for="system.details.secondarySkills" class="description-label">{{localize 'HYP3E.details.secSkills'}}</label>
+            <input type="text" name="system.details.secondarySkills" value="{{system.details.secondarySkills}}"/>
           </div>
         </div>
       </div>
-      <div class="description-block col-top">
-        <div class="description-block flexrow description-field">
-          <label for="system.details.complexion" class="description-label">{{localize 'HYP3E.details.complexion'}}</label>
-          <input type="text" name="system.details.complexion" value="{{system.details.complexion}}"/>
-        </div>
-        <div class="description-block">
-          <label for="system.details.physicalFeatures" class="description-label">{{localize 'HYP3E.details.physFeatures'}}</label>
-          <br />
-          <textarea name="system.details.physicalFeatures">{{system.details.physicalFeatures}}</textarea>
-        </div>
-        <div class="description-block flexrow description-field">
-          <label for="system.details.secondarySkills" class="description-label">{{localize 'HYP3E.details.secSkills'}}</label>
-          <input type="text" name="system.details.secondarySkills" value="{{system.details.secondarySkills}}"/>
-        </div>
-      </div>
-    </div>
-    <hr class="plain-hr" />
-    <div class="flex biography-block">
-      <h2>{{localize "HYP3E.headers.biography"}}</h2>
-      {{#if editable}}
-      <prose-mirror
-        name="system.biography"
-        button="true"
-        editable="{{editable}}"
-        toggled="false"
-        value="{{system.biography}}">
+      <hr class="plain-hr" />
+      <div class="flex biography-block">
+        <h2>{{localize "HYP3E.headers.biography"}}</h2>
+        {{#if editable}}
+        <prose-mirror
+          name="system.biography"
+          button="true"
+          editable="{{editable}}"
+          toggled="false"
+          value="{{system.biography}}">
+          {{{enrichedBiography}}}
+        </prose-mirror>
+        {{else}}
         {{{enrichedBiography}}}
-      </prose-mirror>
-      {{else}}
-      {{{enrichedBiography}}}
-      {{/if}}
-    </div>
+        {{/if}}
+      </div>
+    </section>
   </section>
-</section>
-{{/if}}
+  {{/if}}
 </section>
