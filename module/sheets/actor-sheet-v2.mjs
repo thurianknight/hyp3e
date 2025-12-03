@@ -1321,6 +1321,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             ui.notifications.warn(msg);
             return; // Prevent super._onDropItem()
           }
+          // Clone important properties from item to actor
           const updates = {
             "name": item.name,
             "img": item.img,
