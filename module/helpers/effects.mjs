@@ -168,7 +168,7 @@ export function prepareActiveEffectCategories(effects) {
 
 export async function setupEffectHandlers() {
     /**
-     * Capture ActiveEffectConfig and insert a new field
+     * Capture ActiveEffectConfig and insert new items
      */
     Hooks.on("renderActiveEffectConfig", (app, html, data) => {
         const html$ = $(html)
@@ -228,14 +228,14 @@ export async function setupEffectHandlers() {
         // Get data stored in the effect's flags
         const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
         const sourceActor = sourceUuid ? await fromUuid(sourceUuid) : effect.parent;
-        const sourceActorData = sourceActor?.system ?? {};
-        Hyp3eLogger.info("createActiveEffect", `Actor applying the effect:`, sourceActorData);
+        const actorData = sourceActor?.system ?? {};
+        Hyp3eLogger.info("createActiveEffect", `Actor applying the effect:`, actorData);
 
         // Flag to track whether anything needs to be updated
         let didUpdate = false;
 
-        // Check to see if we have a rollable duration formula, and resolve it if so
-        const { updatedDuration, updated } = checkAndResolveDuration(effect, sourceActorData);
+        // Check to see if we have a rollable Duration formula, and resolve it if so
+        const { updatedDuration, updated } = checkAndResolveDuration(effect, actorData);
         Hyp3eLogger.info("createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
         if (updated) didUpdate = true;
 
@@ -243,16 +243,25 @@ export async function setupEffectHandlers() {
         let updatedChanges = [...effect.changes];  // Start with a shallow copy
 
         for (let i = 0; i < updatedChanges.length; i++) {
-            const change = updatedChanges[i];
-            // Parse the change.value string and resolve it into a number if possible
-            const resolvedChange = parseAndResolveChangeValue(change.value, actor)
+          const change = updatedChanges[i];
+          // Store the change value regardless of whether it's a formula or not
+          if (!change.flags?.hyp3e?.originalValue) {
+            change.flags = change.flags || {};
+            change.flags.hyp3e = change.flags.hyp3e || {};
+            change.flags.hyp3e.originalValue = change.value;
+            didUpdate = true;
+          }
+          // Parse the change.value string and resolve it into a number if possible
+          if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
+            const resolvedChange = parseAndResolveChangeValue(change.value, actorData)
             if (updatedChanges[i].value !== resolvedChange) {
-                updatedChanges[i] = {
-                    ...change,
-                    value: resolvedChange
-                };
-                didUpdate = true;
+              updatedChanges[i] = {
+                ...change,
+                value: resolvedChange
+              };
+              didUpdate = true;
             }
+          }
         }
 
         // Batch out the updates to the effect
@@ -376,121 +385,231 @@ export async function setupEffectHandlers() {
  * @param {*} actor 
  * @returns 
  */
-export function parseAndResolveChangeValue(changeValue, actor) {
-    Hyp3eLogger.info("parseAndResolveChangeValue", `Change String:`, changeValue);
-    if (!changeValue) return
+export function parseAndResolveChangeValue(changeValue, actorData) {
+  if (!changeValue) return;
 
-    // Split the string into parts & resolve each part
-    const parts = changeValue.split(/(\+|\-|\*|\/|\%|\(|\))/).map(part => part.trim());
-    // const resolvedParts = await Promise.all(parts.map(async part => {
-    const resolvedParts = parts.map(part => {
-        // Check if the part is a roll formula
-        if (Roll.validate(part)) {
-            Hyp3eLogger.info("parseAndResolveChangeValue", `Roll Detected:`, part);
-            const roll = new Roll(part, actor?.getRollData?.());
-            // await roll.evaluate({ evaluateSync: true });
-            roll.evaluateSync();
-            Hyp3eLogger.info("parseAndResolveChangeValue", `Roll Total:`, roll.total);
-            return roll.total;
-        }
-        // Check if the part is a data path
-        else if (part.startsWith("system.")) {
-            Hyp3eLogger.info("parseAndResolveChangeValue", `Data Path:`, part);
-            const value = getProperty(actor, part);
-            Hyp3eLogger.info("parseAndResolveChangeValue", `Data Value:`, value);
-            return value !== undefined ? value : part;
-        }
-        // If it's neither, return the original part
-        return part;
+  Hyp3eLogger.info("parseAndResolveChangeValue", `Change string:`, changeValue);
+
+  const result = resolveFormula(changeValue, actorData);
+
+  if (result === null) {
+    Hyp3eLogger.info("parseAndResolveChangeValue", `Could not evaluate "${changeValue}". Returning original.`);
+    return changeValue;
+  }
+
+  Hyp3eLogger.info("parseAndResolveChangeValue", `Parsed result:`, result);
+
+  return Math.floor(result);
+}
+// export function parseAndResolveChangeValue(changeValue, actor) {
+//     Hyp3eLogger.info("parseAndResolveChangeValue", `Change String:`, changeValue);
+//     if (!changeValue) return
+
+//     // Split the string into parts & resolve each part
+//     const parts = changeValue.split(/(\+|\-|\*|\/|\%|\(|\))/).map(part => part.trim());
+//     // const resolvedParts = await Promise.all(parts.map(async part => {
+//     const resolvedParts = parts.map(part => {
+//       // Check if the part is a roll formula
+//         if (Roll.validate(part)) {
+//             Hyp3eLogger.info("parseAndResolveChangeValue", `Roll Detected:`, part);
+//             const roll = new Roll(part, actor?.getRollData?.());
+//             // await roll.evaluate({ evaluateSync: true });
+//             roll.evaluateSync();
+//             Hyp3eLogger.info("parseAndResolveChangeValue", `Roll Total:`, roll.total);
+//             return roll.total;
+//         }
+//         // Check if the part is a data path
+//         else if (part.startsWith("system.")) {
+//             Hyp3eLogger.info("parseAndResolveChangeValue", `Data Path:`, part);
+//             const value = foundry.utils.getProperty(actor, part);
+//             Hyp3eLogger.info("parseAndResolveChangeValue", `Data Value:`, value);
+//             return value !== undefined ? value : part;
+//         }
+
+//         // If it's neither, return the original part
+//         return part;
+//     });
+//     // Reassemble the resolved parts into a string of additions
+//     const resolvedString = resolvedParts.join("");
+//     Hyp3eLogger.info("parseAndResolveChangeValue", `Resolved String:`, resolvedString);
+//     let result = null;
+//     try {
+//         // Evaluate the resolved string as a math expression
+//         result = eval(resolvedString)
+//     } catch (e) {
+//         // If the string can't be evaluated, log it and return the original changeValue
+//         Hyp3eLogger.info("parseAndResolveChangeValue", `Cannot evaluate change value "${resolvedString}" to a number:`, e);
+//         return changeValue;
+//     }
+//     Hyp3eLogger.info("parseAndResolveChangeValue", `Parsed result:`, result);
+//     // Is the result a real number?
+//     if (isNaN(result)) {
+//         ui.notifications?.error(`Effect change value "${changeValue}" resolved to "${resolvedString}". Could not solve for a final number.`);
+//         return changeValue;
+//     } else {
+//         // If the result is a decimal, round it down to the nearest integer
+//         return Math.floor(result);
+//     }
+// }
+
+/**
+ * Resolve a custom duration formula to a final number for rounds and turns.
+ * @param {*} effect 
+ * @param {*} actorData 
+ * @returns 
+ */
+export function checkAndResolveDuration(effect, actorData) {
+  let updatedDuration = { ...effect.duration };
+  let updated = false;
+
+  const formula = effect.getFlag("hyp3e", "durationFormula");
+  if (!formula) return { updatedDuration, updated };
+
+  Hyp3eLogger.info("checkAndResolveDuration", `Actor applying effect:`, actorData);
+
+  // Only actors can apply rolled durations
+  // if (!(effect.parent instanceof Actor)) {
+  //   updatedDuration = { rounds: 1, turns: 1 };
+  //   updated = true;
+  //   return { updatedDuration, updated };
+  // }
+
+  const result = resolveFormula(formula, actorData);
+
+  if (result === null) {
+    Hyp3eLogger.error("checkAndResolveDuration", `Invalid duration formula "${formula}"`);
+    return { updatedDuration, updated };
+  }
+
+  const rounds = Math.max(1, Math.floor(result));
+
+  updatedDuration = { rounds, turns: rounds };
+  updated = true;
+
+  Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" resolved duration "${formula}" to ${rounds} rounds`);
+
+  return { updatedDuration, updated };
+}
+// export function checkAndResolveDuration(effect, sourceActorData) {
+//     // Store duration for update
+//     let updatedDuration = {...effect.duration};  // Start with a shallow copy
+//     // Flag to track whether anything needs to be updated
+//     let updated = false;
+//     // Check to see if we have a rollable duration formula, exit here if not
+//     const formula = effect.getFlag("hyp3e", "durationFormula");
+//     if (!formula) return { updatedDuration, updated };
+//     Hyp3eLogger.info("checkAndResolveDuration", `Actor applying the effect:`, sourceActorData);
+
+//     // Resolve the formula to a number
+//     if (formula) {
+//         try {
+//             // Only roll if the parent (target) is an Actor
+//             if (!(effect.parent instanceof Actor)) {
+//                 updatedDuration = { rounds: 1, turns: 1 };
+//                 updated = true;
+//                 return { updatedDuration, updated };
+//             }
+
+//             // Replace @variables
+//             let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
+//                 return foundry.utils.getProperty(sourceActorData, key) ?? 0;
+//             });
+//             Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" expanded duration formula: "${expanded}".`);
+
+//             // Evaluate any dice expressions
+//             const diceRegex = /\b(\d*d\d+(?:[+-]\d+)*)\b/g;
+//             const diceMatches = [...expanded.matchAll(diceRegex)];
+//             for (const match of diceMatches) {
+//                 try {
+//                     // Use async evaluation
+//                     // const roll = await (new Roll(match[1])).evaluate({ async: true });
+//                     const roll = new Roll(match[1]).evaluateSync();
+//                     expanded = expanded.replace(match[0], roll.total);
+//                 } catch (err) {
+//                     Hyp3eLogger.warn("checkAndResolveDuration", `Invalid dice segment "${match[1]}" in formula "${formula}"`, err);
+//                 }
+//             }
+//             Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" formula roll resolved: "${expanded}".`);
+
+//             // Evaluate final JS expression (allow Math)
+//             let result = 0;
+//             try {
+//                 // eslint-disable-next-line no-new-func
+//                 const func = new Function("Math", `return (${expanded});`);
+//                 result = func(Math);
+//             } catch (err) {
+//                 Hyp3eLogger.error("checkAndResolveDuration", `Error evaluating JS expression in formula "${expanded}"`, err);
+//                 result = 1; // fallback to 1 round
+//             }
+//             const rounds = Math.max(1, Math.floor(result)); // at least 1 round
+//             updatedDuration = { rounds, turns: rounds };
+//             updated = true;
+
+//             // const roll = await new Roll(formula).evaluate({ evaluateSync: true });
+//             // const rounds = roll.total;
+//             // updatedDuration = { "rounds": rounds, "turns": rounds };
+//             Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" resolved duration "${formula}" to ${rounds} rounds`);
+//         } catch (err) {
+//             Hyp3eLogger.error("checkAndResolveDuration", `Invalid duration formula: ${formula}`, err);
+//         }
+//     }
+//     Hyp3eLogger.info("checkAndResolveDuration", `Return data:`, { updatedDuration, updated });
+//     return { updatedDuration, updated };
+// }
+
+/**
+ * Resolve a formula string like "1d6 + @str.atkMod" into a number.
+ * Supports:
+ *   - @data.path lookups
+ *   - Dice expressions (e.g. 2d8+3)
+ *   - Math expressions (Math.ceil, Math.floor, etc.)
+ *
+ * @param {string} formula
+ * @param {object} dataSource  // usually actor or actor.getRollData()
+ * @returns {number|null}
+ */
+export function resolveFormula(formula, dataSource = {}) {
+  if (!formula || typeof formula !== "string") return null;
+
+  try {
+    // Replace dataSource @variables
+    let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
+      return foundry.utils.getProperty(dataSource, key) ?? 0;
     });
-    // Reassemble the resolved parts into a string of additions
-    const resolvedString = resolvedParts.join("");
-    Hyp3eLogger.info("parseAndResolveChangeValue", `Resolved String:`, resolvedString);
+
+    // Replace all dice expressions with rolled totals
+    const diceRegex = /\b(\d*d\d+(?:[+-]\d+)*)\b/g;
+    const matches = [...expanded.matchAll(diceRegex)];
+
+    for (const match of matches) {
+      try {
+        const roll = new Roll(match[1], dataSource).evaluateSync();
+        expanded = expanded.replace(match[0], roll.total);
+      } catch (err) {
+        Hyp3eLogger.warn("resolveFormula", `Invalid dice expression "${match[1]}"`, err);
+      }
+    }
+
+    // Evaluate final numeric expression
     let result = null;
     try {
-        // Evaluate the resolved string as a math expression
-        result = eval(resolvedString)
-    } catch (e) {
-        // If the string can't be evaluated, log it and return the original changeValue
-        Hyp3eLogger.info("parseAndResolveChangeValue", `Cannot evaluate change value "${resolvedString}" to a number:`, e);
-        return changeValue;
+      // eslint-disable-next-line no-new-func
+      const func = new Function("Math", `return (${expanded});`);
+      result = func(Math);
+    } catch (err) {
+      // If we fail here, it's probably because the change value is a simple string of text
+      Hyp3eLogger.info("resolveFormula", `Error evaluating formula "${expanded}"`, err);
+      return null;
     }
-    Hyp3eLogger.info("parseAndResolveChangeValue", `Parsed result:`, result);
-    // Is the result a real number?
-    if (isNaN(result)) {
-        ui.notifications?.error(`Effect change value "${changeValue}" resolved to "${resolvedString}". Could not solve for a final number.`);
-        return changeValue;
-    } else {
-        // If the result is a decimal, round it down to the nearest integer
-        return Math.floor(result);
-    }
-}
 
-export function checkAndResolveDuration(effect, sourceActorData) {
-    // Store duration for update
-    let updatedDuration = {...effect.duration};  // Start with a shallow copy
-    // Flag to track whether anything needs to be updated
-    let updated = false;
-    // Check to see if we have a rollable duration formula, exit here if not
-    const formula = effect.getFlag("hyp3e", "durationFormula");
-    if (!formula) return { updatedDuration, updated };
-    Hyp3eLogger.info("checkAndResolveDuration", `Actor applying the effect:`, sourceActorData);
+    if (typeof result !== "number" || isNaN(result)) return null;
 
-    // Resolve the formula to a number
-    if (formula) {
-        try {
-            // Only roll if the parent (target) is an Actor
-            if (!(effect.parent instanceof Actor)) {
-                updatedDuration = { rounds: 1, turns: 1 };
-                updated = true;
-                return { updatedDuration, updated };
-            }
+    return result;
 
-            // Replace @variables
-            let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
-                return foundry.utils.getProperty(sourceActorData, key) ?? 0;
-            });
-            Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" expanded duration formula: "${expanded}".`);
-
-            // Evaluate any dice expressions
-            const diceRegex = /\b(\d*d\d+(?:[+-]\d+)*)\b/g;
-            const diceMatches = [...expanded.matchAll(diceRegex)];
-            for (const match of diceMatches) {
-                try {
-                    // Use async evaluation
-                    // const roll = await (new Roll(match[1])).evaluate({ async: true });
-                    const roll = new Roll(match[1]).evaluateSync();
-                    expanded = expanded.replace(match[0], roll.total);
-                } catch (err) {
-                    Hyp3eLogger.warn("checkAndResolveDuration", `Invalid dice segment "${match[1]}" in formula "${formula}"`, err);
-                }
-            }
-            Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" formula roll resolved: "${expanded}".`);
-
-            // Evaluate final JS expression (allow Math)
-            let result = 0;
-            try {
-                // eslint-disable-next-line no-new-func
-                const func = new Function("Math", `return (${expanded});`);
-                result = func(Math);
-            } catch (err) {
-                Hyp3eLogger.error("checkAndResolveDuration", `Error evaluating JS expression in formula "${expanded}"`, err);
-                result = 1; // fallback to 1 round
-            }
-            const rounds = Math.max(1, Math.floor(result)); // at least 1 round
-            updatedDuration = { rounds, turns: rounds };
-            updated = true;
-
-            // const roll = await new Roll(formula).evaluate({ evaluateSync: true });
-            // const rounds = roll.total;
-            // updatedDuration = { "rounds": rounds, "turns": rounds };
-            Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" resolved duration "${formula}" to ${rounds} rounds`);
-        } catch (err) {
-            Hyp3eLogger.error("checkAndResolveDuration", `Invalid duration formula: ${formula}`, err);
-        }
-    }
-    Hyp3eLogger.info("checkAndResolveDuration", `Return data:`, { updatedDuration, updated });
-    return { updatedDuration, updated };
+  } catch (err) {
+    Hyp3eLogger.error("resolveFormula", `Unhandled error in resolveFormula("${formula}")`, err);
+    return null;
+  }
 }
 
 /**

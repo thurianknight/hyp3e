@@ -194,7 +194,7 @@ export class Hyp3eActor extends Actor {
       // Prepare character/npc roll data.
       this._getCharacterRollData(data);
       // this._getNpcRollData(data);  // POSSIBLE FUTURE USE
-      Hyp3eLogger.info("Hyp3eActor getRollData", `${this.name} data:`, data);
+      // Hyp3eLogger.info("Hyp3eActor getRollData", `${this.name} data:`, data);
       return data;
   }
 
@@ -511,9 +511,9 @@ export class Hyp3eActor extends Actor {
               Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
               // Parse the change.value string and resolve it into a number if possible
               let resolvedChange = 0
-              if (isNaN(change.value)) {
+              if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
                   // Parse the change.value string and resolve it into a number if possible
-                  resolvedChange = parseAndResolveChangeValue(change.value, this)
+                  resolvedChange = parseAndResolveChangeValue(change.value, systemData)
               } else {
                   resolvedChange = Number(change.value) || 0;
               }
@@ -530,9 +530,9 @@ export class Hyp3eActor extends Actor {
               Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s DR:`, change);
               // Parse the change.value string and resolve it into a number if possible
               let resolvedChange = 0
-              if (isNaN(change.value)) {
+              if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
                   // Parse the change.value string and resolve it into a number if possible
-                  resolvedChange = parseAndResolveChangeValue(change.value, this)
+                  resolvedChange = parseAndResolveChangeValue(change.value, systemData)
               } else {
                 resolvedChange = Number(change.value) || 0;
               }
@@ -549,9 +549,9 @@ export class Hyp3eActor extends Actor {
               Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s MV:`, change);
               // Parse the change.value string and resolve it into a number if possible
               let resolvedChange = 0
-              if (isNaN(change.value)) {
+              if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
                   // Parse the change.value string and resolve it into a number if possible
-                  resolvedChange = parseAndResolveChangeValue(change.value, this)
+                  resolvedChange = parseAndResolveChangeValue(change.value, systemData)
               } else {
                 resolvedChange = Number(change.value) || 0;
               }
@@ -924,8 +924,12 @@ export class Hyp3eActor extends Actor {
    * Then update the item's effect/change with a number, so it becomes "permanent".
    */
   async updateItemEffects() {
-      for ( const item of this.items ) {
-          if ( !item.system.equipped ) continue;
+    const actorData = this.getRollData();
+
+    for ( const item of this.items ) {
+          // Exit if the effect is on an unequipped physical item
+          if ( !item.system.equipped && item.type !== "feature" && item.type !== "spell" ) continue;
+
           for ( const effect of item.effects ) {
               if ( !effect.transfer ) continue;
 
@@ -933,19 +937,22 @@ export class Hyp3eActor extends Actor {
               let didUpdate = false;
 
               // Check to see if we have a rollable duration formula, and resolve it if so
-              const { updatedDuration, updated } = checkAndResolveDuration(effect);
-              Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Effect "${effect.name}" duration:`, updatedDuration);
-              if (updated) didUpdate = true;
+              const { updatedDuration, updated } = checkAndResolveDuration(effect, actorData);
+              if (updated) {
+                didUpdate = true;
+                Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" resolved duration:`, updatedDuration);
+              }
 
               // Store all changes for a batch update at the end
               let updatedChanges = [...effect.changes];  // Start with a shallow copy
-              Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, updatedChanges);
+              // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, updatedChanges);
               for (let i = 0; i < updatedChanges.length; i++) {
                   const change = updatedChanges[i];
                   let resolvedChange = change.value
-                  if (isNaN(change.value)) {
+                  if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
                       // Parse the change.value string and resolve it into a number if possible
-                      resolvedChange = parseAndResolveChangeValue(change.value, this)
+                      resolvedChange = parseAndResolveChangeValue(change.value, actorData)
+                      Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${change.name}" resolved ${change.value} to value ${resolvedChange}`);
                   }
                   if (updatedChanges[i].value !== resolvedChange) {
                       updatedChanges[i] = {
@@ -957,12 +964,13 @@ export class Hyp3eActor extends Actor {
               }
               // Batch out the updates to the effect
               if (didUpdate) {
-                  Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Duration:`, updatedDuration)
-                  Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Changes:`, updatedChanges)
-                  await effect.update({
-                      duration: updatedDuration,
-                      changes: updatedChanges
-                  });
+                const updates = {
+                  duration: updatedDuration,
+                  changes: updatedChanges
+                }
+                  // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Duration:`, updatedDuration)
+                  Hyp3eLogger.info("Hyp3eActor updateItemEffects", `All updates to ${effect.name}:`, updates)
+                  await effect.update(updates);
               }
           }
       }
