@@ -1334,7 +1334,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             "system.attributes.dex.value": item?.parent?.system.attributes.dex.value || 10,
             "prototypeToken.name": item.name,
             "prototypeToken.texture.src": item.img,
-            // "prototypeToken.light...."
+            "prototypeToken.light.angle": item.system?.light.angle || 360,
+            "prototypeToken.light.dim": item.system?.light.dim || null,
+            "prototypeToken.light.bright": item.system?.light.bright || null,
+            "prototypeToken.light.color": item.system?.light.color,
           };
           await this.actor.update(updates);
           const msg = `Item Token linked to item ${item.name}.`;
