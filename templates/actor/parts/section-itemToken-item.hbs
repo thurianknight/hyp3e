@@ -85,3 +85,18 @@
     </li>
 </ol>
 {{/each}}
+<div class="flex biography-block">
+  <h2>{{localize 'HYP3E.headers.descNotes'}}</h2>
+  {{#if editable}}
+  <prose-mirror
+    name="system.biography"
+    button="true"
+    editable="{{editable}}"
+    toggled="false"
+    value="{{system.biography}}">
+    {{{enrichedBiography}}}
+  </prose-mirror>
+  {{else}}
+  {{{enrichedBiography}}}
+  {{/if}}        
+</div>

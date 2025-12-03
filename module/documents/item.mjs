@@ -580,6 +580,18 @@ export class Hyp3eItem extends Item {
         const duration = this.system.duration;
     }
 
+    getNumericDuration(raw) {
+      if (raw === "" || raw === null || raw === undefined) return null;
+    
+      // Convert to number
+      const dur = Number(raw);
+    
+      // Reject anything non-numeric (e.g. "fast", "@level", NaN)
+      if (Number.isNaN(dur)) return null;
+    
+      return dur;
+    }
+
     /** LOOKUP TABLES AND FUNCTIONS ---------------------*/
 
     /**

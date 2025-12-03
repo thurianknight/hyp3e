@@ -173,10 +173,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             template: `${HYP3E.templatePath}/actor/parts/tab-itemToken-abilities.hbs`,
             scrollable: ["", ".tab"],
         },
-        itemTokenDescription: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-itemToken-description.hbs`,
-            scrollable: ["", ".tab"],
-        },
+        // itemTokenDescription: {
+        //     template: `${HYP3E.templatePath}/actor/parts/tab-itemToken-description.hbs`,
+        //     scrollable: ["", ".tab"],
+        // },
     }
 
     // ===========================================================================
@@ -366,8 +366,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             case "treasureAll":
               break;
             case "itemTokenAbilities":
-              break;
-            case "itemTokenDescription":
               if (this.document.type === "itemToken") {
                 // Enrich content for display
                 context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
@@ -379,6 +377,18 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 )
               }
               break;
+            // case "itemTokenDescription":
+            //   if (this.document.type === "itemToken") {
+            //     // Enrich content for display
+            //     context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            //       this.document.system.biography,
+            //       {
+            //         secrets: this.document.isOwner,
+            //         relativeTo: this.document
+            //       }
+            //     )
+            //   }
+            //   break;
             default:
         }
         return context;
@@ -416,7 +426,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       // Item Token tabs
       if (this.document.type === "itemToken") {
         tabs.tabs.push({ id: 'itemTokenAbilities', group: group });
-        tabs.tabs.push({ id: 'itemTokenDescription', group: group });
+        // tabs.tabs.push({ id: 'itemTokenDescription', group: group });
         tabs.tabs.push({ id: 'effects', group: group });
       }
 
@@ -1089,7 +1099,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // li.slideUp(200, () => this.render(false))
         if (this.actor.type === "itemToken") {
           // Unlink the item
-          this.actor.linkedItemUuid = "";
+          this.actor.system.linkedItemUuid = "";
           await this.actor.update();
         }
     }

@@ -986,7 +986,7 @@ export class Hyp3eActor extends Actor {
     let damageType = ""
     let rawDamageRoll = ""
     let damageMessages = [];
-
+    Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Processing temp effects on ${this.name}...`);
     // Collect updates to disable expired effects
     const expiredEffectUpdates = [];
     for (const effect of this.allApplicableEffects()) {
@@ -1114,10 +1114,14 @@ export class Hyp3eActor extends Actor {
    * Process temporary items on the actor, deleting any that are expired.
    */
   async processTemporaryItems(rounds = 1) {
+    Hyp3eLogger.info("Hyp3eActor processTemporaryItems", `Processing temp items on ${this.name}...`);
       // Filter items with numeric duration > 0
       const tempItems = this.items.filter(item => {
-          const dur = item.system?.duration;
-          return typeof dur === "number" && dur > 0 && item.type != "spell";
+        // Convert to a number if possible
+        const dur = item.getNumericDuration(item.system?.duration);
+        return dur !== null && dur > 0 &&
+          item.type !== "spell" &&
+          item.type !== "feature";
       });
 
       // Log items to decrement duration
@@ -1129,9 +1133,9 @@ export class Hyp3eActor extends Actor {
       // Update duration on temporary items
       const updates = [];
       for (const item of tempItems) {
-          const dur = item.system?.duration;
+          const dur = Number(item.system?.duration);
           // Duration must be a positive number
-          if (typeof dur === "number" && dur > 0) {
+          if (dur > 0) {
               updates.push({
                   _id: item.id,
                   "system.duration": dur - rounds
@@ -1144,8 +1148,11 @@ export class Hyp3eActor extends Actor {
 
       // Filter items with numeric duration <= 0
       const expiredItems = this.items.filter(item => {
-          const dur = item.system?.duration;
-          return typeof dur === "number" && dur <= 0 && item.type != "spell";
+        // Convert to a number if possible
+        const dur = item.getNumericDuration(item.system?.duration);
+        return dur !== null && dur <= 0 &&
+          item.type !== "spell" &&
+          item.type !== "feature";
       });
 
       if (expiredItems.length == 0) return;
@@ -1155,7 +1162,7 @@ export class Hyp3eActor extends Actor {
       if (namesToDelete.length > 0) {
           Hyp3eLogger.info("Hyp3eActor processTemporaryItems", `Deleting ${namesToDelete.join(", ")}...`)
           // Post all the item expiration messages together
-          const chatContent = `Conjured item has expired...<ul><li>${namesToDelete.join("</li><li>")}</li></ul>`;
+          const chatContent = `<p>Conjured item has expired...</p><ul><li>${namesToDelete.join("</li><li>")}</li></ul>`;
           sendSimpleChat(this, "", chatContent)
       }
 
@@ -1164,6 +1171,18 @@ export class Hyp3eActor extends Actor {
       await this.deleteEmbeddedDocuments("Item", idsToDelete);
   }
 
+  getNumericDuration(raw) {
+    if (raw === "" || raw === null || raw === undefined) return null;
+  
+    // Convert to number
+    const dur = Number(raw);
+  
+    // Reject anything non-numeric (e.g. "fast", "@level", NaN)
+    if (Number.isNaN(dur)) return null;
+  
+    return dur;
+  }
+  
   /** DAMAGE/HEALING APPLICATION ----------------------*/
 
   /**
