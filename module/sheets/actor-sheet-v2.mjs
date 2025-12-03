@@ -1086,7 +1086,12 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         const item = this.actor.items.get(itemId)
         // Delete the item (active effects are deleted automatically at the same time)
         item.delete()
-        li.slideUp(200, () => this.render(false))
+        // li.slideUp(200, () => this.render(false))
+        if (this.actor.type === "itemToken") {
+          // Unlink the item
+          this.actor.linkedItemUuid = "";
+          await this.actor.update();
+        }
     }
 
     /**
