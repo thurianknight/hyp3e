@@ -215,7 +215,8 @@ export async function setupEffectHandlers() {
     });
 
     /**
-     * Handle the creation of an active effect on an actor.
+     * Handle the creation of an active effect on an actor. This ONLY applies to effects
+     * applied directly to the actor, not effects coming from an equipped item.
      */
     Hooks.on("createActiveEffect", async (effect, options, userId) => {
         // Only process if we're the one who owns this actor
