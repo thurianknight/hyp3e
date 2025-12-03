@@ -1323,7 +1323,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           }
           // Clone important properties from item to actor
           const updates = {
-            "name": item.name,
+            "name": item.system?.friendlyName || item.name,
             "img": item.img,
             "system.linkedItemUuid": item.uuid,
             "system.biography": item.system.description,
@@ -1333,7 +1333,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             "system.hp.value": 1,
             "system.hp.max": 1,
             "system.attributes.dex.value": item?.parent?.system.attributes.dex.value || 10,
-            "prototypeToken.name": item.name,
+            "prototypeToken.name": item.system?.friendlyName || item.name,
             "prototypeToken.texture.src": item.img,
             "prototypeToken.light.angle": item.system?.light.angle || 360,
             "prototypeToken.light.dim": item.system?.light.dim || null,
