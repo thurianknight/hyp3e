@@ -875,7 +875,7 @@ async function migrateWorld() {
 
     // Migrate compendia, one document at a time (time-consuming!)
     for (let pack of game.packs) {
-        if (!pack.collection.startsWith("hyperborea-3e-compendium")) continue;
+        if (!pack.collection.startsWith("hyp3e-compendium")) continue;
 
         const packType = pack.metadata.type
 

@@ -1,5 +1,5 @@
 import { Hyp3eCharacter } from "../helpers/character.mjs";
-import { Hyp3eDice } from "../dice/dice.mjs";
+import { Hyp3eDice, isPureNumber, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { parseAndResolveChangeValue, checkAndResolveDuration } from "../helpers/effects.mjs";
@@ -71,7 +71,7 @@ export class Hyp3eActor extends Actor {
 
     // Make separate methods for each Actor type (character vs. npc) to keep
     // things organized.
-    await this._prepareCharacterData();
+    this._prepareCharacterData();
     this._prepareNpcData();
   }
 
@@ -424,29 +424,29 @@ export class Hyp3eActor extends Actor {
     let shieldMod = 0;
 
     const items = this._getEquippedProtectionItems();
-    Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `${this.name} has equipped protection items:`, items);
+    // Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `${this.name} has equipped protection items:`, items);
 
     for (const item of items) {
-        const sys = item.system ?? {};
+      const sys = item.system ?? {};
 
-        if (this._isHandShield(item)) {
-            // Shield = stacking AC mod
-            shieldMod += sys.ac || 0;
-        } else if (this._isPassiveAc(item)) {
-            // Passive protection items (rings, cloaks, etc) stack too
-            shieldMod += sys.ac || 0;
-        } else {
-            // Armor (or passive AC) = pick the best
-            //  It shouldn't even be possible to equip multiple armors, but just in case...
-            if (sys.ac < ac) {
-                ac = sys.ac;
-                dr = sys.dr || dr;
-            }
-            // Movement
-            if (sys.mv !== mv) {
-                mv = sys.mv ?? mv;
-            }
+      if (this._isHandShield(item)) {
+        // Shield = stacking AC mod
+        shieldMod += sys.ac || 0;
+      } else if (this._isPassiveAc(item)) {
+        // Passive protection items (rings, cloaks, etc) stack too
+        shieldMod += sys.ac || 0;
+      } else {
+        // Armor (or passive AC) = pick the best
+        //  It shouldn't even be possible to equip multiple armors, but just in case...
+        if (sys.ac < ac) {
+          ac = sys.ac;
+          dr = sys.dr || dr;
         }
+        // Movement
+        if (sys.mv !== mv) {
+          mv = sys.mv ?? mv;
+        }
+      }
     }
 
     // Encumbrance
@@ -461,11 +461,11 @@ export class Hyp3eActor extends Actor {
     // Dex and shields
     ac -= (systemData.attributes.dex.defMod || 0) + shieldMod;
 
-    // Active effects can modify AC, DR, and MV after this point...
+    // Active effects can add their changes after this point...
     const allowedKeys = [
-        "system.ac.value",
-        "system.ac.dr",
-        "system.movement.base.value"
+      "system.ac.value",
+      "system.ac.dr",
+      "system.movement.base.value"
     ];
     // Use these to update AC, DR, MV from effects
     let finalAc = ac;
@@ -474,99 +474,86 @@ export class Hyp3eActor extends Actor {
 
     const changes = [];
     for ( const effect of this.allApplicableEffects() ) {
-        // Skip if disabled or not active
-        if ( effect.disabled || !effect.active ) continue;
+      // Skip if disabled or not active
+      if ( effect.disabled || !effect.active ) continue;
 
-        // Validate effect condition is met before applying changes
-        const conditionPasses = this._effectApplies(effect);
-        // Store temporary effect condition state in actor (used by actor sheet)
-        systemData._hyp3eEffectConditionState = systemData._hyp3eEffectConditionState || {};
-        systemData._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
+      // Validate effect condition is met before applying changes
+      const conditionPasses = this._effectApplies(effect);
+      // Store temporary effect condition state in actor (used by actor-sheet)
+      systemData._hyp3eEffectConditionState = systemData._hyp3eEffectConditionState || {};
+      systemData._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
 
-        if (!conditionPasses) {
-          Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
-          continue;
-        }
+      if (!conditionPasses) {
+        Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
+        continue;
+      }
 
-        // Only include changes to allowed keys
-        const filtered = effect.changes
-            .filter(change => allowedKeys.includes(change.key))
-            .map(change => {
-                const c = foundry.utils.deepClone(change);
-                c.effect = effect;
-                c.priority = c.priority ?? (c.mode * 10);
-                return c;
-            });
-        changes.push(...filtered);
+      // Only include changes to allowed keys
+      const filtered = effect.changes
+        .filter(change => allowedKeys.includes(change.key))
+        .map(change => {
+          const c = foundry.utils.deepClone(change);
+          c.effect = effect;
+          c.priority = c.priority ?? (c.mode * 10);
+          return c;
+        });
+      changes.push(...filtered);
     }
     // Do we have any changes to apply?
     if ( changes.length > 0 ) {
       // Organize effects by their priority (though it probably doesn't matter)
       changes.sort((a, b) => a.priority - b.priority);
-      Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Prioritized changes to ${this.name}:`, changes);
 
-      // Accumulate AE changes
+      // Accumulate ActiveEffect changes
       for (const change of changes) {
-          if (change.key === "system.ac.value") {
-              Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
-              // Parse the change.value string and resolve it into a number if possible
-              let resolvedChange = 0
-              if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
-                  // Parse the change.value string and resolve it into a number if possible
-                  resolvedChange = parseAndResolveChangeValue(change.value, systemData)
-              } else {
-                  resolvedChange = Number(change.value) || 0;
-              }
-              // const val = Number(change.value) || 0;
-              // Apply change based on mode
-              switch (change.mode) {
-                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += resolvedChange; break;
-                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= resolvedChange; break;
-                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = resolvedChange; break;
-                  // Extend to other modes if needed
-              }
-          } else
-          if (change.key === "system.ac.dr") {
-              Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s DR:`, change);
-              // Parse the change.value string and resolve it into a number if possible
-              let resolvedChange = 0
-              if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
-                  // Parse the change.value string and resolve it into a number if possible
-                  resolvedChange = parseAndResolveChangeValue(change.value, systemData)
-              } else {
-                resolvedChange = Number(change.value) || 0;
-              }
-              // const val = Number(change.value) || 0;
-              // Apply change based on mode
-              switch (change.mode) {
-                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += resolvedChange; break;
-                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= resolvedChange; break;
-                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = resolvedChange; break;
-                  // Extend to other modes if needed
-              }
-          } else
-          if (change.key === "system.movement.base.value") {
-              Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s MV:`, change);
-              // Parse the change.value string and resolve it into a number if possible
-              let resolvedChange = 0
-              if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
-                  // Parse the change.value string and resolve it into a number if possible
-                  resolvedChange = parseAndResolveChangeValue(change.value, systemData)
-              } else {
-                resolvedChange = Number(change.value) || 0;
-              }
-              // const val = Number(change.value) || 0;
-              // Apply change based on mode
-              switch (change.mode) {
-                  case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += resolvedChange; break;
-                  case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= resolvedChange; break;
-                  case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = resolvedChange; break;
-                  // Extend to other modes if needed
-              }
-          }
+        let resolvedChange = 0;
+        // This regex tests for a pure number: "0", "-5", "3.14", etc.
+        // if (/^-?\d+(\.\d+)?$/.test(change.value)) {
+        if (isPureNumber(change.value)) {
+          resolvedChange = Number(change.value) || 0;
+        } else if (containsDice(change.value)) {
+          Hyp3eLogger.warn("Hyp3eActor _calculateAcDrMv", `Change "${change.value}" contains a dice roll formula, which is not allowed for AC, DR, and MV effects. Skipping...`);
+          continue;
+        } else if (containsMathOrVariables(change.value)) {
+          // Parse the change.value string/formula and resolve it to a number if possible
+          resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);
+          // resolvedChange = parseAndResolveChangeValue(change.value, systemData)
+        }
+        switch (change.key) {
+          case "system.ac.value":
+            // Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
+            // Apply change based on mode
+            switch (change.mode) {
+              case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = resolvedChange; break;
+              // Pretty sure we don't need the other effect modes
+            }  
+            break;
+          case "system.ac.dr":
+            // Apply change based on mode
+            switch (change.mode) {
+              case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = resolvedChange; break;
+              // Pretty sure we don't need the other effect modes
+            }
+            break;
+          case "system.movement.base.value":
+            // Apply change based on mode
+            switch (change.mode) {
+              case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = resolvedChange; break;
+              // Pretty sure we don't need the other effect modes
+            }  
+            break;
+          default:
+            break;
+        }
       }
     }
-    Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Final calculated AC, DR, MV for ${this.name}:`, { ac: finalAc, dr: finalDr, mv: finalMv });
+    // Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Final calculated AC, DR, MV for ${this.name}:`, { ac: finalAc, dr: finalDr, mv: finalMv });
     // Return the final results
     return {
         ac: Math.clamp(finalAc, -9, 9),
@@ -914,7 +901,7 @@ export class Hyp3eActor extends Actor {
     switch (condition.mode) {
       case "any":  return results.some(r => r);
       case "none": return results.every(r => !r);
-      default:     // "all" or anything else
+      default:  // Default is "all"
         return results.every(r => r);
     }
   }
@@ -927,53 +914,56 @@ export class Hyp3eActor extends Actor {
     const actorData = this.getRollData();
 
     for ( const item of this.items ) {
-          // Exit if the effect is on an unequipped physical item
-          if ( !item.system.equipped && item.type !== "feature" && item.type !== "spell" ) continue;
+      // Exit if the effect is on an unequipped physical item
+      if ( !item.system.equipped && item.type !== "feature" && item.type !== "spell" ) continue;
 
-          for ( const effect of item.effects ) {
-              if ( !effect.transfer ) continue;
+      for ( const effect of item.effects ) {
+        if ( !effect.transfer ) continue;
 
-              // Flag to track whether anything needs to be updated
-              let didUpdate = false;
+        // Flag to track whether anything needs to be updated
+        let didUpdate = false;
 
-              // Check to see if we have a rollable duration formula, and resolve it if so
-              const { updatedDuration, updated } = checkAndResolveDuration(effect, actorData);
-              if (updated) {
-                didUpdate = true;
-                Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" resolved duration:`, updatedDuration);
-              }
+        // Check to see if we have a rollable duration formula, and resolve it if so
+        const { updatedDuration, updated } = checkAndResolveDuration(effect, actorData);
+        if (updated) {
+          didUpdate = true;
+          Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" resolved duration:`, updatedDuration);
+        }
 
-              // Store all changes for a batch update at the end
-              let updatedChanges = [...effect.changes];  // Start with a shallow copy
-              // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, updatedChanges);
-              for (let i = 0; i < updatedChanges.length; i++) {
-                  const change = updatedChanges[i];
-                  let resolvedChange = change.value
-                  if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
-                      // Parse the change.value string and resolve it into a number if possible
-                      resolvedChange = parseAndResolveChangeValue(change.value, actorData)
-                      Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${change.name}" resolved ${change.value} to value ${resolvedChange}`);
-                  }
-                  if (updatedChanges[i].value !== resolvedChange) {
-                      updatedChanges[i] = {
-                          ...change,
-                          value: resolvedChange
-                      };
-                      didUpdate = true;
-                  }
-              }
-              // Batch out the updates to the effect
-              if (didUpdate) {
-                const updates = {
-                  duration: updatedDuration,
-                  changes: updatedChanges
-                }
-                  // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Duration:`, updatedDuration)
-                  Hyp3eLogger.info("Hyp3eActor updateItemEffects", `All updates to ${effect.name}:`, updates)
-                  await effect.update(updates);
-              }
+        // Store all changes for a batch update at the end
+        let updatedChanges = [...effect.changes];  // Start with a shallow copy
+        // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, updatedChanges);
+        for (let i = 0; i < updatedChanges.length; i++) {
+          const change = updatedChanges[i];
+          let resolvedChange = 0;
+          if (isPureNumber(change.value)) {
+            resolvedChange = Number(change.value) || 0;
+          } else if (containsDice(change.value)) {
+            // Parse the change.value string/formula and resolve it to a number if possible
+            resolvedChange = await Hyp3eDice.resolveFormulaWithMathAsync(change.value, actorData)
+          } else if (containsMathOrVariables(change.value)) {
+            resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);  
           }
+          if (updatedChanges[i].value !== resolvedChange) {
+            updatedChanges[i] = {
+              ...change,
+              value: resolvedChange
+            };
+            didUpdate = true;
+          }
+        }
+        // Batch out the updates to the effect
+        if (didUpdate) {
+          const updates = {
+            duration: updatedDuration,
+            changes: updatedChanges
+          }
+          // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Duration:`, updatedDuration)
+          Hyp3eLogger.info("Hyp3eActor updateItemEffects", `All updates on actor ${this.name} to effect ${effect.name}:`, { updates });
+          await effect.update(updates);
+        }
       }
+    }
   }
 
   /**

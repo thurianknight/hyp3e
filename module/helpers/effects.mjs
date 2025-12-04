@@ -1,4 +1,5 @@
 import { Hyp3eLogger } from "./logger.mjs";
+import { Hyp3eDice, isPureNumber, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
 import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
 
 /**
@@ -573,15 +574,14 @@ export function resolveFormula(formula, dataSource = {}) {
   if (!formula || typeof formula !== "string") return null;
 
   try {
-    // Replace dataSource @variables
+    // Find & replace dataSource @variables
     let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
       return foundry.utils.getProperty(dataSource, key) ?? 0;
     });
 
-    // Replace all dice expressions with rolled totals
+    // Find & replace dice expressions with rolled totals
     const diceRegex = /\b(\d*d\d+(?:[+-]\d+)*)\b/g;
     const matches = [...expanded.matchAll(diceRegex)];
-
     for (const match of matches) {
       try {
         const roll = new Roll(match[1], dataSource).evaluateSync();
