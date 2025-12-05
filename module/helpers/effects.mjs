@@ -220,91 +220,99 @@ export async function setupEffectHandlers() {
      * applied directly to the actor, not effects coming from an equipped item.
      */
     Hooks.on("createActiveEffect", async (effect, options, userId) => {
-        // Only process if we're the one who owns this actor
-        const actor = effect.parent;
-        if (!actor?.isOwner) return;
-        // Only let the GM create the effect
-        if (!game.user.isGM) return;
-        Hyp3eLogger.info("createActiveEffect", `Create event fired:`, effect);
+      // Only process if we're the one who owns this actor
+      const actor = effect.parent;
+      if (!actor?.isOwner) return;
+      // Only let the GM create the effect
+      if (!game.user.isGM) return;
+      Hyp3eLogger.info("createActiveEffect", `Create event fired:`, effect);
 
-        // Get data stored in the effect's flags
-        const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
-        const sourceActor = sourceUuid ? await fromUuid(sourceUuid) : effect.parent;
-        const actorData = sourceActor?.system ?? {};
-        Hyp3eLogger.info("createActiveEffect", `Actor applying the effect:`, actorData);
+      // Get data stored in the effect's flags
+      const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
+      const sourceActor = sourceUuid ? await fromUuid(sourceUuid) : effect.parent;
+      const actorData = sourceActor?.system ?? {};
+      Hyp3eLogger.info("createActiveEffect", `Actor applying the effect:`, actorData);
 
-        // Flag to track whether anything needs to be updated
-        let didUpdate = false;
+      // Flag to track whether anything needs to be updated
+      let didUpdate = false;
 
-        // Check to see if we have a rollable Duration formula, and resolve it if so
-        const { updatedDuration, updated } = checkAndResolveDuration(effect, actorData);
-        Hyp3eLogger.info("createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
-        if (updated) didUpdate = true;
+      // Check to see if we have a rollable Duration formula, and resolve it if so
+      const { updatedDuration, updated } = await checkAndResolveDuration(effect, actorData);
+      Hyp3eLogger.info("createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
+      if (updated) didUpdate = true;
 
-        // Store all changes for a batch update at the end
-        let updatedChanges = [...effect.changes];  // Start with a shallow copy
+      // Store all changes for a batch update at the end
+      let updatedChanges = [...effect.changes];  // Start with a shallow copy
 
-        for (let i = 0; i < updatedChanges.length; i++) {
-          const change = updatedChanges[i];
-          // Store the change value regardless of whether it's a formula or not
-          if (!change.flags?.hyp3e?.originalValue) {
-            change.flags = change.flags || {};
-            change.flags.hyp3e = change.flags.hyp3e || {};
-            change.flags.hyp3e.originalValue = change.value;
-            didUpdate = true;
-          }
-          // Parse the change.value string and resolve it into a number if possible
-          if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
-            const resolvedChange = parseAndResolveChangeValue(change.value, actorData)
-            if (updatedChanges[i].value !== resolvedChange) {
-              updatedChanges[i] = {
-                ...change,
-                value: resolvedChange
-              };
-              didUpdate = true;
-            }
-          }
+      for (let i = 0; i < updatedChanges.length; i++) {
+        const change = updatedChanges[i];
+        // Store the change value regardless of whether it's a formula or not
+        if (!change.flags?.hyp3e?.originalValue) {
+          change.flags = change.flags || {};
+          change.flags.hyp3e = change.flags.hyp3e || {};
+          change.flags.hyp3e.originalValue = change.value;
+          didUpdate = true;
         }
-
-        // Batch out the updates to the effect
-        if (didUpdate) {
-            Hyp3eLogger.info("createActiveEffect", `Duration:`, updatedDuration)
-            Hyp3eLogger.info("createActiveEffect", `Changes:`, updatedChanges)
-            await effect.update({
-                duration: updatedDuration,
-                changes: updatedChanges
-            });
+        // Parse the change.value string and resolve it into a number if possible
+        // if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
+        // const resolvedChange = parseAndResolveChangeValue(change.value, actorData)
+        let resolvedChange = change.value;
+        if (isPureNumber(change.value)) {
+          resolvedChange = Number(change.value);
+        } else if (containsDice(change.value)) {
+          // Parse the change.value string/formula and resolve it to a number if possible
+          resolvedChange = await Hyp3eDice.resolveFormulaWithMathAsync(change.value, actorData)
+        } else if (containsMathOrVariables(change.value)) {
+          resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);  
         }
-
-        // Automatically set the remaining turns for active effects with a duration in rounds.
-        //  This is useful for effects that are generally applied outside of combat and last for 
-        //  multiple turns (much longer than a typical combat spell/effect).
-        if (!effect.getFlag("hyp3e", "remainingTurns")) {
-            // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
-            const durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
-            const durationTurns = Math.floor(durationRounds / 60) ?? null;
-            if (durationRounds && durationRounds < 60) {
-                Hyp3eLogger.info("createActiveEffect", `Effect ${effect.name} has duration <60 rounds and will expire at the next turn.`);
-            } else if (isNaN(durationTurns)) {
-                Hyp3eLogger.info("createActiveEffect", `Effect ${effect.name} has no duration limit and will not expire.`);
-            }
-            await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
-            Hyp3eLogger.info("createActiveEffect", `Auto-set remainingTurns to ${durationTurns} for ${effect.name}`);
+        if (updatedChanges[i].value !== resolvedChange) {
+          updatedChanges[i] = {
+            ...change,
+            value: resolvedChange
+          };
+          didUpdate = true;
         }
+        // }
+      }
 
-        // Does the effect include light source properties?
-        const lightProps = effect.getFlag("hyp3e", "lightProps");
-        if (lightProps) {
-            // Find all placed tokens for this actor (usually just one) in the current scene
-            for (const token of canvas.tokens.placeables) {
-                if (token.actor?.id !== actor.id) continue;
-                // Apply the light source to the token
-                applyTokenLight(token, lightProps);
-            }
+      // Batch out the updates to the effect
+      if (didUpdate) {
+        Hyp3eLogger.info("createActiveEffect", `Duration:`, updatedDuration)
+        Hyp3eLogger.info("createActiveEffect", `Changes:`, updatedChanges)
+        await effect.update({
+          duration: updatedDuration,
+          changes: updatedChanges
+        });
+      }
+
+      // Automatically set the remaining turns for active effects with a duration in rounds.
+      //  This is useful for effects that are generally applied outside of combat and last for 
+      //  multiple turns (much longer than a typical combat spell/effect).
+      if (!effect.getFlag("hyp3e", "remainingTurns")) {
+        // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
+        const durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
+        const durationTurns = Math.floor(durationRounds / 60) ?? null;
+        if (durationRounds && durationRounds < 60) {
+          Hyp3eLogger.info("createActiveEffect", `Effect ${effect.name} has duration <60 rounds and will expire at the next turn.`);
+        } else if (isNaN(durationTurns)) {
+          Hyp3eLogger.info("createActiveEffect", `Effect ${effect.name} has no duration limit and will not expire.`);
         }
-        // Send a chat message that the effect was applied
-        sendEffectChatMessage(effect)
+        await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
+        Hyp3eLogger.info("createActiveEffect", `Auto-set remainingTurns to ${durationTurns} for ${effect.name}`);
+      }
 
+      // Does the effect include light source properties?
+      const lightProps = effect.getFlag("hyp3e", "lightProps");
+      if (lightProps) {
+        // Find all placed tokens for this actor (usually just one) in the current scene
+        for (const token of canvas.tokens.placeables) {
+          if (token.actor?.id !== actor.id) continue;
+          // Apply the light source to the token
+          applyTokenLight(token, lightProps);
+        }
+      }
+      // Send a chat message that the effect was applied
+      sendEffectChatMessage(effect)
     });
 
     /**
@@ -460,30 +468,36 @@ export function parseAndResolveChangeValue(changeValue, actorData) {
  * @param {*} actorData 
  * @returns 
  */
-export function checkAndResolveDuration(effect, actorData) {
+export async function checkAndResolveDuration(effect, actorData) {
   let updatedDuration = { ...effect.duration };
   let updated = false;
 
+  // Do we even have a duration formula? Exit here if not...
   const formula = effect.getFlag("hyp3e", "durationFormula");
   if (!formula) return { updatedDuration, updated };
 
-  Hyp3eLogger.info("checkAndResolveDuration", `Actor applying effect:`, actorData);
+  Hyp3eLogger.info("checkAndResolveDuration", `Effect ${effect.name}, duration "${formula}", applying to ${actorData.actorName}...`, actorData);
+  // Only actors can apply effects, items leave it
+  // if (!(effect.parent instanceof Actor)) return { updatedDuration, updated };
 
-  // Only actors can apply rolled durations
-  // if (!(effect.parent instanceof Actor)) {
-  //   updatedDuration = { rounds: 1, turns: 1 };
-  //   updated = true;
-  //   return { updatedDuration, updated };
-  // }
+  let resolvedDuration = 0;
+  if (isPureNumber(formula)) {
+    resolvedDuration = Number(formula);
+  } else if (containsDice(formula)) {
+    // Parse the formula string/formula and resolve it to a number if possible
+    resolvedDuration = await Hyp3eDice.resolveFormulaWithMathAsync(formula, actorData)
+  } else if (containsMathOrVariables(formula)) {
+    resolvedDuration = Hyp3eDice.resolveFormulaWithMath(formula, actorData);  
+  }
 
-  const result = resolveFormula(formula, actorData);
+  // const result = resolveFormula(formula, actorData);
 
-  if (result === null) {
+  if (resolvedDuration === null) {
     Hyp3eLogger.error("checkAndResolveDuration", `Invalid duration formula "${formula}"`);
     return { updatedDuration, updated };
   }
 
-  const rounds = Math.max(1, Math.floor(result));
+  const rounds = Math.max(1, Math.floor(resolvedDuration));
 
   updatedDuration = { rounds, turns: rounds };
   updated = true;

@@ -90,6 +90,7 @@ export class Hyp3eActor extends Actor {
     const customClassData = game.settings.get(game.system.id, "customClassData");
     try {
       systemData.actorType = this.type
+      systemData.actorName = this.name
       systemData.baseClass = Hyp3eCharacter.classData[systemData.details.class]?.baseClass ?? customClassData[systemData.details.class]?.baseClass;
     } catch (err) {
       // No match found (happens with custom classes), use "npc"
@@ -147,6 +148,7 @@ export class Hyp3eActor extends Actor {
 
     // Add actor type & base class, used for crit hit & crit miss tables
     systemData.actorType = this.type
+    systemData.actorName = this.name
     systemData.baseClass = "npc"
   }
 
@@ -191,6 +193,7 @@ export class Hyp3eActor extends Actor {
       const data = super.getRollData();
       data.actorId = this.id
       data.actorType = this.type;
+      data.actorName = this.name;
       // Prepare character/npc roll data.
       this._getCharacterRollData(data);
       // this._getNpcRollData(data);  // POSSIBLE FUTURE USE
@@ -521,7 +524,7 @@ export class Hyp3eActor extends Actor {
         }
         switch (change.key) {
           case "system.ac.value":
-            // Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${change.key} to ${this.name}'s AC:`, change);
+            Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s AC:`, change);
             // Apply change based on mode
             switch (change.mode) {
               case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += resolvedChange; break;
@@ -531,6 +534,7 @@ export class Hyp3eActor extends Actor {
             }  
             break;
           case "system.ac.dr":
+            Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s DR:`, change);
             // Apply change based on mode
             switch (change.mode) {
               case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += resolvedChange; break;
@@ -540,6 +544,7 @@ export class Hyp3eActor extends Actor {
             }
             break;
           case "system.movement.base.value":
+            Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s MV:`, change);
             // Apply change based on mode
             switch (change.mode) {
               case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += resolvedChange; break;
@@ -924,7 +929,7 @@ export class Hyp3eActor extends Actor {
         let didUpdate = false;
 
         // Check to see if we have a rollable duration formula, and resolve it if so
-        const { updatedDuration, updated } = checkAndResolveDuration(effect, actorData);
+        const { updatedDuration, updated } = await checkAndResolveDuration(effect, actorData);
         if (updated) {
           didUpdate = true;
           Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" resolved duration:`, updatedDuration);
@@ -935,14 +940,14 @@ export class Hyp3eActor extends Actor {
         // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, updatedChanges);
         for (let i = 0; i < updatedChanges.length; i++) {
           const change = updatedChanges[i];
-          let resolvedChange = 0;
+          let resolvedChange = change.value;
           if (isPureNumber(change.value)) {
-            resolvedChange = Number(change.value) || 0;
+            resolvedChange = Number(change.value);
           } else if (containsDice(change.value)) {
             // Parse the change.value string/formula and resolve it to a number if possible
             resolvedChange = await Hyp3eDice.resolveFormulaWithMathAsync(change.value, actorData)
           } else if (containsMathOrVariables(change.value)) {
-            resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);  
+            resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, actorData);  
           }
           if (updatedChanges[i].value !== resolvedChange) {
             updatedChanges[i] = {
