@@ -1610,7 +1610,21 @@ export class Hyp3eActor extends Actor {
       // Gather dataset properties from the item and actor
       dataset = await this._prepareRollDataset(dataset.itemId, dataset);
       if (!dataset) return;
-
+      // Set the roll button label based on item type
+      switch (item.type) {
+          case "item":
+              dataset.rollButtonLabel = "Use Item"
+              break
+          case "feature":
+              dataset.rollButtonLabel = "Use Ability"
+              break
+          case "spell":
+              dataset.rollButtonLabel = "Cast Spell"
+              break
+          default:
+              dataset.rollButtonLabel = "Use"
+              break
+      }
       Hyp3eLogger.info("Hyp3eActor rollItem", `${dataset.label}:`, item);
       if (item.type === "weapon") {
           // Attack with the weapon
@@ -1646,7 +1660,6 @@ export class Hyp3eActor extends Actor {
               dataset.details = `Using ${itemName} applies the following: ${effectList}.`
               dataset.noRoll = true
           }
-          dataset.rollButtonLabel = "Use Item"
           try {
               await Hyp3eDialog.ShowBasicRollDialog(dataset)
           } catch(err) {

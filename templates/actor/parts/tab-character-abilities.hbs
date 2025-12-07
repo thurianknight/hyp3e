@@ -73,7 +73,7 @@
               <div class="flexrow">
                 <div class="item-name">
                   <div class="item-image">
-                    {{#if item.system.formula}}
+                    {{#if (or item.system.formula item.effects.size)}}
                       <a class="rollable" 
                           data-action="rollThis" 
                           data-item-id="{{item.id}}" 
