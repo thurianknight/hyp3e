@@ -638,9 +638,48 @@ export class Hyp3eDice {
 
 }
 
-// Matches "23", "-5", "3.14", etc.
+/**
+ * Matches "23", "-5", "3.14", etc.
+ * @param {string} str - the string to test
+ * @returns {boolean}
+ */
 export function isPureNumber(str) {
   return typeof str === "string" && /^-?\d+(\.\d+)?$/.test(str.trim());
+}
+
+/**
+ * Rejects any string that contains the following:
+ *  - Pure numbers like "10", "-3.2"
+ *  - Dice expressions like "1d3", "2d6"
+ *  - Actor variables like @str.atkMod or @lvl
+ *  - Simple math operators like +, -, *, /, or %
+ *  - JavaScript Math.* function calls
+ * @param {string} str - the string to test
+ * @returns {boolean}
+ */
+export function isPureString(str) {
+  if (typeof str !== "string") return false;
+
+  const s = str.trim();
+  if (!s.length) return true; // If this happens, we capture it as an empty string
+
+  // Reject pure numbers like "10", "-3.2"
+  if (/^-?\d+(\.\d+)?$/.test(s)) return false;
+
+  // Reject anything containing dice expressions
+  if (/\d+d\d+/.test(s)) return false;
+
+  // Reject @variables like @str.atkMod or @lvl
+  if (/@[a-zA-Z_][\w.]*/.test(s)) return false;
+
+  // Reject simple math operators
+  if (/[+*%/\-]/.test(s)) return false;
+
+  // Reject Math.* function calls
+  if (/Math\.[a-zA-Z_]\w*\s*\(/.test(s)) return false;
+
+  // If it passed all checks, it's a "pure string"
+  return true;
 }
 
 // Matches dice notation: 1d6, d8, 2D10, (1d4 + 1d6), etc.
@@ -659,10 +698,9 @@ export function containsMathOrVariables(str) {
   if (/Math\.[a-zA-Z_]\w*\s*\(/.test(str)) return true;
 
   // Detect math operators or parentheses
-  if (/[()+\-*/]/.test(str)) return true;
+  if (/[()+*/\-]/.test(str)) return true;
 
-  // Detect digits (e.g. "1 + 2", "100", "2x" would be caught here—
-  // but digits alone are fine since pure numbers are checked earlier)
+  // Detect digits (e.g. "1 + 2", "100", "2x"
   if (/\d/.test(str)) return true;
 
   return false;

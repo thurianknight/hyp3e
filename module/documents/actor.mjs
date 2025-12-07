@@ -1,5 +1,5 @@
 import { Hyp3eCharacter } from "../helpers/character.mjs";
-import { Hyp3eDice, isPureNumber, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
+import { Hyp3eDice, isPureNumber, isPureString, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { checkAndResolveDuration } from "../helpers/effects.mjs";
@@ -931,9 +931,11 @@ export class Hyp3eActor extends Actor {
         // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, updatedChanges);
         for (let i = 0; i < updatedChanges.length; i++) {
           const change = updatedChanges[i];
-          let resolvedChange = change.value;
+          let resolvedChange = null;
           if (isPureNumber(change.value)) {
             resolvedChange = Number(change.value);
+          } else if (isPureString(change.value)) {
+            resolvedChange = change.value;
           } else if (containsDice(change.value)) {
             // Parse the change.value string/formula and resolve it to a number if possible
             resolvedChange = await Hyp3eDice.resolveFormulaWithMathAsync(change.value, actorData)

@@ -49,11 +49,11 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
         // Resolve container as jQuery
         const $container = $(container);
         if (!$container.length) throw new Error("HYP3ETurnTrackerAppV2 renderEmbedded: container not found");
-        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 renderEmbedded", "Rendering into container:", $container);
+        // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 renderEmbedded", "Rendering into container:", $container);
 
         // Render the template with current data
         const htmlString = await foundry.applications.handlebars.renderTemplate(HYP3ETurnTrackerAppV2.PARTS.content.template, this._prepareContext());
-        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 renderEmbedded", "Rendering turn tracker:", htmlString);
+        // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 renderEmbedded", "Rendering turn tracker:", htmlString);
         const $html = $(htmlString).addClass("turn-tracker");
 
         // Remove a previous embedded instance if present

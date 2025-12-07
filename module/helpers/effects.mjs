@@ -1,5 +1,5 @@
 import { Hyp3eLogger } from "./logger.mjs";
-import { Hyp3eDice, isPureNumber, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
+import { Hyp3eDice, isPureNumber, isPureString, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
 import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
 
 /**
@@ -253,16 +253,18 @@ export async function setupEffectHandlers() {
           change.flags.hyp3e.originalValue = change.value;
           didUpdate = true;
         }
-        // Parse the change.value string and resolve it into a number if possible
-        let resolvedChange = change.value;
+        // Parse the change.value string and resolve any variables or math
+        let resolvedChange = null;
         if (isPureNumber(change.value)) {
           resolvedChange = Number(change.value);
+        } else if (isPureString(change.value)) {
+          resolvedChange = change.value;
         } else if (containsDice(change.value)) {
           // Dice rolls in the formula require async processing
           resolvedChange = await Hyp3eDice.resolveFormulaWithMathAsync(change.value, actorData)
         } else if (containsMathOrVariables(change.value)) {
           // No dice rolls, we can do it synchronous
-          resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);  
+          resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, actorData);  
         }
         if (updatedChanges[i].value !== resolvedChange) {
           updatedChanges[i] = {
