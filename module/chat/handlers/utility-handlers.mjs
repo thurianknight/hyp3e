@@ -36,7 +36,7 @@ export async function handleSaveButtons(html) {
 }
 
 /**
- * 
+ * Handles "Apply Effect" button click in chat log
  * @param {*} html - The chat message HTML
  * @returns {Boolean} - True if button was added, false if not
  */
@@ -122,7 +122,7 @@ export async function handleEffectButtons(html) {
                 // Handle button clicks
                 effectApplyButton.on("click", (ev) => {
                     ev.stopPropagation();
-                    applyEffect(item, effect.id, actorId);
+                    applyEffect(item.uuid, effect.id, actorId);
                 });
             }
         });

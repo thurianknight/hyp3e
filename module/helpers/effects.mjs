@@ -9,11 +9,11 @@ import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
  */
  export function onManageActiveEffect(event, owner) {
     event.preventDefault();
-    Hyp3eLogger.info("onManageActiveEffect", `Owner of Effect:`, owner);
+    // Hyp3eLogger.info("ActiveEffect onManageActiveEffect", `Owner of Effect:`, owner);
     const a = event.currentTarget;
     const li = a.closest("li");
     const effect = li.dataset.effectId ? owner.effects.get(li.dataset.effectId) : null;
-    Hyp3eLogger.info("onManageActiveEffect", `Effect:`, effect);
+    // Hyp3eLogger.info("ActiveEffect onManageActiveEffect", `Effect:`, effect);
     switch ( a.dataset.action ) {
         case "createEffect":
             _createEffect(owner, a.dataset);
@@ -38,7 +38,7 @@ import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
             _toggleEffect(effect, owner);
             break;
         default:
-            Hyp3eLogger.warn("onManageActiveEffect", `Unknown action:`, a.dataset.action);
+            Hyp3eLogger.warn("ActiveEffect onManageActiveEffect", `Unknown action:`, a.dataset.action);
     }
 }
 
@@ -48,10 +48,10 @@ import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
  * @param {Actor|Item} owner      The owning document which manages this effect
  */
 export function onManageActiveEffectV2(target, owner) {
-    Hyp3eLogger.info("onManageActiveEffectV2", `Owner of Effect:`, owner);
+    // Hyp3eLogger.info("ActiveEffect onManageActiveEffectV2", `Owner of Effect:`, owner);
     const effectId = $(target).closest(".item-entry").data("effectId")
     const effect = effectId ? owner.effects.get(effectId) : null;
-    Hyp3eLogger.info("onManageActiveEffectV2", `Effect:`, effect);
+    // Hyp3eLogger.info("ActiveEffect onManageActiveEffectV2", `Effect:`, effect);
     switch ( target.dataset.action ) {
         case "createEffect":
             _createEffect(owner, target.dataset);
@@ -76,7 +76,7 @@ export function onManageActiveEffectV2(target, owner) {
             _toggleEffect(effect, owner);
             break;
         default:
-            Hyp3eLogger.error("onManageActiveEffectV2", `Unknown action:`, target.dataset.action);
+            Hyp3eLogger.error("ActiveEffect onManageActiveEffectV2", `Unknown action:`, target.dataset.action);
     }
 }
 
@@ -95,14 +95,14 @@ function _createEffect(owner, dataset) {
 function _toggleEffect(effect, owner) {
     let updates = {}
     if (effect.disabled) {
-        Hyp3eLogger.info("_toggleEffect", `Enabling Effect:`, effect);
+        Hyp3eLogger.info("ActiveEffect _toggleEffect", `Enabling Effect:`, effect);
         updates = {disabled: !effect.disabled};
         // Aside from simply toggling the disabled flag, we also want to track the 
         //  start of the effect if the actor is in combat. And if not in combat, 
         //  we want to clear the startRound and startTurn values since they are not valid.
         if (owner.inCombat) {
             const combatant = game.combat.turns.find(c => c.actor.id === owner.id);
-            Hyp3eLogger.info("_toggleEffect", `In Combat:`, combatant);
+            // Hyp3eLogger.info("ActiveEffect _toggleEffect", `In Combat:`, combatant);
             updates.duration = {
                 startRound: combatant.combat.current.round,
                 startTurn: combatant.combat.current.turn
@@ -115,7 +115,7 @@ function _toggleEffect(effect, owner) {
             }
         }
     } else {
-        Hyp3eLogger.info("_toggleEffect", `Disabling Effect:`, effect);
+        Hyp3eLogger.info("ActiveEffect _toggleEffect", `Disabling Effect:`, effect);
         // When disabling an effect, also remove the startRound and startTurn values.
         updates = {
             disabled: !effect.disabled,
@@ -210,7 +210,7 @@ export async function setupEffectHandlers() {
         btn.insertBefore(footer);
       
         btn.click(ev => {
-          Hyp3eLogger.info("renderActiveEffectConfig", `Opening Condition Editor for effect:`, effect);
+          // Hyp3eLogger.info("ActiveEffect renderActiveEffectConfig", `Opening Condition Editor for effect:`, effect);
           new HYP3EConditionEditor({ effect }).render(true);
         });
     });
@@ -225,20 +225,20 @@ export async function setupEffectHandlers() {
       if (!actor?.isOwner) return;
       // Only let the GM create the effect
       if (!game.user.isGM) return;
-      Hyp3eLogger.info("createActiveEffect", `Create event fired:`, effect);
+      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Create event fired for ${effect.name}:`, effect);
 
       // Get data stored in the effect's flags
       const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
       const sourceActor = sourceUuid ? await fromUuid(sourceUuid) : effect.parent;
       const actorData = sourceActor?.system ?? {};
-      Hyp3eLogger.info("createActiveEffect", `Actor applying the effect:`, actorData);
+      // Hyp3eLogger.info("ActiveEffect createActiveEffect", `Actor applying the effect:`, actorData);
 
       // Flag to track whether anything needs to be updated
       let didUpdate = false;
 
       // Check to see if we have a rollable Duration formula, and resolve it if so
       const { updatedDuration, updated } = await checkAndResolveDuration(effect, actorData);
-      Hyp3eLogger.info("createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
+      // Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
       if (updated) didUpdate = true;
 
       // Store all changes for a batch update at the end
@@ -254,15 +254,14 @@ export async function setupEffectHandlers() {
           didUpdate = true;
         }
         // Parse the change.value string and resolve it into a number if possible
-        // if (!/^-?\d+(\.\d+)?$/.test(change.value)) {
-        // const resolvedChange = parseAndResolveChangeValue(change.value, actorData)
         let resolvedChange = change.value;
         if (isPureNumber(change.value)) {
           resolvedChange = Number(change.value);
         } else if (containsDice(change.value)) {
-          // Parse the change.value string/formula and resolve it to a number if possible
+          // Dice rolls in the formula require async processing
           resolvedChange = await Hyp3eDice.resolveFormulaWithMathAsync(change.value, actorData)
         } else if (containsMathOrVariables(change.value)) {
+          // No dice rolls, we can do it synchronous
           resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);  
         }
         if (updatedChanges[i].value !== resolvedChange) {
@@ -272,13 +271,11 @@ export async function setupEffectHandlers() {
           };
           didUpdate = true;
         }
-        // }
       }
 
       // Batch out the updates to the effect
       if (didUpdate) {
-        Hyp3eLogger.info("createActiveEffect", `Duration:`, updatedDuration)
-        Hyp3eLogger.info("createActiveEffect", `Changes:`, updatedChanges)
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} updated Duration and/or Changes:`, { updatedDuration, updatedChanges });
         await effect.update({
           duration: updatedDuration,
           changes: updatedChanges
@@ -292,13 +289,13 @@ export async function setupEffectHandlers() {
         // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
         const durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
         const durationTurns = Math.floor(durationRounds / 60) ?? null;
-        if (durationRounds && durationRounds < 60) {
-          Hyp3eLogger.info("createActiveEffect", `Effect ${effect.name} has duration <60 rounds and will expire at the next turn.`);
-        } else if (isNaN(durationTurns)) {
-          Hyp3eLogger.info("createActiveEffect", `Effect ${effect.name} has no duration limit and will not expire.`);
-        }
+        // if (durationRounds && durationRounds < 60) {
+        //   Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} has duration <60 rounds and will expire at the next turn.`);
+        // } else if (isNaN(durationTurns)) {
+        //   Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} has no duration limit and will not expire.`);
+        // }
         await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
-        Hyp3eLogger.info("createActiveEffect", `Auto-set remainingTurns to ${durationTurns} for ${effect.name}`);
+        // Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingTurns to ${durationTurns} for ${effect.name}`);
       }
 
       // Does the effect include light source properties?
@@ -322,7 +319,7 @@ export async function setupEffectHandlers() {
         if ("disabled" in change) {
             const wasDisabled = change.disabled;
             if (wasDisabled === true) {
-                Hyp3eLogger.info("updateActiveEffect", `Effect ${effect.name} was just disabled:`, effect);
+                Hyp3eLogger.info("ActiveEffect updateActiveEffect", `Disabling ${effect.name} on ${effect.parent?.name}:`, effect);
                 // Does the effect include light source properties?
                 const lightProps = effect.getFlag("hyp3e", "lightProps");
                 if (lightProps) {
@@ -335,14 +332,14 @@ export async function setupEffectHandlers() {
                         if (originalLight) {
                             await token.document.update({ light: originalLight });
                             await token.document.unsetFlag("hyp3e", "originalLight");
-                            Hyp3eLogger.info("updateActiveEffect", `Restored original light for token ${token.name}`);
+                            Hyp3eLogger.info("ActiveEffect updateActiveEffect", `Restored original light for token ${token.name}`);
                         } else {
                             await token.document.update({ light: null });
                         }
                     }
                 }
             } else if (wasDisabled === false) {
-                Hyp3eLogger.info("updateActiveEffect", `Effect ${effect.name} was just enabled:`, effect);
+                Hyp3eLogger.info("ActiveEffect updateActiveEffect", `Enabling ${effect.name} on ${effect.parent?.name}:`, effect);
                 // Does the effect include light source properties?
                 const lightProps = effect.getFlag("hyp3e", "lightProps");
                 if (lightProps) {
@@ -363,7 +360,7 @@ export async function setupEffectHandlers() {
     Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
         const actor = effect.parent;
         if (!actor) return;
-
+        Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Deleting ${effect.name} from ${effect.parent?.name}:`, effect);
         // When an active effect is deleted, check whether it had modified the token's light.
         //  If so, restore the original light settings from the flag.
         const lightProps = effect.getFlag("hyp3e", "lightProps");
@@ -377,7 +374,7 @@ export async function setupEffectHandlers() {
                 await token.document.update({ light: originalLight });
                 await token.document.unsetFlag("hyp3e", "originalLight");
 
-                Hyp3eLogger.info("deleteActiveEffect", `Restored original light for token ${token.name}`);
+                Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Restored original light for token ${token.name}`);
             }
         }
     });
@@ -395,24 +392,24 @@ export async function setupEffectHandlers() {
  * @param {*} actor 
  * @returns 
  */
-export function parseAndResolveChangeValue(changeValue, actorData) {
-  if (!changeValue) return;
+// export function parseAndResolveChangeValue(changeValue, actorData) {
+//   if (!changeValue) return;
 
-  Hyp3eLogger.info("parseAndResolveChangeValue", `Change string:`, changeValue);
+//   Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Change string:`, changeValue);
 
-  const result = resolveFormula(changeValue, actorData);
+//   const result = resolveFormula(changeValue, actorData);
 
-  if (result === null) {
-    Hyp3eLogger.info("parseAndResolveChangeValue", `Could not evaluate "${changeValue}". Returning original.`);
-    return changeValue;
-  }
+//   if (result === null) {
+//     Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Could not evaluate "${changeValue}". Returning original.`);
+//     return changeValue;
+//   }
 
-  Hyp3eLogger.info("parseAndResolveChangeValue", `Parsed result:`, result);
+//   Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Parsed result:`, result);
 
-  return Math.floor(result);
-}
+//   return Math.floor(result);
+// }
 // export function parseAndResolveChangeValue(changeValue, actor) {
-//     Hyp3eLogger.info("parseAndResolveChangeValue", `Change String:`, changeValue);
+//     Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Change String:`, changeValue);
 //     if (!changeValue) return
 
 //     // Split the string into parts & resolve each part
@@ -421,18 +418,18 @@ export function parseAndResolveChangeValue(changeValue, actorData) {
 //     const resolvedParts = parts.map(part => {
 //       // Check if the part is a roll formula
 //         if (Roll.validate(part)) {
-//             Hyp3eLogger.info("parseAndResolveChangeValue", `Roll Detected:`, part);
+//             Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Roll Detected:`, part);
 //             const roll = new Roll(part, actor?.getRollData?.());
 //             // await roll.evaluate({ evaluateSync: true });
 //             roll.evaluateSync();
-//             Hyp3eLogger.info("parseAndResolveChangeValue", `Roll Total:`, roll.total);
+//             Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Roll Total:`, roll.total);
 //             return roll.total;
 //         }
 //         // Check if the part is a data path
 //         else if (part.startsWith("system.")) {
-//             Hyp3eLogger.info("parseAndResolveChangeValue", `Data Path:`, part);
+//             Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Data Path:`, part);
 //             const value = foundry.utils.getProperty(actor, part);
-//             Hyp3eLogger.info("parseAndResolveChangeValue", `Data Value:`, value);
+//             Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Data Value:`, value);
 //             return value !== undefined ? value : part;
 //         }
 
@@ -441,17 +438,17 @@ export function parseAndResolveChangeValue(changeValue, actorData) {
 //     });
 //     // Reassemble the resolved parts into a string of additions
 //     const resolvedString = resolvedParts.join("");
-//     Hyp3eLogger.info("parseAndResolveChangeValue", `Resolved String:`, resolvedString);
+//     Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Resolved String:`, resolvedString);
 //     let result = null;
 //     try {
 //         // Evaluate the resolved string as a math expression
 //         result = eval(resolvedString)
 //     } catch (e) {
 //         // If the string can't be evaluated, log it and return the original changeValue
-//         Hyp3eLogger.info("parseAndResolveChangeValue", `Cannot evaluate change value "${resolvedString}" to a number:`, e);
+//         Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Cannot evaluate change value "${resolvedString}" to a number:`, e);
 //         return changeValue;
 //     }
-//     Hyp3eLogger.info("parseAndResolveChangeValue", `Parsed result:`, result);
+//     Hyp3eLogger.info("ActiveEffect parseAndResolveChangeValue", `Parsed result:`, result);
 //     // Is the result a real number?
 //     if (isNaN(result)) {
 //         ui.notifications?.error(`Effect change value "${changeValue}" resolved to "${resolvedString}". Could not solve for a final number.`);
@@ -476,7 +473,7 @@ export async function checkAndResolveDuration(effect, actorData) {
   const formula = effect.getFlag("hyp3e", "durationFormula");
   if (!formula) return { updatedDuration, updated };
 
-  Hyp3eLogger.info("checkAndResolveDuration", `Effect ${effect.name}, duration "${formula}", applying to ${actorData.actorName}...`, actorData);
+  Hyp3eLogger.info("ActiveEffect checkAndResolveDuration", `Resolving duration formula "${formula}" of effect "${effect.name}", applying to ${actorData.actorName}...`, actorData);
   // Only actors can apply effects, items leave it
   // if (!(effect.parent instanceof Actor)) return { updatedDuration, updated };
 
@@ -493,7 +490,7 @@ export async function checkAndResolveDuration(effect, actorData) {
   // const result = resolveFormula(formula, actorData);
 
   if (resolvedDuration === null) {
-    Hyp3eLogger.error("checkAndResolveDuration", `Invalid duration formula "${formula}"`);
+    Hyp3eLogger.error("ActiveEffect checkAndResolveDuration", `Could not resolve duration formula "${formula}", returning original value...`);
     return { updatedDuration, updated };
   }
 
@@ -502,7 +499,7 @@ export async function checkAndResolveDuration(effect, actorData) {
   updatedDuration = { rounds, turns: rounds };
   updated = true;
 
-  Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" resolved duration "${formula}" to ${rounds} rounds`);
+  Hyp3eLogger.info("ActiveEffect checkAndResolveDuration", `Resolved duration of effect "${effect.name}" to ${rounds} rounds, applying to ${actorData.actorName}.`);
 
   return { updatedDuration, updated };
 }
@@ -514,7 +511,7 @@ export async function checkAndResolveDuration(effect, actorData) {
 //     // Check to see if we have a rollable duration formula, exit here if not
 //     const formula = effect.getFlag("hyp3e", "durationFormula");
 //     if (!formula) return { updatedDuration, updated };
-//     Hyp3eLogger.info("checkAndResolveDuration", `Actor applying the effect:`, sourceActorData);
+//     Hyp3eLogger.info("ActiveEffect checkAndResolveDuration", `Actor applying the effect:`, sourceActorData);
 
 //     // Resolve the formula to a number
 //     if (formula) {
@@ -530,7 +527,7 @@ export async function checkAndResolveDuration(effect, actorData) {
 //             let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
 //                 return foundry.utils.getProperty(sourceActorData, key) ?? 0;
 //             });
-//             Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" expanded duration formula: "${expanded}".`);
+//             Hyp3eLogger.info("ActiveEffect checkAndResolveDuration", `Effect "${effect.name}" expanded duration formula: "${expanded}".`);
 
 //             // Evaluate any dice expressions
 //             const diceRegex = /\b(\d*d\d+(?:[+-]\d+)*)\b/g;
@@ -542,10 +539,10 @@ export async function checkAndResolveDuration(effect, actorData) {
 //                     const roll = new Roll(match[1]).evaluateSync();
 //                     expanded = expanded.replace(match[0], roll.total);
 //                 } catch (err) {
-//                     Hyp3eLogger.warn("checkAndResolveDuration", `Invalid dice segment "${match[1]}" in formula "${formula}"`, err);
+//                     Hyp3eLogger.warn("ActiveEffect checkAndResolveDuration", `Invalid dice segment "${match[1]}" in formula "${formula}"`, err);
 //                 }
 //             }
-//             Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" formula roll resolved: "${expanded}".`);
+//             Hyp3eLogger.info("ActiveEffect checkAndResolveDuration", `Effect "${effect.name}" formula roll resolved: "${expanded}".`);
 
 //             // Evaluate final JS expression (allow Math)
 //             let result = 0;
@@ -554,7 +551,7 @@ export async function checkAndResolveDuration(effect, actorData) {
 //                 const func = new Function("Math", `return (${expanded});`);
 //                 result = func(Math);
 //             } catch (err) {
-//                 Hyp3eLogger.error("checkAndResolveDuration", `Error evaluating JS expression in formula "${expanded}"`, err);
+//                 Hyp3eLogger.error("ActiveEffect checkAndResolveDuration", `Error evaluating JS expression in formula "${expanded}"`, err);
 //                 result = 1; // fallback to 1 round
 //             }
 //             const rounds = Math.max(1, Math.floor(result)); // at least 1 round
@@ -564,12 +561,12 @@ export async function checkAndResolveDuration(effect, actorData) {
 //             // const roll = await new Roll(formula).evaluate({ evaluateSync: true });
 //             // const rounds = roll.total;
 //             // updatedDuration = { "rounds": rounds, "turns": rounds };
-//             Hyp3eLogger.info("checkAndResolveDuration", `Effect "${effect.name}" resolved duration "${formula}" to ${rounds} rounds`);
+//             Hyp3eLogger.info("ActiveEffect checkAndResolveDuration", `Effect "${effect.name}" resolved duration "${formula}" to ${rounds} rounds`);
 //         } catch (err) {
-//             Hyp3eLogger.error("checkAndResolveDuration", `Invalid duration formula: ${formula}`, err);
+//             Hyp3eLogger.error("ActiveEffect checkAndResolveDuration", `Invalid duration formula: ${formula}`, err);
 //         }
 //     }
-//     Hyp3eLogger.info("checkAndResolveDuration", `Return data:`, { updatedDuration, updated });
+//     Hyp3eLogger.info("ActiveEffect checkAndResolveDuration", `Return data:`, { updatedDuration, updated });
 //     return { updatedDuration, updated };
 // }
 
@@ -584,48 +581,48 @@ export async function checkAndResolveDuration(effect, actorData) {
  * @param {object} dataSource  // usually actor or actor.getRollData()
  * @returns {number|null}
  */
-export function resolveFormula(formula, dataSource = {}) {
-  if (!formula || typeof formula !== "string") return null;
+// export function resolveFormula(formula, dataSource = {}) {
+//   if (!formula || typeof formula !== "string") return null;
 
-  try {
-    // Find & replace dataSource @variables
-    let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
-      return foundry.utils.getProperty(dataSource, key) ?? 0;
-    });
+//   try {
+//     // Find & replace dataSource @variables
+//     let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
+//       return foundry.utils.getProperty(dataSource, key) ?? 0;
+//     });
 
-    // Find & replace dice expressions with rolled totals
-    const diceRegex = /\b(\d*d\d+(?:[+-]\d+)*)\b/g;
-    const matches = [...expanded.matchAll(diceRegex)];
-    for (const match of matches) {
-      try {
-        const roll = new Roll(match[1], dataSource).evaluateSync();
-        expanded = expanded.replace(match[0], roll.total);
-      } catch (err) {
-        Hyp3eLogger.warn("resolveFormula", `Invalid dice expression "${match[1]}"`, err);
-      }
-    }
+//     // Find & replace dice expressions with rolled totals
+//     const diceRegex = /\b(\d*d\d+(?:[+-]\d+)*)\b/g;
+//     const matches = [...expanded.matchAll(diceRegex)];
+//     for (const match of matches) {
+//       try {
+//         const roll = new Roll(match[1], dataSource).evaluateSync();
+//         expanded = expanded.replace(match[0], roll.total);
+//       } catch (err) {
+//         Hyp3eLogger.warn("ActiveEffect resolveFormula", `Invalid dice expression "${match[1]}"`, err);
+//       }
+//     }
 
-    // Evaluate final numeric expression
-    let result = null;
-    try {
-      // eslint-disable-next-line no-new-func
-      const func = new Function("Math", `return (${expanded});`);
-      result = func(Math);
-    } catch (err) {
-      // If we fail here, it's probably because the change value is a simple string of text
-      Hyp3eLogger.info("resolveFormula", `Error evaluating formula "${expanded}"`, err);
-      return null;
-    }
+//     // Evaluate final numeric expression
+//     let result = null;
+//     try {
+//       // eslint-disable-next-line no-new-func
+//       const func = new Function("Math", `return (${expanded});`);
+//       result = func(Math);
+//     } catch (err) {
+//       // If we fail here, it's probably because the change value is a simple string of text
+//       Hyp3eLogger.info("ActiveEffect resolveFormula", `Error evaluating formula "${expanded}"`, err);
+//       return null;
+//     }
 
-    if (typeof result !== "number" || isNaN(result)) return null;
+//     if (typeof result !== "number" || isNaN(result)) return null;
 
-    return result;
+//     return result;
 
-  } catch (err) {
-    Hyp3eLogger.error("resolveFormula", `Unhandled error in resolveFormula("${formula}")`, err);
-    return null;
-  }
-}
+//   } catch (err) {
+//     Hyp3eLogger.error("ActiveEffect resolveFormula", `Unhandled error in resolveFormula("${formula}")`, err);
+//     return null;
+//   }
+// }
 
 /**
  * Handle applying a light source to a token document.
@@ -653,7 +650,7 @@ export async function applyTokenLight(token, lightProps) {
         "vision": true // Ensure the token can see
     });
 
-    Hyp3eLogger.info("applyTokenLight", `Applied light source to token ${token.name}`);
+    Hyp3eLogger.info("ActiveEffect applyTokenLight", `Applied light source to token ${token.name}`);
 }
 
 /**
@@ -666,7 +663,7 @@ async function sendEffectChatMessage(effect) {
     let target = effect.parent; // usually an Actor
     // If target is an item, get its actor
     if (target?.documentName === "Item") {
-        Hyp3eLogger.info("sendEffectChatMessage", `Effect target is an Item, getting its Actor...`);
+        // Hyp3eLogger.info("ActiveEffect sendEffectChatMessage", `Effect target is an Item, getting its Actor...`);
         target = target.actor;
     }
     const targetName = target?.name ?? "Unknown Target";
@@ -677,7 +674,7 @@ async function sendEffectChatMessage(effect) {
     // Source metadata from flag
     const sourceData = effect.getFlag("hyp3e", "source") || {};
     const sourceName = sourceData.appliedBy ?? effect.sourceName ?? "Unknown Source";
-    Hyp3eLogger.info("sendEffectChatMessage", `Effect being applied:`, effect);
+    // Hyp3eLogger.info("ActiveEffect sendEffectChatMessage", `Effect being applied:`, effect);
 
     // Start with the effect name
     messageParts.push(`<i>${effectName}</i>`);
@@ -710,7 +707,7 @@ async function sendEffectChatMessage(effect) {
     const content = `
         <ul><li>${messageParts.join(" ")}.</li></ul>
     `;
-    Hyp3eLogger.info("sendEffectChatMessage", `Chat Content:`, content);
+    // Hyp3eLogger.info("ActiveEffect sendEffectChatMessage", `Chat Content:`, content);
 
     // Dispatch the chat message
     await ChatMessage.create({
@@ -725,34 +722,45 @@ async function sendEffectChatMessage(effect) {
  **********************************************************/
 
 /**
- * Apply specified effect from an item or spell to the selected tokens
- * @param {itemId} string      The item that has the effect
- * @param {effectId} string    The effect ID to apply
- * @param {actorId} string     The actor that owns the item
- * @param {disabled} boolean   Whether to disable the effect when applying it
+ * Apply specified effect from an item or spell to the selected token(s)
+ * @param {string} itemId    - ID of the item that has the effect
+ * @param {string} effectId  - ID of the item effect to apply
+ * @param {string} actorId   - ID of the actor that owns the item
+ * @param {boolean} disabled - Whether to disable the effect when applying it
  */
-export async function applyEffect(item, effectId, actorId, disabled = false) {
-  // Get selected tokens
+export async function applyEffect(itemUuid, effectId, actorId, disabled = false) {
+  // Get selected (targeted) tokens to receive effect
   const tokens = canvas?.tokens?.controlled;
   if (!tokens || tokens.length == 0) {
+    Hyp3eLogger.error("ActiveEffect applyEffect", `No tokens selected, cannot apply effect.`);
     ui.notifications?.error("Apply Effect: Please select at least one token.");
     return;
   }
   // Get the source actor
   const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
   if (!actor) {
-    ui.notifications?.error(`Apply Effect: Actor ${actorId} not found!`)
-    return
+    Hyp3eLogger.error("ActiveEffect applyEffect", `Source actor ${actorId} not found, cannot apply effect.`);
+    ui.notifications?.error(`Apply Effect: Source actor ${actorId} not found!`);
+    return;
   }
   const actorData = actor.getRollData();
-  Hyp3eLogger.info("applyEffect", `Source item:`, item);
+
+  // Get the source item owned by the actor
+  const item = await fromUuid(itemUuid)
+  // const item = actor.items.get(itemId);
+  if (!item) {
+    Hyp3eLogger.error("ActiveEffect applyEffect", `Source item ${itemUuid} not found, cannot apply effect.`);
+    ui.notifications?.error(`Apply Effect: Source item ${itemId} not found!`);
+    return;
+  }
   const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
+
   // Get the item effect to be applied
   const effect = item.effects.find(e => e.id === effectId);
   if (!effect) {
     const msg = `Apply Effect: Effect ${effectId} on item ${itemName} not found!`
-    Hyp3eLogger.error("applyEffect", msg)
-    ui.notifications?.error(msg);
+    Hyp3eLogger.error("ActiveEffect applyEffect", `Effect ${effectId} on item ${itemName} not found, cannot apply.`)
+    ui.notifications?.error(`Apply Effect: Effect ${effectId} on item ${itemName} not found!`);
     return;
   }
 
@@ -760,37 +768,36 @@ export async function applyEffect(item, effectId, actorId, disabled = false) {
   const effectData = new Object({...effect});
   effectData.origin = item.uuid;
   if (disabled) effectData.disabled = true;
-  Hyp3eLogger.info("applyEffect", `Cloned Effect:`, effectData);
+  // Hyp3eLogger.info("ActiveEffect applyEffect", `Cloned Effect:`, effectData);
 
-  // Check persistent damage effects for a valid roll formula, and resolve variables if needed
+  // Special check for persistent damage effects, and resolve variables if needed
   const persistentDamage = effectData.changes.find(c => c.key === "system.tempPersistentDamage");
   let damageType, damageRoll
   if (persistentDamage) {
-    Hyp3eLogger.info("applyEffect", `${effectData.name} causes persistent damage:`, persistentDamage);
+    Hyp3eLogger.info("ActiveEffect applyEffect", `${effectData.name} causes persistent damage:`, persistentDamage);
     damageType = persistentDamage.value.split(",")[0];
     damageRoll = persistentDamage.value.split(",")[1];
     damageRoll = damageRoll.replace(";", "");
     // Check if the damage roll is a valid formula
     if (!Roll.validate(damageRoll, actorData)) {
-      const msg = `Apply Effect: Invalid damage roll formula: ${damageRoll}`;
-      Hyp3eLogger.error("applyEffect", msg);
-      ui.notifications?.error(msg);
+      const msg = `Invalid persistent damage roll formula "${damageRoll}", cannot apply.`;
+      Hyp3eLogger.error("ActiveEffect applyEffect", msg);
+      ui.notifications?.error(`Apply Effect: ${msg}`);
       return;
     }
     // Resolve variables in the damage roll formula
-    const roll = new Roll(damageRoll, actor.getRollData());
-    Hyp3eLogger.info("applyEffect", `${effectData.name} Roll: `, roll);
-    roll.evaluate({ evaluateSync: true });
+    const roll = new Roll(damageRoll, actorData);
+    await roll.evaluate();
     // Save the resolved roll formula for later use
     damageRoll = roll.formula;
   }
 
   // Apply the effect to selected tokens/actors
   for (const t of tokens) {
-    Hyp3eLogger.info("applyEffect", `Target Token:`, t);
+    Hyp3eLogger.info("ActiveEffect applyEffect", `Target Token:`, t);
     const result = await t.actor.createEmbeddedDocuments("ActiveEffect", [effectData]);
     const childEffect = result[0];
-    Hyp3eLogger.info("applyEffect", `Created effect on token actor ${t.actor.name}:`, childEffect)
+    Hyp3eLogger.info("ActiveEffect applyEffect", `Created effect on token actor ${t.actor.name}:`, childEffect)
 
     // Set flag to store metadata about the effect source & target actor
     await childEffect.setFlag("hyp3e", "source", {
@@ -798,17 +805,19 @@ export async function applyEffect(item, effectId, actorId, disabled = false) {
       srcActorUuid: actor.uuid,
       appliedBy: actor.name
     });
-    // // Send a chat message that the effect was applied
+
+    // Send a chat message that the effect was applied
     // sendEffectChatMessage(childEffect)
+
     // Now we get the newly-created effect, and modify the persistent damage roll if needed
     if (persistentDamage) {
-      Hyp3eLogger.info("applyEffect", `New Effect:`, childEffect);
+      Hyp3eLogger.info("ActiveEffect applyEffect", `New Effect:`, childEffect);
       if (childEffect) {
         // If the effect has a persistent damage value, we need to update the effect with that value
         const newPersistentDamage = childEffect.changes.find(c => c.key === "system.tempPersistentDamage");
         if (newPersistentDamage) {
           newPersistentDamage.value = `${damageType},${damageRoll}`;
-          Hyp3eLogger.info("applyEffect", `${effectData.name} new persistent damage:`, newPersistentDamage);
+          Hyp3eLogger.info("ActiveEffect applyEffect", `${effectData.name} new persistent damage:`, newPersistentDamage);
           childEffect.update({ changes: [newPersistentDamage] });
         }
       }
@@ -841,7 +850,7 @@ export async function applyAllEffects(item, actorId, disabled = false) {
     // //     ui.notifications?.error(`Apply Effects: Item ${itemId} not found!`);
     // //     return;
     // // }
-    // Hyp3eLogger.info("applyAllEffects", `Item:`, item) }
+    // Hyp3eLogger.info("ActiveEffect applyAllEffects", `Item:`, item) }
     // const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
 
     // // Check if the item has any effects to enable
@@ -855,14 +864,14 @@ export async function applyAllEffects(item, actorId, disabled = false) {
 
     // // Apply the effects to selected tokens/actors
     // for (const t of tokens) {
-    //     Hyp3eLogger.info("applyAllEffects", `Token:`, t) }
-    //     Hyp3eLogger.info("applyAllEffects", `Token Actor:`, t.actor) }
+    //     Hyp3eLogger.info("ActiveEffect applyAllEffects", `Token:`, t) }
+    //     Hyp3eLogger.info("ActiveEffect applyAllEffects", `Token Actor:`, t.actor) }
     //     item.effects.forEach(effect => async () => {
     //         // const effectData = foundry.utils.deepClone(effect);
     //         const effectData = {...effect};
     //         effectData.origin = item.uuid;
     //         if (disabled) effectData.disabled = true;
-    //         Hyp3eLogger.info("applyAllEffects", `Cloned Effect:`, effectData) }
+    //         Hyp3eLogger.info("ActiveEffect applyAllEffects", `Cloned Effect:`, effectData) }
     //         // Set flag to store metadata about the effect source & target actor
     //         await effect.setFlag("hyp3e", "source", {
     //             srcItemUuid: item.uuid,
@@ -883,26 +892,28 @@ export async function applyAllEffects(item, actorId, disabled = false) {
 }
 
 /**
- * Enable specified effect from the item, on the actor
+ * Enable specified effect from an item, onto its owner/actor
  * @param {itemId} string      The item that causes the effect
  * @param {effectId} string    The effect ID to enable
  * @param {actorId} string     The actor that owns the item and will receive/enable the effect
  */
 export async function enableEffect(item, effectId, actorId) {
     // Get the actor
-    const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
+    const actor = game.actors.get(actorId) || null;
     if (!actor) {
-        ui.notifications?.error(`Enable Effect: Actor ${actorId} not found!`)
-        return
+      const msg = `Enable Effect: Actor ${actorId} not found, cannot enable effect ${effectId}`;
+      Hyp3eLogger.error("ActiveEffect enableEffect", msg);
+      ui.notifications.error(msg);
+      return;
     }
-    Hyp3eLogger.info("enableEffect", `Source item:`, item);
+    // Hyp3eLogger.info("ActiveEffect enableEffect", `Source item:`, item);
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
     // Get the item effect to be enabled
     const effect = item.effects.find(e => e.id === effectId);
     if (!effect) {
-        const msg = `Enable Effect: Effect ${effectId} not found!`;
-        Hyp3eLogger.error("enableEffect", msg);
-        ui.notifications?.error(msg);
+        const msg = `Enable Effect: Effect ${effectId} not found on item ${item.name}!`;
+        Hyp3eLogger.error("ActiveEffect enableEffect", msg);
+        ui.notifications.error(msg);
         return;
     }
     // Set flag to store metadata about the effect source & target actor
@@ -913,21 +924,21 @@ export async function enableEffect(item, effectId, actorId) {
     });
 
     // Enable the effect on the actor
-    Hyp3eLogger.info("enableEffect", `Effect to enable:`, effect);
+    // Hyp3eLogger.info("ActiveEffect enableEffect", `Effect to enable:`, effect);
     // Update the item effect
     await effect.update({ disabled: false });
-    if (!foundry.utils.isNewerVersion(game.version, "13")) {
+    // if (!foundry.utils.isNewerVersion(game.version, "13")) {
         // For Foundry v12 only...
         // We updated the effect on the source item. Now, find the matching effect on 
         //  the actor, so we can toggle that as well.
-        const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
-        if (actorEffect) {
-            // actorEffect.update({ disabled: false });
-        } else {
+        // const actorEffect = actor.effects.find(e => e.parent.id === actor.id && e.name === effect.name);
+        // if (actorEffect) {
+        //     actorEffect.update({ disabled: false });
+        // } else {
             // If the effect can't be found, we apply the effect to the actor instead.
             // applyEffect(item, effectId, actorId, false);
-        }
-    }
+        // }
+    // }
 
     // Send a chat message that the effect was enabled
     sendEffectChatMessage(effect)
@@ -942,15 +953,15 @@ export async function enableItemEffectsOnActor(item, actorId) {
     // Get a list of item effects that are applied to the actor
     const transferEffects = item.effects.filter(e => e.transfer && e.duration.rounds === null && e.duration.turns === null);
     if (transferEffects.length === 0) {
-        Hyp3eLogger.info("enableItemEffectsOnActor", `Item ${item.name} has no transferrable effects to apply.`);
+        Hyp3eLogger.info("ActiveEffect enableItemEffectsOnActor", `Item ${item.name} has no transferrable effects to apply.`);
         return;
     }
-    Hyp3eLogger.info("enableItemEffectsOnActor", `Effect(s) to transfer:`, transferEffects);
+    Hyp3eLogger.info("ActiveEffect enableItemEffectsOnActor", `Effect(s) to transfer:`, transferEffects);
     // Get the actor
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
         const msg = `Enable All Item Effects: Actor ${actorId} not found!`;
-        Hyp3eLogger.error("enableItemEffectsOnActor", msg);
+        Hyp3eLogger.error("ActiveEffect enableItemEffectsOnActor", msg);
         ui.notifications?.error(msg);
         return
     }
@@ -962,7 +973,7 @@ export async function enableItemEffectsOnActor(item, actorId) {
 
     // Enable the transferrable effects on the actor
     transferEffects.forEach(async effect => {
-        Hyp3eLogger.info("enableItemEffectsOnActor", `Effect to enable:`, effect);
+        Hyp3eLogger.info("ActiveEffect enableItemEffectsOnActor", `Effect to enable:`, effect);
         chatMsg.push(`<li><i>${effect.name}</i> enabled on ${actor.name}.</li>`)
         // Update the item effect
         await effect.update({ disabled: false });
@@ -988,7 +999,7 @@ export async function enableItemEffectsOnActor(item, actorId) {
     chatMsg.push(`</ul>`)
 
     // Send a chat message that the effects were enabled
-    Hyp3eLogger.info("enableItemEffectsOnActor", `Chat message:`, chatMsg);
+    Hyp3eLogger.info("ActiveEffect enableItemEffectsOnActor", `Chat message:`, chatMsg);
     const chatData = {
         author: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: actor }),
@@ -1008,18 +1019,18 @@ export async function disableEffect(item, effectId, actorId) {
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
         const msg = `Disable Effect: Actor ${actorId} not found!`;
-        Hyp3eLogger.error("disableEffect", msg);
+        Hyp3eLogger.error("ActiveEffect disableEffect", msg);
         ui.notifications?.error(msg);
         return
     }
 
-    Hyp3eLogger.info("disableEffect", `Source item:`, item);
+    Hyp3eLogger.info("ActiveEffect disableEffect", `Source item:`, item);
     const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name;
     // Get the item effect to be disabled
     const effect = item.effects.find(e => e.id === effectId);
     if (!effect) {
         const msg = `Disable Effect: Effect ${effectId} not found!`;
-        Hyp3eLogger.error("disableEffect", msg);
+        Hyp3eLogger.error("ActiveEffect disableEffect", msg);
         ui.notifications?.error(msg);
         return;
     }
@@ -1030,7 +1041,7 @@ export async function disableEffect(item, effectId, actorId) {
         appliedBy: itemName
     });
 
-    Hyp3eLogger.info("disableEffect", `Effect to disable:`, effect);
+    Hyp3eLogger.info("ActiveEffect disableEffect", `Effect to disable:`, effect);
     // Update the item effect
     await effect.update({ disabled: true });
     if (!foundry.utils.isNewerVersion(game.version, "13")) {
@@ -1058,15 +1069,15 @@ export async function disableItemEffectsOnActor(item, actorId) {
     // Get a list of item effects that are applied to the actor
     const transferEffects = item.effects.filter(e => e.transfer);
     if (transferEffects.length === 0) {
-        Hyp3eLogger.info("disableItemEffectsOnActor", `Item ${item.name} has no transferrable effects to disable.`);
+        Hyp3eLogger.info("ActiveEffect disableItemEffectsOnActor", `Item ${item.name} has no transferrable effects to disable.`);
         return;
     }
-    Hyp3eLogger.info("disableItemEffectsOnActor", `Effect(s) to transfer:`, transferEffects);
+    Hyp3eLogger.info("ActiveEffect disableItemEffectsOnActor", `Effect(s) to transfer:`, transferEffects);
     // Get the actor & item
     const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
     if (!actor) {
         const msg = `Disable All Item Effects: Actor ${actorId} not found!`;
-        Hyp3eLogger.error("disableItemEffectsOnActor", msg);
+        Hyp3eLogger.error("ActiveEffect disableItemEffectsOnActor", msg);
         ui.notifications?.error(msg);
         return
     }
@@ -1078,7 +1089,7 @@ export async function disableItemEffectsOnActor(item, actorId) {
 
     // transferEffects.forEach(effect => async () => {
     transferEffects.forEach(async effect => {
-        Hyp3eLogger.info("disableItemEffectsOnActor", `Effect to disable:`, effect);
+        Hyp3eLogger.info("ActiveEffect disableItemEffectsOnActor", `Effect to disable:`, effect);
         chatMsg.push(`<li><i>${effect.name}</i> disabled on ${actor.name}.</li>`)
         // Update the item effect
         await effect.update({ disabled: true });
@@ -1104,7 +1115,7 @@ export async function disableItemEffectsOnActor(item, actorId) {
     chatMsg.push(`</ul>`)
 
     // Send a chat message that the effects were disabled
-    Hyp3eLogger.info("disableItemEffectsOnActor", `Chat message:`, chatMsg);
+    Hyp3eLogger.info("ActiveEffect disableItemEffectsOnActor", `Chat message:`, chatMsg);
     const chatData = {
         author: game.user_id,
         speaker: ChatMessage.getSpeaker({ actor: actor }),

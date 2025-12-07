@@ -2,7 +2,7 @@ import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { Hyp3eDice, isPureNumber, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
-import { parseAndResolveChangeValue, checkAndResolveDuration } from "../helpers/effects.mjs";
+import { checkAndResolveDuration } from "../helpers/effects.mjs";
 import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../chat/chat.mjs"
 
 /**
@@ -205,7 +205,7 @@ export class Hyp3eActor extends Actor {
    * @override
    * Overrides the core system applyActiveEffects method on the actor.
    * Capture change values that include roll formulas or data paths, and resolve them
-   * to a final number that can be applied to the actor.
+   *  to a final number that can be applied to the actor.
    */
   async applyActiveEffects() {
     // For items that apply effects with variables, we resolve those variables 
@@ -236,7 +236,7 @@ export class Hyp3eActor extends Actor {
         const c = foundry.utils.deepClone(change);
         c.effect = effect;
         c.priority = c.priority ?? (c.mode * 10);
-        Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${effect.name} ${change.key}:`, change);
+        // Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${effect.name} ${change.key}:`, change);
         return c;
       }));
       // If the effect includes any status icons, add it/them to the actor
@@ -245,9 +245,10 @@ export class Hyp3eActor extends Actor {
     if ( changes.length === 0 ) return;
 
     changes.sort((a, b) => a.priority - b.priority);
-    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Prioritized changes to ${this.name}:`, changes);
+    // Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Prioritized changes to ${this.name}:`, changes);
 
     // Apply active/enabled changes
+    let changeCount = 0;
     for ( const change of changes ) {
       if ( !change.key ) continue;    // This should never happen
 
@@ -258,12 +259,12 @@ export class Hyp3eActor extends Actor {
           continue;
         }
       }
-
       // Now we can apply updates to the change itself
       const changes = change.effect.apply(this, change);
       Object.assign(overrides, changes);
+      changeCount++;
     }
-
+    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${changeCount} of ${changes.length} changes applied to ${this.name}:`, changes);
     // Expand the set of final overrides
     this.overrides = foundry.utils.expandObject(overrides);
   }
@@ -274,31 +275,31 @@ export class Hyp3eActor extends Actor {
    * Prepare character roll data.
    */
   _getCharacterRollData(data) {
-      if (this.type !== 'character') return;
+    if (this.type !== 'character') return;
 
-      // Copy the attribute scores to the top level, so that rolls can use
-      //   formulas like `@str.atkMod`.
-      if (data.attributes) {
-          for (let [k, v] of Object.entries(data.attributes)) {
-              data[k] = foundry.utils.deepClone(v);
-          }
+    // Copy the attribute scores to the top level, so that rolls can use
+    //   formulas like `@str.atkMod`.
+    if (data.attributes) {
+      for (let [k, v] of Object.entries(data.attributes)) {
+        data[k] = foundry.utils.deepClone(v);
       }
-      // Add character's class to top level of data
-      if (data.details.class) {
-          data.class = data.details.class ?? "npc";
-      }
-      // Add character's level to top level of data
-      if (data.details.level) {
-          data.lvl = data.details.level.value ?? 0;
-      }
+    }
+    // Add character's class to top level of data
+    if (data.details.class) {
+      data.class = data.details.class ?? "npc";
+    }
+    // Add character's level to top level of data
+    if (data.details.level) {
+      data.lvl = data.details.level.value ?? 0;
+    }
   }
 
   /**
    * Prepare NPC roll data.
    */
   _getNpcRollData(data) {
-      if (this.type !== 'npc') return;
-      // Anything to load?
+    if (this.type !== 'npc') return;
+    // Anything to load?
   }
 
   /**
@@ -307,35 +308,35 @@ export class Hyp3eActor extends Actor {
    * @param {Object} systemData
    */
   _applyTempModifiers(systemData) {
-      const tempAcMod = parseInt(systemData.ac?.tempAcMod) || 0;
-      const tempDrMod = parseInt(systemData.ac?.tempDrMod) || 0;
-      const tempMvMod = parseInt(systemData.movement?.tempMvMod) || 0;
+    const tempAcMod = parseInt(systemData.ac?.tempAcMod) || 0;
+    const tempDrMod = parseInt(systemData.ac?.tempDrMod) || 0;
+    const tempMvMod = parseInt(systemData.movement?.tempMvMod) || 0;
 
-      if (tempAcMod) {
-          Hyp3eLogger.info("Hyp3eActor _applyTempModifiers", `Applying temp AC mod: ${tempAcMod}`);
-          systemData.ac.value = Math.clamp(systemData.ac.value - tempAcMod, -9, 9);
-      }
+    if (tempAcMod) {
+      Hyp3eLogger.info("Hyp3eActor _applyTempModifiers", `Applying temp AC mod: ${tempAcMod}`);
+      systemData.ac.value = Math.clamp(systemData.ac.value - tempAcMod, -9, 9);
+    }
 
-      if (tempDrMod) {
-          Hyp3eLogger.info("Hyp3eActor _applyTempModifiers", `Applying temp DR mod: ${tempDrMod}`);
-          systemData.ac.dr += tempDrMod;
-      }
+    if (tempDrMod) {
+      Hyp3eLogger.info("Hyp3eActor _applyTempModifiers", `Applying temp DR mod: ${tempDrMod}`);
+      systemData.ac.dr += tempDrMod;
+    }
 
-      if (tempMvMod) {
-          Hyp3eLogger.info("Hyp3eActor _applyTempModifiers", `Applying temp MV mod: ${tempMvMod}`);
-          systemData.movement.base.value += tempMvMod;
-      }
+    if (tempMvMod) {
+      Hyp3eLogger.info("Hyp3eActor _applyTempModifiers", `Applying temp MV mod: ${tempMvMod}`);
+      systemData.movement.base.value += tempMvMod;
+    }
   }
 
   _setupTaskResolution(systemData) {
-      systemData.taskResolution = {};
-      for (const [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
-          systemData.taskResolution[key] = {
-              ...value,
-              name: game.i18n.localize(value.name),
-              hint: game.i18n.localize(value.hint)
-          };
-      }
+    systemData.taskResolution = {};
+    for (const [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
+      systemData.taskResolution[key] = {
+        ...value,
+        name: game.i18n.localize(value.name),
+        hint: game.i18n.localize(value.hint)
+      };
+    }
   }
 
   /**
@@ -509,18 +510,17 @@ export class Hyp3eActor extends Actor {
 
       // Accumulate ActiveEffect changes
       for (const change of changes) {
+        // Parse the change.value string and resolve it into a number if possible
         let resolvedChange = 0;
-        // This regex tests for a pure number: "0", "-5", "3.14", etc.
-        // if (/^-?\d+(\.\d+)?$/.test(change.value)) {
         if (isPureNumber(change.value)) {
           resolvedChange = Number(change.value) || 0;
         } else if (containsDice(change.value)) {
+          // Dice rolls require async processing, which we can't do during _prepareData
           Hyp3eLogger.warn("Hyp3eActor _calculateAcDrMv", `Change "${change.value}" contains a dice roll formula, which is not allowed for AC, DR, and MV effects. Skipping...`);
           continue;
         } else if (containsMathOrVariables(change.value)) {
-          // Parse the change.value string/formula and resolve it to a number if possible
+          // No dice rolls, we can do it synchronously
           resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);
-          // resolvedChange = parseAndResolveChangeValue(change.value, systemData)
         }
         switch (change.key) {
           case "system.ac.value":
@@ -561,9 +561,9 @@ export class Hyp3eActor extends Actor {
     // Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Final calculated AC, DR, MV for ${this.name}:`, { ac: finalAc, dr: finalDr, mv: finalMv });
     // Return the final results
     return {
-        ac: Math.clamp(finalAc, -9, 9),
-        dr: finalDr,
-        mv: finalMv
+      ac: Math.clamp(finalAc, -9, 9),
+      dr: finalDr,
+      mv: finalMv
     };
   }
 
@@ -853,18 +853,9 @@ export class Hyp3eActor extends Actor {
       // Resolve the right-hand value from the effect test
       let right = test.value;
 
-      // If right is a formula starting with "@", evaluate it using actor data
-      if (typeof right === "string" && right.trim().startsWith("@")) {
-        try {
-          // Remove leading "@"
-          const expr = right.trim().slice(1);
-          const replaced = Roll.replaceFormulaData(expr, rollData);
-          right = Roll.safeEval(replaced);
-        } catch (err) {
-          Hyp3eLogger.warn("Hyp3eActor _effectApplies", "Conditional effect formula error:", { right, err });
-          // Allow the effect if we can't evaluate the formula
-          return true;
-        }
+      // If right is a formula containing Math or @variables, resolve it to a number
+      if (containsMathOrVariables(right)) {
+        right = Hyp3eDice.resolveFormulaWithMath(right, rollData)
       }
       // If right looks like an array literal, parse it
       if (typeof right === "string") {
@@ -981,24 +972,24 @@ export class Hyp3eActor extends Actor {
     let damageType = ""
     let rawDamageRoll = ""
     let damageMessages = [];
-    Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Processing temp effects on ${this.name}...`);
+    Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Processing temporary ActiveEffects on ${this.name}...`);
     // Collect updates to disable expired effects
     const expiredEffectUpdates = [];
     for (const effect of this.allApplicableEffects()) {
       if (effect.isTemporary && !effect.disabled) {
         const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
         if (persistentDamage) {
-          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name}:`, persistentDamage);
+          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} persistent damage:`, persistentDamage);
 
           [damageType, rawDamageRoll] = persistentDamage.value.split(",");
           const damageRollFormula = rawDamageRoll.replace(";", "").trim();
 
-          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType}`);
+          // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType}`);
 
           const roll = new Roll(damageRollFormula);
           await roll.evaluate({ evaluateSync: true });
 
-          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Roll result:`, roll);
+          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} persistent damage roll:`, roll);
 
           totalDamage += roll.total;
 
@@ -1254,7 +1245,7 @@ export class Hyp3eActor extends Actor {
               // Is the temp HP being applied by an ActiveEffect?
               const tempHpEffect = this.effects.find(e => e.changes.some(c => c.key === "system.hp.tempHp"));
               if (tempHpEffect) {
-                  Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Effect applying temp HP: ${tempHpEffect.name}.`);
+                  Hyp3eLogger.info("Hyp3eActor applyHealthChange", `ActiveEffect applying temp HP: ${tempHpEffect.name}.`);
                   // Find the effect that is applying temp HP, and update it
                   netChange = await this.updateEffectValue("system.hp.tempHp", netChange, 0, 100);
               } else {

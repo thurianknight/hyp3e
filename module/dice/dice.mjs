@@ -556,7 +556,7 @@ export class Hyp3eDice {
       mathPattern.lastIndex = 0; // reset search due to modified string
     }
 
-    // After Math.* processing, let Roll handle everything else
+    // After Math.* processing, let Roll handle @variables and anything else
     try {
       return new Roll(expr, rollData).evaluateSync().total;
     } catch (err) {
