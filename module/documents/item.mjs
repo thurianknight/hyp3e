@@ -467,7 +467,7 @@ export class Hyp3eItem extends Item {
             <hr class="plain-hr" />
             <div style="margin: 10px 0;">
                 <img src="${imgSrc}" style="border: none; float: left;" width="24px" height="24px">
-                <span style="text-align: left; font-size: 12pt; font-weight: bold; margin-left: 6px;">
+                <span style="text-align: left; font-size: 1.2em; font-weight: bold; margin-left: 6px;">
                     ${itemName}
                 </span>
             </div>

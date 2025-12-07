@@ -809,6 +809,9 @@ export async function applyEffect(itemUuid, effectId, actorId, disabled = false)
     // Send a chat message that the effect was applied
     // sendEffectChatMessage(childEffect)
 
+    // This last section would be great if we could capture a hook for the effect like _onCreate()
+    //  or similar, and modify the incoming damage to the actor right there. The below code has to 
+    //  update the actor after the effect was already applied, which is not efficient.
     // Now we get the newly-created effect, and modify the persistent damage roll if needed
     if (persistentDamage) {
       Hyp3eLogger.info("ActiveEffect applyEffect", `New Effect:`, childEffect);
