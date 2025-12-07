@@ -171,10 +171,16 @@ export class Hyp3eActor extends Actor {
     // if (data.type === "npc") {
       // Do nothing for now
     // }
-    if (data.type === "merchant" || data.type === "treasure") {
+    if (data.type === "merchant") {
       // Set the default image
       this.updateSource({
         "img": "icons/svg/coins.svg"
+      });
+    }
+    if (data.type === "treasure") {
+      // Set the default image
+      this.updateSource({
+        "img": "icons/svg/chest.svg"
       });
     }
     if (data.type === "itemToken") {
