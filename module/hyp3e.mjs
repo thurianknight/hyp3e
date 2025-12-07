@@ -752,7 +752,7 @@ Hooks.on("createToken", (token, options, userId) => {
  */
 Hooks.on("preUpdateItem", async (item, update) => {
     if (item.type !== "armor" && item.type !== "shield" && item.type !== "weapon") return;
-    if (getProperty(update, "system.equipped") !== true) return;
+    if (foundry.utils.getProperty(update, "system.equipped") !== true) return;
 
     const actor = item.actor;
     if (!actor) return;

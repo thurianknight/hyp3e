@@ -160,7 +160,7 @@ export class Hyp3eItemSheet extends ItemSheet {
         // Spell references must be converted from a keyed object to an array.
         //  Need to expand the formData first.
         const data = expandObject(formData);
-        const refs = getProperty(data, "system.spellcasting.spellRefs");
+        const refs = foundry.utils.getProperty(data, "system.spellcasting.spellRefs");
         if (refs && !Array.isArray(refs)) {
             data.system.spellcasting.spellRefs = Object.values(refs);
         }
