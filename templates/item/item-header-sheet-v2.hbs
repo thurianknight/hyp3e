@@ -18,14 +18,14 @@
             {{/if}}
           {{/if}}
         </h2>
-        {{!-- Hidden, but we want this in the form data --}}
-        <input name="name" type="hidden" value="{{item.name}}" />
       {{else}}
-        {{!-- For non-physical items, we just have a name --}}
+        {{!-- For non-physical items, we don't worry about whether it is identified --}}
         <h2 class="charname">
-          <input name="name" type="text" value="{{item.name}}" placeholder="Name"/>
+          <input class="item-name" name="system.realName" type="text" value="{{item.system.realName}}" placeholder="Name"/>
         </h2>
       {{/if}}
+      {{!-- Hidden, but we want this in the form data --}}
+      <input name="name" type="hidden" value="{{item.name}}" />
       {{!-- Show physical item fields (armor, shields, items, weapons) --}}
       {{#if system.isPhysical}}
         {{> "physical-header"}}

@@ -162,7 +162,9 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
         // This is mostly an issue with new compendium items
         if (context.item.system.realName?.trim() === "") {
-            context.item.system.realName = context.item.name
+          context.item.system.realName = context.item.name
+        } else {
+          context.item.name = context.item.system.realName
         }
 
         // Add isPhysical flag for armor, item, shield, weapon
@@ -276,12 +278,12 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
         // This is where we can manipulate the formData before it's applied to the item
         Hyp3eLogger.info("_processFormData", `Processing form data...`, { event, form, formData });
         Hyp3eLogger.info("_processFormData", `this item:`, this.item);
-
+    
         // Only applies to weapons, armor, and physical items
-        if (!["weapon", "armor", "item"].includes(this.item.type)) {
-            // If the item is not a weapon, armor, or physical item, we don't need to do any processing
-            return super._processFormData(event, form, formData);
-        }
+        // if (!["weapon", "armor", "item"].includes(this.item.type)) {
+        //     // If the item is not a weapon, armor, or physical item, exit here
+        //     return super._processFormData(event, form, formData);
+        // }
 
         const formDataObj = formData.object;
         const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified") || this.item.system.identified;
