@@ -731,6 +731,10 @@
     min-width: 125px;
     max-width: 150px;
   }
+  .hit-points .hit-points-current {
+    font-weight: bold;
+    font-size: 1.25em;
+  }
   .armor-class {
     min-width: 225px;
     max-width: 300px;
@@ -1029,16 +1033,19 @@
   padding: 5px 5px;
 }
 .hyp3e .attribute-value {
+  min-width: 75px;
+  max-width: 90px;
+}
+.hyp3e .attribute-value .attribute-value-current {
   font-weight: bold;
-  min-width: 30px;
-  max-width: 50px;
+  font-size: 1.25em;
 }
 
 .hyp3e .attribute-mod {
   margin-left: 2px;
   margin-right: 2px;
-  min-width: 70px;
-  max-width: 80px;
+  min-width: 50px;
+  max-width: 75px;
 }
 .hyp3e .mod-label {
   font-size: 0.75em;

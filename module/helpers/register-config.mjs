@@ -149,7 +149,7 @@ export function registerHyp3eConfigurations() {
     // Automatic Thief ability target calculation
     game.settings.register(game.system.id, "autoCalcThiefTn", {
         name: game.i18n.localize("HYP3E.settings.autoCalcThiefTn"),
-        hint: game.i18n.localize("HYP3E.settings.autoCalcThiefTn"),
+        hint: game.i18n.localize("HYP3E.settings.autoCalcThiefTnHint"),
         default: true,
         scope: "world",
         type: Boolean,
@@ -435,6 +435,17 @@ export function registerHyp3eConfigurations() {
             "4d6dl": "Method III: 4d6 drop lowest",
             "2d6+6": "Method V: 2d6+6"
         },
+        config: showConfigOptions,
+        requiresReload: true,
+    });
+
+    // Automatic attribute modifier calculation
+    game.settings.register(game.system.id, "autoCalcAttrMods", {
+        name: game.i18n.localize("HYP3E.settings.autoCalcAttrMods"),
+        hint: game.i18n.localize("HYP3E.settings.autoCalcAttrModsHint"),
+        default: true,
+        scope: "world",
+        type: Boolean,
         config: showConfigOptions,
         requiresReload: true,
     });

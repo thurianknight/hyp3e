@@ -201,10 +201,11 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       const currentClass = sheetClass || defaultClass;
       Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Document data:`, { document, sheetClass, config, themes, currentClass });
 
-      // Retrieve base data structure.
+      // Retrieve base data structure
       const context = await super._prepareContext(options);
       context.actor = this.actor;
       context.isGM = game.user.isGM
+      context.autoCalcAttrMods = CONFIG.HYP3E.autoCalcAttrMods;
 
       // Use a safe clone of the actor data for further operations
       const actorData = this.actor.toObject(false);
@@ -1293,14 +1294,14 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     async _onDropItem(event, item) {
         // Hyp3eLogger.info("HYP3EActorSheetV2 _onDropItem", `Item dropped event:`, { event, item })
 
-        // Handle merchant → character drag
+        // Handle merchant -> character drag
         const sourceActor = item?.parent;
         if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
             // Perform the merchant transaction and exit early
             await buyFromMerchant(this.actor, sourceActor, item);
             return; // Prevent super._onDropItem()
         }
-        // Handle character → merchant drag
+        // Handle character -> merchant drag
         if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "merchant") {
             // If selling a container, it must be empty
             if (item._isContainer() && item.contents.length > 0) {
@@ -1314,13 +1315,13 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             return; // Prevent super._onDropItem()
         }
 
-        // Handle treasure → character drag
+        // Handle treasure -> character drag
         if (sourceActor?.type === "treasure" && this.actor.type !== "treasure") {
             // Perform the treasure acquisition and exit early
             await transferFromTreasure(this.actor, sourceActor, item);
             return; // Prevent super._onDropItem()
         }
-        // Handle character → treasure drag
+        // Handle character -> treasure drag
         if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "treasure") {
           const msg = `Why would you want to put items INTO a treasure trove? That makes no sense!`;
           Hyp3eLogger.warn("_onDropItem", msg);
@@ -1353,7 +1354,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             "prototypeToken.light.angle": item.system?.light.angle || 360,
             "prototypeToken.light.dim": item.system?.light.dim || null,
             "prototypeToken.light.bright": item.system?.light.bright || null,
-            "prototypeToken.light.color": item.system?.light.color,
+            "prototypeToken.light.color": item.system?.light.color || null,
           };
           await this.actor.update(updates);
           const msg = `Item Token linked to item ${item.name}.`;
@@ -1373,12 +1374,12 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         const dragged = this.actor.items.get(item.id);
         const targetItem = target ? this.actor.items.get(target.dataset.itemId) : null;
 
-        // Special case 0: container item dragged over another container → sort them
+        // Special case 0: container item dragged over another container -> sort them
         if (dragged.system.isContainer && targetItem?.system.isContainer) {
             return super._onSortItem(event, item)
         }
 
-        // Special case 1: item dragged over a container → assign containerId
+        // Special case 1: item dragged over a container -> assign containerId
         //  But we only do this for characters & npcs, not merchants
         if (targetItem && (targetItem.system.isContainer || targetItem.type === "container")) {
             if (this.actor.type !== "merchant" && this.actor.type !== "treasure") {
@@ -1394,7 +1395,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             }
         }
 
-        // Special case 2: contained item dragged onto a non-contained item → clear containerId
+        // Special case 2: contained item dragged onto a non-contained item -> clear containerId
         if (dragged.system.containerId !== "" && targetItem && targetItem.system.containerId === "") {
             return dragged.update({ 
                                     "system.location": "",
@@ -1402,7 +1403,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                                 });
         }
 
-        // Special case 3: contained item dropped into empty space → clear containerId
+        // Special case 3: contained item dropped into empty space -> clear containerId
         if (dragged.system.containerId && !targetItem) {
             return dragged.update({ 
                                     "system.location": "",

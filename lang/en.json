@@ -71,6 +71,8 @@
             "showWeaponOverlayHint": "If enabled, small icons of equipped weapons and shields will appear on tokens. For the best look, icons should have background transparency. Since the generic weapon icon is of swords crossed behind a shield, the overlay feature is disabled by default.",
             "quickCreateChars": "Enable quick-create characters",
             "quickCreateCharsHint": "Enable the Quick Create Characters button on the Character sheet by selecting a Method. All stats are rolled down-the-line, and the system will re-roll until it gets a set that meets class requirements.",
+            "autoCalcAttrMods": "Auto-calculate character attribute modifiers",
+            "autoCalcAttrModsHint": "Automatically update attribute modifiers when a base atttribute score changes.",
             "customCompendia": "Search compendia",
             "customCompendiaHint": "Comma-separated list of your compendia for armor, equipment, and weapons. This allows you to use your own compendia with the character quick-create feature.",
             "enableAttrChecks": "Enable IN & WS concentration checks",

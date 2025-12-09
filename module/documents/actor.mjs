@@ -24,8 +24,25 @@ export class Hyp3eActor extends Actor {
 
   /** @override */
   async prepareBaseData() {
-      // Data modifications in this step occur before processing embedded
-      // documents or derived data.
+    // Data modifications in this step occur before processing embedded
+    // documents or derived data.
+
+    if (this.type === 'character') {
+      // Get/set "curr" value for each character attribute
+      const attrs = this.system.attributes;
+      for (const [k, attr] of Object.entries(attrs)) {
+        // If no effect touched curr, derive it from base value
+        if (attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
+      }
+
+    //   // Auto-calculate attribute modifiers if configuration is enabled
+    //   if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
+    //     const attributeData = this._calcAttrMods(this.id);
+    //     if (attributeData) {
+    //       systemData.attributes = attributeData;
+    //     }
+    //   }
+    }
 
   }
 
@@ -69,8 +86,7 @@ export class Hyp3eActor extends Actor {
     // Initialize ephemeral effect condition state object
     systemData._hyp3eEffectConditionState = systemData._hyp3eEffectConditionState || {};
 
-    // Make separate methods for each Actor type (character vs. npc) to keep
-    // things organized.
+    // Separate methods for each Actor type (character vs. npc) to keep things organized
     this._prepareCharacterData();
     this._prepareNpcData();
   }
@@ -95,6 +111,21 @@ export class Hyp3eActor extends Actor {
     } catch (err) {
       // No match found (happens with custom classes), use "npc"
       systemData.baseClass = "npc"
+    }
+
+    // Get/set "curr" value for each character attribute
+    // const attrs = this.system.attributes;
+    // for (const [k, attr] of Object.entries(attrs)) {
+    //   // If no effect touched curr, derive it from base value
+    //   if (attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
+    // }
+
+    // Auto-calculate attribute modifiers if configuration is enabled
+    if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
+      const attributeData = this._calcAttrMods(this.id);
+      if (attributeData) {
+        systemData.attributes = attributeData;
+      }
     }
 
     // Add task resolution
@@ -334,6 +365,18 @@ export class Hyp3eActor extends Actor {
     }
   }
 
+  /**
+   * Automatically calculate and populate character attribute modifiers
+   * @param {*} actorId - this actor's ID, used for lookup
+   * @returns {object} - JSON object of attributes and modifiers
+   */
+  _calcAttrMods(actorId) {
+    if (!actorId) return;
+    const attributeData = Hyp3eCharacter.calcAttrMods(actorId);
+    Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Attribute data for ${this.name}:`, attributeData);
+    return attributeData;
+  }
+
   _setupTaskResolution(systemData) {
     systemData.taskResolution = {};
     for (const [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
@@ -390,7 +433,7 @@ export class Hyp3eActor extends Actor {
   /**
    * Determine the actor's encumbrance status based on weight carried and strength.
    * @param {*} systemData - The actor system data object
-   * @returns String - "unencumbered", "encumbered", or "heavilyEncumbered"
+   * @returns {string} - "unencumbered", "encumbered", or "heavilyEncumbered"
    */
   _getEncumberedStatus(systemData) {
     // Calc constants for encumbrance thresholds
@@ -2204,8 +2247,8 @@ export class Hyp3eActor extends Actor {
       }
 
       const attackerPos = attacker?.center ?? null;
-      Hyp3eLogger.info("Hyp3eActor _getAttackerDetails", `Attacker:`, attacker);
-      Hyp3eLogger.info("Hyp3eActor _getAttackerDetails", `Attacker Position:`, attackerPos);
+      // Hyp3eLogger.info("Hyp3eActor _getAttackerDetails", `Attacker:`, attacker);
+      Hyp3eLogger.info("Hyp3eActor _getAttackerDetails", `Attacker ${attacker.name} position:`, attackerPos);
 
       return { attacker, attackerPos };
   }
@@ -2218,7 +2261,7 @@ export class Hyp3eActor extends Actor {
   async _getItemDetails(itemId) {
       const item = this.items.get(itemId) ?? await fromUuid(itemId);
       const itemData = item ? { ...item.system, itemType: item.type } : null;
-      Hyp3eLogger.info("Hyp3eActor _getItemDetails", `Item ${itemId}:`, item);
+      // Hyp3eLogger.info("Hyp3eActor _getItemDetails", `Item ${itemId}:`, item);
       Hyp3eLogger.info("Hyp3eActor _getItemDetails", `Item Data:`, itemData);
 
       // itemName should be prioritized as (1) itemAlias [but only if not identified], 

@@ -267,6 +267,11 @@ Hooks.once("ready", async function() {
     const logLevel = game.settings.get(game.system.id, "logLevel");
     CONFIG.HYP3E.logLevel = logLevel;
 
+    // Automatic attribute modifier calculation
+    const autoCalcAttrMods = game.settings.get(game.system.id, "autoCalcAttrMods");
+    CONFIG.HYP3E.autoCalcAttrMods = autoCalcAttrMods;
+    Hyp3eLogger.info("Init", "CONFIG Automatic attribute modifier calculation:", CONFIG.HYP3E.autoCalcAttrMods);
+
     // Automatic Thief ability target calculation
     const autoCalcThiefTn = game.settings.get(game.system.id, "autoCalcThiefTn");
     CONFIG.HYP3E.autoCalcThiefTn = autoCalcThiefTn;
@@ -313,9 +318,9 @@ Hooks.once("ready", async function() {
     Hyp3eLogger.info("Init", "CONFIG Strength multiplier for heavily encumbered status:", CONFIG.HYP3E.heavilyEncumbered);
 
     // Enable/disable group-based initiative
-    const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
-    CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
-    Hyp3eLogger.info("Init", "CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative);
+    // const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
+    // CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
+    // Hyp3eLogger.info("Init", "CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative);
 
     // Initiative type: group, phased, or individual
     const initiativeType = game.settings.get(game.system.id, "initiativeType");
