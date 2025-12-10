@@ -29,19 +29,24 @@ export class Hyp3eActor extends Actor {
 
     if (this.type === 'character') {
       // Get/set "curr" value for each character attribute
+      const systemData = this.system;
       const attrs = this.system.attributes;
       for (const [k, attr] of Object.entries(attrs)) {
         // If no effect touched curr, derive it from base value
         if (attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
       }
 
-    //   // Auto-calculate attribute modifiers if configuration is enabled
-    //   if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
-    //     const attributeData = this._calcAttrMods(this.id);
-    //     if (attributeData) {
-    //       systemData.attributes = attributeData;
-    //     }
-    //   }
+      //   // Auto-calculate attribute modifiers if configuration is enabled
+      //   if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
+      //     const attributeData = this._calcAttrMods(this.id, systemData);
+      //     if (attributeData) {
+      //       systemData.attributes = attributeData;
+      //     }
+      //   }
+      // Log the prepared data
+      const sysData = foundry.utils.deepClone(this.system);
+      Hyp3eLogger.info("Hyp3eActor prepareBaseData", `${this.name} system data:`, sysData);
+
     }
 
   }
@@ -122,7 +127,7 @@ export class Hyp3eActor extends Actor {
 
     // Auto-calculate attribute modifiers if configuration is enabled
     if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
-      const attributeData = this._calcAttrMods(this.id);
+      const attributeData = this._calcAttrMods(this.id, systemData);
       if (attributeData) {
         systemData.attributes = attributeData;
       }
@@ -158,7 +163,8 @@ export class Hyp3eActor extends Actor {
     this._applyTempModifiers(systemData);
 
     // Log the prepared data
-    Hyp3eLogger.info("Hyp3eActor _prepareCharacterData", `${this.name} system data:`, systemData);
+    const sysData = foundry.utils.deepClone(systemData);
+    Hyp3eLogger.info("Hyp3eActor _prepareCharacterData", `${this.name} system data:`, sysData);
   }
 
   /**
@@ -282,7 +288,7 @@ export class Hyp3eActor extends Actor {
     if ( changes.length === 0 ) return;
 
     changes.sort((a, b) => a.priority - b.priority);
-    // Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Prioritized changes to ${this.name}:`, changes);
+    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Prioritized changes to ${this.name}:`, changes);
 
     // Apply active/enabled changes
     let changeCount = 0;
@@ -367,13 +373,113 @@ export class Hyp3eActor extends Actor {
 
   /**
    * Automatically calculate and populate character attribute modifiers
-   * @param {*} actorId - this actor's ID, used for lookup
+   * @param {string} actorId - this actor's ID, used for lookup
+   * @param {object} - this actor's system data
    * @returns {object} - JSON object of attributes and modifiers
    */
-  _calcAttrMods(actorId) {
+  _calcAttrMods(actorId, systemData) {
     if (!actorId) return;
     const attributeData = Hyp3eCharacter.calcAttrMods(actorId);
-    Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Attribute data for ${this.name}:`, attributeData);
+    Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Initial attribute data for ${this.name}:`, attributeData);
+
+    // Starting here, we apply active effects that update the modifiers...
+    const allowedKeys = [
+      "system.attributes.str.atkMod", 
+      "system.attributes.str.dmgMod", 
+      "system.attributes.str.test", 
+      "system.attributes.str.feat", 
+      "system.attributes.dex.atkMod", 
+      "system.attributes.dex.defMod", 
+      "system.attributes.dex.test", 
+      "system.attributes.dex.feat", 
+      "system.attributes.con.hpMod", 
+      "system.attributes.con.poisRadMod", 
+      "system.attributes.con.traumaSurvive", 
+      "system.attributes.con.test", 
+      "system.attributes.con.feat", 
+      "system.attributes.int.languages", 
+      "system.attributes.int.bonusSpells.lvl1", 
+      "system.attributes.int.bonusSpells.lvl2", 
+      "system.attributes.int.bonusSpells.lvl3", 
+      "system.attributes.int.bonusSpells.lvl4", 
+      "system.attributes.int.learnSpell", 
+      "system.attributes.wis.willMod", 
+      "system.attributes.wis.bonusSpells.lvl1", 
+      "system.attributes.wis.bonusSpells.lvl2", 
+      "system.attributes.wis.bonusSpells.lvl3", 
+      "system.attributes.wis.bonusSpells.lvl4", 
+      "system.attributes.wis.learnSpell", 
+      "system.attributes.cha.reaction", 
+      "system.attributes.cha.maxHenchmen", 
+      "system.attributes.cha.turnUndead", 
+    ];
+
+    const changes = [];
+    for ( const effect of this.allApplicableEffects() ) {
+      // Skip if disabled or not active
+      if ( effect.disabled || !effect.active ) continue;
+
+      // Validate effect condition is met before applying changes
+      const conditionPasses = this._effectApplies(effect);
+      // Store temporary effect condition state in actor (used by actor-sheet)
+      systemData._hyp3eEffectConditionState = systemData._hyp3eEffectConditionState || {};
+      systemData._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
+
+      if (!conditionPasses) {
+        Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
+        continue;
+      }
+
+      // Only include changes to allowed keys
+      const filtered = effect.changes
+        .filter(change => allowedKeys.includes(change.key))
+        .map(change => {
+          const c = foundry.utils.deepClone(change);
+          c.effect = effect;
+          c.priority = c.priority ?? (c.mode * 10);
+          return c;
+        });
+      changes.push(...filtered);
+    }
+
+    // Do we have any changes to apply?
+    if ( changes.length > 0 ) {
+      // Organize effects by their priority (though it probably doesn't matter)
+      changes.sort((a, b) => a.priority - b.priority);
+
+      // Update attributeData object with ActiveEffect changes
+      for (const change of changes) {
+        // Parse the change.value string and resolve it into a number if possible
+        let resolvedChange = null;
+        if (isPureNumber(change.value)) {
+          resolvedChange = Number(change.value) || 0;
+        } else if (isPureString(change.value)) {
+          resolvedChange = change.value;
+        } else if (containsDice(change.value)) {
+          // Dice rolls require async processing, which we can't do during _prepareData
+          Hyp3eLogger.warn("Hyp3eActor _calcAttrMods", `Change "${change.value}" contains a dice roll formula, which is not allowed for attribute modifiers. Skipping...`);
+          continue;
+        } else if (containsMathOrVariables(change.value)) {
+          // No dice rolls, we can do it synchronously
+          resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);
+        }
+
+        Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Applying ${change.effect.name} to ${this.name}'s ${change.key}:`, { resolvedChange, change });
+
+        let path = change.key; // e.g. "system.attributes.str.atkMod"
+        path = path.replace(/^system\.attributes\./, "");
+        let attrModValue = foundry.utils.getProperty(attributeData, path);
+        // Apply change based on mode
+        switch (change.mode) {
+          case CONST.ACTIVE_EFFECT_MODES.ADD: attrModValue += resolvedChange; break;
+          case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: attrModValue *= resolvedChange; break;
+          case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: attrModValue = resolvedChange; break;
+          // Pretty sure we don't need the other effect modes
+        }
+        foundry.utils.setProperty(attributeData, path, attrModValue);
+      }
+    }
+    Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Final attribute data for ${this.name}:`, attributeData);
     return attributeData;
   }
 
@@ -1025,8 +1131,9 @@ export class Hyp3eActor extends Actor {
     let damageMessages = [];
     Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Processing temporary ActiveEffects on ${this.name}...`);
     // Collect updates to disable expired effects
-    const expiredEffectUpdates = [];
+    const expiredEffects = [];
     for (const effect of this.allApplicableEffects()) {
+      Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} has ${effect.name} with remaining time ${effect.duration.remaining} rounds/turns:`, effect);
       if (effect.isTemporary && !effect.disabled) {
         const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
         if (persistentDamage) {
@@ -1040,7 +1147,7 @@ export class Hyp3eActor extends Actor {
           const roll = new Roll(damageRollFormula);
           await roll.evaluate({ evaluateSync: true });
 
-          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} persistent damage roll:`, roll);
+          // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} persistent damage roll:`, roll);
 
           totalDamage += roll.total;
 
@@ -1054,8 +1161,9 @@ export class Hyp3eActor extends Actor {
             await effect.update({ disabled: true });
           } else {
             // Effects applied directly to the actor can be queued for disabling
-            expiredEffectUpdates.push(effect);
+            // expiredEffects.push(effect);
           }
+          expiredEffects.push(effect);
         }
       }
     }
@@ -1069,20 +1177,53 @@ export class Hyp3eActor extends Actor {
       sendSimpleChat(this, "", persistentDamageMsg)
     }
 
-    // Update all expired effects
-    if (expiredEffectUpdates.length > 0) {
-      const updates = expiredEffectUpdates.map(effect => ({
-        _id: effect.id,
+    // Delete if possible, otherwise disable expired effects
+    const deletable = [];
+    const disableOnly = [];
+    
+    for (const effect of expiredEffects) {
+      if (effect.parent?.documentName === "Actor") {
+        Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} will delete ${effect.name}...`);
+        deletable.push(effect);
+      } else {
+        Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} will disable ${effect.name}...`);
+        disableOnly.push(effect);
+      }
+    }
+    // Run the deletes first
+    if (deletable.length > 0) {
+      await this.deleteEmbeddedDocuments(
+        "ActiveEffect",
+        deletable.map(e => e.id)
+      );
+    }
+    // Now disable the rest
+    if (disableOnly.length > 0) {
+      const updates = disableOnly.map(e => ({
+        _id: e.id,
         disabled: true,
         "duration.startRound": null,
         "duration.startTurn": null
       }));
       await this.updateEmbeddedDocuments("ActiveEffect", updates);
-      // Post all the expirations together
-      const effectNames = expiredEffectUpdates.map(effect => effect.name)
+    }
+
+    if (expiredEffects.length > 0) {
+      // Post all the expirations together in one chat
+      const effectNames = expiredEffects.map(effect => effect.name)
       const expiredEffectsMsg = `Active effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
       sendSimpleChat(this, "", expiredEffectsMsg)
     }
+
+    // if (expiredEffects.length > 0) {
+    //   const updates = expiredEffects.map(effect => ({
+    //     _id: effect.id,
+    //     disabled: true,
+    //     "duration.startRound": null,
+    //     "duration.startTurn": null
+    //   }));
+    //   await this.updateEmbeddedDocuments("ActiveEffect", updates);
+    // }
   }
 
   /**
@@ -2041,7 +2182,7 @@ export class Hyp3eActor extends Actor {
         }
 
         // Handle Runegraver spellcasting hit point burn if applicable
-        if (this.system.details.class.toLowerCase() === "runegraver" && item.name.toLowerCase().includes("rune")) {
+        if (this.system?.details?.class.toLowerCase() === "runegraver" && item.name.toLowerCase().includes("rune")) {
           await this.applyHealthChange(parseInt(item.system.spellLevel), "basic", false);
         }
 

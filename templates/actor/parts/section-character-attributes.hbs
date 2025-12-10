@@ -106,7 +106,7 @@
     <a class="flex" role="button" data-action="rollThis" 
         data-roll="{{enableAttrChecks}}" 
         data-roll-type="check" 
-        data-roll-target="{{system.attributes.int.value}}" 
+        data-roll-target="{{system.attributes.int.curr}}" 
         data-label="{{localize 'HYP3E.attributes.int.check'}}">
       <label for="system.attributes.int.value" class="attribute-label {{#if warnInt}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.int.abbrev'}}</label>
       <i class="fas fa-dice"></i>
@@ -152,7 +152,7 @@
         role="button" data-action="rollThis" 
         data-roll="{{enableAttrChecks}}" 
         data-roll-type="check" 
-        data-roll-target="{{system.attributes.wis.value}}" 
+        data-roll-target="{{system.attributes.wis.curr}}" 
         data-label="{{localize 'HYP3E.attributes.wis.check'}}">
       <label for="system.attributes.wis.value" class="attribute-label {{#if warnWis}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.wis.abbrev'}}</label>
       <i class="fas fa-dice"></i>

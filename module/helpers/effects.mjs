@@ -931,7 +931,10 @@ export async function enableEffect(item, effectId, actorId) {
     // Enable the effect on the actor
     // Hyp3eLogger.info("ActiveEffect enableEffect", `Effect to enable:`, effect);
     // Update the item effect
-    await effect.update({ disabled: false });
+    await effect.update({ 
+                    disabled: false, 
+                    "duration.remaining": Math.max(effect.duration.rounds, effect.duration.turns),
+                  });
     // if (!foundry.utils.isNewerVersion(game.version, "13")) {
         // For Foundry v12 only...
         // We updated the effect on the source item. Now, find the matching effect on 
