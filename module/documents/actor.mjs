@@ -383,7 +383,7 @@ export class Hyp3eActor extends Actor {
     if (!actorId) return;
     // Calculate the entire attributes object
     const attributeData = Hyp3eCharacter.calcAttrMods(actorId);
-    Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Initial attribute data for ${this.name}:`, attributeData);
+    // Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Initial attribute data for ${this.name}:`, attributeData);
 
     // Starting here, we apply active effects that update the modifiers...
     const allowedKeys = [
@@ -484,7 +484,7 @@ export class Hyp3eActor extends Actor {
         foundry.utils.setProperty(attributeData, path, attrModValue);
       }
     }
-    Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Final attribute data for ${this.name}:`, attributeData);
+    Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Calculated attribute data for ${this.name}:`, attributeData);
     return attributeData;
   }
 
