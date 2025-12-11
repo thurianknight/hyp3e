@@ -32,6 +32,8 @@ export class Hyp3eActor extends Actor {
       const systemData = this.system;
       const attrs = this.system.attributes;
       for (const [k, attr] of Object.entries(attrs)) {
+        // Convert the original value to a number if necessary
+        attr.value = Number(attr.value);
         // If no effect touched curr, derive it from base value
         if (attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
       }
@@ -379,6 +381,7 @@ export class Hyp3eActor extends Actor {
    */
   _calcAttrMods(actorId, systemData) {
     if (!actorId) return;
+    // Calculate the entire attributes object
     const attributeData = Hyp3eCharacter.calcAttrMods(actorId);
     Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Initial attribute data for ${this.name}:`, attributeData);
 
@@ -469,6 +472,8 @@ export class Hyp3eActor extends Actor {
         let path = change.key; // e.g. "system.attributes.str.atkMod"
         path = path.replace(/^system\.attributes\./, "");
         let attrModValue = foundry.utils.getProperty(attributeData, path);
+        // Convert strings to numbers if necessary, but leave booleans alone
+        if (isPureNumber(attrModValue)) attrModValue = Number(attrModValue);
         // Apply change based on mode
         switch (change.mode) {
           case CONST.ACTIVE_EFFECT_MODES.ADD: attrModValue += resolvedChange; break;

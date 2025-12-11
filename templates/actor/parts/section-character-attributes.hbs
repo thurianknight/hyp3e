@@ -14,10 +14,12 @@
     <span class="flex">
       <label for="system.attributes.str.value" class="attribute-label {{#if warnStr}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.str.abbrev'}}</label>
     </span>
-    <div class="flexrow attribute-value">
-      <input type="number" name="system.attributes.str.value" value="{{system.attributes.str.value}}" />
-      <input type="number" class="attribute-value-current" name="system.attributes.str.curr" value="{{system.attributes.str.curr}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
-      <span class="mod-label">{{localize 'Base/Current'}}</span>
+    <div>
+      <div class="flexrow attribute-value">
+        <input type="text" name="system.attributes.str.value" value="{{system.attributes.str.value}}" data-dtype="Number" />
+        <input type="text" class="attribute-value-current" name="system.attributes.str.curr" value="{{system.attributes.str.curr}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      </div>
+      <span class="mod-label">{{localize 'Base | Current'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.str.atkMod" value="{{numberFormat system.attributes.str.atkMod decimals=0 sign=true}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
@@ -28,11 +30,11 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.str.dmgMod'}}</span>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.str.test" value="{{system.attributes.str.test}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      <input type="text" name="system.attributes.str.test" value="{{system.attributes.str.test}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <a class="mod-label" role="button" data-action="rollThis" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.str.test}}" data-label="{{localize 'HYP3E.attributes.str.test'}}">{{localize 'HYP3E.attributes.str.test'}} <i class="fas fa-dice-d6"></i></a>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.str.feat" value="{{system.attributes.str.feat}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      <input type="text" name="system.attributes.str.feat" value="{{system.attributes.str.feat}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.str.feat}}" data-label="{{localize 'HYP3E.attributes.str.feat'}}">{{localize 'HYP3E.attributes.str.feat'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
@@ -44,10 +46,12 @@
     <span class="flex">
       <label for="system.attributes.dex.value" class="attribute-label {{#if warnDex}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.dex.abbrev'}}</label>
     </span>
-    <div class="flexrow attribute-value">
-      <input type="number" name="system.attributes.dex.value" value="{{system.attributes.dex.value}}" />
-      <input type="number" class="attribute-value-current" name="system.attributes.dex.curr" value="{{system.attributes.dex.curr}}" {{#if autoCalcAttrMods}}disabled{{/if}}/>
-      <span class="mod-label">{{localize 'Base/Current'}}</span>
+    <div>
+      <div class="flexrow attribute-value">
+        <input type="text" name="system.attributes.dex.value" value="{{system.attributes.dex.value}}" data-dtype="Number" />
+        <input type="text" class="attribute-value-current" name="system.attributes.dex.curr" value="{{system.attributes.dex.curr}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}}/>
+      </div>
+      <span class="mod-label">{{localize 'Base | Current'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.dex.atkMod" value="{{numberFormat system.attributes.dex.atkMod decimals=0 sign=true}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
@@ -58,11 +62,11 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.dex.defMod'}}</span>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.dex.test" value="{{system.attributes.dex.test}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      <input type="text" name="system.attributes.dex.test" value="{{system.attributes.dex.test}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <a class="mod-label" role="button" data-action="rollThis" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.dex.test}}" data-label="{{localize 'HYP3E.attributes.dex.test'}}">{{localize 'HYP3E.attributes.dex.test'}} <i class="fas fa-dice-d6"></i></a>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.dex.feat" value="{{system.attributes.dex.feat}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      <input type="text" name="system.attributes.dex.feat" value="{{system.attributes.dex.feat}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.dex.feat}}" data-label="{{localize 'HYP3E.attributes.dex.feat'}}">{{localize 'HYP3E.attributes.dex.feat'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
@@ -74,10 +78,12 @@
     <span class="flex">
       <label for="system.attributes.con.value" class="attribute-label {{#if warnCon}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.con.abbrev'}}</label>
     </span>
-    <div class="flexrow attribute-value">
-      <input type="number" name="system.attributes.con.value" value="{{system.attributes.con.value}}" />
-      <input type="number" class="attribute-value-current" name="system.attributes.con.curr" value="{{system.attributes.con.curr}}" {{#if autoCalcAttrMods}}disabled{{/if}}/>
-      <span class="mod-label">{{localize 'Base/Current'}}</span>
+    <div>
+      <div class="flexrow attribute-value">
+        <input type="text" name="system.attributes.con.value" value="{{system.attributes.con.value}}" data-dtype="Number" />
+        <input type="text" class="attribute-value-current" name="system.attributes.con.curr" value="{{system.attributes.con.curr}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}}/>
+      </div>
+      <span class="mod-label">{{localize 'Base | Current'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.con.hpMod" value="{{numberFormat system.attributes.con.hpMod decimals=0 sign=true}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
@@ -88,15 +94,15 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.con.poisRadMod'}}</span>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.con.traumaSurvive" value="{{system.attributes.con.traumaSurvive}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      <input type="text" name="system.attributes.con.traumaSurvive" value="{{system.attributes.con.traumaSurvive}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.con.traumaSurvive}}" data-label="{{localize 'HYP3E.attributes.con.traumaSurvive'}}">{{localize 'HYP3E.attributes.con.traumaSurvive'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.con.test" value="{{system.attributes.con.test}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      <input type="text" name="system.attributes.con.test" value="{{system.attributes.con.test}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <a class="mod-label" role="button" data-action="rollThis" data-roll="1d6" data-roll-type="check" data-roll-target="{{system.attributes.con.test}}" data-label="{{localize 'HYP3E.attributes.con.test'}}">{{localize 'HYP3E.attributes.con.test'}} <i class="fas fa-dice-d6"></i></a>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.con.feat" value="{{system.attributes.con.feat}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      <input type="text" name="system.attributes.con.feat" value="{{system.attributes.con.feat}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.con.feat}}" data-label="{{localize 'HYP3E.attributes.con.feat'}}">{{localize 'HYP3E.attributes.con.feat'}} <i class="fas fa-dice-d10"></i></a>
     </div>
   </div>
@@ -116,10 +122,12 @@
       <label for="system.attributes.int.value" class="attribute-label {{#if warnInt}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.int.abbrev'}}</label>
     </span>
     {{/if}}
-    <div class="flexrow attribute-value">
-      <input type="number" name="system.attributes.int.value" value="{{system.attributes.int.value}}" />
-      <input type="number" class="attribute-value-current" name="system.attributes.int.curr" value="{{system.attributes.int.curr}}" {{#if autoCalcAttrMods}}disabled{{/if}}/>
-      <span class="mod-label">{{localize 'Base/Current'}}</span>
+    <div>
+      <div class="flexrow attribute-value">
+        <input type="text" name="system.attributes.int.value" value="{{system.attributes.int.value}}" data-dtype="Number" />
+        <input type="text" class="attribute-value-current" name="system.attributes.int.curr" value="{{system.attributes.int.curr}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}}/>
+      </div>
+      <span class="mod-label">{{localize 'Base | Current'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.int.languages" value="{{numberFormat system.attributes.int.languages decimals=0 sign=true}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
@@ -135,7 +143,7 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.int.bonusSpells'}}</span>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.int.learnSpell" value="{{system.attributes.int.learnSpell}}"  {{#if autoCalcAttrMods}}disabled{{/if}}/>
+      <input type="text" name="system.attributes.int.learnSpell" value="{{system.attributes.int.learnSpell}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}}/>
       <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.int.learnSpell}}" data-label="{{localize 'HYP3E.attributes.int.learnSpell'}}">{{localize 'HYP3E.attributes.int.learnSpell'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
@@ -162,10 +170,12 @@
       <label for="system.attributes.wis.value" class="attribute-label {{#if warnWis}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.wis.abbrev'}}</label>
     </span>
     {{/if}}
-    <div class="flexrow attribute-value">
-      <input type="number" name="system.attributes.wis.value" value="{{system.attributes.wis.value}}" />
-      <input type="number" class="attribute-value-current" name="system.attributes.wis.curr" value="{{system.attributes.wis.curr}}" {{#if autoCalcAttrMods}}disabled{{/if}}/>
-      <span class="mod-label">{{localize 'Base/Current'}}</span>
+    <div>
+      <div class="flexrow attribute-value">
+        <input type="text" name="system.attributes.wis.value" value="{{system.attributes.wis.value}}" data-dtype="Number" />
+        <input type="text" class="attribute-value-current" name="system.attributes.wis.curr" value="{{system.attributes.wis.curr}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}}/>
+      </div>
+      <span class="mod-label">{{localize 'Base | Current'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.wis.willMod" value="{{numberFormat system.attributes.wis.willMod decimals=0 sign=true}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
@@ -181,7 +191,7 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.wis.bonusSpells'}}</span>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.wis.learnSpell" value="{{system.attributes.wis.learnSpell}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      <input type="text" name="system.attributes.wis.learnSpell" value="{{system.attributes.wis.learnSpell}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <a class="mod-label" role="button" data-action="rollThis" data-roll="1d100" data-roll-type="check" data-roll-target="{{system.attributes.wis.learnSpell}}" data-label="{{localize 'HYP3E.attributes.wis.learnSpell'}}">{{localize 'HYP3E.attributes.wis.learnSpell'}} <i class="fas fa-dice-d10"></i></a>
     </div>
     <div class="attribute-mod">
@@ -196,17 +206,19 @@
     <span class="flex">
       <label for="system.attributes.cha.value" class="attribute-label {{#if warnCha}}color-trans-red{{/if}}">{{localize 'HYP3E.attributes.cha.abbrev'}}</label>
     </span>
-    <div class="flexrow attribute-value">
-      <input type="number" name="system.attributes.cha.value" value="{{system.attributes.cha.value}}" />
-      <input type="number" class="attribute-value-current" name="system.attributes.cha.curr" value="{{system.attributes.cha.curr}}" {{#if autoCalcAttrMods}}disabled{{/if}}/>
-      <span class="mod-label">{{localize 'Base/Current'}}</span>
+    <div>
+      <div class="flexrow attribute-value">
+        <input type="text" name="system.attributes.cha.value" value="{{system.attributes.cha.value}}" data-dtype="Number" />
+        <input type="text" class="attribute-value-current" name="system.attributes.cha.curr" value="{{system.attributes.cha.curr}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}}/>
+      </div>
+      <span class="mod-label">{{localize 'Base | Current'}}</span>
     </div>
     <div class="attribute-mod">
       <input type="text" name="system.attributes.cha.reaction" value="{{numberFormat system.attributes.cha.reaction decimals=0 sign=true}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <a class="mod-label" role="button" data-action="rollThis" data-roll="2d6+{{system.attributes.cha.reaction}}" data-roll-type="reaction" data-label="{{localize 'HYP3E.attributes.cha.reaction'}}">{{localize 'HYP3E.attributes.cha.reaction'}} <i class="fas fa-dice"></i></a>
     </div>
     <div class="attribute-mod">
-      <input type="number" name="system.attributes.cha.maxHenchmen" value="{{system.attributes.cha.maxHenchmen}}" {{#if autoCalcAttrMods}}disabled{{/if}} />
+      <input type="text" name="system.attributes.cha.maxHenchmen" value="{{system.attributes.cha.maxHenchmen}}" data-dtype="Number" {{#if autoCalcAttrMods}}disabled{{/if}} />
       <span class="mod-label">{{localize 'HYP3E.attributes.cha.maxHenchmen'}}</span>
     </div>
     <div class="attribute-mod">
@@ -219,7 +231,7 @@
     </div>
     <div class="attribute-mod">
       {{!-- <span></span> --}}
-      <input type="number" name="system.ta" value="{{system.ta}}" />
+      <input type="text" name="system.ta" value="{{system.ta}}" data-dtype="Number" />
     </div>
   </div>
 </div>

@@ -4171,18 +4171,26 @@ export class Hyp3eCharacter {
               getsBonusSpell = this._valueFromTable(this.bonusSpell1, attributes.int.curr)
               if (getsBonusSpell) {
                 attributes.int.bonusSpells.lvl1 = true
+              } else {
+                attributes.int.bonusSpells.lvl1 = false
               }
               getsBonusSpell = this._valueFromTable(this.bonusSpell2, attributes.int.curr)
               if (getsBonusSpell) {
                 attributes.int.bonusSpells.lvl2 = true
+              } else {
+                attributes.int.bonusSpells.lvl2 = false
               }
               getsBonusSpell = this._valueFromTable(this.bonusSpell3, attributes.int.curr)
               if (getsBonusSpell) {
                 attributes.int.bonusSpells.lvl3 = true
+              } else {
+                attributes.int.bonusSpells.lvl3 = false
               }
               getsBonusSpell = this._valueFromTable(this.bonusSpell4, attributes.int.curr)
               if (getsBonusSpell) {
                 attributes.int.bonusSpells.lvl4 = true
+              } else {
+                attributes.int.bonusSpells.lvl4 = false
               }
               attributes.int.learnSpell = this._valueFromTable(this.learnSpell, attributes.int.curr)
               break;
@@ -4192,18 +4200,26 @@ export class Hyp3eCharacter {
               getsBonusSpell = this._valueFromTable(this.bonusSpell1, attributes.wis.curr)
               if (getsBonusSpell) {
                 attributes.wis.bonusSpells.lvl1 = true
+              } else {
+                attributes.wis.bonusSpells.lvl1 = false
               }
               getsBonusSpell = this._valueFromTable(this.bonusSpell2, attributes.wis.curr)
               if (getsBonusSpell) {
                 attributes.wis.bonusSpells.lvl2 = true
+              } else {
+                attributes.wis.bonusSpells.lvl2 = false
               }
               getsBonusSpell = this._valueFromTable(this.bonusSpell3, attributes.wis.curr)
               if (getsBonusSpell) {
                 attributes.wis.bonusSpells.lvl3 = true
+              } else {
+                attributes.wis.bonusSpells.lvl3 = false
               }
               getsBonusSpell = this._valueFromTable(this.bonusSpell4, attributes.wis.curr)
               if (getsBonusSpell) {
                 attributes.wis.bonusSpells.lvl4 = true
+              } else {
+                attributes.wis.bonusSpells.lvl4 = false
               }
               attributes.wis.learnSpell = this._valueFromTable(this.learnSpell, attributes.wis.curr)
               break;
