@@ -2138,9 +2138,9 @@ export class Hyp3eActor extends Actor {
       dataset.sitMod = 0;
       dataset.sitModList = "";
       // if (CONFIG.HYP3E.enableCombatSitModDetection) {
-        const sitModObj = this._getCombatantSitMods(attacker, target);
-        dataset.sitMod = parseInt(sitModObj?.sitModSum || 0);
-        dataset.sitModList = sitModObj?.sitModList || "";
+      const sitModObj = this._getCombatantSitMods(attacker, target);
+      dataset.sitMod = parseInt(sitModObj?.sitModSum || 0);
+      dataset.sitModList = sitModObj?.sitModList || "";
       // }
 
       // Combine item/roll specific data for the dialog
@@ -2805,16 +2805,20 @@ export class Hyp3eActor extends Actor {
   }
 
   /**
-   * 
+   * Examine the attacking and defending tokens, the active effects on them as well as 
+   *  status effects, and create a list of situational modifiers and sum total for the 
+   *  attack roll.
    * @param {*} attacker - attacking token
    * @param {*} target - targeted token
-   * @returns {Object} sitModObj { sitMod: number, sitModsArr: Array }
+   * @returns {Object} sitModObj { sitModSum: number, sitModsArr: Array }
    */
   _getCombatantSitMods(attacker, target) {
     Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Getting situational modifiers for attacker ${this.name}...`);
 
-    // Our return object
+    // Our return object & properties
     let sitModObj = {};
+    let sitModSum = 0;
+    let sitModsArr = [];
 
     let attackerEffects;
     if (!foundry.utils.isNewerVersion(game.version, "13")) {
@@ -2846,9 +2850,6 @@ export class Hyp3eActor extends Actor {
     }
 
     // Start gathering situational modifiers
-    let sitModSum = 0
-    let sitModsArr = []
-    // Effect names can be arbitrary, what we care about is the token status/condition
     attackerEffects.forEach(effect => {
       if (!effect.disabled) {
         Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} effect statuses:`, effect.statuses);
@@ -2869,6 +2870,7 @@ export class Hyp3eActor extends Actor {
         //      then there won't be any changes, and we should handle it here.
         if (CONFIG.HYP3E.enableCombatSitModDetection) {
           if (!tempAtkMod) {
+            // Effect names can be arbitrary, what we care about is the token status/condition
             if (effect.statuses.has("blind")) {
               sitModSum += -4
               sitModsArr.push("Blind (-4)")
