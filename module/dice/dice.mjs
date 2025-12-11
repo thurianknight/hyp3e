@@ -226,8 +226,8 @@ export class Hyp3eDice {
    * @param {Object} actorData
    */
   static buildDamageFormula(itemData, ammoData = null, actorData = null) {
-    let dmgRollParts = []
-    let debugDmgRollParts = []
+    let dmgRollParts = [];
+    let debugDmgRollParts = [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Item damage type: ${itemData?.dmgType}`);
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Actor data:`, actorData);
 
@@ -240,105 +240,105 @@ export class Hyp3eDice {
     const caDmgMod = parseInt(actorData.ca) > 0 ? `+${parseInt(actorData.ca)}` : `${parseInt(actorData.ca)}`;
     const itemDmgMod = parseInt(itemData.dmgMod) > 0 ? `+${parseInt(itemData.dmgMod)}` : `${parseInt(itemData.dmgMod)}`;
 
-    const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Basic"
+    const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Basic";
     const altDmgTypes =  Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Alternate damage types:`, altDmgTypes);
     // I may regret this, but I'm going to assume we will never have more than 2 damage fields 
     //  and hard-code it into this function.
-    let dmgRoll2Parts = []
-    let debugDmgRoll2Parts = []
+    let dmgRoll2Parts = [];
+    let debugDmgRoll2Parts = [];
 
     // All items start with the base damage formula
-    dmgRollParts.push(itemData.damage)
+    dmgRollParts.push(itemData.damage);
 
     // Add the debug message header and first table row
-    debugDmgRollParts.push(`<b>Damage formula elements:</b><table class="chat-table">`)
-    debugDmgRollParts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage}</td></tr>`)
+    debugDmgRollParts.push(`<b>Damage formula elements:</b><table class="chat-table">`);
+    debugDmgRollParts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage}</td></tr>`);
 
     // Do we have 2-handed damage?
     if (itemData.damage2h) {
-        dmgRoll2Parts.push(itemData.damage2h)
-        debugDmgRoll2Parts.push(`<b>Damage formula elements:</b><table class="chat-table">`)
-        debugDmgRoll2Parts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage2h}</td></tr>`)
+      dmgRoll2Parts.push(itemData.damage2h);
+      debugDmgRoll2Parts.push(`<b>Damage formula elements:</b><table class="chat-table">`);
+      debugDmgRoll2Parts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage2h}</td></tr>`);
     }
 
     // Reformat the item damage string for commonly-used variables
     // ST Dmg Mod
     const strDmgModRegex = /\+\s*@str.dmgMod/g
     if (debugDmgRollParts[1].match(strDmgModRegex) > "") {
-        if (actorData?.actorType == "character") {
-            dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, `+ ${actorData.str.dmgMod}`)
-            debugDmgRollParts[1] = debugDmgRollParts[1].replace(strDmgModRegex, "")
-            debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`)
-        } else {
-            // NPCs/monsters don't have a ST attribute, so blank out that variable
-            dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, "")
-            debugDmgRollParts[1] = debugDmgRollParts[1].replace(strDmgModRegex, "")
-            debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>0</td></tr>`)
-        }
+      if (actorData?.actorType == "character") {
+        dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, `+ ${actorData.str.dmgMod}`);
+        debugDmgRollParts[1] = debugDmgRollParts[1].replace(strDmgModRegex, "");
+        debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
+      } else {
+        // NPCs/monsters don't have a ST attribute, so blank out that variable
+        dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, "");
+        debugDmgRollParts[1] = debugDmgRollParts[1].replace(strDmgModRegex, "");
+        debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>0</td></tr>`);
+      }
     }
     if (itemData.damage2h) {
-        if (debugDmgRoll2Parts[1].match(strDmgModRegex) > "") {
-            if (actorData?.actorType == "character") {
-                dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(strDmgModRegex, `+ ${actorData.str.dmgMod}`)
-                debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(strDmgModRegex, "")
-                debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`)
-            } else {
-                // NPCs/monsters don't have a ST attribute, so blank out that variable
-                dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, "")
-                debugDmgRollParts[1] = debugDmgRollParts[1].replace(strDmgModRegex, "")
-                debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>0</td></tr>`)
-            }
+      if (debugDmgRoll2Parts[1].match(strDmgModRegex) > "") {
+        if (actorData?.actorType == "character") {
+          dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(strDmgModRegex, `+ ${actorData.str.dmgMod}`);
+          debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(strDmgModRegex, "");
+          debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
+        } else {
+          // NPCs/monsters don't have a ST attribute, so blank out that variable
+          dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, "");
+          debugDmgRollParts[1] = debugDmgRollParts[1].replace(strDmgModRegex, "");
+          debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>0</td></tr>`);
         }
+      }
     }
     // Casting Ability
     const caRegex = /\+\s*@ca/g
     if (debugDmgRollParts[1].match(caRegex) > "") {
-        // This is where we override the actor's CA if the spell is being cast from an item
+      // Temp fix if CA is null
+      if (actorData.ca == null) actorData.ca = 0;
 
-        // Temp fix if CA is null
-        if (actorData.ca == null) actorData.ca = 0
-        dmgRollParts[0] = dmgRollParts[0].replace(caRegex, `+ ${actorData.ca}`)
-        debugDmgRollParts[1] = debugDmgRollParts[1].replace(caRegex, "")
-        debugDmgRollParts.push(`<tr><td>Casting Ability</td><td>${caDmgMod}</td></tr>`)
+      // This is where we override the actor's CA if the spell is being cast from an item
+      dmgRollParts[0] = dmgRollParts[0].replace(caRegex, `+ ${actorData.ca}`);
+      debugDmgRollParts[1] = debugDmgRollParts[1].replace(caRegex, "");
+      debugDmgRollParts.push(`<tr><td>Casting Ability</td><td>${caDmgMod}</td></tr>`);
     }
     if (itemData.damage2h) {
-        if (debugDmgRoll2Parts[1].match(caRegex) > "") {
-            dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(caRegex, `+ ${actorData.ca}`)
-            debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(caRegex, "")
-            debugDmgRoll2Parts.push(`<tr><td>Casting Ability</td><td>${caDmgMod}</td></tr>`)
-        }
+      if (debugDmgRoll2Parts[1].match(caRegex) > "") {
+        dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(caRegex, `+ ${actorData.ca}`);
+        debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(caRegex, "");
+        debugDmgRoll2Parts.push(`<tr><td>Casting Ability</td><td>${caDmgMod}</td></tr>`);
+      }
     }
 
     // Apply the item damage mod if needed
     if (itemData?.dmgMod && parseInt(itemData.dmgMod) != 0) {
-      dmgRollParts.push(itemData.dmgMod)
-      debugDmgRollParts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgMod}</td></tr>`)
+      dmgRollParts.push(itemDmgMod.replace("+", ""));
+      debugDmgRollParts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgMod}</td></tr>`);
       if (itemData.damage2h) {
-        dmgRoll2Parts.push(itemData.dmgMod)
-        debugDmgRoll2Parts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgMod}</td></tr>`)
+        dmgRoll2Parts.push(itemDmgMod.replace("+", ""));
+        debugDmgRoll2Parts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgMod}</td></tr>`);
       }
     }
 
     // Apply the ammunition damage mod if needed
     if (ammoData?.dmgMod && parseInt(ammoData.dmgMod) != 0) {
       const ammoDmgMod = parseInt(ammoData.dmgMod) > 0 ? `+${parseInt(ammoData.dmgMod)}` : `${parseInt(ammoData.dmgMod)}`;
-      dmgRollParts.push(ammoData.dmgMod)
-      debugDmgRollParts.push(`<tr><td>Ammo Dmg Mod</td><td>${ammoDmgMod}</td></tr>`)
+      dmgRollParts.push(ammoDmgMod.replace("+", ""));
+      debugDmgRollParts.push(`<tr><td>Ammo Dmg Mod</td><td>${ammoDmgMod}</td></tr>`);
       if (itemData.damage2h) {
-        dmgRoll2Parts.push(ammoData.dmgMod)
-        debugDmgRoll2Parts.push(`<tr><td>Ammo Dmg Mod</td><td>${ammoDmgMod}</td></tr>`)
+        dmgRoll2Parts.push(ammoDmgMod.replace("+", ""));
+        debugDmgRoll2Parts.push(`<tr><td>Ammo Dmg Mod</td><td>${ammoDmgMod}</td></tr>`);
       }
     }
 
     // Apply the character's (not npc's) ST damage mod if the item is a melee weapon
     if (itemData.melee) {
         if (actorData?.actorType == "character") {
-            dmgRollParts.push(actorData.str.dmgMod)
-            debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`)
+            dmgRollParts.push(strDmgMod.replace("+", ""));
+            debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
             if (itemData.damage2h) {
-                dmgRoll2Parts.push(actorData.str.dmgMod)
-                debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`)
+                dmgRoll2Parts.push(strDmgMod.replace("+", ""));
+                debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
             }
         } else {
             // NPCs/monsters don't have a ST attribute, so nothing to do here except 
@@ -347,23 +347,24 @@ export class Hyp3eDice {
     }
     // Apply the character's ST damage mod if the item has the "strDmgAdj" annotation (missile weapons)
     if (itemData.missile && Array.isArray(itemData.annotations) && 
-      (itemData.annotations?.includes("hurled") || itemData.annotations?.includes("strDmgAdj"))) {
-        const baseFormula = itemData.damage || "";
-        const hasStrVar = baseFormula.includes("@str.dmgMod");
+        (itemData.annotations?.includes("hurled") || 
+          itemData.annotations?.includes("strDmgAdj"))) {
+      const baseFormula = itemData.damage || "";
+      const hasStrVar = baseFormula.includes("@str.dmgMod");
 
-        if (!hasStrVar) {
-            if (actorData?.actorType === "character") {
-                dmgRollParts.push(actorData.str.dmgMod);
-                debugDmgRollParts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${strDmgMod}</td></tr>`);
-                if (itemData.damage2h) {
-                    dmgRoll2Parts.push(actorData.str.dmgMod);
-                    debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${strDmgMod}</td></tr>`);
-                }
-            } else {
-                // NPCs/monsters don't have a ST attribute, so nothing to do here except 
-                //  note it in a comment. :-)
-            }
+      if (!hasStrVar) {
+        if (actorData?.actorType === "character") {
+          dmgRollParts.push(strDmgMod.replace("+", ""));
+          debugDmgRollParts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${strDmgMod}</td></tr>`);
+          if (itemData.damage2h) {
+            dmgRoll2Parts.push(strDmgMod.replace("+", ""));
+            debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${strDmgMod}</td></tr>`);
+          }
+        } else {
+          // NPCs/monsters don't have a ST attribute, so nothing to do here except 
+          //  note it in a comment. :-)
         }
+      }
     }
 
     // Check if the weapon attack has Master or Grandmaster flags set
@@ -386,10 +387,10 @@ export class Hyp3eDice {
     // Does the actor have a temporary damage mod applied?
     if (actorData?.tempDmgMod && parseInt(actorData.tempDmgMod) != 0) {
       const tempDmgMod = parseInt(actorData.tempDmgMod) > 0 ? `+${parseInt(actorData.tempDmgMod)}` : `${parseInt(actorData.tempDmgMod)}`;
-      dmgRollParts.push(actorData.tempDmgMod)
+      dmgRollParts.push(tempDmgMod.replace("+", ""))
       debugDmgRollParts.push(`<tr><td>Effect Mod</td><td>${tempDmgMod}</td></tr>`)
       if (itemData.damage2h) {
-        dmgRoll2Parts.push(actorData.tempDmgMod)
+        dmgRoll2Parts.push(tempDmgMod.replace("+", ""))
         debugDmgRoll2Parts.push(`<tr><td>Effect Mod</td><td>${tempDmgMod}</td></tr>`)
       }
     }
