@@ -2137,11 +2137,11 @@ export class Hyp3eActor extends Actor {
 
       dataset.sitMod = 0;
       dataset.sitModList = "";
-      if (CONFIG.HYP3E.enableCombatSitModDetection) {
-          const sitModObj = this._getCombatantSitMods(attacker, target); // Assuming this function exists
-          dataset.sitMod = parseInt(sitModObj?.sitMod || 0);
-          dataset.sitModList = sitModObj?.sitModList || "";
-      }
+      // if (CONFIG.HYP3E.enableCombatSitModDetection) {
+        const sitModObj = this._getCombatantSitMods(attacker, target);
+        dataset.sitMod = parseInt(sitModObj?.sitModSum || 0);
+        dataset.sitModList = sitModObj?.sitModList || "";
+      // }
 
       // Combine item/roll specific data for the dialog
       const dialogData = {
@@ -2811,145 +2811,151 @@ export class Hyp3eActor extends Actor {
    * @returns {Object} sitModObj { sitMod: number, sitModsArr: Array }
    */
   _getCombatantSitMods(attacker, target) {
-      Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Getting situational modifiers for attacker ${this.name}...`);
+    Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Getting situational modifiers for attacker ${this.name}...`);
 
-      // Our return object
-      let sitModObj = {}
+    // Our return object
+    let sitModObj = {};
 
-      let attackerEffects
+    let attackerEffects;
+    if (!foundry.utils.isNewerVersion(game.version, "13")) {
+      // For Foundry v12...
+      Hyp3eLogger.error("Hyp3eActor _getCombatantSitMods", `Foundry version not supported: ${game.version}`);
+      attackerEffects = this.effects
+    } else if (foundry.utils.isNewerVersion(game.version, "13")) {
+      // For Foundry v13...
+      // attackerEffects = this._getAllApplicableEffects()
+      attackerEffects = this.allApplicableEffects()
+    }
+    Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} (attacking) has effects:`, attackerEffects);
+    // const effects = this._getEffectNames()
+
+    // Hopefully we have a target!
+    let targetEffects
+    if (target) {
       if (!foundry.utils.isNewerVersion(game.version, "13")) {
-          // For Foundry v12...
-          attackerEffects = this.effects
+        // For Foundry v12...
+        Hyp3eLogger.error("Hyp3eActor _getCombatantSitMods", `Foundry version not supported: ${game.version}`);
+        targetEffects = target.actor.effects
       } else if (foundry.utils.isNewerVersion(game.version, "13")) {
-          // For Foundry v13...
-          // attackerEffects = this._getAllApplicableEffects()
-          attackerEffects = this.allApplicableEffects()
+        // For Foundry v13...
+        // targetEffects = target.actor._getAllApplicableEffects()
+        targetEffects = target.actor.allApplicableEffects()
       }
-      Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Attacker effects:`, attackerEffects);
-      // const effects = this._getEffectNames()
+      Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${target.name} (defending) has effects:`, targetEffects);
+      // targetEffects = targetActor._getEffectNames()
+    }
 
-      // Hopefully we have a target!
-      let targetEffects
-      if (target) {
-          if (!foundry.utils.isNewerVersion(game.version, "13")) {
-              // For Foundry v12...
-              targetEffects = target.actor.effects
-          } else if (foundry.utils.isNewerVersion(game.version, "13")) {
-              // For Foundry v13...
-              // targetEffects = target.actor._getAllApplicableEffects()
-              targetEffects = target.actor.allApplicableEffects()
+    // Start gathering situational modifiers
+    let sitModSum = 0
+    let sitModsArr = []
+    // Effect names can be arbitrary, what we care about is the token status/condition
+    attackerEffects.forEach(effect => {
+      if (!effect.disabled) {
+        Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} effect statuses:`, effect.statuses);
+        // Does the effect apply a tempAtkMod?
+        const tempAtkMod = effect.changes.find(c => c.key === "system.tempAtkMod")
+        if (tempAtkMod) {
+          Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} has tempAtkMod: ${tempAtkMod.value}`);
+          // Add the tempAtkMod to the sitMod
+          sitModSum += parseInt(tempAtkMod.value)
+          const changeString = parseInt(tempAtkMod.value) > 0 ? `+${tempAtkMod.value}` : `${tempAtkMod.value}`
+          sitModsArr.push(`${effect.name} (${changeString})`)
+        }
+        // Status effects that may not apply any changes...
+        //      The assumption here is that if an effect has at least one change 
+        //      being applied, it is probably modifying the attacker's roll. So we don't
+        //      want to "double-dip" that modifier by applying it again here.
+        //      But if the status was just applied from the token right-click menu,
+        //      then there won't be any changes, and we should handle it here.
+        if (CONFIG.HYP3E.enableCombatSitModDetection) {
+          if (!tempAtkMod) {
+            if (effect.statuses.has("blind")) {
+              sitModSum += -4
+              sitModsArr.push("Blind (-4)")
+            }
+            if (effect.statuses.has("invisible")) {
+              sitModSum += 4
+              sitModsArr.push("Invisible (+4)")
+            }
           }
-          Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Target effects:`, targetEffects);
-          // targetEffects = targetActor._getEffectNames()
+        }
       }
-
-      // Start gathering situational modifiers
-      let sitModSum = 0
-      let sitModsArr = []
+    });
+    // Hopefully we have a target!
+    if (target) {
+      if (CONFIG.HYP3E.enableCombatSitModDetection) {
+        Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${target.name} elevation (${target.document.elevation}) vs. Attacker elevation (${attacker.document.elevation})...`);
+        // Attacker on higher ground (token height vs. target token height)
+        if (attacker.document.elevation > target.document.elevation) {
+          sitModSum += 1
+          sitModsArr.push("Higher Ground (+1)")
+        }
+        // Defender is on higher ground
+        if (attacker.document.elevation < target.document.elevation) {
+          sitModSum += -1
+          sitModsArr.push("Defender on Higher Ground (-1)")
+        }
+      }
       // Effect names can be arbitrary, what we care about is the token status/condition
-      attackerEffects.forEach(effect => {
-          if (!effect.disabled) {
-              Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Actor effect statuses:`, effect.statuses);
-              // Does the effect apply a tempAtkMod?
-              const chg = effect.changes.find(c => c.key === "system.tempAtkMod")
-              if (chg) {
-                  Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Actor ${this.name} has tempAtkMod: ${chg.value}`);
-                  // Add the tempAtkMod to the sitMod
-                  sitModSum += parseInt(chg.value)
-                  const changeString = parseInt(chg.value) > 0 ? `+${chg.value}` : `${chg.value}`
-                  sitModsArr.push(`${effect.name} (${changeString})`)
+      targetEffects.forEach(effect => {
+        if (!effect.disabled) {
+          Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${target.name} effect statuses:`, effect.statuses);
+          // Status effects that may not apply any changes...
+          //      The assumption here is that if an effect has at least one change 
+          //      being applied, it is probably modifying the target's AC. So we don't
+          //      want to "double-dip" that modifier by applying it again here.
+          //      But if the status was just applied from the token right-click menu,
+          //      then there won't be any changes, and we should handle it here.
+          if (!effect.changes.find(c => c.key == "system.ac.tempAcMod")) {
+            if (CONFIG.HYP3E.enableCombatSitModDetection) {
+              if (effect.statuses.has("blind")) {
+                sitModSum += 4
+                sitModsArr.push("Defender Blind (+4)")
               }
-              // Status effects that may not apply any changes...
-              //      The assumption here is that if an effect has at least one change 
-              //      being applied, it is probably modifying the attacker's roll. So we don't
-              //      want to "double-dip" that modifier by applying it again here.
-              //      But if the status was just applied from the token right-click menu,
-              //      then there won't be any changes, and we should handle it here.
-              if (!chg) {
-                  if (effect.statuses.has("blind")) {
-                      sitModSum += -4
-                      sitModsArr.push("Blind (-4)")
-                  }
-                  if (effect.statuses.has("invisible")) {
-                      sitModSum += 4
-                      sitModsArr.push("Invisible (+4)")
-                  }
+              if (effect.statuses.has("invisible")) {
+                sitModSum += -4
+                sitModsArr.push("Defender Invisible (-4)")
               }
+              if (effect.statuses.has("restrain")) {
+                sitModSum += 2
+                sitModsArr.push("Defender Hindered (+2)")
+              }
+              if (effect.statuses.has("prone")) {
+                sitModSum += 4
+                sitModsArr.push("Defender Prone (+4)")
+              }
+              if (effect.statuses.has("stun")) {
+                sitModSum += 4
+                sitModsArr.push("Defender Stunned (+4)")
+              }
+            }
           }
+        }
       });
-      // Hopefully we have a target!
-      if (target) {
-          Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Target elevation (${target.document.elevation}) vs. Attacker elevation (${attacker.document.elevation})...`);
-          // Attacker on higher ground (token height vs. target token height)
-          if (attacker.document.elevation > target.document.elevation) {
-          // if (attacker.elevation > target.elevation) {
-              sitModSum += 1
-              sitModsArr.push("Higher Ground (+1)")
-          }
-          // Defender is on higher ground
-          if (attacker.document.elevation < target.document.elevation) {
-          // if (attacker.elevation < target.elevation) {
-              sitModSum += -1
-              sitModsArr.push("Defender on Higher Ground (-1)")
-          }
 
-          // Effect names can be arbitrary, what we care about is the token status/condition
-          targetEffects.forEach(effect => {
-              if (!effect.disabled) {
-                  Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Target effect statuses:`, effect.statuses);
-                  // Status effects that may not apply any changes...
-                  //      The assumption here is that if an effect has at least one change 
-                  //      being applied, it is probably modifying the target's AC. So we don't
-                  //      want to "double-dip" that modifier by applying it again here.
-                  //      But if the status was just applied from the token right-click menu,
-                  //      then there won't be any changes, and we should handle it here.
-                  if (!effect.changes.find(c => c.key == "system.ac.tempAcMod")) {
-                      if (effect.statuses.has("blind")) {
-                          sitModSum += 4
-                          sitModsArr.push("Defender Blind (+4)")
-                      }
-                      if (effect.statuses.has("invisible")) {
-                          sitModSum += -4
-                          sitModsArr.push("Defender Invisible (-4)")
-                      }
-                      if (effect.statuses.has("restrain")) {
-                          sitModSum += 2
-                          sitModsArr.push("Defender Hindered (+2)")
-                      }
-                      if (effect.statuses.has("prone")) {
-                          sitModSum += 4
-                          sitModsArr.push("Defender Prone (+4)")
-                      }
-                      if (effect.statuses.has("stun")) {
-                          sitModSum += 4
-                          sitModsArr.push("Defender Stunned (+4)")
-                      }
-                  }
-              }
-          });
+        // Attacker is flanking, +1 (Three or more melee combatants engage a single opponent)
+        // We have the target token. The token does have a "targeted" array which is an array
+        //  of USERs (not actors) who have selected this token to target. So we could count the
+        //  length of the array and if it is 3 or more, apply this modifier. However we also
+        //  need to make sure that they are all engaged in melee (not missile) combat... so we
+        //  would need to get the actual tokens owned by the players, and then determine whether
+        //  they are in melee range of their target. It gets really complicated.
 
-          // Attacker is flanking, +1 (Three or more melee combatants engage a single opponent)
-          // We have the target token. The token does have a "targeted" array which is an array
-          //  of USERs (not actors) who have selected this token to target. So we could count the
-          //  length of the array and if it is 3 or more, apply this modifier. However we also
-          //  need to make sure that they are all engaged in melee (not missile) combat... so we
-          //  would need to get the actual tokens owned by the players, and then determine whether
-          //  they are in melee range of their target. It gets really complicated.
+        // Target of missile attack engaged in melee with ally of attacker, -2
+        // Similar to the above, determining other tokens that are in melee with the targeted
+        //  token gets really complicated. May be possible, just need to think hard on this.
+        //  And then determine whether it is really worth it.
 
-          // Target of missile attack engaged in melee with ally of attacker, -2
-          // Similar to the above, determining other tokens that are in melee with the targeted
-          //  token gets really complicated. May be possible, just need to think hard on this.
-          //  And then determine whether it is really worth it.
+        // Defender is encumbered or heavily encumbered - this is handled by a different option.
 
-          // Defender is encumbered or heavily encumbered - this is handled by a different option.
-
-      }
-      // Finalize the modifiers & return
-      sitModObj = {
-          sitMod: sitModSum,
-          sitModList: sitModsArr.join(", ")
-      }
-      return sitModObj
+    }
+    Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} has accumulated situational modifiers:`, sitModsArr.join(", "));
+    // Finalize the modifiers & return
+    sitModObj = {
+      sitModSum: sitModSum,
+      sitModList: sitModsArr.join(", ")
+    }
+    return sitModObj
   }
 
   /**
