@@ -2191,13 +2191,17 @@ export class Hyp3eActor extends Actor {
           await this.applyHealthChange(parseInt(item.system.spellLevel), "basic", false);
         }
 
-        // Save the caster's (or item's) casting ability in the spell's effect flags
+        // Save the source caster's (or item's) UUID and casting ability in the effect flags
         for (const effect of item.effects.contents) {
             const data = effect.toObject();
 
             data.flags ??= {};
             data.flags.hyp3e ??= {};
-            data.flags.hyp3e.sourceActorUuid = this.uuid;
+            data.flags.hyp3e.source ??= {};
+            data.flags.hyp3e.source.srcItemUuid = dataset.isItemSpell ? item.uuid : null;
+            data.flags.hyp3e.source.srcActorUuid = this.uuid;
+            data.flags.hyp3e.source.appliedBy = this.name;
+            // data.flags.hyp3e.sourceActorUuid = this.uuid;
 
             // Optionally store spell-level data, too
             data.flags.hyp3e.spellUuid = item.uuid;

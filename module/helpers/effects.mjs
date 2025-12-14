@@ -228,8 +228,10 @@ export async function setupEffectHandlers() {
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Create event fired for ${effect.name}:`, effect);
 
       // Get data stored in the effect's flags
-      const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
-      const sourceActor = sourceUuid ? await fromUuid(sourceUuid) : effect.parent;
+      const source = effect.getFlag("hyp3e", "source");
+      const srcActorUuid = source.srcActorUuid;
+      // const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
+      const sourceActor = srcActorUuid ? await fromUuid(srcActorUuid) : effect.parent;
       const actorData = sourceActor?.system ?? {};
       // Hyp3eLogger.info("ActiveEffect createActiveEffect", `Actor applying the effect:`, actorData);
 
