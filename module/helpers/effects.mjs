@@ -465,8 +465,8 @@ export async function setupEffectHandlers() {
 
 /**
  * Resolve a custom duration formula to a final number for rounds and turns.
- * @param {*} effect 
- * @param {*} actorData 
+ * @param {*} effect - The ActiveEffect
+ * @param {*} actorData - The effect's source actor, not the actor receiving the effect
  * @returns 
  */
 export async function checkAndResolveDuration(effect, actorData) {

@@ -2397,8 +2397,8 @@ export class Hyp3eActor extends Actor {
       }
 
       const attackerPos = attacker?.center ?? null;
-      // Hyp3eLogger.info("Hyp3eActor _getAttackerDetails", `Attacker:`, attacker);
-      Hyp3eLogger.info("Hyp3eActor _getAttackerDetails", `Attacker ${attacker.name} position:`, attackerPos);
+      Hyp3eLogger.info("Hyp3eActor _getAttackerDetails", `Attacker:`, attacker);
+      // Hyp3eLogger.info("Hyp3eActor _getAttackerDetails", `Attacker ${attacker.name} position:`, attackerPos);
 
       return { attacker, attackerPos };
   }
