@@ -794,7 +794,8 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         const field = target.dataset.field || "img"
         const current = foundry.utils.getProperty(this.document, field)
 
-        const fp = new foundry.applications.apps.FilePicker({
+        // const fp = new foundry.applications.apps.FilePicker({
+        const fp = new foundry.applications.apps.FilePicker.implementation({
             type: "image",
             current: current,
             callback: (path) => this.document.update({ [field]: path })
@@ -1292,79 +1293,115 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     // ===========================================================================
 
     async _onDropItem(event, item) {
-        // Hyp3eLogger.info("HYP3EActorSheetV2 _onDropItem", `Item dropped event:`, { event, item })
+      // Hyp3eLogger.info("HYP3EActorSheetV2 _onDropItem", `Item dropped event:`, { event, item })
 
-        // Handle merchant -> character drag
-        const sourceActor = item?.parent;
-        if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
-            // Perform the merchant transaction and exit early
-            await buyFromMerchant(this.actor, sourceActor, item);
-            return; // Prevent super._onDropItem()
-        }
-        // Handle character -> merchant drag
-        if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "merchant") {
-            // If selling a container, it must be empty
-            if (item._isContainer() && item.contents.length > 0) {
-                const msg = `Container ${item.name} is not empty! Remove all items from it first, before selling it.`;
-                Hyp3eLogger.warn("_onDropItem", msg);
-                ui.notifications.warn(msg);
-                return; // Prevent super._onDropItem()
-            }
-            // Perform the sale to merchant and exit early
-            await sellToMerchant(this.actor, sourceActor, item);
-            return; // Prevent super._onDropItem()
-        }
+      // Handle merchant -> character drag
+      const sourceActor = item?.parent;
+      if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
+          // Perform the merchant transaction and exit early
+          await buyFromMerchant(this.actor, sourceActor, item);
+          return; // Prevent super._onDropItem()
+      }
+      // Handle character -> merchant drag
+      if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "merchant") {
+          // If selling a container, it must be empty
+          if (item._isContainer() && item.contents.length > 0) {
+              const msg = `Container ${item.name} is not empty! Remove all items from it first, before selling it.`;
+              Hyp3eLogger.warn("_onDropItem", msg);
+              ui.notifications.warn(msg);
+              return; // Prevent super._onDropItem()
+          }
+          // Perform the sale to merchant and exit early
+          await sellToMerchant(this.actor, sourceActor, item);
+          return; // Prevent super._onDropItem()
+      }
 
-        // Handle treasure -> character drag
-        if (sourceActor?.type === "treasure" && this.actor.type !== "treasure") {
-            // Perform the treasure acquisition and exit early
-            await transferFromTreasure(this.actor, sourceActor, item);
-            return; // Prevent super._onDropItem()
-        }
-        // Handle character -> treasure drag
-        if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "treasure") {
-          const msg = `Why would you want to put items INTO a treasure trove? That makes no sense!`;
+      // Handle treasure -> character drag
+      if (sourceActor?.type === "treasure" && this.actor.type !== "treasure") {
+          // Perform the treasure acquisition and exit early
+          await transferFromTreasure(this.actor, sourceActor, item);
+          return; // Prevent super._onDropItem()
+      }
+      // Handle character -> treasure drag
+      if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "treasure") {
+        const msg = `Why would you want to put items INTO a treasure trove? That makes no sense!`;
+        Hyp3eLogger.warn("_onDropItem", msg);
+        ui.notifications.warn(msg);
+        return; // Prevent super._onDropItem()
+      }
+
+      // Handle any item dragged to an ItemToken
+      if (this.actor.type === "itemToken") {
+        if (this.actor.system?.linkedItemUuid && this.actor.system.linkedItemUuid !== "") {
+          const msg = `This Item Token is already linked to an item.`;
           Hyp3eLogger.warn("_onDropItem", msg);
           ui.notifications.warn(msg);
           return; // Prevent super._onDropItem()
         }
+        // Clone important properties from item to actor
+        const updates = {
+          "name": item.system?.friendlyName || item.name,
+          "img": item.img,
+          "system.linkedItemUuid": item.uuid,
+          "system.biography": item.system.description,
+          "system.fa": item?.parent?.system.fa || 0,
+          "system.ca": item?.parent?.system.ca || null,
+          "system.ta": item?.parent?.system.ta || null,
+          "system.hp.value": 1,
+          "system.hp.max": 1,
+          "system.attributes.dex.value": item?.parent?.system.attributes.dex.value || 10,
+          "prototypeToken.name": item.system?.friendlyName || item.name,
+          "prototypeToken.texture.src": item.img,
+          "prototypeToken.light.angle": item.system?.light.angle || 360,
+          "prototypeToken.light.dim": item.system?.light.dim || null,
+          "prototypeToken.light.bright": item.system?.light.bright || null,
+          "prototypeToken.light.color": item.system?.light.color || null,
+        };
+        await this.actor.update(updates);
+        const msg = `Item Token linked to item ${item.name}.`;
+        Hyp3eLogger.info("_onDropItem", msg);
+        ui.notifications.info(msg);
+        return super._onDropItem(event, item) // Copy the item to the itemToken actor
+      }
 
-        // Handle any item dragged to an ItemToken
-        if (this.actor.type === "itemToken") {
-          if (this.actor.system?.linkedItemUuid && this.actor.system.linkedItemUuid !== "") {
-            const msg = `This Item Token is already linked to an item.`;
-            Hyp3eLogger.warn("_onDropItem", msg);
-            ui.notifications.warn(msg);
-            return; // Prevent super._onDropItem()
-          }
-          // Clone important properties from item to actor
-          const updates = {
-            "name": item.system?.friendlyName || item.name,
-            "img": item.img,
-            "system.linkedItemUuid": item.uuid,
-            "system.biography": item.system.description,
-            "system.fa": item?.parent?.system.fa || 0,
-            "system.ca": item?.parent?.system.ca || null,
-            "system.ta": item?.parent?.system.ta || null,
-            "system.hp.value": 1,
-            "system.hp.max": 1,
-            "system.attributes.dex.value": item?.parent?.system.attributes.dex.value || 10,
-            "prototypeToken.name": item.system?.friendlyName || item.name,
-            "prototypeToken.texture.src": item.img,
-            "prototypeToken.light.angle": item.system?.light.angle || 360,
-            "prototypeToken.light.dim": item.system?.light.dim || null,
-            "prototypeToken.light.bright": item.system?.light.bright || null,
-            "prototypeToken.light.color": item.system?.light.color || null,
-          };
-          await this.actor.update(updates);
-          const msg = `Item Token linked to item ${item.name}.`;
-          Hyp3eLogger.info("_onDropItem", msg);
-          ui.notifications.info(msg);
-          return super._onDropItem(event, item) // Copy the item to the itemToken actor
+      // If an effectTemplate was dropped, add the effect to the actor
+      if (item.type === "effectTemplate") {
+        const droppedEffectNames = item.effects.map(e => e.name);
+        const existing = this.actor.effects.find(e => droppedEffectNames.includes(e.name));
+        if (existing) { 
+          // Prevent duplicate inserts
+          const msg = `Effect ${existing.name} is already linked to ${this.actor.name}.`;
+          ui.notifications.warn(msg);
+          Hyp3eLogger.warn("_onDropItem", msg);
+          return; 
         }
 
-        // Otherwise let normal copy-item behavior proceed
-        return super._onDropItem(event, item)
+        // Copy the effectTemplate's ActiveEffects to this actor
+        const effects = item.effects.contents.map(e => {
+          let effectData = e.toObject();
+          effectData.origin = this.actor.uuid;
+          effectData.sourceName = this.actor.name;
+          return effectData;
+        });
+
+        if (!effects.length) {
+          const msg = `No ActiveEffects found on template: ${item.name}`;
+          Hyp3eLogger.warn("_onDropItem", msg);
+          ui.notifications.warn(msg);
+          return;
+        }
+
+        // Duplicate template effects onto this actor
+        await this.actor.createEmbeddedDocuments("ActiveEffect", effects);
+
+        const msg = `Applied ${effects.length} effect(s) from template "${item.name}" to ${this.actor.name}.`;
+        Hyp3eLogger.info("_onDropItem", msg);
+        ui.notifications.info(msg);
+        return;
+      }
+
+      // Otherwise let normal copy-item behavior proceed
+      return super._onDropItem(event, item)
     }
 
     _onSortItem(event, item) {
