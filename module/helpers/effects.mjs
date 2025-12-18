@@ -229,18 +229,19 @@ export async function setupEffectHandlers() {
 
       // Get data stored in the effect's flags
       const source = effect.getFlag("hyp3e", "source");
-      const srcActorUuid = source.srcActorUuid;
+      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect source:`, source);
+      const srcActorUuid = source?.srcActorUuid ?? "";
       // const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
       const sourceActor = srcActorUuid ? await fromUuid(srcActorUuid) : effect.parent;
       const actorData = sourceActor?.system ?? {};
-      // Hyp3eLogger.info("ActiveEffect createActiveEffect", `Actor applying the effect:`, actorData);
+      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Actor applying the effect:`, actorData);
 
       // Flag to track whether anything needs to be updated
       let didUpdate = false;
 
       // Check to see if we have a rollable Duration formula, and resolve it if so
       const { updatedDuration, updated } = await checkAndResolveDuration(effect, actorData);
-      // Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
+      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
       if (updated) didUpdate = true;
 
       // Store all changes for a batch update at the end
@@ -248,6 +249,7 @@ export async function setupEffectHandlers() {
 
       for (let i = 0; i < updatedChanges.length; i++) {
         const change = updatedChanges[i];
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" change:`, change);
         // Store the change value regardless of whether it's a formula or not
         if (!change.flags?.hyp3e?.originalValue) {
           change.flags = change.flags || {};
