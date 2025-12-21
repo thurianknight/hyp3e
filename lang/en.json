@@ -90,6 +90,8 @@
             "initiativeKeep": "Keep same for each round",
             "initiativeReset": "Reset to blank each round",
             "initiativeReroll": "Reroll each round",
+            "resolveDeathAtRoundEnd": "Resolve unconscious/dead at round's end",
+            "resolveDeathAtRoundEndHint": "Do not resolve unconscious or dead status of combatants until the end of the round, when they all fall at once. Disabled by default.",
             "limitMovement": "Limit movement to MV speed",
             "limitMovementHint": "Limit token movement to MV speed for all actors. Disabled by default.",
             "forceRangeLimit": "Force range limit on attacks",

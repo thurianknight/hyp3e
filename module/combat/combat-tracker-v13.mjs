@@ -100,6 +100,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
 
         // Prepare the combatant context
         const turn = await super._prepareTurnContext(combat, combatant, index);
+        Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${combatant.name} turn:`, turn)
 
         // Add group initiative flag
         const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;

@@ -54,6 +54,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             isGroupInitiative: game.settings.get(game.system.id, "isGroupInitiative"),
             initiativeType: game.settings.get(game.system.id, "initiativeType"),
             rerollInitiative: game.settings.get(game.system.id, "rerollInitiative"),
+            resolveDeathAtRoundEnd: game.settings.get(game.system.id, "resolveDeathAtRoundEnd"),
             limitMovement: game.settings.get(game.system.id, "limitMovement"),
             forceRangeLimit: game.settings.get(game.system.id, "forceRangeLimit"),
             forceWeaponEquip: game.settings.get(game.system.id, "forceWeaponEquip"),

@@ -327,6 +327,11 @@ Hooks.once("ready", async function() {
     CONFIG.HYP3E.initiativeType = initiativeType;
     Hyp3eLogger.info("Init", "CONFIG combat initiative type:", CONFIG.HYP3E.initiativeType);
 
+    // Apply death when the round ends
+    const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
+    CONFIG.HYP3E.resolveDeathAtRoundEnd = resolveDeathAtRoundEnd;
+    Hyp3eLogger.info("Init", "CONFIG only apply unconscious/death when round ends:", CONFIG.HYP3E.resolveDeathAtRoundEnd);
+
     // Limit token movement to actor MV base
     if (majorVersion >= 13) {
         const limitMovement = game.settings.get(game.system.id, "limitMovement");

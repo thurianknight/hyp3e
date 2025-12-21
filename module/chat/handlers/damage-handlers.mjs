@@ -432,8 +432,12 @@ export async function applyHealthChange(total, damageType = "basic", applyDr = t
         const fillColor = damage_mod < 0 ? "0x00FF00" : "0xFF0000";
         showValueChange(t, fillColor, damage_mod);
 
-        // Update token status
-        await t.combatant?.updateStatus();
+        // Do we need to apply unconscious or dead statuses right away?
+        const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
+        if (!resolveDeathAtRoundEnd) {
+          // Update token status now
+          await t.combatant?.updateStatus();
+        }
     }
 
     let body = "";

@@ -50,10 +50,27 @@ export class HYP3ECombatant extends Combatant {
 
     // A combatant is defeated if their HP go to zero or negative
     get isDefeated() {
-        if (this.defeated)
-            return true;
+      const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
+      if (!resolveDeathAtRoundEnd) {
+        // Default Foundry behavior, defeat is resolved immediately
+        return this.defeated || (this.actor?.system.hp.value <= 0) || !!this.actor?.statuses.has(CONFIG.specialStatusEffects.DEFEATED);
+        // if (this.defeated) return true;
+        // return (this.actor?.system.hp.value <= 0) || !!this.actor?.statuses.has(CONFIG.specialStatusEffects.DEFEATED);
+      }
 
-        return !this.defeated && (this.actor.system.hp.value <= 0)
+      // Defer defeated status until round-end
+      if (this.combat?.flags?.hyp3e?.deferDefeat) {
+        Hyp3eLogger.info("HYP3ECombatant isDefeated", `${this.name} defeat is deferred for now, returning ${!!this.defeated}...`);
+        // return false;
+        return !!this.defeated;
+      }
+
+      // Round has ended (or not in combat), revert to default behavior
+      const defeatedStatus = this.defeated || (this.actor?.system.hp.value <= 0) || !!this.actor?.statuses.has(CONFIG.specialStatusEffects.DEFEATED);
+      Hyp3eLogger.info("HYP3ECombatant isDefeated", `${this.name} defeat is no longer deferred, returning status of ${defeatedStatus}...`);
+      return defeatedStatus;
+      // if (this.defeated) return true;
+      // return (this.actor?.system.hp.value <= 0) || !!this.actor?.statuses.has(CONFIG.specialStatusEffects.DEFEATED);
     }
 
     // ===========================================================================
@@ -222,7 +239,9 @@ export class HYP3ECombatant extends Combatant {
         // Check if the actor is unconscious or defeated
         let isDefeated = false;
         let isUnconscious = false;
+        // let displayDefeated = false;
         if (this.actor.system.hp.value <= 0) {
+            // displayDefeated = true;
             if (this.actor.type == "character") {
                 if (this.actor.system.hp.value == 0) {
                     isDefeated = true;
@@ -241,6 +260,7 @@ export class HYP3ECombatant extends Combatant {
             isUnconscious = false;
         }
         await this.update({ defeated: isDefeated, unconscious: isUnconscious });
+        // await this.update({ defeated: isDefeated, unconscious: isUnconscious, displayDefeated: displayDefeated });
         const defeated_status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED);
         if (isDefeated) {
             let effect = this.actor && defeated_status ? defeated_status : CONFIG.controlIcons.defeated;

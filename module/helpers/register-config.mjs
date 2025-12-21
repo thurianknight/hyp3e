@@ -289,6 +289,20 @@ export function registerHyp3eConfigurations() {
         },
     });
 
+    // No one falls unconscious or dead until the round ends
+    game.settings.register(game.system.id, "resolveDeathAtRoundEnd", {
+      name: game.i18n.localize("HYP3E.settings.resolveDeathAtRoundEnd"),
+      hint: game.i18n.localize("HYP3E.settings.resolveDeathAtRoundEndHint"),
+      default: false,
+      scope: "world",
+      type: Boolean,
+      config: showConfigOptions,
+      requiresReload: false,
+      onChange: value => {
+        CONFIG.HYP3E.resolveDeathAtRoundEnd = value;
+      }
+    });
+
     if (majorVersion >= 13) {
         // Limit token movement to actor MV base
         game.settings.register(game.system.id, "limitMovement", {

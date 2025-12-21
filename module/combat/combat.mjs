@@ -30,6 +30,12 @@ export class HYP3ECombat extends Combat {
         await super.startCombat();
         if (this.#rerollBehavior !== "reset")
             await this.#rollAbsolutelyEveryone();
+
+        // Set the deferDefeat flag
+        if (game.settings.get(game.system.id, "resolveDeathAtRoundEnd")) {
+          await this.setFlag("hyp3e", "deferDefeat", true);
+        }
+
         // Log the combat object
         Hyp3eLogger.info("HYP3ECombat startCombat", `Combat Started:`, this);
         return this;
@@ -38,7 +44,7 @@ export class HYP3ECombat extends Combat {
     async endCombat() {
         // For each combatant, delete any temporary effects that were previously disabled
         for (const combatant of this.combatants) {
-            combatant.actor.effects.forEach(effect => {
+            combatant?.actor?.effects.forEach(effect => {
                 if (effect.disabled && effect.isTemporary) {
                     Hyp3eLogger.info("HYP3ECombat endCombat", `Deleting effect ${effect.name} from ${combatant.name}:`, effect);
                     return effect.delete();
@@ -49,32 +55,55 @@ export class HYP3ECombat extends Combat {
         await super.endCombat();
     }
 
-    async _onEndRound() {
-        switch(this.#rerollBehavior) {
-            case "reset":
-                this.resetAll();
-                break;
-            case "reroll":
-                this.#rollAbsolutelyEveryone();
-                break;
-            case "keep":
-            default:
-                break;
+    async _onStartRound(context) {
+      // Reset the deferDefeat flag
+      if (game.settings.get(game.system.id, "resolveDeathAtRoundEnd")) {
+        await this.setFlag("hyp3e", "deferDefeat", true);
+      }
+      await super._onStartRound(context);
+    }
+
+    async _onEndRound(context) {
+      Hyp3eLogger.info("HYP3ECombat _onEndRound", `End-round data:`, this)
+      // Do we need to apply unconscious or dead statuses?
+      const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
+      if (resolveDeathAtRoundEnd) {
+        await this.unsetFlag("hyp3e", "deferDefeat");
+        // Cycle through all combatants and update status
+        for (const combatant of this.combatants) {
+          await combatant.updateStatus();
         }
-        // @ts-expect-error - This method exists, but the types package doesn't have it
-        await super._onEndRound();
-        await this.activateCombatant(0)
+      }
+
+      // Reset/reroll initiative
+      switch(this.#rerollBehavior) {
+        case "reset":
+          this.resetAll();
+          break;
+        case "reroll":
+          this.#rollAbsolutelyEveryone();
+          break;
+        case "keep":
+        default:
+          break;
+      }
+      // As of Foundry v13, super._onEndRound() actually does nothing, it's just a placeholder
+      await super._onEndRound(context);
+      await this.activateCombatant(0)
     }
 
     async _onEndTurn(combatant, context) {
         await super._onEndTurn(combatant, context);
         // Log the combatant whose turn is ending
-        Hyp3eLogger.info("HYP3ECombat _onEndTurn", `End-Turn Combatant:`, combatant)
+        Hyp3eLogger.info("HYP3ECombat _onEndTurn", `End-turn data for ${combatant.name}:`, combatant)
 
         if (foundry.utils.isNewerVersion(game.version, "13")) {
             // Clear the movement history to prevent any movement restrictions on its next turn
             combatant.clearMovementHistory();
         }
+
+        // Do we need to apply unconscious or dead statuses right away?
+        const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
 
         // Cycle through temporary effects and items, update combatant status
         const actor = combatant.actor;
@@ -82,7 +111,9 @@ export class HYP3ECombat extends Combat {
           Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.name} temporary items...`);
             await actor.processTemporaryEffects();
             await actor.processTemporaryItems(1);
-            await combatant.updateStatus();
+            if (!resolveDeathAtRoundEnd) {
+              await combatant.updateStatus();
+            }
         } else {
             Hyp3eLogger.warn("HYP3ECombat _onEndTurn", `Combatant has no actor, cannot process temporary effects!`);
         }
