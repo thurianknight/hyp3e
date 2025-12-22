@@ -104,8 +104,12 @@ export class Hyp3eActor extends Actor {
   _prepareCharacterData() {
     if (this.type !== 'character') return;
 
-    // Make modifications to data here. For example:
+    // Make modifications to data here
     const systemData = this.system;
+
+    if (systemData?.hp?.min == null) {
+      systemData.hp.min = -10;
+    }
 
     // Calculated fields go here...
 
@@ -177,8 +181,17 @@ export class Hyp3eActor extends Actor {
 
     // Make modifications to data here
     const systemData = this.system
+
+    // If NPC/Monster is not set, default to monster
+    if (!systemData?.npcType) {
+      systemData.npcType = "monster";
+    }
     // NPCs and monsters don't get the -10 hp benefit that PCs do
-    systemData.hp.min = 0
+    if (systemData.npcType === "monster") {
+      systemData.hp.min = 0
+    } else if (systemData.npcType === "npc") {
+      systemData.hp.min = -3
+    }
 
     // Calculated fields go here...
 
@@ -1403,10 +1416,15 @@ export class Hyp3eActor extends Actor {
       if (this.type === "character") {
         unconsciousHp = 0;
         dyingHp = -4;
-        deadHp = -10;
+        // deadHp = -10; We already know this is set
       } else {
-        // Can we determine whether this is a hireling vs a monster?
-        // 0-level hirelings can drop to -3 hp, monsters die at 0 hp
+        // 0-level NPCs can drop to -3 hp, monsters die at 0 hp
+        if (this.system?.npcType === "monster") {
+          // deadHp = 0; We already know this is set
+        } else if (this.system?.npcType === "npc") {
+          unconsciousHp = 0;
+          // deadHp = -3; We already know this is set
+        }
       }
 
       const maxHp = this.system.hp?.max ?? 999; // Hyperborea has fairly low numbers, so 999 is generous

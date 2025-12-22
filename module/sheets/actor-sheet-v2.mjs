@@ -79,6 +79,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             deleteItem: Hyp3eActorSheetV2._deleteItem,
             // Actions on the sheet header
             editImage: Hyp3eActorSheetV2._onEditImage,
+            setNpcType: Hyp3eActorSheetV2._setNpcType,
             quickCreate: Hyp3eActorSheetV2._onQuickCreate,
             levelUp: Hyp3eActorSheetV2._onLevelUp,
             setLanguages: Hyp3eActorSheetV2._openLanguagesApp,
@@ -194,7 +195,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       const { documentName, type=CONST.BASE_DOCUMENT_TYPE } = document;
       const {
           sheetClasses, defaultClasses, defaultClass
-      } = DocumentSheetConfig.getSheetClassesForSubType(documentName, type);
+      } = foundry.applications.apps.DocumentSheetConfig.getSheetClassesForSubType(documentName, type);
       const sheetClass = document.flags.core?.sheetClass ?? "";
       const config = CONFIG[documentName].sheetClasses[type] ?? {};
       const themes = game.settings.get("core", "sheetThemes");
@@ -802,6 +803,17 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         })
 
         fp.render(true)
+    }
+
+    /**
+     * Switches the NPC type between monster and npc (possibly more, tbd)
+     * @param {*} event 
+     * @param {*} target 
+     */
+    static async _setNpcType(event, target) {
+      const value = target.dataset.value;
+      const newValue = value == "monster" ? "npc" : "monster";
+      await this.actor.update({ "system.npcType": newValue });
     }
 
     /**

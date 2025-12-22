@@ -1,25 +1,53 @@
   {{!-- Sheet Header --}}
   <header class="sheet-header npc">
     <div class="header-bg"></div>
-    <div class="profile-img">
-      <!-- The character profile image -->
-      <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
-      <!-- The character health bar -->
-      <div class="health-bar" style="border-bottom:0px;">
-        <div style="width:{{system.hp.percentage}}%" class="health-fill"></div>
-          <div class="health-text">
-            <span
-              class='short-field align-right current-value'
-              style='text-align:right;'>
-              {{system.hp.value}}
-            </span> 
-            <p style="margin:0px">/</p>
-            <span class=' short-field'>
-              {{system.hp.max}}
-            </span> 
-          </div>
-      </div> <!-- End Health Bar -->
-    </div><!-- End Profile Image -->
+    <div>
+      <div class="profile-img">
+        <!-- The character profile image -->
+        <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+        <!-- The character health bar -->
+        <div class="health-bar" style="border-bottom:0px;">
+          <div style="width:{{system.hp.percentage}}%" class="health-fill"></div>
+            <div class="health-text">
+              <span
+                class='short-field align-right current-value'
+                style='text-align:right;'>
+                {{system.hp.value}}
+              </span> 
+              <p style="margin:0px">/</p>
+              <span class=' short-field'>
+                {{system.hp.max}}
+              </span> 
+            </div>
+        </div> <!-- End Health Bar -->
+      </div><!-- End Profile Image -->
+      <div class="npc-type-switch">
+        <label class="switch">
+          <input type="checkbox" class="npc-type-toggle" 
+            data-action="setNpcType" 
+            data-value="{{system.npcType}}" 
+            {{#if (eq system.npcType "monster")}}checked{{/if}}
+          >
+          <div class="slider round"></div>
+        </label>
+        <div class="npc-type-label">{{system.npcType}}</div>
+        {{!-- <button
+          type="button"
+          class="npc-type {{#if (eq system.npcType 'monster')}}active{{/if}}"
+          data-action="setNpcType"
+          data-value="monster">
+          Monster
+        </button>
+
+        <button
+          type="button"
+          class="npc-type {{#if (eq system.npcType 'npc')}}active{{/if}}"
+          data-action="setNpcType"
+          data-value="npc">
+          NPC
+        </button> --}}
+      </div>
+    </div>
     <div class="header-block">
       <div class="npc-header-block flexcol">
         <div class="npc-header-block flexrow">

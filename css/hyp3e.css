@@ -359,6 +359,52 @@
   height: 24px;
 }
 
+/* Slider-switch styles */
+.hyp3e .switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 16px;
+}
+
+.hyp3e .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.hyp3e .slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  transition: 0.2s;
+  border-radius: 16px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.hyp3e .slider::before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.2s;
+  border-radius: 50%;
+}
+
+.hyp3e input:checked + .slider {
+  background-color: var(--hyp3e-color-shadow-highlight);
+}
+
+.hyp3e input:checked + .slider::before {
+  transform: translateX(24px);
+}
+
 /* Label styles */
 .hyp3e label {
   color: var(--hyp3e-input-text-color);
@@ -1226,6 +1272,14 @@
 /* Input-specific styles */
 .hyp3e .npc-header-block input {
   text-align: center;
+}
+
+.hyp3e .npc-type-switch {
+  margin-top: 20px;
+  margin-right: 15px;
+  display: flex;
+  flex-direction: column; /* stack elements vertically */
+  align-items: center;    /* center horizontally */
 }
 
 /* NPC sheet styles */

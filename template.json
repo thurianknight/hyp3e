@@ -202,7 +202,8 @@
           "treasure": "",
           "dx": 11,
           "rollHD": true,
-          "phenotype": ""
+          "phenotype": "",
+          "npcType": "monster"
       },
       "merchant": {
         "templates": ["base"],
