@@ -1365,7 +1365,7 @@ export class Hyp3eActor extends Actor {
   
     return dur;
   }
-  
+
   /** DAMAGE/HEALING APPLICATION ----------------------*/
 
   /**
@@ -1389,19 +1389,35 @@ export class Hyp3eActor extends Actor {
 
       Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Processing ${amount} HP change for ${actorName}. Damage type: ${damageType}. Apply DR: ${applyDr}`);
 
-      // Get Current State & Define Change Type
+      // Get current state
       const currentHp = this.system.hp?.value ?? 0;
       let tempHp = this.system.hp?.tempHp ?? 0; // Temporary HP, if any
       let newHp = 0; // New HP after applying the change
-      const minHp = this.system.hp?.min ?? 0; // Default to 0 if min HP isn't defined
-      const maxHp = this.system.hp?.max ?? Infinity; // Default to Infinity if max HP isn't defined
+
+      // Define the actor's point of death, different for characters vs. monsters
+      let deadHp = this.system.hp?.min || 0;
+      let unconsciousHp = null;
+      let dyingHp = null;
+      // Characters and classed NPCs (including henchmen) should all be rolled as characters
+      if (this.type === "character") {
+        unconsciousHp = 0;
+        dyingHp = -4;
+        deadHp = -10;
+      } else {
+        // Can we determine whether this is a hireling vs a monster?
+        // 0-level hirelings can drop to -3 hp, monsters die at 0 hp
+      }
+
+      const maxHp = this.system.hp?.max ?? 999; // Hyperborea has fairly low numbers, so 999 is generous
+
+      // Are we applying damage or healing?
       const isDamage = amount > 0;
       const isHealing = amount < 0;
 
       // Check Early Exit Conditions
       // Condition: Trying to damage an already incapacitated/dead actor
-      if (isDamage && currentHp <= minHp) {
-          Hyp3eLogger.info("Hyp3eActor applyHealthChange", `${actorName} is already incapacitated (HP <= ${minHp}). No damage applied.`);
+      if (isDamage && currentHp <= deadHp) {
+          Hyp3eLogger.info("Hyp3eActor applyHealthChange", `${actorName} is already dead (HP <= ${deadHp}). No damage applied.`);
           // We might want to trigger "overkill" effects or messages here...
           return;
       }
@@ -1460,44 +1476,173 @@ export class Hyp3eActor extends Actor {
           }
           // Now apply the remaining damage (if any) to current HP.
           //  Prevent the new HP from going below the allowed minimum.
-          newHp = Math.max(minHp, currentHp - netChange);
+          newHp = Math.max(deadHp, currentHp - netChange);
       } else if (isHealing) {
           // Healing: Only add to real HP, not temp HP
           newHp = currentHp - netChange;
       }
 
-      // Clamp the calculated HP between the actor's min and max HP values
-      newHp = Math.max(minHp, Math.min(newHp, maxHp));
+      // Clamp the calculated HP between the actor's min (dead) and max HP values
+      newHp = Math.max(deadHp, Math.min(newHp, maxHp));
       Hyp3eLogger.info("Hyp3eActor applyHealthChange", `New HP for ${actorName}: ${newHp}.`);
 
-      // Check if Update is Necessary
+      // Check whether update is necessary...
       // Avoid updating the actor if the clamped HP is the same as the current HP
       // (e.g., healing when already at max HP, or taking 0 damage after DR)
       if (newHp === currentHp) {
-          Hyp3eLogger.info("Hyp3eActor applyHealthChange", `No actual HP change needed for ${actorName} after clamping/DR (Current: ${currentHp}, Calculated New: ${newHp}).`);
-          return; // No update needed
+        Hyp3eLogger.info("Hyp3eActor applyHealthChange", `No actual HP change needed for ${actorName} after clamping/DR (Current: ${currentHp}, Calculated New: ${newHp}).`);
+        return; // No update needed
       }
 
       const actualChangeAmount = Math.abs(currentHp - newHp); // How much HP *really* changed
       const changeType = (newHp < currentHp) ? "damage" : "healing";
-      Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Updating ${actorName} HP. Old: ${currentHp}, New: ${newHp} (${actualChangeAmount} ${changeType}).`);
+      Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Updating ${actorName} HP. Old: ${currentHp}, New: ${newHp} (${actualChangeAmount} ${changeType}). Actor:`, this);
 
       // Perform Actor Update
       try {
-          // Perform the asynchronous update on the actor document
-          await this.update({ "system.hp.value": newHp });
+        // Perform the asynchronous update on the actor document
+        await this.update({ "system.hp.value": newHp });
+        // Apply actor/token statuses if not in combat (otherwise combat handles the same)
+        if (!this.inCombat) {
+          if (newHp <= deadHp) {
+            Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Applying "dead" status to ${actorName}...`);
+            await this.setHealthStatus("dead");
+          } else if (newHp <= dyingHp) {
+            Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Applying "bleeding" status to ${actorName}...`);
+            await this.setHealthStatus("bleeding");
+          } else if (newHp <= unconsciousHp) {
+            Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Applying "unconscious" status to ${actorName}...`);
+            await this.setHealthStatus("unconscious");
+          } else {
+            Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Removing "dead/bleeding/unconscious" statuses from ${actorName}...`);
+            await this.setHealthStatus("conscious");
+          }
+        }
 
-          // Optional: Add hook calls after successful update if other modules/systems need to react
-          Hooks.callAll("actorHealthChanged", this, currentHp, newHp, netChange, isDamage, isHealing);
+        // Optional: Add hook calls after successful update if other modules/systems need to react
+        Hooks.callAll("actorHealthChanged", this, currentHp, newHp, netChange, isDamage, isHealing);
 
       } catch (err) {
-          // Log the error and notify the user if the update fails
-          Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Failed to update HP for ${actorName}:`, err);
-          ui.notifications?.error(`Failed to update HP for ${actorName}. See console log for details.`);
-          return err; // Return the error object
+        // Log the error and notify the user if the update fails
+        Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Failed to update HP for ${actorName}:`, err);
+        ui.notifications?.error(`Failed to update HP for ${actorName}. See console log for details.`);
+        return err; // Return the error object
       }
 
       // Implicitly return undefined on successful update or handled early exit
+  }
+
+  /**
+   * After a health change, determine whether unconscious or dead statuses should be 
+   *  applied or removed.
+   * @param {String} statusId - The token status ID that should be applied.
+   * @returns {null}
+   */
+  async setHealthStatus(statusId) {
+    switch (statusId) {
+      case "conscious":
+        // Leave "prone" status in place if it exists
+        this.removeStatus("unconscious");
+        this.removeStatus("bleeding");
+        this.removeStatus("dead");
+        break;
+
+      case "unconscious":
+        this.applyStatus("prone", "Prone");
+        this.applyStatus("unconscious", "Unconscious");
+        this.removeStatus("bleeding");
+        this.removeStatus("dead");
+        break;
+
+      case "bleeding":
+        this.applyStatus("prone", "Prone");
+        this.applyStatus("unconscious", "Unconscious");
+        this.applyStatus("bleeding", "Bleeding");
+        this.removeStatus("dead");
+        break;
+
+      case "dead":
+        this.applyStatus("prone", "Prone");
+        this.removeStatus("unconscious");
+        this.removeStatus("bleeding");
+        this.applyStatus("dead", "Dead");
+        break;
+
+      default:
+        // Remove all statuses... this will probably never happen
+        this.removeStatus("prone");
+        this.removeStatus("unconscious");
+        this.removeStatus("bleeding");
+        this.removeStatus("dead");
+    }
+  }
+
+  /**
+   * Programmatically apply a token status effect to this actor.
+   * @param {*} statusId - The named status to apply, e.g. "prone", "unconscious", etc.
+   * @param {*} label - Optional name of the effect that will appear on the actor sheet
+   * @returns {Promise<ActiveEffect[]|undefined>}
+   */
+  async applyStatus(statusId, label = null) {
+    // Do not apply if this status already exists
+    if (this.effects.some(e => e.statuses?.has(statusId))) return;
+
+    // Warn if an invalid statusId was given
+    if (!CONFIG.statusEffects.some(s => s.id === statusId)) {
+      Hyp3eLogger.warn("Hyp3eActor applyStatus", `Unknown statusId: ${statusId}`);
+    }
+    const status = CONFIG.statusEffects.find(s => s.id === statusId);
+    Hyp3eLogger.info("Hyp3eActor applyStatus", `Status found:`, status);
+
+    // Bleeding is a special case...
+    let changes = [];
+    if (statusId === "bleeding") {
+      changes = [{
+        key: "system.tempPersistentDamage",
+        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+        value: "bleeding,1;"
+      }];  
+    }
+
+    const statusEffect =  this.createEmbeddedDocuments("ActiveEffect", [{
+      name: label ? label : status.name,
+      img: status.img,
+      changes: changes,
+      statuses: new Set([statusId]),
+      origin: this.uuid,
+      disabled: false,
+      flags: { [game.system.id]: { source: "hyp3e" } }
+    }]);
+
+    // Apply overlay icon to token
+    const token = this.getAssociatedToken();
+    Hyp3eLogger.info("Hyp3eActor applyStatus", `Token:`, token);
+    if (token.object) {
+      await token.object.toggleEffect(statusId, {
+        overlay: true,
+        active: true
+      });
+    } else {
+      await token.toggleEffect(statusId, {
+        overlay: true,
+        active: true
+      });
+    }
+    return statusEffect;
+  }
+
+  /**
+   * Programmatically remove/delete a status effect from this actor.
+   * @param {*} statusId - The named status to delete
+   * @returns {null}
+   */
+  async removeStatus(statusId) {
+    // Verify the status exists on this actor
+    const effect = this.effects.find(e =>
+      e.statuses?.has(statusId)
+    );
+    // Delete, do not disable
+    if (effect) await effect.delete();    
   }
 
   /**
@@ -2939,20 +3084,20 @@ export class Hyp3eActor extends Actor {
         }
       });
 
-        // Attacker is flanking, +1 (Three or more melee combatants engage a single opponent)
-        // We have the target token. The token does have a "targeted" array which is an array
-        //  of USERs (not actors) who have selected this token to target. So we could count the
-        //  length of the array and if it is 3 or more, apply this modifier. However we also
-        //  need to make sure that they are all engaged in melee (not missile) combat... so we
-        //  would need to get the actual tokens owned by the players, and then determine whether
-        //  they are in melee range of their target. It gets really complicated.
+      // Attacker is flanking, +1 (Three or more melee combatants engage a single opponent)
+      // We have the target token. The token does have a "targeted" array which is an array
+      //  of USERs (not actors) who have selected this token to target. So we could count the
+      //  length of the array and if it is 3 or more, apply this modifier. However we also
+      //  need to make sure that they are all engaged in melee (not missile) combat... so we
+      //  would need to get the actual tokens owned by the players, and then determine whether
+      //  they are in melee range of their target. It gets really complicated.
 
-        // Target of missile attack engaged in melee with ally of attacker, -2
-        // Similar to the above, determining other tokens that are in melee with the targeted
-        //  token gets really complicated. May be possible, just need to think hard on this.
-        //  And then determine whether it is really worth it.
+      // Target of missile attack engaged in melee with ally of attacker, -2
+      // Similar to the above, determining other tokens that are in melee with the targeted
+      //  token gets really complicated. May be possible, just need to think hard on this.
+      //  And then determine whether it is really worth it.
 
-        // Defender is encumbered or heavily encumbered - this is handled by a different option.
+      // Defender is encumbered or heavily encumbered - this is handled by a different option.
 
     }
     Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} has accumulated situational modifiers:`, sitModsArr.join(", "));
