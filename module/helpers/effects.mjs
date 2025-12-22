@@ -294,14 +294,16 @@ export async function setupEffectHandlers() {
       if (!effect.getFlag("hyp3e", "remainingTurns")) {
         // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
         const durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
-        const durationTurns = Math.floor(durationRounds / 60) ?? null;
+        const durationTurns = durationRounds !== null & durationRounds > 0 
+          ? Math.floor(durationRounds / 60) 
+          : null;
         // if (durationRounds && durationRounds < 60) {
         //   Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} has duration <60 rounds and will expire at the next turn.`);
         // } else if (isNaN(durationTurns)) {
         //   Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} has no duration limit and will not expire.`);
         // }
         await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
-        // Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingTurns to ${durationTurns} for ${effect.name}`);
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingTurns to ${durationTurns} for ${effect.name}`);
       }
 
       // Does the effect include light source properties?

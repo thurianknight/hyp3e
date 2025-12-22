@@ -310,90 +310,24 @@ export class HYP3ECombatant extends Combatant {
     let isDying = isDefeated ? !isDefeated : this.isDying;
     let isUnconscious = isDefeated ? !isDefeated : this.isUnconscious;
     Hyp3eLogger.info("HYP3ECombatant updateStatus", `${this.name} calculated statuses:`, { isDefeated, isDying, isUnconscious });
-    // let isDefeated = false;
-    // let isUnconscious = false;
-    // if (this.actor.system.hp.value <= 0) {
-    //     if (this.actor.type == "character") {
-    //         if (this.actor.system.hp.value == 0) {
-    //             isDefeated = true;
-    //             isUnconscious = false;
-    //         } else {
-    //             isDefeated = true;
-    //             isUnconscious = true;
-    //         }
-    //     } else if (this.actor.type == "npc") {
-    //         isDefeated = true;
-    //         isUnconscious = false;
-    //     }
-    // } else {
-    //     // Actor is alive & conscious
-    //     isDefeated = false;
-    //     isUnconscious = false;
-    // }
-    await this.update({ defeated: isDefeated, isDying: isDying, isUnconscious: isUnconscious });
-    // Hyp3eLogger.info("HYP3ECombatant updateStatus", `${this.name} defeated/dying/unconscious status updated:`, this);
-    let effect;
+    // Update the defeated status, which affects its appearance in the tracker
+    await this.update({ defeated: isDefeated });
+
     if (isDefeated) {
-      const defeated_status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED);
-      effect = this.actor && defeated_status ? defeated_status : CONFIG.controlIcons.defeated;
-      Hyp3eLogger.info("HYP3ECombatant updateStatus", `Combatant ${this.name} has defeated effect:`, effect);
-      if (effect) {
-        if (this.token.object) {
-          await this.token.object.toggleEffect(effect, {
-            overlay: true,
-            active: isDefeated,
-          });
-        } else {
-          await this.token.toggleEffect(effect, {
-            overlay: true,
-            active: isDefeated,
-          });
-        }
-        // Add dead status to the combatant actor
-        await this.actor.setHealthStatus("dead");
-    }
-    } else {  // isDying and isUnconscious are exclusive of isDefeated but not of each other
+      // Add dead status to the combatant actor & token, and remove unconscious and/or bleeding
+      await this.actor.setHealthStatus("dead");
+
+    } else {  // isDying and isUnconscious are exclusive of isDefeated
       if (isDying) {
-        const dying_status = CONFIG.statusEffects.find(e => e.id === "bleeding");
-        effect = this.actor && dying_status ? dying_status : null;
-        Hyp3eLogger.info("HYP3ECombatant updateStatus", `Combatant ${this.name} has dying effect:`, effect);
-        if (effect) {
-          if (this.token.object) {
-            await this.token.object.toggleEffect(effect, {
-              overlay: true,
-              active: isDying,
-            });
-          } else {
-            await this.token.toggleEffect(effect, {
-              overlay: true,
-              active: isDying,
-            });
-          }
-          // Add bleeding persistent damage to the combatant actor
-          await this.actor.setHealthStatus("bleeding");
-        }
+        // Add bleeding status & persistent damage to the combatant actor
+        await this.actor.setHealthStatus("bleeding");
+
       } else
       if (isUnconscious) {
-        const unconscious_status = CONFIG.statusEffects.find(e => e.id === "unconscious");
-        effect = this.actor && unconscious_status ? unconscious_status : null;
-        Hyp3eLogger.info("HYP3ECombatant updateStatus", `Combatant ${this.name} has unconscious effect:`, effect);
-        if (effect) {
-          if (this.token.object) {
-            await this.token.object.toggleEffect(effect, {
-              overlay: true,
-              active: isUnconscious,
-            });
-          } else {
-            await this.token.toggleEffect(effect, {
-              overlay: true,
-              active: isUnconscious,
-            });
-          }
-          // Add unconscious status to the combatant actor
-          await this.actor.setHealthStatus("unconscious");
-        }
+        // Add unconscious status to the combatant actor
+        await this.actor.setHealthStatus("unconscious");
       }
     }
-    Hyp3eLogger.info("HYP3ECombatant updateStatus", `Combatant ${this.name} unconscious/dying/defeated status and token updated:`, this);
+    Hyp3eLogger.info("HYP3ECombatant updateStatus", `Combatant-actor ${this.name} unconscious/dying/defeated status updated:`, this);
   }
 }

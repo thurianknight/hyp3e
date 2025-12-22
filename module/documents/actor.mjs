@@ -1168,6 +1168,7 @@ export class Hyp3eActor extends Actor {
             // Effects applied directly to the actor can be queued for disabling
             // expiredEffects.push(effect);
           }
+          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
           expiredEffects.push(effect);
         }
       }
@@ -1548,24 +1549,24 @@ export class Hyp3eActor extends Actor {
         break;
 
       case "unconscious":
-        this.applyStatus("prone", "Prone");
-        this.applyStatus("unconscious", "Unconscious");
+        this.applyStatus("prone");
+        this.applyStatus("unconscious");
         this.removeStatus("bleeding");
         this.removeStatus("dead");
         break;
 
       case "bleeding":
-        this.applyStatus("prone", "Prone");
-        this.applyStatus("unconscious", "Unconscious");
-        this.applyStatus("bleeding", "Bleeding");
+        this.applyStatus("prone");
+        this.applyStatus("unconscious");
+        this.applyStatus("bleeding");
         this.removeStatus("dead");
         break;
 
       case "dead":
-        this.applyStatus("prone", "Prone");
+        this.applyStatus("prone");
         this.removeStatus("unconscious");
         this.removeStatus("bleeding");
-        this.applyStatus("dead", "Dead");
+        this.applyStatus("dead");
         break;
 
       default:
@@ -1583,52 +1584,36 @@ export class Hyp3eActor extends Actor {
    * @param {*} label - Optional name of the effect that will appear on the actor sheet
    * @returns {Promise<ActiveEffect[]|undefined>}
    */
-  async applyStatus(statusId, label = null) {
+  async applyStatus(statusId) {
     // Do not apply if this status already exists
     if (this.effects.some(e => e.statuses?.has(statusId))) return;
 
-    // Warn if an invalid statusId was given
+    // Warn & exit if an invalid statusId was given
     if (!CONFIG.statusEffects.some(s => s.id === statusId)) {
       Hyp3eLogger.warn("Hyp3eActor applyStatus", `Unknown statusId: ${statusId}`);
+      return;
     }
-    const status = CONFIG.statusEffects.find(s => s.id === statusId);
-    Hyp3eLogger.info("Hyp3eActor applyStatus", `Status found:`, status);
+
+    // Apply status effect to actor & token
+    await this.toggleStatusEffect(statusId, {
+      overlay: true,
+      active: true
+    });
 
     // Bleeding is a special case...
-    let changes = [];
     if (statusId === "bleeding") {
-      changes = [{
-        key: "system.tempPersistentDamage",
-        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-        value: "bleeding,1;"
-      }];  
+      // Find the bleeding effect and update it with persistent damage
+      const effect = this.effects.find(e => e.statuses?.has(statusId));
+      if (effect) {
+        await effect.update({ 
+          changes: [{
+            key: "system.tempPersistentDamage",
+            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+            value: "bleeding,1;"
+          }]
+        });
+      }
     }
-
-    const statusEffect =  this.createEmbeddedDocuments("ActiveEffect", [{
-      name: label ? label : status.name,
-      img: status.img,
-      changes: changes,
-      statuses: new Set([statusId]),
-      origin: this.uuid,
-      disabled: false,
-      flags: { [game.system.id]: { source: "hyp3e" } }
-    }]);
-
-    // Apply overlay icon to token
-    const token = this.getAssociatedToken();
-    Hyp3eLogger.info("Hyp3eActor applyStatus", `Token:`, token);
-    if (token.object) {
-      await token.object.toggleEffect(statusId, {
-        overlay: true,
-        active: true
-      });
-    } else {
-      await token.toggleEffect(statusId, {
-        overlay: true,
-        active: true
-      });
-    }
-    return statusEffect;
   }
 
   /**
