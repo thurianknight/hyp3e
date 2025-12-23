@@ -5,8 +5,8 @@ import { parseGpValue,
             sellToMerchant,
             transferFromTreasure } from "../helpers/money.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
-import { enableItemEffectsOnActor, 
-            disableItemEffectsOnActor, 
+import { enableAllTransferrableItemEffectsToItemOwner, 
+            disableAllTransferrableItemEffectsOnItemOwner, 
             onManageActiveEffectV2, 
             prepareActiveEffectCategories } from "../helpers/effects.mjs";
 import { sendSimpleChat } from "../chat/chat.mjs"
@@ -1043,10 +1043,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Disable or enable any active effects coming from the item
         if (!item.system.equipped) {
             // Disable effects
-            disableItemEffectsOnActor(item, this.actor.id)
+            disableAllTransferrableItemEffectsOnItemOwner(item, this.actor.id)
         } else {
             // Enable effects
-            enableItemEffectsOnActor(item, this.actor.id)
+            enableAllTransferrableItemEffectsToItemOwner(item, this.actor.id)
         }
         // Send a chat message that the item was equipped/unequipped or carried/dropped
         const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
