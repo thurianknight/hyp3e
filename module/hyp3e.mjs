@@ -249,8 +249,13 @@ Hooks.once('init', async function() {
 Hooks.once("ready", async function() {
     // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
     Hooks.on("hotbarDrop", (bar, data, slot) => {
-        createItemMacro(data, slot);
-        return false;
+      // We only override Item drops
+      if (data.type !== "Item") {
+        return; // allow core Foundry behavior
+      }
+      // Handle this Item drop
+      createItemMacro(data, slot);
+      return false;
     });
 
     // Get Foundry major version #
@@ -988,44 +993,37 @@ async function createItemMacro(data, slot) {
     // Did the user miss the hotbar slot?
     if ( slot === null ) return;
 
-    // Is this a script/macro being added to the macro bar?
-    if (data.type == "Macro") {
-        // Get the macro & code from the drop data
-        const macro = await Macro.fromDropData(data);
-        Hyp3eLogger.info("createItemMacro", `Macro:`, macro);
-        Hyp3eLogger.info("createItemMacro", `Adding macro ${macro.name} to hotbar slot ${slot}`);
-        game.user.assignHotbarMacro(macro, slot);
-        return false;
+    Hyp3eLogger.info("createItemMacro", `Hotbar drop data:`, data);
+    if (data.type !== "Item") {
+        // This should never happen
+        return;
     }
 
     // Is this is a valid owned item?
-    if (data.type !== "Item") {
-        Hyp3eLogger.warn("createItemMacro", `Cannot create macro: ${data.type} is not an item.`);
-        Hyp3eLogger.warn("createItemMacro", `Macro Data:`, data);
-        return;
-    }
     if (!data.uuid.includes('Actor.') && !data.uuid.includes('Token.')) {
         const msg = "You can only create macro buttons for owned Items!"
         Hyp3eLogger.warn("createItemMacro", msg);
-        return ui.notifications.warn(msg);
+        ui.notifications.warn(msg);
+        return;
     }
-    // If it is, retrieve it based on the uuid.
+    // If we have an actor-owner, retrieve the item based on its uuid
     const item = await Item.fromDropData(data);
 
-    // Create the macro command using the uuid.
+    // Create the macro command using the uuid
     const command = `game.hyp3e.rollItemMacro("${data.uuid}","${item.actor.id}");`;
     let macro = game.macros.find(m => (m.name === item.name) && (m.command === command));
     if (!macro) {
-        macro = await Macro.create({
-            name: item.name,
-            type: "script",
-            img: item.img,
-            command: command,
-            flags: { "hyp3e.itemMacro": true }
-        });
+      Hyp3eLogger.info("createItemMacro", `Item macro not found, will create...`);
+      macro = await Macro.create({
+        name: item.name,
+        type: "script",
+        img: item.img,
+        command: command,
+        flags: { "hyp3e.itemMacro": true }
+      });
     }
+    Hyp3eLogger.info("createItemMacro", `Item macro:`, macro);
     game.user.assignHotbarMacro(macro, slot);
-    return false;
 }
 
 /**
@@ -1039,22 +1037,6 @@ function rollItemMacro(itemUuid, actorId=null) {
         const msg = `Could not find actor for item ${itemUuid}. You may need to delete and recreate this macro.`;
         Hyp3eLogger.warn("rollItemMacro", msg);
         return ui.notifications.warn(msg);
-        // // wsAI old way. should likely be removed if rollItemMacro is always created with actorId
-        // // Reconstruct the drop data so that we can load the item.
-        // const dropData = {
-        //     type: 'Item',
-        //     uuid: itemUuid
-        // };
-        // // Load the item from the uuid.
-        // Item.fromDropData(dropData).then(item => {
-        //     // Determine if the item loaded and if it's an owned item.
-        //     if (!item || !item.parent) {
-        //         const itemName = item?.name ?? itemUuid;
-        //         return ui.notifications.warn(`Could not find item ${itemName}. You may need to delete and recreate this macro.`);
-        //     }
-        //     // Trigger the item roll
-        //     item.roll();
-        // });
     } else {
         // wsAI note above, might be better to get actor from the Item object.
         const actor = game.actors.get(actorId);
