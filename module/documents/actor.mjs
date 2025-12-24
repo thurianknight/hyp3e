@@ -2718,7 +2718,7 @@ export class Hyp3eActor extends Actor {
               //  - Not grenades, not area effect attacks
               //  - Not weapons conjured by spells (e.g. Exploding Skull, Magic Ice Dart)
               if (!itemData.isGrenade && !itemData.isAreaEffect && (!itemData?.duration || !Number.isFinite(Number(itemData.duration)))) {
-                  const msg = `Target is in melee range! (${gridDistance} ${canvas.scene.grid.units})`;
+                  const msg = `Target is in melee range, cannot use this missile weapon so close! (${gridDistance} ${canvas.scene.grid.units})`;
                   Hyp3eLogger.info("Hyp3eActor _prepareRangeData", msg);
                   rangeMessages.push(msg);
                   isOutOfRange = true;
