@@ -1526,7 +1526,7 @@ export class Hyp3eActor extends Actor {
           if (newHp <= deadHp) {
             Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Applying "dead" status to ${actorName}...`);
             await this.setHealthStatus("dead");
-          } else if (newHp <= dyingHp) {
+          } else if (dyingHp !== null && newHp <= dyingHp) {
             Hyp3eLogger.info("Hyp3eActor applyHealthChange", `Applying "bleeding" status to ${actorName}...`);
             await this.setHealthStatus("bleeding");
           } else if (newHp <= unconsciousHp) {
