@@ -2264,9 +2264,9 @@ export class Hyp3eActor extends Actor {
       const { target, targetData, gridDistance } = this._getTargetDetails(attacker);
       dataset.rangeUoM = canvas.scene?.grid.units || "ft";
       dataset.gridDistance = gridDistance;
-      dataset.targetName = targetData.name; // Store for later use
-      dataset.targetAc = targetData.ac;     // Store for later use
-      dataset.targetSize = targetData.size; // Store for later use
+      dataset.targetName = targetData.name;
+      dataset.targetAc = targetData.ac;
+      dataset.targetSize = targetData.size;
 
       // Warn if attack or spell requires a target, but no tokens were selected
       if (item && (item.type === "weapon" || item.type === "spell" && itemData.atkRoll) && !target) {
@@ -2324,17 +2324,17 @@ export class Hyp3eActor extends Actor {
 
       if (item?.type === "spell") {
 
-        // Temporarily override the actor's CA
+        // Temporarily override the actor's CA if spell was cast from an item
         if (dataset.isItemSpell) {
-            actorData.ca = dataset.itemCa
+          actorData.ca = dataset.itemCa
         }
 
         // Handle spell memorization/slot consumption if applicable
         if (!dataset.isItemSpell && itemData?.quantity?.value > 0) {
-            await this._consumeSpellSlot(item);
+          await this._consumeSpellSlot(item);
         }
 
-        // Handle Runegraver spellcasting hit point burn if applicable
+        // Handle Runegraver spellcasting hit point bleed if applicable
         if (this.system?.details?.class.toLowerCase() === "runegraver" && item.name.toLowerCase().includes("rune")) {
           await this.applyHealthChange(parseInt(item.system.spellLevel), "basic", false);
         }
@@ -2389,19 +2389,17 @@ export class Hyp3eActor extends Actor {
       // Execute the Roll
       const { atkRoll, naturalRoll } = await this._executeRoll(rollFormula, actorData);
       if (!atkRoll) {
-          Hyp3eLogger.error("rollAttackOrSpell", `Roll execution failed.`);
-          return null;
+        Hyp3eLogger.error("rollAttackOrSpell", `Roll execution failed.`);
+        return null;
       }
 
       // Determine Hit/Miss Result
       const { hit, attackTextResult, critFooter } = this._determineHitResult(
-          atkRoll,
-          naturalRoll,
-          itemData,
-          dataset.targetAc,
-          dataset.targetSize,
-          this.system.baseClass, // Pass base class for crit/fumble tables
-          this.id // Pass actor ID for crit/fumble tables
+        atkRoll,
+        naturalRoll,
+        itemData,
+        dataset.targetAc,
+        dataset.targetSize
       );
       atkRoll.hit = hit; // Attach hit status to the roll object
 
@@ -2631,8 +2629,6 @@ export class Hyp3eActor extends Actor {
           Hyp3eLogger.info("Hyp3eActor _getTargetDetails", `Distance:`, gridDistance);
       } else {
           Hyp3eLogger.info("Hyp3eActor getTargetDetails", `No target selected or attacker missing.`);
-          // Optionally notify if an attack requires a target but none is selected
-          // ui.notifications.info("No target selected!"); // Consider moving this notification logic elsewhere if needed more broadly
       }
 
       return { target, targetData, gridDistance };
@@ -2842,11 +2838,9 @@ export class Hyp3eActor extends Actor {
    * @param {object|null} itemData - System data of the item used.
    * @param {number} targetAc - AC of the target.
    * @param {string} targetSize - Size category of the target.
-   * @param {string} actorBaseClass - Base class for crit/fumble tables.
-   * @param {string} actorId - Actor ID for crit/fumble tables.
    * @returns {{hit: boolean, attackTextResult: string, critFooter: string}}
    */
-  _determineHitResult(atkRoll, naturalRoll, itemData, targetAc, targetSize, actorBaseClass, actorId) {
+  _determineHitResult(atkRoll, naturalRoll, itemData, targetAc, targetSize) {
       let hit = false;
       let attackTextResult = "";
       let critFooter = "";
@@ -2880,13 +2874,13 @@ export class Hyp3eActor extends Actor {
               attackTextResult = `<span style='color:#00b34c'><b>Critical Hit!</b></span>`;
               Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Natural 20 Crit Hit!`);
               if (CONFIG.HYP3E.critHit) {
-                  critFooter = `<div class='critical-hit' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
+                  critFooter = `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
               }
           } else if (naturalRoll === 1) {
               attackTextResult = `<span style='color:#e90000'><b>Critical Miss!</b></span>`;
               Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Natural 1 Crit Miss!`);
               if (CONFIG.HYP3E.critMiss) {
-                  critFooter = `<div class='critical-miss' data-base-class='${actorBaseClass}' data-actor-id='${actorId}'></div>`;
+                  critFooter = `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
               }
           } else if (total >= tn) {
               hit = true;
@@ -2960,8 +2954,8 @@ export class Hyp3eActor extends Actor {
    * Examine the attacking and defending tokens, the active effects on them as well as 
    *  status effects, and create a list of situational modifiers and sum total for the 
    *  attack roll.
-   * @param {*} attacker - attacking token
-   * @param {*} target - targeted token
+   * @param {*} attacker - attacking token, if it exists (not theater of the mind)
+   * @param {*} target - targeted token, if it exists (not theater of the mind)
    * @returns {Object} sitModObj { sitModSum: number, sitModsArr: Array }
    */
   _getCombatantSitMods(attacker, target) {
@@ -2982,7 +2976,7 @@ export class Hyp3eActor extends Actor {
       // attackerEffects = this._getAllApplicableEffects()
       attackerEffects = this.allApplicableEffects()
     }
-    Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} (attacking) has effects:`, attackerEffects);
+    Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${this.name} (attacking) has effects:`, attackerEffects);
     // const effects = this._getEffectNames()
 
     // Hopefully we have a target!
@@ -3004,11 +2998,11 @@ export class Hyp3eActor extends Actor {
     // Start gathering situational modifiers
     attackerEffects.forEach(effect => {
       if (!effect.disabled) {
-        Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} effect statuses:`, effect.statuses);
+        Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${this.name} effect statuses:`, effect.statuses);
         // Does the effect apply a tempAtkMod?
         const tempAtkMod = effect.changes.find(c => c.key === "system.tempAtkMod")
         if (tempAtkMod) {
-          Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} has tempAtkMod: ${tempAtkMod.value}`);
+          Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${this.name} has tempAtkMod: ${tempAtkMod.value}`);
           // Add the tempAtkMod to the sitMod
           sitModSum += parseInt(tempAtkMod.value)
           const changeString = parseInt(tempAtkMod.value) > 0 ? `+${tempAtkMod.value}` : `${tempAtkMod.value}`
@@ -3038,16 +3032,19 @@ export class Hyp3eActor extends Actor {
     // Hopefully we have a target!
     if (target) {
       if (CONFIG.HYP3E.enableCombatSitModDetection) {
-        Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${target.name} elevation (${target.document.elevation}) vs. Attacker elevation (${attacker.document.elevation})...`);
-        // Attacker on higher ground (token height vs. target token height)
-        if (attacker.document.elevation > target.document.elevation) {
-          sitModSum += 1
-          sitModsArr.push("Higher Ground (+1)")
-        }
-        // Defender is on higher ground
-        if (attacker.document.elevation < target.document.elevation) {
-          sitModSum += -1
-          sitModsArr.push("Defender on Higher Ground (-1)")
+        // Don't bother with elevation if we don't have an attacker token
+        if (attacker) {
+          Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${target.name} elevation (${target?.document.elevation}) vs. Attacker elevation (${attacker?.document.elevation})...`);
+          // Attacker on higher ground (token height vs. target token height)
+          if (attacker?.document.elevation > target.document.elevation) {
+            sitModSum += 1
+            sitModsArr.push("Higher Ground (+1)")
+          }
+          // Defender is on higher ground
+          if (attacker?.document.elevation < target.document.elevation) {
+            sitModSum += -1
+            sitModsArr.push("Defender on Higher Ground (-1)")
+          }
         }
       }
       // Effect names can be arbitrary, what we care about is the token status/condition
@@ -3103,7 +3100,7 @@ export class Hyp3eActor extends Actor {
       // Defender is encumbered or heavily encumbered - this is handled by a different option.
 
     }
-    Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${attacker.name} has accumulated situational modifiers:`, sitModsArr.join(", "));
+    Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${this.name} has accumulated situational modifiers:`, sitModsArr.join(", "));
     // Finalize the modifiers & return
     sitModObj = {
       sitModSum: sitModSum,
