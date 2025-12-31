@@ -95,9 +95,11 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
         ];
         const quickCreateCharMethods = [
             { value: "", label: "Disabled" },
-            { value: "3d6", label: "Method I: 3d6" },
-            { value: "4d6dl", label: "Method III: 4d6 drop lowest" },
-            { value: "2d6+6", label: "Method V: 2d6+6" },
+            { value: "3d6", label: "Method I: 3d6 in order" },
+            { value: "4d6dl", label: "Method III: 4d6 drop lowest, optimize for prime attributes" },
+            { value: "{3d6,3d6,3d6}kh", label: "Method IV: 3d6 three times and pick best" },
+            { value: "2d6+6", label: "Method V: 2d6+6 in order" },
+            { value: "4d6dl,3d6", label: "Method VI: 4d6 drop low for prime attributes, 3d6 for others" },
         ];
         const logLevels = [
             { value: "0", label: "Verbose (Info, Warnings, Errors)" },

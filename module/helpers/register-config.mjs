@@ -445,9 +445,11 @@ export function registerHyp3eConfigurations() {
         type: String,
         choices: {
             "": "Disabled",
-            "3d6": "Method I: 3d6",
-            "4d6dl": "Method III: 4d6 drop lowest",
-            "2d6+6": "Method V: 2d6+6"
+            "3d6": "Method I: 3d6 in order",
+            "4d6dl": "Method III: 4d6 drop lowest, optimize for prime attributes",
+            "{3d6,3d6,3d6}kh": "Method IV: 3d6 three times and pick best",
+            "2d6+6": "Method V: 2d6+6 in order",
+            "4d6dl,3d6": "Method VI: 4d6 drop low for prime attributes, 3d6 for others"
         },
         config: showConfigOptions,
         requiresReload: true,

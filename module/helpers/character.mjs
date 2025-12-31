@@ -4386,10 +4386,14 @@ export class Hyp3eCharacter {
 
         // Roll attributes down the line, retry until we get a set that meets the class requirements
         Hyp3eLogger.info("Hyp3eCharacter rollAttributesForClass", `Rolling attributes for class ${charClass}`);
+        const rollFormula = game.settings.get(game.system.id, "quickCreateChars")
         let metReqs = false;
         let attributes = {};
         while (!metReqs) {
             attributes = await this._rollAttributes(actor);
+            if (rollFormula == "4d6dl") {
+              attributes = this._optimizeAttributesForClass(charClass, attributes);
+            }
             metReqs = await this._checkAttrRequirements(charClass, attributes);
             if (metReqs) {
                 Hyp3eLogger.info("Hyp3eCharacter rollAttributesForClass", `Character meets class requirements for ${charClass}, attributes rolled:`, attributes);
@@ -4414,6 +4418,37 @@ export class Hyp3eCharacter {
         }
         Hyp3eLogger.info("Hyp3eCharacter _rollAttributes", `Rolled attributes:`, attributes);
         return attributes;
+    }
+
+    static async _optimizeAttributesForClass(charClass, attributes) {
+      const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+      if (!classData) {
+          Hyp3eLogger.error("Hyp3eCharacter _optimizeAttributesForClass", `Class data not found for class ${charClass}!`);
+          return attributes;
+      }
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Optimizing attributes for class ${charClass}:`, attributes);
+      // Load the attribute values into an array, and sort them in descending order
+      const rolledAttrs = Object.entries(attributes);
+      const sortedAttrs = rolledAttrs.sort((a, b) => b[1] - a[1]);
+
+      // Get the attribute requirements and sort them in descending order, too
+      const sortedReqs = Object.entries(classData.attrReqs).sort((a, b) => b[1] - a[1]);
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Sorted attribute requirements for class ${charClass}:`, sortedReqs);
+
+      // Create a new attributes object with optimized values
+      
+
+      const rolledValues = Object.values(attributes).sort((a, b) => b - a);
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Sorted rolled attribute values:`, rolledValues);
+
+      // Assign the highest rolled values to the highest required attributes
+      let optimizedAttributes = {};
+      for (let i = 0; i < sortedReqs.length; i++) {
+          const attr = sortedReqs[i][0];
+          optimizedAttributes[attr] = rolledValues[i];
+      }
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Optimized attributes for class ${charClass}:`, optimizedAttributes);
+      return optimizedAttributes;
     }
 
     static async _checkAttrRequirements(charClass, attributes) {
