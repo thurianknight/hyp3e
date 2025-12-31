@@ -4420,34 +4420,57 @@ export class Hyp3eCharacter {
         return attributes;
     }
 
-    static async _optimizeAttributesForClass(charClass, attributes) {
+    static _optimizeAttributesForClass(charClass, attributes) {
       const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
       if (!classData) {
           Hyp3eLogger.error("Hyp3eCharacter _optimizeAttributesForClass", `Class data not found for class ${charClass}!`);
           return attributes;
       }
-      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Optimizing attributes for class ${charClass}:`, attributes);
-      // Load the attribute values into an array, and sort them in descending order
-      const rolledAttrs = Object.entries(attributes);
-      const sortedAttrs = rolledAttrs.sort((a, b) => b[1] - a[1]);
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Optimizing attributes for ${charClass} with rolls:`, attributes);
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `${charClass} attribute requirements:`, classData.attrReqs);
 
-      // Get the attribute requirements and sort them in descending order, too
-      const sortedReqs = Object.entries(classData.attrReqs).sort((a, b) => b[1] - a[1]);
-      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Sorted attribute requirements for class ${charClass}:`, sortedReqs);
+      // Clone to avoid mutation
+      const optimizedAttributes = {};
 
-      // Create a new attributes object with optimized values
-      
+      // Rolled values in original order
+      const attributeOrder = ["str", "dex", "con", "int", "wis", "cha"];
+      const rolledValues = Object.values(attributes);
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Rolled attribute values in order:`, rolledValues);
 
-      const rolledValues = Object.values(attributes).sort((a, b) => b - a);
-      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Sorted rolled attribute values:`, rolledValues);
+      const classPrimes = Object.keys(classData.attrReqs);
+      // Sort prime attributes by required minimum, descending
+      const primeReqsSorted = Object.keys(classData.attrReqs).sort((a, b) => {
+        return classData.attrReqs[b] - classData.attrReqs[a];
+      });
 
-      // Assign the highest rolled values to the highest required attributes
-      let optimizedAttributes = {};
-      for (let i = 0; i < sortedReqs.length; i++) {
-          const attr = sortedReqs[i][0];
-          optimizedAttributes[attr] = rolledValues[i];
-      }
-      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Optimized attributes for class ${charClass}:`, optimizedAttributes);
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `${charClass} prime attributes:`, primeReqsSorted);
+
+      // Take top N values for prime attributes
+      const topValues = [...rolledValues]
+        .sort((a, b) => b - a)
+        .slice(0, Object.keys(classData.attrReqs).length);
+
+      // Assign top values to primes
+      primeReqsSorted.forEach((attr, i) => {
+        optimizedAttributes[attr] = topValues[i];
+      });
+
+      // Remove used values by value, not index
+      let remainingValues = [...rolledValues];
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Remaining attribute values before removing primes:`, remainingValues);
+      topValues.forEach(val => {
+        Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `Removing value ${val}...`);
+        const idx = remainingValues.indexOf(val);
+        if (idx !== -1) remainingValues.splice(idx, 1);
+      });
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `${charClass} remaining attribute values without primes:`, remainingValues);
+
+      // Assign remaining values to non-primes, in original roll order
+      const nonPrimes = attributeOrder.filter(a => !classPrimes.includes(a));
+      nonPrimes.forEach((attr, i) => {
+        optimizedAttributes[attr] = remainingValues[i];
+      });
+      Hyp3eLogger.info("Hyp3eCharacter _optimizeAttributesForClass", `${charClass} assigned attributes:`, optimizedAttributes);
       return optimizedAttributes;
     }
 
