@@ -4391,7 +4391,7 @@ export class Hyp3eCharacter {
         let attributes = {};
         while (!metReqs) {
             attributes = await this._rollAttributes(actor);
-            if (rollFormula == "4d6dl") {
+            if (rollFormula == "4d6dl") {   // Method III: Arrange/optimize rolls for class
               attributes = this._optimizeAttributesForClass(charClass, attributes);
             }
             metReqs = await this._checkAttrRequirements(charClass, attributes);
@@ -4407,9 +4407,27 @@ export class Hyp3eCharacter {
 
     static async _rollAttributes(actor) {
         const rollFormula = game.settings.get(game.system.id, "quickCreateChars")
-        Hyp3eLogger.info("Hyp3eCharacter _rollAttributes", `Rolling attributes using formula ${rollFormula} down the line...`);
+        Hyp3eLogger.info("Hyp3eCharacter _rollAttributes", `Rolling attributes using formula ${rollFormula}...`);
         // Just roll and return the attributes
         let attributes = {};
+        if (rollFormula === "4d6dl,3d6") {
+            // Special case: Roll 4d6 drop lowest for prime attributes; 3d6 for non-primes
+            const classData = this.classData[actor.system.details.class] || CONFIG.HYP3E.customClassData[actor.system.details.class];
+            const primeAttrs = Object.keys(classData.attrReqs);
+            for (const attr of Object.keys(actor.system.attributes)) {
+                let roll;
+                if (primeAttrs.includes(attr)) {
+                    roll = new Roll("4d6dl1");
+                } else {
+                    roll = new Roll("3d6");
+                }
+                await roll.roll();
+                attributes[attr] = roll.total;
+            }
+            Hyp3eLogger.info("Hyp3eCharacter _rollAttributes", `Rolled attributes with Method VI:`, attributes);
+            return attributes;
+        }
+        // Standard case: Roll same formula for all attributes
         for (const attr of Object.keys(actor.system.attributes)) {
             // Roll specified formula for each attribute
             let roll = new Roll(rollFormula);
