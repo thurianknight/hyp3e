@@ -13,7 +13,7 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
             title: "Quick-Equip Combat Gear",
             icon: "fas fa-swords"
         },
-        position: { width: 500, height: "auto" },
+        position: { width: 400, height: "auto" },
         popOut: true,
         anchor: null,
         actions: {
