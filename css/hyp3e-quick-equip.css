@@ -2,10 +2,10 @@
 
 .quick-equip-app {
   gap: 1rem;
-  justify-content: space-between;
+  justify-content: center;
   .window-content {
-    padding: 0 8px;
-    padding-bottom: 8px;
+    padding: 4px 4px;
+    /* padding-bottom: 8px; */
   }
 }
 
@@ -15,14 +15,16 @@
   background: rgba(255, 255, 255, 0.4);
   border: 1px solid var(--color-border-dark);
   border-radius: 8px;
-  padding: 0.5rem;
+  padding: 0.25rem;
 }
 
 .quick-equip-column h3 {
+  font-size: 0.8rem;
   text-align: center;
   margin-bottom: 0.25rem;
 }
 .quick-equip-column h4 {
+  font-size: 0.8rem;
   text-align: center;
   margin-top: 0;
   margin-bottom: 0.25rem;
@@ -31,10 +33,16 @@
 .quick-equip-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  gap: 0.15rem;
+  padding: 0.15rem 0.15rem;
   cursor: pointer;
   border-radius: 4px;
+  img {
+    width: 24px;
+    height: 24px;
+    border: none;
+  }
 }
 
 .quick-equip-item:hover {

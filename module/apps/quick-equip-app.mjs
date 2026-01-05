@@ -123,6 +123,11 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
         // Wait until the app is in the DOM
         if (!this.rendered) return;
 
+        if (this.element) {
+          const el = $(this.element);
+          el.find(".window-header").hide();
+        }
+
         // Get the token for this actor
         const token = this.actor.getActiveTokens()[0];
         if (!token) {

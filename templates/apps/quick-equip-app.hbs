@@ -4,7 +4,7 @@
     <h4>(or dual-wielding)</h4>
     {{#each mainHand}}
     <div class="quick-equip-item {{#if equipped}}equipped{{/if}}" data-item-id="{{id}}" data-action="equipItem">
-      <img src="{{img}}" width="32" height="32"/>
+      <img src="{{img}}"/>
       <span>{{name}}</span>
     </div>
     {{/each}}
@@ -14,7 +14,7 @@
     <h3>Off-Hand</h3>
     {{#each offHand}}
     <div class="quick-equip-item {{#if equipped}}equipped{{/if}}" data-item-id="{{id}}" data-action="equipItem">
-      <img src="{{img}}" width="32" height="32"/>
+      <img src="{{img}}" />
       <span>{{name}}</span>
     </div>
     {{/each}}
