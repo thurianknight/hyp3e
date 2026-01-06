@@ -1,15 +1,12 @@
 /* Styles for the Turn Tracker app */
-
 .turn-tracker {
-  width: 292px;
-  max-height: 50px;
+  width: 290px;
   padding: 4px;
   margin: 4px;
   border-radius: 6px;
   text-align: center;
   display: flex;
-  z-index: 30;
-  position: relative;
+  flex-direction: row;
   pointer-events: auto;
   input[type=text] {
     text-align: center;
@@ -17,10 +14,39 @@
     font-size: 0.9em;
     max-width: 50px;
     max-height: 20px;
-    /* margin: 5px 5px; */
-    margin: 0 5px;
+    margin-left: 5px;
     padding: 0 2px;
   }
+}
+
+/* Make the entire content area the drag handle */
+.turn-tracker.floating {
+  position: absolute !important;
+  cursor: grab;
+  user-select: none;
+  pointer-events: all;
+}
+
+.turn-tracker-toggle {
+  position: relative;
+  top: 4px;
+  right: 4px;
+  z-index: 1;
+  height: 10px;
+  min-height: 10px;
+  max-height: 10px;
+}
+
+.turn-tracker-toggle button {
+  background: none;
+  padding: 0;
+  border: none;
+  color: #aaa;
+  font-size: 0.5em;
+  height: 10px;
+  min-height: 10px;
+  max-height: 10px;
+  cursor: pointer;
 }
 
 .theme-dark .turn-tracker {
@@ -87,7 +113,7 @@
 }
 
 .turn-tracker .controls button {
-  margin: 0.15em;
+  margin: 3px 1px;
   width: 32px;
   height: 32px;
 }

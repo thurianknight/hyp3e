@@ -4,35 +4,35 @@ import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 
 const {
-    HandlebarsApplicationMixin,
-    ApplicationV2
+  HandlebarsApplicationMixin,
+  ApplicationV2
 } = foundry.applications.api;
 
 export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) {
-    static DEFAULT_OPTIONS = {
-        id: "hyp3e-calendar",
-        tag: "section",
-        window: {
-            title: "Hyperborean Calendar",
-            icon: "fa-solid fa-calendar-days",
-            resizable: true
-        },
-        classes: ["hyp3e-calendar"],
-        position: {
-            width: 560,
-            height: "auto"
-        },
-        form: {
-            handler: HYP3ECalendarApp.onSubmit,
-            closeOnSubmit: false
-        }
-    };
+  static DEFAULT_OPTIONS = {
+    id: "hyp3e-calendar",
+    tag: "section",
+    classes: ["hyp3e-calendar"],
+    window: {
+      title: "Hyperborean Calendar",
+      icon: "fa-solid fa-calendar-days",
+      resizable: true
+    },
+    position: {
+      width: 560,
+      height: "auto"
+    },
+    form: {
+      handler: HYP3ECalendarApp.onSubmit,
+      closeOnSubmit: false
+    }
+  };
 
     /** Path to the Handlebars template */
     static PARTS = {
-        content: {
-            template: `${HYP3E.templatePath}/apps/calendar-app.hbs`
-        }
+      content: {
+        template: `${HYP3E.templatePath}/apps/calendar-app.hbs`
+      }
     };
 
     constructor(...args) {
@@ -41,21 +41,21 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         Hooks.on("calendarDateSet", () => this.render(true));
     }
 
-    _prepareContext(partId, context, options) {
-        Hyp3eLogger.info("HYP3ECalendar _prepareContext", `Calendar parameters:`, {partId, context, options})
+    _prepareContext(options) {
+        Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Calendar options:`, options)
         const date = HYP3ECalendar.getCurrentDate();
         const currentYear = date.year;
         const monthIndex = date.month - 1;
         const { years, months, weekdays } = HYP3E_CALENDAR;
         const verbose = game.settings.get(game.system.id, "calendarVerbose");
-        Hyp3eLogger.info("_prepareContext", `Retrieving Hyperborea calendar date...${HYP3ECalendar.formatDate(verbose)}`)
+        Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Retrieving Hyperborea calendar date...${HYP3ECalendar.formatDate(verbose)}`)
 
         try {
             // Get the named year and month... remember arrays are zero-indexed
             const year = years[HYP3ECalendar.getCycleYear(date.year) - 1];
             const month = months[date.month - 1];
             const festival = month.festivals?.name ? month.festivals : null;
-            Hyp3eLogger.info("_prepareContext", `Array element year (${year.num}) and month (${month.num}).`)
+            Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Array element year (${year.num}) and month (${month.num}).`)
 
             // Build day grid (7 days per week, 4 weeks)
             const days = [];
@@ -97,9 +97,9 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
             // Get turn-related time data
             const turnStartTime = game.hyp3e.turnTracker.turnStartTime();
             const currentTime = game.hyp3e.turnTracker.getTime();
-            Hyp3eLogger.info("_prepareContext", `Turn start time: ${turnStartTime}, current time: ${currentTime}`);
+            Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Turn start time: ${turnStartTime}, current time: ${currentTime}`);
 
-            return {
+            const context = {
                 date,
                 year,
                 currentYear,
@@ -122,15 +122,17 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
                 currentTime,
                 isGM: game.user.isGM
             };
+            Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Calendar context:`, context)
+            return context;
         } catch (err) {
-            Hyp3eLogger.error("_prepareContext", `Error preparing context:`, err);
+            Hyp3eLogger.error("HYP3ECalendarApp _prepareContext", `Error preparing context:`, err);
             throw err;
         }
     }
 
     _onRender(context, options) {
         super._onRender(context, options);
-        Hyp3eLogger.info("_onRender", `Calendar parameters:`, {context, options})
+        Hyp3eLogger.info("HYP3ECalendarApp _onRender", `Calendar render parameters:`, {context, options})
 
         // `this.element` is the root DOM element
         const root = this.element;
@@ -210,7 +212,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         if (game.user.isGM) {
             root.querySelector("[data-action='advance']")
                 ?.addEventListener("click", () => {
-                    Hyp3eLogger.info("HYP3ECalendar advanceDay(false)", "Advance day button clicked by GM.");
+                    Hyp3eLogger.info("HYP3ECalendarApp advanceDay(false)", "Advance day button clicked by GM.");
                     // Sending 'false' tells advanceDay() to NOT reset the turn counter
                     HYP3ECalendar.advanceDay(false);
                     setTimeout(() => this.render(false), 250);
@@ -226,7 +228,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         if (game.user.isGM) {
             root.querySelector("[data-action='advance-reset']")
                 ?.addEventListener("click", () => {
-                    Hyp3eLogger.info("HYP3ECalendar advanceDay(true)", "Advance day + reset turn button clicked by GM.");
+                    Hyp3eLogger.info("HYP3ECalendarApp advanceDay(true)", "Advance day + reset turn button clicked by GM.");
                     // Sending 'true' tells advanceDay() to also reset the turn counter
                     HYP3ECalendar.advanceDay(true);
                     setTimeout(() => this.render(false), 250);
@@ -237,7 +239,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         if (game.user.isGM) {
             root.querySelector("[data-action='reset']")
                 ?.addEventListener("click", () => {
-                    Hyp3eLogger.info("HYP3ECalendar resetTurn", "Reset turn button clicked by GM.");
+                    Hyp3eLogger.info("HYP3ECalendarApp resetTurn", "Reset turn button clicked by GM.");
                     game.hyp3e.turnTracker.resetTurn();
                     setTimeout(() => this.render(false), 250);
                     // this.render(true);
@@ -254,6 +256,6 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
     /** Example form handler */
     static async onSubmit(event, form, formData) {
-        Hyp3eLogger.info("onSubmit", `Form submitted`, formData);
+        Hyp3eLogger.info("HYP3ECalendarApp onSubmit", `Form submitted`, formData);
     }
 }

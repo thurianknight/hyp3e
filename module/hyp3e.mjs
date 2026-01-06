@@ -533,13 +533,12 @@ Hooks.once("ready", async function() {
     game.hyp3e.turnTracker.getTurn = () => HYP3ETurnTracker.getTurn();
     game.hyp3e.turnTracker.turnStartTime = () => HYP3ETurnTracker.getTurnStartTime();
     game.hyp3e.turnTracker.getTime = () => HYP3ETurnTracker.getTime();
-    // Initialize the turn tracker in the chat log
-    if (!trackerInitialized) {
-        const chatLog = ui.chat;
-        if (chatLog) {
-            initTurnTrackerInChatLog(chatLog, chatLog.element, chatLog.options);
-            trackerInitialized = true;
-        }
+
+    // Initialize the Turn Tracker app
+    if (game.settings.get(game.system.id, "enableTurnTracker")) {
+      game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerAppV2();
+      game.hyp3e.openTurnTracker = () => game.hyp3e.turnTrackerApp.render(true);
+      game.hyp3e.openTurnTracker();
     }
 
     // Pre-load processing
@@ -572,8 +571,8 @@ Hooks.on("updateSetting", (setting) => {
  */
 Hooks.on("renderChatLog", (app, html, data) => {
     if (!game.ready || trackerInitialized) return;
-    trackerInitialized = true;
-    initTurnTrackerInChatLog(app, html, data);
+    // trackerInitialized = true;
+    // initTurnTrackerInChatLog(app, html, data);
 });
 
 /**
@@ -678,37 +677,43 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
 });
 
 /**
- * Capture chat commands for the calendar app
+ * Capture chat commands for the Turn Tracker and Calendar apps
  */
 Hooks.on("chatMessage", (chatLog, message, chatData) => {
-    if (!message.startsWith("/cal")) return;
-    const parts = message.split(" ");
+  const parts = message.split(" ");
+  if (!["/cal", "/turn"].includes(parts[0])) return;
 
-    // Anyone can open the calendar (read-only for players), or send the date to chat
-    if (parts[0] === "/cal" && parts.length === 1) {
-        game.hyp3e.openCalendar();
-        return false;
-    }
-    if (parts[0] === "/cal" && parts[1] === "chat") {
-        game.hyp3e.calendar.sendDateToChat();
-        return false;
-    }
-    // Only GMs can advance the day
-    if (parts[1] === "advance" && game.user.isGM) {
-        // "/cal advance reset" will reset the Turn Tracker too (NOT WORKING?)
-        const reset = parts.includes("reset");
-        game.hyp3e.calendar.advanceDay(reset);
-        setTimeout(() => {
-            game.hyp3e.calendar.sendDateToChat();
-        }, 500);
-        return false;
-    }
-
-    // Invalid commands by non-GMs will be ignored, but GMs get an error message
-    if (game.user.isGM) {
-        ui.notifications.warn("Unknown /cal command");
-    }
+  // Open the Turn Tracker app
+  if (parts[0] === "/turn" && parts.length === 1) {
+    game.hyp3e.openTurnTracker();
     return false;
+  }
+
+  // Anyone can open the calendar (read-only for players), or send the date to chat
+  if (parts[0] === "/cal" && parts.length === 1) {
+    game.hyp3e.openCalendar();
+    return false;
+  }
+  if (parts[0] === "/cal" && parts[1] === "chat") {
+    game.hyp3e.calendar.sendDateToChat();
+    return false;
+  }
+  // Only GMs can advance the day
+  if (parts[1] === "advance" && game.user.isGM) {
+    // "/cal advance reset" will reset the Turn Tracker too (NOT WORKING?)
+    const reset = parts.includes("reset");
+    game.hyp3e.calendar.advanceDay(reset);
+    setTimeout(() => {
+      game.hyp3e.calendar.sendDateToChat();
+    }, 500);
+    return false;
+  }
+
+  // Invalid commands by non-GMs will be ignored, but GMs get an error message
+  if (game.user.isGM) {
+    ui.notifications.warn(`Unknown command: ${message}`);
+  }
+  return false;
 });
 
 /**
@@ -808,27 +813,15 @@ async function initTurnTrackerInChatLog(app, html, data) {
     }
     Hyp3eLogger.info("initTurnTrackerInChatLog", "Rendering the Turn Tracker app in the chat log...");
 
-    // Get the Foundry version -- needed for chat form CSS differences
-    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
-    const $html = $(html); // wrap DOM in jQuery
-    let container;
-    if (majorVersion >= 13) {            
-        container = $html.find(".chat-form");
-    } else {
-        container = html.find("#chat-controls");
-    }
-    const $container = $(container);
-    Hyp3eLogger.info("initTurnTrackerInChatLog", "Container for app:", $container);
-    if (container.length === 0) {
-        Hyp3eLogger.warn("initTurnTrackerInChatLog", "Could not find chat controls container, cannot render Turn Tracker app.");
-        return;
-    }
-    game.hyp3e = game.hyp3e || {};
-    // game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerApp();
-    game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerAppV2();
+    // Create a game.hyp3e object to reference the calendar and turn tracker apps
+    // game.hyp3e = game.hyp3e || {};
+    // game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerAppV2();
 
     // Embed into chat (this will call activateListeners on the injected app)
-    game.hyp3e.turnTrackerApp.renderEmbedded(container);
+    // game.hyp3e.turnTrackerApp.renderEmbedded(container);
+    // Initial render based on saved setting
+    // await game.hyp3e.turnTrackerApp.render(true);
+    // await game.hyp3e.turnTrackerApp.renderApp();
 }
 
 /* -------------------------------------------- */

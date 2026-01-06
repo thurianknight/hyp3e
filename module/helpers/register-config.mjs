@@ -72,6 +72,27 @@ export function registerHyp3eConfigurations() {
         default: []
     });
 
+    // Store Turn Tracker display mode (embedded vs. floating)
+    game.settings.register(game.system.id, "turnTrackerMode", {
+      name: "Turn Tracker Display Mode",
+      hint: "Whether the Time Tracker is embedded in the chat bar or is a window/form.",
+      scope: "client", // Per-user, local storage
+      config: false,
+      type: String,
+      default: "embedded",
+      choices: ["embedded", "floating"]
+    });
+
+    // Store Turn Tracker floating position
+    game.settings.register("hyp3e", "turnTrackerPos", {
+      name: "Turn Tracker Floating Position",
+      hint: "(X, Y) coordinates of the upper left corner of the floating TurnTracker window.",
+      scope: "client",
+      config: false,
+      type: Object,
+      default: { top: 100, left: 300, width: 290, height: 160 }
+    });
+
     /********************************************
      * UI Options
      ********************************************/

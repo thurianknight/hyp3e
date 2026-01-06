@@ -4,182 +4,323 @@ import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { TurnAdvanceActionsConfig } from "./turn-advance-actions-config.mjs";
 
 const {
-    HandlebarsApplicationMixin,
-    ApplicationV2
+  HandlebarsApplicationMixin,
+  ApplicationV2
 } = foundry.applications.api;
 
 export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(ApplicationV2) {
-    static DEFAULT_OPTIONS = {
-        id: "hyp3e-turn-tracker-app",
-        tag: "div",
-        window: {
-            title: "Turn Tracker",
-        },
-        classes: ["turn-tracker"],
-        position: {
-            width: 290,
-            height: "auto"
-        },
-    };
-
-    /** Path to the Handlebars template */
-    static PARTS = {
-        content: {
-            template: `${HYP3E.templatePath}/apps/turn-tracker-app-v2.hbs`,
-        }
-    };
-
-    static _hooksRegistered = false;
-
-    constructor(options = {}) {
-        super(options);
-
-        // Only register hooks once
-        if (!HYP3ETurnTrackerAppV2._hooksRegistered) {
-            Hooks.on("explorationTurnAdvanced", this._onTurnAdvanced.bind(this));
-            Hooks.on("explorationTurnRetreat", this._onTurnRetreat.bind(this));
-            Hooks.on("explorationTurnReset", this._onTurnReset.bind(this));
-            HYP3ETurnTrackerAppV2._hooksRegistered = true;
-            Hyp3eLogger.info("HYP3ETurnTrackerAppV2 constructor", "Registered turn tracker hooks");
-        }
-    }
-
-    /** Render this app embedded into a given container (chat bar by default). */
-    async renderEmbedded(container) {
-        // Resolve container as jQuery
-        const $container = $(container);
-        if (!$container.length) throw new Error("HYP3ETurnTrackerAppV2 renderEmbedded: container not found");
-        // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 renderEmbedded", "Rendering into container:", $container);
-
-        // Render the template with current data
-        const htmlString = await foundry.applications.handlebars.renderTemplate(HYP3ETurnTrackerAppV2.PARTS.content.template, this._prepareContext());
-        // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 renderEmbedded", "Rendering turn tracker:", htmlString);
-        const $html = $(htmlString).addClass("turn-tracker");
-
-        // Remove a previous embedded instance if present
-        if (this._embeddedElement) {
-            this.closeEmbedded();
-        }
-
-        // Insert the HTML into the DOM (before container)
-        $container.before($html);
-
-        // Keep a reference so closeEmbedded can remove it later (NOT USED YET)
-        this._embeddedElement = $html;
-
-        // Activate listeners (activateListeners expects a jQuery element)
-        this.activateListeners($html);
-
-        // Return the instance for chaining
-        return this;
-    }
-
-    /** Remove the embedded DOM (if any) and clean references */
-    closeEmbedded() {
-        if (this._embeddedElement) {
-            this._embeddedElement.remove();
-            this._embeddedElement = null;
-        }
-    }
-
-    // static get defaultOptions() {
-    //     return foundry.utils.mergeObject(super.defaultOptions, {
-    //         id: "hyp3e-turn-tracker-app",
-    //         classes: ["turn-tracker"],
-    //         title: "Turn Tracker",
-    //         template: `${HYP3E.templatePath}/apps/turn-tracker-app.hbs`,
-    //         // popOut: true,
-    //         popOut: false, // Disable popout for now
-    //         resizable: false,
-    //         width: 290,
-    //         height: "auto",
-    //     });
+  static DEFAULT_OPTIONS = {
+    id: "hyp3e-turn-tracker",
+    tag: "section",
+    classes: ["hyp3e-turn-tracker"],
+    window: {
+      title: "Turn Tracker",
+      headerDragHandle: ".window-content",
+      resizable: false,
+    },
+    position: {
+      width: 290,
+      height: "auto"
+    },
+    form: {
+      submitOnChange: false,
+      closeOnSubmit: false,
+      submitOnClose: false,
+    },
+    // actions: {
+    //   openCalendar: HYP3ETurnTrackerAppV2.#openCalendar,
+    //   retreatTurn: HYP3ETurnTrackerAppV2.#retreatTurn,
+    //   advanceTurn: HYP3ETurnTrackerAppV2.#advanceTurn,
+    //   resetTurn: HYP3ETurnTrackerAppV2.#resetTurn,
+    //   showTurn: HYP3ETurnTrackerAppV2.#showTurn,
+    //   openTurnActions: HYP3ETurnTrackerAppV2.#openTurnActions,
+    //   toggleMode: HYP3ETurnTrackerAppV2.#toggleMode,
     // }
+  };
 
-    // getData() {
-    _prepareContext(_options) {
-        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Turn Tracker options:`, _options)
-        const currentTurn = game.hyp3e.turnTracker.getTurn();
-        const currentTime = game.hyp3e.turnTracker.getTime();
-        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", "Current turn and time:", { currentTurn, currentTime });
-        return { currentTurn, currentTime, isGM: game.user.isGM };
+  /** Path to the Handlebars template */
+  static PARTS = {
+    content: {
+      template: `${HYP3E.templatePath}/apps/turn-tracker-app-v2.hbs`,
     }
+  };
 
-    _onRender(context, options) {
-        super._onRender(context, options);
-        // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onRender", `Turn Tracker parameters:`, {context, options})
+  static _hooksRegistered = false;
+
+  constructor(options = {}) {
+    super(options);
+
+    // Only register hooks once
+    if (!HYP3ETurnTrackerAppV2._hooksRegistered) {
+      Hooks.on("explorationTurnAdvanced", this._onTurnAdvanced.bind(this));
+      Hooks.on("explorationTurnRetreat", this._onTurnRetreat.bind(this));
+      Hooks.on("explorationTurnReset", this._onTurnReset.bind(this));
+      HYP3ETurnTrackerAppV2._hooksRegistered = true;
+      Hyp3eLogger.info("HYP3ETurnTrackerAppV2 constructor", "Registered turn tracker hooks.");
     }
+  }
 
-    _onTurnAdvanced(data) {
-        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onTurnAdvanced", "Turn advanced:", data);
-        // this.render(false); // Update the tracker
-        this.updateTurnDisplay(data);
+  _prepareContext(options) {
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Turn Tracker options:`, options);
+    const currentTurn = game.hyp3e.turnTracker.getTurn();
+    const currentTime = game.hyp3e.turnTracker.getTime();
+    const context = { 
+      currentTurn, 
+      currentTime, 
+      isGM: game.user.isGM, 
+      mode: game.settings.get("hyp3e", "turnTrackerMode") 
     }
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", "Turn Tracker context:", context);
+    return context;
+  }
 
-    _onTurnRetreat(data) {
-        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onTurnRetreat", "Turn retreat:", data);
-        // this.render(false); // Update the tracker
-        this.updateTurnDisplay(data);
-    }
+  async render(force = false, options = {}) {
+    const mode = game.settings.get("hyp3e", "turnTrackerMode");
 
-    _onTurnReset(data) {
-        Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onTurnReset", "Turn reset:", data);
-        // this.render(false); // Update the tracker
-        this.updateTurnDisplay(data);
-    }
+    // Always clean up embedded version first
+    this.closeEmbedded();
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 render", `Rendering Turn Tracker in ${mode} mode:`, this);
 
-    activateListeners(htmlData) {
-        // super.activateListeners(htmlData);
-        const html = $(htmlData); // Wrap in jQuery
+    // Render the template with current data
+    const context = await this._prepareContext();
+    const htmlString = await foundry.applications.handlebars.renderTemplate(
+      HYP3ETurnTrackerAppV2.PARTS.content.template,
+      context
+    );
+    const $html = $(htmlString).addClass("turn-tracker").addClass(mode);
 
-        html.find(".open-calendar").on("click", ev => {
-            game.hyp3e.openCalendar();
+    if (mode === "embedded") {
+      // Insert html element before chat input area
+      $(".chat-form").before($html);
+    } else {
+      // Floating HUD mode
+      const container = document.getElementById("ui-overlay") ?? document.body;
+      if (!container) {
+        Hyp3eLogger.error("HYP3ETurnTrackerAppV2 render", `UI overlay container not found!`);
+        return this;
+      }
+      container.appendChild($html[0]);
+  
+      // Apply saved position (fallback if missing)
+      let pos = game.settings.get("hyp3e", "turnTrackerPos");
+      if (!pos || isNaN(pos.top) || isNaN(pos.left)) {
+        pos = { top: 100, left: 300 };
+      }
+      $html.css({
+        position: "absolute",
+        top: `${pos.top}px`,
+        left: `${pos.left}px`,
+        zIndex: 70
+      });
+
+      // Manual dragging — no reliance on app.setPosition or this.element
+      let isDragging = false;
+      let dragOffset = { x: 0, y: 0 };
+    
+      const startDrag = (e) => {
+        if (e.button !== 0) return; // Left click only
+        isDragging = true;
+        const rect = $html[0].getBoundingClientRect();
+        dragOffset.x = e.clientX - rect.left;
+        dragOffset.y = e.clientY - rect.top;
+        // Bring to front
+        let maxZ = 70; // Base z-index for floating trackers
+        $("#ui-overlay > .turn-tracker.floating").each((_, el) => {
+          const z = parseInt($(el).css("z-index")) || 70;
+          if (z > maxZ) maxZ = z;
         });
-        html.find(".advance-turn").on("click", async ev => {
-            await game.hyp3e.turnTracker.advanceTurn();
-            if (game.hyp3e?.calendar) {
-                game.hyp3e.calendar.render(false);
-            }
+        $html.css("z-index", maxZ + 1);
+      };
+    
+      const doDrag = (e) => {
+        if (!isDragging) return;
+        const newTop = e.clientY - dragOffset.y;
+        const newLeft = e.clientX - dragOffset.x;
+        $html.css({
+          top: `${newTop}px`,
+          left: `${newLeft}px`
         });
-        html.find(".retreat-turn").on("click", async ev => {
-            await game.hyp3e.turnTracker.retreatTurn();
-            if (game.hyp3e?.calendar) {
-                game.hyp3e.calendar.render(false);
-            }
+      };
+    
+      const endDrag = () => {
+        if (isDragging) {
+          isDragging = false;
+          const rect = $html[0].getBoundingClientRect();
+          game.settings.set("hyp3e", "turnTrackerPos", {
+            top: Math.round(rect.top),
+            left: Math.round(rect.left)
+          });
+        }
+      };
+    
+      // Attach listeners (remove old ones first to avoid duplicates)
+      $html.off("mousedown.drag touchstart.drag")
+           .on("mousedown.drag touchstart.drag", startDrag);
+      $(document).off("mousemove.drag touchmove.drag").on("mousemove.drag touchmove.drag", doDrag)
+                 .off("mouseup.drag touchend.drag").on("mouseup.drag touchend.drag", endDrag);
+
+      // Bring to front on mousedown (local to #ui-overlay)
+      $html.on("mousedown.turnTracker", () => {
+        let maxZ = 70; // Base z-index for floating trackers
+        $("#ui-overlay > .turn-tracker.floating").each((_, el) => {
+          const z = parseInt($(el).css("z-index")) || 70;
+          if (z > maxZ) maxZ = z;
         });
-        html.find(".reset").on("click", async ev => {
-            await game.hyp3e.turnTracker.resetTurn();
-            if (game.hyp3e?.calendar) {
-                game.hyp3e.calendar.render(false);
-            }
+
+        $html.css("z-index", maxZ + 1);
+      });
+    }
+  
+    this._embeddedElement = $html;
+    this._bindButtons($html);
+
+    return this;
+  }
+
+  async close(options = {}) {
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 close", "Method close() called.");
+    this.closeEmbedded();
+    return super.close(options);
+  }
+
+  /** Remove the embedded DOM (if any) and clean references */
+  closeEmbedded() {
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 closeEmbedded", "Method closeEmbedded() called.");
+    if (this._embeddedElement) {
+      this._embeddedElement.remove();
+      this._embeddedElement = null;
+    }
+  }
+
+  _onRender(context, options) {
+    super._onRender(context, options);
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onRender", `Turn Tracker render parameters:`, {context, options})
+  }
+
+  _bindButtons($html) {
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _bindButtons", "Method _bindButtons() called.", $html);
+    // Manual binding of data-action buttons required since we rendered the app manually
+    $html.find('[data-action="openCalendar"]').on("click", () => HYP3ETurnTrackerAppV2.#openCalendar());
+    $html.find('[data-action="retreatTurn"]').on("click", async () => await HYP3ETurnTrackerAppV2.#retreatTurn());
+    $html.find('[data-action="advanceTurn"]').on("click", async () => await HYP3ETurnTrackerAppV2.#advanceTurn());
+    $html.find('[data-action="resetTurn"]').on("click", async () => await HYP3ETurnTrackerAppV2.#resetTurn());
+    $html.find('[data-action="showTurn"]').on("click", () => HYP3ETurnTrackerAppV2.#showTurn());
+    $html.find('[data-action="openTurnActions"]').on("click", () => HYP3ETurnTrackerAppV2.#openTurnActions());
+    // Toggle mode button
+    $html.find('[data-action="toggleMode"]').on("click", async (event) => {
+      event.preventDefault();
+      const currentMode = game.settings.get("hyp3e", "turnTrackerMode");
+      const newMode = currentMode === "embedded" ? "floating" : "embedded";
+  
+      // Save position before switching (if currently floating)
+      if (currentMode === "floating" && this._embeddedElement) {
+        // const { top, left, width, height } = this.position;
+        const rect = this._embeddedElement[0].getBoundingClientRect();
+        await game.settings.set("hyp3e", "turnTrackerPos", {
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height
         });
-        html.find(".show-turn").on("click", async ev => {
-            const turn = game.hyp3e.turnTracker.getTurn();
-            const currentTime = game.hyp3e.turnTracker.getTime();
-            ChatMessage.create({
-                content: `Current exploration turn: ${turn}, time is ${currentTime}.`,
-                type: CONST.CHAT_MESSAGE_TYPES.OTHER
-            });
-        });
-        html.find(".open-turn-actions").on("click", ev => {
-            ev.preventDefault();
-            new TurnAdvanceActionsConfig().render(true);
-        });
+      }
+
+      await game.settings.set("hyp3e", "turnTrackerMode", newMode);
+      // Close current render and re-render in new mode — happens instantly
+      await this.close();
+      await this.render(true);
+      // await this.renderApp();
+    });
+  }
+
+  _onTurnAdvanced(data) {
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onTurnAdvanced", "Turn advanced:", data);
+    this.updateTurnDisplay(data);
+  }
+
+  _onTurnRetreat(data) {
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onTurnRetreat", "Turn retreat:", data);
+    this.updateTurnDisplay(data);
+  }
+
+  _onTurnReset(data) {
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onTurnReset", "Turn reset:", data);
+    this.updateTurnDisplay(data);
+  }
+
+  static #openCalendar(event, target) {
+    game.hyp3e.openCalendar();
+  }
+
+  static async #retreatTurn(event, target) {
+    await game.hyp3e.turnTracker.retreatTurn();
+    if (game.hyp3e?.calendar) {
+      game.hyp3e.calendar.render(false);
+    }
+  }
+
+  static async #advanceTurn(event, target) {
+    await game.hyp3e.turnTracker.advanceTurn();
+    if (game.hyp3e?.calendar) {
+      game.hyp3e.calendar.render(false);
+    }
+  }
+
+  static async #resetTurn(event, target) {
+    await game.hyp3e.turnTracker.resetTurn();
+    if (game.hyp3e?.calendar) {
+      game.hyp3e.calendar.render(false);
+    }
+  }
+
+  static #showTurn(event, target) {
+    const turn = game.hyp3e.turnTracker.getTurn();
+    const currentTime = game.hyp3e.turnTracker.getTime();
+    ChatMessage.create({
+      content: `Current exploration turn: ${turn}, time is ${currentTime}.`,
+      type: CONST.CHAT_MESSAGE_TYPES.OTHER
+    });
+  }
+
+  static #openTurnActions(event, target) {
+    new TurnAdvanceActionsConfig().render(true);
+  }
+
+  static async #toggleMode(event, target) {
+    const currentMode = game.settings.get("hyp3e", "turnTrackerMode");
+    const newMode = currentMode === "embedded" ? "floating" : "embedded";
+
+    // Save position before switching (if currently floating)
+    if (currentMode === "floating" && this._embeddedElement) {
+      const rect = this._embeddedElement[0].getBoundingClientRect();
+      await game.settings.set("hyp3e", "turnTrackerPos", {
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height
+      });
     }
 
-    updateTurnDisplay(turn) {
-        if (!this._embeddedElement) return;
+    await game.settings.set("hyp3e", "turnTrackerMode", newMode);
+    // Close current render and re-render in new mode — happens instantly
+    await this.close();
+    await this.render(true);
+    // await this.renderApp();
+  }
 
-        // Update the turn field
-        const turnField = this._embeddedElement.find("#current-turn");
-        turnField.val(turn);
+  updateTurnDisplay(turn) {
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 updateTurnDisplay", `Method updateTurnDisplay() called. Turn: ${turn}. Embedded element:`, this._embeddedElement);
+    if (!this._embeddedElement) return;
 
-        // Trigger visual flash
-        turnField.addClass("turn-advance-flash");
-        setTimeout(() => turnField.removeClass("turn-advance-flash"), 600);
+    // Update the turn field
+    const turnField = this._embeddedElement.find("#current-turn");
+    turnField.val(turn);
 
-        // Update the time field
-        const currentTime = game.hyp3e.turnTracker.getTime();
-        this._embeddedElement.find("#current-time")?.val(currentTime);
-    }
+    // Trigger visual flash
+    turnField.addClass("turn-advance-flash");
+    setTimeout(() => turnField.removeClass("turn-advance-flash"), 600);
+
+    // Update the time field
+    const currentTime = game.hyp3e.turnTracker.getTime();
+    this._embeddedElement.find("#current-time")?.val(currentTime);
+  }
 }
