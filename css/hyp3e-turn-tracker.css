@@ -1,8 +1,8 @@
 /* Styles for the Turn Tracker app */
 .turn-tracker {
   width: 290px;
-  padding: 4px;
-  margin: 4px;
+  padding: 2px;
+  margin: 2px;
   border-radius: 6px;
   text-align: center;
   display: flex;
@@ -29,8 +29,8 @@
 
 .turn-tracker-toggle {
   position: relative;
-  top: 4px;
-  right: 4px;
+  top: 3px;
+  right: 3px;
   z-index: 1;
   height: 10px;
   min-height: 10px;
@@ -113,7 +113,7 @@
 }
 
 .turn-tracker .controls button {
-  margin: 3px 1px;
+  margin: 4px 1px;
   width: 32px;
   height: 32px;
 }
