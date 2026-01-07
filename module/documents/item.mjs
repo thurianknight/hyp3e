@@ -458,7 +458,8 @@ export class Hyp3eItem extends Item {
         ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: actorData.actorId }),
             flavor: label,
-            content: itemChat
+            content: itemChat,
+            flags: { hyp3e: { isItemDescription: true } }
         });
     }
 

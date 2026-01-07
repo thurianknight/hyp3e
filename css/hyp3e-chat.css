@@ -31,6 +31,41 @@
 }
 
 /* Chat card styling defaults */
+
+/* Styles for item truncated descriptions */
+.hyp3e-chat-card .description.truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* Hide after ~4 lines; adjust as needed */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: all 0.3s ease; /* Smooth expand/hide */
+}
+.hyp3e-chat-card .description:not(.truncated) {
+  display: block; /* Full view */
+}
+
+.hyp3e-chat-card .toggle-description {
+  /* text-align: center; */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  button {
+    /* background: var(--color-border-highlight); */
+    background: none;
+    /* border: 1px solid var(--color-border-light-primary); */
+    border: none;
+    /* color: var(--color-text-light-primary); */
+    padding: 4px 8px;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+}
+
+.hyp3e-chat-card .toggle-description:hover {
+  background: var(--color-border-highlight-alt);
+}
+
+/* Styles for chat roll buttons */
 .dice-damage {
     font-style: italic;
     font-weight: bold;

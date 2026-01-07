@@ -142,8 +142,48 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
     await handleGenericDamageHealButtons(_msg, html);
 }
 
-// Decrement item inventory when used
-// async function useItem(itemId, actorId) {
-//     const actor = game.actors.get(actorId)
-//     actor.useItem(itemId);
-// }
+
+/**
+ * Hook listener for truncating long content in chat messages... fires on renderChatMessage event.
+ * @param {*} _msg 
+ * @param {*} html 
+ * @param {*} _data 
+ * @returns 
+ */
+export const truncateLongContent = async function(_msg, html, _data) {
+  // Only apply to your system's description messages; check flags or content
+  if (!_msg.flags?.hyp3e?.isItemDescription && !html.hasClass('hyp3e-chat-card')) return;
+
+  const toggleBtn = html.find('.toggle-description');
+  if (!toggleBtn.length) return;
+
+  toggleBtn.click(async (event) => {
+    event.preventDefault();
+    const btn = $(event.currentTarget);
+    const description = html.find('.description');
+    
+    description.toggleClass('truncated');
+    
+    if (description.hasClass('truncated')) {
+      btn.text('Expand Description');
+      btn.attr('data-action', 'expand');
+    } else {
+      btn.text('Hide Description');
+      btn.attr('data-action', 'hide');
+      // Optional: Scroll to top of description for better UX
+      description[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // Persist state per _msg (optional, for reloads)
+    await _msg.update({
+      'flags.hyp3e.isDescriptionExpanded': !description.hasClass('truncated')
+    });
+  });
+
+  // Restore persisted state on render (if expanded previously)
+  if (_msg.flags?.hyp3e?.isDescriptionExpanded) {
+    html.find('.description').removeClass('truncated');
+    toggleBtn.text('Hide Description');
+    toggleBtn.attr('data-action', 'hide');
+  }
+}

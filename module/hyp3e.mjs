@@ -7,7 +7,7 @@ import { Hyp3eItemSheetV2 } from "./sheets/item-sheet-v2.mjs";
 // Import helper/utility classes and constants.
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
-import { addChatMessageButtons } from "./chat/chat.mjs";
+import { addChatMessageButtons, truncateLongContent } from "./chat/chat.mjs";
 import { setupEffectHandlers } from "./helpers/effects.mjs";
 import { getAvailableTokenNumber, 
             isTokenInCombat, 
@@ -220,6 +220,10 @@ Hooks.once('init', async function() {
             }
         }
         return outStr;
+    });
+
+    Handlebars.registerHelper('isLongContent', function(content) {
+      return content?.length > 100; // Tune this threshold
     });
 
     Handlebars.registerHelper('ifInList', function(str, arr, options) {
@@ -720,6 +724,7 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
  * Insert damage, save, and effect buttons into chats
  */
 Hooks.on("renderChatMessage", addChatMessageButtons);
+Hooks.on("renderChatMessage", truncateLongContent);
 
 /**
  * Capture the token creation event to run some extra processes on it

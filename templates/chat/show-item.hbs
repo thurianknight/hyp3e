@@ -1,4 +1,13 @@
-<div class="message-content">
-    {{!-- HTML-formatted content. Comes from item description. --}}
+<div class="hyp3e-chat-card item-description">
+  {{!-- HTML-formatted content. Comes from item description. --}}
+  {{#if (isLongContent content)}} {{! Helper to check length, defined in your template registration }}
+  <div class="description truncated">
     {{{content}}}
+  </div>
+  <span class="toggle-description"><button class="toggle-description" data-action="expand">Expand Description</button></span>
+  {{else}}
+  <div class="description">
+    {{{content}}}
+  </div>
+  {{/if}}
 </div>
