@@ -43,26 +43,15 @@
 .hyp3e-chat-card .description:not(.truncated) {
   display: block; /* Full view */
 }
-
 .hyp3e-chat-card .toggle-description {
-  /* text-align: center; */
   display: flex;
   flex-direction: row;
   justify-content: center;
-  button {
-    /* background: var(--color-border-highlight); */
-    background: none;
-    /* border: 1px solid var(--color-border-light-primary); */
-    border: none;
-    /* color: var(--color-text-light-primary); */
-    padding: 4px 8px;
-    margin-top: 8px;
-    cursor: pointer;
-  }
+  padding: 4px 8px;
+  margin-top: 8px;
 }
-
 .hyp3e-chat-card .toggle-description:hover {
-  background: var(--color-border-highlight-alt);
+  /* background: var(--color-border-highlight-alt); */
 }
 
 /* Styles for chat roll buttons */
