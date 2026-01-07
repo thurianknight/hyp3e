@@ -50,7 +50,7 @@ export function isTokenInCombat(token) {
 }
 
 /**
- * Optional: get the Combatant for a token
+ * Get the Combatant for a token
  * @param {Token} token
  * @returns {Combatant|null}
  */

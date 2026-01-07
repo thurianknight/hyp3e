@@ -476,11 +476,18 @@ async function sendEffectChatMessage(effect) {
   const messageParts = [];
   // Who is affected
   let target = effect.parent; // usually an Actor
-  // If target is an item, get its actor
+  // If target is an item, get its actor/owner
   if (target?.documentName === "Item") {
     target = target.actor;
   }
-  const targetName = target?.name ?? "Unknown Target";
+  let targetName = "";
+  if (target?.documentName === "Actor") {
+    const token = target.getAssociatedToken();
+    targetName = token.name ?? target.name ?? "Unknown Target";
+  } else {
+    Hyp3eLogger.warn("ActiveEffect sendEffectChatMessage", `Effect parent is not an Actor or Item, cannot send chat message:`, effect);
+    return;
+  }
 
   // Effect details
   const effectName = effect.name ?? "Unknown Effect";

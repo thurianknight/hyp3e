@@ -3651,7 +3651,7 @@ export class Hyp3eActor extends Actor {
    * @returns {boolean}
    */
   isInCombat() {
-      return this.getCombatant() !== null;
+    return !!this.getCombatant();
   }
 
   /**
