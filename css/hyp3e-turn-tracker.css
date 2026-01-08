@@ -41,7 +41,7 @@
   background: none;
   padding: 0;
   border: none;
-  color: #aaa;
+  color: inherit;
   font-size: 0.5em;
   height: 10px;
   min-height: 10px;
