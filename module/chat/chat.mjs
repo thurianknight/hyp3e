@@ -165,10 +165,10 @@ export const truncateLongContent = async function(_msg, html, _data) {
     description.toggleClass('truncated');
     
     if (description.hasClass('truncated')) {
-      btn.text('Expand Description');
+      btn.text('▼ Expand Description');
       btn.attr('data-action', 'expand');
     } else {
-      btn.text('Hide Description');
+      btn.text('▲ Hide Description');
       btn.attr('data-action', 'hide');
       // Optional: Scroll to top of description for better UX
       description[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -183,7 +183,7 @@ export const truncateLongContent = async function(_msg, html, _data) {
   // Restore persisted state on render (if expanded previously)
   if (_msg.flags?.hyp3e?.isDescriptionExpanded) {
     html.find('.description').removeClass('truncated');
-    toggleBtn.text('Hide Description');
+    toggleBtn.text('▲ Hide Description');
     toggleBtn.attr('data-action', 'hide');
   }
 }

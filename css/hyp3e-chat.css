@@ -33,15 +33,35 @@
 /* Chat card styling defaults */
 
 /* Styles for item truncated descriptions */
+.hyp3e-chat-card .description {
+  /* Base styles for both states – avoids duplication */
+  line-height: 1.5; /* Improves readability */
+  transition: max-height 0.3s ease, opacity 0.3s ease; /* Smoother than 'all' */
+}
+/* Truncated state with fade-out */
 .hyp3e-chat-card .description.truncated {
   display: -webkit-box;
   -webkit-line-clamp: 4; /* Hide after ~4 lines; adjust as needed */
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  transition: all 0.3s ease; /* Smooth expand/hide */
+  max-height: 6em; /* Fallback for browsers without line-clamp support */
+  -webkit-mask-image: linear-gradient(to bottom, 
+    black 0%, 
+    black 70%, 
+    transparent 100%
+  );
+  mask-image: linear-gradient(to bottom, 
+    black 0%, 
+    black 70%, 
+    transparent 100%
+  );
 }
 .hyp3e-chat-card .description:not(.truncated) {
   display: block; /* Full view */
+  max-height: none; /* Fully expanded */
+  mask: none;
+  -webkit-mask: none;
 }
 .hyp3e-chat-card .toggle-description {
   display: flex;
@@ -49,6 +69,8 @@
   justify-content: center;
   padding: 4px 8px;
   margin-top: 8px;
+  font-size: 0.8em;
+  color: var(--hyp3e-color-text-primary);
 }
 .hyp3e-chat-card .toggle-description:hover {
   /* background: var(--color-border-highlight-alt); */
