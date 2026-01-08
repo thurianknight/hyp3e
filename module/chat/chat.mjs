@@ -172,18 +172,13 @@ export const truncateLongContent = async function(_msg, html, _data) {
       btn.attr('data-action', 'hide');
       // Optional: Scroll to top of description for better UX
       description[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-    
-    // Persist state per _msg (optional, for reloads)
-    await _msg.update({
-      'flags.hyp3e.isDescriptionExpanded': !description.hasClass('truncated')
-    });
+    }    
   });
 
   // Restore persisted state on render (if expanded previously)
-  if (_msg.flags?.hyp3e?.isDescriptionExpanded) {
-    html.find('.description').removeClass('truncated');
-    toggleBtn.text('▲ Hide Description');
-    toggleBtn.attr('data-action', 'hide');
-  }
+  // if (_msg.flags?.hyp3e?.isDescriptionExpanded) {
+  //   html.find('.description').removeClass('truncated');
+  //   toggleBtn.text('▲ Hide Description');
+  //   toggleBtn.attr('data-action', 'hide');
+  // }
 }
