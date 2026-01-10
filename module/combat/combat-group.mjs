@@ -7,7 +7,8 @@ export const actionGroups = {
     "melee": "HYP3E.actions.melee",
     "missile": "HYP3E.actions.missile",
     "magic": "HYP3E.actions.magic",
-    "movement": "HYP3E.actions.movement"
+    "movement": "HYP3E.actions.movement",
+    "other": "HYP3E.actions.other",
 }
 
 /**
@@ -35,6 +36,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         await this.rollInitiative();
     }
 
+    /** @override */
     async rollInitiative(combatantIds = null) {
         // If one or more combatant IDs was provided, get any applicable groups, otherwise get all
         let groupsToRollFor
@@ -56,6 +58,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Initiative roll per group:`, rollPerGroup);
 
         const results = await this.#prepareGroupInitiativeDice(rollPerGroup);
+        Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Initiative results per group:`, results);
 
         // Add the combat action value to each combatant for initiative calculation
         combatantsAffected.forEach(c => {
@@ -196,9 +199,10 @@ export class HYP3EGroupCombat extends HYP3ECombat {
 
     get groupInitiativeScores() {
         // Refresh combatant initRoll based on current initiative score
-        this.combatants.forEach(c => {
-            c.setInitRoll()
-        })
+        // this.combatants.forEach(c => {
+        //     c.setInitRoll()
+        //     Hyp3eLogger.info("HYP3EGroupCombat get groupInitiativeScores", `${c.name} init roll:`, c.initRoll);
+        // })
         const initiativeMap = new Map()
         for (const initGroup in this.combatantsByGroup) {
             this.combatantsByGroup[initGroup].forEach(c => {
@@ -208,7 +212,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                 }
             });
         }
-
+        Hyp3eLogger.info("HYP3EGroupCombat get groupInitiativeScores", `Group initiative scores:`, initiativeMap);
         return initiativeMap;
     }
 }

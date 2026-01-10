@@ -69,13 +69,13 @@ export class HYP3ECombatant extends Combatant {
 
     // Defer defeated status until round-end
     if (this.combat?.flags?.hyp3e?.deferDefeat) {
-      Hyp3eLogger.info("HYP3ECombatant isDefeated", `${this.name} defeat is deferred for now, returning ${!!this.defeated}...`);
+      // Hyp3eLogger.info("HYP3ECombatant isDefeated", `${this.name} defeat is deferred for now, returning ${!!this.defeated}...`);
       return !!this.defeated;
     }
 
     // Round has ended (or not in combat), revert to default behavior
     const defeatedStatus = this.defeated || (this.actor?.system.hp.value <= deadHp) || !!this.actor?.statuses.has(CONFIG.specialStatusEffects.DEFEATED);
-    Hyp3eLogger.info("HYP3ECombatant isDefeated", `${this.name} defeat is no longer deferred, returning status of ${defeatedStatus}...`);
+    // Hyp3eLogger.info("HYP3ECombatant isDefeated", `${this.name} defeat is no longer deferred, returning status of ${defeatedStatus}...`);
     return defeatedStatus;
   }
 
@@ -99,14 +99,14 @@ export class HYP3ECombatant extends Combatant {
 
     // Defer unconscious status until round-end
     if (this.combat?.flags?.hyp3e?.deferDefeat) {
-      Hyp3eLogger.info("HYP3ECombatant isUnconscious", `${this.name} unconscious is deferred for now, returning ${!!this.unconscious}...`);
+      // Hyp3eLogger.info("HYP3ECombatant isUnconscious", `${this.name} unconscious is deferred for now, returning ${!!this.unconscious}...`);
       // return false;
       return !!this.unconscious;
     }
 
     // Round has ended (or not in combat), revert to default behavior
     const unconsciousStatus = this.unconscious || (this.actor?.system.hp.value <= unconsciousHp) || !!this.actor?.statuses.has(CONFIG.statusEffects.unconscious);
-    Hyp3eLogger.info("HYP3ECombatant isUnconscious", `${this.name} unconscious is no longer deferred, returning status of ${unconsciousStatus}...`);
+    // Hyp3eLogger.info("HYP3ECombatant isUnconscious", `${this.name} unconscious is no longer deferred, returning status of ${unconsciousStatus}...`);
     return unconsciousStatus;
   }
 
@@ -131,14 +131,14 @@ export class HYP3ECombatant extends Combatant {
 
     // Defer dying status until round-end
     if (this.combat?.flags?.hyp3e?.deferDefeat) {
-      Hyp3eLogger.info("HYP3ECombatant isDying", `${this.name} dying is deferred for now, returning ${!!this.dying}...`);
+      // Hyp3eLogger.info("HYP3ECombatant isDying", `${this.name} dying is deferred for now, returning ${!!this.dying}...`);
       // return false;
       return !!this.dying;
     }
 
     // Round has ended (or not in combat), revert to default behavior
     const dyingStatus = this.dying || (this.actor?.system.hp.value <= dyingHp);
-    Hyp3eLogger.info("HYP3ECombatant isDying", `${this.name} dying is no longer deferred, returning status of ${dyingStatus}...`);
+    // Hyp3eLogger.info("HYP3ECombatant isDying", `${this.name} dying is no longer deferred, returning status of ${dyingStatus}...`);
     return dyingStatus;
   }
 
@@ -196,6 +196,16 @@ export class HYP3ECombatant extends Combatant {
   // INITIATIVE MANAGEMENT
   // ===========================================================================
 
+  /**
+   * This is the rollInitiative method from Foundry v13 base, copied here just for reference.
+   */
+  // async rollInitiative(formula) {
+  //   const roll = this.getInitiativeRoll(formula);
+  //   await roll.evaluate();
+  //   return this.update({initiative: roll.total});
+  // }
+
+  /** @override */ 
   getInitiativeRoll(formula) {
     let rollTerms = formula || CONFIG.Combat.initiative.formula;
 
@@ -224,9 +234,10 @@ export class HYP3ECombatant extends Combatant {
     this.getDefeatedModifier();
     rollTerms += `+ ${this.defeatedInit}`;
 
-    // Finally, roll initiative and return the result
-    const result = new Roll(rollTerms, rollData);
-    return result
+    // Create a roll object and return to rollInitiative() where the roll happens
+    return foundry.dice.Roll.create(rollTerms, rollData);
+    // const result = new Roll(rollTerms, rollData);
+    // return result
   }
 
   getActionModifiers() {
