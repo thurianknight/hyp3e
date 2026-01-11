@@ -57,7 +57,11 @@
         {{!-- For the class features list, span the full width of the sheet --}}
         <ol class="items-list" data-drop="item">
           <li class="flexrow items-header">
-            <h3 class="item-name">{{localize "HYP3E.headers.classAbilities"}}</h3>
+            <h3 class="item-name">{{localize "HYP3E.headers.classAbilities"}} 
+              <a class="sort-items" data-action="sortAz" data-item-type="features" title="Sort Items A-Z">
+                <i class="fas fa-sort-alpha-down"></i>
+              </a>
+            </h3>
             <h3>{{localize "HYP3E.details.level"}}</h3>
             <h3>{{localize "HYP3E.checkRoll"}}</h3>
             <h3>{{localize "HYP3E.target"}}</h3>

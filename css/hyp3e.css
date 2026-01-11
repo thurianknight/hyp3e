@@ -632,6 +632,14 @@
   padding: 5px 5px;
 }
 
+/* Styling for "Sort A-Z" button */
+.hyp3e .sort-items {
+  padding-left: 0.8em;
+  padding-top: 0.2em;
+  font-size: 0.8em;
+  font-weight: normal;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Actor sheet styles applied to all Actor types                             */
 /* ------------------------------------------------------------------------- */
