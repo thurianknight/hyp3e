@@ -71,6 +71,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         actions: {
             // These actions are shared on multiple tabs
             rollThis: Hyp3eActorSheetV2._onRoll,
+            sortAz: Hyp3eActorSheetV2._sortItemsAz,
             createItem: Hyp3eActorSheetV2._onItemCreate,
             dropItemDescription: Hyp3eActorSheetV2._toggleItemSummary,
             toggleItemEquip: Hyp3eActorSheetV2._toggleItemEquip,
@@ -985,6 +986,50 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             this.actor.updateEmbeddedDocuments("Item", [
                 { _id: item.id, "system.quantity.value": item.system.quantity.value+1 },
             ]);
+        }
+    }
+
+    static async _sortItemsAz(event, target) {
+        event.preventDefault()
+        const itemType = target.dataset.itemType;
+        if (!itemType) {
+          Hyp3eLogger.warn("No data-item-type specified on sort button");
+          return;
+        }
+        const actor = this.document; // In V2 sheets, this is the Actor document
+        if (!actor?.items) return;
+
+        Hyp3eLogger.info("HYP3EActorSheetV2 _sortItemsAz", `Sorting ${itemType} A-Z...`, { event, target });
+
+        // Get only items of the requested type
+        const itemsOfType = actor.items.filter(i => i.type === itemType);
+
+        if (!itemsOfType.length) {
+          const msg = `No items of type ${itemType} found on ${actor.name}`;
+          Hyp3eLogger.warn("HYP3EActorSheetV2 _sortItemsAz", msg);
+          ui.notifications.info(msg);
+          return;
+        }
+
+        // Sort alphabetically (case-insensitive, locale-aware)
+        const sorted = [...itemsOfType].sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+        );
+
+        // Prepare minimal updates (only _id and sort)
+        const updates = sorted.map((item, index) => ({
+          _id: item.id,
+          sort: index * 100000,   // Large gaps = safe for manual drag & drop later
+        }));
+
+        try {
+          await actor.updateEmbeddedDocuments("Item", updates);
+          // Optional: force a refresh if needed (usually not necessary in V2)
+          // this.render(false);
+          ui.notifications.info(`Sorted ${sorted.length} ${itemType} items A-Z.`);
+        } catch (err) {
+          Hyp3eLogger.error("Failed to sort items", err);
+          ui.notifications.error("Failed to sort items - see console for details.");
         }
     }
 
