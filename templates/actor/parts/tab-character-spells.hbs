@@ -84,7 +84,11 @@
         <ol class="items-list" data-drop="item">
         {{#each spells as |spells spellLevel|}}
           <li class="flexrow items-header">
-            <h3 class="item-name">{{localize 'HYP3E.details.level'}} {{spellLevel}} {{localize 'HYP3E.dataLabel.spells'}}</h3>
+            <h3 class="item-name">{{localize 'HYP3E.details.level'}} {{spellLevel}} {{localize 'HYP3E.dataLabel.spells'}} 
+              <a class="sort-items" data-action="sortAz" data-item-type="spell" title="Sort Items A-Z">
+                <i class="fas fa-sort-alpha-down"></i>
+              </a>
+            </h3>
             <h3>{{localize 'HYP3E.spell.numMem'}}</h3>
             <h3>{{localize 'HYP3E.weapon.range'}}</h3>
             <h3>{{localize 'HYP3E.spell.duration'}}</h3>

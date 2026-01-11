@@ -1011,13 +1011,32 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           return;
         }
 
-        // Sort alphabetically (case-insensitive, locale-aware)
-        const sorted = [...itemsOfType].sort((a, b) =>
-          a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
-        );
+        let sortedItems;
+        if (itemType === "feature") {
+          // Special sort: Level (null first, then 1,2,3...), then name A-Z
+          sortedItems = [...itemsOfType].sort((a, b) => {
+            // Get level values – treat missing/null/undefined as -1 (so they sort first)
+            const levelA = a.system?.level ?? -1;
+            const levelB = b.system?.level ?? -1;
+      
+            // Compare levels first
+            if (levelA !== levelB) {
+              return levelA - levelB;  // ascending: -1 (nulls), then 1, 2, 3...
+            }
+      
+            // Same level → sort by name alphabetically
+            return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+          });
+        } else {
+          // Default: just alphabetical by name for all other types
+          // Sort alphabetically (case-insensitive, locale-aware)
+          sortedItems = [...itemsOfType].sort((a, b) =>
+            a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+          );
+        }
 
         // Prepare minimal updates (only _id and sort)
-        const updates = sorted.map((item, index) => ({
+        const updates = sortedItems.map((item, index) => ({
           _id: item.id,
           sort: index * 100000,   // Large gaps = safe for manual drag & drop later
         }));
@@ -1026,7 +1045,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           await actor.updateEmbeddedDocuments("Item", updates);
           // Optional: force a refresh if needed (usually not necessary in V2)
           // this.render(false);
-          ui.notifications.info(`Sorted ${sorted.length} ${itemType} items A-Z.`);
+          ui.notifications.info(`Sorted ${sortedItems.length} ${itemType} items A-Z.`);
         } catch (err) {
           Hyp3eLogger.error("Failed to sort items", err);
           ui.notifications.error("Failed to sort items - see console for details.");
