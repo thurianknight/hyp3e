@@ -126,6 +126,8 @@ export class Hyp3eItem extends Item {
                     itemData.light.dim = lightSourceProps.radius;
                     itemData.light.bright = Math.floor(lightSourceProps.radius/2);
                     itemData.light.angle = lightSourceProps.angle;
+                    itemData.light.color = lightSourceProps.color;
+                    itemData.light.alpha = lightSourceProps.alpha;
                 } else {
                     itemData.isLightSource = false;
                 }
@@ -614,16 +616,16 @@ export class Hyp3eItem extends Item {
 
         // Light source lookup table
         const lightSources = {
-            "bonfire": { "radius": 60, "angle": 360 },
-            "campfire": { "radius": 40, "angle": 360 },
-            "candle": { "radius": 5, "angle": 360 },
-            "continuous_light_spell": { "radius": 30, "angle": 360 },
-            "lantern": { "radius": 30, "angle": 360 },
-            "lantern_bullseye": { "radius": 60, "angle": 15 },
-            "lantern_hooded": { "radius": 30, "angle": 360 },
-            "light_spell": { "radius": 15, "angle": 360 },
-            "produce_flame_spell": { "radius": 40, "angle": 360 },
-            "torch": { "radius": 30, "angle": 360 }
+            "bonfire": { "radius": 60, "angle": 360, "color": null, "alpha": 0.5 },
+            "campfire": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
+            "candle": { "radius": 5, "angle": 360, "color": null, "alpha": 0.5 },
+            "continuous_light_spell": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+            "lantern": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+            "lantern_bullseye": { "radius": 60, "angle": 15, "color": null, "alpha": 0.5 },
+            "lantern_hooded": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+            "light_spell": { "radius": 15, "angle": 360, "color": null, "alpha": 0.5 },
+            "produce_flame_spell": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
+            "torch": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 }
         }
 
         // Convert the name to lowercase and replace spaces with underscores

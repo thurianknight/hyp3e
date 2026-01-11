@@ -74,6 +74,11 @@
                 <span>{{localize 'HYP3E.item.attributes.lightColor'}}</span>
               </div>
             </div>
+            <div class="flexrow flexshrink flex-group-left bg-attributes-wide">
+              <label class="resource-label">{{localize 'HYP3E.item.light.alpha'}}</label>
+              <input type="number" name="system.light.alpha" value="{{system.light.alpha}}" min="0" max="1" step="0.05" />
+              <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.lightAlpha'}}</div>
+            </div>
           </fieldset>
         {{/if}}
         <div class="flexrow flexshrink flex-group-left bg-attributes">

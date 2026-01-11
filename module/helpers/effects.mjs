@@ -450,7 +450,7 @@ export async function applyTokenLight(token, lightProps) {
     dim: lightProps.dim,
     bright: lightProps.bright,
     angle: lightProps.angle || 360, // Default to 360 degrees if no angle provided
-    color: lightProps.color || "#ffffff", // Default to white if no color provided
+    color: lightProps.color || null, // Default to null if no color provided
     alpha: lightProps.alpha || 0.5, // Default alpha if none provided
     animation: lightProps.animation || { type: "none" } // Default animation if none provided
   };
