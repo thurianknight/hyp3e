@@ -37,8 +37,16 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     }
 
     /** @override */
-    async rollInitiative(combatantIds = null, options = {}) {
-      Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Arguments passed to method:`, { combatantIds,  options });
+    async rollInitiative(options = {}) {
+      Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Arguments passed to method:`, { options });
+      const {
+        combatantIds = null,
+        group,
+        formula,
+        updateTurn = false,
+        messageOptions = {}
+      } = options;
+
         // If one or more combatant IDs was provided, get any applicable groups, otherwise get all
         let groupsToRollFor
         if (combatantIds !== null && combatantIds.length > 0) {
@@ -47,7 +55,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         } else {
           groupsToRollFor = this.availableGroups;
         }
-        const { group } = options;
+        // const { group } = options;
         if (group !== undefined) {
           Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Group to roll for initiative:`, group);
           groupsToRollFor = [group];

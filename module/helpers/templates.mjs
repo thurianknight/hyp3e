@@ -60,8 +60,8 @@ export const preloadHandlebarsTemplates = async function() {
         // `${HYP3E.templatePath}/item/parts/item-effects.hbs`,
 
         // Combat Tab
-        `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-ind-v12.hbs`,
-        `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group-v12.hbs`,
+        // `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-ind-v12.hbs`,
+        // `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group-v12.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-ind-v13.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group-v13.hbs`,
     ];
@@ -86,7 +86,7 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/chat/show-item.hbs`,
 
         // Combat Tab
-        `${HYP3E.templatePath}/sidebar/combat-tracker-v12.hbs`,
+        // `${HYP3E.templatePath}/sidebar/combat-tracker-v12.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-tracker-v13.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-header-v13.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-footer-v13.hbs`,

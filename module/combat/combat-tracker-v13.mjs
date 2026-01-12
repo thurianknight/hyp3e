@@ -171,14 +171,14 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         html.find('.combat-control[data-action="rollGroup"]').click((ev) => {
             const combatant = game.combat.combatants.find(c => c.actor.isOwner);
             if (combatant) {
-                game.combat.rollInitiative([combatant.id]);
+                game.combat.rollInitiative({ combatantIds: [combatant.id] });
             }
         });
 
         // Roll for specific group
         html.find('a[data-action="roll-group-initiative"]').click((ev) => {      
           const groupName = ev.currentTarget.dataset.initGroup;
-          game.combat.rollInitiative(null, {group: groupName});
+          game.combat.rollInitiative({ group: groupName });
         });
 
         // Set initiative groups
