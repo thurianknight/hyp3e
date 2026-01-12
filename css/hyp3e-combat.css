@@ -155,10 +155,17 @@
   opacity: 1;
 }
 
-/* Group name truncation, if needed */
-.folder-name.ellipsis {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-    min-width: 0;
+/* Folder/group name header */
+.combat-tracker .folder-header {
+  display: flex;
+  align-items: center;          /* vertical centering */
+  justify-content: space-between; /* pushes children to ends */
+}
+.combat-tracker .folder-name {
+  /* takes available space in the middle */
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
