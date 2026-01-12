@@ -137,8 +137,8 @@ Hooks.once('init', async function() {
         CONFIG.ui.combat = HYP3ECombatTracker;
     } else {
         // Load v12-specific Combat Tracker class
-        const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v12.mjs");
-        CONFIG.ui.combat = HYP3ECombatTracker;
+        // const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v12.mjs");
+        // CONFIG.ui.combat = HYP3ECombatTracker;
     }
 
     /* -------------------------------------------- */
