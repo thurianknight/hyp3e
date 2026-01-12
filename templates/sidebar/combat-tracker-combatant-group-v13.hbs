@@ -1,7 +1,14 @@
 <li class="folder flexcol">
     <header class="folder-header" style="background: linear-gradient(90deg, var(--hyp3e-group-color-{{this.initGroup}}, {{this.initGroup}}), transparent)">
-        <i class="fas fa-dice-d6"></i>
-        <span class="folder-name ellipsis">{{localize this.label}}</span>
+        {{#if this.canRollInitiative}}
+        <a data-action="roll-group-initiative" data-init-group="{{this.initGroup}}" title="Roll {{this.initGroup}} initiative">
+          <i class="fas fa-dice-d6" style="padding-right: 0.3em;"></i> 
+          <span class="folder-name ellipsis"> {{localize this.label}}</span>
+        </a>
+        {{else}}
+          <i class="fas fa-dice-d6" style="opacity: 0.5; padding-right: 0.3em;"></i> 
+          <span class="folder-name ellipsis">{{localize this.label}}</span>
+        {{/if}}
         <span class="create-button">
             {{this.initiative}}
         </span>

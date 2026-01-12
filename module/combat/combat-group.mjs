@@ -37,17 +37,21 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     }
 
     /** @override */
-    async rollInitiative(combatantIds = null) {
+    async rollInitiative(combatantIds = null, options = {}) {
+      Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Arguments passed to method:`, { combatantIds,  options });
         // If one or more combatant IDs was provided, get any applicable groups, otherwise get all
         let groupsToRollFor
-        let combatantsAffected = []
         if (combatantIds !== null && combatantIds.length > 0) {
-            Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Combatant IDs for group initiative:`, combatantIds);
-            groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
+          Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Combatant IDs for group initiative:`, combatantIds);
+          groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
         } else {
-            groupsToRollFor = this.availableGroups;
+          groupsToRollFor = this.availableGroups;
         }
-        combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.initGroup))
+        const { group } = options;
+        if (group !== undefined) {
+          Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Group to roll for initiative:`, group);
+          groupsToRollFor = [group];
+        }
         Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Groups to roll for:`, groupsToRollFor);
 
         // Take the groups array and append a roll object to each group
@@ -60,7 +64,8 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         const results = await this.#prepareGroupInitiativeDice(rollPerGroup);
         Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Initiative results per group:`, results);
 
-        // Add the combat action value to each combatant for initiative calculation
+        // For each combatant, add its combat action & status modifiers to initiative
+        const combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.initGroup))
         combatantsAffected.forEach(c => {
             c.initRoll = results[c.initGroup].initiative
             // Movement partially overrides the other combat actions for initiative order

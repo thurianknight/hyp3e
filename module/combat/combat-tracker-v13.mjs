@@ -90,6 +90,16 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
                 // Log the initiative groups
                 Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Initiative groups:`, initGroups);
                 context.initGroups = initGroups;
+
+                const user = game.user;
+                const isGM = user.isGM;
+
+                for (const group of initGroups) {
+                  group.canRollInitiative = isGM || group.turns.some(turn => {
+                    return turn.isOwnedByUser;
+                    // return combatant.actor?.testUserPermission(user, "OWNER");
+                  });
+                }
             }    
         }
     }
@@ -163,6 +173,12 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
             if (combatant) {
                 game.combat.rollInitiative([combatant.id]);
             }
+        });
+
+        // Roll for specific group
+        html.find('a[data-action="roll-group-initiative"]').click((ev) => {      
+          const groupName = ev.currentTarget.dataset.initGroup;
+          game.combat.rollInitiative(null, {group: groupName});
         });
 
         // Set initiative groups

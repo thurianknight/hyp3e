@@ -154,3 +154,11 @@
   visibility: visible;
   opacity: 1;
 }
+
+/* Group name truncation, if needed */
+.folder-name.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+}
