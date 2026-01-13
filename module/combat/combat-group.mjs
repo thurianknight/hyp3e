@@ -95,6 +95,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     const updates = combatantsAffected.map(
       (c) => ({ _id: c.id, 
         initRoll: results[c.initGroup].initiative,
+        "flags.hyp3e.initRoll": results[c.initGroup].initiative,
         initiative: Math.round((results[c.initGroup].initiative 
                                 + (c.actor?.system?.attributes?.dex?.value/1000)
                                 + c.tempInitMod
@@ -104,8 +105,8 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                                 + c.moveInit
                                 + c.otherInit
                                 + c.statusInit
-                                + c.defeatedInit) * 1000) / 1000
-        })
+                                + c.defeatedInit) * 1000) / 1000,
+      })
     )
     await this.updateEmbeddedDocuments("Combatant", updates);
 
@@ -212,15 +213,28 @@ export class HYP3EGroupCombat extends HYP3ECombat {
 
   get groupInitiativeScores() {
     const initiativeMap = new Map()
-    for (const initGroup in this.combatantsByGroup) {
-      this.combatantsByGroup[initGroup].forEach(c => {
-        // Set the combatant's initiative roll as the group's initiative score
-        if (c.initRoll > (initiativeMap.get(initGroup) || 0)) {
-          initiativeMap.set(initGroup, c.initRoll)
+    // for (const initGroup in this.combatantsByGroup) {
+    //   this.combatantsByGroup[initGroup].forEach(c => {
+    //     // Set the combatant's initiative roll as the group's initiative score
+    //     if (c.initRoll > (initiativeMap.get(initGroup) || 0)) {
+    //       initiativeMap.set(initGroup, c.initRoll)
+    //     }
+    //   });
+    // }
+    for (const [initGroup, combatants] of Object.entries(this.combatantsByGroup)) {
+      for (const c of combatants) {
+        const initRoll = c.getFlag("hyp3e", "initRoll") ?? null;
+        if (initRoll === null) continue;
+
+        const current = initiativeMap.get(initGroup) ?? null;
+        if (initRoll > current) {
+          initiativeMap.set(initGroup, initRoll);
         }
-      });
+      }
     }
-    Hyp3eLogger.info("HYP3EGroupCombat get groupInitiativeScores", `Group initiative scores:`, initiativeMap);
+    if (initiativeMap.size > 0) {
+      Hyp3eLogger.info("HYP3EGroupCombat get groupInitiativeScores", `Group initiative scores:`, initiativeMap);
+    }
     return initiativeMap;
   }
 }

@@ -4,269 +4,274 @@ import { HYP3EGroupCombat } from "./combat-group.mjs";
 import HYP3ECombatGroupSelector from "./combat-set-groups.mjs";
 
 export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
-    // ===========================================================================
-    // APPLICATION SETUP
-    // ===========================================================================
+  // ===========================================================================
+  // APPLICATION SETUP
+  // ===========================================================================
 
-    // Merge parent CombatTracker default options + custom options
-    static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS,{
-        actions: {
-            melee: HYP3ECombatTracker._onCombatantControl,
-            missile: HYP3ECombatTracker._onCombatantControl,
-            magic: HYP3ECombatTracker._onCombatantControl,
-            movement: HYP3ECombatTracker._onCombatantControl,
-            other: HYP3ECombatTracker._onCombatantControl,
-        }
-    })
-    // Load the new combat-tracker templates
-    static PARTS = {
-        header: {
-            template: `${HYP3E.templatePath}/sidebar/combat-header-v13.hbs`
-        },
-        tracker: {
-            template: `${HYP3E.templatePath}/sidebar/combat-tracker-v13.hbs`,
-            scrollable: [""],
-        },
-        footer: {
-            template: `${HYP3E.templatePath}/sidebar/combat-footer-v13.hbs`
-        }
+  // Merge parent CombatTracker default options + custom options
+  static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS,{
+    actions: {
+      melee: HYP3ECombatTracker._onCombatantControl,
+      missile: HYP3ECombatTracker._onCombatantControl,
+      magic: HYP3ECombatTracker._onCombatantControl,
+      movement: HYP3ECombatTracker._onCombatantControl,
+      other: HYP3ECombatTracker._onCombatantControl,
     }
-
-    static GROUP_CONFIG_APP = new HYP3ECombatGroupSelector();
-
-
-    // ===========================================================================
-    // RENDERING
-    // ===========================================================================
-
-    async _prepareCombatContext(context, options) {
-        // Log incoming parameters
-        Hyp3eLogger.info("HYP3ECombatTracker _prepareCombatContext", `Incoming combat context:`, context)
-        // Prepare the combat context
-        await super._prepareCombatContext(context, options);
-        // Add group initiative flag
-        // const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
-        // this.isGroupInitiative = isGroupInitiative;
-        // context.isGroupInitiative = isGroupInitiative;
-        // Add initiative type
-        const initiativeType = CONFIG.HYP3E.initiativeType;
-        this.initiativeType = initiativeType;
-        context.initiativeType = initiativeType;
+  })
+  // Load the new combat-tracker templates
+  static PARTS = {
+    header: {
+      template: `${HYP3E.templatePath}/sidebar/combat-header-v13.hbs`
+    },
+    tracker: {
+      template: `${HYP3E.templatePath}/sidebar/combat-tracker-v13.hbs`,
+      scrollable: [""],
+    },
+    footer: {
+      template: `${HYP3E.templatePath}/sidebar/combat-footer-v13.hbs`
     }
+  }
 
-    async _prepareTrackerContext(context, options) {
-        if (!this.viewed || !(this.viewed instanceof foundry.documents.Combat)) {
-            return;
-        }
-        // Log incoming parmeters
-        Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Tracker Context:`, context)
-        // Log the combat object
-        Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Tracker Combat:`, this.viewed)
-        // Prepare the combat tracker context
-        await super._prepareTrackerContext(context, options);
+  static GROUP_CONFIG_APP = new HYP3ECombatGroupSelector();
 
-        // Only needed for group or phased initiative
-        if (CONFIG.HYP3E.initiativeType === "group" || CONFIG.HYP3E.initiativeType === "phased") {
-            if (context.turns && context.turns.length > 0) {
-                const initGroups = context.turns.reduce((arr, turn) => {
-                    const idx = arr.findIndex(r => r.initGroup === turn.initGroup);
 
-                    if (idx !== -1) {
-                        arr[idx].turns.push(turn);
-                        return arr;
-                    }
+  // ===========================================================================
+  // RENDERING
+  // ===========================================================================
 
-                    Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Group init scores:`, game.combat.groupInitiativeScores);
-                    const initiative = game.combat.groupInitiativeScores?.get(turn.initGroup) ?? null;
+  async _prepareCombatContext(context, options) {
+    // Log incoming parameters
+    Hyp3eLogger.info("HYP3ECombatTracker _prepareCombatContext", `Incoming combat context:`, context)
+    // Prepare the combat context
+    await super._prepareCombatContext(context, options);
+    // Add initiative type
+    const initiativeType = CONFIG.HYP3E.initiativeType;
+    this.initiativeType = initiativeType;
+    context.initiativeType = initiativeType;
+  }
 
-                    return [...arr, {
-                        initGroup: turn.initGroup,
-                        label: HYP3EGroupCombat.GROUPS[turn.initGroup],
-                        initiative: initiative,
-                        turns: [turn]
-                    }];
-                }, []);
-
-                // Log the initiative groups
-                Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Initiative groups:`, initGroups);
-                context.initGroups = initGroups;
-
-                const user = game.user;
-                const isGM = user.isGM;
-
-                for (const group of initGroups) {
-                  group.canRollInitiative = isGM || group.turns.some(turn => {
-                    return turn.isOwnedByUser;
-                    // return combatant.actor?.testUserPermission(user, "OWNER");
-                  });
-                }
-            }    
-        }
+  async _prepareTrackerContext(context, options) {
+    if (!this.viewed || !(this.viewed instanceof foundry.documents.Combat)) {
+      return;
     }
+    // Log incoming parmeters
+    Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Tracker Context:`, context)
+    // Log the combat object
+    Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Tracker Combat:`, this.viewed)
+    // Prepare the combat tracker context
+    await super._prepareTrackerContext(context, options);
 
-    async _prepareTurnContext(combat, combatant, index) {
-        // Log the current combatant
-        Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${combatant.name} combatant:`, combatant)
+    // Only needed for group or phased initiative
+    if (CONFIG.HYP3E.initiativeType === "group" || CONFIG.HYP3E.initiativeType === "phased") {
+      Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Group init scores:`, game.combat.groupInitiativeScores);
+      if (context.turns && context.turns.length > 0) {
+        const initGroups = context.turns.reduce((arr, turn) => {
+          const idx = arr.findIndex(r => r.initGroup === turn.initGroup);
 
-        // Prepare the combatant context
-        const turn = await super._prepareTurnContext(combat, combatant, index);
-        Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${combatant.name} turn:`, turn)
+          if (idx !== -1) {
+            arr[idx].turns.push(turn);
+            return arr;
+          }
 
-        // Add group initiative flag
-        // const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
-        // turn.isGroupInitiative = isGroupInitiative;
-        // Add initiative type
-        const initiativeType = CONFIG.HYP3E.initiativeType;
-        turn.initiativeType = initiativeType;
+          const initiative = game.combat.groupInitiativeScores?.get(turn.initGroup) ?? null;
 
-        // Add all of our custom flags to the combatant context
-        turn.isMelee = !!combatant.getFlag(game.system.id, "isMelee")
-        turn.isMissile = !!combatant.getFlag(game.system.id, "isMissile")
-        turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
-        turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
-        turn.isOther = !!combatant.getFlag(game.system.id, "isOther")
-        turn.isSlowed = !!combatant.isSlowed;
-        turn.logLevel = CONFIG.HYP3E.logLevel;
-        turn.isOwnedByUser = !!combatant.actor.isOwner;
+          return [...arr, {
+            initGroup: turn.initGroup,
+            label: HYP3EGroupCombat.GROUPS[turn.initGroup],
+            initiative: initiative,
+            turns: [turn]
+          }];
+        }, []);
 
-        // if (isGroupInitiative) turn.initGroup = combatant.initGroup;
-        switch (initiativeType) {
-            case "group":
-                // For group initiative...
-                turn.initGroup = combatant.initGroup;
-            case "phased":
-                // For phased initiative...
-                turn.initGroup = combatant.initGroup;
-            case "individual":
-                // For individual initiative...
-                turn.initRoll = Math.floor(combatant.initiative)
-            default:
-                // Default to Hyperborea 3E standard group init
-                turn.initGroup = combatant.initGroup;
-        }        
+        const user = game.user;
+        const isGM = user.isGM;
 
-        // Log the updated turn
-        Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${turn.name} turn:`, turn);
-
-        return turn;
-    }
-
-
-    // ===========================================================================
-    // UI EVENTS
-    // ===========================================================================
-
-    // activateListeners(html) {
-    _onRender(context, options) {
-        const html = $(this.element);
-        super._onRender(context, options);
-        // super.activateListeners(html);
-
-        // Reroll group initiative
-        html.find('.combat-control[data-action="reroll"]').click((ev) => {      
-            game.combat.rollInitiative();
-        });
-
-        // Roll for group that the player's combatant is in
-        html.find('.combat-control[data-action="rollGroup"]').click((ev) => {
-            const combatant = game.combat.combatants.find(c => c.actor.isOwner);
-            if (combatant) {
-                game.combat.rollInitiative({ combatantIds: [combatant.id] });
-            }
-        });
-
-        // Roll for specific group
-        html.find('a[data-action="roll-group-initiative"]').click((ev) => {      
-          const groupName = ev.currentTarget.dataset.initGroup;
-          game.combat.rollInitiative({ group: groupName });
-        });
-
-        // Set initiative groups
-        html.find('.combat-control[data-action="set-groups"]').click((ev) => {
-            HYP3ECombatTracker.GROUP_CONFIG_APP.render(true, { focus: true });
-        });
-    }
-
-    // Toggle combat action flags on and off
-    async _toggleFlag(combatant, flag) {
-        // Get the flag's current value so we know what to flip it to
-        const isActive = !!combatant.getFlag(game.system.id, flag);
-        // These combat actions require special logic
-        const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement', 'isOther']
-        if (combatActions.some(f => f == flag)) {
-            // Combat actions can be mutually exclusive, so we may need to toggle multiple flags
-            await combatant.setCombatAction(flag, !isActive)            
-        } else {
-            // Non-combat actions are toggled normally
-            await combatant.setFlag(game.system.id, flag, !isActive);
-        }
-        Hyp3eLogger.info("HYP3ECombatTracker _toggleFlag", `Combatant flag: ${flag}`, combatant);
-    }
-
-    /**
-     * Handle performing some action for an individual combatant.
-     * @this {HYP3ECombatTracker}
-     * @param {...any} args
-     */
-    static _onCombatantControl(event, target) {
-        // event.preventDefault();
-        // event.stopPropagation();
-        // Log the target
-        Hyp3eLogger.info("HYP3ECombatTracker _onCombatantControl", `Combatant control target:`, target);
-
-        // Get the combatant from the target
-        const { combatantId } = target.closest("[data-combatant-id]")?.dataset ?? {};
-        const combatant = this.viewed?.combatants.get(combatantId);
-        // If no combatant, exit
-        if ( !combatant ) {
-            Hyp3eLogger.warn("HYP3ECombatTracker _onCombatantControl", `No actor found matching ID ${combatantId}!`);
-            return;
-        }
-        // If user is not the owner, exit
-        if ( !combatant.actor.isOwner ) {
-            return;
+        for (const group of initGroups) {
+          group.canRollInitiative = isGM || group.turns.some(turn => {
+            return turn.isOwnedByUser;
+          });
         }
 
-        // Log the combatant & action
-        Hyp3eLogger.info("HYP3ECombatTracker _onCombatantControl", `Combatant: `, combatant);
-        Hyp3eLogger.info("HYP3ECombatTracker _onCombatantControl", `Action:`, target.dataset.action);
+        // Log the initiative groups
+        Hyp3eLogger.info("HYP3ECombatTracker _prepareTrackerContext", `Initiative groups:`, initGroups);
+        context.initGroups = initGroups;
+      }  
+    }
+  }
 
-        // Handle the combatant control
-        switch ( target.dataset.action ) {
-            case "melee":
-                return this._toggleFlag(combatant, "isMelee");
-            case "missile":
-                return this._toggleFlag(combatant, "isMissile");
-            case "magic":
-                return this._toggleFlag(combatant, "isMagic");
-            case "movement":
-                return this._toggleFlag(combatant, "isMovement");
-            case "other":
-                return this._toggleFlag(combatant, "isOther");
-            // Fall back to the superclass's button events
-            default:
-                return super._onCombatantControl(event, target);
+  async _prepareTurnContext(combat, combatant, index) {
+    // Log the current combatant
+    Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${combatant.name} combatant:`, combatant)
+
+    // Prepare the combatant context
+    const turn = await super._prepareTurnContext(combat, combatant, index);
+    Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${combatant.name} turn:`, turn)
+
+    // Add group initiative flag
+    // const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
+    // turn.isGroupInitiative = isGroupInitiative;
+    // Add initiative type
+    const initiativeType = CONFIG.HYP3E.initiativeType;
+    turn.initiativeType = initiativeType;
+
+    // Add all of our custom flags to the combatant context
+    turn.isMelee = !!combatant.getFlag(game.system.id, "isMelee")
+    turn.isMissile = !!combatant.getFlag(game.system.id, "isMissile")
+    turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
+    turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
+    turn.isOther = !!combatant.getFlag(game.system.id, "isOther")
+    turn.isSlowed = !!combatant.isSlowed;
+    turn.logLevel = CONFIG.HYP3E.logLevel;
+    turn.isOwnedByUser = !!combatant.actor.isOwner;
+
+    // if (isGroupInitiative) turn.initGroup = combatant.initGroup;
+    switch (initiativeType) {
+      case "group":
+        // For group initiative...
+        turn.initGroup = combatant.initGroup;
+        // turn.initRoll = Math.floor(combatant.initRoll) || null;
+        turn.initRoll = combatant.getFlag("hyp3e", "initRoll") ?? null;
+        break;
+      case "phased":
+        // For phased initiative...
+        turn.initGroup = combatant.initGroup;
+        // turn.initRoll = Math.floor(combatant.initRoll) || null;
+        turn.initRoll = combatant.getFlag("hyp3e", "initRoll") ?? null;
+        break;
+      case "individual":
+        // For individual initiative...
+        turn.initRoll = Math.floor(combatant.initiative) || null;
+        break;
+      default:
+        // Default to Hyperborea 3E standard group init
+        turn.initGroup = combatant.initGroup;
+        // turn.initRoll = Math.floor(combatant.initRoll) || null;
+        turn.initRoll = combatant.getFlag("hyp3e", "initRoll") ?? null;
+        break;
+    }
+
+    // Log the updated turn
+    Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${turn.name} turn:`, turn);
+
+    return turn;
+  }
+
+
+  // ===========================================================================
+  // UI EVENTS
+  // ===========================================================================
+
+  // activateListeners(html) {
+  _onRender(context, options) {
+    const html = $(this.element);
+    super._onRender(context, options);
+    // super.activateListeners(html);
+
+    // Reroll group initiative
+    html.find('.combat-control[data-action="reroll"]').click((ev) => {      
+      game.combat.rollInitiative();
+    });
+
+    // Roll for group that the player's combatant is in
+    html.find('.combat-control[data-action="rollGroup"]').click((ev) => {
+      const combatant = game.combat.combatants.find(c => c.actor.isOwner);
+      if (combatant) {
+        game.combat.rollInitiative({ combatantIds: [combatant.id] });
+      }
+    });
+
+    // Roll for specific group
+    html.find('a[data-action="roll-group-initiative"]').click((ev) => {      
+      const groupName = ev.currentTarget.dataset.initGroup;
+      game.combat.rollInitiative({ group: groupName });
+    });
+
+    // Set initiative groups
+    html.find('.combat-control[data-action="set-groups"]').click((ev) => {
+      HYP3ECombatTracker.GROUP_CONFIG_APP.render(true, { focus: true });
+    });
+  }
+
+  // Toggle combat action flags on and off
+  async _toggleFlag(combatant, flag) {
+    // Get the flag's current value so we know what to flip it to
+    const isActive = !!combatant.getFlag(game.system.id, flag);
+    // These combat actions require special logic
+    const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement', 'isOther']
+    if (combatActions.some(f => f == flag)) {
+      // Combat actions can be mutually exclusive, so we may need to toggle multiple flags
+      await combatant.setCombatAction(flag, !isActive)            
+    } else {
+      // Non-combat actions are toggled normally
+      await combatant.setFlag(game.system.id, flag, !isActive);
+    }
+    Hyp3eLogger.info("HYP3ECombatTracker _toggleFlag", `Combatant flag: ${flag}`, combatant);
+  }
+
+  /**
+   * Handle performing some action for an individual combatant.
+   * @this {HYP3ECombatTracker}
+   * @param {...any} args
+   */
+  static _onCombatantControl(event, target) {
+    // event.preventDefault();
+    // event.stopPropagation();
+    // Log the target
+    Hyp3eLogger.info("HYP3ECombatTracker _onCombatantControl", `Combatant control target:`, target);
+
+    // Get the combatant from the target
+    const { combatantId } = target.closest("[data-combatant-id]")?.dataset ?? {};
+    const combatant = this.viewed?.combatants.get(combatantId);
+    // If no combatant, exit
+    if ( !combatant ) {
+      Hyp3eLogger.warn("HYP3ECombatTracker _onCombatantControl", `No actor found matching ID ${combatantId}!`);
+      return;
+    }
+    // If user is not the owner, exit
+    if ( !combatant.actor.isOwner ) {
+      return;
+    }
+
+    // Log the combatant & action
+    Hyp3eLogger.info("HYP3ECombatTracker _onCombatantControl", `Combatant: `, combatant);
+    Hyp3eLogger.info("HYP3ECombatTracker _onCombatantControl", `Action:`, target.dataset.action);
+
+    // Handle the combatant control
+    switch ( target.dataset.action ) {
+      case "melee":
+        return this._toggleFlag(combatant, "isMelee");
+      case "missile":
+        return this._toggleFlag(combatant, "isMissile");
+      case "magic":
+        return this._toggleFlag(combatant, "isMagic");
+      case "movement":
+        return this._toggleFlag(combatant, "isMovement");
+      case "other":
+        return this._toggleFlag(combatant, "isOther");
+      // Fall back to the superclass's button events
+      default:
+        return super._onCombatantControl(event, target);
+    }
+  }
+
+  // ===========================================================================
+  // ADDITIONS TO THE COMBATANT CONTEXT MENU
+  // ===========================================================================
+
+  _getEntryContextOptions() {
+    const options = super._getEntryContextOptions();
+
+    return [
+      {
+        name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
+        icon: '<i class="fas fa-star-of-life"></i>',
+        callback: (li) => {
+          const combatantId = li.dataset.combatantId
+          const turnToActivate = this.viewed.turns.findIndex(t => t.id === combatantId);
+          this.viewed.activateCombatant(turnToActivate);
         }
-    }
-
-    // ===========================================================================
-    // ADDITIONS TO THE COMBATANT CONTEXT MENU
-    // ===========================================================================
-
-    _getEntryContextOptions() {
-        const options = super._getEntryContextOptions();
-
-        return [
-            {
-                name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
-                icon: '<i class="fas fa-star-of-life"></i>',
-                callback: (li) => {
-                    const combatantId = li.dataset.combatantId
-                    const turnToActivate = this.viewed.turns.findIndex(t => t.id === combatantId);
-                    this.viewed.activateCombatant(turnToActivate);
-                }
-            },
-            ...options
-        ];
-    }
+      },
+      ...options
+    ];
+  }
 }
