@@ -268,15 +268,15 @@ export function registerHyp3eConfigurations() {
      ********************************************/
 
     // Enable/disable group-based initiative
-    game.settings.register(game.system.id, "isGroupInitiative", {
-        name: game.i18n.localize("HYP3E.settings.isGroupInitiative"),
-        hint: game.i18n.localize("HYP3E.settings.isGroupInitiativeHint"),
-        default: true,
-        scope: "world",
-        type: Boolean,
-        config: showConfigOptions,
-        requiresReload: true,
-    });
+    // game.settings.register(game.system.id, "isGroupInitiative", {
+    //     name: game.i18n.localize("HYP3E.settings.isGroupInitiative"),
+    //     hint: game.i18n.localize("HYP3E.settings.isGroupInitiativeHint"),
+    //     default: true,
+    //     scope: "world",
+    //     type: Boolean,
+    //     config: showConfigOptions,
+    //     requiresReload: true,
+    // });
 
     // Select initiative type: group, phased, or individual
     game.settings.register(game.system.id, "initiativeType", {

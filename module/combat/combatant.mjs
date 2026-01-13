@@ -303,17 +303,17 @@ export class HYP3ECombatant extends Combatant {
     }
   }
 
-  setInitRoll() {
-    // Set the combatant's initiative roll value
-    if (CONFIG.HYP3E.initiativeType === "group") {
-      // Slice off the decimal places for group initiative, leaving the original d6 roll
-      this.initRoll = Math.floor(this.initiative);
-    } else if (CONFIG.HYP3E.initiativeType === "phased") {
-      // Drop the tens-place digit as well as the decimal places
-      this.initRoll = Math.floor(this.initiative) % 10;
-    }
-    return this.initRoll;
-  }
+  // setInitRoll() {
+  //   // Set the combatant's initiative roll value
+  //   if (CONFIG.HYP3E.initiativeType === "group") {
+  //     // Slice off the decimal places for group initiative, leaving the original d6 roll
+  //     this.initRoll = Math.floor(this.initiative);
+  //   } else if (CONFIG.HYP3E.initiativeType === "phased") {
+  //     // Drop the tens-place digit as well as the decimal places
+  //     this.initRoll = Math.floor(this.initiative) % 10;
+  //   }
+  //   return this.initRoll;
+  // }
 
   async updateStatus() {
     // Check if the actor is unconscious or defeated

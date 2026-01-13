@@ -45,9 +45,9 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         // Prepare the combat context
         await super._prepareCombatContext(context, options);
         // Add group initiative flag
-        const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
-        this.isGroupInitiative = isGroupInitiative;
-        context.isGroupInitiative = isGroupInitiative;
+        // const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
+        // this.isGroupInitiative = isGroupInitiative;
+        // context.isGroupInitiative = isGroupInitiative;
         // Add initiative type
         const initiativeType = CONFIG.HYP3E.initiativeType;
         this.initiativeType = initiativeType;
@@ -113,8 +113,8 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         Hyp3eLogger.info("HYP3ECombatTracker _prepareTurnContext", `${combatant.name} turn:`, turn)
 
         // Add group initiative flag
-        const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
-        turn.isGroupInitiative = isGroupInitiative;
+        // const isGroupInitiative = CONFIG.HYP3E.isGroupInitiative;
+        // turn.isGroupInitiative = isGroupInitiative;
         // Add initiative type
         const initiativeType = CONFIG.HYP3E.initiativeType;
         turn.initiativeType = initiativeType;

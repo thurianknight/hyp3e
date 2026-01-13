@@ -51,7 +51,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             encumbered: game.settings.get(game.system.id, "encumbered"),
             heavilyEncumbered: game.settings.get(game.system.id, "heavilyEncumbered"),
             // Rules Options - Combat
-            isGroupInitiative: game.settings.get(game.system.id, "isGroupInitiative"),
+            // isGroupInitiative: game.settings.get(game.system.id, "isGroupInitiative"),
             initiativeType: game.settings.get(game.system.id, "initiativeType"),
             rerollInitiative: game.settings.get(game.system.id, "rerollInitiative"),
             resolveDeathAtRoundEnd: game.settings.get(game.system.id, "resolveDeathAtRoundEnd"),

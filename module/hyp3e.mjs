@@ -100,7 +100,7 @@ Hooks.once('init', async function() {
 
 
     // Get initiative mode: group vs. individual
-    const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
+    // const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
     const initiativeType = game.settings.get(game.system.id, "initiativeType");
 
     // Load combat classes
