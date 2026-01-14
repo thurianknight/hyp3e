@@ -357,7 +357,7 @@
         "effect": {
             "add": "Add Effect",
             "create": "Create Effect",
-            "toggle": "Toogle Effect",
+            "toggle": "Toggle Effect",
             "source": "Source"
         },
         "feature": {
