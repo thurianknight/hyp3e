@@ -8,17 +8,6 @@ import HYP3E from "./config.mjs"
 export const preloadHandlebarsTemplates = async function() {
     // Register Handlebars partials
     const partialPaths = [
-        // Actor V1 partials
-        // `${HYP3E.templatePath}/actor/parts/actor-abilities.hbs`,
-        // `${HYP3E.templatePath}/actor/parts/actor-attributes.hbs`,
-        // `${HYP3E.templatePath}/actor/parts/actor-combat.hbs`,
-        // `${HYP3E.templatePath}/actor/parts/actor-items.hbs`,
-        // `${HYP3E.templatePath}/actor/parts/actor-spells.hbs`,
-        // `${HYP3E.templatePath}/actor/parts/actor-effects.hbs`,
-        // `${HYP3E.templatePath}/actor/parts/actor-description.hbs`,
-        // `${HYP3E.templatePath}/actor/parts/npc-all-items.hbs`,
-        // `${HYP3E.templatePath}/actor/parts/npc-abilities.hbs`,
-
         // Actor V2 partials - main sheets
         `${HYP3E.templatePath}/actor/actor-character-header-v2.hbs`,
         `${HYP3E.templatePath}/actor/actor-npc-header-v2.hbs`,
@@ -55,13 +44,8 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/item/parts/physical-attributes.hbs`,
         `${HYP3E.templatePath}/item/parts/spell-attributes.hbs`,
         `${HYP3E.templatePath}/item/parts/weapon-attributes.hbs`,
-        // Item V1 partials - tabs
-        // `${HYP3E.templatePath}/item/parts/item-spells.hbs`,
-        // `${HYP3E.templatePath}/item/parts/item-effects.hbs`,
 
         // Combat Tab
-        // `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-ind-v12.hbs`,
-        // `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group-v12.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-ind-v13.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group-v13.hbs`,
     ];
@@ -86,7 +70,6 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/chat/show-item.hbs`,
 
         // Combat Tab
-        // `${HYP3E.templatePath}/sidebar/combat-tracker-v12.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-tracker-v13.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-header-v13.hbs`,
         `${HYP3E.templatePath}/sidebar/combat-footer-v13.hbs`,

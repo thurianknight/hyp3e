@@ -161,14 +161,14 @@ export class Hyp3eItem extends Item {
         const item = this
         if (identified) {
             // If identified, set item.name to system.realName and item.system.description to item.system.realDescription
-            const name = this.system?.realName > "" ? this.system.realName : this.name
-            const updates = { name: name, "system.description": this.system.realDescription }
-            await this.update(updates)
+            const name = this.system?.realName > "" ? this.system.realName : this.name;
+            const updates = { name: name, "system.description": this.system.realDescription };
+            await this.update(updates);
         } else {
             // If not identified, set item.name to system.itemAlias and item.system.description to item.system.aliasDescription
-            const name = this.system?.itemAlias > "" ? this.system.itemAlias : this.name
-            const updates = { name: name, "system.description": this.system.aliasDescription }
-            await this.update(updates)
+            const name = this.system?.itemAlias > "" ? this.system.itemAlias : this.name;
+            const updates = { name: name, "system.description": this.system.aliasDescription };
+            await this.update(updates);
         }
     }
 

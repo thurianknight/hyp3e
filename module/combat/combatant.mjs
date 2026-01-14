@@ -245,10 +245,14 @@ export class HYP3ECombatant extends Combatant {
   }
 
   getActionModifiers() {
-    const PREFIX = CONFIG.HYP3E.initiativeType === "phased" ? "PHASED" : "GROUP"
+    const initiativeType = game.settings.get(game.system.id, "initiativeType");
+    Hyp3eLogger.info("HYP3ECombatant getActionModifiers", `Initiative type:`, initiativeType);
+    const PREFIX = (initiativeType === "group") ? "GROUP" : "PHASED";
     // Movement partially overrides the other combat actions for initiative order
     // this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.GROUP_INIT_MOD_MOVEMENT : 0;
-    this.moveInit = this.getFlag(game.system.id, "isMovement") ? parseInt(HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVEMENT`]) : 0;
+    const isMovement = this.getFlag(game.system.id, "isMovement") || false;
+    Hyp3eLogger.info("HYP3ECombatant getActionModifiers", `${this.name} Movement declared?:`, isMovement);
+    this.moveInit = isMovement ? Number(HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVEMENT`]) : 0;
     // Action without movement
     if (this.moveInit == 0) {
       this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MELEE`] : 0;

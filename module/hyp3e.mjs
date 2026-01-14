@@ -242,7 +242,7 @@ Hooks.once('init', async function() {
     });
 
     // Preload Handlebars templates
-    return preloadHandlebarsTemplates();
+    return await preloadHandlebarsTemplates();
 
 });
 
