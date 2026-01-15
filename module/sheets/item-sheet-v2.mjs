@@ -281,7 +281,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
     // const formDataObj = formData.object;
     const formDataObj = foundry.utils.expandObject(formData.object);
-    const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified")// || this.item.system.identified;
+    const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified"); // || this.item.system.identified;
     Hyp3eLogger.info("_processFormData", `Is item identified?`, isIdentified);
 
     // Apply name and description based on identification state.
@@ -301,7 +301,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
         formDataObj["system.itemAlias"] = aliasName;
       }
 
-      formDataObj["name"] = aliasName?.trim();
+      formDataObj["name"] = aliasName.trim();
       formDataObj["system.description"] = aliasDesc;
     }
 
@@ -311,6 +311,8 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     if (refs && !Array.isArray(refs)) {
       formDataObj.system.spellcasting.spellRefs = Object.values(refs);
     }
+
+    // Merge updated formDataObj back into formData.object, and log the data
     Hyp3eLogger.info("_processFormData", `Updated form data:`, formDataObj);
     foundry.utils.mergeObject(formData.object, formDataObj, {performDeletions: true});
     Hyp3eLogger.info("_processFormData", `Merged form data:`, formData);
