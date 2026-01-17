@@ -38,211 +38,209 @@ let trackerInitialized = false;
 
 Hooks.once('init', async function() {
 
-    // Add utility classes to the global game object so that they're more easily
-    // accessible in global contexts.
-    game.hyp3e = {
-        Hyp3eActor,
-        Hyp3eItem,
-        rollItemMacro
-    };
+  // Add utility classes to the global game object so that they're more easily
+  // accessible in global contexts.
+  game.hyp3e = {
+    Hyp3eActor,
+    Hyp3eItem,
+    rollItemMacro
+  };
 
-    console.log("Game info:", game);
-    console.log("System info:", game.system);
-    console.log("Foundry version:", game.version);
-    // Get the Foundry version for conditional options
-    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+  console.log("Game info:", game);
+  console.log("System info:", game.system);
+  console.log("Foundry version:", game.version);
+  // Get the Foundry version for conditional options
+  const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
-    // Disable legacy effect transferral
-    CONFIG.ActiveEffect.legacyTransferral = false;
+  // Disable legacy effect transferral
+  CONFIG.ActiveEffect.legacyTransferral = false;
 
-    // Register our Hyperborea system configuration options
-    registerHyp3eConfigurations();
+  // Register our Hyperborea system configuration options
+  registerHyp3eConfigurations();
 
-    // Add custom statusEffects
-    const hasted = {
-        id: "hasted",
-        name: "HYP3E.statusEffects.hasted",
-        img: `${HYP3E.assetsPath}/run.svg`,
-        isActive: false
+  // Add custom statusEffects
+  const hasted = {
+    id: "hasted",
+    name: "HYP3E.statusEffects.hasted",
+    img: `${HYP3E.assetsPath}/run.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(hasted)
+  const slowed = {
+    id: "slowed",
+    name: "HYP3E.statusEffects.slowed",
+    img: `${HYP3E.assetsPath}/snail.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(slowed)
+
+  // Add custom constants for configuration
+  CONFIG.HYP3E = HYP3E;
+
+  // Set chat font size from Hyp3e config
+  applyChatFontSizeSetting();
+
+  // Define custom Document classes
+  CONFIG.Actor.documentClass = Hyp3eActor;
+  CONFIG.Item.documentClass = Hyp3eItem;
+
+  // Register sheet application classes
+  foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+  // Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: false });
+  foundry.documents.collections.Actors.registerSheet("hyp3e", Hyp3eActorSheetV2, { 
+    makeDefault: true,
+    defaultTheme: "default",
+    themes: Hyp3eActorSheetV2.themes
+  });
+  Hyp3eLogger.info("Init", "Registered Hyp3eActorSheetV2");
+  foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
+  // Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: false });
+  foundry.documents.collections.Items.registerSheet("hyp3e", Hyp3eItemSheetV2, { makeDefault: true });
+  Hyp3eLogger.info("Init", "Registered Hyp3eItemSheetV2");
+
+
+  // Get initiative mode: group vs. individual
+  const initiativeType = game.settings.get(game.system.id, "initiativeType");
+
+  // Load combat classes
+  const { HYP3ECombat } = await import( "./combat/combat.mjs");
+  const { HYP3ECombatant } = await import( "./combat/combatant.mjs");
+  const { HYP3EGroupCombat } = await import( "./combat/combat-group.mjs" );
+  const { HYP3EGroupCombatant } = await import( "./combat/combatant-group.mjs");
+  // Initiative roll is the same d6, regardless of group/individual
+  CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
+  // Set the Combat and Combatant document classes based on initiative mode
+  // if (isGroupInitiative) {
+  switch (initiativeType) {
+    case "group":
+      Hyp3eLogger.info("Init", "Group-based combat initiative:", CONFIG.Combat.initiative);
+      CONFIG.Combat.documentClass = HYP3EGroupCombat;
+      CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
+      break;
+    case "phased":
+      Hyp3eLogger.info("Init", "Phased combat initiative:", CONFIG.Combat.initiative);
+      CONFIG.Combat.documentClass = HYP3EGroupCombat;
+      CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
+      break;
+    case "individual":
+      Hyp3eLogger.info("Init", "Individual combat initiative:", CONFIG.Combat.initiative);
+      CONFIG.Combat.documentClass = HYP3ECombat;
+      CONFIG.Combatant.documentClass = HYP3ECombatant;
+      break;
+  }
+
+  if (majorVersion >= 13) {
+    // Load v13-specific Combat Tracker class
+    const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v13.mjs");
+    CONFIG.ui.combat = HYP3ECombatTracker;
+  } else {
+    // Load v12-specific Combat Tracker class
+    // const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v12.mjs");
+    // CONFIG.ui.combat = HYP3ECombatTracker;
+  }
+
+  /* -------------------------------------------- */
+  /*  Handlebars Helpers                          */
+  /* -------------------------------------------- */
+
+  // Normalize anything to a number: handles numbers, strings, and comma/space-separated strings
+  const normalizeNumber = val => {
+    if (val == null) return 0;
+    if (typeof val === "number") return val;
+    if (typeof val === "string") {
+      val = val.replace(/[\s,\u00A0\u202F]+/g, ""); // strip spaces, commas, NBSPs
+      const num = Number(val);
+      if (!isNaN(num)) return num;
     }
-    CONFIG.statusEffects.push(hasted)
-    const slowed = {
-        id: "slowed",
-        name: "HYP3E.statusEffects.slowed",
-        img: `${HYP3E.assetsPath}/snail.svg`,
-        isActive: false
-    }
-    CONFIG.statusEffects.push(slowed)
+    return 0;
+  };
 
-    // Add custom constants for configuration
-    CONFIG.HYP3E = HYP3E;
+  // If you need to add Handlebars helpers, here are a few useful examples:
+  Handlebars.registerHelper("formatNumber", function(value) {
+    if (isNaN(value)) return value;
+    return Number(value).toLocaleString();
+  });
 
-    // Set chat font size from Hyp3e config
-    applyChatFontSizeSetting();
+  Handlebars.registerHelper("gteNum", function (a, b) {
+    const numA = normalizeNumber(a);
+    const numB = normalizeNumber(b);
+    if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
+    return numA >= numB;
+  });
 
-    // Define custom Document classes
-    CONFIG.Actor.documentClass = Hyp3eActor;
-    CONFIG.Item.documentClass = Hyp3eItem;
+  Handlebars.registerHelper("gtNum", function (a, b) {
+    const numA = normalizeNumber(a);
+    const numB = normalizeNumber(b);
+    if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
+    return numA > numB;
+  });
 
-    // Register sheet application classes
-    foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
-    // Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: false });
-    foundry.documents.collections.Actors.registerSheet("hyp3e", Hyp3eActorSheetV2, { 
-        makeDefault: true,
-        defaultTheme: "default",
-        themes: Hyp3eActorSheetV2.themes
-    });
-    Hyp3eLogger.info("Init", "Registered Hyp3eActorSheetV2");
-    foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
-    // Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: false });
-    foundry.documents.collections.Items.registerSheet("hyp3e", Hyp3eItemSheetV2, { makeDefault: true });
-    Hyp3eLogger.info("Init", "Registered Hyp3eItemSheetV2");
+  Handlebars.registerHelper("lteNum", function (a, b) {
+    const numA = normalizeNumber(a);
+    const numB = normalizeNumber(b);
+    if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
+    return numA <= numB;
+  });
 
+  Handlebars.registerHelper("ltNum", function (a, b) {
+    const numA = normalizeNumber(a);
+    const numB = normalizeNumber(b);
+    if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
+    return numA < numB;
+  });
 
-    // Get initiative mode: group vs. individual
-    // const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
-    const initiativeType = game.settings.get(game.system.id, "initiativeType");
+  Handlebars.registerHelper('add', function(num1, num2) {
+    return num1 + num2
+  });
 
-    // Load combat classes
-    const { HYP3ECombat } = await import( "./combat/combat.mjs");
-    const { HYP3ECombatant } = await import( "./combat/combatant.mjs");
-    const { HYP3EGroupCombat } = await import( "./combat/combat-group.mjs" );
-    const { HYP3EGroupCombatant } = await import( "./combat/combatant-group.mjs");
-    // Initiative roll is the same d6, regardless of group/individual
-    CONFIG.Combat.initiative = { decimals: 3, formula: HYP3ECombat.FORMULA }
-    // Set the Combat and Combatant document classes based on initiative mode
-    // if (isGroupInitiative) {
-    switch (initiativeType) {
-        case "group":
-            Hyp3eLogger.info("Init", "Group-based combat initiative:", CONFIG.Combat.initiative);
-            CONFIG.Combat.documentClass = HYP3EGroupCombat;
-            CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
-            break;
-    // } else {
-        case "phased":
-            Hyp3eLogger.info("Init", "Phased combat initiative:", CONFIG.Combat.initiative);
-            CONFIG.Combat.documentClass = HYP3EGroupCombat;
-            CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
-            break;
-        case "individual":
-            Hyp3eLogger.info("Init", "Individual combat initiative:", CONFIG.Combat.initiative);
-            CONFIG.Combat.documentClass = HYP3ECombat;
-            CONFIG.Combatant.documentClass = HYP3ECombatant;
-            break;
-    }
+  Handlebars.registerHelper('subtract', function(num1, num2) {
+    return num1 - num2
+  });
 
-    if (majorVersion >= 13) {
-        // Load v13-specific Combat Tracker class
-        const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v13.mjs");
-        CONFIG.ui.combat = HYP3ECombatTracker;
-    } else {
-        // Load v12-specific Combat Tracker class
-        // const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v12.mjs");
-        // CONFIG.ui.combat = HYP3ECombatTracker;
-    }
+  Handlebars.registerHelper('isMin', function(val) {
+    return val == 1 ? "min" : ""
+  });
 
-    /* -------------------------------------------- */
-    /*  Handlebars Helpers                          */
-    /* -------------------------------------------- */
+  Handlebars.registerHelper('isMax', function(val, maxVal) {
+    return val == maxVal ? "max" : ""
+  });
 
-    // Normalize anything to a number: handles numbers, strings, and comma/space-separated strings
-    const normalizeNumber = val => {
-        if (val == null) return 0;
-        if (typeof val === "number") return val;
-        if (typeof val === "string") {
-            val = val.replace(/[\s,\u00A0\u202F]+/g, ""); // strip spaces, commas, NBSPs
-            const num = Number(val);
-            if (!isNaN(num)) return num;
-        }
-        return 0;
-    };
-
-    // If you need to add Handlebars helpers, here are a few useful examples:
-    Handlebars.registerHelper("formatNumber", function(value) {
-        if (isNaN(value)) return value;
-        return Number(value).toLocaleString();
-    });
-
-    Handlebars.registerHelper("gteNum", function (a, b) {
-        const numA = normalizeNumber(a);
-        const numB = normalizeNumber(b);
-        if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
-        return numA >= numB;
-    });
-
-    Handlebars.registerHelper("gtNum", function (a, b) {
-        const numA = normalizeNumber(a);
-        const numB = normalizeNumber(b);
-        if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
-        return numA > numB;
-    });
-
-    Handlebars.registerHelper("lteNum", function (a, b) {
-        const numA = normalizeNumber(a);
-        const numB = normalizeNumber(b);
-        if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
-        return numA <= numB;
-    });
-
-    Handlebars.registerHelper("ltNum", function (a, b) {
-        const numA = normalizeNumber(a);
-        const numB = normalizeNumber(b);
-        if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
-        return numA < numB;
-    });
-
-    Handlebars.registerHelper('add', function(num1, num2) {
-        return num1 + num2
-    });
-
-    Handlebars.registerHelper('subtract', function(num1, num2) {
-        return num1 - num2
-    });
-
-    Handlebars.registerHelper('isMin', function(val) {
-        return val == 1 ? "min" : ""
-    });
-
-    Handlebars.registerHelper('isMax', function(val, maxVal) {
-        return val == maxVal ? "max" : ""
-    });
-
-    Handlebars.registerHelper("capitalizeWords", function (str) {
+  Handlebars.registerHelper("capitalizeWords", function (str) {
     if (typeof str !== "string") return "";
     return str.replace(/\b\w/g, c => c.toUpperCase());
-    });
+  });
 
-    Handlebars.registerHelper('concat', function() {
-        var outStr = '';
-        for (var arg in arguments) {
-            if (typeof arguments[arg] != 'object') {
-                outStr += arguments[arg];
-            }
-        }
-        return outStr;
-    });
+  Handlebars.registerHelper('concat', function() {
+    var outStr = '';
+    for (var arg in arguments) {
+      if (typeof arguments[arg] != 'object') {
+        outStr += arguments[arg];
+      }
+    }
+    return outStr;
+  });
 
-    Handlebars.registerHelper('isLongContent', function(content) {
-      return content?.length > 100; // Tune this threshold
-    });
+  Handlebars.registerHelper('isLongContent', function(content) {
+    return content?.length > 100; // Tune this threshold
+  });
 
-    Handlebars.registerHelper('ifInList', function(str, arr, options) {
-        if (arr.includes(str)) {
-            return options.fn(this)
-        }
-        return options.inverse(this);
-    });
+  Handlebars.registerHelper('ifInList', function(str, arr, options) {
+    if (arr.includes(str)) {
+      return options.fn(this)
+    }
+    return options.inverse(this);
+  });
 
-    Handlebars.registerHelper('lookup', function(obj, key) {
-        return obj?.[key];
-    });
+  Handlebars.registerHelper('lookup', function(obj, key) {
+    return obj?.[key];
+  });
 
-    Handlebars.registerHelper('toLowerCase', function(str) {
-        return str.toLowerCase();
-    });
+  Handlebars.registerHelper('toLowerCase', function(str) {
+    return str.toLowerCase();
+  });
 
-    // Preload Handlebars templates
-    return await preloadHandlebarsTemplates();
+  // Preload Handlebars templates
+  return await preloadHandlebarsTemplates();
 
 });
 
@@ -251,259 +249,244 @@ Hooks.once('init', async function() {
 /* -------------------------------------------- */
 
 Hooks.once("ready", async function() {
-    // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
-    Hooks.on("hotbarDrop", (bar, data, slot) => {
-      // We only override Item drops
-      if (data.type !== "Item") {
-        return; // allow core Foundry behavior
-      }
-      // Handle this Item drop
-      createItemMacro(data, slot);
-      return false;
-    });
-
-    // Get Foundry major version #
-    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
-    // Get Hyperborea system version
-    const currentVersion = game.system.version
-
-    // Register effects handlers
-    await setupEffectHandlers();
-
-    /**
-     * Load system settings
-     */
-    const logLevel = game.settings.get(game.system.id, "logLevel");
-    CONFIG.HYP3E.logLevel = logLevel;
-
-    // Automatic attribute modifier calculation
-    const autoCalcAttrMods = game.settings.get(game.system.id, "autoCalcAttrMods");
-    CONFIG.HYP3E.autoCalcAttrMods = autoCalcAttrMods;
-    Hyp3eLogger.info("Init", "CONFIG Automatic attribute modifier calculation:", CONFIG.HYP3E.autoCalcAttrMods);
-
-    // Automatic Thief ability target calculation
-    const autoCalcThiefTn = game.settings.get(game.system.id, "autoCalcThiefTn");
-    CONFIG.HYP3E.autoCalcThiefTn = autoCalcThiefTn;
-    Hyp3eLogger.info("Init", "CONFIG Automatic Thief ability target calculation:", CONFIG.HYP3E.autoCalcThiefTn);
-
-    // Automatically calculate AC
-    const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");
-    CONFIG.HYP3E.autoCalcAc = autoCalcAc;
-    Hyp3eLogger.info("Init", "CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc);
-
-    // Enforce weapon equippage rules
-    const enforceWeaponEquipRules = game.settings.get(game.system.id, "enforceWeaponEquipRules");
-    CONFIG.HYP3E.enforceWeaponEquipRules = enforceWeaponEquipRules;
-    Hyp3eLogger.info("Init", "CONFIG Enforce weapon equippage rules:", CONFIG.HYP3E.enforceWeaponEquipRules);
-
-    // Show weapon/shield overlay
-    const showWeaponOverlay = game.settings.get(game.system.id, "showWeaponOverlay");
-    CONFIG.HYP3E.showWeaponOverlay = showWeaponOverlay;
-    Hyp3eLogger.info("Init", "CONFIG Show weapon/shield token overlay:", CONFIG.HYP3E.showWeaponOverlay);
-
-    // Enable basic attribute checks
-    const enableAttrChecks = game.settings.get(game.system.id, "enableAttrChecks");
-    CONFIG.HYP3E.enableAttrChecks = enableAttrChecks;
-    Hyp3eLogger.info("Init", "CONFIG Enable basic attribute checks:", CONFIG.HYP3E.enableAttrChecks);
-
-    // Reverse situational modifiers on roll-under checks
-    const flipRollUnderMods = game.settings.get(game.system.id, "flipRollUnderMods");
-    CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
-    Hyp3eLogger.info("Init", "CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods);
-
-    // Enable encumbrance calculations applied to characters
-    const enableEncumbrance = game.settings.get(game.system.id, "enableEncumbrance");
-    CONFIG.HYP3E.enableEncumbrance = enableEncumbrance;
-    Hyp3eLogger.info("Init", "CONFIG Enable encumbrance calculations applied to characters:", CONFIG.HYP3E.enableEncumbrance);
-    
-    // GM-defined strength multiplier for encumbered status
-    const encumbered = game.settings.get(game.system.id, "encumbered");
-    CONFIG.HYP3E.encumbered = encumbered;
-    Hyp3eLogger.info("Init", "CONFIG Strength multiplier for encumbered status:", CONFIG.HYP3E.encumbered);
-
-    // GM-defined strength multiplier for heavily encumbered status
-    const heavilyEncumbered = game.settings.get(game.system.id, "heavilyEncumbered");
-    CONFIG.HYP3E.heavilyEncumbered = heavilyEncumbered;
-    Hyp3eLogger.info("Init", "CONFIG Strength multiplier for heavily encumbered status:", CONFIG.HYP3E.heavilyEncumbered);
-
-    // Enable/disable group-based initiative
-    // const isGroupInitiative = game.settings.get(game.system.id, "isGroupInitiative");
-    // CONFIG.HYP3E.isGroupInitiative = isGroupInitiative;
-    // Hyp3eLogger.info("Init", "CONFIG Use group-based initiative:", CONFIG.HYP3E.isGroupInitiative);
-
-    // Initiative type: group, phased, or individual
-    const initiativeType = game.settings.get(game.system.id, "initiativeType");
-    CONFIG.HYP3E.initiativeType = initiativeType;
-    Hyp3eLogger.info("Init", "CONFIG combat initiative type:", CONFIG.HYP3E.initiativeType);
-
-    // Apply death when the round ends
-    const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
-    CONFIG.HYP3E.resolveDeathAtRoundEnd = resolveDeathAtRoundEnd;
-    Hyp3eLogger.info("Init", "CONFIG only apply unconscious/death when round ends:", CONFIG.HYP3E.resolveDeathAtRoundEnd);
-
-    // Limit token movement to actor MV base
-    if (majorVersion >= 13) {
-        const limitMovement = game.settings.get(game.system.id, "limitMovement");
-        CONFIG.HYP3E.limitMovement = limitMovement;
-        Hyp3eLogger.info("Init", "CONFIG Limit token movement to actor MV base:", CONFIG.HYP3E.limitMovement);
+  // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
+  Hooks.on("hotbarDrop", (bar, data, slot) => {
+    // We only override Item drops
+    if (data.type !== "Item") {
+      return; // allow core Foundry behavior
     }
+    // Handle this Item drop
+    createItemMacro(data, slot);
+    return false;
+  });
 
-    // Force range limitations on weapon & spell attacks
-    const forceRangeLimit = game.settings.get(game.system.id, "forceRangeLimit");
-    CONFIG.HYP3E.forceRangeLimit = forceRangeLimit;
-    Hyp3eLogger.info("Init", "CONFIG Force range limitations on weapon & spell attacks:", CONFIG.HYP3E.forceRangeLimit);
+  // Get Foundry major version #
+  const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+  // Get Hyperborea system version
+  const currentVersion = game.system.version
 
-    // Force weapon equippage to use
-    const forceWeaponEquip = game.settings.get(game.system.id, "forceWeaponEquip");
-    CONFIG.HYP3E.forceWeaponEquip = forceWeaponEquip;
-    Hyp3eLogger.info("Init", "CONFIG Force item equippage to use:", CONFIG.HYP3E.forceWeaponEquip);
+  // Register effects handlers
+  await setupEffectHandlers();
 
-    // Force spell memorization to cast
-    const forceSpellMemorize = game.settings.get(game.system.id, "forceSpellMemorize");
-    CONFIG.HYP3E.forceSpellMemorize = forceSpellMemorize;
-    Hyp3eLogger.info("Init", "CONFIG Force spell memorization to cast:", CONFIG.HYP3E.forceSpellMemorize);
+  /**
+   * Load system settings
+   */
+  const logLevel = game.settings.get(game.system.id, "logLevel");
+  CONFIG.HYP3E.logLevel = logLevel;
 
-    // Enable combat situational modifier detection
-    const enableCombatSitModDetection = game.settings.get(game.system.id, "enableCombatSitModDetection");
-    CONFIG.HYP3E.enableCombatSitModDetection = enableCombatSitModDetection;
-    Hyp3eLogger.info("Init", "CONFIG Enable combat situational modifier detection:", CONFIG.HYP3E.enableCombatSitModDetection);
+  // Automatic attribute modifier calculation
+  const autoCalcAttrMods = game.settings.get(game.system.id, "autoCalcAttrMods");
+  CONFIG.HYP3E.autoCalcAttrMods = autoCalcAttrMods;
+  Hyp3eLogger.info("Init", "CONFIG Automatic attribute modifier calculation:", CONFIG.HYP3E.autoCalcAttrMods);
 
-    // Enable critical hit rolls
-    const critHit = game.settings.get(game.system.id, "critHit");
-    CONFIG.HYP3E.critHit = critHit;
-    Hyp3eLogger.info("Init", "CONFIG Enable critical hit rolls:", CONFIG.HYP3E.critHit);
+  // Automatic Thief ability target calculation
+  const autoCalcThiefTn = game.settings.get(game.system.id, "autoCalcThiefTn");
+  CONFIG.HYP3E.autoCalcThiefTn = autoCalcThiefTn;
+  Hyp3eLogger.info("Init", "CONFIG Automatic Thief ability target calculation:", CONFIG.HYP3E.autoCalcThiefTn);
 
-    // Enable critical miss rolls
-    const critMiss = game.settings.get(game.system.id, "critMiss");
-    CONFIG.HYP3E.critMiss = critMiss;
-    Hyp3eLogger.info("Init", "CONFIG Enable critical miss rolls:", CONFIG.HYP3E.critMiss);
+  // Automatically calculate AC
+  const autoCalcAc = game.settings.get(game.system.id, "autoCalcAc");
+  CONFIG.HYP3E.autoCalcAc = autoCalcAc;
+  Hyp3eLogger.info("Init", "CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc);
 
-    // Load races list
-    const races = game.settings.get(game.system.id, "races");
-    if (races != "") {
-        CONFIG.HYP3E.races = {}
-        const racesArray = races.split(",");
-        racesArray.forEach((l, i) => (CONFIG.HYP3E.races[l.trim()] = l.trim()));
-        Hyp3eLogger.info("Init", "CONFIG Races:", CONFIG.HYP3E.races);
-    }
+  // Enforce weapon equippage rules
+  const enforceWeaponEquipRules = game.settings.get(game.system.id, "enforceWeaponEquipRules");
+  CONFIG.HYP3E.enforceWeaponEquipRules = enforceWeaponEquipRules;
+  Hyp3eLogger.info("Init", "CONFIG Enforce weapon equippage rules:", CONFIG.HYP3E.enforceWeaponEquipRules);
 
-    // Load language list
-    const languages = game.settings.get(game.system.id, "languages");
-    if (languages != "") {
-        CONFIG.HYP3E.languages = {}
-        const langArray = languages.split(",");
-        langArray.forEach((l, i) => (CONFIG.HYP3E.languages[l.trim()] = l.trim()));
-        Hyp3eLogger.info("Init", "CONFIG Languages:", CONFIG.HYP3E.languages);
-    }
+  // Show weapon/shield overlay
+  const showWeaponOverlay = game.settings.get(game.system.id, "showWeaponOverlay");
+  CONFIG.HYP3E.showWeaponOverlay = showWeaponOverlay;
+  Hyp3eLogger.info("Init", "CONFIG Show weapon/shield token overlay:", CONFIG.HYP3E.showWeaponOverlay);
 
-    // Load class list
-    const characterClasses = game.settings.get(game.system.id, "characterClasses");
-    if (characterClasses != "") {
-        CONFIG.HYP3E.characterClasses = {}
-        const classArray = characterClasses.split(",");
-        classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
-        Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
-    }
+  // Enable basic attribute checks
+  const enableAttrChecks = game.settings.get(game.system.id, "enableAttrChecks");
+  CONFIG.HYP3E.enableAttrChecks = enableAttrChecks;
+  Hyp3eLogger.info("Init", "CONFIG Enable basic attribute checks:", CONFIG.HYP3E.enableAttrChecks);
+
+  // Reverse situational modifiers on roll-under checks
+  const flipRollUnderMods = game.settings.get(game.system.id, "flipRollUnderMods");
+  CONFIG.HYP3E.flipRollUnderMods = flipRollUnderMods;
+  Hyp3eLogger.info("Init", "CONFIG Reverse situational modifiers on roll-under checks:", CONFIG.HYP3E.flipRollUnderMods);
+
+  // Enable encumbrance calculations applied to characters
+  const enableEncumbrance = game.settings.get(game.system.id, "enableEncumbrance");
+  CONFIG.HYP3E.enableEncumbrance = enableEncumbrance;
+  Hyp3eLogger.info("Init", "CONFIG Enable encumbrance calculations applied to characters:", CONFIG.HYP3E.enableEncumbrance);
+  
+  // GM-defined strength multiplier for encumbered status
+  const encumbered = game.settings.get(game.system.id, "encumbered");
+  CONFIG.HYP3E.encumbered = encumbered;
+  Hyp3eLogger.info("Init", "CONFIG Strength multiplier for encumbered status:", CONFIG.HYP3E.encumbered);
+
+  // GM-defined strength multiplier for heavily encumbered status
+  const heavilyEncumbered = game.settings.get(game.system.id, "heavilyEncumbered");
+  CONFIG.HYP3E.heavilyEncumbered = heavilyEncumbered;
+  Hyp3eLogger.info("Init", "CONFIG Strength multiplier for heavily encumbered status:", CONFIG.HYP3E.heavilyEncumbered);
+
+  // Initiative type: group, phased, or individual
+  const initiativeType = game.settings.get(game.system.id, "initiativeType");
+  CONFIG.HYP3E.initiativeType = initiativeType;
+  Hyp3eLogger.info("Init", "CONFIG combat initiative type:", CONFIG.HYP3E.initiativeType);
+
+  // Apply death when the round ends
+  const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
+  CONFIG.HYP3E.resolveDeathAtRoundEnd = resolveDeathAtRoundEnd;
+  Hyp3eLogger.info("Init", "CONFIG only apply unconscious/death when round ends:", CONFIG.HYP3E.resolveDeathAtRoundEnd);
+
+  // Limit token movement to actor MV base
+  if (majorVersion >= 13) {
+    const limitMovement = game.settings.get(game.system.id, "limitMovement");
+    CONFIG.HYP3E.limitMovement = limitMovement;
+    Hyp3eLogger.info("Init", "CONFIG Limit token movement to actor MV base:", CONFIG.HYP3E.limitMovement);
+  }
+
+  // Force range limitations on weapon & spell attacks
+  const forceRangeLimit = game.settings.get(game.system.id, "forceRangeLimit");
+  CONFIG.HYP3E.forceRangeLimit = forceRangeLimit;
+  Hyp3eLogger.info("Init", "CONFIG Force range limitations on weapon & spell attacks:", CONFIG.HYP3E.forceRangeLimit);
+
+  // Force weapon equippage to use
+  const forceWeaponEquip = game.settings.get(game.system.id, "forceWeaponEquip");
+  CONFIG.HYP3E.forceWeaponEquip = forceWeaponEquip;
+  Hyp3eLogger.info("Init", "CONFIG Force item equippage to use:", CONFIG.HYP3E.forceWeaponEquip);
+
+  // Force spell memorization to cast
+  const forceSpellMemorize = game.settings.get(game.system.id, "forceSpellMemorize");
+  CONFIG.HYP3E.forceSpellMemorize = forceSpellMemorize;
+  Hyp3eLogger.info("Init", "CONFIG Force spell memorization to cast:", CONFIG.HYP3E.forceSpellMemorize);
+
+  // Enable combat situational modifier detection
+  const enableCombatSitModDetection = game.settings.get(game.system.id, "enableCombatSitModDetection");
+  CONFIG.HYP3E.enableCombatSitModDetection = enableCombatSitModDetection;
+  Hyp3eLogger.info("Init", "CONFIG Enable combat situational modifier detection:", CONFIG.HYP3E.enableCombatSitModDetection);
+
+  // Enable critical hit rolls
+  const critHit = game.settings.get(game.system.id, "critHit");
+  CONFIG.HYP3E.critHit = critHit;
+  Hyp3eLogger.info("Init", "CONFIG Enable critical hit rolls:", CONFIG.HYP3E.critHit);
+
+  // Enable critical miss rolls
+  const critMiss = game.settings.get(game.system.id, "critMiss");
+  CONFIG.HYP3E.critMiss = critMiss;
+  Hyp3eLogger.info("Init", "CONFIG Enable critical miss rolls:", CONFIG.HYP3E.critMiss);
+
+  // Load races list
+  const races = game.settings.get(game.system.id, "races");
+  if (races != "") {
+    CONFIG.HYP3E.races = {}
+    const racesArray = races.split(",");
+    racesArray.forEach((l, i) => (CONFIG.HYP3E.races[l.trim()] = l.trim()));
+    Hyp3eLogger.info("Init", "CONFIG Races:", CONFIG.HYP3E.races);
+  }
+
+  // Load language list
+  const languages = game.settings.get(game.system.id, "languages");
+  if (languages != "") {
+    CONFIG.HYP3E.languages = {}
+    const langArray = languages.split(",");
+    langArray.forEach((l, i) => (CONFIG.HYP3E.languages[l.trim()] = l.trim()));
+    Hyp3eLogger.info("Init", "CONFIG Languages:", CONFIG.HYP3E.languages);
+  }
+
+  // Load class list
+  const characterClasses = game.settings.get(game.system.id, "characterClasses");
+  if (characterClasses != "") {
+    CONFIG.HYP3E.characterClasses = {}
+    const classArray = characterClasses.split(",");
+    classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
+    Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
+  }
     // Load custom classes
     CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
-    // For testing only...
-    // if (!CONFIG.HYP3E.customClassData || CONFIG.HYP3E.customClassData == {}) {
-    //     console.log("No custom class data found, creating Chronomancer test data.");
-    //     const magician = Hyp3eCharacter.classData["Magician"]
-    //     const chronomancer = {}
-    //     chronomancer["Chronomancer"] = foundry.utils.duplicate(magician)
-    //     CONFIG.HYP3E.customClassData = game.settings.set(game.system.id, "customClassData", chronomancer);
-    //     CONFIG.HYP3E.customClassData = chronomancer;
-    // }
-    // End testing
     Hyp3eLogger.info("Init", "CONFIG Custom Classes:", CONFIG.HYP3E.customClassData);
     for (const [className, classData] of Object.entries(CONFIG.HYP3E.customClassData)) {
-        // Append the class name to characterClasses
-        CONFIG.HYP3E.characterClasses[className] = className;
+      // Append the class name to characterClasses
+      CONFIG.HYP3E.characterClasses[className] = className;
     }
     Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
 
     // Load Phenotypes list
     const phenotypes = game.settings.get(game.system.id, "phenotypes");
     if (phenotypes != "") {
-        CONFIG.HYP3E.phenotypes = {}
-        const phenotypesArray = phenotypes.split(",");
-        phenotypesArray.forEach((l, i) => (CONFIG.HYP3E.phenotypes[l.trim()] = l.trim()));
-        Hyp3eLogger.info("Init", "CONFIG Phenotypes:", CONFIG.HYP3E.phenotypes);
+      CONFIG.HYP3E.phenotypes = {}
+      const phenotypesArray = phenotypes.split(",");
+      phenotypesArray.forEach((l, i) => (CONFIG.HYP3E.phenotypes[l.trim()] = l.trim()));
+      Hyp3eLogger.info("Init", "CONFIG Phenotypes:", CONFIG.HYP3E.phenotypes);
     }
 
     // Load saving throws
     if (CONFIG.HYP3E.saves) {
-        for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {
-            CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
-        }
-        Hyp3eLogger.info("Init", "CONFIG Saves:", CONFIG.HYP3E.saves);
+      for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {
+        CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
+      }
+      Hyp3eLogger.info("Init", "CONFIG Saves:", CONFIG.HYP3E.saves);
     }
 
     // Load creature sizes
     if (CONFIG.HYP3E.creatureSizes) {
-        for (let [k, v] of Object.entries(CONFIG.HYP3E.creatureSizes)) {
-            CONFIG.HYP3E.creatureSizes[k] = game.i18n.localize(CONFIG.HYP3E.creatureSizes[k])
-        }
-        Hyp3eLogger.info("Init", "CONFIG Creature Sizes:", CONFIG.HYP3E.creatureSizes);
+      for (let [k, v] of Object.entries(CONFIG.HYP3E.creatureSizes)) {
+        CONFIG.HYP3E.creatureSizes[k] = game.i18n.localize(CONFIG.HYP3E.creatureSizes[k])
+      }
+      Hyp3eLogger.info("Init", "CONFIG Creature Sizes:", CONFIG.HYP3E.creatureSizes);
     }
 
     // Load weapon types
     if (CONFIG.HYP3E.weaponTypes) { 
-        for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponTypes)) {
-            CONFIG.HYP3E.weaponTypes[k] = game.i18n.localize(CONFIG.HYP3E.weaponTypes[k])
-        }
-        Hyp3eLogger.info("Init", "CONFIG Weapon Types:", CONFIG.HYP3E.weaponTypes);
+      for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponTypes)) {
+        CONFIG.HYP3E.weaponTypes[k] = game.i18n.localize(CONFIG.HYP3E.weaponTypes[k])
+      }
+      Hyp3eLogger.info("Init", "CONFIG Weapon Types:", CONFIG.HYP3E.weaponTypes);
     }
 
     // Load weapon annotations
     if (CONFIG.HYP3E.weaponAnnotations) { 
-        for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponAnnotations)) {
-            CONFIG.HYP3E.weaponAnnotations[k] = game.i18n.localize(CONFIG.HYP3E.weaponAnnotations[k])
-        }
-        Hyp3eLogger.info("Init", "CONFIG Weapon Annotations:", CONFIG.HYP3E.weaponAnnotations);
+      for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponAnnotations)) {
+        CONFIG.HYP3E.weaponAnnotations[k] = game.i18n.localize(CONFIG.HYP3E.weaponAnnotations[k])
+      }
+      Hyp3eLogger.info("Init", "CONFIG Weapon Annotations:", CONFIG.HYP3E.weaponAnnotations);
     }
 
     // Load damage types
     if (CONFIG.HYP3E.damageTypes) { 
-        for (let [k, v] of Object.entries(CONFIG.HYP3E.damageTypes)) {
-            CONFIG.HYP3E.damageTypes[k] = game.i18n.localize(CONFIG.HYP3E.damageTypes[k])
-        }
-        Hyp3eLogger.info("Init", "CONFIG Damage Types:", CONFIG.HYP3E.damageTypes);
-        // Append additional damage types
-        const addlDamageTypes = (game.settings.get(game.system.id, "addlDamageTypes")).trim();
-        if (addlDamageTypes != "") {
-            const addlDamageTypesArray = addlDamageTypes.split(",");
-            addlDamageTypesArray.forEach((l, i) => (CONFIG.HYP3E.damageTypes[l.trim()] = l.trim()));
-        }
+      for (let [k, v] of Object.entries(CONFIG.HYP3E.damageTypes)) {
+        CONFIG.HYP3E.damageTypes[k] = game.i18n.localize(CONFIG.HYP3E.damageTypes[k])
+      }
+      Hyp3eLogger.info("Init", "CONFIG Damage Types:", CONFIG.HYP3E.damageTypes);
+      // Append additional damage types
+      const addlDamageTypes = (game.settings.get(game.system.id, "addlDamageTypes")).trim();
+      if (addlDamageTypes != "") {
+        const addlDamageTypesArray = addlDamageTypes.split(",");
+        addlDamageTypesArray.forEach((l, i) => (CONFIG.HYP3E.damageTypes[l.trim()] = l.trim()));
+      }
     }
 
     // Load armor types
     if (CONFIG.HYP3E.armorTypes) { 
-        for (let [k, v] of Object.entries(CONFIG.HYP3E.armorTypes)) {
-            CONFIG.HYP3E.armorTypes[k] = game.i18n.localize(CONFIG.HYP3E.armorTypes[k])
-        }
-        Hyp3eLogger.info("Init", "CONFIG Armor Types:", CONFIG.HYP3E.armorTypes);
+      for (let [k, v] of Object.entries(CONFIG.HYP3E.armorTypes)) {
+        CONFIG.HYP3E.armorTypes[k] = game.i18n.localize(CONFIG.HYP3E.armorTypes[k])
+      }
+      Hyp3eLogger.info("Init", "CONFIG Armor Types:", CONFIG.HYP3E.armorTypes);
     }
 
     // If we need to do a system migration, do it after the other settings are loaded
     if (game.user.isGM) {
-        const reRunMigration = game.settings.get(game.system.id, `reRunMigration`);
-        const migrationHasRun = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
-        // const migrationHasRun = false  // FOR DEBUGGING, TO FORCE A RE-RUN
-        if (!migrationHasRun || reRunMigration) {
-            Hyp3eLogger.info("Init", "Running one-time migration...");
+      const reRunMigration = game.settings.get(game.system.id, `reRunMigration`);
+      const migrationHasRun = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
+      // const migrationHasRun = false  // FOR DEBUGGING, TO FORCE A RE-RUN
+      if (!migrationHasRun || reRunMigration) {
+        Hyp3eLogger.info("Init", "Running one-time migration...");
 
-            // Do the world migration
-            await migrateWorld();
+        // Do the world migration
+        await migrateWorld();
 
-            // Set the flags so it doesn't run again
-            await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
-            await game.settings.set(game.system.id, `reRunMigration`, false);
-            Hyp3eLogger.info("Init", "Migration complete.");
-        } else {
-            Hyp3eLogger.info("Init", "Migration has been run before, no need to do it again.");
-        }
+        // Set the flags so it doesn't run again
+        await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
+        await game.settings.set(game.system.id, `reRunMigration`, false);
+        Hyp3eLogger.info("Init", "Migration complete.");
+      } else {
+        Hyp3eLogger.info("Init", "Migration has been run before, no need to do it again.");
+      }
     }
 
     // Setup a game.hyp3e property to contain our calendar and turn tracker
@@ -511,10 +494,10 @@ Hooks.once("ready", async function() {
 
     // Initialize the calendar app
     try {
-        game.hyp3e.calendar = new HYP3ECalendarApp();
-        game.hyp3e.openCalendar = () => game.hyp3e.calendar.render(true);
+      game.hyp3e.calendar = new HYP3ECalendarApp();
+      game.hyp3e.openCalendar = () => game.hyp3e.calendar.render(true);
     } catch (err) {
-        Hyp3eLogger.error("Init", `Error initializing calendar app.`, err.message)
+      Hyp3eLogger.error("Init", `Error initializing calendar app.`, err.message)
     }
     // Import the calendar class methods
     game.hyp3e.calendar.getCurrentDate = () => HYP3ECalendar.getCurrentDate();
@@ -547,10 +530,10 @@ Hooks.once("ready", async function() {
 
     // Pre-load processing
     if (game.user.isGM) {
-        // If the token resize option is set, do that now, while the game is loading
-        if (game.settings.get(game.system.id, "resizeTokens")) {
-            resizeTokenPrototypes()
-        }
+      // If the token resize option is set, do that now, while the game is loading
+      if (game.settings.get(game.system.id, "resizeTokens")) {
+        resizeTokenPrototypes()
+      }
     }
 
 });
