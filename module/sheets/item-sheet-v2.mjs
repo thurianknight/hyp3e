@@ -281,7 +281,8 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
     // const formDataObj = formData.object;
     const formDataObj = foundry.utils.expandObject(formData.object);
-    const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified"); // || this.item.system.identified;
+    // Not all item types have identification, so default to identified=true
+    const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified") || this.item.system.identified;
     Hyp3eLogger.info("_processFormData", `Is item identified?`, isIdentified);
 
     // Apply name and description based on identification state.
