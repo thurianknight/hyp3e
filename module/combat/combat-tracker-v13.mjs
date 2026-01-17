@@ -167,7 +167,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     super._onRender(context, options);
     // super.activateListeners(html);
 
-    // Reroll group initiative
+    // Reroll group initiative for all groups (GMs only)
     html.find('.combat-control[data-action="reroll"]').click((ev) => {      
       game.combat.rollInitiative();
     });
@@ -184,6 +184,18 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     html.find('a[data-action="roll-group-initiative"]').click((ev) => {      
       const groupName = ev.currentTarget.dataset.initGroup;
       game.combat.rollInitiative({ group: groupName });
+    });
+
+    // Adjust group initiative score (GMs only)
+    html.find('input[data-action="update-group-initiative"]').change(async (ev) => {
+      const input = ev.currentTarget;
+      const groupName = input.dataset.initGroup;
+      const newScore = parseInt(input.value);
+      if (isNaN(newScore)) {
+        ui.notifications.error("Invalid group initiative score! Must be a number.");
+        return;
+      }
+      await game.combat.setGroupInitiativeScore(groupName, newScore);
     });
 
     // Set initiative groups

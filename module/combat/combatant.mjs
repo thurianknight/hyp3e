@@ -197,7 +197,7 @@ export class HYP3ECombatant extends Combatant {
   // ===========================================================================
 
   /**
-   * This is the rollInitiative method from Foundry v13 base, copied here for reference.
+   * This is the individual rollInitiative method from Foundry v13 base, copied here for reference.
    */
   // async rollInitiative(formula) {
   //   const roll = this.getInitiativeRoll(formula);

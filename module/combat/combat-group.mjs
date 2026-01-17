@@ -1,6 +1,7 @@
 import HYP3E from "../helpers/config.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3ECombat } from "./combat.mjs";
+import { Hyp3eDialog } from "../helpers/dialog.mjs";
 
 export const colorGroups = HYP3E.colors;
 export const actionGroups = {
@@ -62,10 +63,27 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     }
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Groups to roll for:`, groupsToRollFor);
 
+    // Popup a roll dialog to allow for situational modifiers
+    let sitMod = 0;
+    // const dataset = {
+    //   "action": "rollInitiative",
+    //   "roll": HYP3ECombat.FORMULA,
+    //   "rollType": "initiative",
+    //   "label": "Group Initiative",
+    //   "rollButtonLabel": "Roll Initiative"
+    // }
+    // try {
+    //   rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
+    //   sitMod = rollResponse.sitMod;
+    // } catch(err) {
+    //   // Do nothing - user likely cancelled the dialog
+    //   return;
+    // }
+
     // Take the groups array and append a roll object to each group
     const rollPerGroup = groupsToRollFor.reduce((prev, curr) => ({
       ...prev,
-      [curr]: new Roll(HYP3ECombat.FORMULA) 
+      [curr]: new Roll(`${HYP3ECombat.FORMULA} + ${sitMod}`)
     }), {});
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Initiative roll per group:`, rollPerGroup);
 
@@ -187,6 +205,66 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         </div>
       </div>
     `;
+  }
+
+  /**
+   * Set/update the initiative score for a named group. Updates all combatants in the group.
+   * @param {*} initGroup - Named group to receive new initiative
+   * @param {*} newInitScore - New initiative number to set
+   * @returns 
+   */
+  async setGroupInitiativeScore(initGroup, newInitScore) {
+    if (isNaN(newInitScore)) {
+      Hyp3eLogger.warn("HYP3EGroupCombat setGroupInitiativeScore", `Invalid initiative score provided:`, newInitScore);
+      throw new Error(game.i18n.format("HYP3E.errors.invalidNumber", { value: newInitScore }));
+    }
+    const initScore = Number(newInitScore);
+    Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `Setting initiative score for group ${initGroup} to ${initScore}...`);
+    const combatantsToUpdate = this.combatants.filter(c => c.initGroup === initGroup);
+    for (const c of combatantsToUpdate) {
+      c.initRoll = initScore;
+      // Movement partially overrides the other combat actions for initiative order
+      c.getActionModifiers();
+      const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit}`
+      Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other): ${rollTerms}`);
+
+      // Add the actor's temporary initiative modifier, if one exists
+      c.getTempInitMod();
+
+      // Get initiative penalties based on status effects like blind or deaf
+      c.getSlowingModifiers();
+
+      // If defeated, add this initiative penalty to force actor to the end of the round
+      c.getDefeatedModifier();
+      const initiative = Math.round((initScore 
+                                + (c.actor?.system?.attributes?.dex?.value/1000)
+                                + c.tempInitMod
+                                + c.meleeInit
+                                + c.missileInit
+                                + c.magicInit
+                                + c.moveInit
+                                + c.otherInit
+                                + c.statusInit
+                                + c.defeatedInit) * 1000) / 1000;
+      Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `Updating combatant ${c.name} (${c.id}) to initiative ${initiative}...`, c);
+    }
+    const updates = combatantsToUpdate.map(
+      (c) => ({ _id: c.id, 
+        initRoll: initScore,
+        "flags.hyp3e.initRoll": initScore,
+        initiative: Math.round((initScore 
+                                + (c.actor?.system?.attributes?.dex?.value/1000)
+                                + c.tempInitMod
+                                + c.meleeInit
+                                + c.missileInit
+                                + c.magicInit
+                                + c.moveInit
+                                + c.otherInit
+                                + c.statusInit
+                                + c.defeatedInit) * 1000) / 1000,
+      })
+    )
+    return this.updateEmbeddedDocuments("Combatant", updates);
   }
 
   // ===========================================================================

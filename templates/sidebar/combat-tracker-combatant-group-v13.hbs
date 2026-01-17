@@ -9,9 +9,15 @@
       <i class="fas fa-dice-d6" style="opacity: 0.5; padding-right: 0.3em;"></i> 
       <span class="folder-name">{{localize this.label}}</span>
     {{/if}}
-    <span class="create-button">
-      {{this.initiative}}
-    </span>
+    {{!-- <span class="create-button"> --}}
+      <input type="text" style="width: 30px; height: 24px; text-align: center;" 
+        name="{{this.initGroup}}-initiative" 
+        data-action="update-group-initiative" 
+        data-init-group="{{this.initGroup}}" 
+        value="{{this.initiative}}"
+        {{#unless @root.user.isGM}}disabled{{/unless}}
+      />
+    {{!-- </span> --}}
   </header>
 
   <ol class="subdirectory plain" style="border-left: 4px solid {{this.initGroup}};">
