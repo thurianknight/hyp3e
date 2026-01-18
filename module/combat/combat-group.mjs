@@ -53,13 +53,11 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     if (combatantIds !== null && combatantIds.length > 0) {
       Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Combatant IDs for group initiative:`, combatantIds);
       groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
+    } else if (group !== undefined) {
+      // Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Group to roll for initiative:`, group);
+      groupsToRollFor = [group];
     } else {
       groupsToRollFor = this.availableGroups;
-    }
-    // const { group } = options;
-    if (group !== undefined) {
-      Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Group to roll for initiative:`, group);
-      groupsToRollFor = [group];
     }
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Groups to roll for:`, groupsToRollFor);
 
@@ -109,24 +107,31 @@ export class HYP3EGroupCombat extends HYP3ECombat {
       c.getDefeatedModifier();
     })
 
+    // Update each group's initiative score
+    for (const initGroup of groupsToRollFor) {
+      const newInitScore = results[initGroup].initiative;
+      Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Setting ${initGroup} group initiative to ${newInitScore}...`);
+      await this.setGroupInitiativeScore(initGroup, newInitScore);
+    }
+
     // Update the combatants with their new initiative values
-    const updates = combatantsAffected.map(
-      (c) => ({ _id: c.id, 
-        initRoll: results[c.initGroup].initiative,
-        "flags.hyp3e.initRoll": results[c.initGroup].initiative,
-        initiative: Math.round((results[c.initGroup].initiative 
-                                + (c.actor?.system?.attributes?.dex?.value/1000)
-                                + c.tempInitMod
-                                + c.meleeInit
-                                + c.missileInit
-                                + c.magicInit
-                                + c.moveInit
-                                + c.otherInit
-                                + c.statusInit
-                                + c.defeatedInit) * 1000) / 1000,
-      })
-    )
-    await this.updateEmbeddedDocuments("Combatant", updates);
+    // const updates = combatantsAffected.map(
+    //   (c) => ({ _id: c.id, 
+    //     initRoll: results[c.initGroup].initiative,
+    //     "flags.hyp3e.initRoll": results[c.initGroup].initiative,
+    //     initiative: Math.round((results[c.initGroup].initiative 
+    //                             + (c.actor?.system?.attributes?.dex?.value/1000)
+    //                             + c.tempInitMod
+    //                             + c.meleeInit
+    //                             + c.missileInit
+    //                             + c.magicInit
+    //                             + c.moveInit
+    //                             + c.otherInit
+    //                             + c.statusInit
+    //                             + c.defeatedInit) * 1000) / 1000,
+    //   })
+    // )
+    // await this.updateEmbeddedDocuments("Combatant", updates);
 
     await this.#rollInitiativeUIFeedback(results);
     await this.activateCombatant(0);
@@ -147,7 +152,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
   }
 
   async #prepareGroupInitiativeDice(rollPerGroup) {
-    Hyp3eLogger.info("HYP3EGroupCombat #prepareGroupInitiativeDice", `Roll per group:`, rollPerGroup);
+    // Hyp3eLogger.info("HYP3EGroupCombat #prepareGroupInitiativeDice", `Roll per group:`, rollPerGroup);
     const pool = foundry.dice.terms.PoolTerm.fromRolls(Object.values(rollPerGroup));
     const evaluatedRolls = await Roll.fromTerms([pool]).roll()
     const rollValues = evaluatedRolls.dice.map(d => d.total);
@@ -220,6 +225,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     }
     const initScore = Number(newInitScore);
     Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `Setting initiative score for group ${initGroup} to ${initScore}...`);
+
     const combatantsToUpdate = this.combatants.filter(c => c.initGroup === initGroup);
     for (const c of combatantsToUpdate) {
       c.initRoll = initScore;
@@ -236,7 +242,9 @@ export class HYP3EGroupCombat extends HYP3ECombat {
 
       // If defeated, add this initiative penalty to force actor to the end of the round
       c.getDefeatedModifier();
-      const initiative = Math.round((initScore 
+
+      // const initiative = Math.round((initScore 
+      c.initiative = Math.round((initScore 
                                 + (c.actor?.system?.attributes?.dex?.value/1000)
                                 + c.tempInitMod
                                 + c.meleeInit
@@ -246,22 +254,13 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                                 + c.otherInit
                                 + c.statusInit
                                 + c.defeatedInit) * 1000) / 1000;
-      Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `Updating combatant ${c.name} (${c.id}) to initiative ${initiative}...`, c);
+      Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `Updating combatant ${c.name} (${c.id}) to initiative ${c.initiative}...`, c);
     }
     const updates = combatantsToUpdate.map(
       (c) => ({ _id: c.id, 
         initRoll: initScore,
         "flags.hyp3e.initRoll": initScore,
-        initiative: Math.round((initScore 
-                                + (c.actor?.system?.attributes?.dex?.value/1000)
-                                + c.tempInitMod
-                                + c.meleeInit
-                                + c.missileInit
-                                + c.magicInit
-                                + c.moveInit
-                                + c.otherInit
-                                + c.statusInit
-                                + c.defeatedInit) * 1000) / 1000,
+        initiative: c.initiative,
       })
     )
     return this.updateEmbeddedDocuments("Combatant", updates);
