@@ -244,7 +244,7 @@ export class Hyp3eDice {
     const altDmgTypes =  Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Alternate damage types:`, altDmgTypes);
     // I may regret this, but I'm going to assume we will never have more than 2 damage fields 
-    //  and hard-code it into this function.
+    //  (1-hand and 2-hand) and hard-code it into this function.
     let dmgRoll2Parts = [];
     let debugDmgRoll2Parts = [];
 
@@ -291,6 +291,24 @@ export class Hyp3eDice {
         }
       }
     }
+
+    // Fighting Ability
+    const faRegex = /\+\s*@fa/g
+    if (debugDmgRollParts[1].match(faRegex) > "") {
+      // Fix if FA is null
+      if (actorData.fa == null) actorData.fa = 0;
+      dmgRollParts[0] = dmgRollParts[0].replace(faRegex, `+ ${actorData.fa}`);
+      debugDmgRollParts[1] = debugDmgRollParts[1].replace(faRegex, "");
+      debugDmgRollParts.push(`<tr><td>Fighting Ability</td><td>${faDmgMod}</td></tr>`);
+    }
+    if (itemData.damage2h) {
+      if (debugDmgRoll2Parts[1].match(faRegex) > "") {
+        dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(faRegex, `+ ${actorData.ca}`);
+        debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(faRegex, "");
+        debugDmgRoll2Parts.push(`<tr><td>Fighting Ability</td><td>${faDmgMod}</td></tr>`);
+      }
+    }
+
     // Casting Ability
     const caRegex = /\+\s*@ca/g
     if (debugDmgRollParts[1].match(caRegex) > "") {
@@ -333,22 +351,22 @@ export class Hyp3eDice {
 
     // Apply the character's (not npc's) ST damage mod if the item is a melee weapon
     if (itemData.melee) {
-        if (actorData?.actorType == "character") {
-            dmgRollParts.push(strDmgMod.replace("+", ""));
-            debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
-            if (itemData.damage2h) {
-                dmgRoll2Parts.push(strDmgMod.replace("+", ""));
-                debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
-            }
-        } else {
-            // NPCs/monsters don't have a ST attribute, so nothing to do here except 
-            //  note it in a comment. :-)
+      if (actorData?.actorType == "character") {
+        dmgRollParts.push(strDmgMod.replace("+", ""));
+        debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
+        if (itemData.damage2h) {
+          dmgRoll2Parts.push(strDmgMod.replace("+", ""));
+          debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
         }
+      } else {
+        // NPCs/monsters don't have a ST attribute, so nothing to do here except 
+        //  note it in a comment. :-)
+      }
     }
     // Apply the character's ST damage mod if the item has the "strDmgAdj" annotation (missile weapons)
     if (itemData.missile && Array.isArray(itemData.annotations) && 
-        (itemData.annotations?.includes("hurled") || 
-          itemData.annotations?.includes("strDmgAdj"))) {
+                      (itemData.annotations?.includes("hurled") || 
+                        itemData.annotations?.includes("strDmgAdj"))) {
       const baseFormula = itemData.damage || "";
       const hasStrVar = baseFormula.includes("@str.dmgMod");
 
@@ -397,15 +415,15 @@ export class Hyp3eDice {
 
     // Do we have any alternate damage types?
     if (Object.keys(altDmgTypes).length > 0) {
-        for (let [k, v] of Object.entries(altDmgTypes)) {
-            dmgRollParts.push(v)
-            const dmgType = `${CONFIG.HYP3E.damageTypes[k]} Dmg`
-            debugDmgRollParts.push(`<tr><td>${dmgType}</td><td>+${v}</td></tr>`)
-            if (itemData.damage2h) {
-                dmgRoll2Parts.push(v)
-                debugDmgRoll2Parts.push(`<tr><td>${dmgType}</td><td>+${v}</td></tr>`)
-            }
+      for (let [k, v] of Object.entries(altDmgTypes)) {
+        dmgRollParts.push(v)
+        const dmgType = `${CONFIG.HYP3E.damageTypes[k]} Dmg`
+        debugDmgRollParts.push(`<tr><td>${dmgType}</td><td>+${v}</td></tr>`)
+        if (itemData.damage2h) {
+          dmgRoll2Parts.push(v)
+          debugDmgRoll2Parts.push(`<tr><td>${dmgType}</td><td>+${v}</td></tr>`)
         }
+      }
     }
 
     // Finish the debug damage roll table
@@ -420,10 +438,10 @@ export class Hyp3eDice {
 
     // Construct the damage roll formula from parts, and return an object with the formula and debug formula
     const dmgObj = {
-        formula: dmgRollParts.join(" + "),
-        debugFormula: debugDmgRollParts.join(""),
-        formula2h: dmgRoll2Parts.join(" + "),
-        debugFormula2h: debugDmgRoll2Parts.join("")
+      formula: dmgRollParts.join(" + "),
+      debugFormula: debugDmgRollParts.join(""),
+      formula2h: dmgRoll2Parts.join(" + "),
+      debugFormula2h: debugDmgRoll2Parts.join("")
     }
     return dmgObj
   }
@@ -438,110 +456,32 @@ export class Hyp3eDice {
    */
   static async rollFormulaAndEvaluateSuccess(formula, rollData, target, comparison = "ge") {
     if (!formula || typeof parseInt(target) !== "number") {
-        const msg = `Missing formula or target number.`;
-        Hyp3eLogger.error("Hyp3eDice rollFormulaAndEvaluateSuccess", `${msg} Incoming formula & target:`, {formula, target});
-        ui.notifications.error(msg);
-        return { roll: null, total: null, success: false };
+      const msg = `Missing formula or target number.`;
+      Hyp3eLogger.error("Hyp3eDice rollFormulaAndEvaluateSuccess", `${msg} Incoming formula & target:`, {formula, target});
+      ui.notifications.error(msg);
+      return { roll: null, total: null, success: false };
     }
 
     let roll = new Roll(formula, rollData);
     try {
-        await roll.roll();
+      await roll.roll();
     } catch (error) {
-        const msg = `Error evaluating roll formula.`;
-        Hyp3eLogger.error("Hyp3eDice rollFormulaAndEvaluateSuccess", msg, error);
-        ui.notifications.error(msg);
-        return { roll: null, total: null, success: false };
+      const msg = `Error evaluating roll formula.`;
+      Hyp3eLogger.error("Hyp3eDice rollFormulaAndEvaluateSuccess", msg, error);
+      ui.notifications.error(msg);
+      return { roll: null, total: null, success: false };
     }
 
     const total = roll.total;
 
     const success = (comparison === "ge")
-        ? total >= target   // if comparison is "ge"
-        : total <= target;  // otherwise (le or default)
+      ? total >= target   // if comparison is "ge"
+      : total <= target;  // otherwise (le or default)
 
     Hyp3eLogger.info("Hyp3eDice rollFormulaAndEvaluateSuccess", `${roll.formula} = ${total} vs. ${comparison} ${target}: ${success ? "Success" : "Failure"}`);
 
     return { roll, total, success };
   }
-
-  /**
-   * Resolves a formula with dice asynchronously, allowing @variables and Math functions.
-   *  Example: "1d6 + Math.ceil(@con/4)"
-   *   - @variable.path lookups
-   *   - Dice expressions (e.g. 2d8+3)
-   *   - Math expressions (Math.ceil, Math.floor, etc.)
-   * Note: This is only needed when supporting Math.* functions. The Foundry Roll.evaluate() method 
-   *  can handle any standard roll formula like "1d20 + @str.atkMod".
-   * @param {string} formula - Formula string to be resolved
-   * @param {object} rollData - Actor system data for @variable resolution
-   * @returns {number|null}
-   */
-  // static async resolveFormulaWithDice(formula, rollData = {}) {
-  //   if (!formula || typeof formula !== "string") return null;
-
-  //   // Find & replace rollData @variables
-  //   let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
-  //     return foundry.utils.getProperty(rollData, key) ?? 0;
-  //   });
-
-  //   // Find & replace dice expressions with rolled totals
-  //   const diceRegex = /\b(\d*d\d+(?:[+-]\d+)*)\b/g;
-  //   const matches = [...expanded.matchAll(diceRegex)];
-  //   for (const match of matches) {
-  //     try {
-  //       const roll = new Roll(match[1], dataSource).evaluateSync();
-  //       expanded = expanded.replace(match[0], roll.total);
-  //     } catch (err) {
-  //       Hyp3eLogger.warn("Hyp3eDice resolveFormulaWithDice", `Invalid dice expression "${match[1]}"`, err);
-  //     }
-  //   }
-
-  //   // Evaluate any remaining math functions
-  //   try {
-  //     // eslint-disable-next-line no-new-func
-  //     const fn = new Function("Math", `return (${expanded});`);
-  //     const result = fn(Math);
-  //     // Final sanity check to ensure we return a number
-  //     return (typeof result === "number" && !Number.isNaN(result)) ? result : null;
-  //   } catch {
-  //     return null;
-  //   }
-  // }
-
-  /**
-   * Resolves a formula synchronously, allowing @variables and Math functions, but NO dice rolls.
-   *  Example: "-1 * Math.ceil(@con/4)"
-   *   - @variable.path lookups
-   *   - Math expressions (Math.ceil, Math.floor, etc.)
-   * Note: This is only needed when supporting Math.* functions. The Foundry Roll.evaluateSync() 
-   *  method can handle any standard formula (even without dice) like "@str.atkMod + 2".
-   * @param {string} formula - Formula string to be resolved
-   * @param {object} rollData - Actor system data for @variable resolution
-   * @returns {number|null}
-   */
-  // static resolveFormulaNoDice(formula, rollData = {}) {
-  //   if (!formula || typeof formula !== "string") return null;
-
-  //   // Reject dice up front — synchronous mode cannot handle them
-  //   if (/\d*d\d+/.test(formula)) return null;
-
-  //   // Find & replace rollData @variables
-  //   let expanded = formula.replace(/@([A-Za-z0-9.]+)/g, (_, key) => {
-  //     return foundry.utils.getProperty(rollData, key) ?? 0;
-  //   });
-
-  //   // Evaluate any remaining math functions
-  //   try {
-  //     // eslint-disable-next-line no-new-func
-  //     const fn = new Function("Math", `return (${expanded});`);
-  //     const result = fn(Math);
-  //     // Final sanity check to ensure we return a number
-  //     return (typeof result === "number" && !Number.isNaN(result)) ? result : null;
-  //   } catch {
-  //     return null;
-  //   }
-  // }
 
   /**
    * Resolve a formula that may include Math.* functions. NO DICE ROLLS (cannot be async).
