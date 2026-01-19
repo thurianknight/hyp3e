@@ -253,6 +253,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
         return;
     }
     Hyp3eLogger.info("rollDmgButton", `Actor: `, actor);
+    const actorData = actor.getRollData();
 
     const item = actor.items.get(itemId) ?? await fromUuid(itemUuid)
     if (!item) {
@@ -267,7 +268,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
 
     Hyp3eLogger.info("rollDmgButton", `Damage roll formula: ${formula}`);
     // Invoke the damage roll
-    let dmgRoll = new Roll(formula);
+    let dmgRoll = new Roll(formula, actorData);
     Hyp3eLogger.info("rollDmgButton", `Damage roll object: `, dmgRoll);
     // Resolve the roll
     await dmgRoll.evaluate({ evaluateSync: true });
