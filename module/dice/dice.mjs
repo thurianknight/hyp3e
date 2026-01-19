@@ -292,6 +292,8 @@ export class Hyp3eDice {
       }
     }
 
+    // NOTE: Fighting Ability is not normally used in damage formulas, but we want to
+    //  support it here in case a user wants to create a custom item that does so.
     // Fighting Ability
     const faRegex = /\+\s*@fa/g
     if (debugDmgRollParts[1].match(faRegex) > "") {

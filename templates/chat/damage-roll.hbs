@@ -1,56 +1,56 @@
 <div class="dice-damage">{{title}}</div>
 <div class="dice-roll" data-actor-id="{{actorId}}" data-action="expandRoll">
-    <div class="dice-result">
-        <div class="dice-formula">{{dmgRoll.formula}}</div>
-        <div class="dice-tooltip">
-            <div class="wrapper">
-                <section class="tooltip-part">
-                    {{{debugDmgRollFormula}}}
-                    <div class="dice">
-                        <ol class="dice-rolls">
-                            {{#each dmgRoll.dice as |die key|}}
-                            <header class="part-header flexrow">
-                                <span>
-                                    <ol class="dice-rolls">
-                                        {{#each die.values as |val d|}}
-                                        <li class="roll die d{{die.faces}}
-                                            {{isMin val}}
-                                            {{isMax val die.faces}}">{{val}}</li>
-                                        {{/each}}
-                                    </ol>
-                                </span>
-                                <span class="part-total">{{die.total}}</span>
-                            </header>
-                            {{/each}}
-                        </ol>
-                    </div>
-                </section>
-            </div>
-        </div>
-        <div class="dice-roll">
-            <div class="dice-formula flexrow">
-                {{#if (eq damageType "healing")}}
-                <span class="dice-damage">{{dmgRoll.total}} HP healing!</span>
-                {{else}}
-                <span class="dice-damage">{{dmgRoll.total}} HP damage!</span>
-                {{/if}}
-                <span class="damage-button flexrow" data-total="{{dmgRoll.total}}"  
-                    data-natural="{{naturalDmgRoll}}" 
-                    data-roll="{{dmgBaseRoll}}" 
-                    data-formula="{{dmgRoll.formula}}" 
-                    data-damage-type="{{damageType}}"
-                    data-source-type="{{sourceType}}" 
-                    data-apply-dr="{{applyDr}}">
+  <div class="dice-result">
+    <div class="dice-formula">{{dmgRoll.formula}}</div>
+    <div class="dice-tooltip">
+      <div class="wrapper">
+        <section class="tooltip-part">
+          {{{debugDmgRollFormula}}}
+          <div class="dice">
+            <ol class="dice-rolls">
+              {{#each dmgRoll.dice as |die key|}}
+              <header class="part-header flexrow">
+                <span>
+                  <ol class="dice-rolls">
+                    {{#each die.values as |val d|}}
+                    <li class="roll die d{{die.faces}}
+                      {{isMin val}}
+                      {{isMax val die.faces}}">{{val}}</li>
+                    {{/each}}
+                  </ol>
                 </span>
-            </div>
-        </div>
-        {{#if save}}
-        <div>{{{description}}}</div>
-        <div class='save-button' style='padding-top: 5px' data-save='{{save}}'></div>
-        {{/if}}
-        {{!-- If the attack has one or more effects, add an Apply Effects button --}}
-        {{#if hasEffects}}
-        <div class='apply-effects-button' style='padding-top: 5px' data-item-id='{{itemId}}' data-item-uuid='{{itemUuid}}' data-actor-id='{{actorId}}'></div>
-        {{/if}}
+                <span class="part-total">{{die.total}}</span>
+              </header>
+              {{/each}}
+            </ol>
+          </div>
+        </section>
+      </div>
     </div>
+    <div class="dice-roll">
+      <div class="dice-formula flexrow">
+        {{#if (eq damageType "healing")}}
+        <span class="dice-damage">{{dmgRoll.total}} HP healing!</span>
+        {{else}}
+        <span class="dice-damage">{{dmgRoll.total}} HP damage!</span>
+        {{/if}}
+        <span class="damage-button flexrow" data-total="{{dmgRoll.total}}"  
+          data-natural="{{naturalDmgRoll}}" 
+          data-roll="{{dmgBaseRoll}}" 
+          data-formula="{{dmgRoll.formula}}" 
+          data-damage-type="{{damageType}}"
+          data-source-type="{{sourceType}}" 
+          data-apply-dr="{{applyDr}}">
+        </span>
+      </div>
+    </div>
+    {{#if save}}
+    <div>{{{description}}}</div>
+    <div class='save-button' style='padding-top: 5px' data-save='{{save}}'></div>
+    {{/if}}
+    {{!-- If the attack has one or more effects, add an Apply Effects button --}}
+    {{#if hasEffects}}
+    <div class='apply-effects-button' style='padding-top: 5px' data-item-id='{{itemId}}' data-item-uuid='{{itemUuid}}' data-actor-id='{{actorId}}'></div>
+    {{/if}}
+  </div>
 </div>

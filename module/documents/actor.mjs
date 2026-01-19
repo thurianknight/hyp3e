@@ -2419,7 +2419,7 @@ export class Hyp3eActor extends Actor {
       const attackHeader = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
 
       Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Chat data:`, {chatLabel, attackHeader, critFooter});
-      await renderCustomChat(atkRoll, item, this, attacker?.id, chatLabel, debugAtkRollFormula, attackHeader, critFooter, rollResponse.rollMode); // Assuming this exists
+      await renderCustomChat(atkRoll, item, this, attacker?.id, chatLabel, debugAtkRollFormula, attackHeader, critFooter, rollResponse.rollMode);
 
       // Return Roll Result
       return atkRoll;
