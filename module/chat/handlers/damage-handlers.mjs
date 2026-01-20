@@ -26,10 +26,11 @@ export async function handleDamageRollButtons(html) {
     const itemUuid = $(b).data('itemUuid');
     const actorId = $(b).data('actorId');
     const tokenId = $(b).data('tokenId');
-    const buttonText = damageType.toLowerCase().includes("heal") ? "Healing" : "Damage"
+    const buttonText = damageType.toLowerCase().includes("heal") ? "Roll Healing" : "Roll Damage"
 
     let dmgButton = $(
-      `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>${buttonText}: ${dmgFormula}</button>`
+      // `<button class="chat-btn-full-width" title="Click to roll damage"><i class="fas fa-dice"></i>${buttonText}: ${dmgFormula}</button>`
+      `<button class="chat-btn-full-width" title="Click to roll damage"><i class="fas fa-dice"></i>${buttonText}</button>`
     );
     dmgRollElement.append(dmgButton);
 
@@ -63,7 +64,8 @@ export async function handleDamageRoll2hButtons(html) {
     const tokenId = $(b).data('tokenId');
 
     let dmgButton2h = $(
-      `<button class="chat-btn-full-width" title="Click to roll damage."><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
+      // `<button class="chat-btn-full-width" title="Click to roll damage"><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
+      `<button class="chat-btn-full-width" title="Click to roll damage"><i class="fas fa-dice"></i>2-Hand Damage</button>`
     );
     dmgRoll2hElement.append(dmgButton2h);
 
