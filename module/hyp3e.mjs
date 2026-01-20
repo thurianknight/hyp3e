@@ -73,6 +73,20 @@ Hooks.once('init', async function() {
     isActive: false
   }
   CONFIG.statusEffects.push(slowed)
+  const coverPartial = {
+    id: "coverPartial",
+    name: "HYP3E.statusEffects.coverPartial",
+    img: `${HYP3E.assetsPath}/cover-fence.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(coverPartial)
+  const coverFull = {
+    id: "coverFull",
+    name: "HYP3E.statusEffects.coverFull",
+    img: `${HYP3E.assetsPath}/cover-wall.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(coverFull)
 
   // Add custom constants for configuration
   CONFIG.HYP3E = HYP3E;

@@ -675,7 +675,9 @@
         },
         "statusEffects": {
             "hasted": "Hasted",
-            "slowed": "Slowed"
+            "slowed": "Slowed",
+            "coverPartial": "Partial Cover",
+            "coverFull": "Full Cover"
         }
     }
 }
