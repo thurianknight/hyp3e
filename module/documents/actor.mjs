@@ -2285,11 +2285,9 @@ export class Hyp3eActor extends Actor {
 
       dataset.sitMod = 0;
       dataset.sitModList = "";
-      // if (CONFIG.HYP3E.enableCombatSitModDetection) {
-      const sitModObj = this._getCombatantSitMods(attacker, target);
+      const sitModObj = this._getCombatantSitMods(attacker, target, !!itemData?.missile);
       dataset.sitMod = parseInt(sitModObj?.sitModSum || 0);
       dataset.sitModList = sitModObj?.sitModList || "";
-      // }
 
       // Combine item/roll specific data for the dialog
       const dialogData = {
@@ -2956,9 +2954,10 @@ export class Hyp3eActor extends Actor {
    *  attack roll.
    * @param {*} attacker - attacking token, if it exists (not theater of the mind)
    * @param {*} target - targeted token, if it exists (not theater of the mind)
+   * @param {boolean} isMissile - whether this is a missile attack, vs. melee/spell
    * @returns {Object} sitModObj { sitModSum: number, sitModsArr: Array }
    */
-  _getCombatantSitMods(attacker, target) {
+  _getCombatantSitMods(attacker, target, isMissile=false) {
     Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Getting situational modifiers for attacker ${this.name}...`);
 
     // Our return object & properties
@@ -3078,6 +3077,17 @@ export class Hyp3eActor extends Actor {
               if (effect.statuses.has("stun")) {
                 sitModSum += 4
                 sitModsArr.push("Defender Stunned (+4)")
+              }
+              // Concealment only affects missile attacks
+              if (isMissile) {
+                if (effect.statuses.has("coverPartial")) {
+                  sitModSum += -2
+                  sitModsArr.push("Defender Partially Concealed (-2)")
+                }
+                if (effect.statuses.has("coverFull")) {
+                  sitModSum += -5
+                  sitModsArr.push("Defender Mostly Concealed (-5)")
+                }
               }
             }
           }
