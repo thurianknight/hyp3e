@@ -561,8 +561,8 @@ export class Hyp3eActor extends Actor {
    */
   _getEncumberedStatus(systemData) {
     // Calc constants for encumbrance thresholds
-    const encumberedWt = this.system.attributes.str.value * CONFIG.HYP3E.encumbered
-    const heavilyEncumberedWt = this.system.attributes.str.value * CONFIG.HYP3E.heavilyEncumbered
+    const encumberedWt = this.system.attributes.str.curr * CONFIG.HYP3E.encumbered
+    const heavilyEncumberedWt = this.system.attributes.str.curr * CONFIG.HYP3E.heavilyEncumbered
     if (CONFIG.HYP3E.enableEncumbrance) {
       // this.encumbrance is currently calculated by the ActorSheet, though I would
       //  like to move that to the Actor data preparation phase eventually.
