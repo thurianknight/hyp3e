@@ -85,6 +85,10 @@ See [LICENSE.OGL](/LICENSE.OGL) file.
 Hyperborea is a registered trademark of North Wind Adventures. The trademark and Hyperborea logo are used with permission of North Wind Adventures. <!-- ADDITIONAL TEXT REQUESTED BY North Wind Adventures --> Permission to use Hyperborea in the ruleset title granted by North Wind Adventures. <!-- END ADDITIONAL TEXT -->
 <!-- END TEXT REQUIRED BY LICENSE -->
 
+### Icons Used Under Creative Commons License
+Some token status icons are used as provided by https://game-icons.net/ under the [Creative Commons 3.0 license](https://creativecommons.org/licenses/by/3.0/).
+
+
 ## Project Inquiries
 
 You may direct inquiries on the Hyperborea 3rd Edition System for Foundry VTT to [thurianknight@gmail.com](mailto:thurianknight@gmail.com).
