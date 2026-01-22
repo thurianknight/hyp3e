@@ -3024,6 +3024,14 @@ export class Hyp3eActor extends Actor {
               sitModSum += 4
               sitModsArr.push("Invisible (+4)")
             }
+            if (effect.statuses.has("flankAttack")) {
+              sitModSum += 1
+              sitModsArr.push("Flanking (+1)")
+            }
+            if (effect.statuses.has("rearAttack")) {
+              sitModSum += 2
+              sitModsArr.push("Rear Attack (+2)")
+            }
           }
         }
       }

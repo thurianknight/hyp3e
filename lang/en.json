@@ -677,7 +677,9 @@
             "hasted": "Hasted",
             "slowed": "Slowed",
             "coverPartial": "Partial Concealment",
-            "coverFull": "Full Concealment"
+            "coverFull": "Full Concealment",
+            "flankAttack": "Flank Attack",
+            "rearAttack": "Rear Attack"
         }
     }
 }

@@ -66,6 +66,7 @@ Hooks.once('init', async function() {
     isActive: false
   }
   CONFIG.statusEffects.push(hasted)
+
   const slowed = {
     id: "slowed",
     name: "HYP3E.statusEffects.slowed",
@@ -73,6 +74,23 @@ Hooks.once('init', async function() {
     isActive: false
   }
   CONFIG.statusEffects.push(slowed)
+
+  const flankAttack = {
+    id: "flankAttack",
+    name: "HYP3E.statusEffects.flankAttack",
+    img: `${HYP3E.assetsPath}/backup.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(flankAttack)
+
+  const rearAttack = {
+    id: "rearAttack",
+    name: "HYP3E.statusEffects.rearAttack",
+    img: `${HYP3E.assetsPath}/backstab.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(rearAttack)
+
   const coverPartial = {
     id: "coverPartial",
     name: "HYP3E.statusEffects.coverPartial",
@@ -80,6 +98,7 @@ Hooks.once('init', async function() {
     isActive: false
   }
   CONFIG.statusEffects.push(coverPartial)
+  
   const coverFull = {
     id: "coverFull",
     name: "HYP3E.statusEffects.coverFull",
