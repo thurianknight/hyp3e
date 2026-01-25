@@ -342,6 +342,10 @@ export class Hyp3eActor extends Actor {
         data[k] = foundry.utils.deepClone(v);
       }
     }
+    // Add movement to top level of data
+    if (data.movement) {
+      data.mv = data.movement.base.value ?? 0;
+    }
     // Add character's class to top level of data
     if (data.details.class) {
       data.class = data.details.class ?? "npc";
