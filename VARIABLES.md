@@ -39,7 +39,7 @@ When creating roll formulas and macros, it is common to use variables for actor 
   - Temporary Hit Points
 - @lvl
   - Character Level
-- @movement.base.value
+- @mv (simplified), or @movement.base.value
   - Calculated MV per round
 - @movement.tempMvMod
   - Temporary MV modifier
