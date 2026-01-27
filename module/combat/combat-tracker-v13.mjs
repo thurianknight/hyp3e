@@ -167,7 +167,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     super._onRender(context, options);
     // super.activateListeners(html);
 
-    // Reroll group initiative for all groups (GMs only)
+    // Roll group initiative for all groups (GMs only)
     html.find('.combat-control[data-action="reroll"]').click((ev) => {      
       game.combat.rollInitiative();
     });

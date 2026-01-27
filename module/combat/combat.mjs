@@ -76,14 +76,16 @@ export class HYP3ECombat extends Combat {
       }
     }
 
-    // Reset/reroll initiative
+    // Reset/keep initiative
     switch(this.#initiativePersistence) {
       case "reset":
         this.resetAll();
         break;
-      // case "reroll":
-      //   this.#rollAbsolutelyEveryone();
-      //   break;
+      case "reroll":
+        // this.#rollAbsolutelyEveryone();
+        // Revert to 'reset' since we have removed the reroll option from config
+        this.resetAll();
+        break;
       case "keep":
         // Do nothing
         break;
