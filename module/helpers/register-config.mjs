@@ -295,9 +295,9 @@ export function registerHyp3eConfigurations() {
     });
 
     // Re-roll Initiative action
-    game.settings.register(game.system.id, "rerollInitiative", {
-        name: game.i18n.localize("HYP3E.settings.rerollInitiative"),
-        hint: game.i18n.localize("HYP3E.settings.rerollInitiativeHint"),
+    game.settings.register(game.system.id, "resetInitiative", {
+        name: game.i18n.localize("HYP3E.settings.resetInitiative"),
+        hint: game.i18n.localize("HYP3E.settings.resetInitiativeHint"),
         default: "reset",
         scope: "world",
         type: String,
@@ -305,8 +305,7 @@ export function registerHyp3eConfigurations() {
         requiresReload: true,
         choices: {
             keep: "HYP3E.settings.initiativeKeep",
-            reset: "HYP3E.settings.initiativeReset",
-            reroll: "HYP3E.settings.initiativeReroll",
+            reset: "HYP3E.settings.initiativeReset"
         },
     });
 

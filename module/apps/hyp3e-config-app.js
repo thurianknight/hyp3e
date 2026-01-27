@@ -53,7 +53,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             // Rules Options - Combat
             // isGroupInitiative: game.settings.get(game.system.id, "isGroupInitiative"),
             initiativeType: game.settings.get(game.system.id, "initiativeType"),
-            rerollInitiative: game.settings.get(game.system.id, "rerollInitiative"),
+            resetInitiative: game.settings.get(game.system.id, "resetInitiative"),
             resolveDeathAtRoundEnd: game.settings.get(game.system.id, "resolveDeathAtRoundEnd"),
             limitMovement: game.settings.get(game.system.id, "limitMovement"),
             forceRangeLimit: game.settings.get(game.system.id, "forceRangeLimit"),
@@ -84,10 +84,9 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             { value: "phased", label: "Phased initiative" },
             { value: "individual", label: "Individual initiative" }
         ];
-        const rerollInitiativeOpts = [
+        const resetInitiativeOpts = [
             { value: "keep", label: "Keep same for each round" },
-            { value: "reset", label: "Reset to blank each round" },
-            { value: "reroll", label: "Reroll each round" }
+            { value: "reset", label: "Reset to blank each round" }
         ];
         const attrCheckOpts = [
             { value: "", label: "Disabled" },
@@ -107,7 +106,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             { value: "2", label: "Errors Only" }
         ];
         Hyp3eLogger.info("_prepareContext", `Loaded configuration settings:`, settings);
-        return { settings, initiativeTypeOpts, rerollInitiativeOpts, attrCheckOpts, quickCreateCharMethods, logLevels };
+        return { settings, initiativeTypeOpts, resetInitiativeOpts, attrCheckOpts, quickCreateCharMethods, logLevels };
     }
 
     /**

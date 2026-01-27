@@ -9,8 +9,8 @@ import { Hyp3eLogger } from "../helpers/logger.mjs";
 export class HYP3ECombat extends Combat {
   static FORMULA = "1d6";
 
-  get #rerollBehavior() {
-      return game.settings.get(game.system.id, "rerollInitiative");
+  get #initiativePersistence() {
+      return game.settings.get(game.system.id, "resetInitiative");
   }
 
   // ===========================================================================
@@ -28,7 +28,7 @@ export class HYP3ECombat extends Combat {
 
   async startCombat() {
     await super.startCombat();
-    if (this.#rerollBehavior !== "reset") {
+    if (this.#initiativePersistence !== "reset") {
       await this.#rollAbsolutelyEveryone();
     }
 
@@ -77,14 +77,16 @@ export class HYP3ECombat extends Combat {
     }
 
     // Reset/reroll initiative
-    switch(this.#rerollBehavior) {
+    switch(this.#initiativePersistence) {
       case "reset":
         this.resetAll();
         break;
-      case "reroll":
-        this.#rollAbsolutelyEveryone();
-        break;
+      // case "reroll":
+      //   this.#rollAbsolutelyEveryone();
+      //   break;
       case "keep":
+        // Do nothing
+        break;
       default:
         break;
     }
