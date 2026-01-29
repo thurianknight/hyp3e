@@ -1400,9 +1400,13 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       }
       // Handle character -> treasure drag
       if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "treasure") {
-        // const msg = `Why would you want to put items INTO a treasure trove? That makes no sense!`;
-        // Hyp3eLogger.warn("_onDropItem", msg);
-        // ui.notifications.warn(msg);
+        // Do not transfer spells or features
+        if (["spell","feature","effectTemplate"].includes(item.type)) {
+          const msg = `${this.actor.name} cannot hold ${item.type}s!`;
+          Hyp3eLogger.warn("_onDropItem", msg);
+          ui.notifications.warn(msg);
+          return; // Prevent super._onDropItem()
+        }
         // Perform the item transfer and exit early
         await transferFromActor(this.actor, sourceActor, item);
         return; // Prevent super._onDropItem()
