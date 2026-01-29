@@ -526,22 +526,22 @@ export function mergeStructuredMoney(a, b) {
 }
 
 /**
- * Handle taking an item from a treasure hoard
+ * Handle transferring an item from another actor - like a treasure hoard
  * @param {*} recipient 
- * @param {*} treasure 
+ * @param {*} giver 
  * @param {*} item 
  * @returns 
  */
-export async function transferFromTreasure(recipient, treasure, item) {
+export async function transferFromActor(recipient, giver, item) {
   const itemData = item.toObject();
   const itemName = itemData.name;
-  const treasureQty = parseInt(item.system.quantity?.value) ?? 1;
+  const giverQty = parseInt(item.system.quantity?.value) ?? 1;
 
-  // Handle max transfer qty based on treasure qty on hand
-  if (treasureQty <= 0) {
-      return ui.notifications.warn(`Treasure has no ${itemName} in inventory.`);
+  // Handle max transfer qty based on giver qty on hand
+  if (giverQty <= 0) {
+    return ui.notifications.warn(`${giver.name} has no ${itemName} in inventory.`);
   }
-  let maxQty = treasureQty;
+  let maxQty = giverQty;
 
   // Is the item sold in bundles?
   const bundleAmt = item.system.quantity?.bundle && item.system.quantity.bundle > 1
@@ -552,7 +552,7 @@ export async function transferFromTreasure(recipient, treasure, item) {
   const qty = await Dialog.prompt({
     title: `${itemName} Transfer Quantity`,
     content: `
-      <p>${treasure.name} has <strong>${treasureQty}</strong> ${item.name}(s).</p>
+      <p>${giver.name} has <strong>${giverQty}</strong> ${item.name}(s).</p>
       <p>
         <label>How many ${bundleAmt} to transfer? (Max: ${maxQty})</label>
         <input type="number" id="qty" min="1" max="${maxQty}" value="1" 
@@ -573,16 +573,16 @@ export async function transferFromTreasure(recipient, treasure, item) {
   });
   if (!qty) return;
 
-  // Adjust the treasure's qty on hand
-  let newtreasureQty = 0;
+  // Adjust the giver's qty on hand
+  let newGiverQty = 0;
   if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
-    // For bundled items, reduce qty based on number of bundles sold
+    // For bundled items, reduce qty based on number of bundles transferred
     const unitsTransferred = qty * item.system.quantity.bundle;
-    newtreasureQty = Math.ceil(treasureQty - unitsTransferred, 0);
+    newGiverQty = Math.ceil(giverQty - unitsTransferred, 0);
   } else {
-    newtreasureQty = Math.ceil(treasureQty - qty, 0);
+    newGiverQty = Math.ceil(giverQty - qty, 0);
   }
-  await item.update({ "system.quantity.value": newtreasureQty });
+  await item.update({ "system.quantity.value": newGiverQty });
 
   // Check if the recipient already has this item (match by name & type)
   const existing = recipient.items.find(i =>
@@ -597,7 +597,7 @@ export async function transferFromTreasure(recipient, treasure, item) {
     let newQty = 0;
     let bundlesOf = "";
     if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
-      // For bundled items, increase qty based on number of bundles bought
+      // For bundled items, increase qty based on number of bundles transferred
       bundlesOf = `bundle(s) of ${item.system.quantity.bundle}`;
       const unitsTaken = qty * item.system.quantity.bundle;
       newQty = toNumber(existing.system.quantity.value) + unitsTaken;
@@ -623,7 +623,7 @@ export async function transferFromTreasure(recipient, treasure, item) {
     }
     await recipient.createEmbeddedDocuments("Item", [itemData]);
     ui.notifications.info(
-      `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) from ${treasure.name}.`
+      `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) from ${giver.name}.`
     );
   }
 }

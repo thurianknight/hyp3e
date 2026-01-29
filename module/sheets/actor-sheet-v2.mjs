@@ -3,7 +3,7 @@ import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { parseGpValue, 
             buyFromMerchant,
             sellToMerchant,
-            transferFromTreasure } from "../helpers/money.mjs";
+            transferFromActor } from "../helpers/money.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { enableAllTransferrableItemEffectsToItemOwner, 
             disableAllTransferrableItemEffectsOnItemOwner, 
@@ -1374,35 +1374,37 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       // Handle merchant -> character drag
       const sourceActor = item?.parent;
       if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
-          // Perform the merchant transaction and exit early
-          await buyFromMerchant(this.actor, sourceActor, item);
-          return; // Prevent super._onDropItem()
+        // Perform the merchant transaction and exit early
+        await buyFromMerchant(this.actor, sourceActor, item);
+        return; // Prevent super._onDropItem()
       }
       // Handle character -> merchant drag
       if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "merchant") {
-          // If selling a container, it must be empty
-          if (item._isContainer() && item.contents.length > 0) {
-              const msg = `Container ${item.name} is not empty! Remove all items from it first, before selling it.`;
-              Hyp3eLogger.warn("_onDropItem", msg);
-              ui.notifications.warn(msg);
-              return; // Prevent super._onDropItem()
-          }
-          // Perform the sale to merchant and exit early
-          await sellToMerchant(this.actor, sourceActor, item);
+        // If selling a container, it must be empty
+        if (item._isContainer() && item.contents.length > 0) {
+          const msg = `Container ${item.name} is not empty! Remove all items from it first, before selling it.`;
+          Hyp3eLogger.warn("_onDropItem", msg);
+          ui.notifications.warn(msg);
           return; // Prevent super._onDropItem()
+        }
+        // Perform the sale to merchant and exit early
+        await sellToMerchant(this.actor, sourceActor, item);
+        return; // Prevent super._onDropItem()
       }
 
       // Handle treasure -> character drag
       if (sourceActor?.type === "treasure" && this.actor.type !== "treasure") {
-          // Perform the treasure acquisition and exit early
-          await transferFromTreasure(this.actor, sourceActor, item);
-          return; // Prevent super._onDropItem()
+        // Perform the item transfer and exit early
+        await transferFromActor(this.actor, sourceActor, item);
+        return; // Prevent super._onDropItem()
       }
       // Handle character -> treasure drag
       if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "treasure") {
-        const msg = `Why would you want to put items INTO a treasure trove? That makes no sense!`;
-        Hyp3eLogger.warn("_onDropItem", msg);
-        ui.notifications.warn(msg);
+        // const msg = `Why would you want to put items INTO a treasure trove? That makes no sense!`;
+        // Hyp3eLogger.warn("_onDropItem", msg);
+        // ui.notifications.warn(msg);
+        // Perform the item transfer and exit early
+        await transferFromActor(this.actor, sourceActor, item);
         return; // Prevent super._onDropItem()
       }
 
