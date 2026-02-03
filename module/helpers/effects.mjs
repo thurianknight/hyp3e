@@ -485,7 +485,7 @@ async function sendEffectChatMessage(effect) {
     const token = target.getAssociatedToken();
     targetName = token.name ?? target.name ?? "Unknown Target";
   } else {
-    Hyp3eLogger.warn("ActiveEffect sendEffectChatMessage", `Effect parent is not an Actor or Item, cannot send chat message:`, effect);
+    Hyp3eLogger.info("ActiveEffect sendEffectChatMessage", `Effect parent is not an Actor or Item, cannot send chat message:`, effect);
     return;
   }
 
