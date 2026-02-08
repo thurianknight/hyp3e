@@ -44,6 +44,10 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 16
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "axe (hand), blowgun, bow (short), chain whip, club whip, club (light), crossbow (light), dagger, dart, dagger, dart, falcata, flail (horseman's), hammer (horseman's), hooked throwing knife, knife, mace (horseman's), pick (horseman's), scimitar (short), sling, sword (short, broad, long), tonfa, trident (hand)",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -182,6 +186,10 @@ export class Hyp3eCharacter {
                 "transformation": 14,
                 "avoidance": 14,
                 "sorcery": 14
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -324,6 +332,10 @@ export class Hyp3eCharacter {
                 "transformation": 16,
                 "avoidance": 14,
                 "sorcery": 16
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -478,6 +490,10 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 14
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": "blowgun, bow (short, long), crossbow (light, heavy, repeating), sling"
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -605,6 +621,10 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 16
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -726,6 +746,10 @@ export class Hyp3eCharacter {
                 "transformation": 16,
                 "avoidance": 16,
                 "sorcery": 14
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "club (light, war), dagger, flail (horseman's, footman's), hammer (horseman's, war), lasso, mace (horseman's, footman's), morning star, quarterstaff, spear (short, long), spiked staff, sword (short, broad, long, bastard), tonfa, whip",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -874,6 +898,10 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "axe (hand), dagger, dart, dart, pick (horseman's), quarterstaff, spear (short)",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -1019,6 +1047,10 @@ export class Hyp3eCharacter {
                 "transformation": 16,
                 "avoidance": 16,
                 "sorcery": 14
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "bow (short, long), club (light, war), dagger, dart, falcata, lasso, morning star, quarterstaff, scimitar (short, long), sickle, sling, spear (short, long), spiked staff, tonfa, trident (long), whip",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -1168,6 +1200,10 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 16
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -1295,6 +1331,10 @@ export class Hyp3eCharacter {
                 "transformation": 14,
                 "avoidance": 16,
                 "sorcery": 16
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -1431,6 +1471,10 @@ export class Hyp3eCharacter {
                 "transformation": 16,
                 "avoidance": 16,
                 "sorcery": 14
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "dagger, dart, quarterstaff, sling",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -1577,6 +1621,10 @@ export class Hyp3eCharacter {
                 "transformation": 16,
                 "avoidance": 14,
                 "sorcery": 14
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "axe (hand), bow (short), club (light), crossbow (light), dagger, dart, falcata, flail (horseman's), hammer (horseman's), mace (horseman's), pick (horseman's), scimitar (short), sling, sword (short, broad, long), trident (hand)",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -1729,6 +1777,10 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "dagger, dart, quarterstaff, sling",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -1871,6 +1923,10 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 16
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": "axe (great), hammer (great), mace (great), pike, spear (great), scimitar (two-handed), sword (two-handed)"
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -2009,6 +2065,10 @@ export class Hyp3eCharacter {
                 "transformation": 16,
                 "avoidance": 16,
                 "sorcery": 14
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "dagger, dart, quarterstaff, sickle, sling, whip",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -2170,6 +2230,10 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 14
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -2324,6 +2388,10 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "dagger, dart, quarterstaff, sling, whip",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -2476,6 +2544,10 @@ export class Hyp3eCharacter {
                 "transformation": 16,
                 "avoidance": 14,
                 "sorcery": 14
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "axe (hand), bow (short), club (light), crossbow (light), dagger, dart, falcata, flail (horseman's), hammer (horseman's), mace (horseman's), morning star, pick (horseman's), scimitar (short), sling, sword (short, broad, long), trident (hand)",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -2643,6 +2715,10 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "dagger, dart, falcata, morning star, quarterstaff quarterstaff, scimitar (short, long)",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -2788,6 +2864,10 @@ export class Hyp3eCharacter {
                 "transformation": 14,
                 "avoidance": 16,
                 "sorcery": 16
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -2936,6 +3016,10 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -3079,6 +3163,10 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 16
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "axe (hand), bow (short), club (light), crossbow (light), dagger, dart, falcata, flail (horseman's), hammer (horseman's), lasso, mace (horseman's), pick (horseman's), scimitar (short), sling, sword (short, broad, long), trident (hand)",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -3220,6 +3308,10 @@ export class Hyp3eCharacter {
                 "transformation": 16,
                 "avoidance": 16,
                 "sorcery": 14
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "axe (hand), blowgun, bola, boomerang, bow (short), chain whip, club (light, war), dagger, hooked throwing knife, quarterstaff, sling, spear (short, long), tonfa, trident (hand, long)",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
@@ -3380,6 +3472,10 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 16
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "axe (hand), bow (short), club (light), crossbow (light), dagger, dart, falcata, flail (horseman's), hammer (horseman's), mace (horseman's), pick (horseman's), scimitar (short), sling, sword (short, broad, long), trident (hand)",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -3520,6 +3616,10 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "weaponProficiencies": {
+              "favoredWeapons": "any",
+              "exceptions": ""
+            },
             "levelAdvancement": {
                 1: {
                     "xp": 0,
@@ -3657,6 +3757,10 @@ export class Hyp3eCharacter {
                 "transformation": 14,
                 "avoidance": 16,
                 "sorcery": 14
+            },
+            "weaponProficiencies": {
+              "favoredWeapons": "blowgun, dagger, dart, quarterstaff, sling, whip",
+              "exceptions": ""
             },
             "levelAdvancement": {
                 1: {
