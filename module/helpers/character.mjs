@@ -24,7 +24,6 @@ export class Hyp3eCharacter {
             "fa": 1,
             "ca": null,
             "ta": null,
-            "unskilled": -2,
             "attrReqs": {
                 "str": 9,
                 "dex": 9,
@@ -44,6 +43,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 16
             },
+            "unskilled": -2,
             "weaponProficiencies": {
               "favoredWeapons": "axe (hand), blowgun, bow (short), chain whip, club whip, club (light), crossbow (light), dagger, dart, dagger, dart, falcata, flail (horseman's), hammer (horseman's), hooked throwing knife, knife, mace (horseman's), pick (horseman's), scimitar (short), sling, sword (short, broad, long), tonfa, trident (hand)",
               "exceptions": ""
@@ -166,7 +166,6 @@ export class Hyp3eCharacter {
             "fa": 1,
             "ca": null,
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 13,
                 "dex": 13,
@@ -187,6 +186,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 14
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": ""
@@ -311,7 +311,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Druid", "Illusionist"],
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 9,
                 "dex": 9,
@@ -333,6 +332,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 16
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": ""
@@ -470,7 +470,6 @@ export class Hyp3eCharacter {
             "fa": 1,
             "ca": null,
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 15,
                 "con": 15,
@@ -490,6 +489,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 14
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": "blowgun, bow (short, long), crossbow (light, heavy, repeating), sling"
@@ -600,7 +600,6 @@ export class Hyp3eCharacter {
             "fa": 1,
             "ca": null,
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 9,
                 "dex": 9,
@@ -621,6 +620,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 16
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": ""
@@ -732,7 +732,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Cleric"],
             "ta": 1,
-            "unskilled": -2,
             "hitDie": "1d8",
             "attrReqs": {
                 "wis": 9,
@@ -747,6 +746,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -2,
             "weaponProficiencies": {
               "favoredWeapons": "club (light, war), dagger, flail (horseman's, footman's), hammer (horseman's, war), lasso, mace (horseman's, footman's), morning star, quarterstaff, spear (short, long), spiked staff, sword (short, broad, long, bastard), tonfa, whip",
               "exceptions": ""
@@ -882,7 +882,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Cryomancer"],
             "ta": null,
-            "unskilled": -4,
             "attrReqs": {
                 "int": 9,
                 "wis": 9,
@@ -898,6 +897,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -4,
             "weaponProficiencies": {
               "favoredWeapons": "axe (hand), dagger, dart, dart, pick (horseman's), quarterstaff, spear (short)",
               "exceptions": ""
@@ -1032,7 +1032,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Druid"],
             "ta": null,
-            "unskilled": -2,
             "attrReqs": {
                 "wis": 9,
                 "cha": 12,
@@ -1048,6 +1047,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -2,
             "weaponProficiencies": {
               "favoredWeapons": "bow (short, long), club (light, war), dagger, dart, falcata, lasso, morning star, quarterstaff, scimitar (short, long), sickle, sling, spear (short, long), spiked staff, tonfa, trident (long), whip",
               "exceptions": ""
@@ -1183,7 +1183,6 @@ export class Hyp3eCharacter {
             "fa": 1,
             "ca": null,
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 9,
             },
@@ -1200,6 +1199,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 16
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": ""
@@ -1311,7 +1311,6 @@ export class Hyp3eCharacter {
             "fa": 1,
             "ca": null,
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 9,
                 "dex": 9,
@@ -1332,6 +1331,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 16
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": ""
@@ -1453,7 +1453,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Illusionist"],
             "ta": null,
-            "unskilled": -4,
             "attrReqs": {
                 "dex": 9,
                 "int": 9,
@@ -1472,6 +1471,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -4,
             "weaponProficiencies": {
               "favoredWeapons": "dagger, dart, quarterstaff, sling",
               "exceptions": ""
@@ -1603,7 +1603,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Magician"],
             "ta": null,
-            "unskilled": -2,
             "attrReqs": {
                 "dex": 12,
                 "int": 12,
@@ -1622,6 +1621,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 14
             },
+            "unskilled": -2,
             "weaponProficiencies": {
               "favoredWeapons": "axe (hand), bow (short), club (light), crossbow (light), dagger, dart, falcata, flail (horseman's), hammer (horseman's), mace (horseman's), pick (horseman's), scimitar (short), sling, sword (short, broad, long), trident (hand)",
               "exceptions": ""
@@ -1763,7 +1763,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Magician"],
             "ta": null,
-            "unskilled": -4,
             "attrReqs": {
                 "int": 9,
             },
@@ -1777,6 +1776,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -4,
             "weaponProficiencies": {
               "favoredWeapons": "dagger, dart, quarterstaff, sling",
               "exceptions": ""
@@ -1903,7 +1903,6 @@ export class Hyp3eCharacter {
             "fa": 0,
             "ca": null,
             "ta": null,
-            "unskilled": -2,
             "attrReqs": {
                 "str": 9,
                 "dex": 9,
@@ -1923,6 +1922,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 16
             },
+            "unskilled": -2,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": "axe (great), hammer (great), mace (great), pike, spear (great), scimitar (two-handed), sword (two-handed)"
@@ -2050,7 +2050,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Necromancer"],
             "ta": null,
-            "unskilled": -4,
             "attrReqs": {
                 "int": 9,
                 "wis": 9,
@@ -2066,6 +2065,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -4,
             "weaponProficiencies": {
               "favoredWeapons": "dagger, dart, quarterstaff, sickle, sling, whip",
               "exceptions": ""
@@ -2209,7 +2209,6 @@ export class Hyp3eCharacter {
             "fa": 1,
             "ca": null,
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 9,
                 "dex": 9,
@@ -2230,6 +2229,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 14
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": ""
@@ -2372,7 +2372,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Cleric"],
             "ta": 1,
-            "unskilled": -4,
             "attrReqs": {
                 "wis": 9,
                 "cha": 9,
@@ -2388,6 +2387,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -4,
             "weaponProficiencies": {
               "favoredWeapons": "dagger, dart, quarterstaff, sling, whip",
               "exceptions": ""
@@ -2526,7 +2526,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Cleric"],
             "ta": null,
-            "unskilled": -2,
             "attrReqs": {
                 "dex": 12,
                 "wis": 12,
@@ -2545,6 +2544,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 14
             },
+            "unskilled": -2,
             "weaponProficiencies": {
               "favoredWeapons": "axe (hand), bow (short), club (light), crossbow (light), dagger, dart, falcata, flail (horseman's), hammer (horseman's), mace (horseman's), morning star, pick (horseman's), scimitar (short), sling, sword (short, broad, long), trident (hand)",
               "exceptions": ""
@@ -2699,7 +2699,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Pyromancer"],
             "ta": null,
-            "unskilled": -4,
             "attrReqs": {
                 "int": 9,
                 "wis": 9,
@@ -2715,6 +2714,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -4,
             "weaponProficiencies": {
               "favoredWeapons": "dagger, dart, falcata, morning star, quarterstaff quarterstaff, scimitar (short, long)",
               "exceptions": ""
@@ -2844,7 +2844,6 @@ export class Hyp3eCharacter {
             "ca": null,
             "spellLists": ["Druid", "Magician"],
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 9,
                 "dex": 9,
@@ -2865,6 +2864,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 16
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": ""
@@ -2997,7 +2997,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Runes"],
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 9,
                 "wis": 12,
@@ -3016,6 +3015,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": ""
@@ -3144,7 +3144,6 @@ export class Hyp3eCharacter {
             "fa": 1,
             "ca": null,
             "ta": null,
-            "unskilled": -2,
             "attrReqs": {
                 "dex": 9,
                 "int": 9,
@@ -3163,6 +3162,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 16
             },
+            "unskilled": -2,
             "weaponProficiencies": {
               "favoredWeapons": "axe (hand), bow (short), club (light), crossbow (light), dagger, dart, falcata, flail (horseman's), hammer (horseman's), lasso, mace (horseman's), pick (horseman's), scimitar (short), sling, sword (short, broad, long), trident (hand)",
               "exceptions": ""
@@ -3293,7 +3293,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Cleric", "Magician"],
             "ta": null,
-            "unskilled": -4,
             "attrReqs": {
                 "int": 9,
                 "wis": 12
@@ -3309,6 +3308,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -4,
             "weaponProficiencies": {
               "favoredWeapons": "axe (hand), blowgun, bola, boomerang, bow (short), chain whip, club (light, war), dagger, hooked throwing knife, quarterstaff, sling, spear (short, long), tonfa, trident (hand, long)",
               "exceptions": ""
@@ -3455,7 +3455,6 @@ export class Hyp3eCharacter {
             "fa": 1,
             "ca": null,
             "ta": null,
-            "unskilled": -2,
             "attrReqs": {
                 "dex": 9,
             },
@@ -3472,6 +3471,7 @@ export class Hyp3eCharacter {
                 "avoidance": 14,
                 "sorcery": 16
             },
+            "unskilled": -2,
             "weaponProficiencies": {
               "favoredWeapons": "axe (hand), bow (short), club (light), crossbow (light), dagger, dart, falcata, flail (horseman's), hammer (horseman's), mace (horseman's), pick (horseman's), scimitar (short), sling, sword (short, broad, long), trident (hand)",
               "exceptions": ""
@@ -3597,7 +3597,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Magician"],
             "ta": null,
-            "unskilled": 0,
             "attrReqs": {
                 "str": 12,
                 "int": 12,
@@ -3616,6 +3615,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": 0,
             "weaponProficiencies": {
               "favoredWeapons": "any",
               "exceptions": ""
@@ -3741,7 +3741,6 @@ export class Hyp3eCharacter {
             "ca": 1,
             "spellLists": ["Witch"],
             "ta": null,
-            "unskilled": -4,
             "attrReqs": {
                 "int": 9,
                 "wis": 9,
@@ -3758,6 +3757,7 @@ export class Hyp3eCharacter {
                 "avoidance": 16,
                 "sorcery": 14
             },
+            "unskilled": -4,
             "weaponProficiencies": {
               "favoredWeapons": "blowgun, dagger, dart, quarterstaff, sling, whip",
               "exceptions": ""
@@ -5084,6 +5084,10 @@ export class Hyp3eCharacter {
             content += `<li>Turning Ability: ${thisClass.ta}</li>`
             data.unskilled = thisClass.unskilled
             content += `<li>Unskilled Weapon Penalty: ${thisClass.unskilled}</li>`
+            data.proficiencies.class = thisClass.weaponProficiencies.favoredWeapons
+            if (thisClass.weaponProficiencies.exceptions != "") {
+                data.proficiencies.class += ` *except* ${thisClass.weaponProficiencies.exceptions}`
+            }
             data.details.xp.value = 0
             data.details.xp.toNextLvl = thisClass.levelAdvancement[2].xp
             data.details.xp.primeAttr = ""
@@ -5425,6 +5429,9 @@ export class Hyp3eCharacter {
                         }
                     },
                     unskilled: data.unskilled,
+                    proficiencies: {
+                        class: data.proficiencies.class
+                    },
                     attributes: {
                         str: {
                             atkMod: data.attributes.str.atkMod,
