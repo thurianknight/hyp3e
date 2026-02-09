@@ -687,7 +687,7 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
     const totalDistance = movement.history.distance + movement.passed.distance + movement.pending.distance;
     Hyp3eLogger.info("preMoveToken", `${actor.name} total distance: `, totalDistance);
     if (totalDistance > speed) {
-        const msg = `${actor.name} can only move ${speed} ft per round!`;
+        const msg = `This move exceeds ${actor.name}'s speed of ${speed} feet per round!`;
         Hyp3eLogger.warn("preMoveToken", msg)
         ui.notifications.warn(msg);
         if (CONFIG.HYP3E.limitMovement) {
