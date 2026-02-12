@@ -14,7 +14,7 @@
             <div class="money-block flexrow">
               {{#each system.money as |coin key|}}
               <div class="ability align-center">
-                <label for="system.money.{{key}}.value" class="exploration-label">{{coin.label}}</label>
+                <label for="system.money.{{key}}.value" class="exploration-label coins">{{coin.label}}</label>
                 <input type="text" name="system.money.{{key}}.value" value="{{coin.value}}" {{#unless @root.isGM}}disabled{{/unless}} />
               </div>
               {{/each}}
