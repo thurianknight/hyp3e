@@ -1688,7 +1688,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       };
 
       event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.effectAllowed = "copy";
       event.dataTransfer.dropEffect = "move";
     }
 }

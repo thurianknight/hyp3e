@@ -1116,6 +1116,30 @@
   font-weight: bold;
   padding: 5px 5px;
 }
+/* Color per coin type */
+.exploration-label.coin-cp i.fa-coin,
+.exploration-label.coin-copper i.fa-coin {
+  color: #b87333;           /* classic copper / bronze */
+}
+.exploration-label.coin-sp i.fa-coin,
+.exploration-label.coin-silver i.fa-coin {
+  color: #c0c0c0;           /* silver */
+  filter: brightness(1.15); /* often looks better a bit brighter */
+}
+.exploration-label.coin-ep i.fa-coin,
+.exploration-label.coin-electrum i.fa-coin {
+  color: #f3d677;           /* electrum — yellowish pale gold */
+}
+.exploration-label.coin-gp i.fa-coin,
+.exploration-label.coin-gold i.fa-coin {
+  color: #ffb700;           /* gold */
+  filter: drop-shadow(0 0 2px #ffaa00aa);
+}
+.exploration-label.coin-pp i.fa-coin,
+.exploration-label.coin-platinum i.fa-coin {
+  color: #e5e4e2;           /* platinum — bright silver-ish */
+  filter: brightness(1.25);
+}
 
 /* Character Combat-tab styles */
 .hyp3e .movement-other {
