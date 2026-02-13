@@ -1,4 +1,5 @@
 import { Hyp3eLogger } from "./logger.mjs";
+import { sendSimpleChat } from "../chat/chat.mjs"
 
 // Coin value constants (in gp-equivalents)
 export const PP_VAL = 5     // Platinum = 1:5 for gold
@@ -212,9 +213,11 @@ export async function buyFromMerchant(buyer, merchant, item) {
             newQty = toNumber(existing.system.quantity.value) + qty;
         }
         await existing.update({ "system.quantity.value": newQty, "system.quantity.max": newQty });
-        ui.notifications.info(
-            `${buyer.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`
-        );
+
+        const message = `${buyer.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`;
+        sendSimpleChat(buyer, "", message);
+        ui.notifications.info(message);
+
     } else {
         let bundlesOf = "";
         if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
@@ -229,9 +232,11 @@ export async function buyFromMerchant(buyer, merchant, item) {
             itemData.system.quantity.max = qty;
         }
         await buyer.createEmbeddedDocuments("Item", [itemData]);
-        ui.notifications.info(
-            `${buyer.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${merchant.name}.`
-        );
+
+        const message = `${buyer.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${merchant.name}.`;
+        sendSimpleChat(buyer, "", message);
+        ui.notifications.info(message);
+
     }
 }
 
@@ -348,9 +353,11 @@ export async function sellToMerchant(merchant, seller, item) {
             newQty = toNumber(existing.system.quantity.value) + qty;
         }
         await existing.update({ "system.quantity.value": newQty, "system.quantity.max": newQty });
-        ui.notifications.info(
-            `${merchant.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`
-        );
+
+        const message = `${merchant.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`;
+        sendSimpleChat(merchant, "", message);
+        ui.notifications.info(message);
+
     } else {
         if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
             // For bundled items, set qty based on number of bundles bought
@@ -364,9 +371,11 @@ export async function sellToMerchant(merchant, seller, item) {
             itemData.system.quantity.max = qty;
         }
         await merchant.createEmbeddedDocuments("Item", [itemData]);
-        ui.notifications.info(
-            `${merchant.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${seller.name}.`
-        );
+
+        const message = `${merchant.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${seller.name}.`;
+        sendSimpleChat(merchant, "", message);
+        ui.notifications.info(message);
+
     }
 }
 
@@ -605,9 +614,11 @@ export async function transferFromActor(recipient, giver, item) {
       newQty = toNumber(existing.system.quantity.value) + qty;
     }
     await existing.update({ "system.quantity.value": newQty, "system.quantity.max": newQty });
-    ui.notifications.info(
-      `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) (now owns ${newQty}).`
-    );
+
+    const message = `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) (now owns ${newQty}).`;
+    sendSimpleChat(recipient, "", message);
+    ui.notifications.info(message);
+
   } else {
     let bundlesOf = "";
     if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
@@ -622,9 +633,11 @@ export async function transferFromActor(recipient, giver, item) {
       itemData.system.quantity.max = qty;
     }
     await recipient.createEmbeddedDocuments("Item", [itemData]);
-    ui.notifications.info(
-      `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) from ${giver.name}.`
-    );
+
+    const message = `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) from ${giver.name}.`;
+    sendSimpleChat(recipient, "", message);
+    ui.notifications.info(message);
+
   }
 }
 
@@ -681,5 +694,7 @@ export async function transferCoinFromActor(recipient, giver, currency) {
   toMoney[currency].value = toCoin + amount;
   await recipient.update({ 'system.money': toMoney });
 
-  ui.notifications.info(`${amount} ${coinLabel} transferred from ${giver.name} to ${recipient.name}.`);
+  const message = `${amount} ${coinLabel} transferred from ${giver.name} to ${recipient.name}.`;
+  sendSimpleChat(recipient, "", message);
+  ui.notifications.info(message);
 }
