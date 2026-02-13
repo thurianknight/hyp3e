@@ -4,3 +4,8 @@ jsconfig.json
 foundry
 
 .DS_Store
+.env
+.npmignore
+.nvmrc
+.venv/
+.vscode/
