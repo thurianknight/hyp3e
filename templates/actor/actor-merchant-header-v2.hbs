@@ -15,7 +15,7 @@
             <div class="money-block flexrow">
               {{#each system.money as |coin key|}}
               <div class="ability align-center">
-                <label for="system.money.{{key}}.value" class="exploration-label">
+                <label for="system.money.{{key}}.value" class="exploration-label coin-{{key}}">
                   <i class="fas fa-coin"></i>
                   {{coin.label}}
                 </label>

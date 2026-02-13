@@ -627,3 +627,59 @@ export async function transferFromActor(recipient, giver, item) {
     );
   }
 }
+
+/**
+ * Handle transferring coin from another actor
+ * @param {*} recipient 
+ * @param {*} giver 
+ * @param {*} currency 
+ * @returns 
+ */
+export async function transferCoinFromActor(recipient, giver, currency) {
+  const coinLabel = currency.toUpperCase();
+  const coin = giver.system.money[currency];
+  if (!coin) {
+    return ui.notifications.warn(`${giver.name} has no ${coinLabel}.`)
+    return;
+  }
+  let giverAmount = coin.value;
+
+  // Prompt for amount to transfer
+  const amount = await Dialog.prompt({
+    title: `${coinLabel} Transfer Amount`,
+    content: `
+      <p>${giver.name} has <strong>${giverAmount}</strong> ${coinLabel}.</p>
+      <p>
+        <label>How many ${coinLabel} to transfer? (Max: ${giverAmount})</label>
+        <input type="number" id="amount" min="1" max="${giverAmount}" value="1" 
+          style="width:80px; text-align: center;">
+      </p>
+    `,
+    label: "Transfer",
+    callback: html => {
+      const val = parseInt(html.find("#amount").val() ?? "1");
+      if (isNaN(val) || val < 0) return 0;
+      return Math.clamped(val, 1, giverAmount);
+    },
+    rejectClose: false,
+    render: html => {
+      const $input = html.find("#amount");
+      $input.focus();
+    }
+  });
+  if (!amount) return;
+
+  // Adjust the giver's coin amount
+  const fromMoney = foundry.utils.deepClone(giver.system.money);
+  const fromCoin = Number(fromMoney[currency].value);
+  fromMoney[currency].value = fromCoin - amount;
+  await giver.update({ 'system.money': fromMoney });
+
+  // Add to the recipient's coin amount
+  const toMoney = foundry.utils.deepClone(recipient.system.money);
+  const toCoin = Number(toMoney[currency]?.value) || 0;
+  toMoney[currency].value = toCoin + amount;
+  await recipient.update({ 'system.money': toMoney });
+
+  ui.notifications.info(`${amount} ${coinLabel} transferred from ${giver.name} to ${recipient.name}.`);
+}

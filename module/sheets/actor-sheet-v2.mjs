@@ -3,7 +3,8 @@ import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { parseGpValue, 
             buyFromMerchant,
             sellToMerchant,
-            transferFromActor } from "../helpers/money.mjs";
+            transferFromActor,
+            transferCoinFromActor } from "../helpers/money.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { enableAllTransferrableItemEffectsToItemOwner, 
             disableAllTransferrableItemEffectsOnItemOwner, 
@@ -1574,7 +1575,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @param {DragEvent} event The drop event.
      * @override
      */
-    _onDrop(event) {
+    async _onDrop(event) {
       event.preventDefault();           // Important: prevent default browser behavior
       event.stopPropagation();          // Prevent bubbling to parent handlers
       Hyp3eLogger.info("HYP3EActorSheetV2 _onDrop", `Drag/Drop event:`, event)
@@ -1607,53 +1608,12 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         const max = dragData.max ?? 0;
         const currency = dragData.currency;
         if (!currency || max <= 0) return ui.notifications.warn("Invalid currency or coin is zero.");
-        const coinLabel = fromActor.system.money[currency]?.label || currency.toUpperCase();
 
-        // Pop up dialog for amount
-        new Dialog({
-          title: `Transfer ${coinLabel}`,
-          content: `
-            <p>How many ${coinLabel} to transfer? (1 to ${max})</p>
-            <input type="number" id="transfer-amount" min="1" max="${max}" value="1" autofocus>
-          `,
-          buttons: {
-            transfer: {
-              icon: '<i class="fas fa-check"></i>',
-              label: 'Transfer',
-              callback: async (html) => {
-                const amountInput = html[0].querySelector('#transfer-amount');
-                const amount = Number(amountInput.value.trim());
-                if (!Number.isInteger(amount) || amount < 1 || amount > max) {
-                  ui.notifications.warn('Invalid transfer amount.');
-                  return;
-                }
-
-                // Duplicate and update source actor's money
-                const fromMoney = foundry.utils.deepClone(fromActor.system.money);
-                const fromCoin = Number(fromMoney[currency].value);
-                fromMoney[currency].value = fromCoin - amount;
-                await fromActor.update({ 'system.money': fromMoney });
-
-                // Duplicate and update target actor's money
-                const toMoney = foundry.utils.deepClone(this.actor.system.money);
-                const toCoin = Number(toMoney[currency]?.value) || 0;
-                toMoney[currency].value = toCoin + amount;
-                await this.actor.update({ 'system.money': toMoney });
-
-                ui.notifications.info(`${amount} ${coinLabel} transferred successfully.`);
-              }
-            },
-            cancel: {
-              icon: '<i class="fas fa-times"></i>',
-              label: 'Cancel'
-            }
-          },
-          default: 'transfer'
-        }).render(true);
-
-        return; // Handled the drop
+        // Perform the item transfer and exit early
+        await transferCoinFromActor(this.actor, fromActor, currency, max);
+        return; // Prevent super._onDrop()
       }
-  
+
       // Fallback to default drop handling
       super._onDrop(event)
       this.element.querySelectorAll(".drag-target").forEach(el => el.classList.remove("drag-target"));
