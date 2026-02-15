@@ -65,7 +65,7 @@ export class Hyp3eDialog {
      * Handle attack dialogs
      * @param dataset
      */
-    static async ShowAttackRollDialog(dataset, ammoTypes = null, rangeGroup = null, ranges = null, chosen = null) {
+    static async ShowAttackRollDialog(dataset, ammoTypes = null, selectedAmmo = null, rangeGroup = null, ranges = null, chosen = null) {
         // Default rollMode to public roll, the user can change it in the roll dialog
         let rollMode = "publicroll"
         let dialogData = {
@@ -73,6 +73,7 @@ export class Hyp3eDialog {
             rollModes: CONFIG.Dice.rollModes,
             rollMode: rollMode,
             ammoTypes: ammoTypes,
+            selectedAmmo: selectedAmmo,
             rangeGroup: rangeGroup,
             ranges: ranges,
             chosen: chosen

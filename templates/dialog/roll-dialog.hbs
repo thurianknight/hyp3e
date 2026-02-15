@@ -24,7 +24,7 @@
         <div class="flexrow form-group">
             <label class="dialog-label">{{localize 'HYP3E.item.ammunition'}}</label>
             <select name="ammunition">
-                {{selectOptions ammoTypes localize=true}}
+                {{selectOptions ammoTypes selected=selectedAmmo localize=true}}
             </select>
         </div>
         {{/if}}
