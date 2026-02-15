@@ -623,6 +623,7 @@
             "spells": "Spells",
             "spellsPerDay": "Spells/Day",
             "friendlyName": "Friendly Name",
+            "baseWeapon": "Base Weapon Type",
             "altDmg": "Alternative/Additional Damage",
             "annotations": "Annotations",
             "itemId": "Item ID",

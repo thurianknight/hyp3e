@@ -1,8 +1,14 @@
       {{!-- Weapon attributes --}}
       <div class="resource">
         <h3>Weapon-Specific Attributes</h3>
-        <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
-        <input type="text" name="system.formula" value="{{system.formula}}" />
+        <div class="flexrow flexshrink flex-group-left bg-attributes-xwide">
+          <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
+          <input type="text" name="system.formula" value="{{system.formula}}" />
+        </div>
+        {{!-- <div class="flexrow flexshrink flex-group-left bg-attributes-xwide">
+          <label class="resource-label">{{localize 'HYP3E.dataLabel.baseWeapon'}}</label>
+          <input type="text" name="system.baseWeapon" value="{{system.baseWeapon}}" />
+        </div> --}}
         <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.consumable'}}</label>
           <input name="system.isConsumable" type="checkbox" {{checked system.isConsumable}} />

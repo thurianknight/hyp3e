@@ -1,6 +1,7 @@
       {{!-- Physical attributes --}}
       <div class="resource">
         <h3>Physical Item Attributes</h3>
+        <div class="flexrow flexshrink flex-group-left bg-attributes-xwide">
         {{#if isGM}}
         <label class="resource-label">{{localize 'HYP3E.dataLabel.friendlyName'}}</label>
         <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
@@ -10,6 +11,7 @@
             <input type="text" name="system.friendlyName" value="{{system.friendlyName}}" />
           {{/if}}
         {{/if}}
+        </div>
         <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.equipped'}}</label>
           <input name="system.equipped" type="checkbox" {{checked system.equipped}} />

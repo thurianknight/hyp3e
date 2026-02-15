@@ -359,6 +359,7 @@
           "type": "melee",
           "melee": true,
           "missile": false,
+          "baseWeapon": "",
           "wc": 0,
           "hands": 1,
           "range": {

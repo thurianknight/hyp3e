@@ -1447,6 +1447,15 @@
     margin-right: 10px;
   }
 }
+.hyp3e .bg-attributes-xwide {
+  margin-bottom: 5px;
+  input[type="text"],
+  input[type="number"] {
+    text-align: left;
+    min-width: 300px;
+    margin-right: 50px;
+  }
+}
 
 .hyp3e .color-preview {
   display: inline-block;
