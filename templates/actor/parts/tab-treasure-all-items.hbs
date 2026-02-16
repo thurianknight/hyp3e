@@ -65,13 +65,14 @@
       {{!-- Non-container items --}}
       <ol class="items-list" data-drop="item">
         <li class="item flexrow items-header">
-          <h3 class="item-name">{{localize "HYP3E.headers.equipmentItemsEtc"}}</h3>
+          <h3 class="item-name">{{localize "HYP3E.headers.equipmentItemsEtc"}}
+            <a class="sort-items" data-action="sortAz" data-item-type="item" title="Sort Items A-Z">
+              <i class="fas fa-sort-alpha-down"></i>
+            </a>
+          </h3>
           <h3>{{localize "HYP3E.item.qty"}}</h3>
           <h3>{{localize "HYP3E.item.weight"}}</h3>
           <h3>{{localize "HYP3E.item.cost"}}</h3>
-          <a class="sort-items" data-action="sortAz" data-item-type="item" title="Sort Items A-Z">
-            <i class="fas fa-sort-alpha-down"></i>
-          </a>
           <h4 class="item-controls">
             <a data-action="createItem" 
                 data-type="item">
