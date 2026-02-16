@@ -1,18 +1,19 @@
 /* Quick-Equip app styling */
 
 .quick-equip-app {
+  background-color: var(--hyp3e-color-bg-75);
   gap: 1rem;
   justify-content: center;
-  .window-content {
-    padding: 4px 4px;
-    /* padding-bottom: 8px; */
-  }
+}
+.quick-equip-app .window-content {
+  padding: 4px 4px;
+  /* background-color: var(--hyp3e-color-bg-75); */
+  /* padding-bottom: 8px; */
 }
 
 .quick-equip-column {
   flex: 1;
-  /* background: rgba(0,0,0,0.25); */
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.25);
   border: 1px solid var(--color-border-dark);
   border-radius: 8px;
   padding: 0.25rem;
