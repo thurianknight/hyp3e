@@ -2299,6 +2299,11 @@ export class Hyp3eActor extends Actor {
           ...dataset, // Include initial dataset
           showAmmo: itemData?.usesAmmo ?? false,
           showRanges: !!itemData?.missile,
+          carriedAmmo: carriedAmmo,
+          selectedAmmo: selectedAmmo,
+          rangeGroup: rangeGroup,
+          ranges: ranges,
+          chosenRange: chosenRange,
           showSpellRange: item?.type === "spell" && itemData?.atkRoll,
           spellRange: itemData?.range, // Use descriptive range text for spells
           rangeText: rangeText,
@@ -2309,7 +2314,7 @@ export class Hyp3eActor extends Actor {
       // Show Dialog and Get User Input
       let rollResponse;
       try {
-          rollResponse = await this._showRollDialog(dialogData, item?.type, carriedAmmo, selectedAmmo, rangeGroup, ranges, chosenRange);
+          rollResponse = await this._showRollDialog(dialogData, item?.type);
           if (!rollResponse) { // Handle dialog cancellation
               Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Dialog canceled by user.`);
               return null;
@@ -2321,7 +2326,8 @@ export class Hyp3eActor extends Actor {
 
       /**
        *  
-       * If we have reached this point, the attack has been made or the spell cast 
+       * If we have reached this point, the attack has been made or the spell cast.
+       * Time to determine the results!
        * 
        * **/
 
@@ -2772,23 +2778,18 @@ export class Hyp3eActor extends Actor {
    * Shows the appropriate roll dialog.
    * @param {object} dataset - Data for the dialog template.
    * @param {string|null} itemType - Type of the item ('weapon', 'spell', null).
-   * @param {object} carriedAmmo - List of available ammo.
-   * @param {string} selectedAmmo - Pre-selected ammo ID.
-   * @param {string} rangeGroup - Name for the range input group.
-   * @param {object} ranges - Available range options.
-   * @param {string} chosenRange - Pre-selected range category.
    * @returns {Promise<object|null>} The dialog response object, or null if cancelled.
    */
-  async _showRollDialog(dataset, itemType, carriedAmmo, selectedAmmo, rangeGroup, ranges, chosenRange) {
+  async _showRollDialog(dataset, itemType) {
       try {
           let rollResponse;
           if (itemType === "weapon") {
-              rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, carriedAmmo, selectedAmmo, rangeGroup, ranges, chosenRange); // Assuming this exists
+              rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset);
           } else if (itemType === "spell") {
-              rollResponse = await Hyp3eDialog.ShowSpellcastingDialog(dataset); // Assuming this exists
+              rollResponse = await Hyp3eDialog.ShowSpellcastingDialog(dataset);
           } else {
               // Fallback for non-item rolls if needed, potentially reusing ShowAttackRollDialog
-              rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset, {}, "", "", {}, "");
+              rollResponse = await Hyp3eDialog.ShowAttackRollDialog(dataset);
           }
           Hyp3eLogger.info("Hyp3eActor _showRollDialog", `Dialog response:`, rollResponse);
           return rollResponse;
