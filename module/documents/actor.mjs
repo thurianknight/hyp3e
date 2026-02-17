@@ -1715,7 +1715,7 @@ export class Hyp3eActor extends Actor {
           dataset.baseClass = this.system.baseClass
           dataset.roll = item.system.formula
           dataset.rollType = 'item'
-          dataset.rollMode = item.system.rollMode
+          // dataset.rollMode = item.system.rollMode
           // Execute the item roll
           this.rollItem(dataset)
       });
@@ -3302,7 +3302,6 @@ export class Hyp3eActor extends Actor {
 
       const dataset = {
           "rollType": "item",
-          "rollMode": "publicroll",
           "label": `Cast spell ${spell.name}`,
           "itemId": spellUuid,
           "actorId": this.id,

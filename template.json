@@ -327,7 +327,6 @@
           "templates": ["base", "rollable"],
           "class": "",
           "level": "",
-          "blindRoll": null,
           "rollMode": ""
       },
       "item": {

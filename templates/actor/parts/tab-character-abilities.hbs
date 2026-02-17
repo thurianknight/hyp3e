@@ -6,118 +6,118 @@
   {{#if (eq actor.type "character")}}
   <section class="all-content">
     <section class="left-gutter">
-        <img src="systems/hyp3e/assets/serpent-spear.png">
+      <img src="systems/hyp3e/assets/serpent-spear.png">
     </section>
     <section class="main-content">
-        <section class="abilities row-top">
-            {{!-- Natural Attributes --}}
-            <section class="abilities attribute-block">
-                {{> "section-character-attributes"}}
-            </section>
-
-            {{!-- d6 Task Resolution --}}
-            <section class="abilities exploration-block">
-                <div class="abilities flexrow">
-                    <h2>{{localize "HYP3E.headers.taskResolution"}}</h2>
-                </div>
-                <div class="abilities flexcol">
-                    {{#each system.taskResolution as |task key|}}
-                    <div class="ability flexrow flex-group-center">
-                        <a class="flex-xlarge align-left" role="button" 
-                            data-action="rollThis"
-                            data-roll="d6" 
-                            data-roll-target="{{task.tn}}" 
-                            data-roll-type="check" 
-                            data-roll-mode="publicroll" 
-                            data-label="{{task.name}} task">
-                            <span class="exploration-label">{{task.name}}</span>
-                            <i class="fas fa-dice-d6"></i>
-                        </a>
-                        <input type="text" name="system.taskResolution.{{key}}.task" value="{{task.tn}}" disabled/>
-                    </div>
-                    {{/each}}
-                    {{!-- Movement fields --}}
-                    <h2>{{localize "HYP3E.headers.movement"}}</h2>
-                    <div class="ability flexrow flex-group-center">
-                        <span class="flex-xlarge align-left">
-                            <label for="system.movement.exploration.name" class="exploration-label">{{localize "HYP3E.movement.exploration.name"}}</label>
-                        </span>
-                        <input type="text" name="system.movement.exploration.value" value="{{system.movement.exploration.value}}" />
-                    </div>
-                    <div class="ability flexrow flex-group-center">
-                        <span class="flex-xlarge align-left">
-                            <label for="system.movement.travel.name" class="exploration-label">{{localize "HYP3E.movement.travel.name"}}</label>
-                        </span>
-                        <input type="text" name="system.movement.travel.value" value="{{system.movement.travel.value}}" />
-                    </div>
-                </div>
-            </section>
+      <section class="abilities row-top">
+        {{!-- Natural Attributes --}}
+        <section class="abilities attribute-block">
+          {{> "section-character-attributes"}}
         </section>
 
-        {{!-- For the class features list, span the full width of the sheet --}}
-        <ol class="items-list" data-drop="item">
-          <li class="flexrow items-header">
-            <h3 class="item-name">{{localize "HYP3E.headers.classAbilities"}} 
-              <a class="sort-items" data-action="sortAz" data-item-type="feature" title="Sort Items A-Z">
-                <i class="fas fa-sort-alpha-down"></i>
+        {{!-- d6 Task Resolution --}}
+        <section class="abilities exploration-block">
+          <div class="abilities flexrow">
+            <h2>{{localize "HYP3E.headers.taskResolution"}}</h2>
+          </div>
+          <div class="abilities flexcol">
+            {{#each system.taskResolution as |task key|}}
+            <div class="ability flexrow flex-group-center">
+              <a class="flex-xlarge align-left" role="button" 
+                  data-action="rollThis"
+                  data-roll="d6" 
+                  data-roll-target="{{task.tn}}" 
+                  data-roll-type="check" 
+                  {{!-- data-roll-mode="publicroll"  --}}
+                  data-label="{{task.name}} task">
+                <span class="exploration-label">{{task.name}}</span>
+                <i class="fas fa-dice-d6"></i>
               </a>
-            </h3>
-            <h3>{{localize "HYP3E.details.level"}}</h3>
-            <h3>{{localize "HYP3E.checkRoll"}}</h3>
-            <h3>{{localize "HYP3E.target"}}</h3>
-            <h4 class="item-controls">
-              <a data-action="createItem" 
-                  data-type="feature">
-                <i class="fas fa-plus"></i> {{localize "HYP3E.feature.add"}}
-              </a>
-            </h4>
+              <input type="text" name="system.taskResolution.{{key}}.task" value="{{task.tn}}" disabled/>
+            </div>
+            {{/each}}
+            {{!-- Movement fields --}}
+            <h2>{{localize "HYP3E.headers.movement"}}</h2>
+            <div class="ability flexrow flex-group-center">
+              <span class="flex-xlarge align-left">
+                <label for="system.movement.exploration.name" class="exploration-label">{{localize "HYP3E.movement.exploration.name"}}</label>
+              </span>
+              <input type="text" name="system.movement.exploration.value" value="{{system.movement.exploration.value}}" />
+            </div>
+            <div class="ability flexrow flex-group-center">
+              <span class="flex-xlarge align-left">
+                <label for="system.movement.travel.name" class="exploration-label">{{localize "HYP3E.movement.travel.name"}}</label>
+              </span>
+              <input type="text" name="system.movement.travel.value" value="{{system.movement.travel.value}}" />
+            </div>
+          </div>
+        </section>
+      </section>
+
+      {{!-- For the class features list, span the full width of the sheet --}}
+      <ol class="items-list" data-drop="item">
+        <li class="flexrow items-header">
+          <h3 class="item-name">{{localize "HYP3E.headers.classAbilities"}} 
+            <a class="sort-items" data-action="sortAz" data-item-type="feature" title="Sort Items A-Z">
+              <i class="fas fa-sort-alpha-down"></i>
+            </a>
+          </h3>
+          <h3>{{localize "HYP3E.details.level"}}</h3>
+          <h3>{{localize "HYP3E.checkRoll"}}</h3>
+          <h3>{{localize "HYP3E.target"}}</h3>
+          <h4 class="item-controls">
+            <a data-action="createItem" 
+                data-type="feature">
+              <i class="fas fa-plus"></i> {{localize "HYP3E.feature.add"}}
+            </a>
+          </h4>
+        </li>
+        {{#each features as |item id|}}
+          <li class="item-entry item draggable" data-item-id="{{item.id}}">
+            <div class="flexrow">
+              <div class="item-name">
+                <div class="item-image">
+                  {{#if (or item.system.formula item.effects.size)}}
+                    <a class="rollable" 
+                        data-action="rollThis" 
+                        data-item-id="{{item.id}}" 
+                        data-roll-type="item" 
+                        data-roll-mode="{{item.system.rollMode}}" 
+                        data-label="{{item.name}} {{localize 'HYP3E.dataLabel.check'}}">
+                      <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                    </a>
+                  {{else}}
+                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                  {{/if}}
+                </div>
+                <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+              </div>
+              <div class="item-prop">{{item.system.level}}</div>
+              <div class="item-prop">{{item.system.formula}}</div>
+              <div class="item-prop">{{item.system.tn}}</div>
+              <div class="item-controls">
+                <a data-action="displayItem" 
+                    title='{{localize "HYP3E.item.show"}}'>
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a data-action="editItem" 
+                    title="{{localize 'HYP3E.item.edit'}}">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a data-action="deleteItem" 
+                    title="Delete Item">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </div>
+            <div class="item-summary">
+              <div class="item-description">
+                {{{item.system.enrichedDescription}}}
+              </div>
+            </div>
           </li>
-          {{#each features as |item id|}}
-            <li class="item-entry item draggable" data-item-id="{{item.id}}">
-              <div class="flexrow">
-                <div class="item-name">
-                  <div class="item-image">
-                    {{#if (or item.system.formula item.effects.size)}}
-                      <a class="rollable" 
-                          data-action="rollThis" 
-                          data-item-id="{{item.id}}" 
-                          data-roll-type="item" 
-                          data-roll-mode="{{item.system.rollMode}}" 
-                          data-label="{{item.name}} {{localize 'HYP3E.dataLabel.check'}}">
-                        <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-                      </a>
-                    {{else}}
-                    <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-                    {{/if}}
-                  </div>
-                  <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
-                </div>
-                <div class="item-prop">{{item.system.level}}</div>
-                <div class="item-prop">{{item.system.formula}}</div>
-                <div class="item-prop">{{item.system.tn}}</div>
-                <div class="item-controls">
-                  <a data-action="displayItem" 
-                      title='{{localize "HYP3E.item.show"}}'>
-                    <i class="fas fa-eye"></i>
-                  </a>
-                  <a data-action="editItem" 
-                      title="{{localize 'HYP3E.item.edit'}}">
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  <a data-action="deleteItem" 
-                      title="Delete Item">
-                    <i class="fas fa-trash"></i>
-                  </a>
-                </div>
-              </div>
-              <div class="item-summary">
-                <div class="item-description">
-                  {{{item.system.enrichedDescription}}}
-                </div>
-              </div>
-            </li>
-          {{/each}}
-        </ol>
+        {{/each}}
+      </ol>
     </section>
   </section>
   {{/if}}

@@ -151,7 +151,7 @@ async function rollSaveButton(saveType) {
         const dataset = {
             label: "Save vs. " + saveType,
             roll: "1d20",
-            rollMode: "publicroll",
+            // rollMode: "publicroll",
             rollTarget: saveTarget
         };
         await actor.rollSave(dataset);
