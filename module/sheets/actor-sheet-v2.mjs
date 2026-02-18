@@ -1019,8 +1019,14 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
         Hyp3eLogger.info("HYP3EActorSheetV2 _sortItemsAz", `Sorting ${itemType} A-Z...`, { event, target });
 
-        // Get only items of the requested type
-        const itemsOfType = actor.items.filter(i => i.type === itemType);
+        let itemsOfType;
+        if (itemType !== "armor") {
+          // Get only items of the requested type
+          itemsOfType = actor.items.filter(i => i.type === itemType);
+        } else {
+          // For armor, include both armor and shields
+          itemsOfType = actor.items.filter(i => i.type === "armor" || i.type === "shield");
+        }
 
         if (!itemsOfType.length) {
           const msg = `No items of type ${itemType} found on ${actor.name}`;
