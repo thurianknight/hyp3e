@@ -4977,7 +4977,7 @@ export class Hyp3eCharacter {
         // Apply updates to the actor
         try {
             Hyp3eLogger.info("Hyp3eCharacter levelUp", `Updated level data:`, updateData);
-            if(actor.validate(updateData)) {
+            if (actor.validate(updateData)) {
                 Hyp3eLogger.info("Hyp3eCharacter levelUp", `Validation OK, executing update...`);
                 // Update the main actor data
                 await actor.update(updateData)
@@ -4989,7 +4989,7 @@ export class Hyp3eCharacter {
         }
 
         // Update the actor with the new data
-        await actor.update(updateData)
+        // await actor.update(updateData)
 
         // Setup a chat message to show the level-up values
         let label = `<div><b>Level Up!</b></div>`
