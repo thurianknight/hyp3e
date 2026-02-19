@@ -26,11 +26,23 @@ export class Hyp3eActor extends Actor {
   async prepareBaseData() {
     // Data modifications in this step occur before processing embedded
     // documents or derived data.
+    super.prepareBaseData();
+
+    const systemData = this.system;
+    // Base/current FA, CA, TA
+    if (systemData.fa) systemData.fa.curr = systemData.fa.value ?? 0;
+    if (systemData.ca) systemData.ca.curr = systemData.ca.value ?? null;
+    if (systemData.ta) systemData.ta.curr = systemData.ta.value ?? null;
+
+    // Base/current saving throws
+    const saves = systemData.saves;
+    for (const save of Object.values(saves)) {
+      save.curr = save.value ?? 0;
+    }
 
     if (this.type === 'character') {
       // Get/set "curr" value for each character attribute
-      const systemData = this.system;
-      const attrs = this.system.attributes;
+      const attrs = systemData.attributes;
       for (const [k, attr] of Object.entries(attrs)) {
         // Convert the original value to a number if necessary
         attr.value = Number(attr.value);
@@ -38,17 +50,9 @@ export class Hyp3eActor extends Actor {
         if (attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
       }
 
-      //   // Auto-calculate attribute modifiers if configuration is enabled
-      //   if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
-      //     const attributeData = this._calcAttrMods(this.id, systemData);
-      //     if (attributeData) {
-      //       systemData.attributes = attributeData;
-      //     }
-      //   }
       // Log the prepared data
       const sysData = foundry.utils.deepClone(this.system);
       Hyp3eLogger.info("Hyp3eActor prepareBaseData", `${this.name} system data:`, sysData);
-
     }
 
   }
@@ -63,6 +67,8 @@ export class Hyp3eActor extends Actor {
    * is queried and has a roll executed directly from it).
    */
   async prepareDerivedData() {
+    super.prepareDerivedData();
+
     const systemData = this.system;
     const flags = this.flags.hyp3e || {};
     systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
@@ -96,6 +102,8 @@ export class Hyp3eActor extends Actor {
     // Separate methods for each Actor type (character vs. npc) to keep things organized
     this._prepareCharacterData();
     this._prepareNpcData();
+
+    // Hyp3eLogger.info("Hyp3eActor prepareDerivedData", `${this.name} Save after derive:`, this.system.saves.avoidance.value);
   }
 
   /**
@@ -104,7 +112,7 @@ export class Hyp3eActor extends Actor {
   _prepareCharacterData() {
     if (this.type !== 'character') return;
 
-    // Make modifications to data here
+    // Make modifications to base data here
     const systemData = this.system;
 
     if (systemData?.hp?.min == null) {
@@ -124,13 +132,12 @@ export class Hyp3eActor extends Actor {
       systemData.baseClass = "npc"
     }
 
-    // Get/set "curr" value for each character attribute
-    // const attrs = this.system.attributes;
-    // for (const [k, attr] of Object.entries(attrs)) {
-    //   // If no effect touched curr, derive it from base value
-    //   if (attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
-    // }
+    // Get/set "curr" value for properties that can be modified by effects. 
+    //  We do this here in the preparation phase so that the "curr" value is available for 
+    //  rolls and other calculations, and so that it can be modified by active effects in a 
+    //  consistent way.
 
+    
     // Auto-calculate attribute modifiers if configuration is enabled
     if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
       const attributeData = this._calcAttrMods(this.id, systemData);
@@ -261,14 +268,34 @@ export class Hyp3eActor extends Actor {
 
   /**
    * @override
+   * Override actor update() method.
+   */
+  // async update(data, options={}) {
+  //   Hyp3eLogger.info("Hyp3eActor update", `Updating ${this.name}:`, data);
+  //   Hyp3eLogger.info("Hyp3eActor update", `Update options:`, options);
+  //   Hyp3eLogger.info("Hyp3eActor update", `Current _source:`, this._source);
+  //   const result = await super.update(data, options);
+  //   Hyp3eLogger.info("Hyp3eActor update", `After update _source:`, this._source);
+  //   return result;
+  // }
+
+  /**
+   * @override
    * Overrides the core system applyActiveEffects method on the actor.
    * Capture change values that include roll formulas or data paths, and resolve them
-   *  to a final number that can be applied to the actor.
+   *  to a final number that can be applied to the actor's overrides.
    */
-  async applyActiveEffects() {
+  applyActiveEffects() {
+    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${this.name} before apply:`, this);
+
     // For items that apply effects with variables, we resolve those variables 
     //  on the item effect rather than the actor
     this.updateItemEffects()
+
+    // For testing...
+    // super.applyActiveEffects();
+    // Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${this.name} after apply:`, this);
+    // return;
 
     const overrides = {};
     this.statuses.clear();
@@ -317,14 +344,19 @@ export class Hyp3eActor extends Actor {
           continue;
         }
       }
-      // Now we can apply updates to the change itself
+      // Now we can apply updates to the actor based on the change data. 
+      //  We use the change.effect property to access the full effect data, which is necessary 
+      //  for resolving variables in the change.value string.
       const changes = change.effect.apply(this, change);
       Object.assign(overrides, changes);
       changeCount++;
     }
     Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${changeCount} of ${changes.length} changes applied to ${this.name}:`, changes);
     // Expand the set of final overrides
+    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${this.name} effect overrides:`, overrides);
     this.overrides = foundry.utils.expandObject(overrides);
+
+    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${this.name} after apply:`, this);
   }
 
   /** ACTOR DATA HELPERS ------------------------------*/
@@ -1134,8 +1166,9 @@ export class Hyp3eActor extends Actor {
             changes: updatedChanges
           }
           // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Duration:`, updatedDuration)
-          Hyp3eLogger.info("Hyp3eActor updateItemEffects", `All updates on actor ${this.name} to effect ${effect.name}:`, { updates });
+          Hyp3eLogger.info("Hyp3eActor updateItemEffects", `All updates on actor ${this.name} for effect ${effect.name}:`, { updates });
           await effect.update(updates);
+          // return updates;
         }
       }
     }
@@ -2151,7 +2184,7 @@ export class Hyp3eActor extends Actor {
       const commandUndead = itemNameLower.includes("command") && itemNameLower.includes("undead");
       if (turnUndead || commandUndead) {
           // Ensure we have a valid Turning Ability
-          if (!this.system.ta || this.system.ta === 0) {
+          if (!this.system.ta.curr || this.system.ta.curr === 0) {
               const msg = `${this.name} must have a Turning Ability of 1 or greater!`;
               Hyp3eLogger.warn("rollCheck", msg);
               ui.notifications.warn(msg);
@@ -2226,7 +2259,7 @@ export class Hyp3eActor extends Actor {
       if (turnUndead || commandUndead) {
           const turnOrCommand = turnUndead ? "turn" : "command"
           // Use the "success" flag to describe the results of the attempted turning/commanding undead
-          checkFooter = this._resolveTurnUndead(roll.total, rollData.ta, turnOrCommand)
+          checkFooter = this._resolveTurnUndead(roll.total, rollData.ta.curr, turnOrCommand)
       } else if (assassinate) {
           // Use the "success" flag to describe the results of the attempted assassination
           checkFooter = this._resolveAssassination(targetToken, success)
@@ -2335,7 +2368,7 @@ export class Hyp3eActor extends Actor {
 
         // Temporarily override the actor's CA if spell was cast from an item
         if (dataset.isItemSpell) {
-          actorData.ca = dataset.itemCa
+          actorData.ca.curr = dataset.itemCa
         }
 
         // Handle spell memorization/slot consumption if applicable
@@ -3623,7 +3656,7 @@ export class Hyp3eActor extends Actor {
       if (turnOrCommand == 'turn') {
           turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
       } else {
-          turnUndeadHtml = `<p>The total hit dice value of undead affected is ${this.system.ta * 2} HD (2 HD per TA level). Starting from the weakest (lowest Type)...</p><ul>`
+          turnUndeadHtml = `<p>The total hit dice value of undead affected is ${this.system.ta.curr * 2} HD (2 HD per TA level). Starting from the weakest (lowest Type)...</p><ul>`
       }
       for (let i = results.length-1; i >=0; i--) {
           turnUndeadHtml += results[i]

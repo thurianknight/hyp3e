@@ -169,7 +169,7 @@ export function prepareActiveEffectCategories(effects) {
 
 export async function setupEffectHandlers() {
   /**
-   * Capture ActiveEffectConfig and insert new items
+   * Capture ActiveEffectConfig and insert new config fields
    */
   Hooks.on("renderActiveEffectConfig", (app, html, data) => {
       const html$ = $(html)

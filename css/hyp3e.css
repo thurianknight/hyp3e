@@ -756,7 +756,16 @@
     margin-top: 4px;
   }
   .fighting-ability {
-    margin-right: 15px;
+    input[type=text],
+    input[type=number] {
+      margin-right: 2px;
+      text-align: center;
+      max-width: 50px;
+    }
+  }
+  .fighting-ability .fa-current {
+    font-weight: bold;
+    font-size: 1.25em;
   }
   .class-weapons {
     text-align: right;
@@ -1116,29 +1125,18 @@
   font-weight: bold;
   padding: 5px 5px;
 }
-/* Color per coin type */
-.exploration-label.coin-cp i.fa-coin,
-.exploration-label.coin-copper i.fa-coin {
-  color: #b87333;           /* classic copper / bronze */
+
+.hyp3e .turning-ability {
+  input[type=text],
+  input[type=number] {
+    margin-right: 2px;
+    text-align: center;
+    max-width: 50px;
+  }
 }
-.exploration-label.coin-sp i.fa-coin,
-.exploration-label.coin-silver i.fa-coin {
-  color: #c0c0c0;           /* silver */
-  filter: brightness(1.15); /* often looks better a bit brighter */
-}
-.exploration-label.coin-ep i.fa-coin,
-.exploration-label.coin-electrum i.fa-coin {
-  color: #f3d677;           /* electrum — yellowish pale gold */
-}
-.exploration-label.coin-gp i.fa-coin,
-.exploration-label.coin-gold i.fa-coin {
-  color: #ffb700;           /* gold */
-  filter: drop-shadow(0 0 2px #ffaa00aa);
-}
-.exploration-label.coin-pp i.fa-coin,
-.exploration-label.coin-platinum i.fa-coin {
-  color: #e5e4e2;           /* platinum — bright silver-ish */
-  filter: brightness(1.25);
+.hyp3e .turning-ability .ta-current {
+  font-weight: bold;
+  font-size: 1.25em;
 }
 
 /* Character Combat-tab styles */
@@ -1217,13 +1215,15 @@
   }
 }
 .hyp3e .casting-ability {
-  min-width: 100px;
   input[type=text],
   input[type=number] {
     text-align: center;
-    max-width: 50px;
-    margin-bottom: 2px;
+    max-width: 40px;
   }
+}
+.hyp3e .casting-ability .ca-current {
+  font-weight: bold;
+  font-size: 1.25em;
 }
 .hyp3e .spells-label {
   font-family: "Herculanum", sans-serif;
@@ -1250,6 +1250,30 @@
   .treasure-box {
     border: 2px groove var(--hyp3e-color-accent-25);
   }
+}
+/* Color per coin type */
+.exploration-label.coin-cp i.fa-coin,
+.exploration-label.coin-copper i.fa-coin {
+  color: #b87333;           /* classic copper / bronze */
+}
+.exploration-label.coin-sp i.fa-coin,
+.exploration-label.coin-silver i.fa-coin {
+  color: #c0c0c0;           /* silver */
+  filter: brightness(1.15); /* often looks better a bit brighter */
+}
+.exploration-label.coin-ep i.fa-coin,
+.exploration-label.coin-electrum i.fa-coin {
+  color: #f3d677;           /* electrum — yellowish pale gold */
+}
+.exploration-label.coin-gp i.fa-coin,
+.exploration-label.coin-gold i.fa-coin {
+  color: #ffb700;           /* gold */
+  filter: drop-shadow(0 0 2px #ffaa00aa);
+}
+.exploration-label.coin-pp i.fa-coin,
+.exploration-label.coin-platinum i.fa-coin {
+  color: #e5e4e2;           /* platinum — bright silver-ish */
+  filter: brightness(1.25);
 }
 
 /* Character Description-tab styles */

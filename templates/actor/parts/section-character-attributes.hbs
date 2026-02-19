@@ -226,12 +226,14 @@
       <span class="mod-label">{{localize 'HYP3E.attributes.cha.turnUndead'}}</span>
     </div>
     <div class="attribute-mod">
-      {{!-- <span></span> --}}
       <label for="system.ta" class="combat-label">{{localize "HYP3E.turningAbility"}}</label>
     </div>
-    <div class="attribute-mod">
-      {{!-- <span></span> --}}
-      <input type="text" name="system.ta" value="{{system.ta}}" data-dtype="Number" />
+    <div class="ability flex-group-center">
+      <div class="flexrow turning-ability">
+        <input type="text" name="system.ta.value" value="{{system.ta.value}}" data-dtype="Number" />
+        <input type="text" class="ta-current" name="system.ta.curr" value="{{system.ta.curr}}" data-dtype="Number" disabled />
+      </div>
+      <span class="mod-label">{{localize 'Base | Current'}}</span>
     </div>
   </div>
 </div>

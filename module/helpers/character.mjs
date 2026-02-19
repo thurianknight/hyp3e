@@ -37,6 +37,7 @@ export class Hyp3eCharacter {
                 "dex": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 14,
                 "transformation": 16,
@@ -180,6 +181,7 @@ export class Hyp3eCharacter {
                 "dex": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 14,
                 "transformation": 14,
@@ -326,6 +328,7 @@ export class Hyp3eCharacter {
                 "dex": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 14,
                 "transformation": 16,
@@ -483,6 +486,7 @@ export class Hyp3eCharacter {
                 "con": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 14,
                 "transformation": 14,
@@ -614,6 +618,7 @@ export class Hyp3eCharacter {
                 "str": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 16,
                 "transformation": 14,
@@ -740,6 +745,7 @@ export class Hyp3eCharacter {
                 "wis": 16,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 16,
                 "transformation": 16,
@@ -891,6 +897,7 @@ export class Hyp3eCharacter {
                 "wis": 16,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 14,
                 "transformation": 16,
@@ -1041,6 +1048,7 @@ export class Hyp3eCharacter {
                 "cha": 16,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 16,
                 "transformation": 16,
@@ -1193,6 +1201,7 @@ export class Hyp3eCharacter {
                 "str": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 16,
                 "transformation": 14,
@@ -1325,6 +1334,7 @@ export class Hyp3eCharacter {
                 "str": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 16,
                 "transformation": 14,
@@ -1465,6 +1475,7 @@ export class Hyp3eCharacter {
                 "dex": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 14,
                 "transformation": 16,
@@ -1615,6 +1626,7 @@ export class Hyp3eCharacter {
                 "dex": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 16,
                 "transformation": 16,
@@ -1770,6 +1782,7 @@ export class Hyp3eCharacter {
                 "int": 16,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 14,
                 "transformation": 16,
@@ -1916,6 +1929,7 @@ export class Hyp3eCharacter {
                 "dex": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 16,
                 "transformation": 14,
@@ -2059,6 +2073,7 @@ export class Hyp3eCharacter {
                 "wis": 16,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 16,
                 "transformation": 16,
@@ -2223,6 +2238,7 @@ export class Hyp3eCharacter {
                 "str": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 14,
                 "transformation": 14,
@@ -2381,6 +2397,7 @@ export class Hyp3eCharacter {
                 "cha": 16,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 16,
                 "transformation": 16,
@@ -2538,6 +2555,7 @@ export class Hyp3eCharacter {
                 "dex": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 16,
                 "transformation": 16,
@@ -2708,6 +2726,7 @@ export class Hyp3eCharacter {
                 "wis": 16,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 14,
                 "transformation": 16,
@@ -2858,6 +2877,7 @@ export class Hyp3eCharacter {
                 "str": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 16,
                 "transformation": 14,
@@ -3009,6 +3029,7 @@ export class Hyp3eCharacter {
                 "str": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 16,
                 "transformation": 14,
@@ -3156,6 +3177,7 @@ export class Hyp3eCharacter {
                 "dex": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 14,
                 "transformation": 16,
@@ -3302,6 +3324,7 @@ export class Hyp3eCharacter {
                 "wis": 16,
             },
             "saves": {
+                "base": 16,
                 "death": 14,
                 "device": 16,
                 "transformation": 16,
@@ -3465,6 +3488,7 @@ export class Hyp3eCharacter {
                 "dex": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 14,
                 "transformation": 16,
@@ -3609,6 +3633,7 @@ export class Hyp3eCharacter {
                 "str": 8,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 16,
                 "transformation": 14,
@@ -3751,6 +3776,7 @@ export class Hyp3eCharacter {
                 "cha": 16,
             },
             "saves": {
+                "base": 16,
                 "death": 16,
                 "device": 16,
                 "transformation": 14,
@@ -4919,15 +4945,16 @@ export class Hyp3eCharacter {
             Hyp3eLogger.error("Hyp3eCharacter levelUp", `HP roll failed!`)
         }
         // Update fighting ability, casting ability, and turning ability
-        data.fa = thisClass.levelAdvancement[nextLevel].fa
-        if (thisClass.levelAdvancement[nextLevel].ca) { data.ca = thisClass.levelAdvancement[nextLevel].ca }
-        if (thisClass.levelAdvancement[nextLevel].ta) { data.ta = thisClass.levelAdvancement[nextLevel].ta }
+        data.fa.value = thisClass.levelAdvancement[nextLevel].fa
+        if (thisClass.levelAdvancement[nextLevel].ca) { data.ca.value = thisClass.levelAdvancement[nextLevel].ca }
+        if (thisClass.levelAdvancement[nextLevel].ta) { data.ta.value = thisClass.levelAdvancement[nextLevel].ta }
 
         // Update saving throws, if needed
         let currentSave = this._valueFromTable(this.savingThrows, currLevel)
         let newSave = this._valueFromTable(this.savingThrows, nextLevel)
         if (newSave < currentSave) {
             // It's as easy as subtracting 1 from each save...
+            data.saves.base.value -= 1
             data.saves.death.value -= 1
             data.saves.device.value -= 1
             data.saves.transformation.value -= 1
@@ -4943,10 +4970,13 @@ export class Hyp3eCharacter {
                     value: data.hp.value,
                     max: data.hp.max,
                 },
-                fa: data.fa,
-                ca: data.ca,
-                ta: data.ta,
+                fa: { value: data.fa.value },
+                ca: { value: data.ca.value },
+                ta: { value: data.ta.value },
                 saves: {
+                    base: {
+                        value: data.saves.base.value
+                    },
                     death: {
                         value: data.saves.death.value
                     },
@@ -4997,9 +5027,9 @@ export class Hyp3eCharacter {
         content += `<li>New Level: ${nextLevel}</li>`
         content += `<li>XP: ${currentXp} / ${nextLevelXp}</li>`
         content += `<li>Hit Point Increase: ${hpIncrease} (${data.hp.value} HP / ${data.hp.max} max)</li>`
-        content += `<li>Fighting Ability: ${data.fa}</li>`
-        if (data.ca) { content += `<li>Casting Ability: ${data.ca}</li>` }
-        if (data.ta) { content += `<li>Turning Ability: ${data.ta}</li>` }
+        content += `<li>Fighting Ability: ${data.fa.value}</li>`
+        if (data.ca.value) { content += `<li>Casting Ability: ${data.ca.value}</li>` }
+        if (data.ta.value) { content += `<li>Turning Ability: ${data.ta.value}</li>` }
         if (newSave < currentSave) {
             content += `<li>Saving Throws vs:</li><ul>`
             content += `<li>Death: ${data.saves.death.value}</li>`
@@ -5066,9 +5096,9 @@ export class Hyp3eCharacter {
             Hyp3eLogger.info("Hyp3eCharacter setAttributeMods", `Class Data for ${data.details.class}:`, thisClass);
             data.hd = thisClass.hitDie
             content += `<li>Hit Die: ${thisClass.hitDie}</li>`
-            data.fa = thisClass.fa
+            data.fa.value = thisClass.fa
             content += `<li>Fighting Ability: ${thisClass.fa}</li>`
-            data.ca = thisClass.ca
+            data.ca.value = thisClass.ca
             content += `<li>Casting Ability: ${thisClass.ca}</li>`
             if (thisClass?.spellLists && thisClass.spellLists.length > 0) {
                 Hyp3eLogger.info("Hyp3eCharacter setAttributeMods", `Setting ${data.details.class} spell lists...`);
@@ -5080,7 +5110,7 @@ export class Hyp3eCharacter {
                     content += `<li>Spell List(s): ${data.spellList}</li>`
                 }
             }
-            data.ta = thisClass.ta
+            data.ta.value = thisClass.ta
             content += `<li>Turning Ability: ${thisClass.ta}</li>`
             data.unskilled = thisClass.unskilled
             content += `<li>Unskilled Weapon Penalty: ${thisClass.unskilled}</li>`
@@ -5091,6 +5121,7 @@ export class Hyp3eCharacter {
             data.details.xp.value = 0
             data.details.xp.toNextLvl = thisClass.levelAdvancement[2].xp
             data.details.xp.primeAttr = ""
+            data.saves.base.value = thisClass.saves.base
             content += `<li>Saving Throws vs:</li><ul>`
             content += `<li>Death: ${thisClass.saves.death}</li>`
             data.saves.death.value = thisClass.saves.death
@@ -5398,12 +5429,15 @@ export class Hyp3eCharacter {
             let updateData = {
                 system: {
                     hd: data.hd,
-                    fa: data.fa,
-                    ca: data.ca,
+                    fa: { value: data.fa.value },
+                    ca: { value: data.ca.value },
                     spellList: data.spellList,
                     spellList2: data.spellList2,
-                    ta: data.ta,
+                    ta: { value: data.ta.value },
                     saves: {
+                        base: {
+                            value: data.saves.base.value
+                        },
                         death: {
                             value: data.saves.death.value
                         },

@@ -11,10 +11,14 @@
     <section class="main-content">
         {{!-- Casting ability --}}
         <h2>{{localize 'HYP3E.tabs.spells'}}</h2>
-        <div class="flex-group-left">
-            <div class="casting-ability">
-                <span class="spells-label">{{localize "HYP3E.castingAbility"}}</span>
-                <input type="number" class="spells" name="system.ca" value="{{system.ca}}" />
+        <div class="flex-group-left row-top">
+            <span class="spells-label">{{localize "HYP3E.castingAbility"}}</span>
+            <div class="flex-group-center">
+                <div class="casting-ability">
+                    <input type="number" name="system.ca.value" value="{{system.ca.value}}" />
+                    <input type="number" class="ca-current" name="system.ca.curr" value="{{system.ca.curr}}" disabled />
+                </div>
+                <span class="mod-label">{{localize 'Base | Current'}}</span>
             </div>
         </div>
         <div class="flexrow">

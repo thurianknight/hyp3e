@@ -20,8 +20,8 @@ export class Hyp3eDice {
       strAtkMod = parseInt(actorData.str.atkMod) > 0 ? `+${parseInt(actorData.str.atkMod)}` : `${parseInt(actorData.str.atkMod)}`;
       dexAtkMod = parseInt(actorData.dex.atkMod) > 0 ? `+${parseInt(actorData.dex.atkMod)}` : `${parseInt(actorData.dex.atkMod)}`;
     }
-    const faAtkMod = parseInt(actorData.fa) > 0 ? `+${parseInt(actorData.fa)}` : `${parseInt(actorData.fa)}`;
-    const caAtkMod = parseInt(actorData.ca) > 0 ? `+${parseInt(actorData.ca)}` : `${parseInt(actorData.ca)}`;
+    const faAtkMod = parseInt(actorData.fa.curr) > 0 ? `+${parseInt(actorData.fa.curr)}` : `${parseInt(actorData.fa.curr)}`;
+    const caAtkMod = parseInt(actorData.ca.curr) > 0 ? `+${parseInt(actorData.ca.curr)}` : `${parseInt(actorData.ca.curr)}`;
     const itemAtkMod = parseInt(itemData.atkMod) > 0 ? `+${parseInt(itemData.atkMod)}` : `${parseInt(itemData.atkMod)}`;
 
     // Check if the weapon attack has Master or Grandmaster flags set
@@ -122,7 +122,7 @@ export class Hyp3eDice {
         // Most weapons fall into this section...
 
         // Add Fighting Ability, even if it's zero
-        atkRollParts.push(actorData.fa)
+        atkRollParts.push(actorData.fa.curr)
         debugAtkRollParts.push(`<tr><td>Fighting Ability</td><td>${faAtkMod}</td></tr>`)
 
         // Characters add ST or DX mods based on what the formula already has in it.
@@ -155,11 +155,11 @@ export class Hyp3eDice {
     } else if (itemData.itemType == "spell") {
       // Spell attack formulas are so bespoke, we need to handle each variable separately
       if (atkRollParts.includes("@ca")) {
-        atkRollParts[atkRollParts.indexOf("@ca")] = actorData.ca
+        atkRollParts[atkRollParts.indexOf("@ca")] = actorData.ca.curr
         debugAtkRollParts[debugAtkRollParts.indexOf("@ca")] = `<tr><td>Casting Ability</td><td>${caAtkMod}</td></tr>`
       }
       if (atkRollParts.includes("@fa")) {
-        atkRollParts[atkRollParts.indexOf("@fa")] = actorData.fa
+        atkRollParts[atkRollParts.indexOf("@fa")] = actorData.fa.curr
         debugAtkRollParts[debugAtkRollParts.indexOf("@fa")] = `<tr><td>Fighting Ability</td><td>${faAtkMod}</td></tr>`
       }
       if (atkRollParts.includes("@str.atkMod")) {
@@ -236,8 +236,8 @@ export class Hyp3eDice {
     if (actorData?.actorType == "character") {
       strDmgMod = parseInt(actorData.str.dmgMod) > 0 ? `+${parseInt(actorData.str.dmgMod)}` : `${parseInt(actorData.str.dmgMod)}`;
     }
-    const faDmgMod = parseInt(actorData.fa) > 0 ? `+${parseInt(actorData.fa)}` : `${parseInt(actorData.fa)}`;
-    const caDmgMod = parseInt(actorData.ca) > 0 ? `+${parseInt(actorData.ca)}` : `${parseInt(actorData.ca)}`;
+    const faDmgMod = parseInt(actorData.fa.curr) > 0 ? `+${parseInt(actorData.fa.curr)}` : `${parseInt(actorData.fa.curr)}`;
+    const caDmgMod = parseInt(actorData.ca.curr) > 0 ? `+${parseInt(actorData.ca.curr)}` : `${parseInt(actorData.ca.curr)}`;
     const itemDmgMod = parseInt(itemData.dmgMod) > 0 ? `+${parseInt(itemData.dmgMod)}` : `${parseInt(itemData.dmgMod)}`;
 
     const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Basic";
@@ -298,14 +298,14 @@ export class Hyp3eDice {
     const faRegex = /\+\s*@fa/g
     if (debugDmgRollParts[1].match(faRegex) > "") {
       // Fix if FA is null
-      if (actorData.fa == null) actorData.fa = 0;
-      dmgRollParts[0] = dmgRollParts[0].replace(faRegex, `+ ${actorData.fa}`);
+      if (actorData.fa.curr == null) actorData.fa.curr = 0;
+      dmgRollParts[0] = dmgRollParts[0].replace(faRegex, `+ ${actorData.fa.curr}`);
       debugDmgRollParts[1] = debugDmgRollParts[1].replace(faRegex, "");
       debugDmgRollParts.push(`<tr><td>Fighting Ability</td><td>${faDmgMod}</td></tr>`);
     }
     if (itemData.damage2h) {
       if (debugDmgRoll2Parts[1].match(faRegex) > "") {
-        dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(faRegex, `+ ${actorData.ca}`);
+        dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(faRegex, `+ ${actorData.ca.curr}`);
         debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(faRegex, "");
         debugDmgRoll2Parts.push(`<tr><td>Fighting Ability</td><td>${faDmgMod}</td></tr>`);
       }
@@ -315,16 +315,16 @@ export class Hyp3eDice {
     const caRegex = /\+\s*@ca/g
     if (debugDmgRollParts[1].match(caRegex) > "") {
       // Temp fix if CA is null
-      if (actorData.ca == null) actorData.ca = 0;
+      if (actorData.ca.curr == null) actorData.ca.curr = 0;
 
       // This is where we override the actor's CA if the spell is being cast from an item
-      dmgRollParts[0] = dmgRollParts[0].replace(caRegex, `+ ${actorData.ca}`);
+      dmgRollParts[0] = dmgRollParts[0].replace(caRegex, `+ ${actorData.ca.curr}`);
       debugDmgRollParts[1] = debugDmgRollParts[1].replace(caRegex, "");
       debugDmgRollParts.push(`<tr><td>Casting Ability</td><td>${caDmgMod}</td></tr>`);
     }
     if (itemData.damage2h) {
       if (debugDmgRoll2Parts[1].match(caRegex) > "") {
-        dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(caRegex, `+ ${actorData.ca}`);
+        dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(caRegex, `+ ${actorData.ca.curr}`);
         debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(caRegex, "");
         debugDmgRoll2Parts.push(`<tr><td>Casting Ability</td><td>${caDmgMod}</td></tr>`);
       }

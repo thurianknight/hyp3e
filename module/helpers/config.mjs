@@ -72,6 +72,7 @@ HYP3E.blindRollOpts = {
  * @type {Object}
  */
 HYP3E.saves = {
+  "base": "HYP3E.saves.base.name",
   "death": "HYP3E.saves.death.name",
   "transformation": "HYP3E.saves.transformation.name",
   "device": "HYP3E.saves.device.name",
@@ -79,6 +80,7 @@ HYP3E.saves = {
   "sorcery": "HYP3E.saves.sorcery.name"
 };
 HYP3E.saveAbbreviations = {
+  "base": "HYP3E.saves.base.abbrev",
   "death": "HYP3E.saves.death.abbrev",
   "transformation": "HYP3E.saves.transformation.abbrev",
   "device": "HYP3E.saves.device.abbrev",

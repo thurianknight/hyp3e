@@ -1201,8 +1201,8 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // li.slideUp(200, () => this.render(false))
         if (this.actor.type === "itemToken") {
           // Unlink the item
-          this.actor.system.linkedItemUuid = "";
-          await this.actor.update();
+          const itemLink = {"system.linkedItemUuid": ""};
+          await this.actor.update(itemLink);
         }
     }
 
@@ -1450,9 +1450,9 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           "img": item.img,
           "system.linkedItemUuid": item.uuid,
           "system.biography": item.system.description,
-          "system.fa": item?.parent?.system.fa || 0,
-          "system.ca": item?.parent?.system.ca || null,
-          "system.ta": item?.parent?.system.ta || null,
+          "system.fa.value": item?.parent?.system.fa.value || 0,
+          "system.ca.value": item?.parent?.system.ca.value || null,
+          "system.ta.value": item?.parent?.system.ta.value || null,
           "system.hp.value": 1,
           "system.hp.max": 1,
           "system.attributes.dex.value": item?.parent?.system.attributes.dex.value || 10,

@@ -261,6 +261,10 @@
             }
         },
         "saves": {
+            "base": {
+                "name": "Base Save",
+                "abbrev": "Base"
+            },
             "death": {
                 "name": "Death, Poison, ...",
                 "abbrev": "Death"

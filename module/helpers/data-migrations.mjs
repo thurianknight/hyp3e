@@ -18,7 +18,23 @@ export function migrateActorData(actor) {
         Hyp3eLogger.info("migrateActorData", `Fixing token alias for ${actor.name}...`);
         updates = { ...updates, "system.tokenAlias": "" };
     }
+
     // Migrate, fix, or delete old data
+    const stats = ["fa", "ca", "ta"];
+    for (const stat of stats) {
+      const current = foundry.utils.getProperty(actor, `system.${stat}`);
+      // if (current === undefined) continue;
+      // Already migrated? Skip
+      if (typeof current === "object") {
+        continue;
+      }
+      // Transform flat number/null to object
+      Hyp3eLogger.info("migrateActorData", `Fixing system.${stat} for ${actor.name}...`);
+      updates[`system.${stat}`] = {
+        value: current
+      };
+    }
+
     if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp === "object") {
         Hyp3eLogger.info("migrateActorData", `Fixing temp HP for ${actor.name}...`);
         updates = { ...updates, "system.hp.tempHp": 0 };
@@ -288,4 +304,50 @@ export function fixFriendlyName(item) {
     // Use a regex to replace (1h) or (2h) with null
     const output = friendlyName.replace(/\s?\((1h|2h)\)/g, "");
     return output;
+}
+
+export async function migrateItemEffects(item) {
+  const saveKeys = [
+    "system.saves.death.value",
+    "system.saves.device.value",
+    "system.saves.transformation.value",
+    "system.saves.avoidance.value",
+    "system.saves.sorcery.value"
+  ];
+
+  const updates = [];
+
+  if (item.effects.size === 0) return;
+
+  const effectUpdates = [];
+  for (const effect of item.effects) {
+    const newChanges = effect.changes.map(change => {
+      if (saveKeys.includes(change.key)) {
+        // Replace .value with .curr
+        const newKey = change.key.replace(/\.value$/, ".curr");
+        if (newKey !== change.key) {
+          return { ...change, key: newKey };
+        }
+      } else if (["system.fa", "system.ca", "system.ta"].includes(change.key)) {
+        return { ...change, key: change.key + ".curr" };
+      }
+      return change;
+    });
+    // Only queue update if something actually changed
+    if (!foundry.utils.objectsEqual(newChanges, effect.changes)) {
+      effectUpdates.push({
+        _id: effect.id,
+        changes: newChanges
+      });
+    }
+  }
+
+  if (effectUpdates.length > 0) {
+    updates.push({
+      itemId: item.id,
+      name: item.name,
+      updatedEffects: effectUpdates.length
+    });
+    await item.updateEmbeddedDocuments("ActiveEffect", effectUpdates);
+  }
 }

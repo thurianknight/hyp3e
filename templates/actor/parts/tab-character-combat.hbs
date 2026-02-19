@@ -18,9 +18,15 @@
             </div>
             <div class="resource-content fighting-ability flexrow flex-group-center">
                 <label for="system.fa" class="combat-label">{{localize "HYP3E.fightingAbility"}}</label>
-                <input type="text" name="system.fa" value="{{system.fa}}" data-dtype="Number"/>
+                <div>
+                  <div class="flexrow fighting-ability">
+                    <input type="text" name="system.fa.value" value="{{system.fa.value}}" data-dtype="Number" />
+                    <input type="text" class="fa-current" name="system.fa.curr" value="{{system.fa.curr}}" data-dtype="Number" disabled/>
+                  </div>
+                  <span class="mod-label">{{localize 'Base | Current'}}</span>
+                </div>
                 <label for="system.unskilled" class="combat-label">{{localize "HYP3E.unskilled"}}</label>
-                <input type="text" name="system.unskilled" value="{{system.unskilled}}" data-dtype="Number"/>
+                <input type="text" name="system.unskilled" value="{{system.unskilled}}" data-dtype="Number" />
             </div>
             <div class="resource-content class-weapons flexrow">
                 <label for="system.proficiencies" class="combat-label-small">{{localize "HYP3E.wpnSkills"}}</label>
@@ -111,8 +117,15 @@
       {{!-- Saving throws here --}}
       <hr class="plain-hr" />
       <div class="combat-block flexrow">
-          <div class="resource-content flexrow flex-group-center">
+          <div class="resource-content flex-group-center">
+            <label for="system.saves.base.value" class="combat-label-smaller">{{localize "HYP3E.saves.base.name"}}</label>
+            <input type="text" name="system.saves.base.value" value="{{system.saves.base.value}}" data-dtype="Number" />
+          </div>
+          <div class="resource-content flex-group-center flex-xlarge">
             <h3>{{localize "HYP3E.headers.savingThrows"}}</h3>
+          </div>
+          <div class="resource-content flex-group-center">
+            &nbsp;
           </div>
       </div>
       <div class="saves-block flexrow flex-between">
@@ -123,18 +136,18 @@
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.death.value}}" 
+                        data-roll-target="{{system.saves.death.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.death.value" value="{{system.saves.death.value}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.death.curr" value="{{system.saves.death.curr}}" data-dtype="Number"/>
             </div>
             <div class="save-death">
                 <a data-action="rollThis" 
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.death.value}}" 
+                        data-roll-target="{{system.saves.death.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
                     <i class="fas fa-dice-d20"></i>
                     <span class="saves-label">{{localize "HYP3E.saves.death.name"}}</span>
@@ -148,18 +161,18 @@
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.device.value}}" 
+                        data-roll-target="{{system.saves.device.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.device.value" value="{{system.saves.device.value}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.device.curr" value="{{system.saves.device.curr}}" data-dtype="Number"/>
             </div>
             <div class="save-device">
                 <a data-action="rollThis" 
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.device.value}}" 
+                        data-roll-target="{{system.saves.device.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
                     <i class="fas fa-dice-d20"></i>
                     <span class="saves-label">{{localize "HYP3E.saves.device.name"}}</span>
@@ -173,18 +186,18 @@
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.transformation.value}}" 
+                        data-roll-target="{{system.saves.transformation.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.transformation.value" value="{{system.saves.transformation.value}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.transformation.curr" value="{{system.saves.transformation.curr}}" data-dtype="Number"/>
             </div>
             <div class="save-transformation">
                 <a data-action="rollThis" 
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.transformation.value}}" 
+                        data-roll-target="{{system.saves.transformation.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
                     <i class="fas fa-dice-d20"></i>
                     <span class="saves-label">{{localize "HYP3E.saves.transformation.name"}}</span>
@@ -198,18 +211,18 @@
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.avoidance.value}}" 
+                        data-roll-target="{{system.saves.avoidance.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.avoidance.value" value="{{system.saves.avoidance.value}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.avoidance.curr" value="{{system.saves.avoidance.curr}}" data-dtype="Number"/>
             </div>
             <div class="save-avoidance">
                 <a data-action="rollThis" 
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.avoidance.value}}" 
+                        data-roll-target="{{system.saves.avoidance.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
                     <i class="fas fa-dice-d20"></i>
                     <span class="saves-label">{{localize "HYP3E.saves.avoidance.name"}}</span>
@@ -223,18 +236,18 @@
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.sorcery.value}}" 
+                        data-roll-target="{{system.saves.sorcery.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.sorcery.value" value="{{system.saves.sorcery.value}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.sorcery.curr" value="{{system.saves.sorcery.curr}}" data-dtype="Number"/>
             </div>
             <div class="save-sorcery">
                 <a data-action="rollThis" 
                         data-roll-type="save" 
                         data-roll="1d20" 
                         {{!-- data-roll-mode="publicroll"  --}}
-                        data-roll-target="{{system.saves.sorcery.value}}" 
+                        data-roll-target="{{system.saves.sorcery.curr}}" 
                         data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
                     <i class="fas fa-dice-d20"></i>
                     <span class="saves-label">{{localize "HYP3E.saves.sorcery.name"}}</span>

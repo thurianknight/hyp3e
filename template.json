@@ -24,6 +24,9 @@
               "ca": null,
               "ta": null,
               "saves": {
+                  "base": {
+                      "value": 0
+                  },
                   "death": {
                       "value": 0
                   },
