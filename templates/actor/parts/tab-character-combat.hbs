@@ -119,7 +119,7 @@
       <div class="combat-block flexrow">
           <div class="resource-content flex-group-center">
             <label for="system.saves.base.value" class="combat-label-smaller">{{localize "HYP3E.saves.base.name"}}</label>
-            <input type="text" name="system.saves.base.value" value="{{system.saves.base.value}}" data-dtype="Number" />
+            <input type="text" name="system.saves.base.value" value="{{system.saves.base.value}}" data-dtype="Number" disabled />
           </div>
           <div class="resource-content flex-group-center flex-xlarge">
             <h3>{{localize "HYP3E.headers.savingThrows"}}</h3>
@@ -140,7 +140,8 @@
                         data-label="{{localize 'HYP3E.dataLabel.deathSave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.death.curr" value="{{system.saves.death.curr}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.death.value" value="{{system.saves.death.value}}" data-dtype="Number" />
+                <input type="text" name="system.saves.death.curr" value="{{system.saves.death.curr}}" data-dtype="Number" disabled />
             </div>
             <div class="save-death">
                 <a data-action="rollThis" 
@@ -165,7 +166,8 @@
                         data-label="{{localize 'HYP3E.dataLabel.deviceSave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.device.curr" value="{{system.saves.device.curr}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.device.value" value="{{system.saves.device.value}}" data-dtype="Number" />
+                <input type="text" name="system.saves.device.curr" value="{{system.saves.device.curr}}" data-dtype="Number" disabled />
             </div>
             <div class="save-device">
                 <a data-action="rollThis" 
@@ -190,7 +192,8 @@
                         data-label="{{localize 'HYP3E.dataLabel.xformSave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.transformation.curr" value="{{system.saves.transformation.curr}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.transformation.value" value="{{system.saves.transformation.value}}" data-dtype="Number" />
+                <input type="text" name="system.saves.transformation.curr" value="{{system.saves.transformation.curr}}" data-dtype="Number" disabled />
             </div>
             <div class="save-transformation">
                 <a data-action="rollThis" 
@@ -215,7 +218,8 @@
                         data-label="{{localize 'HYP3E.dataLabel.avoidanceSave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.avoidance.curr" value="{{system.saves.avoidance.curr}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.avoidance.value" value="{{system.saves.avoidance.value}}" data-dtype="Number" />
+                <input type="text" name="system.saves.avoidance.curr" value="{{system.saves.avoidance.curr}}" data-dtype="Number" disabled />
             </div>
             <div class="save-avoidance">
                 <a data-action="rollThis" 
@@ -240,7 +244,8 @@
                         data-label="{{localize 'HYP3E.dataLabel.sorcerySave'}}">
                     </a>
                 </div>
-                <input type="text" name="system.saves.sorcery.curr" value="{{system.saves.sorcery.curr}}" data-dtype="Number"/>
+                <input type="text" name="system.saves.sorcery.value" value="{{system.saves.sorcery.value}}" data-dtype="Number" />
+                <input type="text" name="system.saves.sorcery.curr" value="{{system.saves.sorcery.curr}}" data-dtype="Number" disabled />
             </div>
             <div class="save-sorcery">
                 <a data-action="rollThis" 

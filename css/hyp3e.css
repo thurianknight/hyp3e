@@ -832,7 +832,8 @@
   input[type="number"] {
     text-align: center;
     min-width: 20px;
-    max-width: 50px;
+    max-width: 40px;
+    margin-right: 3px;
   }
   .save-death {
     display: flex; 
