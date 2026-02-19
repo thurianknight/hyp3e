@@ -343,6 +343,7 @@ export async function migrateItemEffects(item) {
   }
 
   if (effectUpdates.length > 0) {
+    Hyp3eLogger.info("migrateItemEffects", `Migrating active effects configuration for ${item.name}:`, effectUpdates)
     updates.push({
       itemId: item.id,
       name: item.name,

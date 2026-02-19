@@ -891,6 +891,10 @@
     }
   }
 }
+.hyp3e .saves-block .save-current {
+  font-weight: bold;
+  font-size: 1.25em;
+}
 
 /* Items-list styles used on all sheets & tabs.
   "Items" includes the Class & NPC Abilities lists, Weapons & Armor lists, 

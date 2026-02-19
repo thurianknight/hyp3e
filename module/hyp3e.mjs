@@ -968,7 +968,7 @@ async function migrateWorld() {
             }
           }
           // Migrate item effects required for data changes
-          migrateItemEffects(item);      
+          migrateItemEffects(doc);      
           break;
 
         default:
