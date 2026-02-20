@@ -42,7 +42,12 @@ The Hyperborea 3rd Edition Content Compendium is a Foundry VTT premium module se
 -->
 
 ## System Variables in Formulas and Macros
+
 The file [VARIABLES.md](/VARIABLES.md) has a list of the most commonly-used variables. Consult this when creating any kind of attack/damage, spell rolls, and other macros. For a more exhaustive list (though undocumented), check the Combat Tracker Settings and read the Tracked Resources drop-down list.
+
+## Attribute Keys in ActiveEffects
+
+The file [ACTIVE_EFFECTS.md](/ACTIVE_EFFECTS.md) has a list of the most commonly-used PC and NPC fields for ActiveEffects. Consult this when creating any ActiveEffect that makes a change to these fields.
 
 ## Troubleshooting and Requesting User Support
 
