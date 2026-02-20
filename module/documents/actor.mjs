@@ -115,9 +115,8 @@ export class Hyp3eActor extends Actor {
     // Make modifications to base data here
     const systemData = this.system;
 
-    if (systemData?.hp?.min == null) {
-      systemData.hp.min = -10;
-    }
+    // PCs can drop to -10 hp before they die
+    systemData.hp.min = -10;
 
     // Calculated fields go here...
 
