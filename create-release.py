@@ -45,6 +45,7 @@ items = [
     ("lib", True),
     ("module", True),
     ("templates", True),
+    ("ACTIVE_EFFECTS.md", False),
     ("CHANGELOG.md", False),
     ("CONTRIBUTING.md", False),
     ("LICENSE.OGL", False),
