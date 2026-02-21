@@ -1256,6 +1256,10 @@
     border: 2px groove var(--hyp3e-color-accent-25);
   }
 }
+/* Mouse pointer over draggable coins */
+.exploration-label.coins {
+  cursor: pointer;
+}
 /* Color per coin type */
 .exploration-label.coin-cp i.fa-coin,
 .exploration-label.coin-copper i.fa-coin {
