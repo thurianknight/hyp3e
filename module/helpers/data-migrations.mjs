@@ -307,6 +307,7 @@ export function fixFriendlyName(item) {
 }
 
 export async function migrateItemEffects(item) {
+  // Transform old saves from .value to .curr, and add .curr to fa/ca/ta changes if missing
   const saveKeys = [
     "system.saves.death.value",
     "system.saves.device.value",
