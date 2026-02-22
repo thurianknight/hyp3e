@@ -74,6 +74,27 @@ export class Hyp3eActor extends Actor {
     systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
     // systemData.hp.percentage = Math.min(Math.max((systemData.hp.value * 100) / systemData.hp.max, 0), 100);
 
+    // Helper to ensure nested structure and compute curr (repeatable for fa/ca/ta/saves)
+    const ensureNestedStat = (statPath, defaultValue = 0) => {
+      const stat = foundry.utils.getProperty(systemData, statPath);
+      if (typeof stat === "number" || stat === null) {
+        // Legacy flat: Convert to nested in-memory (don't persist here)
+        const value = stat ?? defaultValue;
+        foundry.utils.setProperty(systemData, statPath, { value, curr: value });
+      } else if (typeof stat === "object" && stat.value !== undefined) {
+        // Already nested: Reset curr to value (effects apply after)
+        stat.curr = stat.value ?? defaultValue;
+      } else {
+        // Undefined or wrong type: Default
+        foundry.utils.setProperty(systemData, statPath, { value: defaultValue, curr: defaultValue });
+      }
+    };
+
+    // Apply to your stats
+    ensureNestedStat("fa", 0);    // fa always exists, ca & ta may be null
+    ensureNestedStat("ca", null);
+    ensureNestedStat("ta", null);
+
     // Notes on system.tempModifiers:
     //  This is an array of modifiers that may be applied to any field in the data template.
     //  However, note that it is better to use effects and apply them to the data template
@@ -258,6 +279,18 @@ export class Hyp3eActor extends Actor {
       data.actorId = this.id
       data.actorType = this.type;
       data.actorName = this.name;
+
+      // Add short aliases that point to the prepared/final values
+      if (data.fa?.curr !== undefined) {
+        data.fa_curr = data.fa.curr;
+      }
+      if (data.ca?.curr !== undefined) {
+        data.ca_curr = data.ca.curr;
+      }
+      if (data.ta?.curr !== undefined) {
+        data.ta_curr = data.ta.curr;
+      }
+
       // Prepare character/npc roll data.
       this._getCharacterRollData(data);
       // this._getNpcRollData(data);  // POSSIBLE FUTURE USE
@@ -269,14 +302,18 @@ export class Hyp3eActor extends Actor {
    * @override
    * Override actor update() method.
    */
-  // async update(data, options={}) {
-  //   Hyp3eLogger.info("Hyp3eActor update", `Updating ${this.name}:`, data);
-  //   Hyp3eLogger.info("Hyp3eActor update", `Update options:`, options);
-  //   Hyp3eLogger.info("Hyp3eActor update", `Current _source:`, this._source);
-  //   const result = await super.update(data, options);
-  //   Hyp3eLogger.info("Hyp3eActor update", `After update _source:`, this._source);
-  //   return result;
-  // }
+  async update(data, options={}) {
+    console.group(`[Hyp3eActor update] Actor ${this.name}`);
+    Hyp3eLogger.info("Hyp3eActor update", `Updating ${this.name} with data:`, data);
+    Hyp3eLogger.info("Hyp3eActor update", `Update options:`, options);
+    Hyp3eLogger.info("Hyp3eActor update", `Current _source:`, this._source);
+    const result = await super.update(data, options);
+    Hyp3eLogger.info("Hyp3eActor update", `After update data:`, this.system);
+    Hyp3eLogger.info("Hyp3eActor update", `After update _source:`, this._source);
+    console.groupEnd();
+
+    return result;
+  }
 
   /**
    * @override
@@ -285,7 +322,11 @@ export class Hyp3eActor extends Actor {
    *  to a final number that can be applied to the actor's overrides.
    */
   applyActiveEffects() {
-    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${this.name} before apply:`, this);
+    // Anything to process?
+    const allApplicableEffects = Array.from(this.allApplicableEffects());
+    if (allApplicableEffects.length === 0) return;
+
+    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${this.name} before apply:`, { Actor: this, Effects: allApplicableEffects });
 
     // For items that apply effects with variables, we resolve those variables 
     //  on the item effect rather than the actor
