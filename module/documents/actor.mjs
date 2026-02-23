@@ -1205,7 +1205,6 @@ export class Hyp3eActor extends Actor {
             duration: updatedDuration,
             changes: updatedChanges
           }
-          // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Duration:`, updatedDuration)
           Hyp3eLogger.info("Hyp3eActor updateItemEffects", `All updates on actor ${this.name} for effect ${effect.name}:`, { updates });
           await effect.update(updates);
           // return updates;
