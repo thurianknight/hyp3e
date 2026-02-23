@@ -285,13 +285,13 @@ Hooks.once('init', async function() {
 Hooks.once("ready", async function() {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on("hotbarDrop", (bar, data, slot) => {
-  // We only override Item drops
-  if (data.type !== "Item") {
-    return; // allow core Foundry behavior
-  }
-  // Handle this Item drop
-  createItemMacro(data, slot);
-  return false;
+    // We only override Item drops
+    if (data.type !== "Item") {
+      return; // allow core Foundry behavior
+    }
+    // Handle this Item drop
+    createItemMacro(data, slot);
+    return false;
   });
 
   // Get Foundry major version #
@@ -370,9 +370,9 @@ Hooks.once("ready", async function() {
 
   // Limit token movement to actor MV base
   if (majorVersion >= 13) {
-  const limitMovement = game.settings.get(game.system.id, "limitMovement");
-  CONFIG.HYP3E.limitMovement = limitMovement;
-  Hyp3eLogger.info("Init", "CONFIG Limit token movement to actor MV base:", CONFIG.HYP3E.limitMovement);
+    const limitMovement = game.settings.get(game.system.id, "limitMovement");
+    CONFIG.HYP3E.limitMovement = limitMovement;
+    Hyp3eLogger.info("Init", "CONFIG Limit token movement to actor MV base:", CONFIG.HYP3E.limitMovement);
   }
 
   // Force range limitations on weapon & spell attacks
@@ -408,28 +408,28 @@ Hooks.once("ready", async function() {
   // Load races list
   const races = game.settings.get(game.system.id, "races");
   if (races != "") {
-  CONFIG.HYP3E.races = {}
-  const racesArray = races.split(",");
-  racesArray.forEach((l, i) => (CONFIG.HYP3E.races[l.trim()] = l.trim()));
-  Hyp3eLogger.info("Init", "CONFIG Races:", CONFIG.HYP3E.races);
+    CONFIG.HYP3E.races = {}
+    const racesArray = races.split(",");
+    racesArray.forEach((l, i) => (CONFIG.HYP3E.races[l.trim()] = l.trim()));
+    Hyp3eLogger.info("Init", "CONFIG Races:", CONFIG.HYP3E.races);
   }
 
   // Load language list
   const languages = game.settings.get(game.system.id, "languages");
   if (languages != "") {
-  CONFIG.HYP3E.languages = {}
-  const langArray = languages.split(",");
-  langArray.forEach((l, i) => (CONFIG.HYP3E.languages[l.trim()] = l.trim()));
-  Hyp3eLogger.info("Init", "CONFIG Languages:", CONFIG.HYP3E.languages);
+    CONFIG.HYP3E.languages = {}
+    const langArray = languages.split(",");
+    langArray.forEach((l, i) => (CONFIG.HYP3E.languages[l.trim()] = l.trim()));
+    Hyp3eLogger.info("Init", "CONFIG Languages:", CONFIG.HYP3E.languages);
   }
 
   // Load class list
   const characterClasses = game.settings.get(game.system.id, "characterClasses");
   if (characterClasses != "") {
-  CONFIG.HYP3E.characterClasses = {}
-  const classArray = characterClasses.split(",");
-  classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
-  Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
+    CONFIG.HYP3E.characterClasses = {}
+    const classArray = characterClasses.split(",");
+    classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
+    Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
   }
   // Load custom classes
   CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
@@ -452,7 +452,7 @@ Hooks.once("ready", async function() {
   // Load saving throws
   if (CONFIG.HYP3E.saves) {
     for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {
-    CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
+      CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
     }
     Hyp3eLogger.info("Init", "CONFIG Saves:", CONFIG.HYP3E.saves);
   }
@@ -460,7 +460,7 @@ Hooks.once("ready", async function() {
   // Load creature sizes
   if (CONFIG.HYP3E.creatureSizes) {
     for (let [k, v] of Object.entries(CONFIG.HYP3E.creatureSizes)) {
-    CONFIG.HYP3E.creatureSizes[k] = game.i18n.localize(CONFIG.HYP3E.creatureSizes[k])
+      CONFIG.HYP3E.creatureSizes[k] = game.i18n.localize(CONFIG.HYP3E.creatureSizes[k])
     }
     Hyp3eLogger.info("Init", "CONFIG Creature Sizes:", CONFIG.HYP3E.creatureSizes);
   }
@@ -468,7 +468,7 @@ Hooks.once("ready", async function() {
   // Load weapon types
   if (CONFIG.HYP3E.weaponTypes) { 
     for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponTypes)) {
-    CONFIG.HYP3E.weaponTypes[k] = game.i18n.localize(CONFIG.HYP3E.weaponTypes[k])
+      CONFIG.HYP3E.weaponTypes[k] = game.i18n.localize(CONFIG.HYP3E.weaponTypes[k])
     }
     Hyp3eLogger.info("Init", "CONFIG Weapon Types:", CONFIG.HYP3E.weaponTypes);
   }
@@ -476,7 +476,7 @@ Hooks.once("ready", async function() {
   // Load weapon annotations
   if (CONFIG.HYP3E.weaponAnnotations) { 
     for (let [k, v] of Object.entries(CONFIG.HYP3E.weaponAnnotations)) {
-    CONFIG.HYP3E.weaponAnnotations[k] = game.i18n.localize(CONFIG.HYP3E.weaponAnnotations[k])
+      CONFIG.HYP3E.weaponAnnotations[k] = game.i18n.localize(CONFIG.HYP3E.weaponAnnotations[k])
     }
     Hyp3eLogger.info("Init", "CONFIG Weapon Annotations:", CONFIG.HYP3E.weaponAnnotations);
   }
@@ -484,21 +484,21 @@ Hooks.once("ready", async function() {
   // Load damage types
   if (CONFIG.HYP3E.damageTypes) { 
     for (let [k, v] of Object.entries(CONFIG.HYP3E.damageTypes)) {
-    CONFIG.HYP3E.damageTypes[k] = game.i18n.localize(CONFIG.HYP3E.damageTypes[k])
+      CONFIG.HYP3E.damageTypes[k] = game.i18n.localize(CONFIG.HYP3E.damageTypes[k])
     }
     Hyp3eLogger.info("Init", "CONFIG Damage Types:", CONFIG.HYP3E.damageTypes);
     // Append additional damage types
     const addlDamageTypes = (game.settings.get(game.system.id, "addlDamageTypes")).trim();
     if (addlDamageTypes != "") {
-    const addlDamageTypesArray = addlDamageTypes.split(",");
-    addlDamageTypesArray.forEach((l, i) => (CONFIG.HYP3E.damageTypes[l.trim()] = l.trim()));
+      const addlDamageTypesArray = addlDamageTypes.split(",");
+      addlDamageTypesArray.forEach((l, i) => (CONFIG.HYP3E.damageTypes[l.trim()] = l.trim()));
     }
   }
 
   // Load armor types
   if (CONFIG.HYP3E.armorTypes) { 
     for (let [k, v] of Object.entries(CONFIG.HYP3E.armorTypes)) {
-    CONFIG.HYP3E.armorTypes[k] = game.i18n.localize(CONFIG.HYP3E.armorTypes[k])
+      CONFIG.HYP3E.armorTypes[k] = game.i18n.localize(CONFIG.HYP3E.armorTypes[k])
     }
     Hyp3eLogger.info("Init", "CONFIG Armor Types:", CONFIG.HYP3E.armorTypes);
   }
@@ -509,17 +509,17 @@ Hooks.once("ready", async function() {
     const migrationHasRun = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
     // const migrationHasRun = false  // FOR DEBUGGING, TO FORCE A RE-RUN
     if (!migrationHasRun || reRunMigration) {
-    Hyp3eLogger.info("Init", "Running one-time migration...");
+      Hyp3eLogger.info("Init", "Running one-time migration...");
 
-    // Do the world migration
-    await migrateWorld();
+      // Do the world migration
+      await migrateWorld();
 
-    // Set the flags so it doesn't run again
-    await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
-    await game.settings.set(game.system.id, `reRunMigration`, false);
-    Hyp3eLogger.info("Init", "Migration complete.");
+      // Set the flags so it doesn't run again
+      await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
+      await game.settings.set(game.system.id, `reRunMigration`, false);
+      Hyp3eLogger.info("Init", "Migration complete.");
     } else {
-    Hyp3eLogger.info("Init", "Migration has been run before, no need to do it again.");
+      Hyp3eLogger.info("Init", "Migration has been run before, no need to do it again.");
     }
   }
 
@@ -566,7 +566,7 @@ Hooks.once("ready", async function() {
   if (game.user.isGM) {
     // If the token resize option is set, do that now, while the game is loading
     if (game.settings.get(game.system.id, "resizeTokens")) {
-    resizeTokenPrototypes()
+      resizeTokenPrototypes()
     }
   }
 
@@ -853,8 +853,8 @@ async function migrateWorld() {
   Hyp3eLogger.info("migrateWorld", `Migrating world ${game.system.version}...`);
 
   // Migrate Actor directory
-  Hyp3eLogger.info("migrateWorld", `Updating data for actors in the directory...`);
-  for (let actor of game.actors.contents) {
+  Hyp3eLogger.info("migrateWorld", `Updating data for ${game.actors.contents.length} actors in the directory...`, game.actors.contents);
+  for (const actor of game.actors.contents) {
     // Migrate actor data
     const origActor = foundry.utils.deepClone(actor)
     const actorUpdates = migrateActorData(origActor)
@@ -863,7 +863,7 @@ async function migrateWorld() {
     }
     // Migrate the actor's items
     if (actor.items) {
-      for (let item of actor.items) {
+      for (const item of actor.items) {
         const origItem = foundry.utils.deepClone(item);
         const itemUpdates = migrateItemData(origItem);
         if (itemUpdates && Object.keys(itemUpdates).length > 0) {
@@ -884,8 +884,8 @@ async function migrateWorld() {
   // return true;
 
   // Migrate Items directory
-  Hyp3eLogger.info("migrateWorld", `Updating data for items in the directory...`);
-  for (let item of game.items.contents) {
+  Hyp3eLogger.info("migrateWorld", `Updating data for ${game.items.contents.length} items in the directory...`, game.items.contents);
+  for (const item of game.items.contents) {
     const origItem = foundry.utils.deepClone(item);
     const itemUpdates = migrateItemData(origItem);
     if (itemUpdates && Object.keys(itemUpdates).length > 0) {
@@ -908,7 +908,7 @@ async function migrateWorld() {
   }
 
   // Migrate compendia, one document at a time (time-consuming!)
-  for (let pack of game.packs) {
+  for (const pack of game.packs) {
     if (!pack.collection.startsWith("hyp3e-compendium")) continue;
 
     const packType = pack.metadata.type
@@ -926,7 +926,7 @@ async function migrateWorld() {
     const documents = await pack.getDocuments()
 
     // Iterate over compendium entries and apply migration functions
-    for (let doc of documents) {
+    for (const doc of documents) {
     try {
       switch(packType) {
       case "Actor":
@@ -938,7 +938,7 @@ async function migrateWorld() {
         }
         // Migrate the actor's items
         if (doc.items) {
-        for (let item of doc.items) {
+        for (const item of doc.items) {
           const origItem = foundry.utils.deepClone(item);
           const itemUpdates = migrateItemData(origItem);
               if (itemUpdates && Object.keys(itemUpdates).length > 0) {
@@ -990,7 +990,7 @@ async function migrateWorld() {
 
 async function resizeTokenPrototypes() {
   // Update the actor directory first
-  for (let actor of game.actors.contents) {
+  for (const actor of game.actors.contents) {
     // Migrate NPC data
     if (actor.type == "npc") {
       const tokenSize = fixTokenSize(actor)

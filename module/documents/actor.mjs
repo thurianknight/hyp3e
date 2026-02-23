@@ -30,9 +30,9 @@ export class Hyp3eActor extends Actor {
 
     const systemData = this.system;
     // Base/current FA, CA, TA
-    if (systemData.fa) systemData.fa.curr = systemData.fa.value ?? 0;
-    if (systemData.ca) systemData.ca.curr = systemData.ca.value ?? null;
-    if (systemData.ta) systemData.ta.curr = systemData.ta.value ?? null;
+    if (systemData.fa && typeof systemData.fa === "object") systemData.fa.curr = systemData.fa.value ?? 0;
+    if (systemData.ca && typeof systemData.ca === "object") systemData.ca.curr = systemData.ca.value ?? null;
+    if (systemData.ta && typeof systemData.ta === "object") systemData.ta.curr = systemData.ta.value ?? null;
 
     // Base/current saving throws
     const saves = systemData.saves;
@@ -74,7 +74,7 @@ export class Hyp3eActor extends Actor {
     systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
     // systemData.hp.percentage = Math.min(Math.max((systemData.hp.value * 100) / systemData.hp.max, 0), 100);
 
-    // Helper to ensure nested structure and compute curr (repeatable for fa/ca/ta/saves)
+    // Helper to ensure nested structure and compute curr (repeatable for FA/CA/TA/saves)
     const ensureNestedStat = (statPath, defaultValue = 0) => {
       const stat = foundry.utils.getProperty(systemData, statPath);
       if (typeof stat === "number" || stat === null) {
@@ -91,7 +91,7 @@ export class Hyp3eActor extends Actor {
     };
 
     // Apply to your stats
-    ensureNestedStat("fa", 0);    // fa always exists, ca & ta may be null
+    ensureNestedStat("fa", 0);    // FA always exists, CA & TA may be null
     ensureNestedStat("ca", null);
     ensureNestedStat("ta", null);
 

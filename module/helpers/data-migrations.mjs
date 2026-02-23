@@ -6,7 +6,7 @@ import { Hyp3eLogger } from "./logger.mjs";
  * @returns {Object} - JSON of update data
  */
 export function migrateActorData(actor) {
-    // Hyp3eLogger.info("migrateActorData", `Original ${actor.name} to migrate:`, actor)
+    Hyp3eLogger.info("migrateActorData", `Migrating data for ${actor.name}...:`, actor)
     // let newActor = {...actor};
     let updates = {};
     // Add new default values
@@ -23,6 +23,7 @@ export function migrateActorData(actor) {
     const stats = ["fa", "ca", "ta"];
     for (const stat of stats) {
       const current = foundry.utils.getProperty(actor, `system.${stat}`);
+      Hyp3eLogger.info("migrateActorData", `${actor.name} property system.${stat}...`, current);
       // if (current === undefined) continue;
       // Already migrated? Skip
       if (typeof current === "object") {
@@ -30,9 +31,7 @@ export function migrateActorData(actor) {
       }
       // Transform flat number/null to object
       Hyp3eLogger.info("migrateActorData", `Fixing system.${stat} for ${actor.name}...`);
-      updates[`system.${stat}`] = {
-        value: current
-      };
+      updates = { ...updates, [`system.${stat}`]: { value: current } };
     }
 
     if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp === "object") {
