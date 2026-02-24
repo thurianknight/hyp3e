@@ -31,11 +31,11 @@ export class Hyp3eActor extends Actor {
     const systemData = this.system;
     // Base/current FA, CA, TA
     // if (systemData.fa && typeof systemData.fa === "object") systemData.fa.curr = systemData.fa.value ?? 0;
-    systemData.fa = systemData?.fightingAbility.value ?? systemData.fa?.value ?? systemData.fa ?? 0;
+    systemData.fa = systemData?.fightingAbility.value ? systemData.fightingAbility.value : (systemData.fa ?? 0);
     // if (systemData.ca && typeof systemData.ca === "object") systemData.ca.curr = systemData.ca.value ?? null;
-    systemData.ca = systemData?.castingAbility.value ?? systemData.ca?.value ?? systemData.ca ?? null;
+    systemData.ca = systemData?.castingAbility.value ? systemData.castingAbility.value : (systemData.ca ?? null);
     // if (systemData.ta && typeof systemData.ta === "object") systemData.ta.curr = systemData.ta.value ?? null;
-    systemData.ta = systemData?.turningAbility.value ?? systemData.ta?.value ?? systemData.ta ?? null;
+    systemData.ta = systemData?.turningAbility.value ? systemData.turningAbility.value : (systemData.ta ?? null);
 
     // Base/current saving throws
     const saves = systemData.saves;
