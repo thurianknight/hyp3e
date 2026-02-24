@@ -12,8 +12,6 @@ When creating roll formulas and macros, it is common to use variables for actor 
 - @ac.tempDrMod
   - Temporary DR modifier
 - @ca
-  - Deprecated. Use @ca_curr instead
-- @ca_curr
   - Current (calculated) Casting Ability
 - @cha.turnUndead
   - Turn Undead modifier
@@ -32,8 +30,6 @@ When creating roll formulas and macros, it is common to use variables for actor 
 - @dex.test
   - Test of DX
 - @fa
-  - Deprecated. Use @fa_curr instead
-- @fa_curr
   - Current (calculated) Fighting Ability
 - @hd
   - Hit Dice used to roll Hit Points for any actor
@@ -56,8 +52,6 @@ When creating roll formulas and macros, it is common to use variables for actor 
 - @str.test
   - Test of ST
 - @ta
-  - Deprecated. Use @ta_curr instead
-- @ta_curr
   - Current (calculated) Turning Ability
 - @tempAtkMod
   - Temporary attack modifier

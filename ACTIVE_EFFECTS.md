@@ -7,12 +7,12 @@ These have mechanical impact in the game, and need specific configuration in the
   - Use system.attributes.*.curr, where * is one of: str, dex, con, int, wis, cha
 - Attribute mods
   - OK to change directly
-- Turning Ability
-  - Use system.ta.curr
 - Fighting Ability
-  - Use system.fa.curr
+  - Use system.fa
 - Casting Ability
-  - Use system.ca.curr
+  - Use system.ca
+- Turning Ability
+  - Use system.ta
 - Hit Points
   - Use system.hp.tempHp
 - Armor Class

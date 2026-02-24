@@ -23,15 +23,25 @@ export function migrateActorData(actor) {
     const stats = ["fa", "ca", "ta"];
     for (const stat of stats) {
       const current = foundry.utils.getProperty(actor, `system.${stat}`);
+      let newStat = "";
+      if (stat === "fa") newStat = "fightingAbility";
+      if (stat === "ca") newStat = "castingAbility";
+      if (stat === "ta") newStat = "turningAbility";
       Hyp3eLogger.info("migrateActorData", `${actor.name} property system.${stat}...`, current);
-      // if (current === undefined) continue;
-      // Already migrated? Skip
-      if (typeof current === "object") {
-        continue;
+      // Transform old number/null to new object
+      Hyp3eLogger.info("migrateActorData", `Setting system.${newStat} for ${actor.name}...`);
+      let newValue;
+      if (typeof current === "object" && current !== null && "value" in current) {
+        newValue = current.value || null;
+      } else if (typeof current === "number") {
+        newValue = current;
+      } else if (typeof current === "string") {
+        const parsed = parseInt(current);
+        newValue = isNaN(parsed) ? null : parsed;
+      } else {
+        newValue = null;
       }
-      // Transform flat number/null to object
-      Hyp3eLogger.info("migrateActorData", `Fixing system.${stat} for ${actor.name}...`);
-      updates = { ...updates, [`system.${stat}`]: { value: current } };
+      updates = { ...updates, [`system.${stat}`]: newValue, [`system.${newStat}`]: { value: newValue } };
     }
 
     if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp === "object") {
@@ -306,7 +316,7 @@ export function fixFriendlyName(item) {
 }
 
 export async function migrateItemEffects(item) {
-  // Transform old saves from .value to .curr, and add .curr to fa/ca/ta changes if missing
+  // Transform old saves from .value to .curr
   const saveKeys = [
     "system.saves.death.value",
     "system.saves.device.value",
@@ -328,8 +338,12 @@ export async function migrateItemEffects(item) {
         if (newKey !== change.key) {
           return { ...change, key: newKey };
         }
-      } else if (["system.fa", "system.ca", "system.ta"].includes(change.key)) {
-        return { ...change, key: change.key + ".curr" };
+      } else if (["system.fa.curr", "system.ca.curr", "system.ta.curr"].includes(change.key)) {
+        // Replace .curr with nothing
+        const newKey = change.key.replace(/\.curr$/, "");
+        if (newKey !== change.key) {
+          return { ...change, key: newKey };
+        }
       }
       return change;
     });

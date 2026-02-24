@@ -299,9 +299,9 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
 
         // Don't forget these fields, they are not on the form itself
         const level1 = this.classData.levelAdvancement["1"]
-        this.classData.fa.value = level1.fa;
-        this.classData.ca.value = level1.ca;
-        this.classData.ta.value = level1.ta;
+        this.classData.fightingAbility.value = level1.fa;
+        this.classData.castingAbility.value = level1.ca;
+        this.classData.turningAbility.value = level1.ta;
 
         // spellLists must be stored as an array, but it comes from the form as an indexed object
         this.classData.spellLists = Object.values(this.classData.spellLists);

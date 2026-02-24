@@ -17,16 +17,19 @@
           "tempDrMod": 0
         },
         "atkRate": "1/1",
-        "fa": {
+        "fa": 0,
+        "fightingAbility": {
           "value": 0
         },
         "tempAtkMod": 0,
         "tempDmgMod": 0,
         "tempInitiativeMod": 0,
-        "ca": {
+        "ca": null,
+        "castingAbility": {
           "value": null
         },
-        "ta": {
+        "ta": null,
+        "turningAbility": {
           "value": null
         },
         "saves": {

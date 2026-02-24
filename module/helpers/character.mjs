@@ -4945,9 +4945,9 @@ export class Hyp3eCharacter {
             Hyp3eLogger.error("Hyp3eCharacter levelUp", `HP roll failed!`)
         }
         // Update fighting ability, casting ability, and turning ability
-        data.fa.value = thisClass.levelAdvancement[nextLevel].fa
-        if (thisClass.levelAdvancement[nextLevel].ca) { data.ca.value = thisClass.levelAdvancement[nextLevel].ca }
-        if (thisClass.levelAdvancement[nextLevel].ta) { data.ta.value = thisClass.levelAdvancement[nextLevel].ta }
+        data.fightingAbility.value = thisClass.levelAdvancement[nextLevel].fa
+        if (thisClass.levelAdvancement[nextLevel].ca) { data.castingAbility.value = thisClass.levelAdvancement[nextLevel].ca }
+        if (thisClass.levelAdvancement[nextLevel].ta) { data.turningAbility.value = thisClass.levelAdvancement[nextLevel].ta }
 
         // Update saving throws, if needed
         let currentSave = this._valueFromTable(this.savingThrows, currLevel)
@@ -4970,9 +4970,9 @@ export class Hyp3eCharacter {
                     value: data.hp.value,
                     max: data.hp.max,
                 },
-                fa: { value: data.fa.value },
-                ca: { value: data.ca.value },
-                ta: { value: data.ta.value },
+                fightingAbility: { value: data.fightingAbility.value },
+                castingAbility: { value: data.castingAbility.value },
+                turningAbility: { value: data.turningAbility.value },
                 saves: {
                     base: {
                         value: data.saves.base.value
@@ -5027,9 +5027,9 @@ export class Hyp3eCharacter {
         content += `<li>New Level: ${nextLevel}</li>`
         content += `<li>XP: ${currentXp} / ${nextLevelXp}</li>`
         content += `<li>Hit Point Increase: ${hpIncrease} (${data.hp.value} HP / ${data.hp.max} max)</li>`
-        content += `<li>Fighting Ability: ${data.fa.value}</li>`
-        if (data.ca.value) { content += `<li>Casting Ability: ${data.ca.value}</li>` }
-        if (data.ta.value) { content += `<li>Turning Ability: ${data.ta.value}</li>` }
+        content += `<li>Fighting Ability: ${data.fightingAbility.value}</li>`
+        if (data.castingAbility.value) { content += `<li>Casting Ability: ${data.castingAbility.value}</li>` }
+        if (data.turningAbility.value) { content += `<li>Turning Ability: ${data.turningAbility.value}</li>` }
         if (newSave < currentSave) {
             content += `<li>Saving Throws vs:</li><ul>`
             content += `<li>Death: ${data.saves.death.value}</li>`
@@ -5096,9 +5096,9 @@ export class Hyp3eCharacter {
             Hyp3eLogger.info("Hyp3eCharacter setAttributeMods", `Class Data for ${data.details.class}:`, thisClass);
             data.hd = thisClass.hitDie
             content += `<li>Hit Die: ${thisClass.hitDie}</li>`
-            data.fa.value = thisClass.fa
+            data.fightingAbility.value = thisClass.fa
             content += `<li>Fighting Ability: ${thisClass.fa}</li>`
-            data.ca.value = thisClass.ca
+            data.castingAbility.value = thisClass.ca
             content += `<li>Casting Ability: ${thisClass.ca}</li>`
             if (thisClass?.spellLists && thisClass.spellLists.length > 0) {
                 Hyp3eLogger.info("Hyp3eCharacter setAttributeMods", `Setting ${data.details.class} spell lists...`);
@@ -5110,7 +5110,7 @@ export class Hyp3eCharacter {
                     content += `<li>Spell List(s): ${data.spellList}</li>`
                 }
             }
-            data.ta.value = thisClass.ta
+            data.turningAbility.value = thisClass.ta
             content += `<li>Turning Ability: ${thisClass.ta}</li>`
             data.unskilled = thisClass.unskilled
             content += `<li>Unskilled Weapon Penalty: ${thisClass.unskilled}</li>`
@@ -5429,11 +5429,11 @@ export class Hyp3eCharacter {
             let updateData = {
                 system: {
                     hd: data.hd,
-                    fa: { value: data.fa.value },
-                    ca: { value: data.ca.value },
+                    fightingAbility: { value: data.fightingAbility.value },
+                    castingAbility: { value: data.castingAbility.value },
                     spellList: data.spellList,
                     spellList2: data.spellList2,
-                    ta: { value: data.ta.value },
+                    turningAbility: { value: data.turningAbility.value },
                     saves: {
                         base: {
                             value: data.saves.base.value

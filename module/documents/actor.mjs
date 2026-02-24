@@ -30,9 +30,12 @@ export class Hyp3eActor extends Actor {
 
     const systemData = this.system;
     // Base/current FA, CA, TA
-    if (systemData.fa && typeof systemData.fa === "object") systemData.fa.curr = systemData.fa.value ?? 0;
-    if (systemData.ca && typeof systemData.ca === "object") systemData.ca.curr = systemData.ca.value ?? null;
-    if (systemData.ta && typeof systemData.ta === "object") systemData.ta.curr = systemData.ta.value ?? null;
+    // if (systemData.fa && typeof systemData.fa === "object") systemData.fa.curr = systemData.fa.value ?? 0;
+    systemData.fa = systemData?.fightingAbility.value ?? systemData.fa?.value ?? systemData.fa ?? 0;
+    // if (systemData.ca && typeof systemData.ca === "object") systemData.ca.curr = systemData.ca.value ?? null;
+    systemData.ca = systemData?.castingAbility.value ?? systemData.ca?.value ?? systemData.ca ?? null;
+    // if (systemData.ta && typeof systemData.ta === "object") systemData.ta.curr = systemData.ta.value ?? null;
+    systemData.ta = systemData?.turningAbility.value ?? systemData.ta?.value ?? systemData.ta ?? null;
 
     // Base/current saving throws
     const saves = systemData.saves;
@@ -75,25 +78,25 @@ export class Hyp3eActor extends Actor {
     // systemData.hp.percentage = Math.min(Math.max((systemData.hp.value * 100) / systemData.hp.max, 0), 100);
 
     // Helper to ensure nested structure and compute curr (repeatable for FA/CA/TA/saves)
-    const ensureNestedStat = (statPath, defaultValue = 0) => {
-      const stat = foundry.utils.getProperty(systemData, statPath);
-      if (typeof stat === "number" || stat === null) {
-        // Legacy flat: Convert to nested in-memory (don't persist here)
-        const value = stat ?? defaultValue;
-        foundry.utils.setProperty(systemData, statPath, { value, curr: value });
-      } else if (typeof stat === "object" && stat.value !== undefined) {
-        // Already nested: Reset curr to value (effects apply after)
-        stat.curr = stat.value ?? defaultValue;
-      } else {
-        // Undefined or wrong type: Default
-        foundry.utils.setProperty(systemData, statPath, { value: defaultValue, curr: defaultValue });
-      }
-    };
+    // const ensureNestedStat = (statPath, defaultValue = 0) => {
+    //   const stat = foundry.utils.getProperty(systemData, statPath);
+    //   if (typeof stat === "number" || stat === null) {
+    //     // Legacy flat: Convert to nested in-memory (don't persist here)
+    //     const value = stat ?? defaultValue;
+    //     foundry.utils.setProperty(systemData, statPath, { value, curr: value });
+    //   } else if (typeof stat === "object" && stat.value !== undefined) {
+    //     // Already nested: Reset curr to value (effects apply after)
+    //     stat.curr = stat.value ?? defaultValue;
+    //   } else {
+    //     // Undefined or wrong type: Default
+    //     foundry.utils.setProperty(systemData, statPath, { value: defaultValue, curr: defaultValue });
+    //   }
+    // };
 
-    // Apply to your stats
-    ensureNestedStat("fa", 0);    // FA always exists, CA & TA may be null
-    ensureNestedStat("ca", null);
-    ensureNestedStat("ta", null);
+    // Apply to your stats: FA always exists, CA & TA may be null
+    // ensureNestedStat("fa", 0);
+    // ensureNestedStat("ca", null);
+    // ensureNestedStat("ta", null);
 
     // Notes on system.tempModifiers:
     //  This is an array of modifiers that may be applied to any field in the data template.
@@ -281,15 +284,15 @@ export class Hyp3eActor extends Actor {
       data.actorName = this.name;
 
       // Add short aliases that point to the prepared/final values
-      if (data.fa?.curr !== undefined) {
-        data.fa_curr = data.fa.curr;
-      }
-      if (data.ca?.curr !== undefined) {
-        data.ca_curr = data.ca.curr;
-      }
-      if (data.ta?.curr !== undefined) {
-        data.ta_curr = data.ta.curr;
-      }
+      // if (data.fa?.curr !== undefined) {
+      //   data.fa_curr = data.fa.curr;
+      // }
+      // if (data.ca?.curr !== undefined) {
+      //   data.ca_curr = data.ca.curr;
+      // }
+      // if (data.ta?.curr !== undefined) {
+      //   data.ta_curr = data.ta.curr;
+      // }
 
       // Prepare character/npc roll data.
       this._getCharacterRollData(data);
@@ -2223,7 +2226,7 @@ export class Hyp3eActor extends Actor {
       const commandUndead = itemNameLower.includes("command") && itemNameLower.includes("undead");
       if (turnUndead || commandUndead) {
           // Ensure we have a valid Turning Ability
-          if (!this.system.ta.curr || this.system.ta.curr === 0) {
+          if (!this.system.ta || this.system.ta === 0) {
               const msg = `${this.name} must have a Turning Ability of 1 or greater!`;
               Hyp3eLogger.warn("rollCheck", msg);
               ui.notifications.warn(msg);
@@ -2298,7 +2301,7 @@ export class Hyp3eActor extends Actor {
       if (turnUndead || commandUndead) {
           const turnOrCommand = turnUndead ? "turn" : "command"
           // Use the "success" flag to describe the results of the attempted turning/commanding undead
-          checkFooter = this._resolveTurnUndead(roll.total, rollData.ta.curr, turnOrCommand)
+          checkFooter = this._resolveTurnUndead(roll.total, rollData.ta, turnOrCommand)
       } else if (assassinate) {
           // Use the "success" flag to describe the results of the attempted assassination
           checkFooter = this._resolveAssassination(targetToken, success)
@@ -2326,6 +2329,7 @@ export class Hyp3eActor extends Actor {
       const { attacker, attackerPos } = await this._getAttackerDetails(dataset);
       const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
       const actorData = this.getRollData();
+      // const actorData = foundry.utils.deepClone(this.system); // Clone this to avoid unintended side effects
 
       // If item lookup fails, exit with a warning
       if (!item) {
@@ -2407,7 +2411,8 @@ export class Hyp3eActor extends Actor {
 
         // Temporarily override the actor's CA if spell was cast from an item
         if (dataset.isItemSpell) {
-          actorData.ca.curr = dataset.itemCa
+          actorData.castingAbility.value = dataset.itemCa
+          actorData.ca = dataset.itemCa
         }
 
         // Handle spell memorization/slot consumption if applicable
@@ -2466,7 +2471,7 @@ export class Hyp3eActor extends Actor {
       }
 
       // Build Roll Formula
-      const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData); // Assuming this exists
+      const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData);
       Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Final attack formula:`, rollFormula);
 
       // Execute the Roll
@@ -2561,7 +2566,7 @@ export class Hyp3eActor extends Actor {
 
       const itemData = item.system;
       const itemName = itemData?.friendlyName?.trim() || item.name;
-      const actorData = this.getRollData();
+      // const actorData = this.getRollData();
 
       dataset.itemType = item.type;
       dataset.itemName = itemName;
@@ -2899,9 +2904,9 @@ export class Hyp3eActor extends Actor {
           const d20Die = atkRoll.dice.find(d => d.faces === 20);
           const naturalRoll = d20Die ? d20Die.results[0].result : 0;
 
-          Hyp3eLogger.info("Hyp3eActor _executeRoll", `Attack Roll:`, atkRoll);
-          Hyp3eLogger.info("Hyp3eActor _executeRoll", `Roll Result:`, atkRoll.total);
-          Hyp3eLogger.info("Hyp3eActor _executeRoll", `Natural d20 Roll:`, naturalRoll);
+          // Hyp3eLogger.info("Hyp3eActor _executeRoll", `Attack Roll:`, atkRoll);
+          // Hyp3eLogger.info("Hyp3eActor _executeRoll", `Roll Result:`, atkRoll.total);
+          // Hyp3eLogger.info("Hyp3eActor _executeRoll", `Natural d20 Roll:`, naturalRoll);
           return { atkRoll, naturalRoll };
       } catch (err) {
           Hyp3eLogger.error("_executeRoll", `Error rolling formula:`, rollFormula, err);
@@ -3695,7 +3700,7 @@ export class Hyp3eActor extends Actor {
       if (turnOrCommand == 'turn') {
           turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
       } else {
-          turnUndeadHtml = `<p>The total hit dice value of undead affected is ${this.system.ta.curr * 2} HD (2 HD per TA level). Starting from the weakest (lowest Type)...</p><ul>`
+          turnUndeadHtml = `<p>The total hit dice value of undead affected is ${this.system.ta * 2} HD (2 HD per TA level). Starting from the weakest (lowest Type)...</p><ul>`
       }
       for (let i = results.length-1; i >=0; i--) {
           turnUndeadHtml += results[i]
