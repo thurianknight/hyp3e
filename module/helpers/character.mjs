@@ -5114,8 +5114,8 @@ export class Hyp3eCharacter {
             content += `<li>Turning Ability: ${thisClass.ta}</li>`
             data.unskilled = thisClass.unskilled
             content += `<li>Unskilled Weapon Penalty: ${thisClass.unskilled}</li>`
-            data.proficiencies.class = thisClass.weaponProficiencies.favoredWeapons
-            if (thisClass.weaponProficiencies.exceptions != "") {
+            data.proficiencies.class = thisClass?.weaponProficiencies?.favoredWeapons ?? "";
+            if (thisClass?.weaponProficiencies?.exceptions && thisClass?.weaponProficiencies?.exceptions != "") {
                 data.proficiencies.class += ` *except* ${thisClass.weaponProficiencies.exceptions}`
             }
             data.details.xp.value = 0
