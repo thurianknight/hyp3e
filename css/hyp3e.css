@@ -1367,6 +1367,62 @@
     max-width: 75px;
     margin-bottom: 2px;
   }
+  .hit-points {
+    input[type=text],
+    input[type="number"] {
+      padding: 0;
+      margin-bottom: 0;
+      margin-right: 2px;
+      text-align: center;
+      max-width: 50px;
+    }  
+  }
+  .hit-points .hit-points-current {
+    font-weight: bold;
+    font-size: 1.25em;
+  }
+  .fighting-ability {
+    input[type=text],
+    input[type=number] {
+      padding: 0;
+      margin-bottom: 0;
+      margin-right: 2px;
+      text-align: center;
+      max-width: 50px;
+    }
+  }
+  .fighting-ability .fa-current {
+    font-weight: bold;
+    font-size: 1.25em;
+  }
+  .casting-ability {
+    input[type=text],
+    input[type=number] {
+      padding: 0;
+      margin-bottom: 0;
+      margin-right: 2px;
+      text-align: center;
+      max-width: 50px;
+    }
+  }
+  .casting-ability .ca-current {
+    font-weight: bold;
+    font-size: 1.25em;
+  }
+  .turning-ability {
+    input[type=text],
+    input[type=number] {
+      padding: 0;
+      margin-bottom: 0;
+      margin-right: 2px;
+      text-align: center;
+      max-width: 50px;
+    }
+  }
+  .turning-ability .ta-current {
+    font-weight: bold;
+    font-size: 1.25em;
+  }
 }
 .hyp3e .npc-description-block {
   padding: 0 2px;
