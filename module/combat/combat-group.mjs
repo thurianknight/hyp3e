@@ -14,8 +14,6 @@ export const actionGroups = {
 
 /**
  * An extension of Foundry's Combat class that implements side-based initiative.
- *
- * @todo Display the initiative results roll as a chat card
  */
 export class HYP3EGroupCombat extends HYP3ECombat {
   // ===========================================================================
@@ -54,29 +52,11 @@ export class HYP3EGroupCombat extends HYP3ECombat {
       Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Combatant IDs for group initiative:`, combatantIds);
       groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
     } else if (group !== undefined) {
-      // Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Group to roll for initiative:`, group);
       groupsToRollFor = [group];
     } else {
       groupsToRollFor = this.availableGroups;
     }
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Groups to roll for:`, groupsToRollFor);
-
-    // Popup a roll dialog to allow for situational modifiers
-    let sitMod = 0;
-    // const dataset = {
-    //   "action": "rollInitiative",
-    //   "roll": HYP3ECombat.FORMULA,
-    //   "rollType": "initiative",
-    //   "label": "Group Initiative",
-    //   "rollButtonLabel": "Roll Initiative"
-    // }
-    // try {
-    //   rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
-    //   sitMod = rollResponse.sitMod;
-    // } catch(err) {
-    //   // Do nothing - user likely cancelled the dialog
-    //   return;
-    // }
 
     // Take the groups array and append a roll object to each group
     const rollPerGroup = groupsToRollFor.reduce((prev, curr) => ({
@@ -113,25 +93,6 @@ export class HYP3EGroupCombat extends HYP3ECombat {
       Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Setting ${initGroup} group initiative to ${newInitScore}...`);
       await this.setGroupInitiativeScore(initGroup, newInitScore);
     }
-
-    // Update the combatants with their new initiative values
-    // const updates = combatantsAffected.map(
-    //   (c) => ({ _id: c.id, 
-    //     initRoll: results[c.initGroup].initiative,
-    //     "flags.hyp3e.initRoll": results[c.initGroup].initiative,
-    //     initiative: Math.round((results[c.initGroup].initiative 
-    //                             + (c.actor?.system?.attributes?.dex?.value/1000)
-    //                             + c.tempInitMod
-    //                             + c.meleeInit
-    //                             + c.missileInit
-    //                             + c.magicInit
-    //                             + c.moveInit
-    //                             + c.otherInit
-    //                             + c.statusInit
-    //                             + c.defeatedInit) * 1000) / 1000,
-    //   })
-    // )
-    // await this.updateEmbeddedDocuments("Combatant", updates);
 
     await this.#rollInitiativeUIFeedback(results);
     await this.activateCombatant(0);
