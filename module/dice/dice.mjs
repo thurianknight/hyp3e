@@ -677,3 +677,56 @@ export function containsMathOrVariables(str) {
 
   return false;
 }
+
+/**
+ * Convert any value to a safe integer for Hyperborea (attributes, hp, modifiers, etc.).
+ * - Number => Math.floor() to ensure integer (preserves existing integers)
+ * - String => parseInt(base 10), trimmed first
+ * - null / undefined / empty / invalid => 0
+ * - Anything else (like an Object or other invalid value/property) => 0
+ *
+ * @param {*} value - The value to normalize to an integer
+ * @param {boolean} [strict=false] - If true, throw on invalid conversions instead of returning 0
+ * @returns {number} An integer (or 0)
+ */
+export function convertToInt(value, strict = false) {
+  // Fast path: already a number
+  if (typeof value === "number") {
+    if (Number.isInteger(value)) {
+      return value;
+    }
+    // If it has decimals (unlikely from user input, but possible from formulas)
+    const floored = Math.floor(value);
+    if (strict && !Number.isInteger(value)) {
+      Hyp3eLogger.warn("Hyp3eDice convertToInt", `Non-integer number truncated from ${value} to ${floored}`);
+    }
+    return floored;
+  }
+
+  // null or undefined => 0
+  if (value == null) {
+    return 0;
+  }
+
+  // String: try parseInt
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed === "") return 0;
+
+    const num = parseInt(trimmed, 10);
+    if (!isNaN(num)) {
+      return num;
+    }
+
+    if (strict) {
+      Hyp3eLogger.warn("Hyp3eDice convertToInt", `Cannot convert string to integer: "${value}"`);
+    }
+    return 0;
+  }
+
+  // Everything else (objects, booleans, arrays, etc.)
+  if (strict) {
+    Hyp3eLogger.warn("Hyp3eDice convertToInt", `Cannot convert value to integer: ${JSON.stringify(value)}`);
+  }
+  return 0;
+}

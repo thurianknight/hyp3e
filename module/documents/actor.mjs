@@ -1,5 +1,5 @@
 import { Hyp3eCharacter } from "../helpers/character.mjs";
-import { Hyp3eDice, isPureNumber, isPureString, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
+import { Hyp3eDice, isPureNumber, isPureString, containsDice, containsMathOrVariables, convertToInt } from "../dice/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { checkAndResolveDuration } from "../helpers/effects.mjs";
@@ -33,6 +33,17 @@ export class Hyp3eActor extends Actor {
     systemData.fa = systemData?.fightingAbility.value ? systemData.fightingAbility.value : (systemData.fa ?? 0);
     systemData.ca = systemData?.castingAbility.value ? systemData.castingAbility.value : (systemData.ca ?? null);
     systemData.ta = systemData?.turningAbility.value ? systemData.turningAbility.value : (systemData.ta ?? null);
+
+    // Fix temporary modifier properties that might be undefined, null, or non-numeric:
+    //  system.hp.tempHp, system.ac.tempAcMod, system.ac.tempDrMod, system.movement.tempMvMod, system.tempAtkMod, system.tempDmgMod
+    // ActiveEffects will be applied after this.
+    systemData.hp.tempHp = convertToInt(systemData.hp?.tempHp);
+    systemData.ac.tempAcMod = convertToInt(systemData.ac?.tempAcMod);
+    systemData.ac.tempDrMod = convertToInt(systemData.ac?.tempDrMod);
+    systemData.movement.tempMvMod = convertToInt(systemData.movement?.tempMvMod);
+    systemData.tempAtkMod = convertToInt(systemData?.tempAtkMod);
+    systemData.tempDmgMod = convertToInt(systemData?.tempDmgMod);
+
 
     // Base/current saving throws
     const saves = systemData.saves;
