@@ -31,8 +31,8 @@ export class Hyp3eActor extends Actor {
     const systemData = this.system;
     // Base/current FA, CA, TA
     systemData.fa = systemData?.fightingAbility.value ? systemData.fightingAbility.value : (systemData.fa ?? 0);
-    systemData.ca = systemData?.castingAbility.value ? systemData.castingAbility.value : (systemData.ca ?? null);
-    systemData.ta = systemData?.turningAbility.value ? systemData.turningAbility.value : (systemData.ta ?? null);
+    systemData.ca = (systemData?.castingAbility.value || systemData?.castingAbility.value === null) ? systemData.castingAbility.value : (systemData.ca ?? null);
+    systemData.ta = (systemData?.turningAbility.value || systemData?.turningAbility.value === null) ? systemData.turningAbility.value : (systemData.ta ?? null);
 
     // Fix temporary modifier properties that might be undefined, null, or non-numeric:
     //  system.hp.tempHp, system.ac.tempAcMod, system.ac.tempDrMod, system.movement.tempMvMod, system.tempAtkMod, system.tempDmgMod
