@@ -9,6 +9,10 @@ These have mechanical impact in the game, and need specific configuration in the
   - OK to change directly
 - Fighting Ability
   - Use system.fa
+- Basic Attack Mod without affecting Fighting Ability, Strength, or other attack modifiers
+  - Use system.tempAtkMod
+- Basic Damage Mod without affecting Strength or other damage modifiers
+  - Use system.tempDmgMod
 - Casting Ability
   - Use system.ca
 - Turning Ability
