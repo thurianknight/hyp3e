@@ -20,13 +20,14 @@ import { handleSaveButtons, handleEffectButtons } from "./handlers/utility-handl
  * @param {*} content - The main HTML of the message
  */
 export function sendSimpleChat(actor, label, content) {
-    Hyp3eLogger.info("sendSimpleChat", `${actor.name} sent message with flavor "${label}" and content "${content}".`)
-    ChatMessage.create({
-        author: game.user.id,
-        speaker: ChatMessage.getSpeaker({ actor }),
-        flavor: label,
-        content: content
-    });
+  Hyp3eLogger.info("sendSimpleChat", `${actor.name} sent message with flavor "${label}" and content "${content}".`)
+  const speaker = actor.displayName;
+  ChatMessage.create({
+    author: game.user.id,
+    speaker: ChatMessage.getSpeaker({ alias: speaker }),
+    flavor: label,
+    content: content
+  });
 }
 
 /**
@@ -38,16 +39,17 @@ export function sendSimpleChat(actor, label, content) {
  * @param {*} rollMode - Chat mode: public, private gm, blind gm, self
  */
 export function sendRollToChat(roll, actor, label, content, rollMode) {
-    Hyp3eLogger.info("sendRollToChat", `${actor.name} sent message with flavor "${label}" and content "${content}".`)
-    // Send to chat
-    roll.toMessage({
-        author: game.user_id,
-        speaker: ChatMessage.getSpeaker({ actor: actor }),
-        flavor: label,
-        content: content
-    },{
-        rollMode: rollMode
-    })
+  Hyp3eLogger.info("sendRollToChat", `${actor.name} sent message with flavor "${label}" and content "${content}".`)
+  const speaker = actor.displayName;
+  // Send to chat
+  roll.toMessage({
+    author: game.user_id,
+    speaker: ChatMessage.getSpeaker({ alias: speaker }),
+    flavor: label,
+    content: content
+  },{
+    rollMode: rollMode
+  })
 }
 
 /**
@@ -63,27 +65,28 @@ export function sendRollToChat(roll, actor, label, content, rollMode) {
  * @param {*} rollMode - Chat mode: public, private gm, blind gm, self
  */
 export async function renderCustomChat(roll, item, actor, tokenId, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
-    // Load & render the chat template
+  const speaker = actor.displayName;  
+  // Load & render the chat template
     const templateData = {
-        roll: roll,
-        headerHTML: headerHTML,
-        debugRollFormula: debugRollFormula,
-        item: item,
-        actorId: actor.id,
-        tokenId: tokenId,
-        footerHTML: footerHTML,
+      roll: roll,
+      headerHTML: headerHTML,
+      debugRollFormula: debugRollFormula,
+      item: item,
+      actorId: actor.id,
+      tokenId: tokenId,
+      footerHTML: footerHTML,
     };
     const template = `${HYP3E.templatePath}/chat/attack-roll.hbs`;
     let customChat = await renderTemplate(template, templateData);
 
     // Send to chat
     roll.toMessage({
-        author: game.user_id,
-        speaker: ChatMessage.getSpeaker({ actor: actor }),
-        flavor: label,
-        content: customChat
+      author: game.user_id,
+      speaker: ChatMessage.getSpeaker({ alias: speaker }),
+      flavor: label,
+      content: customChat
     },{
-        rollMode: rollMode
+      rollMode: rollMode
     })
 }
 
@@ -91,18 +94,18 @@ export async function renderCustomChat(roll, item, actor, tokenId, label, debugR
  * Chat Font Settings
  **********************************************************/
 export function applyChatFontSizeSetting() {
-    const CHAT_FONT_SCALE = {
-        "-2": 0.8,  // shrink more
-        "-1": 0.9,  // shrink a little
-        "0": 1.0,  // default
-        "1": 1.1,  // bump up a little
-        "2": 1.25  // bump up more
-    };
-    const adj = game.settings.get("hyp3e", "chatFontSize") ?? 0;
-    const scale = CHAT_FONT_SCALE[adj] ?? 1.0;
+  const CHAT_FONT_SCALE = {
+    "-2": 0.8,  // shrink more
+    "-1": 0.9,  // shrink a little
+    "0": 1.0,  // default
+    "1": 1.1,  // bump up a little
+    "2": 1.25  // bump up more
+  };
+  const adj = game.settings.get("hyp3e", "chatFontSize") ?? 0;
+  const scale = CHAT_FONT_SCALE[adj] ?? 1.0;
 
-    document.documentElement.style.setProperty("--hyp3e-chat-scale", scale);
-    console.log("[applyChatFontSizeSetting] scale set globally:", scale);
+  document.documentElement.style.setProperty("--hyp3e-chat-scale", scale);
+  console.log("[applyChatFontSizeSetting] scale set globally:", scale);
 }
 
 /**********************************************************
@@ -117,29 +120,29 @@ export function applyChatFontSizeSetting() {
  * @param {*} _data 
  */
 export const addChatMessageButtons = async function(_msg, html, _data) {
-    // Set this flag
-    let addGenericDmgHealBtns = true
+  // Set this flag
+  let addGenericDmgHealBtns = true
 
-    // Handle various button types, each function returns true if it added buttons
-    addGenericDmgHealBtns = !(await handleDamageRollButtons(html)) && addGenericDmgHealBtns;
-    addGenericDmgHealBtns = !(await handleDamageRoll2hButtons(html)) && addGenericDmgHealBtns;
-    addGenericDmgHealBtns = !(await handleApplyDamageButtons(html)) && addGenericDmgHealBtns;
-    addGenericDmgHealBtns = !(await handleCritDamageButton(html)) && addGenericDmgHealBtns;
-    addGenericDmgHealBtns = !(await handleCritMissOrHitButtons(html)) && addGenericDmgHealBtns;
-    addGenericDmgHealBtns = !(await handleSaveButtons(html)) && addGenericDmgHealBtns;
-    addGenericDmgHealBtns = !(await handleEffectButtons(html)) && addGenericDmgHealBtns;
+  // Handle various button types, each function returns true if it added buttons
+  addGenericDmgHealBtns = !(await handleDamageRollButtons(html)) && addGenericDmgHealBtns;
+  addGenericDmgHealBtns = !(await handleDamageRoll2hButtons(html)) && addGenericDmgHealBtns;
+  addGenericDmgHealBtns = !(await handleApplyDamageButtons(html)) && addGenericDmgHealBtns;
+  addGenericDmgHealBtns = !(await handleCritDamageButton(html)) && addGenericDmgHealBtns;
+  addGenericDmgHealBtns = !(await handleCritMissOrHitButtons(html)) && addGenericDmgHealBtns;
+  addGenericDmgHealBtns = !(await handleSaveButtons(html)) && addGenericDmgHealBtns;
+  addGenericDmgHealBtns = !(await handleEffectButtons(html)) && addGenericDmgHealBtns;
 
-    // Skip RollTable results
-    if (_msg.flags?.core?.RollTable || _msg.flags?.documentType === "RollTable") {
-        addGenericDmgHealBtns = false;
-    }
-    // Only add damage/heal buttons to "unflavored" dice roll chat messages
-    if (_msg.flavor !== "") {
-        addGenericDmgHealBtns = false;
-    }
+  // Skip RollTable results
+  if (_msg.flags?.core?.RollTable || _msg.flags?.documentType === "RollTable") {
+    addGenericDmgHealBtns = false;
+  }
+  // Only add damage/heal buttons to "unflavored" dice roll chat messages
+  if (_msg.flavor !== "") {
+    addGenericDmgHealBtns = false;
+  }
 
-    if (!addGenericDmgHealBtns) return;
-    await handleGenericDamageHealButtons(_msg, html);
+  if (!addGenericDmgHealBtns) return;
+  await handleGenericDamageHealButtons(_msg, html);
 }
 
 
@@ -174,11 +177,4 @@ export const truncateLongContent = async function(_msg, html, _data) {
       description[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }    
   });
-
-  // Restore persisted state on render (if expanded previously)
-  // if (_msg.flags?.hyp3e?.isDescriptionExpanded) {
-  //   html.find('.description').removeClass('truncated');
-  //   toggleBtn.text('▲ Hide Description');
-  //   toggleBtn.attr('data-action', 'hide');
-  // }
 }

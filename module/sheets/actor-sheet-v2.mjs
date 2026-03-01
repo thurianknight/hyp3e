@@ -1150,7 +1150,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 containerText = " and its contents"
             }
         }
-        const message = `${this.actor.name} ${equipText} <strong>${itemName}</strong>${containerText}.`
+        const message = `${this.actor.displayName} ${equipText} <strong>${itemName}</strong>${containerText}.`
         sendSimpleChat(this.actor, "", message);
     }
 

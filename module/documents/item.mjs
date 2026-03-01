@@ -1,7 +1,6 @@
 import {Hyp3eDice} from "../dice/dice.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3E } from "../helpers/config.mjs"
-import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../chat/chat.mjs"
 
 /**
  * Extend the basic Item with some very simple modifications.

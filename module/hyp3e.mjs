@@ -762,8 +762,6 @@ Hooks.on("createToken", (token, options, userId) => {
       // Send the list of tokens to this function and get the next available number back
       const i = getAvailableTokenNumber(matchingTokens)
       tokenAlias = `${tokenAlias} (${i})`
-      // const tokenNum = token.name.match(/\(\d{1,2}\)$/);
-      // tokenAlias = `${tokenAlias} ${tokenNum[0]}`
     }
     if (token.prependAdjective || token.actor.prototypeToken.prependAdjective) {
       // Get whatever adjective was prepended to the name and keep it

@@ -3507,7 +3507,7 @@ export class Hyp3eActor extends Actor {
                       await effect.delete();
                   }
                   Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Effect ${effect.name} has expired for actor ${this.name}.`);
-                  const msg = `The effect <b>${effect.name}</b> on ${this.name} has expired.`;
+                  const msg = `The effect <b>${effect.name}</b> on ${this.displayName} has expired.`;
                   ui.notifications.info(msg);
                   sendSimpleChat(this, "", msg);
               } else {
@@ -3757,6 +3757,18 @@ export class Hyp3eActor extends Actor {
   }
 
   /**
+   * Get the token's display name, the actor's tokenAlias if it exists, otherwise the actor name.
+   * @returns {string}
+   */
+  get displayName() {
+    const tokenInfo = this.getActorTokenInfo();
+    if (tokenInfo.token) {
+      return tokenInfo.token.name || tokenInfo.baseActor.system?.tokenAlias || tokenInfo.baseActor.name;
+    }
+    return this.system?.tokenAlias || this.name;
+  }
+
+  /**
    * Check if this actor is in the current active combat.
    * Works for both base actors and synthetic (token) actors.
    * @returns {boolean}
@@ -3771,16 +3783,16 @@ export class Hyp3eActor extends Actor {
    * @returns {Combatant|null}
    */
   getCombatant() {
-      const combat = game.combat;
-      if (!combat) return null;
+    const combat = game.combat;
+    if (!combat) return null;
 
-      // Synthetic actor (unlinked or opened from a token)
-      if (this.token) {
-          return combat.combatants.find(c => c.tokenId === this.token.id) ?? null;
-      }
+    // Synthetic actor (unlinked or opened from a token)
+    if (this.token) {
+      return combat.combatants.find(c => c.tokenId === this.token.id) ?? null;
+    }
 
-      // Base actor (from sidebar)
-      return combat.combatants.find(c => c.actorId === this.id) ?? null;
+    // Base actor (from sidebar)
+    return combat.combatants.find(c => c.actorId === this.id) ?? null;
   }
 
 
@@ -3790,41 +3802,41 @@ export class Hyp3eActor extends Actor {
    * Reaction lookup table
    */
   reactionTable = {
-      0: "<b>Violent</b>: Immediate attack",
-      2: "<b>Violent</b>: Immediate attack",
-      3: "<b>Hostile</b>: Antagonistic; attack likely",
-      4: "<b>Unfriendly</b>: Negative inclination",
-      6: "<b>Neutral</b>: Disinterested or uncertain (reroll once)",
-      9: "<b>Friendly</b>: Considers ideas/proposals",
-      11: "<b>Agreeable</b>: Willing and helpful",
-      12: "<b>Affable</b>: Extremely accomodating"
+    0: "<b>Violent</b>: Immediate attack",
+    2: "<b>Violent</b>: Immediate attack",
+    3: "<b>Hostile</b>: Antagonistic; attack likely",
+    4: "<b>Unfriendly</b>: Negative inclination",
+    6: "<b>Neutral</b>: Disinterested or uncertain (reroll once)",
+    9: "<b>Friendly</b>: Considers ideas/proposals",
+    11: "<b>Agreeable</b>: Willing and helpful",
+    12: "<b>Affable</b>: Extremely accomodating"
   }
 
   /**
    * Hurled item results table
    */
   hurlingResults = {
-      0: "Miss!",
-      7: "Stationary or unaware target",
-      9: "Large (over 8 ft.)",
-      11: "Medium (about 4-8 ft.)",
-      13: "Small (under 4 ft.)"
+    0: "Miss!",
+    7: "Stationary or unaware target",
+    9: "Large (over 8 ft.)",
+    11: "Medium (about 4-8 ft.)",
+    13: "Small (under 4 ft.)"
   }
 
   _valueFromTable(table, val) {
-      let output;
-      for (let i = 0; i <= val; i++) {
-          if (table[i] != undefined) {
-              output = table[i];
-          }
+    let output;
+    for (let i = 0; i <= val; i++) {
+      if (table[i] != undefined) {
+        output = table[i];
       }
-      return output;
+    }
+    return output;
   }
 
   _stringFromTable(table, val) {
-      let output = ""
-      output = table[val]
-      return output
+    let output = ""
+    output = table[val]
+    return output
   }
 
 }

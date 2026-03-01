@@ -214,7 +214,7 @@ export async function buyFromMerchant(buyer, merchant, item) {
         }
         await existing.update({ "system.quantity.value": newQty, "system.quantity.max": newQty });
 
-        const message = `${buyer.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`;
+        const message = `${buyer.displayName} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`;
         sendSimpleChat(buyer, "", message);
         ui.notifications.info(message);
 
@@ -233,7 +233,7 @@ export async function buyFromMerchant(buyer, merchant, item) {
         }
         await buyer.createEmbeddedDocuments("Item", [itemData]);
 
-        const message = `${buyer.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${merchant.name}.`;
+        const message = `${buyer.displayName} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${merchant.displayName}.`;
         sendSimpleChat(buyer, "", message);
         ui.notifications.info(message);
 
@@ -354,7 +354,7 @@ export async function sellToMerchant(merchant, seller, item) {
         }
         await existing.update({ "system.quantity.value": newQty, "system.quantity.max": newQty });
 
-        const message = `${merchant.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`;
+        const message = `${merchant.displayName} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp (now owns ${newQty}).`;
         sendSimpleChat(merchant, "", message);
         ui.notifications.info(message);
 
@@ -372,7 +372,7 @@ export async function sellToMerchant(merchant, seller, item) {
         }
         await merchant.createEmbeddedDocuments("Item", [itemData]);
 
-        const message = `${merchant.name} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${seller.name}.`;
+        const message = `${merchant.displayName} buys ${qty} ${bundlesOf} ${item.name}(s) for ${totalPrice} gp from ${seller.displayName}.`;
         sendSimpleChat(merchant, "", message);
         ui.notifications.info(message);
 
@@ -615,7 +615,7 @@ export async function transferFromActor(recipient, giver, item) {
     }
     await existing.update({ "system.quantity.value": newQty, "system.quantity.max": newQty });
 
-    const message = `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) (now owns ${newQty}).`;
+    const message = `${recipient.displayName} takes ${qty} ${bundlesOf} ${item.name}(s) (now owns ${newQty}).`;
     sendSimpleChat(recipient, "", message);
     ui.notifications.info(message);
 
@@ -634,7 +634,7 @@ export async function transferFromActor(recipient, giver, item) {
     }
     await recipient.createEmbeddedDocuments("Item", [itemData]);
 
-    const message = `${recipient.name} takes ${qty} ${bundlesOf} ${item.name}(s) from ${giver.name}.`;
+    const message = `${recipient.displayName} takes ${qty} ${bundlesOf} ${item.name}(s) from ${giver.displayName}.`;
     sendSimpleChat(recipient, "", message);
     ui.notifications.info(message);
 
@@ -694,7 +694,7 @@ export async function transferCoinFromActor(recipient, giver, currency) {
   toMoney[currency].value = toCoin + amount;
   await recipient.update({ 'system.money': toMoney });
 
-  const message = `${amount} ${coinLabel} transferred from ${giver.name} to ${recipient.name}.`;
+  const message = `${amount} ${coinLabel} transferred from ${giver.displayName} to ${recipient.displayName}.`;
   sendSimpleChat(recipient, "", message);
   ui.notifications.info(message);
 }
