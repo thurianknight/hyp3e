@@ -736,7 +736,7 @@ export async function enableAllTransferrableItemEffectsToItemOwner(item, actorId
   // Send a chat message that the effects were enabled
   const chatData = {
     author: game.user_id,
-    speaker: ChatMessage.getSpeaker({ actor: actor }),
+    speaker: ChatMessage.getSpeaker({ alias: actor.displayName }),
     content: chatMsg.join("")
   };
   ChatMessage.create(chatData, {});
@@ -830,7 +830,7 @@ export async function disableAllTransferrableItemEffectsOnItemOwner(item, actorI
   // Send a chat message that the effects were disabled
   const chatData = {
     author: game.user_id,
-    speaker: ChatMessage.getSpeaker({ actor: actor }),
+    speaker: ChatMessage.getSpeaker({ alias: actor.displayName }),
     content: chatMsg.join("")
   };
   ChatMessage.create(chatData, {});

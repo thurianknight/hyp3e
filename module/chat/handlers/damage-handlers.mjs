@@ -307,7 +307,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
   // Send to chat
   dmgRoll.toMessage({
     author: game.user_id,
-    speaker: ChatMessage.getSpeaker({ actor: actor }),
+    speaker: ChatMessage.getSpeaker({ alias: actor.displayName }),
     content: html
   })
 }

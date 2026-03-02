@@ -159,7 +159,7 @@ async function rollCritHit(charType, actorId) {
     // Send to chat
     roll.toMessage({
         author: game.user_id,
-        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        speaker: ChatMessage.getSpeaker({ alias: actor.displayName }),
         roll: roll,
         flavor: flavor,
         content: html
@@ -278,7 +278,7 @@ async function rollCritMiss(charType, actorId) {
     // Send to chat
     roll.toMessage({
         author: game.user_id,
-        speaker: ChatMessage.getSpeaker({ actor: actor }),
+        speaker: ChatMessage.getSpeaker({ alias: actor.displayName }),
         roll: roll,
         flavor: flavor,
         content: html
