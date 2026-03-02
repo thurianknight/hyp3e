@@ -61,7 +61,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     // Take the groups array and append a roll object to each group
     const rollPerGroup = groupsToRollFor.reduce((prev, curr) => ({
       ...prev,
-      [curr]: new Roll(`${HYP3ECombat.FORMULA} + ${sitMod}`)
+      [curr]: new Roll(HYP3ECombat.FORMULA)
     }), {});
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Initiative roll per group:`, rollPerGroup);
 
