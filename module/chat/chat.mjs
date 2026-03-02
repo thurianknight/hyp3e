@@ -20,7 +20,7 @@ import { handleSaveButtons, handleEffectButtons } from "./handlers/utility-handl
  * @param {*} content - The main HTML of the message
  */
 export function sendSimpleChat(actor, label, content) {
-  Hyp3eLogger.info("sendSimpleChat", `${actor.name} sent message with flavor "${label}" and content "${content}".`)
+  // Hyp3eLogger.info("sendSimpleChat", `${actor.displayName} sent message with flavor "${label}" and content "${content}".`)
   const speaker = actor.displayName;
   ChatMessage.create({
     author: game.user.id,
@@ -39,7 +39,7 @@ export function sendSimpleChat(actor, label, content) {
  * @param {*} rollMode - Chat mode: public, private gm, blind gm, self
  */
 export function sendRollToChat(roll, actor, label, content, rollMode) {
-  Hyp3eLogger.info("sendRollToChat", `${actor.name} sent message with flavor "${label}" and content "${content}".`)
+  // Hyp3eLogger.info("sendRollToChat", `${actor.displayName} sent message with flavor "${label}" and content "${content}".`)
   const speaker = actor.displayName;
   // Send to chat
   roll.toMessage({

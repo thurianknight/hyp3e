@@ -483,7 +483,7 @@ async function sendEffectChatMessage(effect) {
   let targetName = "";
   if (target?.documentName === "Actor") {
     const token = target.getAssociatedToken();
-    targetName = token.name ?? target.name ?? "Unknown Target";
+    targetName = target.displayName ?? "Unknown Target";  // token.name ?? target.name ?? "Unknown Target";
   } else {
     Hyp3eLogger.info("ActiveEffect sendEffectChatMessage", `Effect parent is not an Actor or Item, cannot send chat message:`, effect);
     return;
@@ -526,7 +526,7 @@ async function sendEffectChatMessage(effect) {
 
   // Dispatch the chat message
   await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ actor: target }),
+    speaker: ChatMessage.getSpeaker({ alias: targetName }),
     content,
     type: CONST.CHAT_MESSAGE_TYPES.OTHER
   });
@@ -721,7 +721,7 @@ export async function enableAllTransferrableItemEffectsToItemOwner(item, actorId
   // Enable the transferrable effects on the actor
   transferEffects.forEach(async effect => {
     Hyp3eLogger.info("ActiveEffect enableAllTransferrableItemEffectsToItemOwner", `Effect to enable:`, effect);
-    chatMsg.push(`<li><i>${effect.name}</i> enabled on ${actor.name}.</li>`)
+    chatMsg.push(`<li><i>${effect.name}</i> enabled on ${actor.displayName}.</li>`)
     // Update the item effect
     await effect.update({ disabled: false });
     // Set flag to store metadata about the effect source & target actor
@@ -814,7 +814,7 @@ export async function disableAllTransferrableItemEffectsOnItemOwner(item, actorI
 
   transferEffects.forEach(async effect => {
     Hyp3eLogger.info("ActiveEffect disableAllTransferrableItemEffectsOnItemOwner", `Effect to disable:`, effect);
-    chatMsg.push(`<li><i>${effect.name}</i> disabled on ${actor.name}.</li>`)
+    chatMsg.push(`<li><i>${effect.name}</i> disabled on ${actor.displayName}.</li>`)
     // Update the item effect
     await effect.update({ disabled: true });
 

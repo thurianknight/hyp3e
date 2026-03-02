@@ -119,13 +119,13 @@ export async function buyFromMerchant(buyer, merchant, item) {
         }
         maxQty = Math.min(merchantQty, Math.floor(buyerFunds / sellPrice));
         if (maxQty <= 0) {
-            return ui.notifications.warn(`${buyer.name} cannot afford ${sellPrice} gp.`);
+            return ui.notifications.warn(`${buyer.displayName} cannot afford ${sellPrice} gp.`);
         }
     } else {
         // Ignore merchant qty on hand, only consider buyer wealth
         maxQty = Math.floor(buyerFunds / sellPrice);
         if (maxQty <= 0) {
-            return ui.notifications.warn(`${buyer.name} cannot afford ${sellPrice} gp.`);
+            return ui.notifications.warn(`${buyer.displayName} cannot afford ${sellPrice} gp.`);
         }
     }
 
@@ -138,7 +138,7 @@ export async function buyFromMerchant(buyer, merchant, item) {
     const qty = await Dialog.prompt({
         title: `${itemName} Purchase Quantity`,
         content: `
-            <p>${merchant.name} has <strong>${merchantQty}</strong> ${item.name}(s) in stock at <strong>${sellPrice}</strong> gp each.</p>
+            <p>${merchant.displayName} has <strong>${merchantQty}</strong> ${item.name}(s) in stock at <strong>${sellPrice}</strong> gp each.</p>
             <p>
                 <label>How many ${bundleAmt} to buy? (Max: ${maxQty})</label>
                 <input type="number" id="qty" min="1" max="${maxQty}" value="1" 
@@ -172,7 +172,7 @@ export async function buyFromMerchant(buyer, merchant, item) {
 
     // Check again whether the buyer can afford this item at this qty
     if (buyerFunds < totalPrice) {
-        return ui.notifications.warn(`${buyer.name} cannot afford ${totalPrice} gp!`);
+        return ui.notifications.warn(`${buyer.displayName} cannot afford ${totalPrice} gp!`);
     }
 
     // Update money for buyer & seller
@@ -262,11 +262,11 @@ export async function sellToMerchant(merchant, seller, item) {
 
     // Handle max purchase qty based on seller qty and merchant wealth
     if (sellerQty <= 0) {
-        return ui.notifications.warn(`${seller.name} has no ${itemName} to sell!`);
+        return ui.notifications.warn(`${seller.displayName} has no ${itemName} to sell!`);
     }
     const maxQty = Math.min(sellerQty, Math.floor(merchantFunds / buyPrice));
     if (maxQty <= 0) {
-        return ui.notifications.warn(`${merchant.name} cannot afford ${buyPrice} gp.`);
+        return ui.notifications.warn(`${merchant.displayName} cannot afford ${buyPrice} gp.`);
     }
 
     // Is the item sold in bundles?
@@ -277,7 +277,7 @@ export async function sellToMerchant(merchant, seller, item) {
     const qty = await Dialog.prompt({
         title: `${itemName} Sell Quantity`,
         content: `
-            <p>${seller.name} has <strong>${sellerQty}</strong> ${item.name}(s) to sell at <strong>${buyPrice}</strong> gp each.</p>
+            <p>${seller.displayName} has <strong>${sellerQty}</strong> ${item.name}(s) to sell at <strong>${buyPrice}</strong> gp each.</p>
             <p>
                 <label>How many ${bundleAmt} to sell? (Max: ${maxQty})</label>
                 <input type="number" id="qty" min="1" max="${maxQty}" value="1" 
@@ -311,7 +311,7 @@ export async function sellToMerchant(merchant, seller, item) {
 
     // Check again whether the merchant can afford this item at this qty
     if (merchantFunds < totalPrice) {
-        return ui.notifications.warn(`${merchant.name} cannot afford ${totalPrice} gp!`);
+        return ui.notifications.warn(`${merchant.displayName} cannot afford ${totalPrice} gp!`);
     }
 
     // Update money for buyer & seller
@@ -398,7 +398,7 @@ export async function adjustMoney(actor, cost) {
     const totalCp = Object.entries(money).reduce(
         (sum, [k, v]) => sum + (toNumber(v.value)) * COIN_TO_CP[k], 0
     );
-    Hyp3eLogger.info("adjustMoney", `${actor.name} has ${totalCp} cp value in coin.`);
+    Hyp3eLogger.info("adjustMoney", `${actor.displayName} has ${totalCp} cp value in coin.`);
 
     // NOTE: 'cost' in gp may be a decimal number, not just an integer!
     //  But it must be an integer when converted to cp.
@@ -419,7 +419,7 @@ export async function adjustMoney(actor, cost) {
 
     // Ensure affordability for negative cost (spending)
     if (cost < 0 && absCostCp > totalCp) {
-        const msg = `${actor.name} cannot afford ${Math.abs(cost)} gp!`;
+        const msg = `${actor.displayName} cannot afford ${Math.abs(cost)} gp!`;
         Hyp3eLogger.warn("adjustMoney", msg)
         ui.notifications.warn(msg);
         return false;
@@ -548,7 +548,7 @@ export async function transferFromActor(recipient, giver, item) {
 
   // Handle max transfer qty based on giver qty on hand
   if (giverQty <= 0) {
-    return ui.notifications.warn(`${giver.name} has no ${itemName} in inventory.`);
+    return ui.notifications.warn(`${giver.displayName} has no ${itemName} in inventory.`);
   }
   let maxQty = giverQty;
 
@@ -561,7 +561,7 @@ export async function transferFromActor(recipient, giver, item) {
   const qty = await Dialog.prompt({
     title: `${itemName} Transfer Quantity`,
     content: `
-      <p>${giver.name} has <strong>${giverQty}</strong> ${item.name}(s).</p>
+      <p>${giver.displayName} has <strong>${giverQty}</strong> ${item.name}(s).</p>
       <p>
         <label>How many ${bundleAmt} to transfer? (Max: ${maxQty})</label>
         <input type="number" id="qty" min="1" max="${maxQty}" value="1" 
@@ -652,7 +652,7 @@ export async function transferCoinFromActor(recipient, giver, currency) {
   const coinLabel = currency.toUpperCase();
   const coin = giver.system.money[currency];
   if (!coin) {
-    return ui.notifications.warn(`${giver.name} has no ${coinLabel}.`)
+    return ui.notifications.warn(`${giver.displayName} has no ${coinLabel}.`)
     return;
   }
   let giverAmount = coin.value;
@@ -661,7 +661,7 @@ export async function transferCoinFromActor(recipient, giver, currency) {
   const amount = await Dialog.prompt({
     title: `${coinLabel} Transfer Amount`,
     content: `
-      <p>${giver.name} has <strong>${giverAmount}</strong> ${coinLabel}.</p>
+      <p>${giver.displayName} has <strong>${giverAmount}</strong> ${coinLabel}.</p>
       <p>
         <label>How many ${coinLabel} to transfer? (Max: ${giverAmount})</label>
         <input type="number" id="amount" min="1" max="${giverAmount}" value="1" 

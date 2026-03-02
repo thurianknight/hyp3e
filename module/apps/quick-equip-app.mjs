@@ -70,7 +70,7 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
         // If our actor's token is not among the currently selected tokens, close the app
         const ourTokenStillSelected = selectedTokens.some(t => t.actor?.uuid === this.actor.uuid);
         if (!ourTokenStillSelected) {
-            Hyp3eLogger.info("_onControlToken", `${this.actor.name} token is no longer selected, closing Quick-Equip app:`, selectedTokens)
+            // Hyp3eLogger.info("_onControlToken", `${this.actor.name} token is no longer selected, closing Quick-Equip app:`, selectedTokens)
             this.close();
         }
     }

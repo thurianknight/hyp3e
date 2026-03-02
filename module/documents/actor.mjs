@@ -63,7 +63,7 @@ export class Hyp3eActor extends Actor {
 
       // Log the prepared data
       const sysData = foundry.utils.deepClone(this.system);
-      Hyp3eLogger.info("Hyp3eActor prepareBaseData", `${this.name} system data:`, sysData);
+      Hyp3eLogger.info("Hyp3eActor prepareBaseData", `${this.displayName} base data:`, this);
     }
 
   }
@@ -313,18 +313,18 @@ export class Hyp3eActor extends Actor {
    * @override
    * Override actor update() method.
    */
-  async update(data, options={}) {
-    console.group(`[Hyp3eActor update] Actor ${this.name}`);
-    Hyp3eLogger.info("Hyp3eActor update", `Updating ${this.name} with data:`, data);
-    Hyp3eLogger.info("Hyp3eActor update", `Update options:`, options);
-    Hyp3eLogger.info("Hyp3eActor update", `Current _source:`, this._source);
-    const result = await super.update(data, options);
-    Hyp3eLogger.info("Hyp3eActor update", `After update data:`, this.system);
-    Hyp3eLogger.info("Hyp3eActor update", `After update _source:`, this._source);
-    console.groupEnd();
+  // async update(data, options={}) {
+  //   console.group(`[Hyp3eActor update] Actor ${this.name}`);
+  //   Hyp3eLogger.info("Hyp3eActor update", `Updating ${this.name} with data:`, data);
+  //   Hyp3eLogger.info("Hyp3eActor update", `Update options:`, options);
+  //   Hyp3eLogger.info("Hyp3eActor update", `Current _source:`, this._source);
+  //   const result = await super.update(data, options);
+  //   Hyp3eLogger.info("Hyp3eActor update", `After update data:`, this.system);
+  //   Hyp3eLogger.info("Hyp3eActor update", `After update _source:`, this._source);
+  //   console.groupEnd();
 
-    return result;
-  }
+  //   return result;
+  // }
 
   /**
    * @override
@@ -1256,7 +1256,7 @@ export class Hyp3eActor extends Actor {
 
           totalDamage += roll.total;
 
-          damageMessages.push(`${this.name} takes ${roll.total} ${damageType} damage!`);
+          damageMessages.push(`${this.displayName} takes ${roll.total} ${damageType} damage!`);
         }
 
         if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
@@ -1753,7 +1753,7 @@ export class Hyp3eActor extends Actor {
       }
       Hyp3eLogger.info("Hyp3eActor useItem", `Using item:`, item);
       const itemName = item.system?.friendlyName ? item.system.friendlyName : item.name
-      let message = `<p>${this.name} used ${itemName}.</p>`
+      let message = `<p>${this.displayName} used ${itemName}.</p>`
       // Decrement qty if it's consumable, otherwise just allow it to be used
       if (item.system.isConsumable && item.system.quantity.value > 0) {
           const newQuantity = item.system.quantity.value - 1;
@@ -2180,7 +2180,7 @@ export class Hyp3eActor extends Actor {
             const skillsPreventedByHeavyArmor = ["climb", "hide", "move silently"];
             const armorType = this.system.wornArmorType;
             if (armorType === "heavy" && skillsPreventedByHeavyArmor.includes(itemNameLower)) {
-                const msg = `${this.name} cannot attempt to ${itemNameLower} while wearing heavy armor.`;
+                const msg = `${this.displayName} cannot attempt to ${itemNameLower} while wearing heavy armor.`;
                 Hyp3eLogger.warn("Hyp3eActor rollCheck", msg);
                 ui.notifications.warn(msg);
                 return false;
@@ -2692,7 +2692,7 @@ export class Hyp3eActor extends Actor {
           const targetActorData = target.actor.system;
           targetData.ac = targetActorData.ac?.value ?? 9;
           // Use token name if possible, otherwise actor name
-          targetData.name = target.name ? target.name : target.actor.name;
+          targetData.name = target.name ? target.name : target.actor.displayName;
           targetData.size = targetActorData.size ?? "M";
           // Get the attacker's actual token size
           const attackerWidth = attacker.document.width ?? 1; // Default to 1 if not found
@@ -3607,7 +3607,7 @@ export class Hyp3eActor extends Actor {
       let assassinationHtml = ''
       let results = []
       const assassinLevel = parseInt(this.system.details.level.value)
-      const targetName = target.actor.name
+      const targetName = target.actor.displayName
 
       // From here on, success or failure is based on multiple factors
       if (success) {

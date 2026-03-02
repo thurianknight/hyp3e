@@ -688,7 +688,7 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
   const totalDistance = movement.history.distance + movement.passed.distance + movement.pending.distance;
   Hyp3eLogger.info("preMoveToken", `${actor.name} total distance: `, totalDistance);
   if (totalDistance > speed) {
-    const msg = `This move exceeds ${actor.name}'s speed of ${speed} feet per round!`;
+    const msg = `This move exceeds ${actor.displayName}'s speed of ${speed} feet per round!`;
     Hyp3eLogger.warn("preMoveToken", msg)
     ui.notifications.warn(msg);
     if (CONFIG.HYP3E.limitMovement) {
@@ -782,7 +782,7 @@ Hooks.on("createToken", (token, options, userId) => {
       token.actor.rollHD()
     } catch (err) {
       Hyp3eLogger.error("createToken", `Failed to roll HD for NPC ${token.actor.name}.`, err);
-      ui.notifications.error(`Failed to roll HD for NPC ${token.actor.name}. Check the console for details.`);
+      ui.notifications.error(`Failed to roll HD for NPC ${token.actor.displayName}. Check the console for details.`);
     }
   }
 });

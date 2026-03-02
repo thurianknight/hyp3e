@@ -93,7 +93,7 @@ export async function handleEffectButtons(html) {
         if (!effect.disabled) {
           // The effect is enabled, so create a button to disable it
           let effectDisableButton = $(
-            `<button class="chat-btn-full-width" title="Click to disable ${effect.name} on ${actor.name}."><i class="fas fa-user-slash"></i>Disable ${effect.name}</button>`
+            `<button class="chat-btn-full-width" title="Click to disable ${effect.name} on ${actor.displayName}."><i class="fas fa-user-slash"></i>Disable ${effect.name}</button>`
           );
           effectBtnElement.append(effectDisableButton);
           // Handle button clicks
@@ -104,7 +104,7 @@ export async function handleEffectButtons(html) {
         } else {
           // Effect is disabled, so create a button to enable it
           let effectEnableButton = $(
-            `<button class="chat-btn-full-width" title="Click to enable ${effect.name} on ${actor.name}."><i class="fas fa-user-check"></i>Enable ${effect.name}</button>`
+            `<button class="chat-btn-full-width" title="Click to enable ${effect.name} on ${actor.displayName}."><i class="fas fa-user-check"></i>Enable ${effect.name}</button>`
           );
           effectBtnElement.append(effectEnableButton);
           // Handle button clicks

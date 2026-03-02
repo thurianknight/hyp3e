@@ -215,7 +215,7 @@ export class HYP3ECombatant extends Combatant {
 
     // Get the actor's roll data now, so we can use the DX value
     const rollData = this.actor?.getRollData() || {};
-    const name = this.actor?.name || ""
+    const name = this.actor?.displayName || ""
     Hyp3eLogger.info("HYP3ECombatant getInitiativeRoll", `Actor roll data for individual initiative:`, rollData);
 
     // Movement partially overrides the other combat actions for initiative order

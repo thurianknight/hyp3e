@@ -113,7 +113,7 @@ export class HYP3ECombat extends Combat {
     // Cycle through temporary effects and items, update combatant status
     const actor = combatant.actor;
     if (actor) {
-      Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.name} temporary items...`);
+      Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary items...`);
         await actor.processTemporaryEffects();
         await actor.processTemporaryItems(1);
         if (!resolveDeathAtRoundEnd) {
