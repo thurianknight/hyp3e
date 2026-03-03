@@ -16,6 +16,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
       magic: HYP3ECombatTracker._onCombatantControl,
       movement: HYP3ECombatTracker._onCombatantControl,
       other: HYP3ECombatTracker._onCombatantControl,
+      delayed: HYP3ECombatTracker._onCombatantControl,
     }
   })
   // Load the new combat-tracker templates
@@ -120,6 +121,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     turn.isMagic = !!combatant.getFlag(game.system.id, "isMagic")
     turn.isMovement = !!combatant.getFlag(game.system.id, "isMovement")
     turn.isOther = !!combatant.getFlag(game.system.id, "isOther")
+    turn.isDelayed = !!combatant.getFlag(game.system.id, "isDelayed")
     turn.isSlowed = !!combatant.isSlowed;
     turn.logLevel = CONFIG.HYP3E.logLevel;
     turn.isOwnedByUser = !!combatant.actor.isOwner;
@@ -209,7 +211,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     // Get the flag's current value so we know what to flip it to
     const isActive = !!combatant.getFlag(game.system.id, flag);
     // These combat actions require special logic
-    const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement', 'isOther']
+    const combatActions = ['isMelee', 'isMissile', 'isMagic', 'isMovement', 'isOther', 'isDelayed'];
     if (combatActions.some(f => f == flag)) {
       // Combat actions can be mutually exclusive, so we may need to toggle multiple flags
       await combatant.setCombatAction(flag, !isActive)            
@@ -260,6 +262,8 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         return this._toggleFlag(combatant, "isMovement");
       case "other":
         return this._toggleFlag(combatant, "isOther");
+      case "delayed":
+        return this._toggleFlag(combatant, "isDelayed");
       // Fall back to the superclass's button events
       default:
         return super._onCombatantControl(event, target);

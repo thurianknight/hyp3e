@@ -1,4 +1,5 @@
 import { Hyp3eLogger } from "./logger.mjs";
+import { HYP3E } from "./config.mjs";
 import { Hyp3eDice, isPureNumber, isPureString, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
 import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
 
@@ -162,6 +163,59 @@ export function prepareActiveEffectCategories(effects) {
     }
     return categories;
 }
+
+export function pushCustomStatusEffects() {
+  // Build list of custom status effects and add to the CONFIG.statusEffects array
+  const hasted = {
+    id: "hasted",
+    name: "HYP3E.statusEffects.hasted",
+    img: `${HYP3E.assetsPath}/run.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(hasted)
+
+  const slowed = {
+    id: "slowed",
+    name: "HYP3E.statusEffects.slowed",
+    img: `${HYP3E.assetsPath}/snail.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(slowed)
+
+  const flankAttack = {
+    id: "flankAttack",
+    name: "HYP3E.statusEffects.flankAttack",
+    img: `${HYP3E.assetsPath}/backup.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(flankAttack)
+
+  const rearAttack = {
+    id: "rearAttack",
+    name: "HYP3E.statusEffects.rearAttack",
+    img: `${HYP3E.assetsPath}/backstab.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(rearAttack)
+
+  const coverPartial = {
+    id: "coverPartial",
+    name: "HYP3E.statusEffects.coverPartial",
+    img: `${HYP3E.assetsPath}/cover-fence.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(coverPartial)
+  
+  const coverFull = {
+    id: "coverFull",
+    name: "HYP3E.statusEffects.coverFull",
+    img: `${HYP3E.assetsPath}/cover-wall.svg`,
+    isActive: false
+  }
+  CONFIG.statusEffects.push(coverFull)
+
+}
+
 
 /**********************************************************
  * Effect Hook Handlers

@@ -661,7 +661,8 @@
             "missileDeclared": "Missile",
             "magicDeclared": "Magic",
             "moveDeclared": "Movement",
-            "otherDeclared": "Other"
+            "otherDeclared": "Other",
+            "delayedDeclared": "Delayed Action / Last Strike"
         },
         "actions": {
             "melee": "Melee",

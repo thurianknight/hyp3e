@@ -74,8 +74,8 @@ export class HYP3EGroupCombat extends HYP3ECombat {
       c.initRoll = results[c.initGroup].initiative
       // Movement partially overrides the other combat actions for initiative order
       c.getActionModifiers();
-      const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit}`
-      Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other): ${rollTerms}`);
+      const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit} + ${c.delayedInit}`
+      Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other + delayed): ${rollTerms}`);
 
       // Add the actor's temporary initiative modifier, if one exists
       c.getTempInitMod();
@@ -192,8 +192,8 @@ export class HYP3EGroupCombat extends HYP3ECombat {
       c.initRoll = initScore;
       // Movement partially overrides the other combat actions for initiative order
       c.getActionModifiers();
-      const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit}`
-      Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other): ${rollTerms}`);
+      const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit} + ${c.delayedInit}`
+      Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other + delayed): ${rollTerms}`);
 
       // Add the actor's temporary initiative modifier, if one exists
       c.getTempInitMod();
@@ -213,6 +213,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
                                 + c.magicInit
                                 + c.moveInit
                                 + c.otherInit
+                                + c.delayedInit
                                 + c.statusInit
                                 + c.defeatedInit) * 1000) / 1000;
       Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `Updating combatant ${c.name} (${c.id}) to initiative ${c.initiative}...`, c);

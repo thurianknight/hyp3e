@@ -3,20 +3,22 @@ import { Hyp3eLogger } from "../helpers/logger.mjs";
 export class HYP3ECombatant extends Combatant {
   // All mods are added to the initiative roll + DX of an actor, to position them in order high to low
   // Group initiative mods
-  static GROUP_INIT_MOD_MELEE = 0.80
-  static GROUP_INIT_MOD_MISSILE = 0.60
-  static GROUP_INIT_MOD_MAGIC = 0.40
-  static GROUP_INIT_MOD_MOVEMENT = 0.20
-  static GROUP_INIT_MOD_OTHER = 0.025
-  static GROUP_INIT_MOD_MOVE_OTHER = 0.001
+  static GROUP_INIT_MOD_MELEE = 0.80;
+  static GROUP_INIT_MOD_MISSILE = 0.60;
+  static GROUP_INIT_MOD_MAGIC = 0.40;
+  static GROUP_INIT_MOD_MOVEMENT = 0.20;
+  static GROUP_INIT_MOD_OTHER = 0.025;
+  static GROUP_INIT_MOD_MOVE_OTHER = 0.001;
+  static GROUP_INIT_MOD_DELAYED = -94;
 
   // Phased initiative mods
-  static PHASED_INIT_MOD_MELEE = 80
-  static PHASED_INIT_MOD_MISSILE = 60
-  static PHASED_INIT_MOD_MAGIC = 40
-  static PHASED_INIT_MOD_MOVEMENT = 20
-  static PHASED_INIT_MOD_OTHER = 2.5
-  static PHASED_INIT_MOD_MOVE_OTHER = 0.1
+  static PHASED_INIT_MOD_MELEE = 80;
+  static PHASED_INIT_MOD_MISSILE = 60;
+  static PHASED_INIT_MOD_MAGIC = 40;
+  static PHASED_INIT_MOD_MOVEMENT = 20;
+  static PHASED_INIT_MOD_OTHER = 2.5;
+  static PHASED_INIT_MOD_MOVE_OTHER = 0.1;
+  static PHASED_INIT_MOD_DELAYED = -94;
 
   // Status-based initiative mods
   static INITIATIVE_MOD_DEAF = -2;
@@ -46,6 +48,10 @@ export class HYP3ECombatant extends Combatant {
 
   get isOther() {
     return this.getFlag(game.system.id, "isOther");
+  }
+
+  get isDelayed() {
+    return this.getFlag(game.system.id, "isDelayed");
   }
 
   // A combatant is defeated if their HP go at or below their minimum (0 for monsters, -10 for PCs)
@@ -185,6 +191,9 @@ export class HYP3ECombatant extends Combatant {
           this.setFlag(game.system.id, 'isMagic', !value)
         }
         break;
+      case "isDelayed":
+        // isDelayed can stack with the other combat actions
+        break;
       default:
         // This should never happen
         break;
@@ -221,8 +230,8 @@ export class HYP3ECombatant extends Combatant {
     // Movement partially overrides the other combat actions for initiative order
     this.getActionModifiers();
     // Add the action values to rollTerms
-    rollTerms += `+ ${this.meleeInit + this.missileInit + this.magicInit + this.moveInit + this.otherInit}`
-    Hyp3eLogger.info("HYP3ECombatant getInitiativeRoll", `${this.name} initiative roll terms (roll + melee + missile + magic + move + other): ${rollTerms}`);
+    rollTerms += `+ ${this.meleeInit + this.missileInit + this.magicInit + this.moveInit + this.otherInit} + ${this.delayedInit}`;
+    Hyp3eLogger.info("HYP3ECombatant getInitiativeRoll", `${this.name} initiative roll terms (roll + melee + missile + magic + move + other + delayed): ${rollTerms}`);
     // Add the actor's DX value
     rollTerms += `+ ${(rollData.attributes?.dex?.value/1000)}`
 
@@ -259,6 +268,7 @@ export class HYP3ECombatant extends Combatant {
       this.missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MISSILE`] : 0;
       this.magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MAGIC`] : 0;
       this.otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_OTHER`] : 0;
+      this.delayedInit = this.getFlag(game.system.id, "isDelayed") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_DELAYED`] : 0;
     } else {
       // Movement declared, possibly with another action
       this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MELEE`] : 0)/10;
@@ -266,6 +276,8 @@ export class HYP3ECombatant extends Combatant {
       this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MAGIC`] : 0)/10;
       // We treat Move + Other specially to ensure it falls in the correct order
       this.otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVE_OTHER`] : 0;
+      // Delayed actions are handled to ensure they fall at the end of the initiative order
+      this.delayedInit = this.getFlag(game.system.id, "isDelayed") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_DELAYED`] : 0;
       // If move is combined with another action, reduce its modifier value to 1/10
       if (this.meleeInit > 0 || this.missileInit > 0 || this.magicInit > 0 || this.otherInit > 0) {
         this.moveInit = this.moveInit/10;
@@ -278,6 +290,7 @@ export class HYP3ECombatant extends Combatant {
     initMods['magicInit'] = this.magicInit;
     initMods['moveInit'] = this.moveInit;
     initMods['otherInit'] = this.otherInit;
+    initMods['delayedInit'] = this.delayedInit;
     Hyp3eLogger.info("HYP3ECombatant getActionModifiers", `${this.name} declared-action Initiative mods:`, initMods);
   }
 

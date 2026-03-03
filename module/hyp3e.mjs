@@ -8,7 +8,7 @@ import { Hyp3eItemSheetV2 } from "./sheets/item-sheet-v2.mjs";
 import { preloadHandlebarsTemplates } from "./helpers/templates.mjs";
 import { HYP3E } from "./helpers/config.mjs";
 import { addChatMessageButtons, truncateLongContent } from "./chat/chat.mjs";
-import { setupEffectHandlers } from "./helpers/effects.mjs";
+import { setupEffectHandlers, pushCustomStatusEffects } from "./helpers/effects.mjs";
 import { getAvailableTokenNumber, 
       isTokenInCombat, 
       getTokenActor, 
@@ -42,9 +42,9 @@ Hooks.once('init', async function() {
   // Add utility classes to the global game object so that they're more easily
   // accessible in global contexts.
   game.hyp3e = {
-  Hyp3eActor,
-  Hyp3eItem,
-  rollItemMacro
+    Hyp3eActor,
+    Hyp3eItem,
+    rollItemMacro
   };
 
   console.log("Game info:", game);
@@ -59,54 +59,57 @@ Hooks.once('init', async function() {
   // Register our Hyperborea system configuration options
   registerHyp3eConfigurations();
 
-  // Add custom statusEffects
-  const hasted = {
-  id: "hasted",
-  name: "HYP3E.statusEffects.hasted",
-  img: `${HYP3E.assetsPath}/run.svg`,
-  isActive: false
-  }
-  CONFIG.statusEffects.push(hasted)
+  // Build a list of custom status effects and add to the CONFIG.statusEffects array
+  pushCustomStatusEffects();
 
-  const slowed = {
-  id: "slowed",
-  name: "HYP3E.statusEffects.slowed",
-  img: `${HYP3E.assetsPath}/snail.svg`,
-  isActive: false
-  }
-  CONFIG.statusEffects.push(slowed)
+  // // Add custom statusEffects
+  // const hasted = {
+  //   id: "hasted",
+  //   name: "HYP3E.statusEffects.hasted",
+  //   img: `${HYP3E.assetsPath}/run.svg`,
+  //   isActive: false
+  // }
+  // CONFIG.statusEffects.push(hasted)
 
-  const flankAttack = {
-  id: "flankAttack",
-  name: "HYP3E.statusEffects.flankAttack",
-  img: `${HYP3E.assetsPath}/backup.svg`,
-  isActive: false
-  }
-  CONFIG.statusEffects.push(flankAttack)
+  // const slowed = {
+  //   id: "slowed",
+  //   name: "HYP3E.statusEffects.slowed",
+  //   img: `${HYP3E.assetsPath}/snail.svg`,
+  //   isActive: false
+  // }
+  // CONFIG.statusEffects.push(slowed)
 
-  const rearAttack = {
-  id: "rearAttack",
-  name: "HYP3E.statusEffects.rearAttack",
-  img: `${HYP3E.assetsPath}/backstab.svg`,
-  isActive: false
-  }
-  CONFIG.statusEffects.push(rearAttack)
+  // const flankAttack = {
+  //   id: "flankAttack",
+  //   name: "HYP3E.statusEffects.flankAttack",
+  //   img: `${HYP3E.assetsPath}/backup.svg`,
+  //   isActive: false
+  // }
+  // CONFIG.statusEffects.push(flankAttack)
 
-  const coverPartial = {
-  id: "coverPartial",
-  name: "HYP3E.statusEffects.coverPartial",
-  img: `${HYP3E.assetsPath}/cover-fence.svg`,
-  isActive: false
-  }
-  CONFIG.statusEffects.push(coverPartial)
+  // const rearAttack = {
+  //   id: "rearAttack",
+  //   name: "HYP3E.statusEffects.rearAttack",
+  //   img: `${HYP3E.assetsPath}/backstab.svg`,
+  //   isActive: false
+  // }
+  // CONFIG.statusEffects.push(rearAttack)
+
+  // const coverPartial = {
+  //   id: "coverPartial",
+  //   name: "HYP3E.statusEffects.coverPartial",
+  //   img: `${HYP3E.assetsPath}/cover-fence.svg`,
+  //   isActive: false
+  // }
+  // CONFIG.statusEffects.push(coverPartial)
   
-  const coverFull = {
-  id: "coverFull",
-  name: "HYP3E.statusEffects.coverFull",
-  img: `${HYP3E.assetsPath}/cover-wall.svg`,
-  isActive: false
-  }
-  CONFIG.statusEffects.push(coverFull)
+  // const coverFull = {
+  //   id: "coverFull",
+  //   name: "HYP3E.statusEffects.coverFull",
+  //   img: `${HYP3E.assetsPath}/cover-wall.svg`,
+  //   isActive: false
+  // }
+  // CONFIG.statusEffects.push(coverFull)
 
   // Add custom constants for configuration
   CONFIG.HYP3E = HYP3E;
