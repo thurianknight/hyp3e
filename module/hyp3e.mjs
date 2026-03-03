@@ -20,7 +20,6 @@ import { migrateActorData,
       migrateItemEffects } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, 
       setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
-// import { HYP3ETurnTrackerApp } from "./apps/turn-tracker-app.mjs";
 import { HYP3ETurnTrackerAppV2 } from "./apps/turn-tracker-app-v2.mjs";
 import { HYP3ECalendar, 
       setupCalendarHooks } from "./helpers/calendar.mjs";
@@ -589,16 +588,6 @@ Hooks.on("updateSetting", (setting) => {
   }
 });
 
-// /**
-//  * Insert the turn tracker app into the chat log.
-//  * This is only done once, when the chat log is first rendered.
-//  */
-// Hooks.on("renderChatLog", (app, html, data) => {
-//   if (!game.ready || trackerInitialized) return;
-//   // trackerInitialized = true;
-//   // initTurnTrackerInChatLog(app, html, data);
-// });
-
 /**
  * Render the Settings Config app for our Hyperborea system options.
  * This is only available to GMs.
@@ -828,24 +817,14 @@ await setupTurnTrackerHooks();
  * This shows the current turn, and allows GMs to advance or reset the turn count.
  * It also pushes the current turn to the chat log when requested.
  */
-async function initTurnTrackerInChatLog(app, html, data) {
-  // if (!game.user.isGM) return; // Only render for GMs
-  if (!game.settings.get(game.system.id, "enableTurnTracker")) {
-    Hyp3eLogger.info("initTurnTrackerInChatLog", "Turn Tracker is disabled, not rendering the app.");
-    return; // Exit early if the turn tracker is disabled
-  }
-  Hyp3eLogger.info("initTurnTrackerInChatLog", "Rendering the Turn Tracker app in the chat log...");
-
-  // Create a game.hyp3e object to reference the calendar and turn tracker apps
-  // game.hyp3e = game.hyp3e || {};
-  // game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerAppV2();
-
-  // Embed into chat (this will call activateListeners on the injected app)
-  // game.hyp3e.turnTrackerApp.renderEmbedded(container);
-  // Initial render based on saved setting
-  // await game.hyp3e.turnTrackerApp.render(true);
-  // await game.hyp3e.turnTrackerApp.renderApp();
-}
+// async function initTurnTrackerInChatLog(app, html, data) {
+//   // if (!game.user.isGM) return; // Only render for GMs
+//   if (!game.settings.get(game.system.id, "enableTurnTracker")) {
+//     Hyp3eLogger.info("initTurnTrackerInChatLog", "Turn Tracker is disabled, not rendering the app.");
+//     return; // Exit early if the turn tracker is disabled
+//   }
+//   Hyp3eLogger.info("initTurnTrackerInChatLog", "Rendering the Turn Tracker app in the chat log...");
+// }
 
 /* -------------------------------------------- */
 /*  Migrate system/world functions        */
