@@ -8,7 +8,7 @@
             <strong class="name">{{ name }}</strong>
 
             <div class="combatant-controls">
-                {{!-- {{#if this.isOwnedByUser}} --}}
+                {{#if @root.combat.round}}
                 {{!-- Combat action declaration buttons --}}
                 <button type="button" class="inline-control combatant-control icon fa-solid fa-sword {{#if isMelee}}active{{/if}}"
                         data-action="melee" data-tooltip="{{localize 'HYP3E.combat.meleeDeclared'}}"
@@ -29,7 +29,7 @@
                         data-action="delayed" data-tooltip="{{localize 'HYP3E.combat.delayedDeclared'}}"
                         aria-label="{{localize 'HYP3E.combat.delayedDeclared'}}"></button>
                 <span class="tooltip-initiative">Initiative: {{ initiative }}</span>
-                {{!-- {{/if}} --}}
+                {{/if}}
             </div>
             <div class="combatant-controls">
                 {{#if @root.user.isGM}}
