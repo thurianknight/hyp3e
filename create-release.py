@@ -105,7 +105,7 @@ g = Github(auth=auth)
 repo = g.get_repo("thurianknight/hyp3e")
 
 release_name = f"Release {tag}"
-release = repo.create_git_release(tag=tag, name=release_name, message=f"Release of hyp3e version {version}", draft=False, prerelease=False)
+release = repo.create_git_release(tag=tag, name=release_name, message=f"Pre-release of hyp3e version {version}", draft=False, prerelease=True)
 
 # Upload system.json
 system_json_path = source_root / "system.json"
