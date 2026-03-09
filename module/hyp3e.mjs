@@ -453,6 +453,7 @@ Hooks.once("ready", async function() {
 
   // Load saving throws
   if (CONFIG.HYP3E.saves) {
+    delete CONFIG.HYP3E.saves["base"];
     for (let [k, v] of Object.entries(CONFIG.HYP3E.saves)) {
       CONFIG.HYP3E.saves[k] = game.i18n.localize(CONFIG.HYP3E.saves[k])
     }

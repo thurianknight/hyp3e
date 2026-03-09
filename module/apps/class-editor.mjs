@@ -94,6 +94,7 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
 
         // Saving throws
         const saves = CONFIG.HYP3E.saves;
+        delete saves["base"];
         const savingThrows = {};
         for (const save of Object.keys(saves)) {
             savingThrows[save] = {
