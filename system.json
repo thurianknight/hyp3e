@@ -16,12 +16,17 @@
       "flags": {}
     },
     {
-        "name": "wintersleepAI",
-        "flags": {}
+      "name": "wintersleepAI",
+      "flags": {}
     },
     {
-        "name": "Xander-Carroll",
-        "flags": {}
+      "name": "Xander-Carroll",
+      "flags": {}
+    },
+    {
+      "name": "Jaboo36",
+      "url": "https://github.com/Jaboo36",
+      "flags": {}
     }
   ],
   "esmodules": [

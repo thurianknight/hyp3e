@@ -114,6 +114,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/xander-carroll"><img src="https://avatars.githubusercontent.com/u/93937517?v=4" width="100px;" alt="Xander-Carroll"/><br /><sub><b>Xander-Carroll</b></sub></a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/vttred/ose"><img src="https://avatars.githubusercontent.com/u/74152737?s=200&v=4" width="100px;" alt="VTT Red & OSE Devs"/><br /><sub><b>VTT Red & OSE Devs</b></sub></a></td>
       <td align="center" valign="top" width="14.28%"><br /><sub><b>@The_Basilisk (on Discord)</b></sub></a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Jaboo36"><img src="https://avatars.githubusercontent.com/u/56381148?v=4" width="100px;" alt="Jaboo36"/><br /><sub><b>Jaboo36</b></sub></a></td>
     </tr>
   </tbody>
 </table>
