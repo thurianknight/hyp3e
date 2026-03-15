@@ -85,7 +85,7 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
         const dex = this.actor.system.attributes.dex.value ?? 0;
 
         const weapons = this.actor.items.filter(i => i.type === "weapon");
-        const shields = this.actor.items.filter(i => i.type === "shield");
+        const shields = this.actor.items.filter(i => i.type === "shield" && i.system.type !== "passive" || (i.type === "armor" && i.system.type === "shield"));
 
         // Main hand: All weapons regardless of type
         const mainHand = weapons.map(w => ({
