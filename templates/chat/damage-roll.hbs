@@ -2,6 +2,14 @@
 <div class="dice-roll" data-actor-id="{{actorId}}" data-action="expandRoll">
   <div class="dice-result">
     <div class="dice-formula">{{dmgRoll.formula}}</div>
+    <div class="damage-icons-row">
+      {{#each typeDamages}}
+        <div class="damage-icon" title="{{total}} {{label}}">
+          {{{icon}}}
+          <span class="damage-amount">{{total}}</span>
+        </div>
+      {{/each}}
+    </div>
     <div class="dice-tooltip">
       <div class="wrapper">
         <section class="tooltip-part">

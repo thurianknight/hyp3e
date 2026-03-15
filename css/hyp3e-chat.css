@@ -76,6 +76,34 @@
   /* background: var(--color-border-highlight-alt); */
 }
 
+/* Styles for damage-type icons */
+.damage-icons-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.damage-icon {
+  position: relative;
+  width: 32px;  /* Adjust based on icon size */
+  height: 32px;
+  display: inline-block;
+  font-size: 30px;  /* For icon size */
+  color: #ff0000;  /* Icon color, e.g., red for damage */
+}
+
+.damage-amount {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 2px black;  /* For visibility over icon */
+}
+
 /* Styles for chat roll buttons */
 .dice-damage {
     font-style: italic;

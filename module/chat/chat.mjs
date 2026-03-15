@@ -64,7 +64,7 @@ export function sendRollToChat(roll, actor, label, content, rollMode) {
  * @param {*} footerHTML - HTML that is displayed below the dice roll info
  * @param {*} rollMode - Chat mode: public, private gm, blind gm, self
  */
-export async function renderCustomChat(roll, item, actor, tokenId, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
+export async function renderCustomChat(roll, item, dmgObj, actor, tokenId, label, debugRollFormula, headerHTML, footerHTML, rollMode) {
   const speaker = actor.displayName;  
   // Load & render the chat template
     const templateData = {
@@ -72,6 +72,7 @@ export async function renderCustomChat(roll, item, actor, tokenId, label, debugR
       headerHTML: headerHTML,
       debugRollFormula: debugRollFormula,
       item: item,
+      dmgObj: dmgObj,
       actorId: actor.id,
       tokenId: tokenId,
       footerHTML: footerHTML,

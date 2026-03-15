@@ -2321,7 +2321,7 @@ export class Hyp3eActor extends Actor {
       roll.hit = false
 
       // Construct a custom chat card for the check
-      await renderCustomChat(roll, item, this, tokenId, label, "", checkHeader, checkFooter, rollResponse.rollMode)
+      await renderCustomChat(roll, item, {}, this, tokenId, label, "", checkHeader, checkFooter, rollResponse.rollMode)
 
       return true
   }
@@ -2504,10 +2504,10 @@ export class Hyp3eActor extends Actor {
       if (hit && item && Roll.validate(itemData.damage)) {
           damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);
           // Temporarily attach to item object for chat card context
-          item.dmgFormula = damageFormulas.primary?.formula;
-          item.debugDmgRollFormula = damageFormulas.primary?.debugFormula;
-          item.dmgFormula2h = damageFormulas.secondary?.formula;
-          item.debugDmgRollFormula2h = damageFormulas.secondary?.debugFormula;
+          // item.dmgFormula = damageFormulas.primary?.formula;
+          // item.debugDmgRollFormula = damageFormulas.primary?.debugFormula;
+          // item.dmgFormula2h = damageFormulas.secondary?.formula;
+          // item.debugDmgRollFormula2h = damageFormulas.secondary?.debugFormula;
       }
 
       // Render chat message
@@ -2515,7 +2515,7 @@ export class Hyp3eActor extends Actor {
       const attackHeader = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
 
       Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Chat data:`, {chatLabel, attackHeader, critFooter});
-      await renderCustomChat(atkRoll, item, this, attacker?.id, chatLabel, debugAtkRollFormula, attackHeader, critFooter, rollResponse.rollMode);
+      await renderCustomChat(atkRoll, item, damageFormulas, this, attacker?.id, chatLabel, debugAtkRollFormula, attackHeader, critFooter, rollResponse.rollMode);
 
       // Return Roll Result
       return atkRoll;
@@ -3000,15 +3000,18 @@ export class Hyp3eActor extends Actor {
       const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData);
       dmgFormulas.primary = {
           formula: dmgObj.formula,
-          debugFormula: dmgObj.debugFormula
+          debugFormula: dmgObj.debugFormula,
+          damageGroups: dmgObj.damageGroups
       };
+      dmgFormulas.dmgIcons = dmgObj.dmgIcons;
       Hyp3eLogger.info("Hyp3eActor _prepareDamageFormulas", `Damage formula: ${dmgObj.formula}`);
 
       // Build secondary (e.g., 2-handed) damage formula if applicable
       if (itemData.damage2h) {
           dmgFormulas.secondary = {
               formula: dmgObj.formula2h,
-              debugFormula: dmgObj.debugFormula2h
+              debugFormula: dmgObj.debugFormula2h,
+              damageGroups: dmgObj.damageGroups2h
           };
           Hyp3eLogger.info("Hyp3eActor _prepareDamageFormulas", `Damage formula 2H: ${dmgObj.formula2h}`);
       }

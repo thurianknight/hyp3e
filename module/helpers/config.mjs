@@ -191,7 +191,7 @@ HYP3E.weaponAnnotations = {
 };
 
 /**
- * Alternate damage types
+ * Standard damage types
  * @type {Object}
  */
 HYP3E.damageTypes = {
@@ -210,6 +210,22 @@ HYP3E.damageTypes = {
     "positive": "HYP3E.weapon.damageTypes.positive",
     "healing": "HYP3E.weapon.damageTypes.healing",
 }
+HYP3E.damageTypeIcons = {
+    "basic": `${HYP3E.assetsPath}/damage-icons/cross-mark-red.svg`,
+    "bludgeoning": `${HYP3E.assetsPath}/damage-icons/thor-hammer-red.svg`,
+    "piercing": `${HYP3E.assetsPath}/damage-icons/broadhead-arrow-red.svg`,
+    "slashing": `${HYP3E.assetsPath}/damage-icons/broadsword-red.svg`,
+    "acid": `${HYP3E.assetsPath}/damage-icons/chemical-bolt-red.svg`,
+    "cold": `${HYP3E.assetsPath}/damage-icons/snowflake-2-red.svg`,
+    "electricity": `${HYP3E.assetsPath}/damage-icons/lightning-helix-red.svg`,
+    "fire": `${HYP3E.assetsPath}/damage-icons/small-fire-red.svg`,
+    "gas": `${HYP3E.assetsPath}/damage-icons/poison-gas-red.svg`,
+    "negative": `${HYP3E.assetsPath}/damage-icons/thunder-skull-red.svg`,
+    "pain": `${HYP3E.assetsPath}/damage-icons/back-pain-red.svg`,
+    "poison": `${HYP3E.assetsPath}/damage-icons/poison-bottle-red.svg`,
+    "positive": `${HYP3E.assetsPath}/damage-icons/rolling-energy-red.svg`,
+    "healing": `${HYP3E.assetsPath}/damage-icons/caduceus-red.svg`
+};
 
 /**
  * The armor types

@@ -538,7 +538,7 @@ export class Hyp3eItem extends Item {
       <div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' 
       data-actor-id='${actorData.actorId}' data-formula='${roll.formula}' 
       data-damage-type='${itemData.dmgType}' data-debug-formula='${dmgObj.debugFormula}' 
-      data-source-type='${item.type}'></div>`;
+      data-damage-groups='${JSON.stringify(dmgObj.damageGroups)}' data-source-type='${item.type}'></div>`;
   }
 
   _renderItemCheckSection(itemData) {

@@ -275,6 +275,11 @@ Hooks.once('init', async function() {
   return str.toLowerCase();
   });
 
+  // Register a safe JSON helper for Handlebars templates
+  Handlebars.registerHelper("json", function(context) {
+    return new Handlebars.SafeString(JSON.stringify(context));
+  });
+
   // Preload Handlebars templates
   return await preloadHandlebarsTemplates();
 

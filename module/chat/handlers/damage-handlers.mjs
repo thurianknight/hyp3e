@@ -21,6 +21,8 @@ export async function handleDamageRollButtons(html) {
     const dmgFormula = $(b).data('formula');
     const debugDmgRollFormula = $(b).data('debugFormula');
     const damageType = $(b).data('damageType');
+    // const damageGroups = JSON.parse($(b).data('damageGroups'));
+    const damageGroups = $(b).data('damageGroups');
     const sourceType = $(b).data('sourceType');
     const itemId = $(b).data('itemId');
     const itemUuid = $(b).data('itemUuid');
@@ -36,7 +38,7 @@ export async function handleDamageRollButtons(html) {
 
     dmgRollElement.on("click", (ev) => {
       ev.stopPropagation();
-      rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType);
+      rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType, damageGroups);
     });
   });
 
@@ -57,6 +59,8 @@ export async function handleDamageRoll2hButtons(html) {
     const dmgFormula = $(b).data('formula');
     const debugDmgRollFormula = $(b).data('debugFormula');
     const damageType = $(b).data('damageType');
+    // const damageGroups = JSON.parse($(b).data('damageGroups'));
+    const damageGroups = $(b).data('damageGroups');
     const sourceType = $(b).data('sourceType');
     const itemId = $(b).data('itemId');
     const itemUuid = $(b).data('itemUuid');
@@ -71,7 +75,7 @@ export async function handleDamageRoll2hButtons(html) {
 
     dmgRoll2hElement.on("click", (ev) => {
       ev.stopPropagation();
-      rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType);
+      rollDmgButton(dmgFormula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType, damageGroups);
     });
   });
 
@@ -228,7 +232,7 @@ export async function handleGenericDamageHealButtons(_msg, html) {
  * @param {*} sourceType - Item type, either "weapon" or "spell"
  * @returns null
  */
-async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType) {
+async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType, damageGroups) {
   // Fix invalid formulae if possible
   if (formula == "" || formula == null || formula == "0") {
     formula = "0d0"
@@ -275,6 +279,86 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
   // Resolve the roll
   await dmgRoll.evaluate({ evaluateSync: true });
 
+  Hyp3eLogger.info("rollDmgButton", `Damage types: `, damageGroups);
+
+  // Calculate damage-type totals from the roll, respecting +/- operators
+  const fullTerms = dmgRoll.terms;  // Keep ALL terms, including OperatorTerm
+  Hyp3eLogger.info("rollDmgButton", `Full roll terms: `, fullTerms.map(t => ({
+    class: t.constructor.name,
+    total: t.total,
+    operator: t instanceof foundry.dice.terms.OperatorTerm ? t.operator : null
+  })));
+
+  const typeDamages = damageGroups.map(group => {
+    // Slice the consecutive terms belonging to this damage group.
+    // (The original termStart and termCount were calculated based on non-operator terms,
+    //  so we need to adjust the slice to include the operators that belong to them)
+
+    // Because operators sit BETWEEN value terms, the full slice needs to start at the
+    //  first value term of the group, and include up to (and including) the last value term,
+    //  plus any trailing operator only if it's part of the next group — but since groups are
+    //  additive, we usually want value terms + their preceding operator (except first group).
+
+    let nonOpCount = 0;
+    let startIdx = -1;
+    let endIdx = -1;  // inclusive
+  
+    for (let i = 0; i < fullTerms.length; i++) {
+      if (!(fullTerms[i] instanceof foundry.dice.terms.OperatorTerm)) {
+        if (nonOpCount === group.termStart) {
+          startIdx = i;
+        }
+        if (nonOpCount === group.termStart + group.termCount - 1) {
+          endIdx = i;
+          break;  // No need to continue once we have the last value term
+        }
+        nonOpCount++;
+      }
+    }
+  
+    if (startIdx === -1 || endIdx === -1) {
+      Hyp3eLogger.warn("rollDmgButton", `Could not map group to term indices`, group);
+      return { type: group.dmgType, total: 0, icon: `<img src="${group.icon}" />`, label: group.label || group.dmgType };
+    }
+    Hyp3eLogger.info("rollDmgButton", `Start/end indexes: `, { start: startIdx, end: endIdx });
+
+    // Now include the operator BEFORE the first value term (if any), but only if it's not the very first term
+    //  (The very first group has no preceding operator — it's implicitly positive)
+    let groupTerms = fullTerms.slice(startIdx, endIdx + 1);
+  
+    if (startIdx > 0) {
+      // Include the operator immediately before the first value term of this group
+      const prevTerm = fullTerms[startIdx - 1];
+      if (prevTerm instanceof foundry.dice.terms.OperatorTerm) {
+        groupTerms = [prevTerm, ...groupTerms];
+      }
+    }
+    Hyp3eLogger.info("rollDmgButton", `Group terms for ${group.dmgType}: `, groupTerms);
+
+    let groupTotal = 0;
+    let currentSign = 1;  // starts positive (first term has no preceding operator)
+    
+    for (const term of groupTerms) {
+      if (term instanceof foundry.dice.terms.OperatorTerm) {
+        currentSign = term.operator === "+" ? 1 : -1;
+      } else {
+        // Apply current sign to this value term's total
+        groupTotal += currentSign * (term.total ?? 0);
+        // Reset sign to +1 after applying (next operator will override)
+        currentSign = 1;
+      }
+    }
+    Hyp3eLogger.info("rollDmgButton", `Group total: `, groupTotal);
+
+    return {
+      type: group.dmgType,
+      total: groupTotal,
+      icon: `<img src="${group.icon}" />`,
+      label: group.label || group.dmgType
+    };
+  })  //.filter(d => d.total !== 0);  // or > 0 or >=0 depending on your preference
+  Hyp3eLogger.info("rollDmgButton", `Damage types: `, typeDamages);
+
   let naturalDmgRoll = 0
   if (dmgRoll.dice[0]?.total) {
     naturalDmgRoll = dmgRoll.dice[0]?.total
@@ -298,7 +382,8 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
     applyDr: applyDr,
     save: item.system.save,
     hasEffects: item.effects.size > 0 ? true : false,
-    description: item.system.description
+    description: item.system.description,
+    typeDamages: typeDamages
   };
 
   const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;

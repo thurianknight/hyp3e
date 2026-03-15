@@ -228,6 +228,7 @@ export class Hyp3eDice {
   static buildDamageFormula(itemData, ammoData = null, actorData = null) {
     let dmgRollParts = [];
     let debugDmgRollParts = [];
+    let dmgIcons = [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Item damage type: ${itemData?.dmgType}`);
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Actor data:`, actorData);
 
@@ -241,12 +242,20 @@ export class Hyp3eDice {
     const itemDmgMod = parseInt(itemData.dmgMod) > 0 ? `+${parseInt(itemData.dmgMod)}` : `${parseInt(itemData.dmgMod)}`;
 
     const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Basic";
+    const baseIcon = itemData?.dmgType 
+      ? (CONFIG.HYP3E.damageTypeIcons[itemData.dmgType] ?? CONFIG.HYP3E.damageTypeIcons["basic"])
+      : CONFIG.HYP3E.damageTypeIcons["basic"];
+    dmgIcons.push(`<span>${baseIcon}</span>`);
+
     const altDmgTypes =  Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Alternate damage types:`, altDmgTypes);
+
     // I may regret this, but I'm going to assume we will never have more than 2 damage fields 
     //  (1-hand and 2-hand) and hard-code it into this function.
     let dmgRoll2Parts = [];
     let debugDmgRoll2Parts = [];
+    let damageGroups = [];  // Damage array for 1H groups
+    let damageGroups2h = [];  // Damage array for 2H groups
 
     // All items start with the base damage formula
     dmgRollParts.push(itemData.damage);
@@ -388,14 +397,14 @@ export class Hyp3eDice {
     }
 
     // Check if the weapon attack has Master or Grandmaster flags set
-    let masteryMod = 0
+    let masteryMod = null
     if (itemData.wpnGrandmaster) {
-      masteryMod = 2
+      masteryMod = '2'
     } else if (itemData.wpnMaster) {
-      masteryMod = 1
-    }        
+      masteryMod = '1'
+    }
     // Add Weapon Mastery mod, if applicable
-    if (masteryMod > 0) {
+    if (masteryMod) {
       dmgRollParts.push(masteryMod)
       debugDmgRollParts.push(`<tr><td>Mastery Mod</td><td>+${masteryMod}</td></tr>`)
       if (itemData.damage2h) {
@@ -415,15 +424,22 @@ export class Hyp3eDice {
       }
     }
 
+    // Before alts, record how many parts are for base (for both 1H and 2H)
+    const numBaseParts = dmgRollParts.length;
+    const numBaseParts2h = dmgRoll2Parts.length;
+
     // Do we have any alternate damage types?
     if (Object.keys(altDmgTypes).length > 0) {
       for (let [k, v] of Object.entries(altDmgTypes)) {
         dmgRollParts.push(v)
-        const dmgType = `${CONFIG.HYP3E.damageTypes[k]} Dmg`
-        debugDmgRollParts.push(`<tr><td>${dmgType}</td><td>+${v}</td></tr>`)
+        const dmgType = CONFIG.HYP3E.damageTypes[k];
+        const altIcon = CONFIG.HYP3E.damageTypeIcons[k.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
+        debugDmgRollParts.push(`<tr><td>${dmgType} Dmg</td><td>+${v}</td></tr>`)
+        dmgIcons.push(`<span>${altIcon}</span>`);
+
         if (itemData.damage2h) {
           dmgRoll2Parts.push(v)
-          debugDmgRoll2Parts.push(`<tr><td>${dmgType}</td><td>+${v}</td></tr>`)
+          debugDmgRoll2Parts.push(`<tr><td>${dmgType} Dmg</td><td>+${v}</td></tr>`)
         }
       }
     }
@@ -432,20 +448,98 @@ export class Hyp3eDice {
     debugDmgRollParts.push(`</table>`)
     if (itemData.damage2h) { debugDmgRoll2Parts.push(`</table>`) }
 
+    // New: Compute term counts per part (handles if any part like itemData.damage has multiple terms, e.g., '1d6 + 1d4')
+    const termCounts = dmgRollParts.map(part => {
+      if (!part) return 0;
+      const tempRoll = new Roll(`${part}`);  // No actorData needed, since vars are replaced
+      return tempRoll.terms.filter(t => !(t instanceof OperatorTerm)).length;
+    });
+
+    const termCounts2h = dmgRoll2Parts.map(part => {
+      if (!part) return 0;
+      const tempRoll = new Roll(`${part}`);
+      return tempRoll.terms.filter(t => !(t instanceof OperatorTerm)).length;
+    });
+
+    // New: Build damageGroups for 1H
+    let currentTermStart = 0;
+    // Base group
+    const baseTermCount = termCounts.slice(0, numBaseParts).reduce((a, b) => a + b, 0);
+    damageGroups.push({
+      dmgType: itemData.dmgType || 'basic',
+      termStart: currentTermStart,
+      termCount: baseTermCount,
+      icon: baseIcon,
+      label: CONFIG.HYP3E.damageTypes[itemData.dmgType || 'basic'] || 'Damage'  // e.g. "Slashing", "Fire"
+    });
+    currentTermStart += baseTermCount;
+
+    // Alt groups
+    if (Object.keys(altDmgTypes).length > 0) {
+      Object.keys(altDmgTypes).forEach((k, idx) => {
+        const altIdx = numBaseParts + idx;
+        const altTermCount = termCounts[altIdx];
+        const altIcon = CONFIG.HYP3E.damageTypeIcons[k.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
+        damageGroups.push({
+          dmgType: k,
+          termStart: currentTermStart,
+          termCount: altTermCount,
+          icon: altIcon,
+          label: CONFIG.HYP3E.damageTypes[k] || k.charAt(0).toUpperCase() + k.slice(1)  // fallback to capitalized key
+        });
+        currentTermStart += altTermCount;
+      });
+    }
+
+    // New: Repeat for 2H groups (parallel logic)
+    currentTermStart = 0;
+    const baseTermCount2h = termCounts2h.slice(0, numBaseParts2h).reduce((a, b) => a + b, 0);
+    if (itemData.damage2h) {
+      damageGroups2h.push({
+        dmgType: itemData.dmgType || 'basic',
+        termStart: currentTermStart,
+        termCount: baseTermCount2h,
+        icon: baseIcon,
+        label: CONFIG.HYP3E.damageTypes[itemData.dmgType || 'basic'] || 'Damage'  // e.g. "Slashing", "Fire"
+      });
+      currentTermStart += baseTermCount2h;
+
+      if (Object.keys(altDmgTypes).length > 0) {
+        Object.keys(altDmgTypes).forEach((k, idx) => {
+          const altIdx = numBaseParts2h + idx;
+          const altTermCount = termCounts2h[altIdx];
+          const altIcon = CONFIG.HYP3E.damageTypeIcons[k.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
+          damageGroups2h.push({
+            dmgType: k,
+            termStart: currentTermStart,
+            termCount: altTermCount,
+            icon: altIcon,
+            label: CONFIG.HYP3E.damageTypes[k] || k.charAt(0).toUpperCase() + k.slice(1)  // fallback to capitalized key
+          });
+          currentTermStart += altTermCount;
+        });
+      }
+    }
+
     // Log the damage roll parts & the constructed formula
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", "Damage roll parts:", dmgRollParts);
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", "Debug damage parts:", debugDmgRollParts);
+    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", "Damage groups:", damageGroups);
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", "Damage 2H roll parts:", dmgRoll2Parts);
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", "Debug damage 2H parts:", debugDmgRoll2Parts);
+    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", "Damage groups 2H:", damageGroups2h);
 
     // Construct the damage roll formula from parts, and return an object with the formula and debug formula
     const dmgObj = {
       formula: dmgRollParts.join(" + "),
       debugFormula: debugDmgRollParts.join(""),
       formula2h: dmgRoll2Parts.join(" + "),
-      debugFormula2h: debugDmgRoll2Parts.join("")
+      debugFormula2h: debugDmgRoll2Parts.join(""),
+      dmgIcons: dmgIcons.join(""),
+      damageGroups,
+      damageGroups2h
     }
-    return dmgObj
+    return dmgObj;
   }
 
   /**
