@@ -2245,8 +2245,9 @@ export class Hyp3eActor extends Actor {
           if (dataset.roll.indexOf("@cha.turnUndead") < 0) {
               dataset.roll = `${dataset.roll} - @cha.turnUndead`;
           }
-          // Clerics turn undead on a sliding scale from 10 (lowest level) down to 1 (highest)
-          dataset.rollTarget = 10;
+          // Clerics turn undead on a sliding scale from 10+ (lowest level) down to 1 (highest),
+          //  but there is no actual target number since it is a range of success.
+          dataset.rollTarget = this.system.ta == 1 ? 10 : 13;
       }
 
       // Use simple word parsing in the ability name to determine if this is an assassin plying her trade
@@ -3646,7 +3647,7 @@ export class Hyp3eActor extends Actor {
       minimum value for success is always a target number of 10, affecting undead at Type [TA - 1].
 
       Logic:
-      - If TA is 1, it is possible to completely fail.
+      - If TA is 1, it is possible to completely fail on a result of 11+.
       - If TA is 2 or higher, we have the chance for an automatic turn of undead.
       - As long as we have some kind of success, we always roll 2d6 for the number of undead affected (except if 
       TA >= 7, see below).
