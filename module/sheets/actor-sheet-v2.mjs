@@ -1462,6 +1462,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           "prototypeToken.light.dim": item.system?.light.dim || null,
           "prototypeToken.light.bright": item.system?.light.bright || null,
           "prototypeToken.light.color": item.system?.light.color || null,
+          "prototypeToken.light.alpha": item.system?.light.alpha || null,
         };
         await this.actor.update(updates);
         const msg = `Item Token linked to item ${item.name}.`;
