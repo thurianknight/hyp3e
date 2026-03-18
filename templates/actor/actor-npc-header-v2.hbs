@@ -31,21 +31,6 @@
           <div class="slider round"></div>
         </label>
         <div class="npc-type-label">{{system.npcType}}</div>
-        {{!-- <button
-          type="button"
-          class="npc-type {{#if (eq system.npcType 'monster')}}active{{/if}}"
-          data-action="setNpcType"
-          data-value="monster">
-          Monster
-        </button>
-
-        <button
-          type="button"
-          class="npc-type {{#if (eq system.npcType 'npc')}}active{{/if}}"
-          data-action="setNpcType"
-          data-value="npc">
-          NPC
-        </button> --}}
       </div>
     </div>
     <div class="header-block">
@@ -100,6 +85,22 @@
               <i class="fas fa-dice"></i>
             </a>
           </div>
+          {{#if (eq system.npcType "npc")}}
+          {{#if isGM}}
+          <div class="npc-field align-center">
+            <input type="text" name="system.loyalty" value="{{system.loyalty}}" data-dtype="Number" />
+            <a class="rollable small-label" 
+                data-action="rollThis" 
+                data-roll="2d6" 
+                data-roll-type="check" 
+                data-roll-target="{{system.loyalty}}" 
+                data-label="{{localize 'HYP3E.loyalty'}}">
+                    {{localize 'HYP3E.loyalty'}} 
+              <i class="fas fa-dice"></i>
+            </a>
+          </div>
+          {{/if}}
+          {{/if}}
           <div class="npc-field align-center">
             <input type="text" name="system.xp" value="{{system.xp}}" />
             <label for="system.xp" class="small-label">{{localize 'HYP3E.xp'}}</label>

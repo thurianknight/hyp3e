@@ -353,6 +353,7 @@
         "encLair": "# in Lair",
         "phenotype": "Phenotype",
         "morale": "Morale",
+        "loyalty": "Loyalty",
         "xp": "XP Value",
         "treasure": "Treasure Class",
         "tokenAlias": "Token Alias",
