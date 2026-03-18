@@ -12,6 +12,7 @@ import { setupEffectHandlers, pushCustomStatusEffects } from "./helpers/effects.
 import { getAvailableTokenNumber, 
       isTokenInCombat, 
       getTokenActor, 
+      getTokenCombatant, 
       overlayEquippedWeaponAndShield } from "./helpers/tokens.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { migrateActorData, 
@@ -680,13 +681,19 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
     Hyp3eLogger.warn("preMoveToken", `Token actor not found!`, token)
     return;
   }
+  // Hyp3eLogger.info("preMoveToken", `Moving token ${token.name}: `, token);
+  const combatant = getTokenCombatant(token);
+
+  const baseMove = actor.system.movement?.base.value ?? 40;
+  // "isDelayed" is a declared action that allows a combatant to take their turn later in the round, 
+  //  but it also doubles their allowed movement.
+  const maxMove = combatant.isDelayed ? baseMove * 2 : baseMove;
 
   // Calculate current move, including completed and pending waypoints
-  const speed = actor.system.movement?.base.value ?? 40;
   const totalDistance = movement.history.distance + movement.passed.distance + movement.pending.distance;
   Hyp3eLogger.info("preMoveToken", `${actor.name} total distance: `, totalDistance);
-  if (totalDistance > speed) {
-    const msg = `This move exceeds ${actor.displayName}'s speed of ${speed} feet per round!`;
+  if (totalDistance > maxMove) {
+    const msg = `This move exceeds ${actor.displayName}'s speed of ${maxMove} feet per round!`;
     Hyp3eLogger.warn("preMoveToken", msg)
     ui.notifications.warn(msg);
     if (CONFIG.HYP3E.limitMovement) {
