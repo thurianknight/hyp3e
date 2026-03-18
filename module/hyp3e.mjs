@@ -683,10 +683,14 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
   }
   // Hyp3eLogger.info("preMoveToken", `Moving token ${token.name}: `, token);
   const combatant = getTokenCombatant(token);
+  if (!combatant) {
+    Hyp3eLogger.warn("preMoveToken", `Token combatant not found!`, token)
+    return;
+  }
 
   const baseMove = actor.system.movement?.base.value ?? 40;
   // "isDelayed" is a declared action that allows a combatant to take their turn later in the round, 
-  //  but it also doubles their allowed movement.
+  //  but it also doubles their allowed movement for a "charge".
   const maxMove = combatant.isDelayed ? baseMove * 2 : baseMove;
 
   // Calculate current move, including completed and pending waypoints
