@@ -56,6 +56,7 @@
             <input type="text" name="system.alignment" value="{{system.alignment}}" />
             <label for="system.alignment" class="small-label">{{localize 'HYP3E.alignment'}}</label>
           </div>
+          {{#if (eq system.npcType "monster")}}
           <div class="npc-field align-center">
             <input type="text" name="system.encWild" value="{{system.encWild}}" />
             <label for="system.encWild" class="small-label">{{localize 'HYP3E.encWild'}}</label>
@@ -64,6 +65,13 @@
             <input type="text" name="system.encLair" value="{{system.encLair}}" />
             <label for="system.encLair" class="small-label">{{localize 'HYP3E.encLair'}}</label>
           </div>
+          {{/if}}
+          {{#if (eq system.npcType "npc")}}
+          <div class="npc-field align-center">
+            <input type="text" name="system.cost" value="{{system.cost}}" />
+            <label for="system.cost" class="small-label">{{localize 'HYP3E.cost'}}</label>
+          </div>
+          {{/if}}
         </div>
         <div class="npc-header-block flexrow">
           {{#if (eq system.npcType "monster")}}
@@ -75,18 +83,6 @@
             <label for="system.phenotype" class="small-label">{{localize 'HYP3E.phenotype'}}</label>
           </div>
           {{/if}}
-          <div class="npc-field align-center">
-            <input type="text" name="system.morale" value="{{system.morale}}" data-dtype="Number" />
-            <a class="rollable small-label" 
-                data-action="rollThis" 
-                data-roll="2d6" 
-                data-roll-type="check" 
-                data-roll-target="{{system.morale}}" 
-                data-label="{{localize 'HYP3E.morale'}}">
-                    {{localize 'HYP3E.morale'}} 
-              <i class="fas fa-dice"></i>
-            </a>
-          </div>
           {{#if (eq system.npcType "npc")}}
           {{#if isGM}}
           <div class="npc-field align-center">
@@ -102,11 +98,19 @@
             </a>
           </div>
           {{/if}}
-          <div class="npc-field align-center">
-            <input type="text" name="system.cost" value="{{system.cost}}" />
-            <label for="system.cost" class="small-label">{{localize 'HYP3E.cost'}}</label>
-          </div>
           {{/if}}
+          <div class="npc-field align-center">
+            <input type="text" name="system.morale" value="{{system.morale}}" data-dtype="Number" />
+            <a class="rollable small-label" 
+                data-action="rollThis" 
+                data-roll="2d6" 
+                data-roll-type="check" 
+                data-roll-target="{{system.morale}}" 
+                data-label="{{localize 'HYP3E.morale'}}">
+                    {{localize 'HYP3E.morale'}} 
+              <i class="fas fa-dice"></i>
+            </a>
+          </div>
           <div class="npc-field align-center">
             <input type="text" name="system.xp" value="{{system.xp}}" />
             <label for="system.xp" class="small-label">{{localize 'HYP3E.xp'}}</label>
