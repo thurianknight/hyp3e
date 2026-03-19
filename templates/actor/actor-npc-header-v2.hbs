@@ -66,6 +66,7 @@
           </div>
         </div>
         <div class="npc-header-block flexrow">
+          {{#if (eq system.npcType "monster")}}
           <div class="npc-field align-center">
             <select name="system.phenotype">
               <option value=""></option>
@@ -73,6 +74,7 @@
             </select><br/>
             <label for="system.phenotype" class="small-label">{{localize 'HYP3E.phenotype'}}</label>
           </div>
+          {{/if}}
           <div class="npc-field align-center">
             <input type="text" name="system.morale" value="{{system.morale}}" data-dtype="Number" />
             <a class="rollable small-label" 
@@ -100,6 +102,10 @@
             </a>
           </div>
           {{/if}}
+          <div class="npc-field align-center">
+            <input type="text" name="system.cost" value="{{system.cost}}" />
+            <label for="system.cost" class="small-label">{{localize 'HYP3E.cost'}}</label>
+          </div>
           {{/if}}
           <div class="npc-field align-center">
             <input type="text" name="system.xp" value="{{system.xp}}" />

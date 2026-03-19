@@ -212,6 +212,7 @@
       "encLair": 0,
       "morale": null,
       "loyalty": null,
+      "cost": "0",
       "xp": "0",
       "treasure": "",
       "dx": 11,
