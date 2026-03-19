@@ -102,8 +102,9 @@ export class HYP3ECalendar {
         }
     }
 
-    static formatDate(verbose = true) {
-        const {year, month, day} = this.getCurrentDate();
+    static formatDate(verbose = false) {
+      Hyp3eLogger.info("formatDate", `formatDate called with verbose: ${verbose}`);
+      const {year, month, day} = this.getCurrentDate();
         Hyp3eLogger.info("formatDate", `Current date:`, {year, month, day})
         const cycleYear = this.getCycleYear(year);
         Hyp3eLogger.info("formatDate", `Cycle year: ${cycleYear}`)
@@ -123,7 +124,7 @@ export class HYP3ECalendar {
 
         if (!verbose) {
             // Short version: "8th Libra, 576"
-            return `${dayOrdinal} ${m.name}, ${year}`;
+            return `${weekday}, ${dayOrdinal} ${m.name}, ${year}`;
         }
         return `${weekday}, the ${dayOrdinal} of ${m.name}, ${year} (Year of the ${y.name})`;
     }

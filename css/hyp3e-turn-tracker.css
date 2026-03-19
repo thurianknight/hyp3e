@@ -1,9 +1,16 @@
 /* Styles for the Turn Tracker app */
-.turn-tracker {
-  width: 292px;
-  padding: 2px;
+.turn-tracker-container {
+  display: flex;
+  flex-direction: column;
   margin: 2px;
+  padding: 2px;
   border-radius: 6px;
+}
+.turn-tracker-row {
+  width: 292px;
+  /* padding: 2px;
+  margin: 2px; */
+  /* border-radius: 6px; */
   text-align: center;
   display: flex;
   flex-direction: row;
@@ -20,7 +27,7 @@
 }
 
 /* Make the entire content area the drag handle */
-.turn-tracker.floating {
+.turn-tracker-row.floating {
   position: absolute !important;
   cursor: grab;
   user-select: none;
@@ -49,7 +56,7 @@
   cursor: pointer;
 }
 
-.theme-dark .turn-tracker {
+.theme-dark .turn-tracker-container {
   background: rgba(0, 0, 0, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.2);
   /* color: #fff; */
@@ -66,7 +73,7 @@
     }
   }
 }
-.theme-light .turn-tracker {
+.theme-light .turn-tracker-container {
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(0, 0, 0, 0.2);
   color: #2a2a2a;
@@ -90,14 +97,14 @@
     }
 }
 
-.turn-tracker .turn-label {
+.turn-tracker-row .turn-label {
   /* margin: 0.5em 0; */
   text-align: center;
   text-decoration: none;
   font-size: 0.9em;
   padding: 2px 0;
 }
-.turn-tracker .time-label {
+.turn-tracker-row .time-label {
   /* margin: 0.5em 0; */
   text-align: center;
   text-decoration: none;
@@ -105,14 +112,14 @@
   padding: 2px 0;
 }
 
-.turn-tracker .controls {
+.turn-tracker-row .controls {
   display: flex;
   flex: auto;
   justify-content: center;
   flex-direction: row;
 }
 
-.turn-tracker .controls button {
+.turn-tracker-row .controls button {
   margin: 4px 1px;
   width: 32px;
   height: 32px;

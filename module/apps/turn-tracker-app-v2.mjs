@@ -64,9 +64,11 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Turn Tracker options:`, options);
     const currentTurn = game.hyp3e.turnTracker.getTurn();
     const currentTime = game.hyp3e.turnTracker.getTime();
+    const currentDate = game.hyp3e.calendar.formatDate(false);
     const context = { 
       currentTurn, 
       currentTime, 
+      currentDate,
       isGM: game.user.isGM, 
       mode: game.settings.get("hyp3e", "turnTrackerMode") 
     }
@@ -302,5 +304,9 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     // Update the time field
     const currentTime = game.hyp3e.turnTracker.getTime();
     this._embeddedElement.find("#current-time")?.val(currentTime);
+
+    // Update the date field
+    const currentDate = game.hyp3e.calendar.formatDate(false);
+    this._embeddedElement.find("#current-date")?.text(currentDate);
   }
 }

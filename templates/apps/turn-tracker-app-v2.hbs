@@ -1,35 +1,44 @@
-<div class="turn-tracker">
-  <div class="controls">
-    <button type="button" data-action="openCalendar" title="Open Calendar"><i class="fas fa-calendar-days"></i></button>
-    {{!-- <button class="reset-turn" data-action="resetTurn" title="Start/Reset"><i class="fas fa-stop"></i></button> --}}
-    {{#if isGM}}
-    <button type="button" data-action="retreatTurn" title="Retreat Turn"><i class="fas fa-backward-step"></i></button>
-    <button type="button" data-action="advanceTurn" title="Advance Turn"><i class="fas fa-forward-step"></i></button>
-    {{/if}}
-    <button type="button" data-action="showTurn" title="Display in Chat"><i class="fas fa-comment"></i></button>
-  </div>
-  <div class="column-top">
+<div class="turn-tracker-container">
+  <div class="turn-tracker-row">
     <div class="controls">
-      <span class="turn-label">Turn:</span>
-      <input id="current-turn" type="text" value="{{currentTurn}}" disabled />
-    </div>
-    <div class="controls">
-      <span class="time-label">Time:</span>
-      <input id="current-time" type="text" value="{{currentTime}}" disabled />
-    </div>
-  </div>
-  <div class="controls">
-    {{#if isGM}}
-    <button type="button" data-action="openTurnActions" title="Configure Turn-Advance Actions"><i class="fas fa-cog"></i></button>
-    {{/if}}
-  </div>
-  <div class="turn-tracker-toggle">
-    <button type="button" class="toggle-mode" data-action="toggleMode" title="{{#if (eq mode 'embedded')}}Float Tracker{{else}}Dock to Chat{{/if}}">
-      {{#if (eq mode 'embedded')}}
-      <i class="fas fa-external-link-alt"></i>
-      {{else}}
-      <i class="fas fa-anchor"></i>
+      <button type="button" data-action="openCalendar" title="Open Calendar"><i class="fas fa-calendar-days"></i></button>
+      {{!-- <button class="reset-turn" data-action="resetTurn" title="Start/Reset"><i class="fas fa-stop"></i></button> --}}
+      {{#if isGM}}
+      <button type="button" data-action="retreatTurn" title="Retreat Turn"><i class="fas fa-backward-step"></i></button>
+      <button type="button" data-action="advanceTurn" title="Advance Turn"><i class="fas fa-forward-step"></i></button>
       {{/if}}
-    </button>
+      <button type="button" data-action="showTurn" title="Display in Chat"><i class="fas fa-comment"></i></button>
+    </div>
+    <div class="column-top">
+      <div class="controls">
+        <span class="turn-label">Turn:</span>
+        <input id="current-turn" type="text" value="{{currentTurn}}" disabled />
+      </div>
+      <div class="controls">
+        <span class="time-label">Time:</span>
+        <input id="current-time" type="text" value="{{currentTime}}" disabled />
+      </div>
+    </div>
+    <div class="controls">
+      {{#if isGM}}
+      <button type="button" data-action="openTurnActions" title="Configure Turn-Advance Actions"><i class="fas fa-cog"></i></button>
+      {{/if}}
+    </div>
+    <div class="turn-tracker-toggle">
+      <button type="button" class="toggle-mode" data-action="toggleMode" title="{{#if (eq mode 'embedded')}}Float Tracker{{else}}Dock to Chat{{/if}}">
+        {{#if (eq mode 'embedded')}}
+        <i class="fas fa-external-link-alt"></i>
+        {{else}}
+        <i class="fas fa-anchor"></i>
+        {{/if}}
+      </button>
+    </div>
   </div>
+  {{#if showDate}}
+  <div class="turn-tracker-row">
+    <div class="controls">
+      <span class="time-label" id="current-date">{{currentDate}}</span>
+    </div>
+  </div>
+  {{/if}}
 </div>
