@@ -1,4 +1,4 @@
-// systems/hyp3e/module/apps/turn-tracker-app.mjs
+// systems/hyp3e/module/apps/turn-tracker-app-v2.mjs
 import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { TurnAdvanceActionsConfig } from "./turn-advance-actions-config.mjs";
@@ -68,6 +68,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     const context = { 
       currentTurn, 
       currentTime, 
+      showDateInTurnTracker: game.settings.get(game.system.id, "showDateInTurnTracker"),
       currentDate,
       isGM: game.user.isGM, 
       mode: game.settings.get("hyp3e", "turnTrackerMode") 

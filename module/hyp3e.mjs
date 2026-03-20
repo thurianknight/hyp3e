@@ -829,20 +829,6 @@ await setupCalendarHooks();
 // Register Turn Tracker hooks
 await setupTurnTrackerHooks();
 
-/**
- * Render the exploration turn tracker app in the chat log.
- * This shows the current turn, and allows GMs to advance or reset the turn count.
- * It also pushes the current turn to the chat log when requested.
- */
-// async function initTurnTrackerInChatLog(app, html, data) {
-//   // if (!game.user.isGM) return; // Only render for GMs
-//   if (!game.settings.get(game.system.id, "enableTurnTracker")) {
-//     Hyp3eLogger.info("initTurnTrackerInChatLog", "Turn Tracker is disabled, not rendering the app.");
-//     return; // Exit early if the turn tracker is disabled
-//   }
-//   Hyp3eLogger.info("initTurnTrackerInChatLog", "Rendering the Turn Tracker app in the chat log...");
-// }
-
 /* -------------------------------------------- */
 /*  Migrate system/world functions        */
 /* -------------------------------------------- */

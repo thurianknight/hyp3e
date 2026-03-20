@@ -40,6 +40,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             chatFontSize: game.settings.get(game.system.id, "chatFontSize"),
             calendarVerbose: game.settings.get(game.system.id, "calendarVerbose"),
             enableTurnTracker: game.settings.get(game.system.id, "enableTurnTracker"),
+            showDateInTurnTracker: game.settings.get(game.system.id, "showDateInTurnTracker"),
             showWeaponOverlay: game.settings.get(game.system.id, "showWeaponOverlay"),
             resizeTokens: game.settings.get(game.system.id, "resizeTokens"),
             // Rules Options - General

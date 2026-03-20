@@ -8,10 +8,7 @@ export async function setupTurnTrackerHooks() {
      */
     Hooks.on("explorationTurnReset", (turn) => {
         Hyp3eLogger.info("explorationTurnReset", `Exploration turn reset to ${turn}`);
-        // Update the turn tracker display (if it exists) in the chat log
-        // const tracker = $(".turn-tracker");
-        // if (!tracker.length) return;
-        // $("#current-turn").val(turn);
+        
     });
 
     /**
@@ -20,12 +17,7 @@ export async function setupTurnTrackerHooks() {
     Hooks.on("explorationTurnAdvanced", async (turn) => {
         Hyp3eLogger.info("explorationTurnAdvanced", `Exploration turn ${turn} triggered.`);
 
-        // Update the turn tracker display (if it exists) in the chat log
-        // const tracker = $(".turn-tracker");
-        // if (!tracker.length) return;
-        // $("#current-turn").val(turn);
-
-        // The rest is for GMs only
+        // Only the GM can run turn advancement logic
         if (!game.user.isGM) return;
 
         // Process all tokens on the canvas

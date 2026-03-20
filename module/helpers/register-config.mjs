@@ -138,6 +138,17 @@ export function registerHyp3eConfigurations() {
         requiresReload: true
     });
 
+    // Display current date in the Turn Tracker app
+    game.settings.register(game.system.id, "showDateInTurnTracker", {
+        name: game.i18n.localize("HYP3E.settings.showDateInTurnTracker"),
+        hint: game.i18n.localize("HYP3E.settings.showDateInTurnTrackerHint"),
+        scope: "world",
+        config: showConfigOptions,
+        type: Boolean,
+        default: true,
+        requiresReload: true
+    });
+
     // Show equipped weapons & shields on tokens
     game.settings.register(game.system.id, "showWeaponOverlay", {
         name: game.i18n.localize("HYP3E.settings.showWeaponOverlay"),
