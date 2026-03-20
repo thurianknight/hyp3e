@@ -103,7 +103,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
         return this;
       }
       container.appendChild($html[0]);
-  
+
       // Apply saved position (fallback if missing)
       let pos = game.settings.get("hyp3e", "turnTrackerPos");
       if (!pos || isNaN(pos.top) || isNaN(pos.left)) {
@@ -119,7 +119,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
       // Manual dragging — no reliance on app.setPosition or this.element
       let isDragging = false;
       let dragOffset = { x: 0, y: 0 };
-    
+
       const startDrag = (e) => {
         if (e.button !== 0) return; // Left click only
         isDragging = true;
@@ -134,7 +134,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
         });
         $html.css("z-index", maxZ + 1);
       };
-    
+
       const doDrag = (e) => {
         if (!isDragging) return;
         const newTop = e.clientY - dragOffset.y;
@@ -144,7 +144,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
           left: `${newLeft}px`
         });
       };
-    
+
       const endDrag = () => {
         if (isDragging) {
           isDragging = false;
@@ -155,7 +155,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
           });
         }
       };
-    
+
       // Attach listeners (remove old ones first to avoid duplicates)
       $html.off("mousedown.drag touchstart.drag")
            .on("mousedown.drag touchstart.drag", startDrag);
@@ -173,7 +173,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
         $html.css("z-index", maxZ + 1);
       });
     }
-  
+
     this._embeddedElement = $html;
     this._bindButtons($html);
 

@@ -120,12 +120,12 @@ export class HYP3ETurnTracker {
      */
     Hyp3eLogger.info("HYP3ETurnTracker initSync", `Initializing updateSetting hook...`);
     Hooks.on("updateSetting", (setting, value, options, userId) => {
-      Hyp3eLogger.info("HYP3ETurnTracker", `Setting updated:`, { setting, value, options, userId });
       if (setting.key !== "hyp3e.explorationTurn") return;
+      Hyp3eLogger.info("HYP3ETurnTracker", `Setting updated:`, { setting, value, options, userId });
 
       const oldTurn = this._lastTurn;
       const newTurn = value.value;
-      Hyp3eLogger.info("HYP3ETurnTracker", `Turn changed from ${oldTurn} to ${newTurn} by user ${userId}`);
+      Hyp3eLogger.info("HYP3ETurnTracker", `Turn changed from ${oldTurn} to ${newTurn} by user ${userId.name}`);
       // update cache
       this._lastTurn = newTurn;
 
@@ -143,10 +143,10 @@ export class HYP3ETurnTracker {
 
   static async advanceTurn() {
     Hyp3eLogger.info("advanceTurn", `advanceTurn() fired on: ${game.user.id}, GM? ${game.user.isGM}`);
+    await this.advanceTime(10); // Advance time by 10 minutes each turn
     const newTurn = this.currentTurn + 1;
     await game.settings.set("hyp3e", "explorationTurn", newTurn);
     Hyp3eLogger.info("advanceTurn", `Turn tracker advanced to turn ${newTurn}`);
-    await this.advanceTime(10); // Advance time by 10 minutes each turn
     return newTurn;
   }
 
@@ -173,10 +173,10 @@ export class HYP3ETurnTracker {
 
   static async retreatTurn() {
     if (this.currentTurn <= 1) return;  // Don't let turn go below 1
+    await this.retreatTime(10); // Retreat time by 10 minutes each turn
     const newTurn = this.currentTurn - 1;
     await game.settings.set("hyp3e", "explorationTurn", newTurn);
     Hyp3eLogger.info("retreatTurn", `Turn tracker retreated to turn ${newTurn}`);
-    await this.retreatTime(10); // Retreat time by 10 minutes each turn
     return newTurn;
   }
 
@@ -204,7 +204,9 @@ export class HYP3ETurnTracker {
   static async reset() {
     const newTurn = 1;
     await game.settings.set("hyp3e", "explorationTurn", newTurn);
-    Hyp3eLogger.info("reset", `Turn tracker reset to turn ${newTurn}.`);
+    const currentTime = this.turnStartTime;
+    await game.settings.set("hyp3e", "currentTime", currentTime);
+    Hyp3eLogger.info("reset", `Turn tracker reset to turn ${newTurn} and time ${currentTime}.`);
     return newTurn;
   }
 

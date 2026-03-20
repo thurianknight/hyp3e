@@ -546,6 +546,7 @@ Hooks.once("ready", async function() {
   game.hyp3e.calendar.getCurrentDate = () => HYP3ECalendar.getCurrentDate();
   game.hyp3e.calendar.setCurrentDate = () => HYP3ECalendar.setCurrentDate();
   game.hyp3e.calendar.advanceDay = () => HYP3ECalendar.advanceDay();
+  game.hyp3e.calendar.retreatDay = () => HYP3ECalendar.retreatDay();
   game.hyp3e.calendar.formatDate = () => HYP3ECalendar.formatDate();
   game.hyp3e.calendar.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
   Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.calendar.formatDate(true)}.`, game.hyp3e.calendar.getCurrentDate());
