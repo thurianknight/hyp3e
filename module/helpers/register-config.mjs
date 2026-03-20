@@ -45,6 +45,15 @@ export function registerHyp3eConfigurations() {
         default: { year: 576, month: 1, day: 1 }
     });
 
+    // Store the current time
+    game.settings.register(game.system.id, "currentTime", {
+      name: "Current Time",
+      scope: "world",
+      config: false,  // Always hidden from UI
+      type: String,
+      default: "8:00",
+    });
+
     // Store the current exploration turn
     game.settings.register(game.system.id, "explorationTurn", {
         name: "Exploration Turn",
