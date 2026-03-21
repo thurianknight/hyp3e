@@ -52,6 +52,7 @@ items = [
     ("LICENSE_boilerplate.txt", False),
     ("README.md", False),
     ("VARIABLES.md", False),
+    ("hyperborea_combat_architecture.md", False),
     ("system.json", False),
     ("template.json", False),
 ]
@@ -77,7 +78,6 @@ shutil.make_archive(
     base_name     = str(dest),
     format        = "zip",
     root_dir      = str(dest),
-    # base_dir      = ".",
     dry_run       = False,
     logger        = None,
 )
