@@ -31,8 +31,7 @@ export async function handleDamageRollButtons(html) {
     const buttonText = damageType.toLowerCase().includes("heal") ? "Roll Healing" : "Roll Damage"
 
     let dmgButton = $(
-      // `<button class="chat-btn-full-width" title="Click to roll damage"><i class="fas fa-dice"></i>${buttonText}: ${dmgFormula}</button>`
-      `<button class="chat-btn-full-width" title="Click to roll damage"><i class="fas fa-dice"></i>${buttonText}</button>`
+      `<button class="chat-btn-full-width" title="Roll damage"><i class="fas fa-dice"></i>${buttonText}</button>`
     );
     dmgRollElement.append(dmgButton);
 
@@ -68,8 +67,7 @@ export async function handleDamageRoll2hButtons(html) {
     const tokenId = $(b).data('tokenId');
 
     let dmgButton2h = $(
-      // `<button class="chat-btn-full-width" title="Click to roll damage"><i class="fas fa-dice"></i>2H Damage: ${dmgFormula}</button>`
-      `<button class="chat-btn-full-width" title="Click to roll damage"><i class="fas fa-dice"></i>2-Hand Damage</button>`
+      `<button class="chat-btn-full-width" title="Roll 2H damage"><i class="fas fa-dice"></i>2-Hand Damage</button>`
     );
     dmgRoll2hElement.append(dmgButton2h);
 
@@ -101,16 +99,16 @@ export async function handleApplyDamageButtons(html) {
     let sourceType = $(b).data('sourceType');
 
     const fullDamageButton = $(
-      `<button class="dice-total-fullDamage-btn chat-button-small" title="Click to apply ${total} damage to selected token(s)."><i class="fas fa-user-minus"></i></button>`
+      `<button class="dice-total-fullDamage-btn chat-button-small" title="Apply ${total} damage to selected token(s)"><i class="fas fa-user-minus"></i></button>`
     );
     const halfDamageButton = $(
-      `<button class="dice-total-halfDamage-btn chat-button-small" title="Click to apply half damage to selected token(s)."><i class="fas fa-user-shield"></i></button>`
+      `<button class="dice-total-halfDamage-btn chat-button-small" title="Apply half damage to selected token(s)"><i class="fas fa-user-shield"></i></button>`
     );
     const fullHealingButton = $(
-      `<button class="dice-total-fullHealing-btn chat-button-small" title="Click to apply ${total} healing to selected token(s)."><i class="fas fa-user-plus"></i></button>`
+      `<button class="dice-total-fullHealing-btn chat-button-small" title="Apply ${total} healing to selected token(s)"><i class="fas fa-user-plus"></i></button>`
     );
     const fullDamageModifiedButton = $(
-      `<button class="dice-total-fullDamageMod-btn chat-button-small" title="Click to apply ${total} damage with modifier prompt to selected token(s)."><i class="fas fa-user-edit"></i></button>`
+      `<button class="dice-total-fullDamageMod-btn chat-button-small" title="Apply ${total} damage with modifier prompt to selected token(s)"><i class="fas fa-user-edit"></i></button>`
     );
     dmgBtnsElement.append(fullDamageButton);
     dmgBtnsElement.append(halfDamageButton);
@@ -202,10 +200,10 @@ export async function handleGenericDamageHealButtons(_msg, html) {
 
   const btnContainer = $(`<div class="roll-chat-buttons flexrow"></div>`);
   const dmgBtn = $(
-    `<button class="dice-total-fullDamage-btn chat-button-small" title="Click to apply ${total} damage to selected token(s)."><i class="fas fa-user-minus"></i></button>`
+    `<button class="dice-total-fullDamage-btn chat-button-small" title="Apply ${total} damage to selected token(s)"><i class="fas fa-user-minus"></i></button>`
   );
   const healBtn = $(
-    `<button class="dice-total-fullHealing-btn chat-button-small" title="Click to apply ${total} healing to selected token(s)."><i class="fas fa-user-plus"></i></button>`
+    `<button class="dice-total-fullHealing-btn chat-button-small" title="Apply ${total} healing to selected token(s)"><i class="fas fa-user-plus"></i></button>`
   );
 
   btnContainer.append(dmgBtn, healBtn);
