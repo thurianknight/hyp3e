@@ -6,7 +6,7 @@
  */
 import { HYP3E } from "../../helpers/config.mjs"
 import { Hyp3eLogger } from "../../helpers/logger.mjs";
-import { applyHealthChange } from "./damage-handlers.mjs";
+import { applyHealthChange, rollDmgButton } from "./damage-handlers.mjs";
 
 /**
  * 
@@ -63,6 +63,22 @@ export async function handleCritMissOrHitButtons(html) {
                 baseClassLabel = "NPC"
             }
             let actorId = $(b).data('actorId');
+
+            // Read weapon damage data embedded by actor.mjs (present when item has a valid damage formula)
+            const formula = $(b).data('formula');
+            const dmgData = formula ? {
+                formula:      formula,
+                debugFormula: $(b).data('debugFormula'),
+                baseDamage:   $(b).data('baseDamage'),
+                damageType:   $(b).data('damageType'),
+                itemId:       $(b).data('itemId'),
+                itemUuid:     $(b).data('itemUuid'),
+                actorId:      actorId,
+                tokenId:      $(b).data('tokenId'),
+                sourceType:   $(b).data('sourceType'),
+                damageGroups: $(b).data('damageGroups'),
+            } : null;
+
             const icon = "fa-user-slash";
             const critMissButton = $(long_button('miss',`Roll Critical Miss for ${baseClassLabel}-class`, icon));
             critMissElement.append(critMissButton);
@@ -70,7 +86,7 @@ export async function handleCritMissOrHitButtons(html) {
             // Handle button clicks
             critMissButton.on("click", (ev) => {
                 ev.stopPropagation();
-                rollCritMiss(baseClass, actorId);
+                rollCritMiss(baseClass, actorId, dmgData);
             });
         });
     }
@@ -85,14 +101,68 @@ export async function handleCritMissOrHitButtons(html) {
             }
             let actorId = $(b).data('actorId');
             const icon = "fa-user";
-            const critHitButton = $(long_button('hit',`Roll Critical Hit for ${baseClassLabel}-class`, icon));
-            critHitElement.append(critHitButton);
 
-            // Handle button clicks
-            critHitButton.on("click", (ev) => {
-                ev.stopPropagation();
-                rollCritHit(baseClass, actorId);
-            });
+            // Check if the message also has a damage roll button to combine with
+            const dmgEl = html.find(".dmg-roll-button");
+            if (dmgEl.length > 0) {
+                const dmg2hEl = html.find(".dmg-roll-button2h");
+                const dmgData = {
+                    formula:      dmgEl.data('formula'),
+                    debugFormula: dmgEl.data('debugFormula'),
+                    baseDamage:   dmgEl.data('baseDamage'),
+                    damageType:   dmgEl.data('damageType'),
+                    itemId:       dmgEl.data('itemId'),
+                    itemUuid:     dmgEl.data('itemUuid'),
+                    actorId:      dmgEl.data('actorId'),
+                    tokenId:      dmgEl.data('tokenId'),
+                    sourceType:   dmgEl.data('sourceType'),
+                    damageGroups: dmgEl.data('damageGroups'),
+                };
+
+                // Hide separate damage button(s) — the combined button covers them
+                dmgEl.hide();
+                if (dmg2hEl.length > 0) dmg2hEl.hide();
+
+                const critDmgButton = $(long_button('hit', `Roll Critical Hit Damage for ${baseClassLabel}-class`, icon));
+                critHitElement.append(critDmgButton);
+                critDmgButton.on("click", (ev) => {
+                    ev.stopPropagation();
+                    rollCritHitWithDamage(baseClass, dmgData.actorId, dmgData.formula, dmgData.debugFormula,
+                        dmgData.baseDamage, dmgData.damageType, dmgData.itemId, dmgData.itemUuid,
+                        dmgData.tokenId, dmgData.sourceType, dmgData.damageGroups);
+                });
+
+                if (dmg2hEl.length > 0) {
+                    const dmgData2h = {
+                        formula:      dmg2hEl.data('formula'),
+                        debugFormula: dmg2hEl.data('debugFormula'),
+                        baseDamage:   dmg2hEl.data('baseDamage'),
+                        damageType:   dmg2hEl.data('damageType'),
+                        itemId:       dmg2hEl.data('itemId'),
+                        itemUuid:     dmg2hEl.data('itemUuid'),
+                        actorId:      dmg2hEl.data('actorId'),
+                        tokenId:      dmg2hEl.data('tokenId'),
+                        sourceType:   dmg2hEl.data('sourceType'),
+                        damageGroups: dmg2hEl.data('damageGroups'),
+                    };
+                    const crit2hDmgButton = $(long_button('hit', `Roll Critical Hit 2H Damage for ${baseClassLabel}-class`, icon));
+                    critHitElement.append(crit2hDmgButton);
+                    crit2hDmgButton.on("click", (ev) => {
+                        ev.stopPropagation();
+                        rollCritHitWithDamage(baseClass, dmgData2h.actorId, dmgData2h.formula, dmgData2h.debugFormula,
+                            dmgData2h.baseDamage, dmgData2h.damageType, dmgData2h.itemId, dmgData2h.itemUuid,
+                            dmgData2h.tokenId, dmgData2h.sourceType, dmgData2h.damageGroups);
+                    });
+                }
+            } else {
+                // No damage button present (e.g. crit-miss hitAllyCrit case) — show text result only
+                const critHitButton = $(long_button('hit', `Roll Critical Hit for ${baseClassLabel}-class`, icon));
+                critHitElement.append(critHitButton);
+                critHitButton.on("click", (ev) => {
+                    ev.stopPropagation();
+                    rollCritHit(baseClass, actorId);
+                });
+            }
         });
     }
 
@@ -166,8 +236,10 @@ async function rollCritHit(charType, actorId) {
     })
 }
 
-async function rollCritMiss(charType, actorId) {
+async function rollCritMiss(charType, actorId, dmgData = null) {
     let content = "";
+    let hitCrit = false;
+    let hitAllyOrSelf = false;
     let roll = await new Roll("1d12").roll();
     if (roll.total <= 2) {
         content = game.i18n.localize("HYP3E.attack.critMiss.badMiss");
@@ -177,7 +249,7 @@ async function rollCritMiss(charType, actorId) {
         } else if (roll.total <= 8) {
             const [feet, direction] = await getFeetAndDirectionCritMiss();
             content = game.i18n.format(
-                "HYP3E.attack.critMiss.dropWeapon", 
+                "HYP3E.attack.critMiss.dropWeapon",
                 { feet: feet, direction: direction }
             );
         } else if (roll.total <= 9) {
@@ -185,14 +257,18 @@ async function rollCritMiss(charType, actorId) {
         } else if (roll.total <= 10) {
             content = game.i18n.localize("HYP3E.attack.critMiss.tripFall");
         } else if (roll.total <= 11) {
+            hitAllyOrSelf = true;
             if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAllyCrit");
+                hitCrit = true;
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAlly");
-            }            
+            }
         } else if (roll.total == 12) {
+            hitAllyOrSelf = true;
             if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelfCrit");
+                hitCrit = true;
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelf");
             }
@@ -205,7 +281,7 @@ async function rollCritMiss(charType, actorId) {
         } else if (roll.total <= 4) {
             const [feet, direction] = await getFeetAndDirectionCritMiss();
             content = game.i18n.format(
-                "HYP3E.attack.critMiss.dropWeapon", 
+                "HYP3E.attack.critMiss.dropWeapon",
                 { feet: feet, direction: direction }
             );
         } else if (roll.total <= 6) {
@@ -213,14 +289,18 @@ async function rollCritMiss(charType, actorId) {
         } else if (roll.total <= 8) {
             content = game.i18n.localize("HYP3E.attack.critMiss.tripFall");
         } else if (roll.total <= 10) {
+            hitAllyOrSelf = true;
             if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAllyCrit");
+                hitCrit = true;
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAlly");
-            }            
+            }
         } else if (roll.total <= 12) {
+            hitAllyOrSelf = true;
             if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelfCrit");
+                hitCrit = true;
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelf");
             }
@@ -234,7 +314,7 @@ async function rollCritMiss(charType, actorId) {
         } else if (roll.total <= 6) {
             const [feet, direction] = await getFeetAndDirectionCritMiss();
             content = game.i18n.format(
-                "HYP3E.attack.critMiss.dropWeapon", 
+                "HYP3E.attack.critMiss.dropWeapon",
                 { feet: feet, direction: direction }
             );
         } else if (roll.total <= 8) {
@@ -242,14 +322,18 @@ async function rollCritMiss(charType, actorId) {
         } else if (roll.total <= 10) {
             content = game.i18n.localize("HYP3E.attack.critMiss.tripFall");
         } else if (roll.total <= 11) {
-            if (getCritMissHitCrit(charType)) {
+            hitAllyOrSelf = true;
+            if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAllyCrit");
+                hitCrit = true;
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitAlly");
-            }            
+            }
         } else if (roll.total <= 12) {
-            if (getCritMissHitCrit(charType)) {
+            hitAllyOrSelf = true;
+            if (await getCritMissHitCrit(charType)) {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelfCrit");
+                hitCrit = true;
             } else {
                 content = game.i18n.localize("HYP3E.attack.critMiss.hitSelf");
             }
@@ -259,6 +343,25 @@ async function rollCritMiss(charType, actorId) {
     }
 
     content = `<div class="dice-damage">` + content + `</div>`
+    if (hitAllyOrSelf && dmgData) {
+        // Inject a damage roll button so the player can roll damage for the accidental hit.
+        // For hitAllyCrit/hitSelfCrit, the .critical-hit div below will cause the chat handler
+        // to replace this with a combined "Roll Critical Hit Damage" button automatically.
+        content += `<div class='dmg-roll-button' style='padding-top: 5px'` +
+            ` data-item-id='${dmgData.itemId}'` +
+            ` data-item-uuid='${dmgData.itemUuid}'` +
+            ` data-actor-id='${dmgData.actorId}'` +
+            ` data-token-id='${dmgData.tokenId}'` +
+            ` data-base-damage='${dmgData.baseDamage}'` +
+            ` data-damage-type='${dmgData.damageType}'` +
+            ` data-formula='${dmgData.formula}'` +
+            ` data-debug-formula='${dmgData.debugFormula}'` +
+            ` data-damage-groups='${JSON.stringify(dmgData.damageGroups)}'` +
+            ` data-source-type='${dmgData.sourceType}'></div>`;
+    }
+    if (hitCrit) {
+        content += `<div class='critical-hit' data-base-class='${charType}' data-actor-id='${actorId}'></div>`;
+    }
     const templateData = {
         // title: game.i18n.localize(`HYP3E.attack.critMiss.${charType}`),
         title: "",
@@ -283,6 +386,67 @@ async function rollCritMiss(charType, actorId) {
         flavor: flavor,
         content: html
     })
+}
+
+/**
+ * Roll 1d6 to determine the critical hit multiplier for a given class, then roll
+ * and send damage with that multiplier applied — combining the two separate steps
+ * into a single button click.
+ */
+async function rollCritHitWithDamage(charType, actorId, formula, debugDmgRollFormula, baseDmgFormula, damageType, itemId, itemUuid, tokenId, sourceType, damageGroups) {
+    const dmg = game.i18n.localize("HYP3E.headers.damage");
+    let roll = await new Roll("1d6").roll();
+    let critLabel, formulaAppend;
+
+    if (charType === "fighter") {
+        if (roll.total <= 2) {
+            critLabel = `+2 ${dmg}`;
+            formulaAppend = "+2";
+        } else if (roll.total <= 4) {
+            critLabel = `×2 Dice ${dmg}`;
+            formulaAppend = `+${baseDmgFormula}`;
+        } else {
+            critLabel = `×3 Dice ${dmg}`;
+            formulaAppend = `+${baseDmgFormula}+${baseDmgFormula}`;
+        }
+    } else if (charType === "magician") {
+        if (roll.total <= 2) {
+            critLabel = `+1 ${dmg}`;
+            formulaAppend = "+1";
+        } else if (roll.total <= 4) {
+            critLabel = `+2 ${dmg}`;
+            formulaAppend = "+2";
+        } else {
+            critLabel = `×2 Dice ${dmg}`;
+            formulaAppend = `+${baseDmgFormula}`;
+        }
+    } else {
+        // cleric / thief / npc-monster
+        if (roll.total <= 1) {
+            critLabel = `+1 ${dmg}`;
+            formulaAppend = "+1";
+        } else if (roll.total <= 3) {
+            critLabel = `+2 ${dmg}`;
+            formulaAppend = "+2";
+        } else if (roll.total <= 5) {
+            critLabel = `×2 Dice ${dmg}`;
+            formulaAppend = `+${baseDmgFormula}`;
+        } else {
+            critLabel = `×3 Dice ${dmg}`;
+            formulaAppend = `+${baseDmgFormula}+${baseDmgFormula}`;
+        }
+    }
+
+    const baseClassLabel = charType === "npc" ? "NPC" : charType.charAt(0).toUpperCase() + charType.substring(1);
+    const title = `${baseClassLabel} Critical Hit: ${critLabel}`;
+    const adjustedFormula = formula + formulaAppend;
+
+    await rollDmgButton(
+        adjustedFormula, debugDmgRollFormula, baseDmgFormula, damageType,
+        actorId, itemId, itemUuid, tokenId, sourceType,
+        damageGroups,
+        title
+    );
 }
 
 /**********************************************************
