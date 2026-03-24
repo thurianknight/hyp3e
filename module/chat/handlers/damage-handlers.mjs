@@ -232,7 +232,7 @@ export async function handleGenericDamageHealButtons(_msg, html) {
  * @param {*} sourceType - Item type, either "weapon" or "spell"
  * @returns null
  */
-async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType, damageGroups) {
+export async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damageType, actorId, itemId, itemUuid, tokenId, sourceType, damageGroups, titleOverride = null) {
   // Fix invalid formulae if possible
   if (formula == "" || formula == null || formula == "0") {
     formula = "0d0"
@@ -367,7 +367,7 @@ async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula, damag
   }
 
   const damageText = damageType.toLowerCase().includes("heal") ? "Healing" : "Damage"
-  const title = `Rolling ${damageText}...`
+  const title = titleOverride ?? `Rolling ${damageText}...`
   const templateData = {
     title: title,
     dmgRoll: dmgRoll,

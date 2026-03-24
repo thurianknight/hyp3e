@@ -2500,23 +2500,37 @@ export class Hyp3eActor extends Actor {
       );
       atkRoll.hit = hit; // Attach hit status to the roll object
 
-      // Prepare Damage Formula (if hit)
+      // Prepare Damage Formula (if hit, or on crit miss so damage data is available for hitAlly/hitSelf outcomes)
       let damageFormulas = {};
-      if (hit && item && Roll.validate(itemData.damage)) {
+      const isCritMiss = naturalRoll === 1 && CONFIG.HYP3E.critMiss;
+      if ((hit || isCritMiss) && item && Roll.validate(itemData.damage)) {
           damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);
-          // Temporarily attach to item object for chat card context
-          // item.dmgFormula = damageFormulas.primary?.formula;
-          // item.debugDmgRollFormula = damageFormulas.primary?.debugFormula;
-          // item.dmgFormula2h = damageFormulas.secondary?.formula;
-          // item.debugDmgRollFormula2h = damageFormulas.secondary?.debugFormula;
+      }
+
+      // Embed damage data in the crit-miss footer so the crit miss handler can offer damage rolls
+      let resolvedCritFooter = critFooter;
+      if (isCritMiss && damageFormulas.primary) {
+          const df = damageFormulas.primary;
+          resolvedCritFooter = `<div class='critical-miss'` +
+              ` data-base-class='${this.system.baseClass}'` +
+              ` data-actor-id='${this.id}'` +
+              ` data-formula='${df.formula}'` +
+              ` data-debug-formula='${df.debugFormula}'` +
+              ` data-base-damage='${itemData.damage}'` +
+              ` data-damage-type='${itemData.dmgType}'` +
+              ` data-item-id='${item.id}'` +
+              ` data-item-uuid='${item.uuid}'` +
+              ` data-token-id='${attacker?.id ?? ""}'` +
+              ` data-source-type='${item.type}'` +
+              ` data-damage-groups='${JSON.stringify(df.damageGroups)}'></div>`;
       }
 
       // Render chat message
       const chatLabel = this._createChatLabel(this.img, itemName);
       const attackHeader = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
 
-      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Chat data:`, {chatLabel, attackHeader, critFooter});
-      await renderCustomChat(atkRoll, item, damageFormulas, this, attacker?.id, chatLabel, debugAtkRollFormula, attackHeader, critFooter, rollResponse.rollMode);
+      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Chat data:`, {chatLabel, attackHeader, resolvedCritFooter});
+      await renderCustomChat(atkRoll, item, damageFormulas, this, attacker?.id, chatLabel, debugAtkRollFormula, attackHeader, resolvedCritFooter, rollResponse.rollMode);
 
       // Return Roll Result
       return atkRoll;
