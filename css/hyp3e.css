@@ -1023,6 +1023,14 @@
   background: rgba(33, 150, 243, 0.1);
 }
 
+/* Drop position line indicator for item reordering */
+.hyp3e .items-list .item-entry.drop-before {
+  border-top: 2px solid var(--color-border-highlight, #2196f3);
+}
+.hyp3e .items-list .item-entry.drop-after {
+  border-bottom: 2px solid var(--color-border-highlight, #2196f3);
+}
+
 /* Indent contained items under their container */
 .hyp3e .items-list .item-entry .contained-items {
   padding-left: 10px;

@@ -1662,12 +1662,14 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         super._onDragOver(event)
 
         const li = event.target.closest("[data-item-id]");
+
+        // Clear all existing drag indicators
+        this.element.querySelectorAll(".drag-target, .drop-before, .drop-after")
+            .forEach(el => el.classList.remove("drag-target", "drop-before", "drop-after"));
+
         if (!li) return;
 
         const item = this.actor.items.get(li.dataset.itemId);
-
-        // Remove existing highlights
-        this.element.querySelectorAll(".drag-target").forEach(el => el.classList.remove("drag-target"));
 
         // Highlight valid containers
         if (item?.system.isContainer || item?.type === "container") {
@@ -1675,13 +1677,22 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             return;
         }
 
-        // Highlight valid stack-merge targets (same type, has quantity, not itself)
+        // Highlight valid stack-merge targets (same name and type, both have quantity, not itself)
         const draggedItem = this._draggedItemId ? this.actor.items.get(this._draggedItemId) : null;
         if (draggedItem && item && draggedItem.id !== item.id
             && draggedItem.type === item.type && draggedItem.name === item.name
             && draggedItem.system?.quantity?.value > 0
             && item.system?.quantity?.value > 0) {
             li.classList.add("drag-target");
+            return;
+        }
+
+        // Show drop-line indicator for reordering: top half = insert before, bottom half = insert after
+        const rect = li.getBoundingClientRect();
+        if (event.clientY < rect.top + rect.height / 2) {
+            li.classList.add("drop-before");
+        } else {
+            li.classList.add("drop-after");
         }
     }
 
