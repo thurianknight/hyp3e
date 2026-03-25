@@ -786,6 +786,22 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           }
         }
 
+        // Right-click context menu on item entries
+        new ContextMenu(this.element, ".item-entry", [
+            {
+                name: game.i18n.localize("HYP3E.item.splitStack"),
+                icon: '<i class="fas fa-scissors"></i>',
+                condition: (target) => {
+                    const item = this.actor.items.get($(target).data("itemId"));
+                    return item?.system?.quantity?.value > 1;
+                },
+                callback: (target) => {
+                    const itemId = $(target).data("itemId");
+                    Hyp3eActorSheetV2._splitItemStack.call(this, itemId);
+                }
+            }
+        ]);
+
         // Log render completion
         Hyp3eLogger.info("HYP3EActorSheetV2 _onRender", `Actor Sheet rendered.`, { context, options, sheet: this });
     }
@@ -1005,6 +1021,72 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 { _id: item.id, "system.quantity.value": item.system.quantity.value+1 },
             ]);
         }
+    }
+
+    /**
+     * Split an item stack into two separate stacks via a dialog.
+     * Called from the right-click context menu on any item with quantity > 1.
+     * @param {string} itemId - The ID of the item to split
+     * @private
+     */
+    static async _splitItemStack(itemId) {
+        const item = this.actor.items.get(itemId);
+        if (!item || item.system.quantity.value <= 1) return;
+
+        const maxSplit = item.system.quantity.value - 1;
+
+        const splitQty = await new Promise((resolve, reject) => {
+            new Dialog({
+                title: `${game.i18n.localize("HYP3E.item.splitStack")}: ${item.name}`,
+                content: `
+                    <form>
+                        <div class="form-group">
+                            <label>${game.i18n.format("HYP3E.item.splitStackPrompt", { max: maxSplit })}</label>
+                            <input type="number" name="splitQty" value="1" min="1" max="${maxSplit}" autofocus>
+                        </div>
+                    </form>`,
+                buttons: {
+                    split: {
+                        icon: '<i class="fas fa-scissors"></i>',
+                        label: game.i18n.localize("HYP3E.item.splitStack"),
+                        callback: (html) => resolve(parseInt(html.find('[name="splitQty"]').val()))
+                    },
+                    cancel: {
+                        icon: '<i class="fas fa-times"></i>',
+                        label: "Cancel",
+                        callback: () => reject()
+                    }
+                },
+                default: "split"
+            }).render(true);
+        }).catch(() => null);
+
+        if (!splitQty || splitQty < 1 || splitQty >= item.system.quantity.value) return;
+
+        Hyp3eLogger.info("HYP3EActorSheetV2 _splitItemStack", `Splitting ${splitQty} from stack of ${item.system.quantity.value} (${item.name})`);
+
+        // Find the sort value for the next item of the same type so the new stack
+        // lands directly below the original rather than at the end of the list.
+        const siblings = this.actor.items
+            .filter(i => i.type === item.type)
+            .sort((a, b) => (a.sort || 0) - (b.sort || 0));
+        const originalIndex = siblings.findIndex(i => i.id === item.id);
+        const nextItem = siblings[originalIndex + 1];
+        const newSort = nextItem
+            ? Math.round(((item.sort || 0) + (nextItem.sort || 0)) / 2)
+            : (item.sort || 0) + CONST.SORT_INTEGER_DENSITY;
+
+        // Reduce the original stack
+        await this.actor.updateEmbeddedDocuments("Item", [
+            { _id: item.id, "system.quantity.value": item.system.quantity.value - splitQty }
+        ]);
+
+        // Create a new stack with the split quantity, positioned directly below the original
+        const newItemData = item.toObject();
+        delete newItemData._id;
+        newItemData.sort = newSort;
+        newItemData.system.quantity.value = splitQty;
+        await this.actor.createEmbeddedDocuments("Item", [newItemData]);
     }
 
     static async _sortItemsAz(event, target) {
