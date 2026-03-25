@@ -1637,8 +1637,9 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                                 });
         }
 
-        // Special case 4: item dragged onto another item of the same type with quantity -> combine stacks
+        // Special case 4: item dragged onto another item with the same name and type -> combine stacks
         if (targetItem && dragged.id !== targetItem.id && dragged.type === targetItem.type
+            && dragged.name === targetItem.name
             && dragged.system?.quantity?.value > 0 && targetItem.system?.quantity?.value > 0) {
             const combined = targetItem.system.quantity.value + dragged.system.quantity.value;
             await targetItem.update({ "system.quantity.value": combined });
@@ -1677,7 +1678,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Highlight valid stack-merge targets (same type, has quantity, not itself)
         const draggedItem = this._draggedItemId ? this.actor.items.get(this._draggedItemId) : null;
         if (draggedItem && item && draggedItem.id !== item.id
-            && draggedItem.type === item.type
+            && draggedItem.type === item.type && draggedItem.name === item.name
             && draggedItem.system?.quantity?.value > 0
             && item.system?.quantity?.value > 0) {
             li.classList.add("drag-target");
