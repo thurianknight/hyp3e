@@ -1640,7 +1640,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Special case 4: item dragged onto another item with the same name and type -> combine stacks
         if (targetItem && dragged.id !== targetItem.id && dragged.type === targetItem.type
             && dragged.name === targetItem.name
-            && dragged.system?.quantity?.value > 0 && targetItem.system?.quantity?.value > 0) {
+            && dragged.system?.quantity !== undefined && targetItem.system?.quantity !== undefined) {
             const combined = targetItem.system.quantity.value + dragged.system.quantity.value;
             await targetItem.update({ "system.quantity.value": combined });
             await this.actor.deleteEmbeddedDocuments("Item", [dragged.id]);
@@ -1677,12 +1677,12 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             return;
         }
 
-        // Highlight valid stack-merge targets (same name and type, both have quantity, not itself)
+        // Highlight valid stack-merge targets (same name and type, not itself)
         const draggedItem = this._draggedItemId ? this.actor.items.get(this._draggedItemId) : null;
         if (draggedItem && item && draggedItem.id !== item.id
             && draggedItem.type === item.type && draggedItem.name === item.name
-            && draggedItem.system?.quantity?.value > 0
-            && item.system?.quantity?.value > 0) {
+            && draggedItem.system?.quantity !== undefined
+            && item.system?.quantity !== undefined) {
             li.classList.add("drag-target");
             return;
         }
