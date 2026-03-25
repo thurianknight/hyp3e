@@ -1593,7 +1593,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       return super._onDropItem(event, item)
     }
 
-    _onSortItem(event, item) {
+    async _onSortItem(event, item) {
         // Hyp3eLogger.info("HYP3EActorSheetV2 _onSortItem", `Item sort event:`, { event, item })
 
         const target = event.target.closest("[data-item-id]");
@@ -1637,8 +1637,23 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                                 });
         }
 
+        // Special case 4: item dragged onto another item of the same type with quantity -> combine stacks
+        if (targetItem && dragged.id !== targetItem.id && dragged.type === targetItem.type
+            && dragged.system?.quantity?.value > 0 && targetItem.system?.quantity?.value > 0) {
+            const combined = targetItem.system.quantity.value + dragged.system.quantity.value;
+            await targetItem.update({ "system.quantity.value": combined });
+            await this.actor.deleteEmbeddedDocuments("Item", [dragged.id]);
+            return;
+        }
+
         // Default: fall back to built-in sorting
         return super._onSortItem(event, item)
+    }
+
+    _onDragStart(event) {
+        super._onDragStart(event);
+        const li = event.currentTarget.closest("[data-item-id]");
+        this._draggedItemId = li?.dataset.itemId ?? null;
     }
 
     _onDragOver(event) {
@@ -1653,8 +1668,18 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Remove existing highlights
         this.element.querySelectorAll(".drag-target").forEach(el => el.classList.remove("drag-target"));
 
-        // Highlight only valid containers
+        // Highlight valid containers
         if (item?.system.isContainer || item?.type === "container") {
+            li.classList.add("drag-target");
+            return;
+        }
+
+        // Highlight valid stack-merge targets (same type, has quantity, not itself)
+        const draggedItem = this._draggedItemId ? this.actor.items.get(this._draggedItemId) : null;
+        if (draggedItem && item && draggedItem.id !== item.id
+            && draggedItem.type === item.type
+            && draggedItem.system?.quantity?.value > 0
+            && item.system?.quantity?.value > 0) {
             li.classList.add("drag-target");
         }
     }
