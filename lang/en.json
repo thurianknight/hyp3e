@@ -385,6 +385,8 @@
             "add": "Add Item",
             "edit": "Edit",
             "delete": "Delete",
+            "splitStack": "Split Stack",
+            "splitStackPrompt": "Split off how many? (max {max})",
             "show": "Show",
             "equip": "Toggle Equip/Unequip",
             "equipped": "Equipped",

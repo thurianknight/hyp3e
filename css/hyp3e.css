@@ -1017,6 +1017,20 @@
   background: rgba(255, 204, 0, 0.1);
 }
 
+/* Highlight item stack merge target on drag-over */
+.hyp3e .items-list .item-entry.drag-target {
+  outline: 2px dotted var(--color-border-highlight, #2196f3);
+  background: rgba(33, 150, 243, 0.1);
+}
+
+/* Drop position line indicator for item reordering */
+.hyp3e .items-list .item-entry.drop-before {
+  border-top: 2px solid var(--color-border-highlight, #2196f3);
+}
+.hyp3e .items-list .item-entry.drop-after {
+  border-bottom: 2px solid var(--color-border-highlight, #2196f3);
+}
+
 /* Indent contained items under their container */
 .hyp3e .items-list .item-entry .contained-items {
   padding-left: 10px;
