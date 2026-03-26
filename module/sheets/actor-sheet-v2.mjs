@@ -1035,31 +1035,36 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
         const maxSplit = item.system.quantity.value - 1;
 
-        const splitQty = await new Promise((resolve, reject) => {
-            new Dialog({
-                title: `${game.i18n.localize("HYP3E.item.splitStack")}: ${item.name}`,
-                content: `
-                    <form>
-                        <div class="form-group">
-                            <label>${game.i18n.format("HYP3E.item.splitStackPrompt", { max: maxSplit })}</label>
-                            <input type="number" name="splitQty" value="1" min="1" max="${maxSplit}" autofocus>
-                        </div>
-                    </form>`,
-                buttons: {
-                    split: {
-                        icon: '<i class="fas fa-scissors"></i>',
-                        label: game.i18n.localize("HYP3E.item.splitStack"),
-                        callback: (html) => resolve(parseInt(html.find('[name="splitQty"]').val()))
+        let splitQty;
+        if (item.system.quantity.value === 2) {
+            splitQty = 1;
+        } else {
+            splitQty = await new Promise((resolve, reject) => {
+                new Dialog({
+                    title: `${game.i18n.localize("HYP3E.item.splitStack")}: ${item.name}`,
+                    content: `
+                        <form>
+                            <div class="form-group">
+                                <label>${game.i18n.format("HYP3E.item.splitStackPrompt", { max: maxSplit })}</label>
+                                <input type="number" name="splitQty" value="1" min="1" max="${maxSplit}" autofocus>
+                            </div>
+                        </form>`,
+                    buttons: {
+                        split: {
+                            icon: '<i class="fas fa-scissors"></i>',
+                            label: game.i18n.localize("HYP3E.item.splitStack"),
+                            callback: (html) => resolve(parseInt(html.find('[name="splitQty"]').val()))
+                        },
+                        cancel: {
+                            icon: '<i class="fas fa-times"></i>',
+                            label: "Cancel",
+                            callback: () => reject()
+                        }
                     },
-                    cancel: {
-                        icon: '<i class="fas fa-times"></i>',
-                        label: "Cancel",
-                        callback: () => reject()
-                    }
-                },
-                default: "split"
-            }).render(true);
-        }).catch(() => null);
+                    default: "split"
+                }).render(true);
+            }).catch(() => null);
+        }
 
         if (!splitQty || splitQty < 1 || splitQty >= item.system.quantity.value) return;
 
