@@ -436,7 +436,7 @@ async function rollCritHitWithDamage(charType, actorId, formula, debugDmgRollFor
       formulaAppend = `${baseDmgFormula} + ${baseDmgFormula}`;
     }
   }
-  Hyp3eLogger.info("rollCritHitWithDamage", `Rolling critical hit damage. Base formula: ${formula}, formula to append: ${formulaAppend}, damageGroups: ${JSON.stringify(damageGroups)}`);
+  // Hyp3eLogger.info("rollCritHitWithDamage", `Rolling critical hit damage. Base formula: ${formula}, formula to append: ${formulaAppend}, damageGroups: ${JSON.stringify(damageGroups)}`);
 
   const baseClassLabel = charType === "npc" ? "NPC" : charType.charAt(0).toUpperCase() + charType.substring(1);
   const title = `${baseClassLabel} Critical Hit: ${critLabel}`;
@@ -447,7 +447,7 @@ async function rollCritHitWithDamage(charType, actorId, formula, debugDmgRollFor
   // Update debugDmgRollFormula html to reflect the new formula with crit damage included, for use in the roll tooltip
   const debugDmgRollFormulaWithCrit = debugDmgRollFormula ? debugDmgRollFormula.replace(baseDmgFormula, `(${baseDmgFormula} + ${formulaAppend})`) : null;
 
-  Hyp3eLogger.info("rollCritHitWithDamage", `Debug damage html: ${debugDmgRollFormulaWithCrit}`);
+  // Hyp3eLogger.info("rollCritHitWithDamage", `Debug damage html: ${debugDmgRollFormulaWithCrit}`);
   Hyp3eLogger.info("rollCritHitWithDamage", `Rolling critical hit damage with adjusted formula. Base formula: ${formula}, formula to append: ${formulaAppend}, adjusted formula: ${adjFormula}, original damageGroups: ${JSON.stringify(damageGroups)}, adjusted damageGroups: ${JSON.stringify(adjDamageGroups)}`);
   await rollDmgButton(
     adjFormula, debugDmgRollFormulaWithCrit, baseDmgFormula, damageType,
@@ -471,7 +471,7 @@ async function rollCritHitWithDamage(charType, actorId, formula, debugDmgRollFor
 function insertCritDamageDice(formula, formulaAppend, damageGroups) {
   if (!formula || !formulaAppend) return formula || "";
 
-  Hyp3eLogger.info("insertCritDamageDice", `Inserting crit damage dice into formula. Base formula: ${formula}, formula to append: ${formulaAppend}, damageGroups: ${JSON.stringify(damageGroups)}`);
+  // Hyp3eLogger.info("insertCritDamageDice", `Inserting crit damage dice into formula. Base formula: ${formula}, formula to append: ${formulaAppend}, damageGroups: ${JSON.stringify(damageGroups)}`);
 
   // Get the number of dice in the formulaAppend string, split on "+"
   const numDice = formulaAppend.split("+").length;
@@ -479,7 +479,8 @@ function insertCritDamageDice(formula, formulaAppend, damageGroups) {
   // Update the damageGroups array objects to reflect the additional dice being added by the crit
   let adjDamageGroups = null;
   if (damageGroups) {
-    adjDamageGroups = [...damageGroups]; // make a copy of the damageGroups array to avoid mutating the original
+    // Copy the damageGroups array to avoid mutating the original
+    adjDamageGroups = damageGroups.map(group => ({ ...group }));
     for (let i = 0; i < adjDamageGroups.length; i++) {
       // Each element is an object, so we update just the property we care about
       if (i == 0) {
@@ -491,7 +492,6 @@ function insertCritDamageDice(formula, formulaAppend, damageGroups) {
       }
     }
   }
-  Hyp3eLogger.info("insertCritDamageDice", `Updated damageGroups after crit insertion: ${JSON.stringify(adjDamageGroups)}`);
 
   // Split the base formula on pluses or minuses, and retain the signs
   const parts = formula.split(/([+-])/);
@@ -499,6 +499,8 @@ function insertCritDamageDice(formula, formulaAppend, damageGroups) {
   // Insert formulaAppend after the base damage dice (which is the first part)
   parts[0] = `${parts[0]} + ${formulaAppend}`;
   const adjFormula = parts.join("");
+  // Hyp3eLogger.info("insertCritDamageDice", `Result → Formula: ${adjFormula}, damageGroups: ${JSON.stringify(adjDamageGroups)}`);
+
   return { adjFormula: adjFormula, adjDamageGroups: adjDamageGroups };
 }
 
