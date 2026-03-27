@@ -356,6 +356,11 @@ Hooks.once("ready", async function() {
   CONFIG.HYP3E.enableEncumbrance = enableEncumbrance;
   Hyp3eLogger.info("Init", "CONFIG Enable encumbrance calculations applied to characters:", CONFIG.HYP3E.enableEncumbrance);
   
+  // Enable coin weight (100 coins = 1 lb)
+  const enableCoinWeight = game.settings.get(game.system.id, "enableCoinWeight");
+  CONFIG.HYP3E.enableCoinWeight = enableCoinWeight;
+  Hyp3eLogger.info("Init", "CONFIG Enable coin weight:", CONFIG.HYP3E.enableCoinWeight);
+
   // GM-defined strength multiplier for encumbered status
   const encumbered = game.settings.get(game.system.id, "encumbered");
   CONFIG.HYP3E.encumbered = encumbered;

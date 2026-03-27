@@ -120,6 +120,14 @@
 
                 <fieldset>
                     <div class="form-group config-item">
+                        <label class="option-label">{{localize "HYP3E.settings.enableCoinWeight"}}</label>
+                        <input type="checkbox" name="enableCoinWeight" {{checked settings.enableCoinWeight}} />
+                    </div>
+                    <div class="form-group">
+                        <p class="option-hint">{{localize "HYP3E.settings.enableCoinWeightHint"}}</p>
+                    </div>
+
+                    <div class="form-group config-item">
                         <label class="option-label">{{localize "HYP3E.settings.encumberedLabel"}}</label>
                         <input type="number" name="encumbered" value="{{settings.encumbered}}" />
                     </div>

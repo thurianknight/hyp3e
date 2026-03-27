@@ -604,6 +604,7 @@ export class Hyp3eActor extends Actor {
    */
   _calcWeightCarried() {
     let carriedWt = 0;
+    // Start with carried/equipped items. We ignore weight of non-equipped items since they are not being carried.
     for (let item of this.items) {
       // Calculate total weight carried by the character. For weapons & armor, the equipped
       //  status is ignored and the item weight is always added to encumbrance.
@@ -631,6 +632,15 @@ export class Hyp3eActor extends Actor {
         }
       }
     }
+    // If enabled, add coin weight (100 coins = 1 lb)
+    if (CONFIG.HYP3E.enableCoinWeight) {
+      for (const [coinType, coinData] of Object.entries(this.system.money)) {
+        if (coinData.value) {
+          carriedWt += coinData.value / 100;
+        }
+      }
+    }
+
     // Round to one decimal place
     carriedWt = Math.round(carriedWt * 10)/10;
 

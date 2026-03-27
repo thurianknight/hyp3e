@@ -49,6 +49,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             enforceWeaponEquipRules: game.settings.get(game.system.id, "enforceWeaponEquipRules"),
             flipRollUnderMods: game.settings.get(game.system.id, "flipRollUnderMods"),
             enableEncumbrance: game.settings.get(game.system.id, "enableEncumbrance"),
+            enableCoinWeight: game.settings.get(game.system.id, "enableCoinWeight"),
             encumbered: game.settings.get(game.system.id, "encumbered"),
             heavilyEncumbered: game.settings.get(game.system.id, "heavilyEncumbered"),
             // Rules Options - Combat

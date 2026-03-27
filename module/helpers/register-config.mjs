@@ -256,6 +256,19 @@ export function registerHyp3eConfigurations() {
             CONFIG.HYP3E.enableEncumbrance = value;
         }
     });
+    // Enable coin weight (100 coins = 1 lb)
+    game.settings.register(game.system.id, "enableCoinWeight", {
+        name: game.i18n.localize("HYP3E.settings.enableCoinWeight"),
+        hint: game.i18n.localize("HYP3E.settings.enableCoinWeightHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: showConfigOptions,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.enableCoinWeight = value;
+        }
+    });
     // GM-defined strength multiplier for encumbered status
     game.settings.register(game.system.id, "encumbered", {
         name: game.i18n.localize("HYP3E.settings.encumberedLabel"),
