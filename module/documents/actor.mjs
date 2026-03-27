@@ -632,6 +632,7 @@ export class Hyp3eActor extends Actor {
         }
       }
     }
+
     // If enabled, add coin weight (100 coins = 1 lb)
     if (CONFIG.HYP3E.enableCoinWeight) {
       for (const [coinType, coinData] of Object.entries(this.system.money)) {
