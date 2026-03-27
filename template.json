@@ -246,21 +246,21 @@
     "treasure": {
       "templates": ["base"],
       "money" : {
-      "cp": {
-        "value": 0
-      },
-      "sp": {
-        "value": 0
-      },
-      "ep": {
-        "value": 0
-      },
-      "gp": {
-        "value": 0
-      },
-      "pp": {
-        "value": 0
-      }
+        "cp": {
+          "value": 0
+        },
+        "sp": {
+          "value": 0
+        },
+        "ep": {
+          "value": 0
+        },
+        "gp": {
+          "value": 0
+        },
+        "pp": {
+          "value": 0
+        }
       }
     },
     "itemToken": {
