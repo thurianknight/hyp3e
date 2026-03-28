@@ -9,7 +9,8 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
     // NPC template
     schema.attributes = new fields.SchemaField({
       dex: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 10 })
+        value: new fields.NumberField({ initial: 10 }),
+        curr: new fields.NumberField({ initial: 10 }),
       })
     });
     schema.size = new fields.StringField({ blank: true });

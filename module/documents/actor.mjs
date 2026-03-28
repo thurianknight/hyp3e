@@ -58,7 +58,7 @@ export class Hyp3eActor extends Actor {
         // Convert the original value to a number if necessary
         attr.value = Number(attr.value);
         // If no effect touched curr, derive it from base value
-        if (attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
+        if (!attr.curr || attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
       }
 
       // Log the prepared data

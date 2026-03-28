@@ -1,5 +1,7 @@
 // module/data/actor/base.mjs
 import { SystemDataModel } from "../_utils.mjs";   // see utils below
+import { Hyp3eLogger } from "../../helpers/logger.mjs";
+
 
 export default class Hyp3eActorBase extends SystemDataModel {
   static defineSchema() {
@@ -44,12 +46,30 @@ export default class Hyp3eActorBase extends SystemDataModel {
       }),
 
       saves: new fields.SchemaField({
-        base:         new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
-        death:        new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
-        device:       new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
-        transformation: new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
-        avoidance:    new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
-        sorcery:      new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) })
+        base:         new fields.SchemaField({ 
+          value: new fields.NumberField({ integer: true, initial:0 }), 
+          curr: new fields.NumberField({ integer: true, initial: 0 })
+        }),
+        death:        new fields.SchemaField({ 
+          value: new fields.NumberField({ integer: true, initial:0 }), 
+          curr: new fields.NumberField({ integer: true, initial: 0 })
+        }),
+        device:       new fields.SchemaField({ 
+          value: new fields.NumberField({ integer: true, initial:0 }), 
+          curr: new fields.NumberField({ integer: true, initial: 0 })
+        }),
+        transformation: new fields.SchemaField({ 
+          value: new fields.NumberField({ integer: true, initial:0 }), 
+          curr: new fields.NumberField({ integer: true, initial: 0 })
+        }),
+        avoidance:    new fields.SchemaField({ 
+          value: new fields.NumberField({ integer: true, initial:0 }), 
+          curr: new fields.NumberField({ integer: true, initial: 0 })
+        }),
+        sorcery:      new fields.SchemaField({ 
+          value: new fields.NumberField({ integer: true, initial:0 }), 
+          curr: new fields.NumberField({ integer: true, initial: 0 })
+        })
       }),
 
       movement: new fields.SchemaField({
@@ -72,5 +92,46 @@ export default class Hyp3eActorBase extends SystemDataModel {
       resistances: new fields.ObjectField({ initial: {} }),           // flexible object
       tempModifiers: new fields.ArrayField(new fields.ObjectField(), { initial: [] })
     };
+  }
+
+  /** 
+   * Runs BEFORE Active Effects are applied.
+   * Used for calculating base "curr" values that AEs can then modify.
+   */
+  prepareBaseData() {
+    super.prepareBaseData?.();
+
+    const attributes = this.attributes;   // 'this' here is the system data model
+
+    // Example: add .curr to each attribute (adjust the formula to match your old prepareCharacterData logic)
+    for (const [k, attr] of Object.entries(attributes)) {
+      // If no effect touched curr, derive it from base value
+      attr.curr = attr.value;
+    }
+
+    // Base/current FA, CA, TA
+    this.fa = this?.fightingAbility.value ? this.fightingAbility.value : (this.fa ?? 0);
+    this.ca = (this?.castingAbility.value || this?.castingAbility.value === null) ? this.castingAbility.value : (this.ca ?? null);
+    this.ta = (this?.turningAbility.value || this?.turningAbility.value === null) ? this.turningAbility.value : (this.ta ?? null);
+
+    // Base/current saving throws
+    const saves = this.saves;
+    for (const save of Object.values(saves)) {
+      save.curr = save.value ?? 0;
+    }
+  }
+
+  /** 
+   * Runs AFTER Active Effects.
+   * Use this for final totals, clamping, or anything that depends on post-AE values.
+   */
+  prepareDerivedData() {
+    super.prepareDerivedData?.();
+
+    // Example: clamp HP after any AE modifications to max
+    // if (this.hp?.value != null && this.hp?.max != null) {
+    //   this.hp.value = Math.min(this.hp.value, this.hp.max);
+    // }
+
   }
 }

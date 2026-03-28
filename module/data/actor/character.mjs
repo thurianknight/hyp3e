@@ -1,5 +1,6 @@
 // module/data/actor/character.mjs
 import Hyp3eActorBase from "./base.mjs";
+import { Hyp3eLogger } from "../../helpers/logger.mjs";
 
 export default class Hyp3eCharacter extends Hyp3eActorBase {
   static defineSchema() {
@@ -30,6 +31,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     schema.attributes = new fields.SchemaField({
       str: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
+        curr: new fields.NumberField({ integer: true, initial: 10 }),
         atkMod: new fields.NumberField({ integer: true, initial: 0 }),
         dmgMod: new fields.NumberField({ integer: true, initial: 0 }),
         test: new fields.NumberField({ integer: true, initial: 0 }),
@@ -37,6 +39,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       }),
       dex: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
+        curr: new fields.NumberField({ integer: true, initial: 10 }),
         atkMod: new fields.NumberField({ integer: true, initial: 0 }),
         defMod: new fields.NumberField({ integer: true, initial: 0 }),
         test: new fields.NumberField({ integer: true, initial: 0 }),
@@ -44,6 +47,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       }),
       con: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
+        curr: new fields.NumberField({ integer: true, initial: 10 }),
         hpMod: new fields.NumberField({ integer: true, initial: 0 }),
         poisRadMod: new fields.NumberField({ integer: true, initial: 0 }),
         traumaSurvive: new fields.NumberField({ integer: true, initial: 0 }),
@@ -52,6 +56,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       }),
       int: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
+        curr: new fields.NumberField({ integer: true, initial: 10 }),
         languages: new fields.NumberField({ integer: true, initial: 0 }),
         bonusSpells: new fields.SchemaField({
           lvl1: new fields.BooleanField({ initial: false }),
@@ -63,6 +68,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       }),
       wis: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
+        curr: new fields.NumberField({ integer: true, initial: 10 }),
         willMod: new fields.NumberField({ integer: true, initial: 0 }),
         bonusSpells: new fields.SchemaField({
           lvl1: new fields.BooleanField({ initial: false }),
@@ -74,6 +80,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       }),
       cha: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
+        curr: new fields.NumberField({ integer: true, initial: 10 }),
         reaction: new fields.NumberField({ integer: true, initial: 0 }),
         maxHenchmen: new fields.NumberField({ integer: true, initial: 0 }),
         turnUndead: new fields.NumberField({ integer: true, initial: 0 })
@@ -122,6 +129,52 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
 
     schema.treasure = new fields.StringField({ blank: true });
 
+    schema.taskResolution = new fields.SchemaField({
+      simple: new fields.SchemaField({
+        name: new fields.StringField({ initial: "HYP3E.taskResolution.simple.name" }),
+        hint: new fields.StringField({ initial: "HYP3E.taskResolution.simple.hint" }),
+        tn: new fields.NumberField({ integer: true, initial: 5 })
+      }),
+      moderate: new fields.SchemaField({
+        name: new fields.StringField({ initial: "HYP3E.taskResolution.moderate.name" }),
+        hint: new fields.StringField({ initial: "HYP3E.taskResolution.moderate.hint" }),
+        tn: new fields.NumberField({ integer: true, initial: 4 })
+      }),
+      "challenging": new fields.SchemaField({
+        name: new fields.StringField({ initial: "HYP3E.taskResolution.challenging.name" }),
+        hint: new fields.StringField({ initial: "HYP3E.taskResolution.challenging.hint" }),
+        tn: new fields.NumberField({ integer: true, initial: 3 })
+      }),
+      "difficult": new fields.SchemaField({
+        name: new fields.StringField({ initial: "HYP3E.taskResolution.difficult.name" }),
+        hint: new fields.StringField({ initial: "HYP3E.taskResolution.difficult.hint" }),
+        tn: new fields.NumberField({ integer: true, initial: 2 })
+      }),
+      "veryDifficult": new fields.SchemaField({
+        name: new fields.StringField({ initial: "HYP3E.taskResolution.veryDifficult.name" }),
+        hint: new fields.StringField({ initial: "HYP3E.taskResolution.veryDifficult.hint" }),
+        tn: new fields.NumberField({ integer: true, initial: 1 })
+      })
+    });
+  
     return schema;
+  }
+
+  /** 
+   * Runs BEFORE Active Effects are applied.
+   * Used for calculating base "curr" values that AEs can then modify.
+   */
+  prepareBaseData() {
+    super.prepareBaseData?.();
+
+  }
+  
+  /** 
+   * Runs AFTER Active Effects.
+   * Use this for final totals, clamping, or anything that depends on post-AE values.
+   */
+  prepareDerivedData() {
+    super.prepareDerivedData?.();
+
   }
 }

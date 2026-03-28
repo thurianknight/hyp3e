@@ -58,9 +58,18 @@ Hooks.once('init', async function() {
   // Disable legacy effect transferral
   CONFIG.ActiveEffect.legacyTransferral = false;
 
+  // Register our Hyperborea system configuration options
+  registerHyp3eConfigurations();
+
+  // Build a list of custom status effects and add to the CONFIG.statusEffects array
+  pushCustomStatusEffects();
+
+  // Add custom constants for configuration
+  CONFIG.HYP3E = HYP3E;
+
   // Register data models for Actors and Items. This replaces the "template.json" system.
   // Actors
-  /**
+  //**
   CONFIG.Actor.dataModels.character = HYP3E_DATA_MODELS.Hyp3eCharacter;
   CONFIG.Actor.dataModels.npc       = HYP3E_DATA_MODELS.Hyp3eNPC;
   CONFIG.Actor.dataModels.merchant  = HYP3E_DATA_MODELS.Hyp3eMerchant;
@@ -78,16 +87,7 @@ Hooks.once('init', async function() {
   CONFIG.Item.dataModels.effectTemplate = HYP3E_DATA_MODELS.Hyp3eEffectTemplate;
 
   console.log("Hyperborea | DataModels registered");
-  */
-
-  // Register our Hyperborea system configuration options
-  registerHyp3eConfigurations();
-
-  // Build a list of custom status effects and add to the CONFIG.statusEffects array
-  pushCustomStatusEffects();
-
-  // Add custom constants for configuration
-  CONFIG.HYP3E = HYP3E;
+  //*/
 
   // Set chat font size from Hyp3e config
   applyChatFontSizeSetting();

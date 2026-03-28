@@ -1,15 +1,15 @@
 import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eCharacter } from "../helpers/character.mjs";
 import { parseGpValue, 
-            buyFromMerchant,
-            sellToMerchant,
-            transferFromActor,
-            transferCoinFromActor } from "../helpers/money.mjs";
+          buyFromMerchant,
+          sellToMerchant,
+          transferFromActor,
+          transferCoinFromActor } from "../helpers/money.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { enableAllTransferrableItemEffectsToItemOwner, 
-            disableAllTransferrableItemEffectsOnItemOwner, 
-            onManageActiveEffectV2, 
-            prepareActiveEffectCategories } from "../helpers/effects.mjs";
+          disableAllTransferrableItemEffectsOnItemOwner, 
+          onManageActiveEffectV2, 
+          prepareActiveEffectCategories } from "../helpers/effects.mjs";
 import { sendSimpleChat } from "../chat/chat.mjs"
 import HYP3EActorSetLanguages from "../apps/character-set-languages.mjs";
 
@@ -22,421 +22,421 @@ const { ActorSheetV2 } = foundry.applications.sheets
  */
 export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) {
 
-    static LANGUAGES_APP = new HYP3EActorSetLanguages();
+  static LANGUAGES_APP = new HYP3EActorSetLanguages();
 
-    // ===========================================================================
-    // ITEM SHEET SETUP
-    // ===========================================================================
+  // ===========================================================================
+  // ITEM SHEET SETUP
+  // ===========================================================================
 
-    get title() {
-        const typeLabel = game.i18n.localize(`TYPES.actor.${this.actor.type}`);
-        return `${typeLabel}: ${this.actor.name}`;
+  get title() {
+    const typeLabel = game.i18n.localize(`TYPES.actor.${this.actor.type}`);
+    return `${typeLabel}: ${this.actor.name}`;
+  }
+
+  static get themes() {
+    // Set Foundry's system Light and Dark themes
+    const globalThemes = {
+      light: "Light",
+      dark: "Dark",
+    };
+
+    const customThemes = {
+      warlord: "Warlord",
+      cryomancer: "Cryomancer",
+      necromancer: "Necromancer",
+      pyromancer: "Pyromancer",
+      beastmaster: "Beastmaster",
+      shadowmaster: "Shadowmaster",
+    };
+
+    // Merge and log for verification
+    const allThemes = { ...globalThemes, ...customThemes };
+    // Hyp3eLogger.info("HYP3EActorSheetV2 get themes", "Available themes:", allThemes);
+    return allThemes;
+  }
+
+  /** @override */
+  static DEFAULT_OPTIONS = {
+    classes: ["hyp3e", "actor"],
+    position: {
+      width: 810,
+      height: 700,
+    },
+    form: {
+      submitOnChange: true
+    },
+    window: {
+      icon: "fas fa-book",
+      resizable: true,
+    },
+    actions: {
+      // These actions are shared on multiple tabs
+      rollThis: Hyp3eActorSheetV2._onRoll,
+      sortAz: Hyp3eActorSheetV2._sortItemsAz,
+      createItem: Hyp3eActorSheetV2._onItemCreate,
+      dropItemDescription: Hyp3eActorSheetV2._toggleItemSummary,
+      toggleItemEquip: Hyp3eActorSheetV2._toggleItemEquip,
+      displayItem: Hyp3eActorSheetV2._displayItemInChat,
+      editItem: Hyp3eActorSheetV2._editItem,
+      deleteItem: Hyp3eActorSheetV2._deleteItem,
+      // Actions on the sheet header
+      editImage: Hyp3eActorSheetV2._onEditImage,
+      setNpcType: Hyp3eActorSheetV2._setNpcType,
+      quickCreate: Hyp3eActorSheetV2._onQuickCreate,
+      levelUp: Hyp3eActorSheetV2._onLevelUp,
+      setLanguages: Hyp3eActorSheetV2._openLanguagesApp,
+      // Actions on the Abilities tab
+      setAttributeMods: Hyp3eActorSheetV2._onSetAttributeMods,
+      updateBonusSpell: Hyp3eActorSheetV2._updateBonusSpell,
+      // Actions on the Combat tab
+      itemToggleLight: Hyp3eActorSheetV2._itemToggleLight,
+      itemCastSpell: Hyp3eActorSheetV2._itemCastSpell,
+      itemQtySub: Hyp3eActorSheetV2._decrementItemQty,
+      itemQtyAdd: Hyp3eActorSheetV2._incrementItemQty,
+      // Actions on the Effects tab
+      createEffect: Hyp3eActorSheetV2._onManageActiveEffect,
+      editEffect: Hyp3eActorSheetV2._onManageActiveEffect,
+      deleteEffect: Hyp3eActorSheetV2._onManageActiveEffect,
+      toggleEffect: Hyp3eActorSheetV2._onManageActiveEffect,
+    },
+  }
+
+  // static TABS = {
+  //     primary: {
+  //         tabs: [
+  //             { id: 'abilities' },
+  //             { id: 'description' },
+  //             { id: 'effects' }
+  //         ],
+  //         labelPrefix: 'HYP3E.tabs',
+  //         initial: 'abilities'
+  //     }
+  // }
+  // Start with an empty tabs array, and during _getTabsConfig we customize for each actor type
+  static TABS = {
+    primary: {
+      tabs: [],
+      labelPrefix: 'HYP3E.tabs',
+      initial: 'abilities'
     }
+  }
 
-    static get themes() {
-        // Set Foundry's system Light and Dark themes
-        const globalThemes = {
-            light: "Light",
-            dark: "Dark",
-        };
+  static PARTS = {
+    header: {
+      template: `${HYP3E.templatePath}/actor/actor-main-sheet-v2.hbs`,
+    },
+    tabs: {
+      // Foundry-provided generic template
+      template: 'templates/generic/tab-navigation.hbs',
+    },
+    abilities: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-actor-abilities.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    // Combat, Spells, and Items are only used by Characters. We use conditional rendering
+    //  in the handlebars templates, so these three will not appear on the NPC sheet.
+    combat: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-character-combat.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    spells: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-character-spells.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    items: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-character-items.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    // All PCs and NPCs gets Description, same as Abilities, above.
+    description: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-actor-description.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    // We load Effects last so that any active effects from items are already applied
+    effects: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-actor-effects.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    // Merchants get equipment and fighting gear, and none of the prior tabs
+    equipment: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-merchant-equipment.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    fightingGear: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-merchant-fighting-gear.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    // Treasure hoards get one combined list of all items
+    treasureAll: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-treasure-all-items.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    // Item tokens get NPC-styled abilities and description tabs
+    itemTokenAbilities: {
+      template: `${HYP3E.templatePath}/actor/parts/tab-itemToken-abilities.hbs`,
+      scrollable: ["", ".tab"],
+    },
+    // itemTokenDescription: {
+    //     template: `${HYP3E.templatePath}/actor/parts/tab-itemToken-description.hbs`,
+    //     scrollable: ["", ".tab"],
+    // },
+  }
 
-        const customThemes = {
-            warlord: "Warlord",
-            cryomancer: "Cryomancer",
-            necromancer: "Necromancer",
-            pyromancer: "Pyromancer",
-            beastmaster: "Beastmaster",
-            shadowmaster: "Shadowmaster",
-        };
-
-        // Merge and log for verification
-        const allThemes = { ...globalThemes, ...customThemes };
-        Hyp3eLogger.info("HYP3EActorSheetV2 get themes", "Available themes:", allThemes);
-        return allThemes;
-    }
-
-    /** @override */
-    static DEFAULT_OPTIONS = {
-        classes: ["hyp3e", "actor"],
-        position: {
-            width: 810,
-            height: 700,
-        },
-        form: {
-            submitOnChange: true
-        },
-        window: {
-            icon: "fas fa-book",
-            resizable: true,
-        },
-        actions: {
-            // These actions are shared on multiple tabs
-            rollThis: Hyp3eActorSheetV2._onRoll,
-            sortAz: Hyp3eActorSheetV2._sortItemsAz,
-            createItem: Hyp3eActorSheetV2._onItemCreate,
-            dropItemDescription: Hyp3eActorSheetV2._toggleItemSummary,
-            toggleItemEquip: Hyp3eActorSheetV2._toggleItemEquip,
-            displayItem: Hyp3eActorSheetV2._displayItemInChat,
-            editItem: Hyp3eActorSheetV2._editItem,
-            deleteItem: Hyp3eActorSheetV2._deleteItem,
-            // Actions on the sheet header
-            editImage: Hyp3eActorSheetV2._onEditImage,
-            setNpcType: Hyp3eActorSheetV2._setNpcType,
-            quickCreate: Hyp3eActorSheetV2._onQuickCreate,
-            levelUp: Hyp3eActorSheetV2._onLevelUp,
-            setLanguages: Hyp3eActorSheetV2._openLanguagesApp,
-            // Actions on the Abilities tab
-            setAttributeMods: Hyp3eActorSheetV2._onSetAttributeMods,
-            updateBonusSpell: Hyp3eActorSheetV2._updateBonusSpell,
-            // Actions on the Combat tab
-            itemToggleLight: Hyp3eActorSheetV2._itemToggleLight,
-            itemCastSpell: Hyp3eActorSheetV2._itemCastSpell,
-            itemQtySub: Hyp3eActorSheetV2._decrementItemQty,
-            itemQtyAdd: Hyp3eActorSheetV2._incrementItemQty,
-            // Actions on the Effects tab
-            createEffect: Hyp3eActorSheetV2._onManageActiveEffect,
-            editEffect: Hyp3eActorSheetV2._onManageActiveEffect,
-            deleteEffect: Hyp3eActorSheetV2._onManageActiveEffect,
-            toggleEffect: Hyp3eActorSheetV2._onManageActiveEffect,
-        },
-    }
-
-    // static TABS = {
-    //     primary: {
-    //         tabs: [
-    //             { id: 'abilities' },
-    //             { id: 'description' },
-    //             { id: 'effects' }
-    //         ],
-    //         labelPrefix: 'HYP3E.tabs',
-    //         initial: 'abilities'
-    //     }
-    // }
-    // Start with an empty tabs array, and during _getTabsConfig we customize for each actor type
-    static TABS = {
-        primary: {
-            tabs: [],
-            labelPrefix: 'HYP3E.tabs',
-            initial: 'abilities'
-        }
-    }
-
-    static PARTS = {
-        header: {
-            template: `${HYP3E.templatePath}/actor/actor-main-sheet-v2.hbs`,
-        },
-        tabs: {
-            // Foundry-provided generic template
-            template: 'templates/generic/tab-navigation.hbs',
-        },
-        abilities: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-actor-abilities.hbs`,
-            scrollable: ["", ".tab"],
-        },
-        // Combat, Spells, and Items are only used by Characters. We use conditional rendering
-        //  in the handlebars templates, so these three will not appear on the NPC sheet.
-        combat: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-character-combat.hbs`,
-            scrollable: ["", ".tab"],
-        },
-        spells: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-character-spells.hbs`,
-            scrollable: ["", ".tab"],
-        },
-        items: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-character-items.hbs`,
-            scrollable: ["", ".tab"],
-        },
-        // All PCs and NPCs gets Description, same as Abilities, above.
-        description: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-actor-description.hbs`,
-            scrollable: ["", ".tab"],
-        },
-        // We load Effects last so that any active effects from items are already applied
-        effects: {
-          template: `${HYP3E.templatePath}/actor/parts/tab-actor-effects.hbs`,
-          scrollable: ["", ".tab"],
-        },
-        // Merchants get equipment and fighting gear, and none of the prior tabs
-        equipment: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-merchant-equipment.hbs`,
-            scrollable: ["", ".tab"],
-        },
-        fightingGear: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-merchant-fighting-gear.hbs`,
-            scrollable: ["", ".tab"],
-        },
-        // Treasure hoards get one combined list of all items
-        treasureAll: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-treasure-all-items.hbs`,
-            scrollable: ["", ".tab"],
-        },
-        // Item tokens get NPC-styled abilities and description tabs
-        itemTokenAbilities: {
-            template: `${HYP3E.templatePath}/actor/parts/tab-itemToken-abilities.hbs`,
-            scrollable: ["", ".tab"],
-        },
-        // itemTokenDescription: {
-        //     template: `${HYP3E.templatePath}/actor/parts/tab-itemToken-description.hbs`,
-        //     scrollable: ["", ".tab"],
-        // },
-    }
-
-    // ===========================================================================
-    // OVERRIDES
-    // ===========================================================================
+  // ===========================================================================
+  // OVERRIDES
+  // ===========================================================================
   
-    /** @override */
-    get document() {
-        return this.options.document  // Document comes from options
+  /** @override */
+  get document() {
+    return this.options.document  // Document comes from options
+  }
+
+  /** @override */
+  async _prepareContext(options) {
+    const document = this.document;
+    const { documentName, type=CONST.BASE_DOCUMENT_TYPE } = document;
+    const {
+        sheetClasses, defaultClasses, defaultClass
+    } = foundry.applications.apps.DocumentSheetConfig.getSheetClassesForSubType(documentName, type);
+    // const sheetClass = document.flags.core?.sheetClass ?? "";
+    // const config = CONFIG[documentName].sheetClasses[type] ?? {};
+    // const themes = game.settings.get("core", "sheetThemes");
+    // const currentClass = sheetClass || defaultClass;
+    // Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Document data:`, { document, sheetClass, config, themes, currentClass });
+
+    // Retrieve base data structure
+    const context = await super._prepareContext(options);
+    context.actor = this.actor;
+    context.isGM = game.user.isGM
+    context.autoCalcAttrMods = CONFIG.HYP3E.autoCalcAttrMods;
+
+    // Use a safe clone of the actor data for further operations
+    const actorData = this.actor.toObject(false);
+    Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Actor data for sheet:`, actorData);
+
+    // Add the actor's system data and flags to context root for easier access
+    context.system = actorData.system;
+    context.flags = actorData.flags;
+
+    // Add the actor's items to sheet context, for ease of access
+    context.items = this.actor.items.map(i => ({
+      id: i.id,
+      ...i.toObject(),
+    }));
+
+    // Prepare character data and items
+    if (actorData.type == 'character') {
+      await this._prepareItems(context);
+      this._prepareCharacterData(context);
+    }
+    
+    // Prepare NPC data and items
+    if (actorData.type == 'npc') {
+      await this._prepareItems(context);
+      this._prepareNpcData(context);
     }
 
-    /** @override */
-    async _prepareContext(options) {
-      const document = this.document;
-      const { documentName, type=CONST.BASE_DOCUMENT_TYPE } = document;
-      const {
-          sheetClasses, defaultClasses, defaultClass
-      } = foundry.applications.apps.DocumentSheetConfig.getSheetClassesForSubType(documentName, type);
-      const sheetClass = document.flags.core?.sheetClass ?? "";
-      const config = CONFIG[documentName].sheetClasses[type] ?? {};
-      const themes = game.settings.get("core", "sheetThemes");
-      const currentClass = sheetClass || defaultClass;
-      Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Document data:`, { document, sheetClass, config, themes, currentClass });
+    // Prepare merchant data and items
+    if (actorData.type == 'merchant') {
+      await this._prepareItems(context);
+      this._prepareMerchantData(context);
+    }
 
-      // Retrieve base data structure
-      const context = await super._prepareContext(options);
-      context.actor = this.actor;
-      context.isGM = game.user.isGM
-      context.autoCalcAttrMods = CONFIG.HYP3E.autoCalcAttrMods;
+    // Prepare treasure data and items
+    if (actorData.type == 'treasure') {
+      await this._prepareItems(context);
+      this._prepareTreasureData(context);
+    }
 
-      // Use a safe clone of the actor data for further operations
-      const actorData = this.actor.toObject(false);
-      Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Actor data for sheet:`, actorData);
+    // Prepare itemToken data
+    if (actorData.type == 'itemToken') {
+      await this._prepareItems(context);
+      await this._prepareItemTokenData(context);
+    }
 
-      // Add the actor's system data and flags to context root for easier access
-      context.system = actorData.system;
-      context.flags = actorData.flags;
+    // Add roll data for TinyMCE editors.
+    context.rollData = this.actor.getRollData();
 
-      // Add the actor's items to sheet context, for ease of access
-      context.items = this.actor.items.map(i => ({
-          id: i.id,
-          ...i.toObject(),
-      }));
+    // Enable/disable character quick-create button
+    if (game.settings.get(game.system.id, "quickCreateChars") != "" && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
+      context.enableQuickCreate = true;
+    } else {
+      context.enableQuickCreate = false;
+    };
 
-      // Prepare character data and items
-      if (actorData.type == 'character') {
-          await this._prepareItems(context);
-          this._prepareCharacterData(context);
-      }
-      
-      // Prepare NPC data and items
-      if (actorData.type == 'npc') {
-          await this._prepareItems(context);
-          this._prepareNpcData(context);
-      }
+    // Prepare active effects
+    context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
 
-      // Prepare merchant data and items
-      if (actorData.type == 'merchant') {
-          await this._prepareItems(context);
-          this._prepareMerchantData(context);
-      }
+    // Log the complete actor sheet data
+    Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Actor sheet data complete:`, context);
 
-      // Prepare treasure data and items
-      if (actorData.type == 'treasure') {
-          await this._prepareItems(context);
-          this._prepareTreasureData(context);
-      }
+    return context;
+  }
 
-      // Prepare itemToken data
-      if (actorData.type == 'itemToken') {
-        await this._prepareItems(context);
-        await this._prepareItemTokenData(context);
-      }
+  /** @override */
+  async _preparePartContext(partId, context) {
+    context = await super._preparePartContext(partId, context);
+    // Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `Part context for "${partId}":`, context);
 
-      // Add roll data for TinyMCE editors.
-      context.rollData = this.actor.getRollData();
-
-      // Enable/disable character quick-create button
-      if (game.settings.get(game.system.id, "quickCreateChars") != "" && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
-          context.enableQuickCreate = true;
-      } else {
-          context.enableQuickCreate = false;
-      };
-
-      // Prepare active effects
-      context.effects = prepareActiveEffectCategories(this.actor.allApplicableEffects());
-
-      // Log the complete actor sheet data
-      Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Actor sheet data complete:`, context);
-
+    if (partId === "header" || partId === "tabs") {
+      // Header and tabs parts do not need special tab handling
+      return context;
+    }
+    if (!context.tabs) {
+      Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `No tabs data found in context!`);
+      return context;
+    }
+    if (!context.tabs[partId]) {
+      Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `No tab data found for part "${partId}".`);
       return context;
     }
 
-    /** @override */
-    async _preparePartContext(partId, context) {
-        context = await super._preparePartContext(partId, context);
-        Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `Part context for "${partId}":`, context);
+    // Remove parts that aren't for the NPC actor type
+    // if (this.actor.type === "npc" && ["combat","spells","items"].includes(partId)) {
+    //     return null; // returning null skips rendering this part
+    // }
 
-        if (partId === "header" || partId === "tabs") {
-            // Header and tabs parts do not need special tab handling
-            return context;
-        }
-        if (!context.tabs) {
-            Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `No tabs data found in context!`);
-            return context;
-        }
-        if (!context.tabs[partId]) {
-            Hyp3eLogger.info("HYP3EActorSheetV2 _preparePartContext", `No tab data found for part "${partId}".`);
-            return context;
-        }
+    // Remove parts that aren't for the Merchant actor type
+    // if (this.actor.type === "merchant" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
+    //     return null; // returning null skips rendering this part
+    // }
 
-        // Remove parts that aren't for the NPC actor type
-        // if (this.actor.type === "npc" && ["combat","spells","items"].includes(partId)) {
-        //     return null; // returning null skips rendering this part
-        // }
-
-        // Remove parts that aren't for the Merchant actor type
-        // if (this.actor.type === "merchant" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
-        //     return null; // returning null skips rendering this part
-        // }
-
-        // Reset the default tab for Merchants
-        if (this.actor.type === "merchant" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
-            context.tabs["equipment"].active = true;
-            context.tabs["equipment"].cssClass = "active";
-        }
-
-        // Remove parts that aren't for the Treasure actor type
-        // if (this.actor.type === "treasure" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
-        //     return null; // returning null skips rendering this part
-        // }
-
-        // Reset the default tab for Treasure
-        if (this.actor.type === "treasure" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
-            context.tabs["treasureAll"].active = true;
-            context.tabs["treasureAll"].cssClass = "active";
-        }
-
-        // Reset the default tab for Item Tokens
-        if (this.actor.type === "itemToken" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
-            context.tabs["itemTokenAbilities"].active = true;
-            context.tabs["itemTokenAbilities"].cssClass = "active";
-        }
-
-        // Process tabs
-        if (context.tabs[partId].active) {
-            context.tab = context.tabs[partId];
-        }
-
-        // Enrich text editor fields as needed
-        switch (partId) {
-            case 'abilities':
-                break;
-            case 'combat':
-                break;
-            case 'spells':
-                break;
-            case 'items':
-              if (this.document.type === "character") {
-                // Enrich content for display
-                context.enrichedTreasure = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-                    this.document.system.treasure,
-                    {
-                        secrets: this.document.isOwner,
-                        relativeTo: this.document
-                    }
-                )
-              }
-              break;
-            case 'description':
-              if (this.document.type === "character" || this.document.type === "npc") {
-                // Enrich content for display
-                context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-                  this.document.system.biography,
-                  {
-                    secrets: this.document.isOwner,
-                    relativeTo: this.document
-                  }
-                )
-              }
-              break;
-            case 'effects':
-              break;
-            case "equipment":
-              break;
-            case "fightingGear":
-              break;
-            case "treasureAll":
-              break;
-            case "itemTokenAbilities":
-              if (this.document.type === "itemToken") {
-                // Enrich content for display
-                context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-                  this.document.system.biography,
-                  {
-                    secrets: this.document.isOwner,
-                    relativeTo: this.document
-                  }
-                )
-              }
-              break;
-            // case "itemTokenDescription":
-            //   if (this.document.type === "itemToken") {
-            //     // Enrich content for display
-            //     context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-            //       this.document.system.biography,
-            //       {
-            //         secrets: this.document.isOwner,
-            //         relativeTo: this.document
-            //       }
-            //     )
-            //   }
-            //   break;
-            default:
-        }
-        return context;
+    // Reset the default tab for Merchants
+    if (this.actor.type === "merchant" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
+      context.tabs["equipment"].active = true;
+      context.tabs["equipment"].cssClass = "active";
     }
 
-    /** @override */
-    _getTabsConfig(group) {
-      const tabs = foundry.utils.deepClone(super._getTabsConfig(group))
+    // Remove parts that aren't for the Treasure actor type
+    // if (this.actor.type === "treasure" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
+    //     return null; // returning null skips rendering this part
+    // }
 
-      // Common PC & NPC tabs
-      if (this.document.type === "character" || this.document.type === "npc") {
-        tabs.tabs.push({ id: 'abilities', group: group });
-        tabs.tabs.push({ id: 'description', group: group });
-        tabs.tabs.push({ id: 'effects', group: group });
-      }
-
-      // Insert PC-specific tabs
-      if (this.document.type === "character") {
-        tabs.tabs.splice(1, 0, { id: 'combat', group: group });
-        tabs.tabs.splice(2, 0, { id: 'spells', group: group });
-        tabs.tabs.splice(3, 0, { id: 'items', group: group });
-      }
-
-      // Merchant tabs
-      if (this.document.type === "merchant") {
-        tabs.tabs.push({ id: 'equipment', group: group });
-        tabs.tabs.push({ id: 'fightingGear', group: group });
-      }
-
-      // Treasure tab
-      if (this.document.type === "treasure") {
-        tabs.tabs.push({ id: 'treasureAll', group: group });
-      }
-
-      // Item Token tabs
-      if (this.document.type === "itemToken") {
-        tabs.tabs.push({ id: 'itemTokenAbilities', group: group });
-        // tabs.tabs.push({ id: 'itemTokenDescription', group: group });
-        tabs.tabs.push({ id: 'effects', group: group });
-      }
-
-      Hyp3eLogger.info("HYP3EActorSheetV2 _getTabsConfig", `Tabs config for ${this.actor.name}:`, tabs);
-      return tabs
+    // Reset the default tab for Treasure
+    if (this.actor.type === "treasure" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
+      context.tabs["treasureAll"].active = true;
+      context.tabs["treasureAll"].cssClass = "active";
     }
+
+    // Reset the default tab for Item Tokens
+    if (this.actor.type === "itemToken" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
+      context.tabs["itemTokenAbilities"].active = true;
+      context.tabs["itemTokenAbilities"].cssClass = "active";
+    }
+
+    // Process tabs
+    if (context.tabs[partId].active) {
+      context.tab = context.tabs[partId];
+    }
+
+    // Enrich text editor fields as needed
+    switch (partId) {
+      case 'abilities':
+        break;
+      case 'combat':
+        break;
+      case 'spells':
+        break;
+      case 'items':
+        if (this.document.type === "character") {
+          // Enrich content for display
+          context.enrichedTreasure = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.document.system.treasure,
+            {
+              secrets: this.document.isOwner,
+              relativeTo: this.document
+            }
+          )
+        }
+        break;
+      case 'description':
+        if (this.document.type === "character" || this.document.type === "npc") {
+          // Enrich content for display
+          context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.document.system.biography,
+            {
+              secrets: this.document.isOwner,
+              relativeTo: this.document
+            }
+          )
+        }
+        break;
+      case 'effects':
+        break;
+      case "equipment":
+        break;
+      case "fightingGear":
+        break;
+      case "treasureAll":
+        break;
+      case "itemTokenAbilities":
+        if (this.document.type === "itemToken") {
+          // Enrich content for display
+          context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            this.document.system.biography,
+            {
+              secrets: this.document.isOwner,
+              relativeTo: this.document
+            }
+          )
+        }
+        break;
+      // case "itemTokenDescription":
+      //   if (this.document.type === "itemToken") {
+      //     // Enrich content for display
+      //     context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+      //       this.document.system.biography,
+      //       {
+      //         secrets: this.document.isOwner,
+      //         relativeTo: this.document
+      //       }
+      //     )
+      //   }
+      //   break;
+      default:
+    }
+    return context;
+  }
+
+  /** @override */
+  _getTabsConfig(group) {
+    const tabs = foundry.utils.deepClone(super._getTabsConfig(group))
+
+    // Common PC & NPC tabs
+    if (this.document.type === "character" || this.document.type === "npc") {
+      tabs.tabs.push({ id: 'abilities', group: group });
+      tabs.tabs.push({ id: 'description', group: group });
+      tabs.tabs.push({ id: 'effects', group: group });
+    }
+
+    // Insert PC-specific tabs
+    if (this.document.type === "character") {
+      tabs.tabs.splice(1, 0, { id: 'combat', group: group });
+      tabs.tabs.splice(2, 0, { id: 'spells', group: group });
+      tabs.tabs.splice(3, 0, { id: 'items', group: group });
+    }
+
+    // Merchant tabs
+    if (this.document.type === "merchant") {
+      tabs.tabs.push({ id: 'equipment', group: group });
+      tabs.tabs.push({ id: 'fightingGear', group: group });
+    }
+
+    // Treasure tab
+    if (this.document.type === "treasure") {
+      tabs.tabs.push({ id: 'treasureAll', group: group });
+    }
+
+    // Item Token tabs
+    if (this.document.type === "itemToken") {
+      tabs.tabs.push({ id: 'itemTokenAbilities', group: group });
+      // tabs.tabs.push({ id: 'itemTokenDescription', group: group });
+      tabs.tabs.push({ id: 'effects', group: group });
+    }
+
+    Hyp3eLogger.info("HYP3EActorSheetV2 _getTabsConfig", `Tabs config for ${this.actor.name}:`, tabs);
+    return tabs
+  }
 
   /**
    * Organize and classify Data for Character sheets.
@@ -494,8 +494,8 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       }
       // If the attribute is NOT at its default 10, set disableQuickCreate to true
       if (v.value != 10 && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
-          this.actor.setFlag(game.system.id, "disableQuickCreate", true)
-          // Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
+        this.actor.setFlag(game.system.id, "disableQuickCreate", true)
+        // Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
       }
     }
 
@@ -540,10 +540,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @return {undefined}
      */
     _prepareNpcData(context) {
-        // Load creature sizes
-        context.creatureSizes = CONFIG.HYP3E.creatureSizes
-        // Load Phenotypes
-        context.phenotypes = CONFIG.HYP3E.phenotypes
+      // Load creature sizes
+      context.creatureSizes = CONFIG.HYP3E.creatureSizes
+      // Load Phenotypes
+      context.phenotypes = CONFIG.HYP3E.phenotypes
     }
 
     /**
