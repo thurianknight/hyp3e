@@ -19,7 +19,7 @@ export default class Hyp3eSpell extends Hyp3eItemBase {
     schema.affected = new fields.StringField({ initial: "" });
 
     // Spell template
-    schema.memorized = new fields.NumberField({ initial: 0 });
+    // schema.memorized = new fields.NumberField({ initial: 0 });
     schema.quantity = new fields.SchemaField({
       value: new fields.NumberField({ initial: 0 }),
       max: new fields.NumberField({ initial: 9 })

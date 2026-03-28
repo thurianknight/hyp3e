@@ -10,7 +10,7 @@ export default class Hyp3eActorBase extends SystemDataModel {
       
       hp: new fields.SchemaField({
         value: new fields.NumberField({ required: true, integer: true, initial: 0 }),
-        min:   new fields.NumberField({ required: true, integer: true, initial: -10 }),
+        min:   new fields.NumberField({ required: true, integer: true, initial: 0 }),
         max:   new fields.NumberField({ required: true, integer: true, initial: 0 }),
         tempHp: new fields.NumberField({ required: true, integer: true, initial: 0 })
       }),
@@ -44,18 +44,18 @@ export default class Hyp3eActorBase extends SystemDataModel {
       }),
 
       saves: new fields.SchemaField({
-        base:         new fields.SchemaField({ value: new fields.NumberField({initial:0}) }),
-        death:        new fields.SchemaField({ value: new fields.NumberField({initial:0}) }),
-        device:       new fields.SchemaField({ value: new fields.NumberField({initial:0}) }),
-        transformation: new fields.SchemaField({ value: new fields.NumberField({initial:0}) }),
-        avoidance:    new fields.SchemaField({ value: new fields.NumberField({initial:0}) }),
-        sorcery:      new fields.SchemaField({ value: new fields.NumberField({initial:0}) })
+        base:         new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
+        death:        new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
+        device:       new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
+        transformation: new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
+        avoidance:    new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) }),
+        sorcery:      new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:0 }) })
       }),
 
       movement: new fields.SchemaField({
-        base:        new fields.SchemaField({ value: new fields.NumberField({initial:40}) }),
-        exploration: new fields.SchemaField({ value: new fields.NumberField({initial:120}) }),
-        travel:      new fields.SchemaField({ value: new fields.NumberField({initial:24}) }),
+        base:        new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:40 }) }),
+        exploration: new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:120 }) }),
+        travel:      new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:24 }) }),
         tempMvMod:   new fields.NumberField({ required: true, integer: true, initial: 0 })
       }),
 

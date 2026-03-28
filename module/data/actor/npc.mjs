@@ -13,14 +13,14 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
       })
     });
     schema.size = new fields.StringField({ blank: true });
-    schema.encWild = new fields.NumberField({ initial: 0 });
-    schema.encLair = new fields.NumberField({ initial: 0 });
+    schema.encWild = new fields.StringField({ blank: true });
+    schema.encLair = new fields.StringField({ blank: true });
     schema.morale = new fields.NumberField({ nullable: true, initial: null });
     schema.loyalty = new fields.NumberField({ nullable: true, initial: null });
-    schema.cost = new fields.StringField({ blank: true });
-    schema.xp = new fields.StringField({ blank: true });
+    schema.cost = new fields.StringField({ blank: true, initial: "0" });
+    schema.xp = new fields.StringField({ blank: true, initial: "0" });
     schema.treasure = new fields.StringField({ blank: true, initial: "" });
-    schema.dx = new fields.NumberField({ initial: 11 });
+    // schema.dx = new fields.NumberField({ initial: 11 });
     schema.rollHD = new fields.BooleanField({ initial: true });
     schema.phenotype = new fields.StringField({ blank: true, initial: "" });
     schema.npcType = new fields.StringField({ blank: true, initial: "monster" });

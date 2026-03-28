@@ -1,3 +1,5 @@
+// Import datamodels
+import * as HYP3E_DATA_MODELS from "./data/_module.mjs";
 // Import document classes
 import { Hyp3eActor } from "./documents/actor.mjs";
 import { Hyp3eItem } from "./documents/item.mjs";
@@ -56,60 +58,33 @@ Hooks.once('init', async function() {
   // Disable legacy effect transferral
   CONFIG.ActiveEffect.legacyTransferral = false;
 
+  // Register data models for Actors and Items. This replaces the "template.json" system.
+  // Actors
+  /**
+  CONFIG.Actor.dataModels.character = HYP3E_DATA_MODELS.Hyp3eCharacter;
+  CONFIG.Actor.dataModels.npc       = HYP3E_DATA_MODELS.Hyp3eNPC;
+  CONFIG.Actor.dataModels.merchant  = HYP3E_DATA_MODELS.Hyp3eMerchant;
+  CONFIG.Actor.dataModels.treasure  = HYP3E_DATA_MODELS.Hyp3eTreasure;
+  CONFIG.Actor.dataModels.itemToken = HYP3E_DATA_MODELS.Hyp3eItemToken;
+
+  // Items
+  CONFIG.Item.dataModels.armor        = HYP3E_DATA_MODELS.Hyp3eArmor;
+  CONFIG.Item.dataModels.shield       = HYP3E_DATA_MODELS.Hyp3eShield;
+  CONFIG.Item.dataModels.weapon       = HYP3E_DATA_MODELS.Hyp3eWeapon;
+  CONFIG.Item.dataModels.spell        = HYP3E_DATA_MODELS.Hyp3eSpell;
+  CONFIG.Item.dataModels.feature      = HYP3E_DATA_MODELS.Hyp3eFeature;
+  CONFIG.Item.dataModels.item         = HYP3E_DATA_MODELS.Hyp3eItem;
+  // CONFIG.Item.dataModels.container    = HYP3E_DATA_MODELS.Hyp3eContainer;
+  CONFIG.Item.dataModels.effectTemplate = HYP3E_DATA_MODELS.Hyp3eEffectTemplate;
+
+  console.log("Hyperborea | DataModels registered");
+  */
+
   // Register our Hyperborea system configuration options
   registerHyp3eConfigurations();
 
   // Build a list of custom status effects and add to the CONFIG.statusEffects array
   pushCustomStatusEffects();
-
-  // // Add custom statusEffects
-  // const hasted = {
-  //   id: "hasted",
-  //   name: "HYP3E.statusEffects.hasted",
-  //   img: `${HYP3E.assetsPath}/run.svg`,
-  //   isActive: false
-  // }
-  // CONFIG.statusEffects.push(hasted)
-
-  // const slowed = {
-  //   id: "slowed",
-  //   name: "HYP3E.statusEffects.slowed",
-  //   img: `${HYP3E.assetsPath}/snail.svg`,
-  //   isActive: false
-  // }
-  // CONFIG.statusEffects.push(slowed)
-
-  // const flankAttack = {
-  //   id: "flankAttack",
-  //   name: "HYP3E.statusEffects.flankAttack",
-  //   img: `${HYP3E.assetsPath}/backup.svg`,
-  //   isActive: false
-  // }
-  // CONFIG.statusEffects.push(flankAttack)
-
-  // const rearAttack = {
-  //   id: "rearAttack",
-  //   name: "HYP3E.statusEffects.rearAttack",
-  //   img: `${HYP3E.assetsPath}/backstab.svg`,
-  //   isActive: false
-  // }
-  // CONFIG.statusEffects.push(rearAttack)
-
-  // const coverPartial = {
-  //   id: "coverPartial",
-  //   name: "HYP3E.statusEffects.coverPartial",
-  //   img: `${HYP3E.assetsPath}/cover-fence.svg`,
-  //   isActive: false
-  // }
-  // CONFIG.statusEffects.push(coverPartial)
-  
-  // const coverFull = {
-  //   id: "coverFull",
-  //   name: "HYP3E.statusEffects.coverFull",
-  //   img: `${HYP3E.assetsPath}/cover-wall.svg`,
-  //   isActive: false
-  // }
-  // CONFIG.statusEffects.push(coverFull)
 
   // Add custom constants for configuration
   CONFIG.HYP3E = HYP3E;
@@ -123,17 +98,15 @@ Hooks.once('init', async function() {
 
   // Register sheet application classes
   foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
-  // Actors.registerSheet("hyp3e", Hyp3eActorSheet, { makeDefault: false });
   foundry.documents.collections.Actors.registerSheet("hyp3e", Hyp3eActorSheetV2, { 
-  makeDefault: true,
-  defaultTheme: "default",
-  themes: Hyp3eActorSheetV2.themes
+    makeDefault: true,
+    defaultTheme: "default",
+    themes: Hyp3eActorSheetV2.themes
   });
-  Hyp3eLogger.info("Init", "Registered Hyp3eActorSheetV2");
+  // Hyp3eLogger.info("Init", "Registered Hyp3eActorSheetV2");
   foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
-  // Items.registerSheet("hyp3e", Hyp3eItemSheet, { makeDefault: false });
   foundry.documents.collections.Items.registerSheet("hyp3e", Hyp3eItemSheetV2, { makeDefault: true });
-  Hyp3eLogger.info("Init", "Registered Hyp3eItemSheetV2");
+  // Hyp3eLogger.info("Init", "Registered Hyp3eItemSheetV2");
 
 
   // Get initiative mode: group vs. individual

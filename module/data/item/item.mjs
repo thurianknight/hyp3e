@@ -13,11 +13,11 @@ export default class Hyp3eItem extends Hyp3eItemBase {
       bundle: new fields.NumberField({ initial: 1 })
     });
     schema.isConsumable = new fields.BooleanField({ initial: false });
-    schema.isLightSource = new fields.BooleanField({ initial: null });
+    schema.isLightSource = new fields.BooleanField({ initial: false });
     schema.light = new fields.ObjectField({ initial: {} });
     schema.location = new fields.StringField({ initial: "" });
     schema.weight = new fields.NumberField({ initial: 0 });
-    schema.cost = new fields.NumberField({ initial: 0 });
+    schema.cost = new fields.StringField({ initial: "0" });
     schema.xp = new fields.StringField({ initial: "" });
     schema.containerId = new fields.StringField({ initial: "" });
 
@@ -45,12 +45,12 @@ export default class Hyp3eItem extends Hyp3eItemBase {
         value: new fields.NumberField({ nullable: true, initial: null }),
         max: new fields.NumberField({ nullable: true, initial: null })
       }),
-      spellRefs: new fields.ArrayField({ initial: [] })
+      spellRefs: new fields.ArrayField(new fields.StringField(), { initial: [] })
     });
 
     // Item template
     schema.isContainer = new fields.BooleanField({ initial: false });
-    schema.itemIds = new fields.ArrayField({ initial: [] });
+    schema.itemIds = new fields.ArrayField(new fields.StringField(), { initial: [] });
     schema.isAmmunition = new fields.BooleanField({ initial: false });
 
     return schema;

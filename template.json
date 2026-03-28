@@ -208,8 +208,8 @@
         }
       },
       "size": "",
-      "encWild": 0,
-      "encLair": 0,
+      "encWild": "",
+      "encLair": "",
       "morale": null,
       "loyalty": null,
       "cost": "0",

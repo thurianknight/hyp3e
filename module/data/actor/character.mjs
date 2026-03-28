@@ -29,65 +29,65 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     // Character template
     schema.attributes = new fields.SchemaField({
       str: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 10 }),
-        atkMod: new fields.NumberField({ initial: 0 }),
-        dmgMod: new fields.NumberField({ initial: 0 }),
-        test: new fields.NumberField({ initial: 0 }),
-        feat: new fields.NumberField({ initial: 0 })
+        value: new fields.NumberField({ integer: true, initial: 10 }),
+        atkMod: new fields.NumberField({ integer: true, initial: 0 }),
+        dmgMod: new fields.NumberField({ integer: true, initial: 0 }),
+        test: new fields.NumberField({ integer: true, initial: 0 }),
+        feat: new fields.NumberField({ integer: true, initial: 0 })
       }),
       dex: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 10 }),
-        atkMod: new fields.NumberField({ initial: 0 }),
-        defMod: new fields.NumberField({ initial: 0 }),
-        test: new fields.NumberField({ initial: 0 }),
-        feat: new fields.NumberField({ initial: 0 })
+        value: new fields.NumberField({ integer: true, initial: 10 }),
+        atkMod: new fields.NumberField({ integer: true, initial: 0 }),
+        defMod: new fields.NumberField({ integer: true, initial: 0 }),
+        test: new fields.NumberField({ integer: true, initial: 0 }),
+        feat: new fields.NumberField({ integer: true, initial: 0 })
       }),
       con: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 10 }),
-        hpMod: new fields.NumberField({ initial: 0 }),
-        poisRadMod: new fields.NumberField({ initial: 0 }),
-        traumaSurvive: new fields.NumberField({ initial: 0 }),
-        test: new fields.NumberField({ initial: 0 }),
-        feat: new fields.NumberField({ initial: 0 })
+        value: new fields.NumberField({ integer: true, initial: 10 }),
+        hpMod: new fields.NumberField({ integer: true, initial: 0 }),
+        poisRadMod: new fields.NumberField({ integer: true, initial: 0 }),
+        traumaSurvive: new fields.NumberField({ integer: true, initial: 0 }),
+        test: new fields.NumberField({ integer: true, initial: 0 }),
+        feat: new fields.NumberField({ integer: true, initial: 0 })
       }),
       int: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 10 }),
-        languages: new fields.NumberField({ initial: 0 }),
+        value: new fields.NumberField({ integer: true, initial: 10 }),
+        languages: new fields.NumberField({ integer: true, initial: 0 }),
         bonusSpells: new fields.SchemaField({
           lvl1: new fields.BooleanField({ initial: false }),
           lvl2: new fields.BooleanField({ initial: false }),
           lvl3: new fields.BooleanField({ initial: false }),
           lvl4: new fields.BooleanField({ initial: false })
         }),
-        learnSpell: new fields.NumberField({ initial: 0 })
+        learnSpell: new fields.NumberField({ integer: true, initial: 0 })
       }),
       wis: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 10 }),
-        willMod: new fields.NumberField({ initial: 0 }),
+        value: new fields.NumberField({ integer: true, initial: 10 }),
+        willMod: new fields.NumberField({ integer: true, initial: 0 }),
         bonusSpells: new fields.SchemaField({
           lvl1: new fields.BooleanField({ initial: false }),
           lvl2: new fields.BooleanField({ initial: false }),
           lvl3: new fields.BooleanField({ initial: false }),
           lvl4: new fields.BooleanField({ initial: false })
         }),
-        learnSpell: new fields.NumberField({ initial: 0 })
+        learnSpell: new fields.NumberField({ integer: true, initial: 0 })
       }),
       cha: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 10 }),
-        reaction: new fields.NumberField({ initial: 0 }),
-        maxHenchmen: new fields.NumberField({ initial: 0 }),
-        turnUndead: new fields.NumberField({ initial: 0 })
+        value: new fields.NumberField({ integer: true, initial: 10 }),
+        reaction: new fields.NumberField({ integer: true, initial: 0 }),
+        maxHenchmen: new fields.NumberField({ integer: true, initial: 0 }),
+        turnUndead: new fields.NumberField({ integer: true, initial: 0 })
       })
     });
 
     schema.details = new fields.SchemaField({
       notes: new fields.StringField({ blank: true }),
       class: new fields.StringField({ blank: true }),
-      level: new fields.SchemaField({ value: new fields.NumberField({ initial: 1 }) }),
+      level: new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial: 1 }) }),
       xp: new fields.SchemaField({
-        value: new fields.NumberField({ initial: 0 }),
-        toNextLvl: new fields.NumberField({ initial: 0 }),
-        bonus: new fields.NumberField({ initial: 0 }),
+        value: new fields.StringField({ initial: "0" }),
+        toNextLvl: new fields.StringField({ initial: "0" }),
+        bonus: new fields.NumberField({ integer: true, initial: 0 }),
         primeAttr: new fields.StringField({ blank: true })
       }),
       race: new fields.StringField({ blank: true }),
@@ -113,11 +113,11 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     });
 
     schema.money = new fields.SchemaField({
-      cp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-      sp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-      ep: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-      gp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-      pp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) })
+      cp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+      sp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+      ep: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+      gp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+      pp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) })
     });
 
     schema.treasure = new fields.StringField({ blank: true });
