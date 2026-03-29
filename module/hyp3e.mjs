@@ -155,98 +155,98 @@ Hooks.once('init', async function() {
 
   // Normalize anything to a number: handles numbers, strings, and comma/space-separated strings
   const normalizeNumber = val => {
-  if (val == null) return 0;
-  if (typeof val === "number") return val;
-  if (typeof val === "string") {
-    val = val.replace(/[\s,\u00A0\u202F]+/g, ""); // strip spaces, commas, NBSPs
-    const num = Number(val);
-    if (!isNaN(num)) return num;
-  }
-  return 0;
+    if (val == null) return 0;
+    if (typeof val === "number") return val;
+    if (typeof val === "string") {
+      val = val.replace(/[\s,\u00A0\u202F]+/g, ""); // strip spaces, commas, NBSPs
+      const num = Number(val);
+      if (!isNaN(num)) return num;
+    }
+    return 0;
   };
 
   // If you need to add Handlebars helpers, here are a few useful examples:
   Handlebars.registerHelper("formatNumber", function(value) {
-  if (isNaN(value)) return value;
-  return Number(value).toLocaleString();
+    if (isNaN(value)) return value;
+    return Number(value).toLocaleString();
   });
 
   Handlebars.registerHelper("gteNum", function (a, b) {
-  const numA = normalizeNumber(a);
-  const numB = normalizeNumber(b);
-  if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
-  return numA >= numB;
+    const numA = normalizeNumber(a);
+    const numB = normalizeNumber(b);
+    if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
+    return numA >= numB;
   });
 
   Handlebars.registerHelper("gtNum", function (a, b) {
-  const numA = normalizeNumber(a);
-  const numB = normalizeNumber(b);
-  if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
-  return numA > numB;
+    const numA = normalizeNumber(a);
+    const numB = normalizeNumber(b);
+    if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
+    return numA > numB;
   });
 
   Handlebars.registerHelper("lteNum", function (a, b) {
-  const numA = normalizeNumber(a);
-  const numB = normalizeNumber(b);
-  if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
-  return numA <= numB;
+    const numA = normalizeNumber(a);
+    const numB = normalizeNumber(b);
+    if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
+    return numA <= numB;
   });
 
   Handlebars.registerHelper("ltNum", function (a, b) {
-  const numA = normalizeNumber(a);
-  const numB = normalizeNumber(b);
-  if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
-  return numA < numB;
+    const numA = normalizeNumber(a);
+    const numB = normalizeNumber(b);
+    if (Number.isNaN(numA) || Number.isNaN(numB)) return false;
+    return numA < numB;
   });
 
   Handlebars.registerHelper('add', function(num1, num2) {
-  return num1 + num2
+    return num1 + num2
   });
 
   Handlebars.registerHelper('subtract', function(num1, num2) {
-  return num1 - num2
+    return num1 - num2
   });
 
   Handlebars.registerHelper('isMin', function(val) {
-  return val == 1 ? "min" : ""
+    return val == 1 ? "min" : ""
   });
 
   Handlebars.registerHelper('isMax', function(val, maxVal) {
-  return val == maxVal ? "max" : ""
+    return val == maxVal ? "max" : ""
   });
 
   Handlebars.registerHelper("capitalizeWords", function (str) {
-  if (typeof str !== "string") return "";
-  return str.replace(/\b\w/g, c => c.toUpperCase());
+    if (typeof str !== "string") return "";
+    return str.replace(/\b\w/g, c => c.toUpperCase());
   });
 
   Handlebars.registerHelper('concat', function() {
-  var outStr = '';
-  for (var arg in arguments) {
-    if (typeof arguments[arg] != 'object') {
-    outStr += arguments[arg];
+    var outStr = '';
+    for (var arg in arguments) {
+      if (typeof arguments[arg] != 'object') {
+      outStr += arguments[arg];
+      }
     }
-  }
-  return outStr;
+    return outStr;
   });
 
   Handlebars.registerHelper('isLongContent', function(content) {
-  return content?.length > 100; // Tune this threshold
+    return content?.length > 100; // Tune this threshold
   });
 
   Handlebars.registerHelper('ifInList', function(str, arr, options) {
-  if (arr.includes(str)) {
-    return options.fn(this)
-  }
-  return options.inverse(this);
+    if (arr.includes(str)) {
+      return options.fn(this)
+    }
+    return options.inverse(this);
   });
 
   Handlebars.registerHelper('lookup', function(obj, key) {
-  return obj?.[key];
+    return obj?.[key];
   });
 
   Handlebars.registerHelper('toLowerCase', function(str) {
-  return str.toLowerCase();
+    return str.toLowerCase();
   });
 
   // Register a safe JSON helper for Handlebars templates

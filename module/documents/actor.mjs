@@ -637,7 +637,12 @@ export class Hyp3eActor extends Actor {
     if (CONFIG.HYP3E.enableCoinWeight) {
       for (const [coinType, coinData] of Object.entries(this.system.money)) {
         if (coinData.value) {
-          carriedWt += coinData.value / 100;
+          let val = coinData.value;
+          val = val.replace(/[\s,\u00A0\u202F]+/g, ""); // strip spaces, commas, NBSPs
+          const num = Number(val);
+          if (!isNaN(num)) {
+            carriedWt += parseInt(num) / 100;
+          }
         }
       }
     }
