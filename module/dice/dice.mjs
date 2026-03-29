@@ -775,7 +775,7 @@ export function containsMathOrVariables(str) {
 /**
  * Convert any value to a safe integer for Hyperborea (attributes, hp, modifiers, etc.).
  * - Number => Math.floor() to ensure integer (preserves existing integers)
- * - String => parseInt(base 10), trimmed first
+ * - String => parseInt(base 10), trimmed and commas removed (e.g. " 1,000 " => 1000)
  * - null / undefined / empty / invalid => 0
  * - Anything else (like an Object or other invalid value/property) => 0
  *
@@ -804,9 +804,9 @@ export function convertToInt(value, strict = false) {
 
   // String: try parseInt
   if (typeof value === "string") {
-    const trimmed = value.trim();
+    let trimmed = value.trim();
     if (trimmed === "") return 0;
-
+    trimmed = trimmed.replace(/[\s,\u00A0\u202F]+/g, ""); // strip spaces, commas, NBSPs
     const num = parseInt(trimmed, 10);
     if (!isNaN(num)) {
       return num;
