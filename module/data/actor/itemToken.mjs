@@ -7,6 +7,13 @@ export default class Hyp3eItemToken extends Hyp3eActorBase {
     const schema = super.defineSchema();
   
     // Item Token fields
+    schema.attributes = new fields.SchemaField({
+      dex: new fields.SchemaField({
+        value: new fields.NumberField({ initial: 10 }),
+        curr: new fields.NumberField({ initial: 10 }),
+      })
+    });
+    schema.size = new fields.StringField({ blank: true });
     schema.linkedItemUuid = new fields.StringField({ blank: true, initial: "" });
 
     return schema;

@@ -99,12 +99,13 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
   prepareBaseData() {
     super.prepareBaseData?.();
 
-    const attributes = this.attributes;   // 'this' here is the system data model
-
-    // Example: add .curr to each attribute (adjust the formula to match your old prepareCharacterData logic)
-    for (const [k, attr] of Object.entries(attributes)) {
-      // If no effect touched curr, derive it from base value
-      attr.curr = attr.value;
+    if (this.attributes) {
+      const attributes = this.attributes;   // 'this' here is the system data model
+      // Add .curr to each attribute
+      for (const [k, attr] of Object.entries(attributes)) {
+        // If no effect touched curr, derive it from base value
+        attr.curr = attr.value;
+      }  
     }
 
     // Base/current FA, CA, TA

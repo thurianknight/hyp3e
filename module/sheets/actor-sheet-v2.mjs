@@ -576,7 +576,8 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @return {undefined}
      */
     _prepareItemTokenData(context) {
-      // No special data preparation needed for item tokens at this time
+      // Load sizes for token creation
+      context.creatureSizes = CONFIG.HYP3E.creatureSizes
     }
 
     /**
@@ -1538,6 +1539,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           "system.linkedItemUuid": item.uuid,
           "system.biography": item.system.description,
           "system.fightingAbility.value": item?.parent?.system.fightingAbility.value || 0,
+          "system.attributes.dex.value": item?.parent?.system.attributes.dex.curr || 10,
           "system.castingAbility.value": item?.parent?.system.castingAbility.value || null,
           "system.turningAbility.value": item?.parent?.system.turningAbility.value || null,
           "system.hp.value": 1,

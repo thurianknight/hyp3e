@@ -9,9 +9,13 @@
             <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
           </h2>
         </div>
-        <div class="npc-header-block flexrow">
-          <div class="npc-header-block">
-
+        <div class="npc-header-block align-left">
+          <div class="npc-field">
+            <label for="system.size" class="small-label" style="margin-right: 10px;">{{localize 'HYP3E.size'}}</label> 
+            <select name="system.size" style="width: auto;">
+              <option value=""></option>
+              {{selectOptions creatureSizes selected=system.size localize=false}}
+            </select>
           </div>
         </div>
       </div>
