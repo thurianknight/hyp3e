@@ -1,9 +1,7 @@
 // module/data/actor/base.mjs
-import { SystemDataModel } from "../_utils.mjs";   // see utils below
-import { Hyp3eLogger } from "../../helpers/logger.mjs";
+import { Hyp3eDataModel } from "../_utils.mjs";   // see utils below
 
-
-export default class Hyp3eActorBase extends SystemDataModel {
+export default class Hyp3eActorBase extends Hyp3eDataModel {
   static defineSchema() {
     const fields = foundry.data.fields;
 

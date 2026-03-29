@@ -6,7 +6,7 @@ export default class Hyp3eItemToken extends Hyp3eActorBase {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
   
-    // Item Token template
+    // Item Token fields
     schema.linkedItemUuid = new fields.StringField({ blank: true, initial: "" });
 
     return schema;

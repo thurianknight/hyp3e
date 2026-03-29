@@ -6,7 +6,7 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
 
-    // NPC template
+    // NPC fields
     schema.attributes = new fields.SchemaField({
       dex: new fields.SchemaField({
         value: new fields.NumberField({ initial: 10 }),

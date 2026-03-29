@@ -1,7 +1,7 @@
 // module/data/item/base.mjs
-import { SystemDataModel } from "../_utils.mjs";
+import { Hyp3eDataModel } from "../_utils.mjs";
 
-export default class Hyp3eItemBase extends SystemDataModel {
+export default class Hyp3eItemBase extends Hyp3eDataModel {
   static defineSchema() {
     const fields = foundry.data.fields;
 

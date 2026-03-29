@@ -7,27 +7,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     const fields = foundry.data.fields;
     const schema = super.defineSchema();
 
-    // Spellcaster template
-    schema.spellList = new fields.StringField({ blank: true, initial: "" });
-    schema.spells = new fields.SchemaField({
-      l1: new fields.StringField({ blank: true }),
-      l2: new fields.StringField({ blank: true }),
-      l3: new fields.StringField({ blank: true }),
-      l4: new fields.StringField({ blank: true }),
-      l5: new fields.StringField({ blank: true }),
-      l6: new fields.StringField({ blank: true })
-    });
-    schema.spellList2 = new fields.StringField({ blank: true, initial: "" });
-    schema.spells2 = new fields.SchemaField({
-      l1: new fields.StringField({ blank: true }),
-      l2: new fields.StringField({ blank: true }),
-      l3: new fields.StringField({ blank: true }),
-      l4: new fields.StringField({ blank: true }),
-      l5: new fields.StringField({ blank: true }),
-      l6: new fields.StringField({ blank: true })
-    });
-
-    // Character template
+    // Character fields
     schema.attributes = new fields.SchemaField({
       str: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
@@ -85,6 +65,25 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
         maxHenchmen: new fields.NumberField({ integer: true, initial: 0 }),
         turnUndead: new fields.NumberField({ integer: true, initial: 0 })
       })
+    });
+
+    schema.spellList = new fields.StringField({ blank: true, initial: "" });
+    schema.spells = new fields.SchemaField({
+      l1: new fields.StringField({ blank: true }),
+      l2: new fields.StringField({ blank: true }),
+      l3: new fields.StringField({ blank: true }),
+      l4: new fields.StringField({ blank: true }),
+      l5: new fields.StringField({ blank: true }),
+      l6: new fields.StringField({ blank: true })
+    });
+    schema.spellList2 = new fields.StringField({ blank: true, initial: "" });
+    schema.spells2 = new fields.SchemaField({
+      l1: new fields.StringField({ blank: true }),
+      l2: new fields.StringField({ blank: true }),
+      l3: new fields.StringField({ blank: true }),
+      l4: new fields.StringField({ blank: true }),
+      l5: new fields.StringField({ blank: true }),
+      l6: new fields.StringField({ blank: true })
     });
 
     schema.details = new fields.SchemaField({
