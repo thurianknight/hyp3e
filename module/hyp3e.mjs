@@ -41,13 +41,13 @@ let trackerInitialized = false;
 
 Hooks.once('init', async function() {
 
-  // Add utility classes to the global game object so that they're more easily
-  // accessible in global contexts.
-  game.hyp3e = {
-    Hyp3eActor,
-    Hyp3eItem,
-    rollItemMacro
-  };
+  // // Add utility classes to the global game object so that they're more easily
+  // // accessible in global contexts.
+  // game.hyp3e = {
+  //   Hyp3eActor,
+  //   Hyp3eItem,
+  //   rollItemMacro
+  // };
 
   console.log("Game info:", game);
   console.log("System info:", game.system);
@@ -86,8 +86,16 @@ Hooks.once('init', async function() {
   // CONFIG.Item.dataModels.container    = HYP3E_DATA_MODELS.Hyp3eContainer;
   CONFIG.Item.dataModels.effectTemplate = HYP3E_DATA_MODELS.Hyp3eEffectTemplate;
 
-  console.log("Hyperborea | DataModels registered");
+  console.log("Hyperborea | DataModels registered - template.json no longer used.");
   //*/
+
+  // Add utility classes to the global game object so that they're more easily
+  // accessible in global contexts.
+  game.hyp3e = {
+    Hyp3eActor,
+    Hyp3eItem,
+    rollItemMacro
+  };
 
   // Set chat font size from Hyp3e config
   applyChatFontSizeSetting();
