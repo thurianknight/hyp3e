@@ -107,7 +107,7 @@
             "enableEncumbrance": "Enable custom encumbrance formulae",
             "enableEncumbranceHint": "Enables the following GM-defined Strength multipliers as encumbrance formulae, to enforce MV and AC penalties. Disabled by default.",
             "enableCoinWeight": "Enable coin weight",
-            "enableCoinWeightHint": "Enables the use of coin weight in the encumbrance calculation (100 coins = 1 lb.). Disabled by default.",
+            "enableCoinWeightHint": "Include coin weight (100 coins = 1 lb.) in the encumbrance calculation. Disabled by default.",
             "encumberedLabel": "Encumbered multiplier: ST x ",
             "heavilyEncumberedLabel": "Heavily encumbered: ST x ",
             "encumbranceLabelHint": "A whole number, e.g. 10, 15, etc. This is only used if Encumbrance is enabled, above.",
