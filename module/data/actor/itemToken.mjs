@@ -4,7 +4,7 @@ import Hyp3eActorBase from "./base.mjs";
 export default class Hyp3eItemToken extends Hyp3eActorBase {
   static defineSchema() {
     const fields = foundry.data.fields;
-    const schema = super.defineSchema();
+    let schema = super.defineSchema();
   
     // Item Token fields
     schema.attributes = new fields.SchemaField({

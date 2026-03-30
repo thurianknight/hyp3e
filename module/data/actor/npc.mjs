@@ -4,7 +4,7 @@ import Hyp3eActorBase from "./base.mjs";
 export default class Hyp3eNpc extends Hyp3eActorBase {
   static defineSchema() {
     const fields = foundry.data.fields;
-    const schema = super.defineSchema();
+    let schema = super.defineSchema();
 
     // NPC fields
     schema.attributes = new fields.SchemaField({

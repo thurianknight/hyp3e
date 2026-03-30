@@ -1,11 +1,12 @@
 // module/data/actor/character.mjs
 import Hyp3eActorBase from "./base.mjs";
+import { moneyTemplate } from "../templates/money.mjs";
 import { Hyp3eLogger } from "../../helpers/logger.mjs";
 
 export default class Hyp3eCharacter extends Hyp3eActorBase {
   static defineSchema() {
     const fields = foundry.data.fields;
-    const schema = super.defineSchema();
+    let schema = super.defineSchema();
 
     // Character fields
     schema.attributes = new fields.SchemaField({
