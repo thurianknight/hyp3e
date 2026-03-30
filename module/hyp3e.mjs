@@ -69,7 +69,6 @@ Hooks.once('init', async function() {
 
   // Register data models for Actors and Items. This replaces the "template.json" system.
   // Actors
-  //**
   CONFIG.Actor.dataModels.character = HYP3E_DATA_MODELS.Hyp3eCharacter;
   CONFIG.Actor.dataModels.npc       = HYP3E_DATA_MODELS.Hyp3eNPC;
   CONFIG.Actor.dataModels.merchant  = HYP3E_DATA_MODELS.Hyp3eMerchant;
@@ -83,11 +82,9 @@ Hooks.once('init', async function() {
   CONFIG.Item.dataModels.spell        = HYP3E_DATA_MODELS.Hyp3eSpell;
   CONFIG.Item.dataModels.feature      = HYP3E_DATA_MODELS.Hyp3eFeature;
   CONFIG.Item.dataModels.item         = HYP3E_DATA_MODELS.Hyp3eItem;
-  // CONFIG.Item.dataModels.container    = HYP3E_DATA_MODELS.Hyp3eContainer;
   CONFIG.Item.dataModels.effectTemplate = HYP3E_DATA_MODELS.Hyp3eEffectTemplate;
 
   console.log("Hyperborea | DataModels registered - template.json no longer used.");
-  //*/
 
   // Add utility classes to the global game object so that they're more easily
   // accessible in global contexts.
