@@ -8,11 +8,11 @@ export function moneyTemplate() {
 
   return {
     money: new fields.SchemaField({
-      cp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-      sp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-      ep: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-      gp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-      pp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) })
+      cp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+      sp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+      ep: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+      gp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+      pp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) })
     })
   };
 }

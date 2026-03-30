@@ -118,13 +118,16 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       lvl12: new fields.StringField({ blank: true })
     });
 
-    schema.money = new fields.SchemaField({
-      cp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
-      sp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
-      ep: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
-      gp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
-      pp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) })
-    });
+    // Money template
+    schema = this.mergeSchema(schema, moneyTemplate);
+    
+    // schema.money = new fields.SchemaField({
+    //   cp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+    //   sp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+    //   ep: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+    //   gp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) }),
+    //   pp: new fields.SchemaField({ value: new fields.StringField({ initial: "0" }) })
+    // });
 
     schema.treasure = new fields.StringField({ blank: true });
 

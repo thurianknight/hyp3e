@@ -10,14 +10,6 @@ export default class Hyp3eMerchant extends Hyp3eActorBase {
     // Money template
     schema = this.mergeSchema(schema, moneyTemplate);
 
-    // schema.money = new fields.SchemaField({
-    //   cp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-    //   sp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-    //   ep: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-    //   gp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) }),
-    //   pp: new fields.SchemaField({ value: new fields.NumberField({ initial: 0 }) })
-    // });
-
     // Merchant-specific fields
     schema.buyMultiplier = new fields.NumberField({ initial: 0.5 });
     schema.sellMultiplier = new fields.NumberField({ initial: 1.0 });
