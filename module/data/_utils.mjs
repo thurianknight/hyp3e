@@ -16,4 +16,9 @@ export class Hyp3eDataModel extends foundry.abstract.TypeDataModel {
     // Put any data migration logic here later
     return super.migrateData(source);
   }
+
+  // Helper to get system settings
+  getSetting(key) {
+    return game.settings.get(game.system.id, key);
+  }
 }

@@ -4235,24 +4235,24 @@ export class Hyp3eCharacterClass {
     }
 
     /**
-     * @param {string} actorId - The actor ID to lookup.
+     * @param {string} data - The actor's system data object
      * @return {object} - The attribute data object 
      */
-    static calcAttrMods(actorId) {
-      let actor = game.actors.get(actorId)
-      if (!actor) {
-        Hyp3eLogger.info("Hyp3eCharacterClass calcAttrMods", `Actor not found for id ${actorId}`);
-        return null;
-      }
+    static calcAttrMods(data) {
+      // let actor = game.actors.get(actorId)
+      // if (!actor) {
+      //   Hyp3eLogger.info("Hyp3eCharacterClass calcAttrMods", `Actor not found for id ${actorId}`);
+      //   return null;
+      // }
       // Actor system data for lookups
-      const data = actor.system;
+      // const data = actor.system;
       let thisClass = this.classData[data.details.class];
       if (!thisClass) {
         const customClassData = game.settings.get(game.system.id, "customClassData");
         thisClass = customClassData[data.details.class];
       }
       // Clone attributes so we can safely work with the modifiers
-      const attributes = foundry.utils.deepClone(actor.system.attributes);
+      const attributes = foundry.utils.deepClone(data.attributes);
 
       // Temp variable
       let getsBonusSpell = false

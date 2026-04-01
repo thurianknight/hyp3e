@@ -93,7 +93,8 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
       resistances: new fields.ObjectField({ initial: {} }),           // flexible object
       tempModifiers: new fields.ArrayField(new fields.ObjectField(), { initial: [] }),
 
-      baseClass: new fields.StringField({ required: true, blank: true, initial: "" })
+      baseClass: new fields.StringField({ required: true, blank: true, initial: "" }),
+      _hyp3eEffectConditionState: new fields.ObjectField({ initial: {} })   // { [effectUuid]: "active" | "inactive" }
     };
   }
 

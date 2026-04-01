@@ -48,6 +48,8 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
       this.hp.min = -3
     }
 
+    this.baseClass = "npc";
+
     Hyp3eLogger.info("Hyp3eNpc prepareBaseData", `Base data prepared for npc ${this.parent.name}:`, this);
   }
 

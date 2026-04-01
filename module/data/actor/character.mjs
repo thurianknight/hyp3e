@@ -1,5 +1,6 @@
 // module/data/actor/character.mjs
 import Hyp3eActorBase from "./base.mjs";
+import { Hyp3eCharacterClass } from "../../helpers/character.mjs";
 import { moneyTemplate } from "../templates/money.mjs";
 import { Hyp3eLogger } from "../../helpers/logger.mjs";
 
@@ -180,6 +181,29 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
   prepareDerivedData() {
     super.prepareDerivedData?.();
 
+    // Get character base class, used for crit hit & crit miss tables
+    const customClassData = this.getSetting("customClassData");
+    this.baseClass = Hyp3eCharacterClass.classData[this.details.class]?.baseClass ?? customClassData[this.details.class]?.baseClass ?? "npc";
+
+    // Auto-calculate attribute modifiers if configuration is enabled
+    const autoCalcAttrMods = this.getSetting("autoCalcAttrMods");
+    if (autoCalcAttrMods) {
+      const attributeData = this._calcAttrMods();
+      if (attributeData) {
+        this.attributes = attributeData;
+      }
+    }
+
+    // Apply active effects that modify attributes, if any exist. This is 
+    //  necessary because some attribute modifiers depend on other attribute 
+    //  values (e.g. a spell that gives you +1 to all modifiers, which then 
+    //  affects your attack and damage mods).
+    if (this.attributes) {
+      let attributes = this.attributes;
+      attributes = this._applyActiveEffectsToAttributes(attributes);
+      this.attributes = attributes;
+    }
+
     // Calculate weight carried & encumbrance
     this.weightCarried = this._calcWeightCarried();
 
@@ -199,12 +223,148 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
   }
 
   /**
+   * Automatically calculate and populate character attribute modifiers
+   * @returns {object} - JSON object of attributes and modifiers
+   */
+  _calcAttrMods() {
+    if (!this.attributes) return;
+
+    // Use a clone of the actor's system data to avoid mutating it directly
+    const systemData = foundry.utils.deepClone(this);
+    const attributeData = Hyp3eCharacterClass.calcAttrMods(systemData);
+
+    Hyp3eLogger.info("Hyp3eCharacter _calcAttrMods", `Calculated attribute data for ${this.parent.name}:`, attributeData);
+    return attributeData;
+  }
+
+  /**
+   * Apply active effects that modify attributes, if any exist.
+   * @returns {*} attributes with active effects applied to them
+   * 
+   * Note: This function is necessary to apply changes from active effects that 
+   *  depend on other attribute values (e.g. a spell that gives you +1 to all 
+   *  modifiers, which then affects your attack and damage mods).
+   * We have to do this in a separate function after _calcAttrMods because we 
+   *  need the base modifiers to calculate the dependent modifiers correctly.
+   */
+  _applyActiveEffectsToAttributes() {
+    const actor = this.parent;
+    if (!actor) return this.attributes;
+
+    const attributeData = foundry.utils.deepClone(this.attributes);
+
+    // Attribute modifiers that could receive an active effect
+    const allowedKeys = [
+      "system.attributes.str.atkMod", 
+      "system.attributes.str.dmgMod", 
+      "system.attributes.str.test", 
+      "system.attributes.str.feat", 
+      "system.attributes.dex.atkMod", 
+      "system.attributes.dex.defMod", 
+      "system.attributes.dex.test", 
+      "system.attributes.dex.feat", 
+      "system.attributes.con.hpMod", 
+      "system.attributes.con.poisRadMod", 
+      "system.attributes.con.traumaSurvive", 
+      "system.attributes.con.test", 
+      "system.attributes.con.feat", 
+      "system.attributes.int.languages", 
+      "system.attributes.int.bonusSpells.lvl1", 
+      "system.attributes.int.bonusSpells.lvl2", 
+      "system.attributes.int.bonusSpells.lvl3", 
+      "system.attributes.int.bonusSpells.lvl4", 
+      "system.attributes.int.learnSpell", 
+      "system.attributes.wis.willMod", 
+      "system.attributes.wis.bonusSpells.lvl1", 
+      "system.attributes.wis.bonusSpells.lvl2", 
+      "system.attributes.wis.bonusSpells.lvl3", 
+      "system.attributes.wis.bonusSpells.lvl4", 
+      "system.attributes.wis.learnSpell", 
+      "system.attributes.cha.reaction", 
+      "system.attributes.cha.maxHenchmen", 
+      "system.attributes.cha.turnUndead", 
+    ];
+
+    const changes = [];
+    for ( const effect of actor.allApplicableEffects() ) {
+      // Skip if disabled or not active
+      if ( effect.disabled || !effect.active ) continue;
+
+      // Validate effect condition is met before applying changes
+      const conditionPasses = actor._effectApplies(effect);
+      // Store temporary effect condition state in actor (used by actor-sheet)
+      this._hyp3eEffectConditionState = this._hyp3eEffectConditionState || {};
+      this._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
+
+      if (!conditionPasses) {
+        Hyp3eLogger.info("Hyp3eCharacter _applyActiveEffectsToAttributes", `Skipping effect "${effect.name}" on ${this.parent.name} — condition not met:`, effect.flags.hyp3e?.condition);
+        continue;
+      }
+
+      // Only include changes to allowed keys
+      const filtered = effect.changes
+        .filter(change => allowedKeys.includes(change.key))
+        .map(change => {
+          const c = foundry.utils.deepClone(change);
+          c.effect = effect;
+          c.priority = c.priority ?? (c.mode * 10);
+          return c;
+        });
+      changes.push(...filtered);
+    }
+
+    // Do we have any changes to apply?
+    if ( changes.length > 0 ) {
+      // Organize effects by their priority (though it probably doesn't matter)
+      changes.sort((a, b) => a.priority - b.priority);
+
+      // Update attributeData object with ActiveEffect changes
+      for (const change of changes) {
+        // Parse the change.value string and resolve it into a number if possible
+        let resolvedChange = null;
+        if (isPureNumber(change.value)) {
+          resolvedChange = Number(change.value) || 0;
+        } else if (isPureString(change.value)) {
+          resolvedChange = change.value;
+        } else if (containsDice(change.value)) {
+          // Dice rolls require async processing, which we can't do during _prepareData
+          Hyp3eLogger.info("Hyp3eCharacter _applyActiveEffectsToAttributes", `Change "${change.value}" contains a dice roll formula, which is not allowed for attribute modifiers. Skipping...`);
+          continue;
+        } else if (containsMathOrVariables(change.value)) {
+          // No dice rolls, we can do it synchronously
+          resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);
+        }
+
+        Hyp3eLogger.info("Hyp3eCharacter _applyActiveEffectsToAttributes", `Applying ${change.effect.name} to ${this.parent.name}'s ${change.key}:`, { resolvedChange, change });
+
+        let path = change.key; // e.g. "system.attributes.str.atkMod"
+        path = path.replace(/^system\.attributes\./, "");
+        let attrModValue = foundry.utils.getProperty(attributeData, path);
+        // Convert strings to numbers if necessary, but leave booleans alone
+        if (isPureNumber(attrModValue)) attrModValue = Number(attrModValue);
+        // Apply change based on mode
+        switch (change.mode) {
+          case CONST.ACTIVE_EFFECT_MODES.ADD: attrModValue += resolvedChange; break;
+          case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: attrModValue *= resolvedChange; break;
+          case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: attrModValue = resolvedChange; break;
+          // Pretty sure we don't need the other effect modes
+        }
+        foundry.utils.setProperty(attributeData, path, attrModValue);
+      }
+    }
+
+    Hyp3eLogger.info("Hyp3eCharacter _applyActiveEffectsToAttributes", `Updated attribute data with active effects for ${this.parent.name}:`, attributeData);
+    return attributeData;
+  }
+
+  /**
    * Calculate the total weight carried by the character. Only used with characters.
    * @returns {number} Total weight carried, rounded to one decimal place
    */
   _calcWeightCarried() {
-    const enableCoinWeight = game.settings.get(game.system.id, "enableCoinWeight");
+    const enableCoinWeight = this.getSetting("enableCoinWeight");
     if (!this.parent?.items && !enableCoinWeight) return 0;
+
     let carriedWt = this.parent.items.reduce((total, item) => {
       // Start with carried/equipped items. We ignore weight of non-equipped 
       //  items since they are assumed to have been removed or dropped.

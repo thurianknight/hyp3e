@@ -123,22 +123,22 @@ export class Hyp3eActor extends Actor {
 
     // Calculated fields go here...
 
-    // Add actor type & base class, used for crit hit & crit miss tables
-    const customClassData = game.settings.get(game.system.id, "customClassData");
-    try {
-      systemData.baseClass = Hyp3eCharacterClass.classData[systemData.details.class]?.baseClass ?? customClassData[systemData.details.class]?.baseClass;
-    } catch (err) {
-      // No match found (happens with custom classes), use "npc"
-      systemData.baseClass = "npc"
-    }
+    // // Add actor type & base class, used for crit hit & crit miss tables
+    // const customClassData = game.settings.get(game.system.id, "customClassData");
+    // try {
+    //   systemData.baseClass = Hyp3eCharacterClass.classData[systemData.details.class]?.baseClass ?? customClassData[systemData.details.class]?.baseClass;
+    // } catch (err) {
+    //   // No match found (happens with custom classes), use "npc"
+    //   systemData.baseClass = "npc"
+    // }
 
     // Auto-calculate attribute modifiers if configuration is enabled
-    if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
-      const attributeData = this._calcAttrMods(this.id, systemData);
-      if (attributeData) {
-        systemData.attributes = attributeData;
-      }
-    }
+    // if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
+    //   const attributeData = this._calcAttrMods(this.id, systemData);
+    //   if (attributeData) {
+    //     systemData.attributes = attributeData;
+    //   }
+    // }
 
     // Calculate weight carried & encumbrance
     // systemData.weightCarried = this._calcWeightCarried();
@@ -186,7 +186,7 @@ export class Hyp3eActor extends Actor {
     this._applyTempModifiers(systemData);
 
     // Add actor base class, used for crit hit & crit miss tables
-    systemData.baseClass = "npc"
+    // systemData.baseClass = "npc"
   }
 
   /**
@@ -418,7 +418,7 @@ export class Hyp3eActor extends Actor {
   _calcAttrMods(actorId, systemData) {
     if (!actorId) return;
     // Calculate the entire attributes object
-    const attributeData = Hyp3eCharacterClass.calcAttrMods(actorId);
+    const attributeData = Hyp3eCharacterClass.calcAttrMods(systemData);
     // Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Initial attribute data for ${this.name}:`, attributeData);
 
     // Starting here, we apply active effects that update the modifiers...
