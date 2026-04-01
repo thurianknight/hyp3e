@@ -56,7 +56,7 @@ export function parseGpValue(coinString) {
 /**
  * Take any valid number or numeric string and return a pure number
  * @param {*} value 
- * @returns 
+ * @returns {Number}
  */
 export function toNumber(value) {
   if (value == null) return 0;
@@ -254,7 +254,8 @@ export async function sellToMerchant(merchant, seller, item) {
     const buyMult = parseFloat(merchant.system?.buyMultiplier) ?? 1.0;
     // Final price is rounded to the nearest .01, or half a copper piece
     const buyPrice = Math.round(basePrice * buyMult * 100)/100;
-    const sellerQty = parseInt(item.system.quantity?.value) ?? 1;
+    // const sellerQty = parseInt(item.system.quantity?.value) ?? 1;
+    const sellerQty = toNumber(item.system.quantity?.value) ?? 1;
     Hyp3eLogger.info("sellToMerchant", `Merchant's buying price in gp:`, buyPrice)
 
     const merchantFunds = getTotalMoney(merchant.system.money);
@@ -544,7 +545,7 @@ export function mergeStructuredMoney(a, b) {
 export async function transferFromActor(recipient, giver, item) {
   const itemData = item.toObject();
   const itemName = itemData.name;
-  const giverQty = parseInt(item.system.quantity?.value) ?? 1;
+  const giverQty = toNumber(item.system.quantity?.value) ?? 1;
 
   // Handle max transfer qty based on giver qty on hand
   if (giverQty <= 0) {
@@ -655,7 +656,7 @@ export async function transferCoinFromActor(recipient, giver, currency) {
     return ui.notifications.warn(`${giver.displayName} has no ${coinLabel}.`)
     return;
   }
-  let giverAmount = coin.value;
+  let giverAmount = toNumber(coin.value);
 
   // Prompt for amount to transfer
   const amount = await Dialog.prompt({
@@ -684,13 +685,13 @@ export async function transferCoinFromActor(recipient, giver, currency) {
 
   // Adjust the giver's coin amount
   const fromMoney = foundry.utils.deepClone(giver.system.money);
-  const fromCoin = Number(fromMoney[currency].value);
+  const fromCoin = toNumber(fromMoney[currency].value);
   fromMoney[currency].value = fromCoin - amount;
   await giver.update({ 'system.money': fromMoney });
 
   // Add to the recipient's coin amount
   const toMoney = foundry.utils.deepClone(recipient.system.money);
-  const toCoin = Number(toMoney[currency]?.value) || 0;
+  const toCoin = toNumber(toMoney[currency]?.value) || 0;
   toMoney[currency].value = toCoin + amount;
   await recipient.update({ 'system.money': toMoney });
 
