@@ -134,32 +134,32 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
 
     schema.taskResolution = new fields.SchemaField({
       simple: new fields.SchemaField({
-        name: new fields.StringField({ initial: "HYP3E.taskResolution.simple.name" }),
-        hint: new fields.StringField({ initial: "HYP3E.taskResolution.simple.hint" }),
+        name: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.simple.name") }),
+        hint: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.simple.hint") }),
         tn: new fields.NumberField({ integer: true, initial: 5 })
       }),
       moderate: new fields.SchemaField({
-        name: new fields.StringField({ initial: "HYP3E.taskResolution.moderate.name" }),
-        hint: new fields.StringField({ initial: "HYP3E.taskResolution.moderate.hint" }),
+        name: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.moderate.name") }),
+        hint: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.moderate.hint") }),
         tn: new fields.NumberField({ integer: true, initial: 4 })
       }),
       "challenging": new fields.SchemaField({
-        name: new fields.StringField({ initial: "HYP3E.taskResolution.challenging.name" }),
-        hint: new fields.StringField({ initial: "HYP3E.taskResolution.challenging.hint" }),
+        name: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.challenging.name") }),
+        hint: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.challenging.hint") }),
         tn: new fields.NumberField({ integer: true, initial: 3 })
       }),
       "difficult": new fields.SchemaField({
-        name: new fields.StringField({ initial: "HYP3E.taskResolution.difficult.name" }),
-        hint: new fields.StringField({ initial: "HYP3E.taskResolution.difficult.hint" }),
+        name: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.difficult.name") }),
+        hint: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.difficult.hint") }),
         tn: new fields.NumberField({ integer: true, initial: 2 })
       }),
       "veryDifficult": new fields.SchemaField({
-        name: new fields.StringField({ initial: "HYP3E.taskResolution.veryDifficult.name" }),
-        hint: new fields.StringField({ initial: "HYP3E.taskResolution.veryDifficult.hint" }),
+        name: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.veryDifficult.name") }),
+        hint: new fields.StringField({ initial: game.i18n.localize("HYP3E.taskResolution.veryDifficult.hint") }),
         tn: new fields.NumberField({ integer: true, initial: 1 })
       })
     });
-  
+
     return schema;
   }
 
@@ -170,6 +170,8 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
   prepareBaseData() {
     super.prepareBaseData?.();
 
+    // PCs can drop to -10 hp before they die
+    this.hp.min = -10;
   }
   
   /** 

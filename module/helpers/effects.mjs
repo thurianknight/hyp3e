@@ -287,7 +287,8 @@ export async function setupEffectHandlers() {
     const srcActorUuid = source?.srcActorUuid ?? "";
     // const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
     const sourceActor = srcActorUuid ? await fromUuid(srcActorUuid) : effect.parent;
-    const actorData = sourceActor?.system ?? {};
+    // const actorData = sourceActor?.system ?? {};
+    const actorData = sourceActor.getRollData?.() ?? {};
     Hyp3eLogger.info("ActiveEffect createActiveEffect", `Actor applying the effect:`, actorData);
 
     // Flag to track whether anything needs to be updated

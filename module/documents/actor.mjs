@@ -30,40 +30,40 @@ export class Hyp3eActor extends Actor {
 
     const systemData = this.system;
     // Base/current FA, CA, TA
-    systemData.fa = systemData?.fightingAbility.value ? systemData.fightingAbility.value : (systemData.fa ?? 0);
-    systemData.ca = (systemData?.castingAbility.value || systemData?.castingAbility.value === null) ? systemData.castingAbility.value : (systemData.ca ?? null);
-    systemData.ta = (systemData?.turningAbility.value || systemData?.turningAbility.value === null) ? systemData.turningAbility.value : (systemData.ta ?? null);
+    // systemData.fa = systemData?.fightingAbility.value ? systemData.fightingAbility.value : (systemData.fa ?? 0);
+    // systemData.ca = (systemData?.castingAbility.value || systemData?.castingAbility.value === null) ? systemData.castingAbility.value : (systemData.ca ?? null);
+    // systemData.ta = (systemData?.turningAbility.value || systemData?.turningAbility.value === null) ? systemData.turningAbility.value : (systemData.ta ?? null);
 
     // Fix temporary modifier properties that might be undefined, null, or non-numeric:
     //  system.hp.tempHp, system.ac.tempAcMod, system.ac.tempDrMod, system.movement.tempMvMod, system.tempAtkMod, system.tempDmgMod
     // ActiveEffects will be applied after this.
-    systemData.hp.tempHp = convertToInt(systemData.hp?.tempHp);
-    systemData.ac.tempAcMod = convertToInt(systemData.ac?.tempAcMod);
-    systemData.ac.tempDrMod = convertToInt(systemData.ac?.tempDrMod);
-    systemData.movement.tempMvMod = convertToInt(systemData.movement?.tempMvMod);
-    systemData.tempAtkMod = convertToInt(systemData?.tempAtkMod);
-    systemData.tempDmgMod = convertToInt(systemData?.tempDmgMod);
+    // systemData.hp.tempHp = convertToInt(systemData.hp?.tempHp);
+    // systemData.ac.tempAcMod = convertToInt(systemData.ac?.tempAcMod);
+    // systemData.ac.tempDrMod = convertToInt(systemData.ac?.tempDrMod);
+    // systemData.movement.tempMvMod = convertToInt(systemData.movement?.tempMvMod);
+    // systemData.tempAtkMod = convertToInt(systemData?.tempAtkMod);
+    // systemData.tempDmgMod = convertToInt(systemData?.tempDmgMod);
 
 
     // Base/current saving throws
-    const saves = systemData.saves;
-    for (const save of Object.values(saves)) {
-      save.curr = save.value ?? 0;
-    }
+    // const saves = systemData.saves;
+    // for (const save of Object.values(saves)) {
+    //   save.curr = save.value ?? 0;
+    // }
 
     if (this.type === 'character') {
-      // Get/set "curr" value for each character attribute
-      const attrs = systemData.attributes;
-      for (const [k, attr] of Object.entries(attrs)) {
-        // Convert the original value to a number if necessary
-        attr.value = Number(attr.value);
-        // If no effect touched curr, derive it from base value
-        if (!attr.curr || attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
-      }
+      // // Get/set "curr" value for each character attribute
+      // const attrs = systemData.attributes;
+      // for (const [k, attr] of Object.entries(attrs)) {
+      //   // Convert the original value to a number if necessary
+      //   attr.value = Number(attr.value);
+      //   // If no effect touched curr, derive it from base value
+      //   if (!attr.curr || attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
+      // }
 
       // Log the prepared data
-      const sysData = foundry.utils.deepClone(this.system);
-      Hyp3eLogger.info("Hyp3eActor prepareBaseData", `${this.displayName} base data:`, this);
+      // const sysData = foundry.utils.deepClone(this.system);
+      // Hyp3eLogger.info("Hyp3eActor prepareBaseData", `${this.displayName} base data:`, this);
     }
 
   }
@@ -82,29 +82,7 @@ export class Hyp3eActor extends Actor {
 
     const systemData = this.system;
     const flags = this.flags.hyp3e || {};
-    systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
-    // systemData.hp.percentage = Math.min(Math.max((systemData.hp.value * 100) / systemData.hp.max, 0), 100);
-
-    // Helper to ensure nested structure and compute curr (repeatable for FA/CA/TA/saves)
-    // const ensureNestedStat = (statPath, defaultValue = 0) => {
-    //   const stat = foundry.utils.getProperty(systemData, statPath);
-    //   if (typeof stat === "number" || stat === null) {
-    //     // Legacy flat: Convert to nested in-memory (don't persist here)
-    //     const value = stat ?? defaultValue;
-    //     foundry.utils.setProperty(systemData, statPath, { value, curr: value });
-    //   } else if (typeof stat === "object" && stat.value !== undefined) {
-    //     // Already nested: Reset curr to value (effects apply after)
-    //     stat.curr = stat.value ?? defaultValue;
-    //   } else {
-    //     // Undefined or wrong type: Default
-    //     foundry.utils.setProperty(systemData, statPath, { value: defaultValue, curr: defaultValue });
-    //   }
-    // };
-
-    // Apply to your stats: FA always exists, CA & TA may be null
-    // ensureNestedStat("fa", 0);
-    // ensureNestedStat("ca", null);
-    // ensureNestedStat("ta", null);
+    // systemData.hp.percentage = Math.clamp((systemData.hp.value * 100) / systemData.hp.max, 0, 100);
 
     // Notes on system.tempModifiers:
     //  This is an array of modifiers that may be applied to any field in the data template.
@@ -147,28 +125,17 @@ export class Hyp3eActor extends Actor {
     // Make modifications to base data here
     const systemData = this.system;
 
-    // PCs can drop to -10 hp before they die
-    systemData.hp.min = -10;
-
     // Calculated fields go here...
 
     // Add actor type & base class, used for crit hit & crit miss tables
     const customClassData = game.settings.get(game.system.id, "customClassData");
     try {
-      systemData.actorType = this.type
-      systemData.actorName = this.name
       systemData.baseClass = Hyp3eCharacter.classData[systemData.details.class]?.baseClass ?? customClassData[systemData.details.class]?.baseClass;
     } catch (err) {
       // No match found (happens with custom classes), use "npc"
       systemData.baseClass = "npc"
     }
 
-    // Get/set "curr" value for properties that can be modified by effects. 
-    //  We do this here in the preparation phase so that the "curr" value is available for 
-    //  rolls and other calculations, and so that it can be modified by active effects in a 
-    //  consistent way.
-
-    
     // Auto-calculate attribute modifiers if configuration is enabled
     if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
       const attributeData = this._calcAttrMods(this.id, systemData);
@@ -178,7 +145,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Add task resolution
-    this._setupTaskResolution(systemData);
+    // this._setupTaskResolution(systemData);
 
     // Calculate weight carried & encumbrance
     systemData.weightCarried = this._calcWeightCarried();
@@ -220,25 +187,12 @@ export class Hyp3eActor extends Actor {
     // Make modifications to data here
     const systemData = this.system
 
-    // If NPC/Monster is not set, default to monster
-    if (!systemData?.npcType) {
-      systemData.npcType = "monster";
-    }
-    // NPCs and monsters don't get the -10 hp benefit that PCs do
-    if (systemData.npcType === "monster") {
-      systemData.hp.min = 0
-    } else if (systemData.npcType === "npc") {
-      systemData.hp.min = -3
-    }
-
     // Calculated fields go here...
 
     // Apply temp AC, DR, and MV modifiers
     this._applyTempModifiers(systemData);
 
-    // Add actor type & base class, used for crit hit & crit miss tables
-    systemData.actorType = this.type
-    systemData.actorName = this.name
+    // Add actor base class, used for crit hit & crit miss tables
     systemData.baseClass = "npc"
   }
 
@@ -286,27 +240,16 @@ export class Hyp3eActor extends Actor {
    * Override getRollData() that's supplied to rolls.
    */
   getRollData() {
-      const data = super.getRollData();
-      data.actorId = this.id
-      data.actorType = this.type;
-      data.actorName = this.name;
+    const data = super.getRollData();
+    data.actorId = this.id
+    // data.actorType = this.type;
+    data.actorName = this.name;
 
-      // Add short aliases that point to the prepared/final values
-      // if (data.fa?.curr !== undefined) {
-      //   data.fa_curr = data.fa.curr;
-      // }
-      // if (data.ca?.curr !== undefined) {
-      //   data.ca_curr = data.ca.curr;
-      // }
-      // if (data.ta?.curr !== undefined) {
-      //   data.ta_curr = data.ta.curr;
-      // }
-
-      // Prepare character/npc roll data.
-      this._getCharacterRollData(data);
-      // this._getNpcRollData(data);  // POSSIBLE FUTURE USE
-      // Hyp3eLogger.info("Hyp3eActor getRollData", `${this.name} data:`, data);
-      return data;
+    // Prepare character/npc roll data.
+    this._getCharacterRollData(data);
+    // this._getNpcRollData(data);  // POSSIBLE FUTURE USE
+    // Hyp3eLogger.info("Hyp3eActor getRollData", `${this.name} data:`, data);
+    return data;
   }
 
   /**

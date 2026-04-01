@@ -14,11 +14,14 @@ export class Hyp3eDice {
     let debugAtkRollFormula = "";
 
     // Format these output strings for later
-    let strAtkMod = "0";
-    let dexAtkMod = "0";
-    if (actorData?.actorType == "character") {
-      strAtkMod = parseInt(actorData.str.atkMod) > 0 ? `+${parseInt(actorData.str.atkMod)}` : `${parseInt(actorData.str.atkMod)}`;
-      dexAtkMod = parseInt(actorData.dex.atkMod) > 0 ? `+${parseInt(actorData.dex.atkMod)}` : `${parseInt(actorData.dex.atkMod)}`;
+    let formattedStrAtkMod = "0";
+    let formattedDexAtkMod = "0";
+    // if (actorData?.actorType == "character") {
+    if (actorData?.str?.atkMod !== undefined) {
+      formattedStrAtkMod = parseInt(actorData.str.atkMod) > 0 ? `+${parseInt(actorData.str.atkMod)}` : `${parseInt(actorData.str.atkMod)}`;
+    }
+    if (actorData?.dex?.atkMod !== undefined) {
+      formattedDexAtkMod = parseInt(actorData.dex.atkMod) > 0 ? `+${parseInt(actorData.dex.atkMod)}` : `${parseInt(actorData.dex.atkMod)}`;
     }
     const faAtkMod = parseInt(actorData.fa) > 0 ? `+${parseInt(actorData.fa)}` : `${parseInt(actorData.fa)}`;
     const caAtkMod = parseInt(actorData.ca) > 0 ? `+${parseInt(actorData.ca)}` : `${parseInt(actorData.ca)}`;
@@ -110,14 +113,16 @@ export class Hyp3eDice {
 
       // Grenade-like items only use the character's DX attack mod
       if (itemData.isGrenade) {
-        if (actorData?.actorType == "character") {
+        // if (actorData?.actorType == "character") {
           // If @dex.atkMod exists, remove it first
           atkRollParts = atkRollParts.filter(part => (part != "@dex.atkMod"));
           debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@dex.atkMod"));
           // By removing and re-adding, we ensure the parts are in the order we want
-          atkRollParts.push(actorData.dex.atkMod);
-          debugAtkRollParts.push(`<tr><td>DX Atk Mod</td><td>${dexAtkMod}</td></tr>`);
-        }
+          if (actorData?.dex?.atkMod !== undefined) {
+            atkRollParts.push(actorData.dex.atkMod);
+            debugAtkRollParts.push(`<tr><td>DX Atk Mod</td><td>${formattedDexAtkMod}</td></tr>`);
+          }
+        // }
       } else {
         // Most weapons fall into this section...
 
@@ -135,9 +140,10 @@ export class Hyp3eDice {
           atkRollParts = atkRollParts.filter(part => (part != "@str.atkMod"))
           debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@str.atkMod"))
           // By removing and re-adding, we ensure the parts are in the order we want
-          if (actorData?.actorType == "character") {
+          // if (actorData?.actorType == "character") {
+          if (actorData?.str?.atkMod !== undefined) {
             atkRollParts.push(actorData.str.atkMod)
-            debugAtkRollParts.push(`<tr><td>ST Atk Mod</td><td>${strAtkMod}</td></tr>`)
+            debugAtkRollParts.push(`<tr><td>ST Atk Mod</td><td>${formattedStrAtkMod}</td></tr>`)
           }
         }
         if (atkRollParts.includes("@dex.atkMod")) {
@@ -145,9 +151,10 @@ export class Hyp3eDice {
           atkRollParts = atkRollParts.filter(part => (part != "@dex.atkMod"))
           debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@dex.atkMod"))
           // By removing and re-adding, we ensure the parts are in the order we want
-          if (actorData?.actorType == "character") {
+          // if (actorData?.actorType == "character") {
+          if (actorData?.dex?.atkMod !== undefined) {
             atkRollParts.push(actorData.dex.atkMod)
-            debugAtkRollParts.push(`<tr><td>DX Atk Mod</td><td>${dexAtkMod}</td></tr>`)
+            debugAtkRollParts.push(`<tr><td>DX Atk Mod</td><td>${formattedDexAtkMod}</td></tr>`)
           }
         }
       }
@@ -164,11 +171,11 @@ export class Hyp3eDice {
       }
       if (atkRollParts.includes("@str.atkMod")) {
         atkRollParts[atkRollParts.indexOf("@str.atkMod")] = actorData.str?.atkMod ? actorData.str?.atkMod : 0;
-        debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = actorData.str?.atkMod ? `<tr><td>ST Atk Mod</td><td>${strAtkMod}</td></tr>` : `<tr><td>ST Atk Mod</td><td>0</td></tr>`;
+        debugAtkRollParts[debugAtkRollParts.indexOf("@str.atkMod")] = actorData.str?.atkMod ? `<tr><td>ST Atk Mod</td><td>${formattedStrAtkMod}</td></tr>` : `<tr><td>ST Atk Mod</td><td>0</td></tr>`;
       }
       if (atkRollParts.includes("@dex.atkMod")) {
         atkRollParts[atkRollParts.indexOf("@dex.atkMod")] = actorData.dex?.atkMod ? actorData.dex?.atkMod : 0
-        debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = actorData.dex?.atkMod ? `<tr><td>DX Atk Mod</td><td>${dexAtkMod}</td></tr>` : `<tr><td>DX Atk Mod</td><td>0</td></tr>`;
+        debugAtkRollParts[debugAtkRollParts.indexOf("@dex.atkMod")] = actorData.dex?.atkMod ? `<tr><td>DX Atk Mod</td><td>${formattedDexAtkMod}</td></tr>` : `<tr><td>DX Atk Mod</td><td>0</td></tr>`;
       }
     }
 
@@ -233,9 +240,10 @@ export class Hyp3eDice {
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Actor data:`, actorData);
 
     // Format these output strings for later
-    let strDmgMod = "0";
-    if (actorData?.actorType == "character") {
-      strDmgMod = parseInt(actorData.str.dmgMod) > 0 ? `+${parseInt(actorData.str.dmgMod)}` : `${parseInt(actorData.str.dmgMod)}`;
+    let formattedStrDmgMod = "0";
+    // if (actorData?.actorType == "character") {
+    if (actorData?.str?.dmgMod !== undefined) {
+      formattedStrDmgMod = parseInt(actorData.str.dmgMod) > 0 ? `+${parseInt(actorData.str.dmgMod)}` : `${parseInt(actorData.str.dmgMod)}`;
     }
     const faDmgMod = parseInt(actorData.fa) > 0 ? `+${parseInt(actorData.fa)}` : `${parseInt(actorData.fa)}`;
     const caDmgMod = parseInt(actorData.ca) > 0 ? `+${parseInt(actorData.ca)}` : `${parseInt(actorData.ca)}`;
@@ -275,10 +283,11 @@ export class Hyp3eDice {
     // ST Dmg Mod
     const strDmgModRegex = /\+\s*@str.dmgMod/g
     if (debugDmgRollParts[1].match(strDmgModRegex) > "") {
-      if (actorData?.actorType == "character") {
+      // if (actorData?.actorType == "character") {
+      if (actorData?.str?.dmgMod !== undefined) {
         dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, `+ ${actorData.str.dmgMod}`);
         debugDmgRollParts[1] = debugDmgRollParts[1].replace(strDmgModRegex, "");
-        debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
+        debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${formattedStrDmgMod}</td></tr>`);
       } else {
         // NPCs/monsters don't have a ST attribute, so blank out that variable
         dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, "");
@@ -288,10 +297,11 @@ export class Hyp3eDice {
     }
     if (itemData.damage2h) {
       if (debugDmgRoll2Parts[1].match(strDmgModRegex) > "") {
-        if (actorData?.actorType == "character") {
+        // if (actorData?.actorType == "character") {
+        if (actorData?.str?.dmgMod !== undefined) {
           dmgRoll2Parts[0] = dmgRoll2Parts[0].replace(strDmgModRegex, `+ ${actorData.str.dmgMod}`);
           debugDmgRoll2Parts[1] = debugDmgRoll2Parts[1].replace(strDmgModRegex, "");
-          debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
+          debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${formattedStrDmgMod}</td></tr>`);
         } else {
           // NPCs/monsters don't have a ST attribute, so blank out that variable
           dmgRollParts[0] = dmgRollParts[0].replace(strDmgModRegex, "");
@@ -362,16 +372,14 @@ export class Hyp3eDice {
 
     // Apply the character's (not npc's) ST damage mod if the item is a melee weapon
     if (itemData.melee) {
-      if (actorData?.actorType == "character") {
-        dmgRollParts.push(strDmgMod.replace("+", ""));
-        debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
+      // if (actorData?.actorType == "character") {
+      if (actorData?.str?.dmgMod !== undefined) {
+        dmgRollParts.push(formattedStrDmgMod.replace("+", ""));
+        debugDmgRollParts.push(`<tr><td>ST Dmg Mod</td><td>${formattedStrDmgMod}</td></tr>`);
         if (itemData.damage2h) {
-          dmgRoll2Parts.push(strDmgMod.replace("+", ""));
-          debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${strDmgMod}</td></tr>`);
+          dmgRoll2Parts.push(formattedStrDmgMod.replace("+", ""));
+          debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod</td><td>${formattedStrDmgMod}</td></tr>`);
         }
-      } else {
-        // NPCs/monsters don't have a ST attribute, so nothing to do here except 
-        //  note it in a comment. :-)
       }
     }
     // Apply the character's ST damage mod if the item has the "strDmgAdj" annotation (missile weapons)
@@ -382,16 +390,14 @@ export class Hyp3eDice {
       const hasStrVar = baseFormula.includes("@str.dmgMod");
 
       if (!hasStrVar) {
-        if (actorData?.actorType === "character") {
-          dmgRollParts.push(strDmgMod.replace("+", ""));
-          debugDmgRollParts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${strDmgMod}</td></tr>`);
+        // if (actorData?.actorType === "character") {
+        if (actorData?.str?.dmgMod !== undefined) {
+          dmgRollParts.push(formattedStrDmgMod.replace("+", ""));
+          debugDmgRollParts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${formattedStrDmgMod}</td></tr>`);
           if (itemData.damage2h) {
-            dmgRoll2Parts.push(strDmgMod.replace("+", ""));
-            debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${strDmgMod}</td></tr>`);
+            dmgRoll2Parts.push(formattedStrDmgMod.replace("+", ""));
+            debugDmgRoll2Parts.push(`<tr><td>ST Dmg Mod (annotation)</td><td>${formattedStrDmgMod}</td></tr>`);
           }
-        } else {
-          // NPCs/monsters don't have a ST attribute, so nothing to do here except 
-          //  note it in a comment. :-)
         }
       }
     }

@@ -1,5 +1,6 @@
 // module/data/actor/base.mjs
 import { Hyp3eDataModel } from "../_utils.mjs";   // see utils below
+import { isPureNumber, isPureString, convertToInt } from "../../dice/dice.mjs";
 
 export default class Hyp3eActorBase extends Hyp3eDataModel {
   static defineSchema() {
@@ -12,7 +13,8 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
         value: new fields.NumberField({ required: true, integer: true, initial: 0 }),
         min:   new fields.NumberField({ required: true, integer: true, initial: 0 }),
         max:   new fields.NumberField({ required: true, integer: true, initial: 0 }),
-        tempHp: new fields.NumberField({ required: true, integer: true, initial: 0 })
+        tempHp: new fields.NumberField({ required: true, integer: true, initial: 0 }),
+        percentage: new fields.NumberField({ required: true, initial: 100 })
       }),
 
       ac: new fields.SchemaField({
@@ -88,7 +90,11 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
       tokenAlias: new fields.StringField({ required: true, blank: true, initial: "" }),
 
       resistances: new fields.ObjectField({ initial: {} }),           // flexible object
-      tempModifiers: new fields.ArrayField(new fields.ObjectField(), { initial: [] })
+      tempModifiers: new fields.ArrayField(new fields.ObjectField(), { initial: [] }),
+
+      // actorType: new fields.StringField({ required: true, blank: true, initial: "" }),
+      // actorName: new fields.StringField({ required: true, blank: true, initial: "" }),
+      baseClass: new fields.StringField({ required: true, blank: true, initial: "" })
     };
   }
 
@@ -108,12 +114,21 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
       }  
     }
 
-    // Base/current FA, CA, TA
+    // Fix temporary modifier properties that might be undefined, null, or non-numeric.
+    //  ActiveEffects will be applied later.
+    // this.hp.tempHp = convertToInt(this.hp?.tempHp);
+    // this.ac.tempAcMod = convertToInt(this.ac?.tempAcMod);
+    // this.ac.tempDrMod = convertToInt(this.ac?.tempDrMod);
+    // this.movement.tempMvMod = convertToInt(this.movement?.tempMvMod);
+    // this.tempAtkMod = convertToInt(this?.tempAtkMod);
+    // this.tempDmgMod = convertToInt(this?.tempDmgMod);
+
+    // Reset base/current FA, CA, TA
     this.fa = this?.fightingAbility.value ? this.fightingAbility.value : (this.fa ?? 0);
     this.ca = (this?.castingAbility.value || this?.castingAbility.value === null) ? this.castingAbility.value : (this.ca ?? null);
     this.ta = (this?.turningAbility.value || this?.turningAbility.value === null) ? this.turningAbility.value : (this.ta ?? null);
 
-    // Base/current saving throws
+    // Reset base/current saving throws
     const saves = this.saves;
     for (const save of Object.values(saves)) {
       save.curr = save.value ?? 0;
@@ -127,10 +142,7 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
   prepareDerivedData() {
     super.prepareDerivedData?.();
 
-    // Example: clamp HP after any AE modifications to max
-    // if (this.hp?.value != null && this.hp?.max != null) {
-    //   this.hp.value = Math.min(this.hp.value, this.hp.max);
-    // }
-
+    // Clamp HP percentage values
+    this.hp.percentage = Math.clamp((this.hp.value * 100) / this.hp.max, 0, 100);
   }
 }

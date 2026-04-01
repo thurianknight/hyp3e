@@ -28,4 +28,32 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
 
     return schema;
   }
+  
+  /** 
+   * Runs BEFORE Active Effects are applied.
+   * Used for calculating base "curr" values that AEs can then modify.
+   */
+  prepareBaseData() {
+    super.prepareBaseData?.();
+
+    // If NPC/Monster is not set, default to monster
+    if (!this?.npcType) {
+      this.npcType = "monster";
+    }
+    // NPCs and monsters don't get the -10 hp benefit that PCs do
+    if (this.npcType === "monster") {
+      this.hp.min = 0
+    } else if (this.npcType === "npc") {
+      this.hp.min = -3
+    }
+  }
+  
+  /** 
+   * Runs AFTER Active Effects.
+   * Use this for final totals, clamping, or anything that depends on post-AE values.
+   */
+  prepareDerivedData() {
+    super.prepareDerivedData?.();
+
+  }
 }
