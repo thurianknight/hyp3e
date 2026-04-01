@@ -1,5 +1,5 @@
 import { HYP3E } from "../helpers/config.mjs"
-import { Hyp3eCharacter } from "../helpers/character.mjs";
+import { Hyp3eCharacterClass } from "../helpers/character.mjs";
 import { parseGpValue, 
           buyFromMerchant,
           sellToMerchant,
@@ -453,37 +453,37 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Flag attributes that are too low for the character class
         switch (k) {
           case "str":
-            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `ST is too low for ${context.system.details.class}!`)
               context.warnStr = true
             }
             break
           case "dex":
-            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `DX is too low for ${context.system.details.class}!`)
               context.warnDex = true
             }
             break
           case "con":
-            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `CN is too low for ${context.system.details.class}!`)
               context.warnCon = true
             }
             break
           case "int":
-            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `IN is too low for ${context.system.details.class}!`)
               context.warnInt = true
             }
             break
           case "wis":
-            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `WS is too low for ${context.system.details.class}!`)
               context.warnWis = true
             }
             break
           case "cha":
-            if (Hyp3eCharacter.isAttributeLow(actorData, k)) {
+            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `CH is too low for ${context.system.details.class}!`)
               context.warnCha = true
             }
@@ -1313,7 +1313,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         dataset.baseClass = this.actor.system.baseClass
         // Log the dataset
         Hyp3eLogger.info("HYP3EActorSheetV2 _onLevelUp", `Level up dataset:`, dataset);
-        let createOk = await Hyp3eCharacter.quickCreateCharacter(dataset);
+        let createOk = await Hyp3eCharacterClass.quickCreateCharacter(dataset);
         if (createOk) {
             ui.notifications.info("Character created!")
             this.render()
@@ -1336,7 +1336,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Log the dataset
         Hyp3eLogger.info("HYP3EActorSheetV2 _onLevelUp", `Level up dataset:`, dataset);
         // Check current XP, and level up if possible
-        let levelUpOk = await Hyp3eCharacter.levelUp(dataset)
+        let levelUpOk = await Hyp3eCharacterClass.levelUp(dataset)
         if (levelUpOk) {
             this.render()
         }
@@ -1361,7 +1361,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         Hyp3eLogger.info("HYP3EActorSheetV2 _onSetAttributeMods", `Set attribute mods dataset:`, dataset);
 
         // Take the attribute scores and class, and lookup/calculate modifiers
-        const setAttrOk = await Hyp3eCharacter.setAttributeMods(dataset, false)
+        const setAttrOk = await Hyp3eCharacterClass.setAttributeMods(dataset, false)
             .then(setAttrOk => {
                 if (setAttrOk) {
                     this.render()

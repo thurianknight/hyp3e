@@ -1,6 +1,7 @@
 // module/data/actor/base.mjs
 import { Hyp3eDataModel } from "../_utils.mjs";   // see utils below
 import { isPureNumber, isPureString, convertToInt } from "../../dice/dice.mjs";
+import { Hyp3eLogger } from "../../helpers/logger.mjs";
 
 export default class Hyp3eActorBase extends Hyp3eDataModel {
   static defineSchema() {
@@ -92,8 +93,6 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
       resistances: new fields.ObjectField({ initial: {} }),           // flexible object
       tempModifiers: new fields.ArrayField(new fields.ObjectField(), { initial: [] }),
 
-      // actorType: new fields.StringField({ required: true, blank: true, initial: "" }),
-      // actorName: new fields.StringField({ required: true, blank: true, initial: "" }),
       baseClass: new fields.StringField({ required: true, blank: true, initial: "" })
     };
   }
@@ -116,12 +115,12 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
 
     // Fix temporary modifier properties that might be undefined, null, or non-numeric.
     //  ActiveEffects will be applied later.
-    // this.hp.tempHp = convertToInt(this.hp?.tempHp);
-    // this.ac.tempAcMod = convertToInt(this.ac?.tempAcMod);
-    // this.ac.tempDrMod = convertToInt(this.ac?.tempDrMod);
-    // this.movement.tempMvMod = convertToInt(this.movement?.tempMvMod);
-    // this.tempAtkMod = convertToInt(this?.tempAtkMod);
-    // this.tempDmgMod = convertToInt(this?.tempDmgMod);
+    this.hp.tempHp = convertToInt(this.hp?.tempHp);
+    this.ac.tempAcMod = convertToInt(this.ac?.tempAcMod);
+    this.ac.tempDrMod = convertToInt(this.ac?.tempDrMod);
+    this.movement.tempMvMod = convertToInt(this.movement?.tempMvMod);
+    this.tempAtkMod = convertToInt(this?.tempAtkMod);
+    this.tempDmgMod = convertToInt(this?.tempDmgMod);
 
     // Reset base/current FA, CA, TA
     this.fa = this?.fightingAbility.value ? this.fightingAbility.value : (this.fa ?? 0);
@@ -133,6 +132,8 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
     for (const save of Object.values(saves)) {
       save.curr = save.value ?? 0;
     }
+
+    Hyp3eLogger.info("Hyp3eActorBase prepareBaseData", `Base data prepared for actor ${this.parent.name}:`, this);
   }
 
   /** 
@@ -144,5 +145,7 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
 
     // Clamp HP percentage values
     this.hp.percentage = Math.clamp((this.hp.value * 100) / this.hp.max, 0, 100);
+
+    Hyp3eLogger.info("Hyp3eActorBase prepareDerivedData", `Derived data prepared for actor ${this.parent.name}:`, this);
   }
 }

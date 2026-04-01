@@ -1,5 +1,5 @@
 // systems/hyp3e/module/apps/class-editor.mjs
-import { Hyp3eCharacter } from "../helpers/character.mjs";
+import { Hyp3eCharacterClass } from "../helpers/character.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { findItemsByFolderOrCompendiumName } from "../helpers/folders-and-compendia.mjs"

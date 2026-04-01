@@ -1,4 +1,4 @@
-import { Hyp3eCharacter } from "../helpers/character.mjs";
+import { Hyp3eCharacterClass } from "../helpers/character.mjs";
 import { Hyp3eDice, isPureNumber, isPureString, containsDice, containsMathOrVariables, convertToInt } from "../dice/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
@@ -72,10 +72,6 @@ export class Hyp3eActor extends Actor {
    * @override
    * Augment the basic actor data with additional dynamic data. Typically,
    * you'll want to handle most of your calculated/derived data in this step.
-   * Data calculated in this step should generally not exist in template.json
-   * (such as attribute modifiers rather than attribute scores) and should be
-   * available both inside and outside of character sheets (such as if an actor
-   * is queried and has a roll executed directly from it).
    */
   async prepareDerivedData() {
     super.prepareDerivedData();
@@ -130,7 +126,7 @@ export class Hyp3eActor extends Actor {
     // Add actor type & base class, used for crit hit & crit miss tables
     const customClassData = game.settings.get(game.system.id, "customClassData");
     try {
-      systemData.baseClass = Hyp3eCharacter.classData[systemData.details.class]?.baseClass ?? customClassData[systemData.details.class]?.baseClass;
+      systemData.baseClass = Hyp3eCharacterClass.classData[systemData.details.class]?.baseClass ?? customClassData[systemData.details.class]?.baseClass;
     } catch (err) {
       // No match found (happens with custom classes), use "npc"
       systemData.baseClass = "npc"
@@ -144,23 +140,20 @@ export class Hyp3eActor extends Actor {
       }
     }
 
-    // Add task resolution
-    // this._setupTaskResolution(systemData);
-
     // Calculate weight carried & encumbrance
-    systemData.weightCarried = this._calcWeightCarried();
+    // systemData.weightCarried = this._calcWeightCarried();
 
     // What weight-class of armor (if any) is worn?
-    const items = this._getEquippedProtectionItems();
-    let armorType = "unarmored";
-    for (const item of items) {
-      const sys = item.system ?? {};
-      if (item.type === "armor" && sys.type !== "shield") {
-        armorType = sys.type || "unarmored";
-        break; // We assume only one armor will be worn, so break after the first match
-      }
-    }
-    systemData.wornArmorType = armorType;
+    // const items = this._getEquippedProtectionItems();
+    // let armorType = "unarmored";
+    // for (const item of items) {
+    //   const sys = item.system ?? {};
+    //   if (item.type === "armor" && sys.type !== "shield") {
+    //     armorType = sys.type || "unarmored";
+    //     break; // We assume only one armor will be worn, so break after the first match
+    //   }
+    // }
+    // systemData.wornArmorType = armorType;
 
     // Get encumbered status
     systemData.encumberedState = this._getEncumberedStatus(systemData);
@@ -425,7 +418,7 @@ export class Hyp3eActor extends Actor {
   _calcAttrMods(actorId, systemData) {
     if (!actorId) return;
     // Calculate the entire attributes object
-    const attributeData = Hyp3eCharacter.calcAttrMods(actorId);
+    const attributeData = Hyp3eCharacterClass.calcAttrMods(actorId);
     // Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Initial attribute data for ${this.name}:`, attributeData);
 
     // Starting here, we apply active effects that update the modifiers...
@@ -531,19 +524,9 @@ export class Hyp3eActor extends Actor {
     return attributeData;
   }
 
-  _setupTaskResolution(systemData) {
-    systemData.taskResolution = {};
-    for (const [key, value] of Object.entries(CONFIG.HYP3E.taskResolution)) {
-      systemData.taskResolution[key] = {
-        ...value,
-        name: game.i18n.localize(value.name),
-        hint: game.i18n.localize(value.hint)
-      };
-    }
-  }
-
   /**
    * Calculate the total weight carried by the actor. Only used with characters.
+   * @returns {number} Total weight carried, rounded to one decimal place
    */
   _calcWeightCarried() {
     let carriedWt = 0;
@@ -785,7 +768,8 @@ export class Hyp3eActor extends Actor {
   }
 
   /**
-   * Gather equipped protection items (armor, shields, passives).
+   * Gather equipped protection items (armor, shields).
+   * @returns {Array} Array of equipped armor and shield items
    */
   _getEquippedProtectionItems() {
     const items = [];

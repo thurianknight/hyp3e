@@ -1,5 +1,6 @@
 // module/data/actor/npc.mjs
 import Hyp3eActorBase from "./base.mjs";
+import { Hyp3eLogger } from "../../helpers/logger.mjs";
 
 export default class Hyp3eNpc extends Hyp3eActorBase {
   static defineSchema() {
@@ -28,7 +29,7 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
 
     return schema;
   }
-  
+
   /** 
    * Runs BEFORE Active Effects are applied.
    * Used for calculating base "curr" values that AEs can then modify.
@@ -46,8 +47,10 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
     } else if (this.npcType === "npc") {
       this.hp.min = -3
     }
+
+    Hyp3eLogger.info("Hyp3eNpc prepareBaseData", `Base data prepared for npc ${this.parent.name}:`, this);
   }
-  
+
   /** 
    * Runs AFTER Active Effects.
    * Use this for final totals, clamping, or anything that depends on post-AE values.
@@ -55,5 +58,6 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
   prepareDerivedData() {
     super.prepareDerivedData?.();
 
+    Hyp3eLogger.info("Hyp3eNpc prepareDerivedData", `Derived data prepared for npc ${this.parent.name}:`, this);
   }
 }

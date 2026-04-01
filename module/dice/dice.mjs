@@ -803,7 +803,7 @@ export function convertToInt(value, strict = false) {
     return floored;
   }
 
-  // null or undefined => 0
+  // Null or undefined => 0
   if (value == null) {
     return 0;
   }
