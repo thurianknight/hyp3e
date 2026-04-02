@@ -209,19 +209,18 @@ export class Hyp3eActor extends Actor {
       // Do nothing for now
     // }
     if (data.type === "merchant") {
-      // Set the default image
       this.updateSource({
+        "prototypeToken.actorLink": true,
         "img": "icons/svg/coins.svg"
       });
     }
     if (data.type === "treasure") {
-      // Set the default image
       this.updateSource({
+        "prototypeToken.actorLink": true,
         "img": "icons/svg/chest.svg"
       });
     }
     if (data.type === "itemToken") {
-      // Set the default image
       this.updateSource({
         "img": "icons/svg/item-bag.svg"
       });
