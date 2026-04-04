@@ -626,32 +626,6 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
   }
 
   /**
-   * Apply temporary AC, DR, and MV modifiers to the actor's system data.
-   * Centralized helper used by both character and NPC preparation functions.
-   * @param {Object} systemData
-   */
-  _applyTempModifiers() {
-    const tempAcMod = parseInt(this.ac?.tempAcMod) || 0;
-    const tempDrMod = parseInt(this.ac?.tempDrMod) || 0;
-    const tempMvMod = parseInt(this.movement?.tempMvMod) || 0;
-
-    if (tempAcMod) {
-      Hyp3eLogger.info("Hyp3eCharacter _applyTempModifiers", `Applying temp AC mod: ${tempAcMod}`);
-      this.ac.value = Math.clamp(this.ac.value - tempAcMod, -9, 9);
-    }
-
-    if (tempDrMod) {
-      Hyp3eLogger.info("Hyp3eCharacter _applyTempModifiers", `Applying temp DR mod: ${tempDrMod}`);
-      this.ac.dr += tempDrMod;
-    }
-
-    if (tempMvMod) {
-      Hyp3eLogger.info("Hyp3eCharacter _applyTempModifiers", `Applying temp MV mod: ${tempMvMod}`);
-      this.movement.base.value += tempMvMod;
-    }
-  }
-
-  /**
    * Return true if the item should be treated as a hand-using shield.
    */
   _isHandShield(item) {

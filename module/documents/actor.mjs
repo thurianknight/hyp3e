@@ -119,7 +119,7 @@ export class Hyp3eActor extends Actor {
     if (this.type !== 'character') return;
 
     // Make modifications to base data here
-    const systemData = this.system;
+    // const systemData = this.system;
 
     // Calculated fields go here...
 
@@ -159,16 +159,16 @@ export class Hyp3eActor extends Actor {
     // systemData.encumberedState = this._getEncumberedStatus(systemData);
 
     // Auto-calculate AC, DR, MV if configuration is enabled
-    if (game.settings.get(game.system.id, "autoCalcAc")) {
-      this.updateCharacterAcAndMv(systemData)
-    }
+    // if (game.settings.get(game.system.id, "autoCalcAc")) {
+    //   this.updateCharacterAcAndMv(systemData)
+    // }
 
     // Apply temp AC, DR, and MV modifiers
-    this._applyTempModifiers(systemData);
+    // this._applyTempModifiers(systemData);
 
     // Log the prepared data
-    const sysData = foundry.utils.deepClone(systemData);
-    Hyp3eLogger.info("Hyp3eActor _prepareCharacterData", `${this.name} system data:`, sysData);
+    // const sysData = foundry.utils.deepClone(systemData);
+    // Hyp3eLogger.info("Hyp3eActor _prepareCharacterData", `${this.name} system data:`, sysData);
   }
 
   /**
@@ -178,12 +178,12 @@ export class Hyp3eActor extends Actor {
     if (this.type !== 'npc') return;
 
     // Make modifications to data here
-    const systemData = this.system
+    // const systemData = this.system
 
     // Calculated fields go here...
 
     // Apply temp AC, DR, and MV modifiers
-    this._applyTempModifiers(systemData);
+    // this._applyTempModifiers(systemData);
 
     // Add actor base class, used for crit hit & crit miss tables
     // systemData.baseClass = "npc"

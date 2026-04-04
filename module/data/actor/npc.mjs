@@ -60,6 +60,9 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
   prepareDerivedData() {
     super.prepareDerivedData?.();
 
+    // Apply temp AC, DR, and MV modifiers
+    this._applyTempModifiers();
+
     Hyp3eLogger.info("Hyp3eNpc prepareDerivedData", `Derived data prepared for npc ${this.parent.name}:`, this);
   }
 }
