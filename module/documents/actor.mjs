@@ -156,7 +156,7 @@ export class Hyp3eActor extends Actor {
     // systemData.wornArmorType = armorType;
 
     // Get encumbered status
-    systemData.encumberedState = this._getEncumberedStatus(systemData);
+    // systemData.encumberedState = this._getEncumberedStatus(systemData);
 
     // Auto-calculate AC, DR, MV if configuration is enabled
     if (game.settings.get(game.system.id, "autoCalcAc")) {

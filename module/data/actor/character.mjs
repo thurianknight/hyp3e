@@ -2,6 +2,7 @@
 import Hyp3eActorBase from "./base.mjs";
 import { Hyp3eCharacterClass } from "../../helpers/character.mjs";
 import { moneyTemplate } from "../templates/money.mjs";
+import { isPureNumber, isPureString, convertToInt } from "../../dice/dice.mjs";
 import { Hyp3eLogger } from "../../helpers/logger.mjs";
 
 export default class Hyp3eCharacter extends Hyp3eActorBase {
@@ -169,7 +170,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
 
     // PCs can drop to -10 hp before they die
     this.hp.min = -10;
-    this.weightCarried = 0; // will be calculated in prepareDerivedData
+    this.weightCarried = 0;
 
     Hyp3eLogger.info("Hyp3eCharacter prepareBaseData", `Base data prepared for character ${this.parent.name}:`, this);
   }
@@ -218,6 +219,21 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       }
     }
     this.wornArmorType = armorType;
+
+    // Get encumbered status
+    this.encumberedState = this._getEncumberedStatus();
+
+    // Auto-calculate AC, DR, MV if configuration is enabled
+    const autoCalcAc = this.getSetting("autoCalcAc");
+    if (autoCalcAc) {
+      const { ac, dr, mv } = this._getCharacterAcAndMv();
+      this.ac.value = ac;
+      this.ac.dr = dr;
+      this.movement.base.value = mv;
+    }
+
+    // Apply temp AC, DR, and MV modifiers regardless of autoCalc setting
+    this._applyTempModifiers();
 
     Hyp3eLogger.info("Hyp3eCharacter prepareDerivedData", `Derived data prepared for character ${this.parent.name}:`, this);
   }
@@ -399,9 +415,9 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     if (enableCoinWeight) {
       for (const [coinType, coinData] of Object.entries(this.money)) {
         if (coinData.value) {
-          // let val = coinData.value;
-          if (!isNaN(coinData.value) && coinData.value > 0) {
-            carriedWt += coinData.value / 100;
+          let val = convertToInt(coinData.value);
+          if (!isNaN(val) && val > 0) {
+            carriedWt += val / 100;
           }
         }
       }
@@ -418,6 +434,31 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
   }
 
   /**
+   * Determine the charactor's encumbrance status based on weight carried and strength.
+   * @returns {string} - "unencumbered", "encumbered", or "heavilyEncumbered"
+   */
+  _getEncumberedStatus() {
+    const enableEncumbrance = this.getSetting("enableEncumbrance");
+    const encumbered = this.getSetting("encumbered");
+    const heavilyEncumbered = this.getSetting("heavilyEncumbered");
+    // Calc constants for encumbrance thresholds
+    const encumberedWt = this.attributes.str.curr * encumbered
+    const heavilyEncumberedWt = this.attributes.str.curr * heavilyEncumbered
+    if (enableEncumbrance) {
+      // this.encumbrance is currently calculated by the ActorSheet, though I would
+      //  like to move that to the Actor data preparation phase eventually.
+      if (this.weightCarried > heavilyEncumberedWt) {
+        return "heavilyEncumbered";
+      } else if (this.weightCarried > encumberedWt) {
+        return "encumbered";
+      } else {
+        return "unencumbered";
+      }
+    }
+    return "unencumbered";
+  }
+
+  /**
    * Gather equipped protection items (armor, shields).
    * @returns {Array} Array of equipped protection items
    */
@@ -431,5 +472,199 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       }
     }
     return items;
-  }  
+  }
+
+  /**
+   * Calculate the character's AC, DR, and MV based on equipped armor, shields, etc.
+   * @returns {Object} Object containing key/value pairs for ac, dr, and mv
+   */
+  _getCharacterAcAndMv() {
+    let ac = 9;
+    let mv = 40;
+    let dr = 0;
+    let shieldMod = 0;
+
+    const items = this._getEquippedProtectionItems();
+    Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `${this.parent.name} has equipped protection items:`, items);
+
+    for (const item of items) {
+      const sys = item.system ?? {};
+
+      if (this._isHandShield(item)) {
+        // Shield = stacking AC mod
+        shieldMod += sys.ac || 0;
+      } else if (this._isPassiveAc(item)) {
+        // Passive protection items (rings, cloaks, etc) stack too
+        shieldMod += sys.ac || 0;
+      } else {
+        // Armor (or passive AC) = pick the best
+        //  It shouldn't even be possible to equip multiple armors, but just in case...
+        if (sys.ac < ac) {
+          ac = sys.ac;
+          dr = sys.dr || dr;
+        }
+        // Movement
+        if (sys.mv !== mv) {
+          mv = sys.mv ?? mv;
+        }
+      }
+    }
+
+    // Encumbrance
+    const enableEncumbrance = this.getSetting("enableEncumbrance");
+    if (enableEncumbrance) {
+      if (this.encumberedState === "encumbered") {
+        ac += 1; mv -= 10;
+      } else if (this.encumberedState === "heavilyEncumbered") {
+        ac += 2; mv -= 20;
+      }
+    }
+
+    // Dex and shields
+    ac -= (this.attributes.dex.defMod || 0) + shieldMod;
+
+    // Active effects can add their changes after this point...
+    const allowedKeys = [
+      "system.ac.value",
+      "system.ac.dr",
+      "system.movement.base.value"
+    ];
+    // Use these to update AC, DR, MV from effects
+    let finalAc = ac;
+    let finalDr = dr;
+    let finalMv = mv;
+
+    const changes = [];
+    for ( const effect of this.parent.allApplicableEffects() ) {
+      // Skip if disabled or not active
+      if ( effect.disabled || !effect.active ) continue;
+
+      // Validate effect condition is met before applying changes
+      const conditionPasses = this.parent._effectApplies(effect);
+      // Store temporary effect condition state in actor (used by actor-sheet)
+      this._hyp3eEffectConditionState = this._hyp3eEffectConditionState || {};
+      this._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
+
+      if (!conditionPasses) {
+        Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Skipping effect "${effect.name}" on ${this.parent.name} — condition not met:`, effect.flags.hyp3e?.condition);
+        continue;
+      }
+
+      // Only include changes to allowed keys
+      const filtered = effect.changes
+        .filter(change => allowedKeys.includes(change.key))
+        .map(change => {
+          const c = foundry.utils.deepClone(change);
+          c.effect = effect;
+          c.priority = c.priority ?? (c.mode * 10);
+          return c;
+        });
+      changes.push(...filtered);
+    }
+    // Do we have any changes to apply?
+    if ( changes.length > 0 ) {
+      // Organize effects by their priority (though it probably doesn't matter)
+      changes.sort((a, b) => a.priority - b.priority);
+
+      // Accumulate ActiveEffect changes
+      for (const change of changes) {
+        // Parse the change.value string and resolve it into a number if possible
+        let resolvedChange = 0;
+        if (isPureNumber(change.value)) {
+          resolvedChange = Number(change.value) || 0;
+        } else if (containsDice(change.value)) {
+          // Dice rolls require async processing, which we can't do during _prepareData
+          Hyp3eLogger.warn("Hyp3eCharacter _getCharacterAcAndMv", `Change "${change.value}" contains a dice roll formula, which is not allowed for AC, DR, and MV effects. Skipping...`);
+          continue;
+        } else if (containsMathOrVariables(change.value)) {
+          // No dice rolls, we can do it synchronously
+          resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);
+        }
+        switch (change.key) {
+          case "system.ac.value":
+            Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s AC:`, change);
+            // Apply change based on mode
+            switch (change.mode) {
+              case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = resolvedChange; break;
+              // Pretty sure we don't need the other effect modes
+            }  
+            break;
+          case "system.ac.dr":
+            Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s DR:`, change);
+            // Apply change based on mode
+            switch (change.mode) {
+              case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = resolvedChange; break;
+              // Pretty sure we don't need the other effect modes
+            }
+            break;
+          case "system.movement.base.value":
+            Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s MV:`, change);
+            // Apply change based on mode
+            switch (change.mode) {
+              case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= resolvedChange; break;
+              case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = resolvedChange; break;
+              // Pretty sure we don't need the other effect modes
+            }  
+            break;
+          default:
+            break;
+        }
+      }
+    }
+    // Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Final calculated AC, DR, MV for ${this.name}:`, { ac: finalAc, dr: finalDr, mv: finalMv });
+    // Return the final results
+    return {
+      ac: Math.clamp(finalAc, -9, 9),
+      dr: finalDr,
+      mv: finalMv
+    };
+  }
+
+  /**
+   * Apply temporary AC, DR, and MV modifiers to the actor's system data.
+   * Centralized helper used by both character and NPC preparation functions.
+   * @param {Object} systemData
+   */
+  _applyTempModifiers() {
+    const tempAcMod = parseInt(this.ac?.tempAcMod) || 0;
+    const tempDrMod = parseInt(this.ac?.tempDrMod) || 0;
+    const tempMvMod = parseInt(this.movement?.tempMvMod) || 0;
+
+    if (tempAcMod) {
+      Hyp3eLogger.info("Hyp3eCharacter _applyTempModifiers", `Applying temp AC mod: ${tempAcMod}`);
+      this.ac.value = Math.clamp(this.ac.value - tempAcMod, -9, 9);
+    }
+
+    if (tempDrMod) {
+      Hyp3eLogger.info("Hyp3eCharacter _applyTempModifiers", `Applying temp DR mod: ${tempDrMod}`);
+      this.ac.dr += tempDrMod;
+    }
+
+    if (tempMvMod) {
+      Hyp3eLogger.info("Hyp3eCharacter _applyTempModifiers", `Applying temp MV mod: ${tempMvMod}`);
+      this.movement.base.value += tempMvMod;
+    }
+  }
+
+  /**
+   * Return true if the item should be treated as a hand-using shield.
+   */
+  _isHandShield(item) {
+    return (
+      (item.type === "shield" && item.system.type !== "passive") ||
+      (item.type === "armor" && item.system.type === "shield")
+    );
+  }
+
+  /**
+   * Return true if the item is a passive AC item (ring, cloak, etc).
+   */
+  _isPassiveAc(item) {
+    return (item.type === "shield" && item.system.type === "passive");
+  }
 }
