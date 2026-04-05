@@ -44,9 +44,24 @@ export class Hyp3eItem extends Item {
   /** @override */
   async _onCreate(data, options, user) {
     await super._onCreate(data, options, user);
+
+    const itemData = this.system;
+
+    if (this.type === "item") {
+      // Try to match item name to a light source in the lookup table
+      const lightSourceProps = this._getLightSourceProperties();
+      if (lightSourceProps) {
+        itemData.isLightSource = true;
+        itemData.light.dim = lightSourceProps.radius;
+        itemData.light.bright = Math.floor(lightSourceProps.radius/2);
+        itemData.light.angle = lightSourceProps.angle;
+        itemData.light.color = lightSourceProps.color;
+        itemData.light.alpha = lightSourceProps.alpha;
+      }
+    }
+
     // If this is a weapon, add a basic roll formula if none is set
     if (this.type === "weapon") {
-      const itemData = this.system;
       if (!itemData.formula?.trim()) {
         const formula = "1d20 + @str.atkMod";
         await this.update({ "system.formula": formula });
@@ -60,6 +75,7 @@ export class Hyp3eItem extends Item {
     // As with the actor class, items are documents that can have their data
     // preparation methods overridden (such as prepareBaseData()).
     super.prepareData();
+    // Hyp3eLogger.info("Hyp3eItem prepareData", `Item ${this.name}:`, this);
 
     // Skip processing if this item is in a compendium
     if (this.pack) return;
@@ -105,24 +121,6 @@ export class Hyp3eItem extends Item {
     // if (this.type === "weapon" && itemData.type === "missile" && (typeof itemData.usesAmmo === "undefined")) {
     //   if (/(bow|sling|gun)/i.test(this.name)) {
     //     itemData.usesAmmo = true;
-    //   }
-    // }
-
-    // isLightSource flag (physical items & spells)
-    // if (["armor", "item", "shield", "weapon", "spell"].includes(this.type)) {
-    //   if (itemData.isLightSource === undefined || itemData.isLightSource === null) {
-    //     // Match item name to a light source in the lookup table
-    //     const lightSourceProps = this._getLightSourceProperties();
-    //     if (lightSourceProps) {
-    //       itemData.isLightSource = true;
-    //       itemData.light.dim = lightSourceProps.radius;
-    //       itemData.light.bright = Math.floor(lightSourceProps.radius/2);
-    //       itemData.light.angle = lightSourceProps.angle;
-    //       itemData.light.color = lightSourceProps.color;
-    //       itemData.light.alpha = lightSourceProps.alpha;
-    //     } else {
-    //       itemData.isLightSource = false;
-    //     }
     //   }
     // }
   }
@@ -603,37 +601,38 @@ export class Hyp3eItem extends Item {
    * @param {*} name - Simple name of the light source, e.g. "Torch", "Lantern, Hooded", etc.
    * @returns 
    */
-  // _getLightSourceProperties() {
-  //   // If the item hasn't been initialized yet, return null
-  //   if (!this.name || !this.system) return null;
+  _getLightSourceProperties() {
+    // If the item hasn't been initialized yet, return null
+    if (!this.name || !this.system) return null;
 
-  //   // Light source lookup table
-  //   const lightSources = {
-  //     "bonfire": { "radius": 60, "angle": 360, "color": null, "alpha": 0.5 },
-  //     "campfire": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
-  //     "candle": { "radius": 5, "angle": 360, "color": null, "alpha": 0.5 },
-  //     "continuous_light_spell": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-  //     "lantern": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-  //     "lantern_bullseye": { "radius": 60, "angle": 15, "color": null, "alpha": 0.5 },
-  //     "lantern_hooded": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-  //     "light_spell": { "radius": 15, "angle": 360, "color": null, "alpha": 0.5 },
-  //     "produce_flame_spell": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
-  //     "torch": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 }
-  //   }
+    // Light source lookup table
+    const lightSources = {
+      "bonfire": { "radius": 60, "angle": 360, "color": null, "alpha": 0.5 },
+      "campfire": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
+      "candle": { "radius": 5, "angle": 360, "color": null, "alpha": 0.5 },
+      "continuous_light_spell": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+      "lamp": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+      "lantern": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+      "lantern_bullseye": { "radius": 60, "angle": 15, "color": null, "alpha": 0.5 },
+      "lantern_hooded": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+      "light_spell": { "radius": 15, "angle": 360, "color": null, "alpha": 0.5 },
+      "produce_flame_spell": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
+      "torch": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 }
+    }
 
-  //   // Convert the name to lowercase and replace spaces with underscores
-  //   let normalized = this.name.toLowerCase().replace(/\s+/g, "_");
-  //   // Remove hyphens, commas, and apostrophes
-  //   normalized = normalized.replace(/[-,']/g, "");
-  //   // Check if the normalized name exists in the lightSources table
-  //   let lightSourceProps
-  //   lightSourceProps = lightSources[normalized];
-  //   if (lightSourceProps) {
-  //     return lightSourceProps;
-  //   } else {
-  //     return null;
-  //   }
-  // }
+    // Convert the name to lowercase and replace spaces with underscores
+    let normalized = this.name.toLowerCase().replace(/\s+/g, "_");
+    // Remove hyphens, commas, and apostrophes
+    normalized = normalized.replace(/[-,']/g, "");
+    // Check if the normalized name exists in the lightSources table
+    let lightSourceProps
+    lightSourceProps = lightSources[normalized];
+    if (lightSourceProps) {
+      return lightSourceProps;
+    } else {
+      return null;
+    }
+  }
 
   _stringOrObjectFromTable(table, val) {
     const output = table[val]

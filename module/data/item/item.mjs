@@ -37,18 +37,5 @@ export default class Hyp3eItem extends Hyp3eItemBase {
     if (this.atkRoll) {
       this.parent.applyAttackFormula();
     }
-
-    // Match item name to a light source in the lookup table and set properties if found
-    const lightSourceProps = this._getLightSourceProperties();
-    if (lightSourceProps) {
-      this.isLightSource = true;
-      this.light.dim = lightSourceProps.radius;
-      this.light.bright = Math.floor(lightSourceProps.radius/2);
-      this.light.angle = lightSourceProps.angle;
-      this.light.color = lightSourceProps.color;
-      this.light.alpha = lightSourceProps.alpha;
-    } else {
-      this.isLightSource = false;
-    }
   }
 }
