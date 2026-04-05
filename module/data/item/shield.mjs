@@ -14,41 +14,22 @@ export default class Hyp3eShield extends Hyp3eItemBase {
     schema = this.mergeSchema(schema, equippableTemplate);
     schema = this.mergeSchema(schema, canHaveSpellsTemplate);
 
-    // Physical template
-    // schema.quantity = new fields.SchemaField({
-    //   value: new fields.NumberField({ initial: 1 }),
-    //   max: new fields.NumberField({ initial: 1 }),
-    //   bundle: new fields.NumberField({ initial: 1 })
-    // });
-    // schema.isConsumable = new fields.BooleanField({ initial: false });
-    // schema.isLightSource = new fields.BooleanField({ initial: false });
-    // schema.light = new fields.ObjectField({ initial: {} });
-    // schema.location = new fields.StringField({ initial: "" });
-    // schema.weight = new fields.NumberField({ initial: 0 });
-    // schema.cost = new fields.StringField({ initial: "0" });
-    // schema.xp = new fields.StringField({ initial: "" });
-    // schema.containerId = new fields.StringField({ initial: "" });
-
-    // Equippable template
-    // schema.equipped = new fields.BooleanField({ initial: false });
-
-    // canHaveSpells template
-    // schema.spellcasting = new fields.SchemaField({ 
-    //   hasSpells: new fields.BooleanField({ initial: false }),
-    //   hideCharges: new fields.BooleanField({ initial: false }),
-    //   ca: new fields.NumberField({ nullable: true, initial: null }),
-    //   charges: new fields.SchemaField({
-    //     value: new fields.NumberField({ nullable: true, initial: null }),
-    //     max: new fields.NumberField({ nullable: true, initial: null })
-    //   }),
-    //   spellRefs: new fields.ArrayField(new fields.StringField(), { initial: [] })
-    // });
-
     // Shield-specific fields
     schema.type = new fields.StringField({ initial: "small" });
     schema.ac = new fields.NumberField({ initial: 1 });
     schema.dr = new fields.NumberField({ nullable: true, initial: null });
 
     return schema;
+  }
+  
+  /** 
+   * Cleanup any missing or invalid data, and set up any derived values that AEs might modify.
+   */
+  prepareData() {
+    super.prepareData?.();
+
+    // Skip processing if this item is in a compendium
+    if (this.pack) return;
+
   }
 }

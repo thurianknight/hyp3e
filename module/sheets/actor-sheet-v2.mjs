@@ -635,8 +635,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                             // Normal unbundled item
                             i.system.carriedWt = (i.system.weight * i.system.quantity.value)
                         }
-                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10    
-                        // encumbrance += i.system.carriedWt
+                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
                     } else if (i.type === 'weapon' || i.type === 'armor' || i.type === 'shield') {
                         if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
                             // For bundled items, we calculate weight based on number of bundles
@@ -644,8 +643,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                         } else {
                             i.system.carriedWt = (i.system.weight * i.system.quantity.value)
                         }
-                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10    
-                        // encumbrance += i.system.carriedWt
+                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
                     } else {
                         i.system.carriedWt = 0
                     }
@@ -720,7 +718,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 }
             }
         }
-        // encumbrance = Math.round(encumbrance * 10)/10
         encumbrance = this.actor.system.weightCarried
         allTheGold = Math.round(allTheGold * 100)/100
         // Now convert allTheGold to a string and add " gp" to the end

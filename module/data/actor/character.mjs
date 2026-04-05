@@ -445,8 +445,6 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     const encumberedWt = this.attributes.str.curr * encumbered
     const heavilyEncumberedWt = this.attributes.str.curr * heavilyEncumbered
     if (enableEncumbrance) {
-      // this.encumbrance is currently calculated by the ActorSheet, though I would
-      //  like to move that to the Actor data preparation phase eventually.
       if (this.weightCarried > heavilyEncumberedWt) {
         return "heavilyEncumbered";
       } else if (this.weightCarried > encumberedWt) {

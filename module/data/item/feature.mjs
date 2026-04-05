@@ -10,23 +10,27 @@ export default class Hyp3eFeature extends Hyp3eItemBase {
     // Merge shared data templates
     schema = this.mergeSchema(schema, rollableTemplate);
 
-    // Rollable template
-    // schema.formula = new fields.StringField({ initial: "" });
-    // schema.atkRoll = new fields.BooleanField({ initial: false });
-    // schema.tn = new fields.StringField({ initial: "" });
-    // schema.save = new fields.StringField({ initial: "" });
-    // schema.damage = new fields.StringField({ initial: "" });
-    // schema.damage2h = new fields.StringField({ initial: "" });
-    // schema.dmgType = new fields.StringField({ initial: "basic" });
-    // schema.altDmg = new fields.ObjectField({ initial: {} });
-    // schema.duration = new fields.StringField({ initial: "" });
-    // schema.affected = new fields.StringField({ initial: "" });
-
     // Feature-specific fields
     schema.class = new fields.StringField({ initial: "" });
     schema.level = new fields.StringField({ initial: "" });
     schema.rollMode = new fields.StringField({ initial: "publicroll" });
 
     return schema;
+  }
+  
+  /** 
+   * Cleanup any missing or invalid data, and set up any derived values that AEs might modify.
+   */
+  prepareData() {
+    super.prepareData?.();
+
+    // Skip processing if this item is in a compendium
+    if (this.pack) return;
+
+    // Apply attack formula logic if needed
+    if (this.atkRoll) {
+      this.parent.applyAttackFormula();
+    }
+
   }
 }

@@ -68,70 +68,63 @@ export class Hyp3eItem extends Item {
     const itemData = this.system;
 
     // Add isPhysical flag for armor, item, shield, weapon
-    itemData.isPhysical = ["armor", "item", "shield", "weapon"].includes(this.type);
+    // itemData.isPhysical = ["armor", "item", "shield", "weapon"].includes(this.type);
 
-    if (itemData.isPhysical) {
-      // Ensure quantity and weight are numbers
-      itemData.quantity.value = Number(itemData.quantity.value) || 0;
-      itemData.quantity.max = Number(itemData.quantity.max) || 0;
-      itemData.weight = Number(itemData.weight) || 0;
-    }
+    // if (itemData.isPhysical) {
+    //   // Ensure quantity and weight are numbers
+    //   itemData.quantity.value = Number(itemData.quantity.value) || 0;
+    //   itemData.quantity.max = Number(itemData.quantity.max) || 0;
+    //   itemData.weight = Number(itemData.weight) || 0;
+    // }
 
     // Setup the item's realName to be its name, if realName is blank
-    if (!itemData.realName?.trim()) itemData.realName = this.name;
+    // if (!itemData.realName?.trim()) itemData.realName = this.name;
     // If the item is identified but has no realDescription, set it to the description
-    if (itemData.identified && !itemData.realDescription?.trim()) {
-      itemData.realDescription = itemData.description;
-    }
+    // if (itemData.identified && !itemData.realDescription?.trim()) {
+    //   itemData.realDescription = itemData.description;
+    // }
     // If the item is identified but has no Description, set it to the realDescription
-    if (itemData.identified && !itemData.description?.trim()) {
-      itemData.description = itemData.realDescription;
-    }
+    // if (itemData.identified && !itemData.description?.trim()) {
+    //   itemData.description = itemData.realDescription;
+    // }
 
     // Fix weapon & spell missing or invalid damage type
     // if (["weapon", "spell"].includes(this.type)) {
-    //   if (!CONFIG.HYP3E.damageTypes[itemData.dmgType]) {
-    //     Hyp3eLogger.warn("prepareData", `Invalid damage type ${itemData.dmgType} on ${this.name}. Setting to Basic...`)
+    //   if (!itemData?.dmgType || itemData?.dmgType.trim() === "") {
+    //     Hyp3eLogger.warn("prepareData", `No damage type set on ${this.name}. Setting to Basic...`)
     //     itemData.dmgType = "basic"
     //   }
     // }
-    // Fix weapon & spell missing damage type
-    if (["weapon", "spell"].includes(this.type)) {
-      if (itemData?.dmgType.trim() === "") {
-        Hyp3eLogger.warn("prepareData", `No damage type set on ${this.name}. Setting to Basic...`)
-        itemData.dmgType = "basic"
-      }
-    }
 
     // Apply attack formula logic if weapon or atkRoll
-    if ((this.type === "weapon" || itemData.atkRoll) && !itemData.formula?.trim()) {
-      this.applyAttackFormula();
-    }
+    // if ((this.type === "weapon" || itemData.atkRoll) && !itemData.formula?.trim()) {
+    //   this.applyAttackFormula();
+    // }
 
     // Ammo usage flag
-    if (this.type === "weapon" && itemData.type === "missile" && (typeof itemData.usesAmmo === "undefined")) {
-      if (/(bow|sling|gun)/i.test(this.name)) {
-        itemData.usesAmmo = true;
-      }
-    }
+    // if (this.type === "weapon" && itemData.type === "missile" && (typeof itemData.usesAmmo === "undefined")) {
+    //   if (/(bow|sling|gun)/i.test(this.name)) {
+    //     itemData.usesAmmo = true;
+    //   }
+    // }
 
     // isLightSource flag (physical items & spells)
-    if (["armor", "item", "shield", "weapon", "spell"].includes(this.type)) {
-      if (itemData.isLightSource === undefined || itemData.isLightSource === null) {
-        // Match item name to a light source in the lookup table
-        const lightSourceProps = this._getLightSourceProperties();
-        if (lightSourceProps) {
-          itemData.isLightSource = true;
-          itemData.light.dim = lightSourceProps.radius;
-          itemData.light.bright = Math.floor(lightSourceProps.radius/2);
-          itemData.light.angle = lightSourceProps.angle;
-          itemData.light.color = lightSourceProps.color;
-          itemData.light.alpha = lightSourceProps.alpha;
-        } else {
-          itemData.isLightSource = false;
-        }
-      }
-    }
+    // if (["armor", "item", "shield", "weapon", "spell"].includes(this.type)) {
+    //   if (itemData.isLightSource === undefined || itemData.isLightSource === null) {
+    //     // Match item name to a light source in the lookup table
+    //     const lightSourceProps = this._getLightSourceProperties();
+    //     if (lightSourceProps) {
+    //       itemData.isLightSource = true;
+    //       itemData.light.dim = lightSourceProps.radius;
+    //       itemData.light.bright = Math.floor(lightSourceProps.radius/2);
+    //       itemData.light.angle = lightSourceProps.angle;
+    //       itemData.light.color = lightSourceProps.color;
+    //       itemData.light.alpha = lightSourceProps.alpha;
+    //     } else {
+    //       itemData.isLightSource = false;
+    //     }
+    //   }
+    // }
   }
 
   /**
@@ -610,37 +603,37 @@ export class Hyp3eItem extends Item {
    * @param {*} name - Simple name of the light source, e.g. "Torch", "Lantern, Hooded", etc.
    * @returns 
    */
-  _getLightSourceProperties() {
-    // If the item hasn't been initialized yet, return null
-    if (!this.name || !this.system) return null;
+  // _getLightSourceProperties() {
+  //   // If the item hasn't been initialized yet, return null
+  //   if (!this.name || !this.system) return null;
 
-    // Light source lookup table
-    const lightSources = {
-      "bonfire": { "radius": 60, "angle": 360, "color": null, "alpha": 0.5 },
-      "campfire": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
-      "candle": { "radius": 5, "angle": 360, "color": null, "alpha": 0.5 },
-      "continuous_light_spell": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-      "lantern": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-      "lantern_bullseye": { "radius": 60, "angle": 15, "color": null, "alpha": 0.5 },
-      "lantern_hooded": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-      "light_spell": { "radius": 15, "angle": 360, "color": null, "alpha": 0.5 },
-      "produce_flame_spell": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
-      "torch": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 }
-    }
+  //   // Light source lookup table
+  //   const lightSources = {
+  //     "bonfire": { "radius": 60, "angle": 360, "color": null, "alpha": 0.5 },
+  //     "campfire": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
+  //     "candle": { "radius": 5, "angle": 360, "color": null, "alpha": 0.5 },
+  //     "continuous_light_spell": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+  //     "lantern": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+  //     "lantern_bullseye": { "radius": 60, "angle": 15, "color": null, "alpha": 0.5 },
+  //     "lantern_hooded": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
+  //     "light_spell": { "radius": 15, "angle": 360, "color": null, "alpha": 0.5 },
+  //     "produce_flame_spell": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
+  //     "torch": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 }
+  //   }
 
-    // Convert the name to lowercase and replace spaces with underscores
-    let normalized = this.name.toLowerCase().replace(/\s+/g, "_");
-    // Remove hyphens, commas, and apostrophes
-    normalized = normalized.replace(/[-,']/g, "");
-    // Check if the normalized name exists in the lightSources table
-    let lightSourceProps
-    lightSourceProps = lightSources[normalized];
-    if (lightSourceProps) {
-      return lightSourceProps;
-    } else {
-      return null;
-    }
-  }
+  //   // Convert the name to lowercase and replace spaces with underscores
+  //   let normalized = this.name.toLowerCase().replace(/\s+/g, "_");
+  //   // Remove hyphens, commas, and apostrophes
+  //   normalized = normalized.replace(/[-,']/g, "");
+  //   // Check if the normalized name exists in the lightSources table
+  //   let lightSourceProps
+  //   lightSourceProps = lightSources[normalized];
+  //   if (lightSourceProps) {
+  //     return lightSourceProps;
+  //   } else {
+  //     return null;
+  //   }
+  // }
 
   _stringOrObjectFromTable(table, val) {
     const output = table[val]
