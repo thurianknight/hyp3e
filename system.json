@@ -2,7 +2,7 @@
   "id": "hyp3e",
   "title": "Hyperborea 3rd Edition",
   "description": "The Hyperborea 3rd Edition system for FoundryVTT!",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "compatibility": {
     "minimum": "13",
     "verified": "13.351"
@@ -42,6 +42,44 @@
       "flags": {}
     }
   ],
+  "documentTypes": {
+    "Actor": {
+      "character": {
+        "htmlFields": ["treasure", "biography", "notes"]
+      },
+      "itemToken": {
+        "htmlFields": ["biography"]
+      },
+      "merchant": {},
+      "npc": {
+        "htmlFields": ["biography"]
+      },
+      "treasure": {}
+    },
+    "Item": {
+      "armor": {
+        "htmlFields": ["description", "realDescription"]
+      },
+      "effectTemplate": {
+        "htmlFields": ["description", "realDescription"]
+      },
+      "feature": {
+        "htmlFields": ["description", "realDescription"]
+      },
+      "item": {
+        "htmlFields": ["description", "realDescription"]
+      },
+      "shield": {
+        "htmlFields": ["description", "realDescription"]
+      },
+      "spell": {
+        "htmlFields": ["description", "realDescription"]
+      },
+      "weapon": {
+        "htmlFields": ["description", "realDescription"]
+      }
+    }
+  },
   "primaryTokenAttribute": "hp",
   "secondaryTokenAttribute": "None",
   "url": "https://github.com/thurianknight/hyp3e",

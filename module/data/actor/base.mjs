@@ -153,7 +153,6 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
   /**
    * Apply temporary AC, DR, and MV modifiers to the actor's system data.
    * Centralized helper used by both character and NPC preparation functions.
-   * @param {Object} systemData
    */
   _applyTempModifiers() {
     const tempAcMod = parseInt(this.ac?.tempAcMod) || 0;

@@ -2,7 +2,7 @@
 import Hyp3eActorBase from "./base.mjs";
 import { Hyp3eCharacterClass } from "../../helpers/character.mjs";
 import { moneyTemplate } from "../templates/money.mjs";
-import { isPureNumber, isPureString, convertToInt } from "../../dice/dice.mjs";
+import { Hyp3eDice, isPureNumber, isPureString, convertToInt, containsDice, containsMathOrVariables } from "../../dice/dice.mjs";
 import { Hyp3eLogger } from "../../helpers/logger.mjs";
 
 export default class Hyp3eCharacter extends Hyp3eActorBase {
@@ -331,6 +331,9 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
 
     // Do we have any changes to apply?
     if ( changes.length > 0 ) {
+      // Use a clone of the actor's system data to avoid mutating it directly
+      const systemData = foundry.utils.deepClone(this);
+  
       // Organize effects by their priority (though it probably doesn't matter)
       changes.sort((a, b) => a.priority - b.priority);
 
@@ -564,6 +567,9 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       // Organize effects by their priority (though it probably doesn't matter)
       changes.sort((a, b) => a.priority - b.priority);
 
+      // Use a clone of the actor's system data to avoid mutating it directly
+      const systemData = foundry.utils.deepClone(this);
+  
       // Accumulate ActiveEffect changes
       for (const change of changes) {
         // Parse the change.value string and resolve it into a number if possible
