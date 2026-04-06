@@ -3014,6 +3014,21 @@ export class Hyp3eActor extends Actor {
     let sitModSum = 0;
     let sitModsArr = [];
 
+    // Is the attacker dual wielding? If so, penalties apply based on weapon class.
+    if (!isMissile) {
+      const weapons = this.items.filter(i => i.type === "weapon" && i.system.equipped);
+      if (weapons.length >= 2) {
+        const mainHand = weapons[0];
+        const offHand = weapons[1];
+        const mainHandWC = mainHand.system.wc ?? 1;
+        const offHandWC = offHand.system.wc ?? 1;
+        const dualWieldPenalty = -1 * (mainHandWC + offHandWC);
+        sitModSum += dualWieldPenalty;
+        sitModsArr.push(`Dual Wielding (${dualWieldPenalty})`);
+        Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Dual wielding penalty applied: ${dualWieldPenalty}`);
+      }
+    }
+
     let attackerEffects;
     if (!foundry.utils.isNewerVersion(game.version, "13")) {
       // For Foundry v12...
@@ -3021,7 +3036,6 @@ export class Hyp3eActor extends Actor {
       attackerEffects = this.effects
     } else if (foundry.utils.isNewerVersion(game.version, "13")) {
       // For Foundry v13...
-      // attackerEffects = this._getAllApplicableEffects()
       attackerEffects = this.allApplicableEffects()
     }
     Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${this.name} (attacking) has effects:`, attackerEffects);
@@ -3036,7 +3050,6 @@ export class Hyp3eActor extends Actor {
         targetEffects = target.actor.effects
       } else if (foundry.utils.isNewerVersion(game.version, "13")) {
         // For Foundry v13...
-        // targetEffects = target.actor._getAllApplicableEffects()
         targetEffects = target.actor.allApplicableEffects()
       }
       Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${target.name} (defending) has effects:`, targetEffects);
