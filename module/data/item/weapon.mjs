@@ -47,28 +47,9 @@ export default class Hyp3eWeapon extends Hyp3eItemBase {
    */
   prepareBaseData() {
     super.prepareBaseData?.();
-    Hyp3eLogger.info("Hyp3eWeapon prepareBaseData", `Weapon ${this.parent.name}:`, this);
 
     // Skip processing if this item is in a compendium
-    if (this.pack) return;
-
-    // Fix missing or invalid damage type
-    if (!this.dmgType || this.dmgType.trim() === "") {
-      Hyp3eLogger.warn("Hyp3eWeapon prepareBaseData", `No damage type set on ${this.parent.name}. Setting to Basic...`)
-      this.dmgType = "basic"
-    }
-
-    // Apply attack formula logic if needed
-    if (this.formula.trim() == "") {
-      this.parent.applyAttackFormula();
-    }
-
-    // Set the ammo usage flag
-    if (this.type === "missile" && (!this.usesAmmo)) {
-      if (/(bow|sling|gun)/gi.test(this.parent.name)) {
-        this.usesAmmo = true;
-      }
-    }
+    if (this.parent.pack) return;
 
   }
 }

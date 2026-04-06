@@ -15,8 +15,11 @@ export default class Hyp3eEffectTemplate extends Hyp3eItemBase {
   /** 
    * Cleanup any missing or invalid data, and set up any derived values that AEs might modify.
    */
-  prepareData() {
-    super.prepareData?.();
+  prepareBaseData() {
+    super.prepareBaseData?.();
+
+    // Skip processing if this item is in a compendium
+    if (this.parent.pack) return;
 
   }
 }

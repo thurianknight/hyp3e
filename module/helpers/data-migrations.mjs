@@ -1,4 +1,5 @@
 import { Hyp3eLogger } from "./logger.mjs";
+import { Hyp3eItem } from "../documents/item.mjs";
 
 /**
  * Migrate Actor data to new formats, properties, etc.
@@ -136,6 +137,8 @@ export function migrateItemData(item) {
         "system.light.dim": lightSourceProps.radius,
         "system.light.bright": Math.floor(lightSourceProps.radius / 2),
         "system.light.angle": lightSourceProps.angle || 360,
+        "system.light.color": lightSourceProps.color,
+        "system.light.alpha": lightSourceProps.alpha
     });
 
     // All items, regardless of type
@@ -185,7 +188,7 @@ export function migrateItemData(item) {
         // Add the new light source properties if they do not exist yet
         if (item.system.isLightSource === undefined || item.system.isLightSource === null) {
             Hyp3eLogger.info("migrateItemData", `Fixing light source properties for ${item.name}...`);
-            const lightSourceProps = item._getLightSourceProperties();
+            const lightSourceProps = Hyp3eItem.getLightSourceProperties(item.name);
             if (lightSourceProps) {
                 const lightProps = lightSourceUpdates(lightSourceProps);
                 updates = { ...updates, ...lightProps };

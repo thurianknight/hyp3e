@@ -15,6 +15,10 @@ export class Hyp3eItem extends Item {
   async _preCreate(data, options, user) {
     await super._preCreate(data, options, user);
     Hyp3eLogger.info("Hyp3eItem _preCreate", `Starting data:`, data)
+
+    // Ensure system object exists (very important!)
+    data.system = data.system || {};
+
     const updateData = {};
 
     // Replace default image for new items, but if an image is defined, leave it be
@@ -29,16 +33,43 @@ export class Hyp3eItem extends Item {
       container: "icons/svg/item-bag.svg"
     };
     if (!data.img || data.img === "") {
-      updateData.img = TYPE_IMAGES[this.type] || "icons/svg/item-bag.svg";
+      updateData.img = TYPE_IMAGES[data.type] || "icons/svg/item-bag.svg";
     }
 
+    // Setup the item's realName to be its name
+    updateData["system.realName"] = data.name || "New Item";
+
     // A newly-created item won't have the system attribute yet, but cloned items will
-    if (data.system?.containerId) {
+    if (!options.fromCompendium && !options.fromDrop) {
       updateData["system.containerId"] = "";
       updateData["system.location"] = "";
     }
-    Hyp3eLogger.info("Hyp3eItem _preCreate", `Update data:`, updateData);
-    this.updateSource(updateData);
+
+    if (data.type === "item") {
+      // Try to match item name to a light source in the lookup table
+      const lightSourceProps = Hyp3eItem.getLightSourceProperties(data.name);
+      if (lightSourceProps) {
+        updateData["system.isLightSource"] = true;
+        updateData["system.light.dim"] = lightSourceProps.radius;
+        updateData["system.light.bright"] = Math.floor(lightSourceProps.radius/2);
+        updateData["system.light.angle"] = lightSourceProps.angle;
+        updateData["system.light.color"] = lightSourceProps.color;
+        updateData["system.light.alpha"] = lightSourceProps.alpha;
+      }
+    }
+
+    // If this is a new weapon, add a basic roll formula for melee
+    if (data.type === "weapon") {
+      if (options.fromCompendium !== true && options.fromDrop !== true) {
+        updateData["system.formula"] = "1d20 + @str.atkMod";
+      }
+    }
+
+    // Apply all changes at once
+    if (Object.keys(updateData).length > 0) {
+      Hyp3eLogger.info("Hyp3eItem _preCreate", `Update data:`, updateData);
+      this.updateSource(updateData);
+    }
   }
 
   /** @override */
@@ -47,27 +78,34 @@ export class Hyp3eItem extends Item {
 
     const itemData = this.system;
 
-    if (this.type === "item") {
-      // Try to match item name to a light source in the lookup table
-      const lightSourceProps = this._getLightSourceProperties();
-      if (lightSourceProps) {
-        itemData.isLightSource = true;
-        itemData.light.dim = lightSourceProps.radius;
-        itemData.light.bright = Math.floor(lightSourceProps.radius/2);
-        itemData.light.angle = lightSourceProps.angle;
-        itemData.light.color = lightSourceProps.color;
-        itemData.light.alpha = lightSourceProps.alpha;
-      }
-    }
+    // if (this.type === "item") {
+    //   // Try to match item name to a light source in the lookup table
+    //   const lightSourceProps = this._getLightSourceProperties();
+    //   if (lightSourceProps) {
+    //     itemData.isLightSource = true;
+    //     itemData.light.dim = lightSourceProps.radius;
+    //     itemData.light.bright = Math.floor(lightSourceProps.radius/2);
+    //     itemData.light.angle = lightSourceProps.angle;
+    //     itemData.light.color = lightSourceProps.color;
+    //     itemData.light.alpha = lightSourceProps.alpha;
+    //   }
+    // }
 
-    // If this is a weapon, add a basic roll formula if none is set
-    if (this.type === "weapon") {
-      if (!itemData.formula?.trim()) {
-        const formula = "1d20 + @str.atkMod";
-        await this.update({ "system.formula": formula });
-      }
-    }
+    // // If this is a weapon, add a basic roll formula if none is set
+    // if (this.type === "weapon") {
+    //   if (!itemData.formula?.trim()) {
+    //     const formula = "1d20 + @str.atkMod";
+    //     await this.update({ "system.formula": formula });
+    //   }
+    // }
     Hyp3eLogger.info("Hyp3eItem _onCreate", `Created item:`, this);
+  }
+
+  /** @override */
+  async _onUpdate(changed, options, user) {
+    super._onUpdate(changed, options, user);
+    Hyp3eLogger.info("Hyp3eItem _onUpdate", `Changed data:`, changed);
+
   }
 
   /** @override */
@@ -601,9 +639,8 @@ export class Hyp3eItem extends Item {
    * @param {*} name - Simple name of the light source, e.g. "Torch", "Lantern, Hooded", etc.
    * @returns 
    */
-  _getLightSourceProperties() {
-    // If the item hasn't been initialized yet, return null
-    if (!this.name || !this.system) return null;
+  static getLightSourceProperties(name) {
+    if (!name) return null;
 
     // Light source lookup table
     const lightSources = {
@@ -621,11 +658,11 @@ export class Hyp3eItem extends Item {
     }
 
     // Convert the name to lowercase and replace spaces with underscores
-    let normalized = this.name.toLowerCase().replace(/\s+/g, "_");
+    let normalized = name.toLowerCase().replace(/\s+/g, "_");
     // Remove hyphens, commas, and apostrophes
     normalized = normalized.replace(/[-,']/g, "");
     // Check if the normalized name exists in the lightSources table
-    let lightSourceProps
+    let lightSourceProps;
     lightSourceProps = lightSources[normalized];
     if (lightSourceProps) {
       return lightSourceProps;

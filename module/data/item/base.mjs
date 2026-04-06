@@ -19,14 +19,11 @@ export default class Hyp3eItemBase extends Hyp3eDataModel {
   /** 
    * Cleanup any missing or invalid data, and set up any derived values that AEs might modify.
    */
-  prepareData() {
-    super.prepareData?.();
+  prepareBaseData() {
+    super.prepareBaseData?.();
 
     // Skip processing if this item is in a compendium
-    if (this.pack) return;
-
-    // Setup the item's realName to be its name, if realName is blank
-    if (this.realName.trim() == "") this.realName = this.parent.name;
+    if (this.parent.pack) return;
 
     // If the item is identified but has no realDescription, set it to the description
     if (this.identified && this.realDescription.trim() == "") {
