@@ -7,7 +7,7 @@ import { Hyp3eItem } from "../documents/item.mjs";
  * @returns {Object} - JSON of update data
  */
 export function migrateActorData(actor) {
-    Hyp3eLogger.info("migrateActorData", `Migrating data for ${actor.name}...:`, actor)
+    // Hyp3eLogger.info("migrateActorData", `Migrating data for ${actor.name}...:`, actor)
     // let newActor = {...actor};
     let updates = {};
     // Add new default values
@@ -21,35 +21,39 @@ export function migrateActorData(actor) {
     }
 
     // Migrate, fix, or delete old data
-    const stats = ["fa", "ca", "ta"];
-    for (const stat of stats) {
-      const current = foundry.utils.getProperty(actor, `system.${stat}`);
-      let newStat = "";
-      if (stat === "fa") newStat = "fightingAbility";
-      if (stat === "ca") newStat = "castingAbility";
-      if (stat === "ta") newStat = "turningAbility";
-      Hyp3eLogger.info("migrateActorData", `${actor.name} property system.${stat}...`, current);
-      // Transform old number/null to new object
-      Hyp3eLogger.info("migrateActorData", `Setting system.${newStat} for ${actor.name}...`);
-      let newValue;
-      if (typeof current === "object" && current !== null && "value" in current) {
-        newValue = current.value || null;
-      } else if (typeof current === "number") {
-        newValue = current;
-      } else if (typeof current === "string") {
-        const parsed = parseInt(current);
-        newValue = isNaN(parsed) ? null : parsed;
-      } else {
-        newValue = null;
+    // If fightingAbility is missing, assume same issue for casting and turning, 
+    //  and migrate all three from old properties
+    if (actor.system.fightingAbility === undefined) {
+      const stats = ["fa", "ca", "ta"];
+      for (const stat of stats) {
+        const current = foundry.utils.getProperty(actor, `system.${stat}`);
+        let newStat = "";
+        if (stat === "fa") newStat = "fightingAbility";
+        if (stat === "ca") newStat = "castingAbility";
+        if (stat === "ta") newStat = "turningAbility";
+        // Transform old number/null to new object
+        Hyp3eLogger.info("migrateActorData", `Setting system.${newStat} for ${actor.name}...`);
+        let newValue;
+        if (typeof current === "object" && current !== null && "value" in current) {
+          newValue = current.value || null;
+        } else if (typeof current === "number") {
+          newValue = current;
+        } else if (typeof current === "string") {
+          const parsed = parseInt(current);
+          newValue = isNaN(parsed) ? null : parsed;
+        } else {
+          newValue = null;
+        }
+        updates = { ...updates, [`system.${stat}`]: newValue, [`system.${newStat}`]: { value: newValue } };
       }
-      updates = { ...updates, [`system.${stat}`]: newValue, [`system.${newStat}`]: { value: newValue } };
     }
 
+    // If tempHp is an object, convert it to zero
     if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp === "object") {
         Hyp3eLogger.info("migrateActorData", `Fixing temp HP for ${actor.name}...`);
         updates = { ...updates, "system.hp.tempHp": 0 };
     }
-    // If tempAcMod is an object, convert it to zero
+    // If tempAtkMod is an object, convert it to zero
     if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod === "object") {
         Hyp3eLogger.info("migrateActorData", `Fixing temp attack mod for ${actor.name}...`);
         updates = { ...updates, "system.tempAtkMod": 0 };
