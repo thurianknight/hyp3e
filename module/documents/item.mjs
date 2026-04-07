@@ -60,7 +60,7 @@ export class Hyp3eItem extends Item {
 
     // If this is a new weapon, add a basic roll formula for melee
     if (data.type === "weapon") {
-      if (options.fromCompendium !== true && options.fromDrop !== true) {
+      if (options.fromCompendium !== true && options.fromDrop !== true && !data?.system?.formula?.trim()) {
         updateData["system.formula"] = "1d20 + @str.atkMod";
       }
     }
@@ -75,29 +75,7 @@ export class Hyp3eItem extends Item {
   /** @override */
   async _onCreate(data, options, user) {
     await super._onCreate(data, options, user);
-
-    const itemData = this.system;
-
-    // if (this.type === "item") {
-    //   // Try to match item name to a light source in the lookup table
-    //   const lightSourceProps = this._getLightSourceProperties();
-    //   if (lightSourceProps) {
-    //     itemData.isLightSource = true;
-    //     itemData.light.dim = lightSourceProps.radius;
-    //     itemData.light.bright = Math.floor(lightSourceProps.radius/2);
-    //     itemData.light.angle = lightSourceProps.angle;
-    //     itemData.light.color = lightSourceProps.color;
-    //     itemData.light.alpha = lightSourceProps.alpha;
-    //   }
-    // }
-
-    // // If this is a weapon, add a basic roll formula if none is set
-    // if (this.type === "weapon") {
-    //   if (!itemData.formula?.trim()) {
-    //     const formula = "1d20 + @str.atkMod";
-    //     await this.update({ "system.formula": formula });
-    //   }
-    // }
+    // const itemData = this.system;
     Hyp3eLogger.info("Hyp3eItem _onCreate", `Created item:`, this);
   }
 
@@ -119,48 +97,8 @@ export class Hyp3eItem extends Item {
     if (this.pack) return;
 
     // Get the Item's data
-    const itemData = this.system;
+    // const itemData = this.system;
 
-    // Add isPhysical flag for armor, item, shield, weapon
-    // itemData.isPhysical = ["armor", "item", "shield", "weapon"].includes(this.type);
-
-    // if (itemData.isPhysical) {
-    //   // Ensure quantity and weight are numbers
-    //   itemData.quantity.value = Number(itemData.quantity.value) || 0;
-    //   itemData.quantity.max = Number(itemData.quantity.max) || 0;
-    //   itemData.weight = Number(itemData.weight) || 0;
-    // }
-
-    // Setup the item's realName to be its name, if realName is blank
-    // if (!itemData.realName?.trim()) itemData.realName = this.name;
-    // If the item is identified but has no realDescription, set it to the description
-    // if (itemData.identified && !itemData.realDescription?.trim()) {
-    //   itemData.realDescription = itemData.description;
-    // }
-    // If the item is identified but has no Description, set it to the realDescription
-    // if (itemData.identified && !itemData.description?.trim()) {
-    //   itemData.description = itemData.realDescription;
-    // }
-
-    // Fix weapon & spell missing or invalid damage type
-    // if (["weapon", "spell"].includes(this.type)) {
-    //   if (!itemData?.dmgType || itemData?.dmgType.trim() === "") {
-    //     Hyp3eLogger.warn("prepareData", `No damage type set on ${this.name}. Setting to Basic...`)
-    //     itemData.dmgType = "basic"
-    //   }
-    // }
-
-    // Apply attack formula logic if weapon or atkRoll
-    // if ((this.type === "weapon" || itemData.atkRoll) && !itemData.formula?.trim()) {
-    //   this.applyAttackFormula();
-    // }
-
-    // Ammo usage flag
-    // if (this.type === "weapon" && itemData.type === "missile" && (typeof itemData.usesAmmo === "undefined")) {
-    //   if (/(bow|sling|gun)/i.test(this.name)) {
-    //     itemData.usesAmmo = true;
-    //   }
-    // }
   }
 
   /**

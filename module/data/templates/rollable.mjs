@@ -15,7 +15,7 @@ export function rollableTemplate() {
     damage2h: new fields.StringField({ initial: "" }),
     dmgType: new fields.StringField({ initial: "basic" }),
     altDmg: new fields.ObjectField({ initial: {} }),
-    duration: new fields.StringField({ initial: "" }),
+    // duration: new fields.StringField({ initial: "" }),
     affected: new fields.StringField({ initial: "" })
   };
 }

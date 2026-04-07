@@ -54,7 +54,7 @@ items = [
     ("VARIABLES.md", False),
     ("hyperborea_combat_architecture.md", False),
     ("system.json", False),
-    ("template.json", False),
+    # ("template.json", False),
 ]
 
 for name, is_dir in items:

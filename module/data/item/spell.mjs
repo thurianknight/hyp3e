@@ -19,12 +19,13 @@ export default class Hyp3eSpell extends Hyp3eItemBase {
     });
     schema.spellLevel = new fields.NumberField({ initial: 1 });
     schema.range = new fields.StringField({ initial: "" });
+    schema.duration = new fields.StringField({ initial: "" }),
     schema.classList = new fields.StringField({ initial: "" });
     schema.isConsumable = new fields.BooleanField({ initial: true });
 
     return schema;
   }
-  
+
   /** 
    * Cleanup any missing or invalid data, and set up any derived values that AEs might modify.
    */

@@ -141,6 +141,14 @@ export function migrateItemData(item) {
         "system.light.alpha": lightSourceProps.alpha
     });
 
+    // Ensure quantities and weight are numbers
+    const qtyAndWeightUpdates = (item) => ({
+      "system.quantity.value": Number(item.system.quantity.value) || 1,
+      "system.quantity.max": Number(item.system.quantity.max) || 1,
+      "system.quantity.bundle": Number(item.system.quantity.bundle) || 0,
+      "system.weight": Number(item.system.weight) || 0
+    });
+
     // All items, regardless of type
     if (!("identified" in item.system)) {
         Hyp3eLogger.info("migrateItemData", `Fixing "identified" flag for ${item.name}...`);
@@ -161,6 +169,8 @@ export function migrateItemData(item) {
 
     // Armor only
     if (item.type === "armor") {
+        // Ensure quantities and weight are numbers
+        updates = { ...updates, ...qtyAndWeightUpdates(item) };
         // Convert legacy shield to new type
         const shieldUpdate = migrateShield(item);
         if (shieldUpdate) {
@@ -178,13 +188,21 @@ export function migrateItemData(item) {
         }
     }
 
+    // Shield only
+    if (item.type === "shield") {
+        // Ensure quantities and weight are numbers
+        updates = { ...updates, ...qtyAndWeightUpdates(item) };
+    }
+
     // Features only
     if (item.type === "feature") {
 
     }
 
-    // General items only
+    // General/equipment items only
     if (item.type === "item") {
+        // Ensure quantities and weight are numbers
+        updates = { ...updates, ...qtyAndWeightUpdates(item) };
         // Add the new light source properties if they do not exist yet
         if (item.system.isLightSource === undefined || item.system.isLightSource === null) {
             Hyp3eLogger.info("migrateItemData", `Fixing light source properties for ${item.name}...`);
@@ -206,14 +224,18 @@ export function migrateItemData(item) {
 
     // Weapons only
     if (item.type === "weapon") {
-        // const friendlyName = fixFriendlyName(item);
-        // if (friendlyName) {
-        //     updates = { ...updates, "system.friendlyName": friendlyName };
-        // }
+        // Ensure quantities and weight are numbers
+        updates = { ...updates, ...qtyAndWeightUpdates(item) };
+        // Set weapon hands property based on name or annotations
         const handsUpdate = migrateWeaponHands(item);
         if (handsUpdate) {
             Hyp3eLogger.info("migrateItemData", `Updated weapon hands for ${item.name}:`, handsUpdate)
             updates = { ...updates, ...handsUpdate };
+        }
+        // Fix weapon & spell missing or invalid damage type
+        if (!item.system.dmgType || item.system.dmgType.trim() === "") {
+            Hyp3eLogger.warn("migrateItemData", `No damage type set on ${item.name}. Setting to Basic...`)
+            updates = { ...updates, "system.dmgType": "basic" };
         }
     }
 

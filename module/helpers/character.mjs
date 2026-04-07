@@ -4808,7 +4808,7 @@ export class Hyp3eCharacterClass {
                 const folder = item.folder?.name?.toLowerCase() ?? "";
                 if (folderNames.includes(folder)) {
                     newItem = item.toObject();
-                    newItem.system.quantity = { value: quantity, max: quantity, bundle: newItem.system.quantity?.bundle ?? null };
+                    newItem.system.quantity = { value: quantity, max: quantity, bundle: newItem.system.quantity?.bundle ?? 0 };
                     Hyp3eLogger.info("Hyp3eCharacterClass getDefaultItemsForClass", `Found ${itemType} in folder ${folder}:`, newItem);
                     break;
                 }
@@ -4822,7 +4822,7 @@ export class Hyp3eCharacterClass {
                     if (compMatch) {
                         const doc = await pack.getDocument(compMatch._id);
                         newItem = doc.toObject();
-                        newItem.system.quantity = { value: quantity, max: quantity, bundle: newItem.system.quantity?.bundle ?? null };
+                        newItem.system.quantity = { value: quantity, max: quantity, bundle: newItem.system.quantity?.bundle ?? 0 };
                         Hyp3eLogger.info("Hyp3eCharacterClass getDefaultItemsForClass", `Found ${itemType} in compendium ${pack.metadata.label}:`, newItem);
                         break;
                     }
@@ -4840,7 +4840,7 @@ export class Hyp3eCharacterClass {
                         quantity: {
                             value: quantity,
                             max: quantity,
-                            bundle: null
+                            bundle: 0
                         }
                     }
                 };
