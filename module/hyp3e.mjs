@@ -820,7 +820,7 @@ async function migrateWorld() {
   Hyp3eLogger.info("migrateWorld", `Migrating world ${game.system.version}...`);
 
   // Migrate Actor directory
-  Hyp3eLogger.info("migrateWorld", `Updating data for ${game.actors.contents.length} actors in the directory...`, game.actors.contents);
+  Hyp3eLogger.info("migrateWorld", `Migrating data for ${game.actors.contents.length} actors in the directory...`);
   for (const actor of game.actors.contents) {
     // Migrate actor data
     const origActor = foundry.utils.deepClone(actor)
@@ -851,7 +851,7 @@ async function migrateWorld() {
   // return true;
 
   // Migrate Items directory
-  Hyp3eLogger.info("migrateWorld", `Updating data for ${game.items.contents.length} items in the directory...`, game.items.contents);
+  Hyp3eLogger.info("migrateWorld", `Migrating data for ${game.items.contents.length} items in the directory...`);
   for (const item of game.items.contents) {
     const origItem = foundry.utils.deepClone(item);
     const itemUpdates = migrateItemData(origItem);
