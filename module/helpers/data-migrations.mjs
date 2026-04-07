@@ -147,26 +147,26 @@ export function migrateItemData(item) {
 
     // Ensure quantities and weight are numbers
     const qtyAndWeightUpdates = (item) => ({
-      "system.quantity.value": Number(item.system.quantity.value) || 1,
-      "system.quantity.max": Number(item.system.quantity.max) || 1,
-      "system.quantity.bundle": Number(item.system.quantity.bundle) || 0,
-      "system.weight": Number(item.system.weight) || 0
+      "system.quantity.value": toNumber(item.system.quantity.value) || 1,
+      "system.quantity.max": toNumber(item.system.quantity.max) || 1,
+      "system.quantity.bundle": Number(item.system.quantity.bundle) || null,
+      "system.weight": toNumber(item.system.weight) || 0
     });
 
     // All items, regardless of type
-    if (!("identified" in item.system)) {
+    if (item.system.identified === undefined) {
         Hyp3eLogger.info("migrateItemData", `Fixing "identified" flag for ${item.name}...`);
         updates = { ...updates, "system.identified": true };
     }
-    if (!("tokenAlias" in item.system)) {
-        Hyp3eLogger.info("migrateItemData", `Fixing token alias for ${item.name}...`);
-        updates = { ...updates, "system.tokenAlias": "" };
+    if (item.system.itemAlias === undefined) {
+        Hyp3eLogger.info("migrateItemData", `Fixing item alias for ${item.name}...`);
+        updates = { ...updates, "system.itemAlias": "" };
     }
-    if (!("realName" in item.system) || item.system.realName == "") {
+    if (item.system.realName === undefined || item.system.realName == "") {
         Hyp3eLogger.info("migrateItemData", `Fixing real name for ${item.name}...`);
         updates = { ...updates, "system.realName": item.name };
     }
-    if (!("realDescription" in item.system) || item.system.realDescription == "") {
+    if (item.system.realDescription === undefined) {
         Hyp3eLogger.info("migrateItemData", `Fixing real description for ${item.name}...`);
         updates = { ...updates, "system.realDescription": item.system.description };
     }
@@ -174,7 +174,9 @@ export function migrateItemData(item) {
     // Armor only
     if (item.type === "armor") {
         // Ensure quantities and weight are numbers
-        updates = { ...updates, ...qtyAndWeightUpdates(item) };
+        if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
+            updates = { ...updates, ...qtyAndWeightUpdates(item) };
+        }
         // Convert legacy shield to new type
         const shieldUpdate = migrateShield(item);
         if (shieldUpdate) {
@@ -195,7 +197,9 @@ export function migrateItemData(item) {
     // Shield only
     if (item.type === "shield") {
         // Ensure quantities and weight are numbers
-        updates = { ...updates, ...qtyAndWeightUpdates(item) };
+        if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
+            updates = { ...updates, ...qtyAndWeightUpdates(item) };
+        }
     }
 
     // Features only
@@ -206,7 +210,9 @@ export function migrateItemData(item) {
     // General/equipment items only
     if (item.type === "item") {
         // Ensure quantities and weight are numbers
-        updates = { ...updates, ...qtyAndWeightUpdates(item) };
+        if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
+            updates = { ...updates, ...qtyAndWeightUpdates(item) };
+        }
         // Add the new light source properties if they do not exist yet
         if (item.system.isLightSource === undefined || item.system.isLightSource === null) {
             Hyp3eLogger.info("migrateItemData", `Fixing light source properties for ${item.name}...`);
@@ -229,7 +235,9 @@ export function migrateItemData(item) {
     // Weapons only
     if (item.type === "weapon") {
         // Ensure quantities and weight are numbers
-        updates = { ...updates, ...qtyAndWeightUpdates(item) };
+        if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
+            updates = { ...updates, ...qtyAndWeightUpdates(item) };
+        }
         // Set weapon hands property based on name or annotations
         const handsUpdate = migrateWeaponHands(item);
         if (handsUpdate) {
@@ -394,4 +402,20 @@ export async function migrateItemEffects(item) {
     });
     await item.updateEmbeddedDocuments("ActiveEffect", effectUpdates);
   }
+}
+
+/**
+ * Take any valid number or numeric string and return a pure number
+ * @param {*} value 
+ * @returns {Number}
+ */
+export function toNumber(value) {
+  if (value == null) return 0;
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    // Remove commas, currency symbols, and trim spaces
+    value = value.replace(/[^0-9.\-]/g, "");
+  }
+  const n = Number(value);
+  return isNaN(n) ? 0 : n;
 }
