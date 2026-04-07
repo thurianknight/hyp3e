@@ -2,7 +2,7 @@
 
 .quick-equip-app {
   background-color: var(--hyp3e-color-bg-75);
-  gap: 1rem;
+  gap: 0.5rem;
   justify-content: center;
 }
 .quick-equip-app .window-content {
@@ -11,12 +11,26 @@
   /* padding-bottom: 8px; */
 }
 
+.quick-equip-app .quick-equip-controls {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0;
+}
+.quick-equip-app .quick-equip-control {
+  border: none;
+  height: 24px;
+  width: 24px;
+  color: var(--color-text);
+  font-size: 1.0rem;
+  border-radius: 4px;
+}
+
 .quick-equip-column {
   flex: 1;
   background: rgba(255, 255, 255, 0.25);
   border: 1px solid var(--color-border-dark);
   border-radius: 8px;
-  padding: 0.25rem;
+  padding: 0.2rem;
 }
 
 .quick-equip-column h3 {
