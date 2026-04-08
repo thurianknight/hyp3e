@@ -5140,7 +5140,8 @@ export class Hyp3eCharacterClass {
                 switch (k) {
                     case "str":
                         Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Setting ${k} modifiers...`);
-                        content += `<li>ST Mods:</li><ul>`
+                        content += `<li>Strength (ST): ${data.attributes.str.value}</li><ul>`
+                        // content += `<li>ST Modifiers:</li><ul>`
                         data.attributes.str.atkMod = this._valueFromTable(this.strAtkMod, data.attributes.str.value)
                         content += `<li>Melee Attack Mod: ${data.attributes.str.atkMod}</li>`
                         data.attributes.str.dmgMod = this._valueFromTable(this.strDmgMod, data.attributes.str.value)
@@ -5181,7 +5182,8 @@ export class Hyp3eCharacterClass {
 
                     case "dex":
                         Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Setting ${k} modifiers...`);
-                        content += `<li>DX Mods:</li><ul>`
+                        content += `<li>Dexterity (DX): ${data.attributes.dex.value}</li><ul>`
+                        // content += `<li>DX Modifiers:</li><ul>`
                         data.attributes.dex.atkMod = this._valueFromTable(this.dexAtkMod, data.attributes.dex.value)
                         content += `<li>Missile Attack Mod: ${data.attributes.dex.atkMod}</li>`
                         data.attributes.dex.defMod = this._valueFromTable(this.dexDefMod, data.attributes.dex.value)
@@ -5222,7 +5224,8 @@ export class Hyp3eCharacterClass {
 
                     case "con":
                         Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Setting ${k} modifiers...`);
-                        content += `<li>CN Mods:</li><ul>`
+                        content += `<li>Constitution (CN): ${data.attributes.con.value}</li><ul>`
+                        // content += `<li>CN Modifiers:</li><ul>`
                         data.attributes.con.hpMod = this._valueFromTable(this.conHpMod, data.attributes.con.value)
                         content += `<li>Hit Point Mod: ${data.attributes.con.hpMod}</li>`
                         data.attributes.con.poisRadMod = this._valueFromTable(this.conPoisonMod, data.attributes.con.value)
@@ -5265,7 +5268,8 @@ export class Hyp3eCharacterClass {
 
                     case "int":
                         Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Setting ${k} modifiers...`);
-                        content += `<li>IN Mods:</li><ul>`
+                        content += `<li>Intelligence (IN): ${data.attributes.int.value}</li><ul>`
+                        // content += `<li>IN Modifiers:</li><ul>`
 
                         data.attributes.int.languages = this._valueFromTable(this.intLanguages, data.attributes.int.value)
                         content += `<li>Languages: ${data.attributes.int.languages}</li>`
@@ -5324,7 +5328,8 @@ export class Hyp3eCharacterClass {
 
                     case "wis":
                         Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Setting ${k} modifiers...`);
-                        content += `<li>WS Mods:</li><ul>`
+                        content += `<li>Wisdom (WS): ${data.attributes.wis.value}</li><ul>`
+                        // content += `<li>WS Modifiers:</li><ul>`
 
                         data.attributes.wis.willMod = this._valueFromTable(this.wisWillMod, data.attributes.wis.value)
                         content += `<li>Will Mod: ${data.attributes.wis.willMod}</li>`
@@ -5383,7 +5388,8 @@ export class Hyp3eCharacterClass {
 
                     case "cha":
                         Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Setting ${k} modifiers...`);
-                        content += `<li>CH Mods:</li><ul>`
+                        content += `<li>Charisma (CH): ${data.attributes.cha.value}</li><ul>`
+                        // content += `<li>CH Modifiers:</li><ul>`
                         data.attributes.cha.reaction = this._valueFromTable(this.chaReactionMod, data.attributes.cha.value)
                         content += `<li>Reaction Mod: ${data.attributes.cha.reaction}</li>`
                         data.attributes.cha.maxHenchmen = this._valueFromTable(this.chaRetainers, data.attributes.cha.value)
