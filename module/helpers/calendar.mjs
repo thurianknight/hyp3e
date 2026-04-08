@@ -2,20 +2,37 @@ import { HYP3E_CALENDAR } from "./calendar-data.mjs"
 import { Hyp3eLogger } from "./logger.mjs";
 
 export async function setupCalendarHooks() {
+  console.log("[HYP3E] HYP3ECalendar: Initializing Calendar hooks...");
   /**
-   * Custom hook for handling calendar day advancement.
+   * Custom hooks for handling calendar updates.
    */
-  Hooks.on("calendarDayAdvanced", async ({ year, month, day }) => {
+  Hooks.on("calendarDayAdvanced", ({ year, month, day }) => {
+    Hyp3eLogger.info("calendarDayAdvanced", `Calendar advanced to ${year}-${month}-${day}`);
     // Nothing to do at this time...
   });
-
-  Hooks.on("calendarDayRetreated", async ({ year, month, day }) => {
+  Hooks.on("calendarDayRetreated", ({ year, month, day }) => {
+    Hyp3eLogger.info("calendarDayRetreated", `Calendar retreated to ${year}-${month}-${day}`);
     // Nothing to do at this time...
   });
-
+  Hooks.on("calendarDateSet", ({ year, month, day }) => {
+    Hyp3eLogger.info("calendarDateSet", `Calendar date set to ${year}-${month}-${day}`);
+    // Nothing to do at this time...
+  });
 }
 
 export class HYP3ECalendar {
+
+  /** Call this once during system ready */
+  static initSync() {
+    /**
+     * Hook into setting updates to monitor changes to the calendar date.
+     */
+    Hyp3eLogger.info("HYP3ECalendar initSync", `Initializing updateSetting hook...`);
+    Hooks.on("updateSetting", (setting, value, options, userId) => {
+      if (setting.key !== "hyp3e.calendarDate") return;
+      Hyp3eLogger.info("HYP3ECalendar", `Setting updated:`, { setting, value, options, userId });
+    });
+  }
 
   static getCurrentDate() {
     return game.settings.get("hyp3e", "calendarDate");
@@ -83,10 +100,7 @@ export class HYP3ECalendar {
   }
 
   static async advanceDay(resetTurns = false) {
-    if (!game.user.isGM) {
-      Hyp3eLogger.warn("advanceDay", "Only the GM can change the date.");
-      return;
-    }
+    if (!game.user.isGM) return;
 
     let {year, month, day} = this.getCurrentDate();
     day++;
@@ -101,9 +115,9 @@ export class HYP3ECalendar {
     Hyp3eLogger.info("advanceDay", `Calendar advanced to ${this.formatDate()}`);
     Hooks.callAll("calendarDayAdvanced", { year, month, day });
 
-    if (resetTurns && game.hyp3e?.turnTrackerApp) {
-      await game.hyp3e.turnTracker.resetTurn();
-    }
+    // if (resetTurns && game.hyp3e?.turnTrackerApp) {
+    //   await game.hyp3e.turnTracker.resetTurn();
+    // }
   }
 
   static async retreatDay(resetTurns = false) {

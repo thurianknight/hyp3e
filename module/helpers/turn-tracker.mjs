@@ -77,6 +77,28 @@ export async function setupTurnTrackerHooks() {
       }
     }
   });
+
+  /**
+   * Global listeners for calendar changes
+   */
+  Hooks.on("calendarDateSet", () => {
+    if (game.hyp3e?.turnTrackerApp) {
+      Hyp3eLogger.info("calendarDateSet", "calendarDateSet → rendering turn tracker");
+      game.hyp3e.turnTrackerApp._refreshDisplay();
+    }
+  });
+  Hooks.on("calendarDayAdvanced", () => {
+    if (game.hyp3e?.turnTrackerApp) {
+      Hyp3eLogger.info("calendarDayAdvanced", "calendarDayAdvanced → rendering turn tracker");
+      game.hyp3e.turnTrackerApp._refreshDisplay();
+    }
+  });
+  Hooks.on("calendarDayRetreated", () => {
+    if (game.hyp3e?.turnTrackerApp) {
+      Hyp3eLogger.info("calendarDayRetreated", "calendarDayRetreated → rendering turn tracker");
+      game.hyp3e.turnTrackerApp._refreshDisplay();
+    }
+  });
 }
 
 export class HYP3ETurnTracker {
@@ -99,15 +121,6 @@ export class HYP3ETurnTracker {
 
   static get currentTime() {
     return game.settings.get("hyp3e", "currentTime") || "8:00";
-    // const startTime = this.turnStartTime;
-    // const [startHour, startMinute] = startTime.split(":").map(Number);
-    // const totalMinutes = startHour * 60 + startMinute + (this.currentTurn - 1) * 10;
-    // const currentHour = Math.floor(totalMinutes / 60) % 24;
-    // const currentMinute = totalMinutes % 60;
-    const currentTime = game.settings.get("hyp3e", "currentTime");
-    const currentHour = currentTime ? parseInt(currentTime.split(":")[0]) : 0;
-    const currentMinute = currentTime ? parseInt(currentTime.split(":")[1]) : 0;
-    return `${currentHour.toString()}:${currentMinute.toString().padStart(2, '0')}`;
   }
 
   /** Call this once during system ready */
@@ -120,23 +133,29 @@ export class HYP3ETurnTracker {
      */
     Hyp3eLogger.info("HYP3ETurnTracker initSync", `Initializing updateSetting hook...`);
     Hooks.on("updateSetting", (setting, value, options, userId) => {
-      if (setting.key !== "hyp3e.explorationTurn") return;
-      Hyp3eLogger.info("HYP3ETurnTracker", `Setting updated:`, { setting, value, options, userId });
+      // Calendar updates are handled separately in the calendar app, but we can trigger a render here as a safety net
+      if (setting.key === "hyp3e.calendarDate" && game.hyp3e?.turnTrackerApp) {
+        game.hyp3e.turnTrackerApp.render(false);
+      }
 
-      const oldTurn = this._lastTurn;
-      const newTurn = value.value;
-      Hyp3eLogger.info("HYP3ETurnTracker", `Turn changed from ${oldTurn} to ${newTurn} by user ${userId.name}`);
-      // update cache
-      this._lastTurn = newTurn;
+      if (setting.key === "hyp3e.explorationTurn") {
+        Hyp3eLogger.info("HYP3ETurnTracker", `Setting updated:`, { setting, value, options, userId });
 
-      if (newTurn > oldTurn) {
-        Hooks.callAll("explorationTurnAdvanced", newTurn);
-      } else if (newTurn === 1 && oldTurn !== 1) {
-        Hooks.callAll("explorationTurnReset", newTurn);
-      } else if (newTurn < oldTurn) {
-        Hooks.callAll("explorationTurnRetreat", newTurn);
-      } else {
-        Hooks.callAll("explorationTurnUpdated", newTurn);
+        const oldTurn = this._lastTurn;
+        const newTurn = value.value;
+        Hyp3eLogger.info("HYP3ETurnTracker", `Turn changed from ${oldTurn} to ${newTurn} by user ${userId.name}`);
+        // update cache
+        this._lastTurn = newTurn;
+
+        if (newTurn > oldTurn) {
+          Hooks.callAll("explorationTurnAdvanced", newTurn);
+        } else if (newTurn === 1 && oldTurn !== 1) {
+          Hooks.callAll("explorationTurnReset", newTurn);
+        } else if (newTurn < oldTurn) {
+          Hooks.callAll("explorationTurnRetreat", newTurn);
+        } else {
+          Hooks.callAll("explorationTurnUpdated", newTurn);
+        }
       }
     });
   }

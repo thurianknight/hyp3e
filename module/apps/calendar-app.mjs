@@ -152,7 +152,6 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
             ...HYP3ECalendar.getCurrentDate(),
             year: newYear
           });
-          game.hyp3e.turnTrackerApp.render();
         }
       });
     }
@@ -170,7 +169,6 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
           ...HYP3ECalendar.getCurrentDate(),
           month: newMonth
         });
-        game.hyp3e.turnTrackerApp.render();
       });
     }
     // Only add listener for the GM, not players
@@ -184,7 +182,6 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
             ...HYP3ECalendar.getCurrentDate(),
             day
           });
-          game.hyp3e.turnTrackerApp.render();
         });
       });
     }
@@ -203,7 +200,6 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         if (timePattern.test(newTime)) {
           await game.settings.set("hyp3e", "turnStartTime", newTime);
           this.render(true);
-          game.hyp3e.turnTrackerApp.render();
         } else {
           ui.notifications.error("Invalid time format. Please use H:mm (e.g., 8:00).");
           // Reset to previous valid value
@@ -214,14 +210,13 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
     // Button listeners
     if (game.user.isGM) {
-      root.querySelector("[data-action='advance']")?.addEventListener("click", () => {
+      root.querySelector("[data-action='advance']")?.addEventListener("click", async () => {
         Hyp3eLogger.info("HYP3ECalendarApp advanceDay(false)", "Advance day button clicked by GM.");
         // Sending 'false' tells advanceDay() to NOT reset the turn counter
-        HYP3ECalendar.advanceDay(false);
-        setTimeout(() => {
-          this.render(false)
-          game.hyp3e.turnTrackerApp.render();
-        }, 250);
+        await HYP3ECalendar.advanceDay(false);
+        // setTimeout(() => {
+        //   this.render(false)
+        // }, 250);
       });
     }
 
@@ -230,25 +225,24 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
     });
 
     if (game.user.isGM) {
-      root.querySelector("[data-action='advance-reset']")?.addEventListener("click", () => {
+      root.querySelector("[data-action='advance-reset']")?.addEventListener("click", async () => {
         Hyp3eLogger.info("HYP3ECalendarApp advanceDay(true)", "Advance day + reset turn button clicked by GM.");
         // Sending 'true' tells advanceDay() to also reset the turn counter
-        HYP3ECalendar.advanceDay(true);
-        setTimeout(() => {
-          this.render(false)
-          game.hyp3e.turnTrackerApp.render();
-        }, 250);
+        await HYP3ECalendar.advanceDay(true);
+        await game.hyp3e.turnTracker.resetTurn();
+        // setTimeout(() => {
+        //   this.render(false)
+        // }, 250);
       });
     }
 
     if (game.user.isGM) {
-      root.querySelector("[data-action='reset']")?.addEventListener("click", () => {
+      root.querySelector("[data-action='reset']")?.addEventListener("click", async() => {
         Hyp3eLogger.info("HYP3ECalendarApp resetTurn", "Reset turn button clicked by GM.");
-        game.hyp3e.turnTracker.resetTurn();
-        setTimeout(() => {
-          this.render(false);
-          game.hyp3e.turnTrackerApp.render();
-        }, 250);
+        await game.hyp3e.turnTracker.resetTurn();
+        // setTimeout(() => {
+        //   this.render(false);
+        // }, 250);
       });
     }
   }

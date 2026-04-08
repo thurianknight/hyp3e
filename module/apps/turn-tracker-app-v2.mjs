@@ -177,6 +177,10 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     this._embeddedElement = $html;
     this._bindButtons($html);
 
+    // Update display with current turn info
+    // this.updateTurnDisplay(context.currentTurn);
+    this._refreshDisplay();
+
     return this;
   }
 
@@ -197,7 +201,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
 
   _onRender(context, options) {
     super._onRender(context, options);
-    // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onRender", `Turn Tracker render parameters:`, {context, options})
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onRender", `Turn Tracker render parameters:`, {context, options})
   }
 
   _bindButtons($html) {
@@ -219,17 +223,20 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
 
   _onTurnAdvanced(data) {
     // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onTurnAdvanced", "Turn advanced:", data);
-    this.updateTurnDisplay(data);
+    // this.updateTurnDisplay(data);
+    this._refreshDisplay();
   }
 
   _onTurnRetreat(data) {
     // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onTurnRetreat", "Turn retreat:", data);
-    this.updateTurnDisplay(data);
+    // this.updateTurnDisplay(data);
+    this._refreshDisplay();
   }
 
   _onTurnReset(data) {
     // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _onTurnReset", "Turn reset:", data);
-    this.updateTurnDisplay(data);
+    // this.updateTurnDisplay(data);
+    this._refreshDisplay();
   }
 
   static #openCalendar(event, target) {
@@ -290,8 +297,37 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     await game.settings.set("hyp3e", "turnTrackerMode", newMode);
   }
 
+  /**
+   * Refresh only the dynamic parts of the Turn Tracker (turn, time, date)
+   * without doing a full re-render. Safe to call from hooks on any client.
+   */
+  _refreshDisplay() {
+    if (!this._embeddedElement) {
+      // If somehow the element is gone, do a light re-render
+      this.render(false);
+      return;
+    }
+
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _refreshDisplay", "Refresh display called from hook");
+
+    // Update date
+    const currentDate = game.hyp3e.calendar.formatDate(false);
+    this._embeddedElement.find("#current-date")?.text(currentDate);
+
+    // Update time
+    const currentTime = game.hyp3e.turnTracker.getTime();
+    this._embeddedElement.find("#current-time")?.val(currentTime);
+
+    // Update turn
+    const currentTurn = game.hyp3e.turnTracker.getTurn();
+    const turnField = this._embeddedElement.find("#current-turn");
+    if (turnField.length) {
+      turnField.val(currentTurn);
+    }
+  }
+
   updateTurnDisplay(turn) {
-    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 updateTurnDisplay", `Method updateTurnDisplay() called. Turn: ${turn}. Embedded element:`, this._embeddedElement);
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 updateTurnDisplay", `Updating display for turn: ${turn}.`);
     if (!this._embeddedElement) return;
 
     // Update the turn field
@@ -302,11 +338,11 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     turnField.addClass("turn-advance-flash");
     setTimeout(() => turnField.removeClass("turn-advance-flash"), 600);
 
-    // Update the time field
+    // Update time
     const currentTime = game.hyp3e.turnTracker.getTime();
     this._embeddedElement.find("#current-time")?.val(currentTime);
 
-    // Update the date field
+    // Update date
     const currentDate = game.hyp3e.calendar.formatDate(false);
     this._embeddedElement.find("#current-date")?.text(currentDate);
   }
