@@ -1188,7 +1188,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Get the type of item to create
         const type = target.dataset.type;
         // Grab any data associated with this control
-        const data = duplicate(target.dataset);
+        const data = foundry.utils.duplicate(target.dataset);
         // Initialize a default name.
         const name = `New ${type.capitalize()}`;
         // Prepare the item object.

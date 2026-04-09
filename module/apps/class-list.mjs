@@ -96,7 +96,7 @@ export class HYP3ECustomClassList extends HandlebarsApplicationMixin(Application
         const confirmed = confirm(`Are you sure you want to delete the class "${className}"?`);
         if (!confirmed) return;
 
-        const allClasses = duplicate(game.settings.get(game.system.id, "customClassData"));
+        const allClasses = foundry.utils.duplicate(game.settings.get(game.system.id, "customClassData"));
         delete allClasses[className];
         await game.settings.set(game.system.id, "customClassData", allClasses);
 
