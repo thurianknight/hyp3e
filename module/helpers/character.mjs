@@ -5101,6 +5101,7 @@ export class Hyp3eCharacterClass {
             data.castingAbility.value = thisClass.ca
             content += `<li>Casting Ability: ${thisClass.ca}</li>`
             if (thisClass?.spellLists && thisClass.spellLists.length > 0) {
+                data.spellcaster = true;
                 Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Setting ${data.details.class} spell lists...`);
                 data.spellList = thisClass.spellLists[0]
                 data.spellList2 = thisClass.spellLists.length > 1 ? thisClass.spellLists[1] : null
@@ -5109,6 +5110,8 @@ export class Hyp3eCharacterClass {
                 } else {
                     content += `<li>Spell List(s): ${data.spellList}</li>`
                 }
+            } else {
+              data.spellcaster = false;
             }
             data.turningAbility.value = thisClass.ta
             content += `<li>Turning Ability: ${thisClass.ta}</li>`
@@ -5437,6 +5440,7 @@ export class Hyp3eCharacterClass {
                     hd: data.hd,
                     fightingAbility: { value: data.fightingAbility.value },
                     castingAbility: { value: data.castingAbility.value },
+                    spellcaster: data.spellcaster,
                     spellList: data.spellList,
                     spellList2: data.spellList2,
                     turningAbility: { value: data.turningAbility.value },
