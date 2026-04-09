@@ -580,6 +580,14 @@
   padding: 0 0;
   min-width: 60px;
 }
+.hyp3e .header-label-small {
+  font-family: "Herculanum", sans-serif;
+  font-weight: bold;
+  font-size: 0.8em;
+  padding: 5px 10px;
+  text-wrap: nowrap;
+  min-width: 60px;
+}
 .hyp3e .header-label-wide {
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
@@ -1081,6 +1089,14 @@
   flex-direction: column;
   align-items: flex-start;
   flex: 1;
+}
+
+.hyp3e .spellcaster-switch {
+  margin-left: 15px;
+  min-width: 70px;
+  display: flex;
+  flex-direction: column; /* stack elements vertically */
+  align-items: center;    /* center horizontally */
 }
 
 /* Input-specific styles */

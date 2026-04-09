@@ -69,7 +69,22 @@
                     data-action="levelUp">
                 <i class="fas fa-book" style="font-size: small"></i>
                 </a>
-                <span class="header-label-wide align-left">{{localize "HYP3E.dataLabel.levelUp"}}</span>
+                <span class="header-label align-left">{{localize "HYP3E.dataLabel.levelUp"}}</span>
+            </div>
+            <div class="spellcaster-switch">
+              <label class="switch">
+                <input type="checkbox" class="spellcaster-toggle" 
+                  data-action="toggleSpells" 
+                  data-value="{{system.spellcaster}}" 
+                  {{#if system.spellcaster}}checked{{/if}}
+                >
+                <div class="slider round"></div>
+              </label>
+              <label class="header-label-small">
+                {{#if system.spellcaster}}{{localize "HYP3E.dataLabel.spellcaster"}}
+                {{else}}{{localize "HYP3E.dataLabel.noSpells"}}
+                {{/if}}
+              </label>
             </div>
           </div>
           <div class="flexrow">

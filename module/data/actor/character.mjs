@@ -70,6 +70,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       })
     });
 
+    schema.spellcaster = new fields.BooleanField({ initial: true });
     schema.spellList = new fields.StringField({ blank: true, initial: "" });
     schema.spells = new fields.SchemaField({
       l1: new fields.StringField({ blank: true }),

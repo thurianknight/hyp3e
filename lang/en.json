@@ -619,6 +619,8 @@
             "levelUp": "Level Up!",
             "quickCreate": "Quick Create Character",
             "setAttributeMods": "Set Attribute Modifiers",
+            "spellcaster": "Spellcaster",
+            "noSpells": "No Spells",
             "basicMeleeAtk": "Basic melee attack",
             "attackWith": "Attack with",
             "castSpell": "Cast spell",

@@ -81,6 +81,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       deleteItem: Hyp3eActorSheetV2._deleteItem,
       // Actions on the sheet header
       editImage: Hyp3eActorSheetV2._onEditImage,
+      toggleSpells: Hyp3eActorSheetV2._toggleSpells,
       setNpcType: Hyp3eActorSheetV2._setNpcType,
       quickCreate: Hyp3eActorSheetV2._onQuickCreate,
       levelUp: Hyp3eActorSheetV2._onLevelUp,
@@ -412,7 +413,9 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     // Insert PC-specific tabs
     if (this.document.type === "character") {
       tabs.tabs.splice(1, 0, { id: 'combat', group: group });
-      tabs.tabs.splice(2, 0, { id: 'spells', group: group });
+      if (this.actor.system.spellcaster) {
+        tabs.tabs.splice(2, 0, { id: 'spells', group: group });
+      }
       tabs.tabs.splice(3, 0, { id: 'items', group: group });
     }
 
@@ -839,12 +842,24 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     /**
+     * Toggles the spellcaster flag true/false, which controls whether the Spells tab is shown on the sheet
+     * @param {*} event 
+     * @param {*} target
+     */
+    static async _toggleSpells(event, target) {
+      const value = target.dataset.value;
+      Hyp3eLogger.info("HYP3EActorSheetV2 _toggleSpells", `Toggle spells clicked:`, target);
+      await this.actor.update({ "system.spellcaster": !this.actor.system.spellcaster });
+    }
+
+    /**
      * Switches the NPC type between monster and npc (possibly more, tbd)
      * @param {*} event 
      * @param {*} target 
      */
     static async _setNpcType(event, target) {
       const value = target.dataset.value;
+      Hyp3eLogger.info("HYP3EActorSheetV2 _setNpcType", `Set NPC type clicked:`, target);
       const newValue = value == "monster" ? "npc" : "monster";
       await this.actor.update({ "system.npcType": newValue });
     }
