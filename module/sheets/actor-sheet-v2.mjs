@@ -1239,22 +1239,27 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             // Enable effects
             enableAllTransferrableItemEffectsToItemOwner(item, this.actor.id)
         }
-        // Send a chat message that the item was equipped/unequipped or carried/dropped
-        const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
-        let equipText = ""
-        let containerText = ""
-        if (item.type === "armor" || item.type === "shield" || item.type === "weapon") {
-            equipText = item.system.equipped ? "equipped" : "unequipped"
-        } else if (item.type === "item" || item.type === "container") {
-            equipText = item.system.equipped ? "is carrying" : "dropped"
-            // If this is a container, carry or drop the contents too
-            if (item.system.isContainer || item.type === "container") {
-                this._carryOrDropContainer(item)
-                containerText = " and its contents"
-            }
+        // If this is a container, carry or drop the contents too
+        if (item.system.isContainer || item.type === "container") {
+            this._carryOrDropContainer(item)
         }
-        const message = `${this.actor.displayName} ${equipText} <strong>${itemName}</strong>${containerText}.`
-        sendSimpleChat(this.actor, "", message);
+
+        // Send a chat message that the item was equipped/unequipped or carried/dropped
+        // const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
+        // let equipText = ""
+        // let containerText = ""
+        // if (item.type === "armor" || item.type === "shield" || item.type === "weapon") {
+        //     equipText = item.system.equipped ? "equipped" : "unequipped"
+        // } else if (item.type === "item" || item.type === "container") {
+        //     equipText = item.system.equipped ? "is carrying" : "dropped"
+        //     // If this is a container, carry or drop the contents too
+        //     if (item.system.isContainer || item.type === "container") {
+        //         this._carryOrDropContainer(item)
+        //         containerText = " and its contents"
+        //     }
+        // }
+        // const message = `${this.actor.displayName} ${equipText} <strong>${itemName}</strong>${containerText}.`
+        // sendSimpleChat(this.actor, "", message);
     }
 
     /**

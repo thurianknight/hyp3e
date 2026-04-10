@@ -1,4 +1,5 @@
 import {Hyp3eDice} from "../dice/dice.mjs";
+import { sendSimpleChat } from "../chat/chat.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 
@@ -84,6 +85,28 @@ export class Hyp3eItem extends Item {
     super._onUpdate(changed, options, user);
     Hyp3eLogger.info("Hyp3eItem _onUpdate", `Changed data:`, changed);
 
+    if (changed.system?.equipped !== undefined) {
+      // Only proceed if the item is owned by an actor
+      if (!this.actor) return;
+      // Also, only proceed if the item is not in a container
+      if (this.type === "item" && this.system?.containerId) return;
+
+      // Send a chat message that the item was equipped/unequipped or carried/dropped
+      const itemName = this.system.friendlyName ? this.system.friendlyName : this.name
+      let equipText = ""
+      let containerText = ""
+      if (this.type === "armor" || this.type === "shield" || this.type === "weapon") {
+        equipText = this.system.equipped ? "equipped" : "unequipped"
+      } else if (this.type === "item" || this.type === "container") {
+        equipText = this.system.equipped ? "is carrying" : "dropped"
+        // If this is a container, indicate change to its contents too
+        if (this.system.isContainer || this.type === "container") {
+          containerText = " and its contents"
+        }
+      }
+      const message = `${this.actor.displayName} ${equipText} <strong>${itemName}</strong>${containerText}.`
+      sendSimpleChat(this.actor, "", message);
+    }
   }
 
   /** @override */
