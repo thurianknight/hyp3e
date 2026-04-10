@@ -298,7 +298,8 @@ export class Hyp3eActor extends Actor {
         continue;
       }
 
-      changes.push(...effect.changes.map(change => {
+      const effectChanges = effect?.changes || effect?.system.changes || [];
+      changes.push(...effectChanges.map(change => {
         const c = foundry.utils.deepClone(change);
         c.effect = effect;
         c.priority = c.priority ?? (c.mode * 10);
@@ -1124,7 +1125,8 @@ export class Hyp3eActor extends Actor {
         }
 
         // Store all changes for a batch update at the end
-        let updatedChanges = [...effect.changes];  // Start with a shallow copy
+        const effectChanges = effect?.changes || effect?.system.changes || [];
+        let updatedChanges = [...effectChanges];  // Start with a shallow copy
         // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, updatedChanges);
         for (let i = 0; i < updatedChanges.length; i++) {
           const change = updatedChanges[i];
@@ -1177,7 +1179,8 @@ export class Hyp3eActor extends Actor {
     for (const effect of this.allApplicableEffects()) {
       Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} has ${effect.name} with remaining time ${effect.duration.remaining} rounds/turns:`, effect);
       if (effect.isTemporary && !effect.disabled) {
-        const persistentDamage = effect.changes.find(c => c.key === "system.tempPersistentDamage");
+        const effectChanges = effect?.changes || effect?.system.changes || [];
+        const persistentDamage = effectChanges.find(c => c.key === "system.tempPersistentDamage");
         if (persistentDamage) {
           Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} persistent damage:`, persistentDamage);
 
@@ -1282,7 +1285,8 @@ export class Hyp3eActor extends Actor {
       }
 
       // Store all changes for a single batch update at the end
-      let updatedChanges = [...effect.changes];  // Start with a shallow copy
+      const effectChanges = effect?.changes || effect?.system.changes || [];
+      let updatedChanges = [...effectChanges];  // Start with a shallow copy
       let didUpdate = false;
       let newValue = 0;
       let excess = 0;

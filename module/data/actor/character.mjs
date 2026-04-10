@@ -319,7 +319,8 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       }
 
       // Only include changes to allowed keys
-      const filtered = effect.changes
+      const effectChanges = effect?.changes || effect?.system.changes || [];
+      const filtered = effectChanges
         .filter(change => allowedKeys.includes(change.key))
         .map(change => {
           const c = foundry.utils.deepClone(change);
@@ -553,7 +554,8 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       }
 
       // Only include changes to allowed keys
-      const filtered = effect.changes
+      const effectChanges = effect?.changes || effect?.system.changes || [];
+      const filtered = effectChanges
         .filter(change => allowedKeys.includes(change.key))
         .map(change => {
           const c = foundry.utils.deepClone(change);

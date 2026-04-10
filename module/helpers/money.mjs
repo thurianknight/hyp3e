@@ -150,7 +150,7 @@ export async function buyFromMerchant(buyer, merchant, item) {
         callback: html => {
             const val = parseInt(html.find("#qty").val() ?? "1");
             if (isNaN(val) || val < 0) return 0;
-            return Math.clamped(val, 1, maxQty);
+            return Math.clamp(val, 1, maxQty);
         },
         rejectClose: false,
         render: html => {
@@ -158,7 +158,7 @@ export async function buyFromMerchant(buyer, merchant, item) {
             const $total = html.find("#total");
             const updateTotal = () => {
                 const val = Number($input.val());
-                const qty = Math.clamped(Math.floor(val || 1), 1, maxQty);
+                const qty = Math.clamp(Math.floor(val || 1), 1, maxQty);
                 const total = Math.round(qty * sellPrice * 100) / 100;
                 $total.text(`Total: ${total.toFixed(2)} gp`);
             };
@@ -290,7 +290,7 @@ export async function sellToMerchant(merchant, seller, item) {
         callback: html => {
             const val = parseInt(html.find("#qty").val() ?? "1");
             if (isNaN(val) || val < 0) return 0;
-            return Math.clamped(val, 1, maxQty);
+            return Math.clamp(val, 1, maxQty);
         },
         rejectClose: false,
         render: html => {
@@ -298,7 +298,7 @@ export async function sellToMerchant(merchant, seller, item) {
             const $total = html.find("#total");
             const updateTotal = () => {
                 const val = Number($input.val());
-                const qty = Math.clamped(Math.floor(val || 1), 1, maxQty);
+                const qty = Math.clamp(Math.floor(val || 1), 1, maxQty);
                 const total = Math.round(qty * buyPrice * 100) / 100;
                 $total.text(`Total: ${total.toFixed(2)} gp`);
             };
@@ -573,7 +573,7 @@ export async function transferFromActor(recipient, giver, item) {
     callback: html => {
       const val = parseInt(html.find("#qty").val() ?? "1");
       if (isNaN(val) || val < 0) return 0;
-      return Math.clamped(val, 1, maxQty);
+      return Math.clamp(val, 1, maxQty);
     },
     rejectClose: false,
     render: html => {
@@ -673,7 +673,7 @@ export async function transferCoinFromActor(recipient, giver, currency) {
     callback: html => {
       const val = parseInt(html.find("#amount").val() ?? "1");
       if (isNaN(val) || val < 0) return 0;
-      return Math.clamped(val, 1, giverAmount);
+      return Math.clamp(val, 1, giverAmount);
     },
     rejectClose: false,
     render: html => {

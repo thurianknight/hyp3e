@@ -40,15 +40,7 @@ let trackerInitialized = false;
 /* -------------------------------------------- */
 
 Hooks.once('init', async function() {
-
-  // // Add utility classes to the global game object so that they're more easily
-  // // accessible in global contexts.
-  // game.hyp3e = {
-  //   Hyp3eActor,
-  //   Hyp3eItem,
-  //   rollItemMacro
-  // };
-
+  // Log game and system information
   console.log("Game info:", game);
   console.log("System info:", game.system);
   console.log("Foundry version:", game.version);
@@ -56,7 +48,9 @@ Hooks.once('init', async function() {
   const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
   // Disable legacy effect transferral
-  CONFIG.ActiveEffect.legacyTransferral = false;
+  if (CONFIG.ActiveEffect?.legacyTransferral) {
+    CONFIG.ActiveEffect.legacyTransferral = false;
+  }
 
   // Register our Hyperborea system configuration options
   registerHyp3eConfigurations();

@@ -368,7 +368,8 @@ export async function migrateItemEffects(item) {
 
   const effectUpdates = [];
   for (const effect of item.effects) {
-    const newChanges = effect.changes.map(change => {
+    const effectChanges = effect?.changes || effect?.system.changes || [];
+    const newChanges = effectChanges.map(change => {
       if (saveKeys.includes(change.key)) {
         // Replace .value with .curr
         const newKey = change.key.replace(/\.value$/, ".curr");
@@ -385,7 +386,7 @@ export async function migrateItemEffects(item) {
       return change;
     });
     // Only queue update if something actually changed
-    if (!foundry.utils.objectsEqual(newChanges, effect.changes)) {
+    if (!foundry.utils.objectsEqual(newChanges, effectChanges)) {
       effectUpdates.push({
         _id: effect.id,
         changes: newChanges

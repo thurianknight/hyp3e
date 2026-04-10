@@ -300,7 +300,8 @@ export async function setupEffectHandlers() {
     if (updated) didUpdate = true;
 
     // Store all changes for a batch update at the end
-    let updatedChanges = [...effect.changes];  // Start with a shallow copy
+    const effectChanges = effect?.changes || effect?.system.changes || [];
+    let updatedChanges = [...effectChanges];  // Start with a shallow copy
 
     for (let i = 0; i < updatedChanges.length; i++) {
       const change = updatedChanges[i];
@@ -352,11 +353,6 @@ export async function setupEffectHandlers() {
       const durationTurns = durationRounds !== null & durationRounds > 0 
         ? Math.floor(durationRounds / 60) 
         : null;
-      // if (durationRounds && durationRounds < 60) {
-      //   Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} has duration <60 rounds and will expire at the next turn.`);
-      // } else if (isNaN(durationTurns)) {
-      //   Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} has no duration limit and will not expire.`);
-      // }
       await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingTurns to ${durationTurns} for ${effect.name}`);
     }
@@ -643,7 +639,8 @@ export async function applyEffectToSelectedTokenActors(itemUuid, effectId, actor
   // Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `Cloned Effect:`, effectData);
 
   // Special check for persistent damage effects, and resolve variables if needed
-  const persistentDamage = effectData.changes.find(c => c.key === "system.tempPersistentDamage");
+  const effectChanges = effectData.changes || effectData.system?.changes || [];
+  const persistentDamage = effectChanges.find(c => c.key === "system.tempPersistentDamage");
   let damageType, damageRoll
   if (persistentDamage) {
     Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `${effectData.name} causes persistent damage:`, persistentDamage);
