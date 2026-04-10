@@ -15,7 +15,8 @@ import {applyEffectToSelectedTokenActors, enableTransferrableEffectToItemOwner, 
  */
 export async function handleSaveButtons(html) {
     // Saving throw button
-    let saveBtnElement = html.find(".save-button");
+    const html$ = $(html);
+    let saveBtnElement = html$.find(".save-button");
     if (saveBtnElement.length === 0) return false;
 
     saveBtnElement.each((_i, b) => {
@@ -42,7 +43,8 @@ export async function handleSaveButtons(html) {
  */
 export async function handleEffectButtons(html) {
   // Apply/Enable/Disable Effect buttons
-  let effectBtnElement = html.find(".apply-effects-button");
+  const html$ = $(html);
+  let effectBtnElement = html$.find(".apply-effects-button");
   if (effectBtnElement.length === 0) return false;
 
   effectBtnElement.each(async (_i, b) => {

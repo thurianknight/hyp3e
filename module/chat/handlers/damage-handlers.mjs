@@ -13,7 +13,8 @@ import { Hyp3eLogger } from "../../helpers/logger.mjs";
  * @returns {Boolean} - True if buttons were added, false if not
  */
 export async function handleDamageRollButtons(html) {
-  let dmgRollElement = html.find(".dmg-roll-button");
+  const html$ = $(html);
+  let dmgRollElement = html$.find(".dmg-roll-button");
   if (dmgRollElement.length === 0) return false;
 
   dmgRollElement.each((_i, b) => {
@@ -50,7 +51,8 @@ export async function handleDamageRollButtons(html) {
  * @returns {Boolean} - True if buttons were added, false if not
  */
 export async function handleDamageRoll2hButtons(html) {
-  let dmgRoll2hElement = html.find(".dmg-roll-button2h");
+  const html$ = $(html);
+  let dmgRoll2hElement = html$.find(".dmg-roll-button2h");
   if (dmgRoll2hElement.length === 0) return false;
 
   dmgRoll2hElement.each((_i, b) => {
@@ -87,7 +89,8 @@ export async function handleDamageRoll2hButtons(html) {
  */
 export async function handleApplyDamageButtons(html) {
   // Four damage-applying buttons in a row: full dmg, half dmg, full heal, full dmg w/ modifier prompt
-  let dmgBtnsElement = html.find(".damage-button");
+  const html$ = $(html);
+  let dmgBtnsElement = html$.find(".damage-button");
   if (dmgBtnsElement.length === 0) return false;
 
   dmgBtnsElement.each((_i, b) => {
@@ -137,8 +140,8 @@ export async function handleApplyDamageButtons(html) {
         yes: {
           icon: "<i class='fas fa-check'></i>",
           label: `Apply Modifier Above`,
-          callback: (html) => {
-            const form = html[0].querySelector("form");
+          callback: (html$) => {
+            const form = html$[0].querySelector("form");
             const modifier = ((
               form.querySelector('[name="inputField"]')
             ))?.value;
@@ -195,6 +198,7 @@ export async function handleApplyDamageButtons(html) {
  */
 export async function handleGenericDamageHealButtons(_msg, html) {
   // Catch any generic dice roll sent to chat
+  const html$ = $(html);
   const total = _msg.rolls?.[0]?.total ?? _msg.roll?.total;
   if (total === undefined) return; // not a dice roll
 
@@ -207,7 +211,7 @@ export async function handleGenericDamageHealButtons(_msg, html) {
   );
 
   btnContainer.append(dmgBtn, healBtn);
-  html.append(btnContainer);
+  html$.append(btnContainer);
 
   dmgBtn.on("click", () => applyHealthChange(total, "basic", true));
   healBtn.on("click", () => applyHealthChange(total * -1, "", false)); // Healing is negative, and ignores DR

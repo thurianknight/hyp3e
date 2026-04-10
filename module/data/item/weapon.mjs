@@ -22,12 +22,12 @@ export default class Hyp3eWeapon extends Hyp3eItemBase {
     schema.melee = new fields.BooleanField({ initial: true });
     schema.missile = new fields.BooleanField({ initial: false });
     schema.baseWeapon = new fields.StringField({ initial: "" });
-    schema.wc = new fields.NumberField({ initial: 0 });
+    schema.wc = new fields.NumberField({ nullable: true, initial: 0 });
     schema.hands = new fields.NumberField({ initial: 1 });
     schema.range = new fields.SchemaField({ 
-      short: new fields.NumberField({ initial: 0 }),
-      medium: new fields.NumberField({ initial: 0 }),
-      long: new fields.NumberField({ initial: 0 })
+      short: new fields.NumberField({ nullable: true, initial: 0 }),
+      medium: new fields.NumberField({ nullable: true, initial: 0 }),
+      long: new fields.NumberField({ nullable: true, initial: 0 })
     });
     schema.rof = new fields.StringField({ initial: "1/1" });
     schema.atkMod = new fields.NumberField({ initial: 0 });

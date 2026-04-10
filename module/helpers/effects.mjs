@@ -582,8 +582,7 @@ async function sendEffectChatMessage(effect) {
   // Dispatch the chat message
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ alias: targetName }),
-    content,
-    type: CONST.CHAT_MESSAGE_TYPES.OTHER
+    content
   });
 }
 

@@ -32,26 +32,27 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
     if (this._hookRegistered) return;
     this._hookRegistered = true;
 
-    Hooks.on("controlToken", (token, controlled) => {
-      const selectedTokens = canvas.tokens.controlled;
-      for (const [uuid, app] of this.instances ?? []) {
-        const stillSelected = selectedTokens.some(t => t.actor?.uuid === uuid);
-        if (!stillSelected) app.close();
-      }
-    });
+    // Hooks.on("controlToken", (token, controlled) => {
+    //   const selectedTokens = canvas.tokens.controlled;
+    //   for (const [uuid, app] of this.instances ?? []) {
+    //     const stillSelected = selectedTokens.some(t => t.actor?.uuid === uuid);
+    //     if (!stillSelected) app.close();
+    //   }
+    // });
   }
 
   static openForActor(actor) {
     // Ensure global hook exists
     this.initialize();
+    // Hyp3eLogger.info("HYP3EQuickEquipApp openForActor", `Opening Quick-Equip app for actor ${actor.name}`, this)
 
     // Keep one instance per actor
-    const existing = this.instances?.get(actor.uuid);
-    if (existing) return existing.render(true);
+    // const existing = this.instances?.get(actor.uuid);
+    // if (existing) return existing.render(true);
 
     const app = new this(actor);
-    this.instances ??= new Map();
-    this.instances.set(actor.uuid, app);
+    // this.instances ??= new Map();
+    // this.instances.set(actor.uuid, app);
     app.render(true);
 
     return app;
@@ -70,14 +71,14 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
     // If our actor's token is not among the currently selected tokens, close the app
     const ourTokenStillSelected = selectedTokens.some(t => t.actor?.uuid === this.actor.uuid);
     if (!ourTokenStillSelected) {
-      // Hyp3eLogger.info("_onControlToken", `${this.actor.name} token is no longer selected, closing Quick-Equip app:`, selectedTokens)
+      // Hyp3eLogger.info("HYP3EQuickEquipApp _onControlToken", `${this.actor.name} token is no longer selected, closing Quick-Equip app:`, selectedTokens)
       this.close();
     }
   }
 
   /** Clean up hook when app closes */
   async close(options = {}) {
-    this.constructor.instances?.delete(this.actor.uuid);
+    // this.constructor.instances?.delete(this.actor.uuid);
     return super.close(options);
   }
 
@@ -131,7 +132,7 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
     // Get the token for this actor
     const token = this.actor.getActiveTokens()[0];
     if (!token) {
-      Hyp3eLogger.warn("render", `Could not get token for actor ${this.actor.name}!`)
+      Hyp3eLogger.warn("HYP3EQuickEquipApp render", `Could not get token for actor ${this.actor.name}!`)
       return;
     }
 
@@ -158,7 +159,7 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
     const itemId = target.dataset.itemId;
     const item = this.actor.items.get(itemId);
     if (!item) {
-      Hyp3eLogger.warn("#equipItem", `Could not get item with ID ${itemId}! Target supplied:`, target);
+      Hyp3eLogger.warn("HYP3EQuickEquipApp #equipItem", `Could not get item with ID ${itemId}! Target supplied:`, target);
       return;
     }
 

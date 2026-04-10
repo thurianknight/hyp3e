@@ -268,8 +268,8 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     const turn = game.hyp3e.turnTracker.getTurn();
     const currentTime = game.hyp3e.turnTracker.getTime();
     ChatMessage.create({
-      content: `Current exploration turn: ${turn}, time is ${currentTime}.`,
-      type: CONST.CHAT_MESSAGE_TYPES.OTHER
+      user: game.user.id,
+      content: `Current exploration turn: ${turn}, time is ${currentTime}.`
     });
   }
 

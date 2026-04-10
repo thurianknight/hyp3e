@@ -156,15 +156,16 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
  */
 export const truncateLongContent = async function(_msg, html, _data) {
   // Only apply to your system's description messages; check flags or content
-  if (!_msg.flags?.hyp3e?.isItemDescription && !html.hasClass('hyp3e-chat-card')) return;
+  const html$ = $(html);
+  if (!_msg.flags?.hyp3e?.isItemDescription && !html$.hasClass('hyp3e-chat-card')) return;
 
-  const toggleBtn = html.find('.toggle-description');
+  const toggleBtn = html$.find('.toggle-description');
   if (!toggleBtn.length) return;
 
   toggleBtn.click(async (event) => {
     event.preventDefault();
     const btn = $(event.currentTarget);
-    const description = html.find('.description');
+    const description = html$.find('.description');
     
     description.toggleClass('truncated');
     

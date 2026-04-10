@@ -97,7 +97,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       xp: new fields.SchemaField({
         value: new fields.StringField({ initial: "0" }),
         toNextLvl: new fields.StringField({ initial: "0" }),
-        bonus: new fields.NumberField({ integer: true, initial: 0 }),
+        bonus: new fields.NumberField({ nullable: true, integer: true, initial: 0 }),
         primeAttr: new fields.StringField({ blank: true })
       }),
       race: new fields.StringField({ blank: true }),
@@ -113,7 +113,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       physicalFeatures: new fields.StringField({ blank: true })
     });
 
-    schema.unskilled = new fields.NumberField({ initial: 0 });
+    schema.unskilled = new fields.NumberField({ nullable: true, initial: null });
 
     schema.proficiencies = new fields.SchemaField({
       class: new fields.StringField({ blank: true }),

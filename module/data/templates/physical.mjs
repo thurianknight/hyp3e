@@ -9,8 +9,8 @@ export function physicalTemplate() {
   return {
     quantity: new fields.SchemaField({
       value: new fields.NumberField({ required: true, integer: true, initial: 1 }),
-      max:   new fields.NumberField({ required: true, integer: true, initial: 1 }),
-      bundle: new fields.NumberField({ required: true, integer: true, initial: 0 })
+      max:   new fields.NumberField({ nullable: true, required: true, integer: true, initial: 1 }),
+      bundle: new fields.NumberField({ nullable: true, required: true, integer: true, initial: 0 })
     }),
 
     isConsumable: new fields.BooleanField({ initial: false }),
@@ -19,7 +19,7 @@ export function physicalTemplate() {
     duration: new fields.StringField({ initial: "" }),
 
     location: new fields.StringField({ required: true, blank: true, initial: "" }),
-    weight: new fields.NumberField({ required: true, integer: true, initial: 0 }),
+    weight: new fields.NumberField({ nullable: true, required: true, integer: true, initial: 0 }),
     cost: new fields.StringField({ required: true, blank: true, initial: "0" }),
     xp: new fields.StringField({ required: true, blank: true, initial: "" }),
 

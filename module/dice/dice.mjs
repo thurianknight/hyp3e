@@ -458,13 +458,13 @@ export class Hyp3eDice {
     const termCounts = dmgRollParts.map(part => {
       if (!part) return 0;
       const tempRoll = new Roll(`${part}`);  // No actorData needed, since vars are replaced
-      return tempRoll.terms.filter(t => !(t instanceof OperatorTerm)).length;
+      return tempRoll.terms.filter(t => !(t instanceof foundry.dice.terms.OperatorTerm)).length;
     });
 
     const termCounts2h = dmgRoll2Parts.map(part => {
       if (!part) return 0;
       const tempRoll = new Roll(`${part}`);
-      return tempRoll.terms.filter(t => !(t instanceof OperatorTerm)).length;
+      return tempRoll.terms.filter(t => !(t instanceof foundry.dice.terms.OperatorTerm)).length;
     });
 
     // New: Build damageGroups for 1H

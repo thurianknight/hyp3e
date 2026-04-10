@@ -32,9 +32,9 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
         value: new fields.NumberField({ required: true, integer: true, initial: 0 })
       }),
 
-      tempAtkMod: new fields.NumberField({ required: true, integer: true, initial: 0 }),
-      tempDmgMod: new fields.NumberField({ required: true, integer: true, initial: 0 }),
-      tempInitiativeMod: new fields.NumberField({ required: true, integer: true, initial: 0 }),
+      tempAtkMod: new fields.NumberField({ nullable: true, required: true, integer: true, initial: 0 }),
+      tempDmgMod: new fields.NumberField({ nullable: true, required: true, integer: true, initial: 0 }),
+      tempInitiativeMod: new fields.NumberField({ nullable: true, required: true, integer: true, initial: 0 }),
 
       ca: new fields.NumberField({ nullable: true, initial: null }),
       castingAbility: new fields.SchemaField({
@@ -48,8 +48,8 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
 
       saves: new fields.SchemaField({
         base:         new fields.SchemaField({ 
-          value: new fields.NumberField({ integer: true, initial:0 }), 
-          curr: new fields.NumberField({ integer: true, initial: 0 })
+          value: new fields.NumberField({ nullable: true, integer: true, initial:0 }), 
+          curr: new fields.NumberField({ nullable: true, integer: true, initial: 0 })
         }),
         death:        new fields.SchemaField({ 
           value: new fields.NumberField({ integer: true, initial:0 }), 
@@ -77,7 +77,7 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
         base:        new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:40 }) }),
         exploration: new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:120 }) }),
         travel:      new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:24 }) }),
-        tempMvMod:   new fields.NumberField({ required: true, integer: true, initial: 0 })
+        tempMvMod:   new fields.NumberField({ nullable: true, required: true, integer: true, initial: 0 })
       }),
 
       otherMv: new fields.SchemaField({

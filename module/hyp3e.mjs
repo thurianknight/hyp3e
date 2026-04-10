@@ -733,8 +733,8 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
 /**
  * Insert damage, save, and effect buttons into chats
  */
-Hooks.on("renderChatMessage", addChatMessageButtons);
-Hooks.on("renderChatMessage", truncateLongContent);
+Hooks.on("renderChatMessageHTML", addChatMessageButtons);
+Hooks.on("renderChatMessageHTML", truncateLongContent);
 
 /**
  * Capture the token creation event to run some extra processes on it

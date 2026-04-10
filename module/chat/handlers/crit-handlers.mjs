@@ -15,7 +15,8 @@ import { applyHealthChange, rollDmgButton } from "./damage-handlers.mjs";
  */
 export async function handleCritDamageButton(html) {
   // Apply critical damage button
-  let critDmgElement = html.find(".crit-damage-button");
+  const html$ = $(html);
+  let critDmgElement = html$.find(".crit-damage-button");
   if (critDmgElement.length === 0) return false;
 
   critDmgElement.each((_i, b) => {
@@ -44,11 +45,12 @@ export async function handleCritDamageButton(html) {
  */
 export async function handleCritMissOrHitButtons(html) {
   // "longer" button style for crit miss/hit
+  const html$ = $(html);
   const long_button = (critType, charType, icon) => `<button class="chat-btn-full-width" title="Roll critical ${critType} for ${baseClassLabel}-class"><i class="fas ${icon}"></i>${charType}</button>`;
 
   // Crit misses & hits are mutually exclusive so we can handle them both here
-  let critMissElement = html.find(".critical-miss");
-  let critHitElement = html.find(".critical-hit");
+  let critMissElement = html$.find(".critical-miss");
+  let critHitElement = html$.find(".critical-hit");
   if (critMissElement.length === 0 && critHitElement.length === 0) return false;
 
   let baseClass = "";
@@ -103,9 +105,9 @@ export async function handleCritMissOrHitButtons(html) {
       const icon = "fa-user";
 
       // Check if the message also has a damage roll button to combine with
-      const dmgEl = html.find(".dmg-roll-button");
+      const dmgEl = html$.find(".dmg-roll-button");
       if (dmgEl.length > 0) {
-        const dmg2hEl = html.find(".dmg-roll-button2h");
+        const dmg2hEl = html$.find(".dmg-roll-button2h");
         const dmgData = {
           formula:    dmgEl.data('formula'),
           debugFormula: dmgEl.data('debugFormula'),
