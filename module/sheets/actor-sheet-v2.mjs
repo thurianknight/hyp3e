@@ -789,18 +789,18 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
         // Right-click context menu on item entries
         new ContextMenu(this.element, ".item-entry", [
-            {
-                name: game.i18n.localize("HYP3E.item.splitStack"),
-                icon: '<i class="fas fa-scissors"></i>',
-                condition: (target) => {
-                    const item = this.actor.items.get($(target).data("itemId"));
-                    return item?.system?.quantity?.value > 1;
-                },
-                callback: (target) => {
-                    const itemId = $(target).data("itemId");
-                    Hyp3eActorSheetV2._splitItemStack.call(this, itemId);
-                }
+          {
+            name: game.i18n.localize("HYP3E.item.splitStack"),
+            icon: '<i class="fas fa-scissors"></i>',
+            condition: (target) => {
+              const item = this.actor.items.get($(target).data("itemId"));
+              return item?.system?.quantity?.value > 1;
+            },
+            callback: (target) => {
+              const itemId = $(target).data("itemId");
+              Hyp3eActorSheetV2._splitItemStack.call(this, itemId);
             }
+          }
         ]);
 
         // Log render completion
@@ -1095,8 +1095,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             : (item.sort || 0) + CONST.SORT_INTEGER_DENSITY;
 
         // Reduce the original stack
+        const newQty = item.system.quantity.value - splitQty;
+        const reducedMax = Math.max(item.system.quantity.max - splitQty, 1);
         await this.actor.updateEmbeddedDocuments("Item", [
-            { _id: item.id, "system.quantity.value": item.system.quantity.value - splitQty }
+            { _id: item.id, "system.quantity.value": newQty, "system.quantity.max": reducedMax }
         ]);
 
         // Create a new stack with the split quantity, positioned directly below the original
@@ -1104,6 +1106,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         delete newItemData._id;
         newItemData.sort = newSort;
         newItemData.system.quantity.value = splitQty;
+        newItemData.system.quantity.max = splitQty;
         await this.actor.createEmbeddedDocuments("Item", [newItemData]);
     }
 
@@ -1613,106 +1616,107 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     async _onSortItem(event, item) {
-        // Hyp3eLogger.info("HYP3EActorSheetV2 _onSortItem", `Item sort event:`, { event, item })
+      // Hyp3eLogger.info("HYP3EActorSheetV2 _onSortItem", `Item sort event:`, { event, item })
 
-        const target = event.target.closest("[data-item-id]");
-        const dragged = this.actor.items.get(item.id);
-        const targetItem = target ? this.actor.items.get(target.dataset.itemId) : null;
+      const target = event.target.closest("[data-item-id]");
+      const dragged = this.actor.items.get(item.id);
+      const targetItem = target ? this.actor.items.get(target.dataset.itemId) : null;
 
-        // Special case 0: container item dragged over another container -> sort them
-        if (dragged.system.isContainer && targetItem?.system.isContainer) {
-            return super._onSortItem(event, item)
-        }
-
-        // Special case 1: item dragged over a container -> assign containerId
-        //  But we only do this for characters & npcs, not merchants
-        if (targetItem && (targetItem.system.isContainer || targetItem.type === "container")) {
-            if (this.actor.type !== "merchant" && this.actor.type !== "treasure") {
-                return dragged.update({ 
-                                        "system.location": targetItem.name,
-                                        "system.containerId": targetItem.id
-                                    });
-            } else {
-                const msg = `Merchant or treasure inventory must be stand-alone, not in containers.`;
-                Hyp3eLogger.warn("_onSortItem", msg);
-                ui.notifications.warn(msg);
-                return;
-            }
-        }
-
-        // Special case 2: contained item dragged onto a non-contained item -> clear containerId
-        if (dragged.system.containerId !== "" && targetItem && targetItem.system.containerId === "") {
-            return dragged.update({ 
-                                    "system.location": "",
-                                    "system.containerId": ""
-                                });
-        }
-
-        // Special case 3: contained item dropped into empty space -> clear containerId
-        if (dragged.system.containerId && !targetItem) {
-            return dragged.update({ 
-                                    "system.location": "",
-                                    "system.containerId": ""
-                                });
-        }
-
-        // Special case 4: item dragged onto another item with the same name and type -> combine stacks
-        if (targetItem && dragged.id !== targetItem.id && dragged.type === targetItem.type
-            && dragged.name === targetItem.name
-            && dragged.system?.quantity !== undefined && targetItem.system?.quantity !== undefined) {
-            const combined = targetItem.system.quantity.value + dragged.system.quantity.value;
-            await targetItem.update({ "system.quantity.value": combined });
-            await this.actor.deleteEmbeddedDocuments("Item", [dragged.id]);
-            return;
-        }
-
-        // Default: fall back to built-in sorting
+      // Special case 0: container item dragged over another container -> sort them
+      if (dragged.system.isContainer && targetItem?.system.isContainer) {
         return super._onSortItem(event, item)
+      }
+
+      // Special case 1: item dragged over a container -> assign containerId
+      //  But we only do this for characters & npcs, not merchants
+      if (targetItem && (targetItem.system.isContainer || targetItem.type === "container")) {
+        if (this.actor.type !== "merchant" && this.actor.type !== "treasure") {
+          return dragged.update({ 
+                                  "system.location": targetItem.name,
+                                  "system.containerId": targetItem.id
+                                });
+        } else {
+          const msg = `Merchant or treasure inventory must be stand-alone, not in containers.`;
+          Hyp3eLogger.warn("_onSortItem", msg);
+          ui.notifications.warn(msg);
+          return;
+        }
+      }
+
+      // Special case 2: contained item dragged onto a non-contained item -> clear containerId
+      if (dragged.system.containerId !== "" && targetItem && targetItem.system.containerId === "") {
+        return dragged.update({ 
+                                "system.location": "",
+                                "system.containerId": ""
+                              });
+      }
+
+      // Special case 3: contained item dropped into empty space -> clear containerId
+      if (dragged.system.containerId && !targetItem) {
+        return dragged.update({ 
+                                "system.location": "",
+                                "system.containerId": ""
+                              });
+      }
+
+      // Special case 4: item dragged onto another item with the same name and type -> combine stacks
+      if (targetItem && dragged.id !== targetItem.id && dragged.type === targetItem.type
+          && dragged.name === targetItem.name
+          && dragged.system?.quantity !== undefined && targetItem.system?.quantity !== undefined) {
+        const combined = targetItem.system.quantity.value + dragged.system.quantity.value;
+        const combinedMax = targetItem.system.quantity.max + dragged.system.quantity.max;
+        await targetItem.update({ "system.quantity.value": combined, "system.quantity.max": combinedMax });
+        await this.actor.deleteEmbeddedDocuments("Item", [dragged.id]);
+        return;
+      }
+
+      // Default: fall back to built-in sorting
+      return super._onSortItem(event, item)
     }
 
     _onDragStart(event) {
-        super._onDragStart(event);
-        const li = event.currentTarget.closest("[data-item-id]");
-        this._draggedItemId = li?.dataset.itemId ?? null;
+      super._onDragStart(event);
+      const li = event.currentTarget.closest("[data-item-id]");
+      this._draggedItemId = li?.dataset.itemId ?? null;
     }
 
     _onDragOver(event) {
-        // Hyp3eLogger.info("HYP3EActorSheetV2 _onDragOver", `Drag-over event:`, event)
-        super._onDragOver(event)
+      // Hyp3eLogger.info("HYP3EActorSheetV2 _onDragOver", `Drag-over event:`, event)
+      super._onDragOver(event)
 
-        const li = event.target.closest("[data-item-id]");
+      const li = event.target.closest("[data-item-id]");
 
-        // Clear all existing drag indicators
-        this.element.querySelectorAll(".drag-target, .drop-before, .drop-after")
-            .forEach(el => el.classList.remove("drag-target", "drop-before", "drop-after"));
+      // Clear all existing drag indicators
+      this.element.querySelectorAll(".drag-target, .drop-before, .drop-after")
+        .forEach(el => el.classList.remove("drag-target", "drop-before", "drop-after"));
 
-        if (!li) return;
+      if (!li) return;
 
-        const item = this.actor.items.get(li.dataset.itemId);
+      const item = this.actor.items.get(li.dataset.itemId);
 
-        // Highlight valid containers
-        if (item?.system.isContainer || item?.type === "container") {
-            li.classList.add("drag-target");
-            return;
-        }
+      // Highlight valid containers
+      if (item?.system.isContainer || item?.type === "container") {
+        li.classList.add("drag-target");
+        return;
+      }
 
-        // Highlight valid stack-merge targets (same name and type, not itself)
-        const draggedItem = this._draggedItemId ? this.actor.items.get(this._draggedItemId) : null;
-        if (draggedItem && item && draggedItem.id !== item.id
-            && draggedItem.type === item.type && draggedItem.name === item.name
-            && draggedItem.system?.quantity !== undefined
-            && item.system?.quantity !== undefined) {
-            li.classList.add("drag-target");
-            return;
-        }
+      // Highlight valid stack-merge targets (same name and type, not itself)
+      const draggedItem = this._draggedItemId ? this.actor.items.get(this._draggedItemId) : null;
+      if (draggedItem && item && draggedItem.id !== item.id
+          && draggedItem.type === item.type && draggedItem.name === item.name
+          && draggedItem.system?.quantity !== undefined
+          && item.system?.quantity !== undefined) {
+        li.classList.add("drag-target");
+        return;
+      }
 
-        // Show drop-line indicator for reordering: top half = insert before, bottom half = insert after
-        const rect = li.getBoundingClientRect();
-        if (event.clientY < rect.top + rect.height / 2) {
-            li.classList.add("drop-before");
-        } else {
-            li.classList.add("drop-after");
-        }
+      // Show drop-line indicator for reordering: top half = insert before, bottom half = insert after
+      const rect = li.getBoundingClientRect();
+      if (event.clientY < rect.top + rect.height / 2) {
+        li.classList.add("drop-before");
+      } else {
+        li.classList.add("drop-after");
+      }
     }
 
     /**
