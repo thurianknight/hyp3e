@@ -85,13 +85,14 @@ export class Hyp3eItem extends Item {
     super._onUpdate(changed, options, user);
     Hyp3eLogger.info("Hyp3eItem _onUpdate", `Changed data:`, changed);
 
+    // Send a chat message that the item was equipped/unequipped or carried/dropped, 
+    //  but only if the equipped status changed
     if (changed.system?.equipped !== undefined) {
       // Only proceed if the item is owned by an actor
       if (!this.actor) return;
       // Also, only proceed if the item is not in a container
       if (this.type === "item" && this.system?.containerId) return;
 
-      // Send a chat message that the item was equipped/unequipped or carried/dropped
       const itemName = this.system.friendlyName ? this.system.friendlyName : this.name
       let equipText = ""
       let containerText = ""
