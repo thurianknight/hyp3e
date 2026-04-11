@@ -245,8 +245,16 @@ export async function setupEffectHandlers() {
           </div>
       `);
 
-      // Insert just after the rounds input
-      html$.find('input[name="duration.rounds"]').closest(".form-group").after(field);
+      // Determine Foundry version, v13 or earlier, or v14 or later, and insert 
+      //  the field in the appropriate location on the sheet
+      const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+      if (majorVersion <= 13) {
+        // Insert just after the duration rounds input
+        html$.find('input[name="duration.rounds"]').closest(".form-group").after(field);
+      } else {
+        // Insert just after the duration value input
+        html$.find('input[name="duration.value"]').closest(".form-group").after(field);
+      }
 
       // Don't insert the Condition Editor button if one already exists
       if (html$.find("button.hyp3e-condition-edit").length) return;
