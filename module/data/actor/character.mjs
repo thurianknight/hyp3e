@@ -335,7 +335,10 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     if ( changes.length > 0 ) {
       // Use a clone of the actor's system data to avoid mutating it directly
       const systemData = foundry.utils.deepClone(this);
-  
+
+      // Change modes were changed in Foundry v14, so we need to check the version to know how to apply them
+      const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+
       // Organize effects by their priority (though it probably doesn't matter)
       changes.sort((a, b) => a.priority - b.priority);
 
@@ -363,12 +366,22 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
         let attrModValue = foundry.utils.getProperty(attributeData, path);
         // Convert strings to numbers if necessary, but leave booleans alone
         if (isPureNumber(attrModValue)) attrModValue = Number(attrModValue);
-        // Apply change based on mode
-        switch (change.mode) {
-          case CONST.ACTIVE_EFFECT_MODES.ADD: attrModValue += resolvedChange; break;
-          case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: attrModValue *= resolvedChange; break;
-          case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: attrModValue = resolvedChange; break;
-          // Pretty sure we don't need the other effect modes
+        // Apply change based on mode (Foundry v13) or type (Foundry v14+)
+        if (majorVersion <= 13) {
+          switch (change.mode) {
+            case CONST.ACTIVE_EFFECT_MODES.ADD: attrModValue += resolvedChange; break;
+            case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: attrModValue *= resolvedChange; break;
+            case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: attrModValue = resolvedChange; break;
+            // Pretty sure we don't need the other effect modes
+          }
+        } else {
+          switch (change.type) {
+            case "add": attrModValue += resolvedChange; break;
+            case "subtract": attrModValue -= resolvedChange; break;
+            case "multiply": attrModValue *= resolvedChange; break;
+            case "override": attrModValue = resolvedChange; break;
+            // Pretty sure we don't need the other effect types
+          }
         }
         foundry.utils.setProperty(attributeData, path, attrModValue);
       }
@@ -569,10 +582,14 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     if ( changes.length > 0 ) {
       // Organize effects by their priority (though it probably doesn't matter)
       changes.sort((a, b) => a.priority - b.priority);
+      Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Changes to be applied on ${this.parent.name}:`, changes);
 
       // Use a clone of the actor's system data to avoid mutating it directly
       const systemData = foundry.utils.deepClone(this);
-  
+
+      // Change modes were changed in Foundry v14, so we need to check the version to know how to apply them
+      const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+
       // Accumulate ActiveEffect changes
       for (const change of changes) {
         // Parse the change.value string and resolve it into a number if possible
@@ -589,44 +606,75 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
         }
         switch (change.key) {
           case "system.ac.value":
-            Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s AC:`, change);
-            // Apply change based on mode
-            switch (change.mode) {
-              case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += resolvedChange; break;
-              case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= resolvedChange; break;
-              case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = resolvedChange; break;
-              // Pretty sure we don't need the other effect modes
-            }  
+            Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.parent.name}'s AC:`, change);
+            // Apply change based on mode (Foundry v13) or type (Foundry v14+)
+            if (majorVersion <= 13) {
+              switch (change.mode) {
+                case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += resolvedChange; break;
+                case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= resolvedChange; break;
+                case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = resolvedChange; break;
+                // Pretty sure we don't need the other effect modes
+              }
+            } else {
+              switch (change.type) {
+                case "add": finalAc += resolvedChange; break;
+                case "subtract": finalAc -= resolvedChange; break;
+                case "multiply": finalAc *= resolvedChange; break;
+                case "override": finalAc = resolvedChange; break;
+                // Pretty sure we don't need the other effect types
+              }
+            }
             break;
           case "system.ac.dr":
-            Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s DR:`, change);
-            // Apply change based on mode
-            switch (change.mode) {
-              case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += resolvedChange; break;
-              case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= resolvedChange; break;
-              case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = resolvedChange; break;
-              // Pretty sure we don't need the other effect modes
+            Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.parent.name}'s DR:`, change);
+            // Apply change based on mode (Foundry v13) or type (Foundry v14+)
+            if (majorVersion <= 13) {
+              switch (change.mode) {
+                case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += resolvedChange; break;
+                case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= resolvedChange; break;
+                case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = resolvedChange; break;
+                // Pretty sure we don't need the other effect modes
+            }
+            } else {
+              switch (change.type) {
+                case "add": finalDr += resolvedChange; break;
+                case "subtract": finalDr -= resolvedChange; break;
+                case "multiply": finalDr *= resolvedChange; break;
+                case "override": finalDr = resolvedChange; break;
+                // Pretty sure we don't need the other effect types
+              }
             }
             break;
           case "system.movement.base.value":
-            Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s MV:`, change);
-            // Apply change based on mode
-            switch (change.mode) {
-              case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += resolvedChange; break;
-              case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= resolvedChange; break;
-              case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = resolvedChange; break;
-              // Pretty sure we don't need the other effect modes
-            }  
+            Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.parent.name}'s MV:`, change);
+            // Apply change based on mode (Foundry v13) or type (Foundry v14+)
+            if (majorVersion <= 13) {
+              switch (change.mode) {
+                case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += resolvedChange; break;
+                case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= resolvedChange; break;
+                case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = resolvedChange; break;
+                // Pretty sure we don't need the other effect modes
+              }
+            } else {
+              switch (change.type) {
+                case "add": finalMv += resolvedChange; break;
+                case "subtract": finalMv -= resolvedChange; break;
+                case "multiply": finalMv *= resolvedChange; break;
+                case "override": finalMv = resolvedChange; break;
+                // Pretty sure we don't need the other effect types
+              }
+            }
             break;
           default:
             break;
         }
       }
     }
-    // Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Final calculated AC, DR, MV for ${this.name}:`, { ac: finalAc, dr: finalDr, mv: finalMv });
+    finalAc = Math.clamp(finalAc, -9, 9)
+    Hyp3eLogger.info("Hyp3eCharacter _getCharacterAcAndMv", `Final calculated AC, DR, MV for ${this.parent.name}:`, { ac: finalAc, dr: finalDr, mv: finalMv });
     // Return the final results
     return {
-      ac: Math.clamp(finalAc, -9, 9),
+      ac: finalAc,
       dr: finalDr,
       mv: finalMv
     };

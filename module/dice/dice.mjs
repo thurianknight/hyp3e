@@ -716,6 +716,7 @@ export class Hyp3eDice {
  * @returns {boolean}
  */
 export function isPureNumber(str) {
+  if (typeof str === "number") return true; // allow actual numbers
   return typeof str === "string" && /^-?\d+(\.\d+)?$/.test(str.trim());
 }
 

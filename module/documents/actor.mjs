@@ -1116,30 +1116,40 @@ export class Hyp3eActor extends Actor {
 
         // Flag to track whether anything needs to be updated
         let didUpdate = false;
+        const updates = {};
 
         // Check to see if we have a rollable duration formula, and resolve it if so
         const { updatedDuration, updated } = await checkAndResolveDuration(effect, actorData);
         if (updated) {
           didUpdate = true;
+          updates.duration = updatedDuration;
           Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" resolved duration:`, updatedDuration);
         }
 
         // Store all changes for a batch update at the end
         const effectChanges = effect?.changes || effect?.system.changes || [];
         let updatedChanges = [...effectChanges];  // Start with a shallow copy
-        // Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, updatedChanges);
+        Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, effectChanges);
         for (let i = 0; i < updatedChanges.length; i++) {
           const change = updatedChanges[i];
+          Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" change key "${change.key}" has value ${change.value}, type: ${typeof change.value}`, change);
           let resolvedChange = null;
-          if (isPureNumber(change.value)) {
+          if (!isNaN(change.value)) {
             resolvedChange = Number(change.value);
+            Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" value: ${resolvedChange} is a real number, no resolution needed.`);
+          } else if (isPureNumber(change.value)) {
+            resolvedChange = Number(change.value);
+            Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" value: ${resolvedChange} is a numeric string, resolved to a number.`);
           } else if (isPureString(change.value)) {
             resolvedChange = change.value;
+            Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" value: ${resolvedChange} is a string, no resolution needed.`);
           } else if (containsDice(change.value)) {
             // Parse the change.value string/formula and resolve it to a number if possible
             resolvedChange = await Hyp3eDice.resolveFormulaWithMathAsync(change.value, actorData)
+            Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" value: ${change.value} contains dice, resolved to ${resolvedChange}.`);
           } else if (containsMathOrVariables(change.value)) {
             resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, actorData);  
+            Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" value: ${change.value} contains math or variables, resolved to ${resolvedChange}.`);
           }
           if (updatedChanges[i].value !== resolvedChange) {
             updatedChanges[i] = {
@@ -1147,17 +1157,14 @@ export class Hyp3eActor extends Actor {
               value: resolvedChange
             };
             didUpdate = true;
+            updates.changes = updatedChanges;
+            Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" resolved change:`, updatedChanges[i]);
           }
         }
         // Batch out the updates to the effect
         if (didUpdate) {
-          const updates = {
-            duration: updatedDuration,
-            changes: updatedChanges
-          }
           Hyp3eLogger.info("Hyp3eActor updateItemEffects", `All updates on actor ${this.name} for effect ${effect.name}:`, { updates });
           await effect.update(updates);
-          // return updates;
         }
       }
     }
@@ -1641,6 +1648,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Apply status effect to actor & token
+    Hyp3eLogger.info("Hyp3eActor applyStatus", `Applying status ${statusId} to ${this.name}...`);
     await this.toggleStatusEffect(statusId, {
       overlay: true,
       active: true
@@ -1648,16 +1656,31 @@ export class Hyp3eActor extends Actor {
 
     // Bleeding is a special case...
     if (statusId === "bleeding") {
+      // Change modes were changed in Foundry v14, so we need to check the version to know how to apply them
+      const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+
       // Find the bleeding effect and update it with persistent damage
       const effect = this.effects.find(e => e.statuses?.has(statusId));
       if (effect) {
-        await effect.update({ 
-          changes: [{
-            key: "system.tempPersistentDamage",
-            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            value: "bleeding,1;"
-          }]
-        });
+        if (majorVersion <= 13) {
+          await effect.update({ 
+            changes: [{
+              key: "system.tempPersistentDamage",
+              mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+              value: "bleeding,1;"
+            }]
+          });
+        } else {
+          await effect.update({ 
+            system: {
+              changes: [{
+                key: "system.tempPersistentDamage",
+                type: "add",
+                value: "bleeding,1;"
+              }]
+            }
+          });
+        }
       }
     }
   }
