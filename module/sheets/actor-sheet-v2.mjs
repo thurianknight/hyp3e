@@ -788,7 +788,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         }
 
         // Right-click context menu on item entries
-        new ContextMenu(this.element, ".item-entry", [
+        new foundry.applications.ux.ContextMenu.implementation(this.element, ".item-entry", [
           {
             name: game.i18n.localize("HYP3E.item.splitStack"),
             icon: '<i class="fas fa-scissors"></i>',
