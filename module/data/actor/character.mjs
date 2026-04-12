@@ -110,7 +110,8 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       hair: new fields.StringField({ blank: true }),
       eyes: new fields.StringField({ blank: true }),
       complexion: new fields.StringField({ blank: true }),
-      physicalFeatures: new fields.StringField({ blank: true })
+      physicalFeatures: new fields.StringField({ blank: true }),
+      secondarySkills: new fields.StringField({ blank: true }),
     });
 
     schema.unskilled = new fields.NumberField({ nullable: true, initial: null });
