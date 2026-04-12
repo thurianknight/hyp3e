@@ -325,6 +325,11 @@ export async function setupEffectHandlers() {
         change.flags.hyp3e.originalValue = change.value;
         didUpdate = true;
       }
+      // Ignore if the key is system.tempPersistentDamage, since that is a special case we 
+      //  handle separately in the Actor document
+      if (change.key === "system.tempPersistentDamage") {
+        continue;
+      }
       // Parse the change.value string and resolve any variables or math
       let resolvedChange = null;
       if (!isNaN(change.value)) {
@@ -385,6 +390,8 @@ export async function setupEffectHandlers() {
         applyTokenLight(token, lightProps);
       }
     }
+    Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} created on ${actor.name}:`, effect);
+
     // Send a chat message that the effect was applied
     sendEffectChatMessage(effect)
   });
@@ -500,7 +507,7 @@ export async function checkAndResolveDuration(effect, actorData) {
 
   const rounds = Math.max(1, Math.floor(resolvedDuration));
 
-  updatedDuration = { rounds, turns: rounds };
+  updatedDuration = { rounds: rounds };
   updated = true;
 
   Hyp3eLogger.info("ActiveEffect checkAndResolveDuration", `Resolved duration of effect "${effect.name}" to ${rounds} rounds, applying to ${actorData.actorName}.`);
@@ -654,30 +661,38 @@ export async function applyEffectToSelectedTokenActors(itemUuid, effectId, actor
   const effectData = new Object({...effect});
   effectData.origin = item.uuid;
   if (disabled) effectData.disabled = true;
-  // Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `Cloned Effect:`, effectData);
+  Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `Cloned Effect:`, effectData);
+
+  // Is the duration a formula that needs to be resolved? If so, resolve it before 
+  //  applying the effect to the target actors
+  const { updatedDuration, updated } = await checkAndResolveDuration(effect, actorData);
+  if (updated) {
+    effectData.duration = updatedDuration;
+    Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `Resolved effect duration:`, updatedDuration);
+  }
 
   // Special check for persistent damage effects, and resolve variables if needed
-  const effectChanges = effectData.changes || effectData.system?.changes || [];
-  const persistentDamage = effectChanges.find(c => c.key === "system.tempPersistentDamage");
-  let damageType, damageRoll
-  if (persistentDamage) {
-    Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `${effectData.name} causes persistent damage:`, persistentDamage);
-    damageType = persistentDamage.value.split(",")[0];
-    damageRoll = persistentDamage.value.split(",")[1];
-    damageRoll = damageRoll.replace(";", "");
-    // Check if the damage roll is a valid formula
-    if (!Roll.validate(damageRoll, actorData)) {
-      const msg = `Invalid persistent damage roll formula "${damageRoll}", cannot apply.`;
-      Hyp3eLogger.error("ActiveEffect applyEffectToSelectedTokenActors", msg);
-      ui.notifications?.error(`Apply Effect: ${msg}`);
-      return;
-    }
-    // Resolve variables in the damage roll formula
-    const roll = new Roll(damageRoll, actorData);
-    await roll.evaluate();
-    // Save the resolved roll formula for later use
-    damageRoll = roll.formula;
-  }
+  // const effectChanges = effectData.changes || effectData.system?.changes || [];
+  // const persistentDamage = effectChanges.find(c => c.key === "system.tempPersistentDamage");
+  // let damageType, damageRoll
+  // if (persistentDamage) {
+  //   Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `${effectData.name} causes persistent damage:`, persistentDamage);
+  //   damageType = persistentDamage.value.split(",")[0];
+  //   damageRoll = persistentDamage.value.split(",")[1];
+  //   damageRoll = damageRoll.replace(";", "");
+  //   // Check if the damage roll is a valid formula
+  //   if (!Roll.validate(damageRoll, actorData)) {
+  //     const msg = `Invalid persistent damage roll formula "${damageRoll}", cannot apply.`;
+  //     Hyp3eLogger.error("ActiveEffect applyEffectToSelectedTokenActors", msg);
+  //     ui.notifications?.error(`Apply Effect: ${msg}`);
+  //     return;
+  //   }
+  //   // Resolve variables in the damage roll formula
+  //   const roll = new Roll(damageRoll, actorData);
+  //   await roll.evaluate();
+  //   // Save the resolved roll formula for later use
+  //   damageRoll = roll.formula;
+  // }
 
   // Apply the effect to selected tokens/actors
   for (const t of tokens) {
@@ -697,18 +712,18 @@ export async function applyEffectToSelectedTokenActors(itemUuid, effectId, actor
     //  or similar, and modify the incoming damage to the actor right there. The below code has to 
     //  update the actor after the effect was already applied, which is not efficient.
     // Now we get the newly-created effect, and modify the persistent damage roll if needed
-    if (persistentDamage) {
-      Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `New Effect:`, childEffect);
-      if (childEffect) {
-        // If the effect has a persistent damage value, we need to update the effect with that value
-        const newPersistentDamage = childEffect.changes.find(c => c.key === "system.tempPersistentDamage");
-        if (newPersistentDamage) {
-          newPersistentDamage.value = `${damageType},${damageRoll}`;
-          Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `${effectData.name} new persistent damage:`, newPersistentDamage);
-          childEffect.update({ changes: [newPersistentDamage] });
-        }
-      }
-    }
+    // if (persistentDamage) {
+    //   Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `New Effect:`, childEffect);
+    //   if (childEffect) {
+    //     // If the effect has a persistent damage value, we need to update the effect with that value
+    //     const newPersistentDamage = childEffect.changes.find(c => c.key === "system.tempPersistentDamage");
+    //     if (newPersistentDamage) {
+    //       newPersistentDamage.value = `${damageType},${damageRoll}`;
+    //       Hyp3eLogger.info("ActiveEffect applyEffectToSelectedTokenActors", `${effectData.name} new persistent damage:`, newPersistentDamage);
+    //       childEffect.update({ changes: [newPersistentDamage] });
+    //     }
+    //   }
+    // }
   }
 }
 

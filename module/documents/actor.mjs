@@ -1281,15 +1281,30 @@ export class Hyp3eActor extends Actor {
     for (const effect of this.allApplicableEffects()) {
       Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} has ${effect.name} with remaining time ${effect.duration.remaining} rounds/turns:`, effect);
       if (effect.isTemporary && !effect.disabled) {
+        if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
+          // Effect expired, mark for removal and skip processing its damage
+          if (effect.origin) {
+            // Effects applied from an item/ability must be disabled immediately
+            await effect.update({ disabled: true });
+          }
+          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
+          expiredEffects.push(effect);
+          continue;
+        }
         const effectChanges = effect?.changes || effect?.system.changes || [];
         const persistentDamage = effectChanges.find(c => c.key === "system.tempPersistentDamage");
         if (persistentDamage) {
           Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} persistent damage:`, persistentDamage);
 
-          [damageType, rawDamageRoll] = persistentDamage.value.split(",");
+          // Does the value string include a comma separating damage type and formula?
+          if (persistentDamage.value.includes(",")) {
+            [damageType, rawDamageRoll] = persistentDamage.value.split(",");
+          } else {
+            damageType = "basic"; // Default damage type
+            rawDamageRoll = persistentDamage.value;
+          }
           const damageRollFormula = rawDamageRoll.replace(";", "").trim();
-
-          // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType}`);
+          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType}`);
 
           const roll = new Roll(damageRollFormula);
           await roll.evaluate({ evaluateSync: true });
@@ -1301,18 +1316,18 @@ export class Hyp3eActor extends Actor {
           damageMessages.push(`${this.displayName} takes ${roll.total} ${damageType} damage!`);
         }
 
-        if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-          // Effect expired, handle it
-          if (effect.origin) {
-            // Effects applied from an item/ability must be disabled immediately
-            await effect.update({ disabled: true });
-          } else {
-            // Effects applied directly to the actor can be queued for disabling
-            // expiredEffects.push(effect);
-          }
-          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
-          expiredEffects.push(effect);
-        }
+        // if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
+        //   // Effect expired, handle it
+        //   if (effect.origin) {
+        //     // Effects applied from an item/ability must be disabled immediately
+        //     await effect.update({ disabled: true });
+        //   } else {
+        //     // Effects applied directly to the actor can be queued for disabling
+        //     // expiredEffects.push(effect);
+        //   }
+        //   Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
+        //   expiredEffects.push(effect);
+        // }
       }
     }
 
