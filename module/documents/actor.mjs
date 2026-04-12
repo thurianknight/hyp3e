@@ -267,19 +267,24 @@ export class Hyp3eActor extends Actor {
    * Capture change values that include roll formulas or data paths, and resolve them
    *  to a final number that can be applied to the actor's overrides.
    */
-  applyActiveEffects() {
-    // Anything to process?
-    const allApplicableEffects = Array.from(this.allApplicableEffects());
-    if (allApplicableEffects.length === 0) return;
-
-    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${this.name} before apply:`, { Actor: this, Effects: allApplicableEffects });
-
-    // For items that apply effects with variables, we resolve those variables 
-    //  on the item effect rather than the actor
-    this.updateItemEffects()
+  applyActiveEffects(phase = null) {
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    if (majorVersion >= 14) {
+      return this.applyActiveEffectsV14(phase);
+    }
 
     const overrides = {};
     this.statuses.clear();
+
+    // HYP3E CUSTOMIZATION: Simple sanity check to see if we have any applicable effects.
+    const allApplicableEffects = Array.from(this.allApplicableEffects());
+    if (allApplicableEffects.length === 0) return;
+    Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${this.name} before apply:`, { Actor: this, Effects: allApplicableEffects });
+
+    // HYP3E CUSTOMIZATION: For items that apply effects with variables, we resolve 
+    //  those variables on the item effect rather than the actor
+    this.updateItemEffects()
+    // Back to standard Foundry code...
 
     // Organize non-disabled effects by their application priority
     const changes = [];
@@ -287,7 +292,10 @@ export class Hyp3eActor extends Actor {
       // Skip if disabled or not active
       if ( effect.disabled || !effect.active ) continue;
 
-      // Validate effect condition is met before applying changes
+      // HYP3E CUSTOMIZATION: We validate effect conditions at the point of application 
+      //  rather than filtering them out in allApplicableEffects() because we want 
+      //  them to still be included in the actor data for use in things like the 
+      //  character sheet, even if their conditions aren't currently met.
       const conditionPasses = this._effectApplies(effect);
       // Store temporary effect condition state in actor (used by actor sheet)
       this.system._hyp3eEffectConditionState = this.system._hyp3eEffectConditionState || {};
@@ -297,17 +305,17 @@ export class Hyp3eActor extends Actor {
         Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
         continue;
       }
+      // Back to standard Foundry code...
 
       const effectChanges = effect?.changes || effect?.system.changes || [];
       changes.push(...effectChanges.map(change => {
         const c = foundry.utils.deepClone(change);
         c.effect = effect;
         c.priority = c.priority ?? (c.mode * 10);
-        // Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${effect.name} ${change.key}:`, change);
         return c;
       }));
       // If the effect includes any status icons, add it/them to the actor
-      for ( const statusId of effect.statuses ) this.statuses.add(statusId);
+      // for ( const statusId of effect.statuses ) this.statuses.add(statusId);
     }
     if ( changes.length === 0 ) return;
 
@@ -319,7 +327,7 @@ export class Hyp3eActor extends Actor {
     for ( const change of changes ) {
       if ( !change.key ) continue;    // This should never happen
 
-      // Explicitly skip changes to AC, DR, and MV, if autoCalcAc is true
+      // HYP3E CUSTOMIZATION: Explicitly skip changes to AC, DR, and MV, if autoCalcAc is true
       if (game.settings.get(game.system.id, "autoCalcAc")) {
         if (["system.ac.value", "system.ac.dr", "system.movement.base.value"].includes(change.key)) {
           Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping AC/DR/MV change:`, change);
@@ -339,6 +347,93 @@ export class Hyp3eActor extends Actor {
     this.overrides = foundry.utils.expandObject(overrides);
 
     Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `${this.name} after apply:`, this);
+  }
+
+  /**
+   * Apply any transformations to the Actor data which are caused by ActiveEffects.
+   * @param {string} phase The application phase under which changes are to be applied.
+   */
+  applyActiveEffectsV14(phase) {
+    const ActiveEffect = foundry.documents.ActiveEffect.implementation;
+    if ( typeof phase !== "string" ) {
+      phase = this._completedActiveEffectPhases.has("initial") ? "final" : "initial";
+      const message = 'Actor#applyActiveEffects must be called with a string phase identifier, with "initial"'
+        + " as the first phase.";
+      foundry.utils.logCompatibilityWarning(message, {since: 14, until: 16, once: true});
+    }
+    else if ( !(phase in ActiveEffect.CHANGE_PHASES) ) {
+      const error = new Error(`"${phase}" is not a registered ActiveEffect application phase.`);
+      Hooks.onError("Actor#applyActiveEffects", error, {log: "error"});
+    }
+    if ( this._completedActiveEffectPhases.has(phase) ) {
+      const error = new Error(`ActiveEffect application phase "${phase}" has already completed and cannot be run again`
+        + " in this Actor's data-preparation cycle.");
+      Hooks.onError("Actor#applyActiveEffects", error, {log: "error"});
+      return;
+    }
+    this._completedActiveEffectPhases.add(phase);
+
+    // Organize non-disabled effects by their application priority
+    /** @type {ActiveEffectChangeData[]} */
+    const changes = [];
+    /** @type {ActiveEffectChangeData[]} */
+    const tokenChanges = [];
+    for ( const effect of this.allApplicableEffects() ) {
+      if ( !effect.active ) continue;
+
+      // HYP3E CUSTOMIZATION: We validate effect conditions at the point of application 
+      //  rather than filtering them out in allApplicableEffects() because we want 
+      //  them to still be included in the actor data for use in things like the 
+      //  character sheet, even if their conditions aren't currently met.
+      const conditionPasses = this._effectApplies(effect);
+      // Store temporary effect condition state in actor (used by actor sheet)
+      this.system._hyp3eEffectConditionState = this.system._hyp3eEffectConditionState || {};
+      this.system._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
+
+      if (!conditionPasses) {
+        Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
+        continue;
+      }
+      // Back to standard Foundry v14 code...
+
+      for ( const change of effect.system.changes ) {
+        if ( (change.key === "") || (change.phase !== phase) ) continue;
+
+        // // HYP3E CUSTOMIZATION: Explicitly skip changes to AC, DR, and MV, if autoCalcAc is true
+        // if (game.settings.get(game.system.id, "autoCalcAc")) {
+        //   if (["system.ac.value", "system.ac.dr", "system.movement.base.value"].includes(change.key)) {
+        //     Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping AC/DR/MV change:`, change);
+        //     continue;
+        //   }
+        // }
+        // Back to standard Foundry v14 code...
+  
+        const copy = foundry.utils.deepClone(change);
+        copy.effect = effect;
+        if ( copy.key?.startsWith("token.") ) { // Keep Token changes separate for later application
+          copy.key = copy.key.slice(6);
+          tokenChanges.push(copy);
+        }
+        else changes.push(copy);
+      }
+      if ( phase === "initial" ) {
+        for ( const statusId of effect.statuses ) this.statuses.add(statusId);
+      }
+    }
+    changes.sort((a, b) => a.priority - b.priority);
+    ActiveEffect._shimChanges(changes);
+    this.tokenActiveEffectChanges[phase] = tokenChanges;
+
+    // Apply all changes
+    const overrides = {};
+    const replacementData = this.getRollData();
+    for ( const change of changes ) {
+      const result = ActiveEffect.applyChange(this, change, {replacementData});
+      if ( foundry.utils.isPlainObject(result) ) Object.assign(overrides, result);
+    }
+
+    // Expand the set of final overrides
+    foundry.utils.mergeObject(this.overrides, foundry.utils.expandObject(overrides));
   }
 
   /** ACTOR DATA HELPERS ------------------------------*/
@@ -1142,7 +1237,7 @@ export class Hyp3eActor extends Actor {
             Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" value: ${resolvedChange} is a numeric string, resolved to a number.`);
           } else if (isPureString(change.value)) {
             resolvedChange = change.value;
-            Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" value: ${resolvedChange} is a string, no resolution needed.`);
+            Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" value: ${resolvedChange} is simple text, no resolution needed.`);
           } else if (containsDice(change.value)) {
             // Parse the change.value string/formula and resolve it to a number if possible
             resolvedChange = await Hyp3eDice.resolveFormulaWithMathAsync(change.value, actorData)

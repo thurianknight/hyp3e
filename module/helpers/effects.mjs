@@ -301,11 +301,15 @@ export async function setupEffectHandlers() {
 
     // Flag to track whether anything needs to be updated
     let didUpdate = false;
+    const updates = {};
 
     // Check to see if we have a rollable Duration formula, and resolve it if so
     const { updatedDuration, updated } = await checkAndResolveDuration(effect, actorData);
-    Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" duration:`, updatedDuration);
-    if (updated) didUpdate = true;
+    if (updated) {
+      didUpdate = true;
+      updates.duration = updatedDuration;
+      Hyp3eLogger.info("ActiveEffect createActiveEffect", `"${effect.name}" resolved duration:`, updatedDuration);
+    }
 
     // Store all changes for a batch update at the end
     const effectChanges = effect?.changes || effect?.system.changes || [];
@@ -313,7 +317,7 @@ export async function setupEffectHandlers() {
 
     for (let i = 0; i < updatedChanges.length; i++) {
       const change = updatedChanges[i];
-      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" change:`, change);
+      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" change key "${change.key}" has value ${change.value}, type: ${typeof change.value}`, change);
       // Store the change value regardless of whether it's a formula or not
       if (!change.flags?.hyp3e?.originalValue) {
         change.flags = change.flags || {};
@@ -323,16 +327,23 @@ export async function setupEffectHandlers() {
       }
       // Parse the change.value string and resolve any variables or math
       let resolvedChange = null;
-      if (isPureNumber(change.value)) {
+      if (!isNaN(change.value)) {
         resolvedChange = Number(change.value);
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `"${effect.name}" value: ${resolvedChange} is a real number, no resolution needed.`);
+      } else if (isPureNumber(change.value)) {
+        resolvedChange = Number(change.value);
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `"${effect.name}" value: ${resolvedChange} is a numeric string, no resolution needed.`);
       } else if (isPureString(change.value)) {
         resolvedChange = change.value;
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `"${effect.name}" value: ${resolvedChange} is simple text, no resolution needed.`);
       } else if (containsDice(change.value)) {
         // Dice rolls in the formula require async processing
         resolvedChange = await Hyp3eDice.resolveFormulaWithMathAsync(change.value, actorData)
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `"${effect.name}" value: ${change.value} contains dice, resolved to ${resolvedChange}.`);
       } else if (containsMathOrVariables(change.value)) {
         // No dice rolls, we can do it synchronous
-        resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, actorData);  
+        resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, actorData);
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `"${effect.name}" value: ${change.value} contains math or variables, resolved to ${resolvedChange}.`);
       }
       if (updatedChanges[i].value !== resolvedChange) {
         updatedChanges[i] = {
@@ -340,16 +351,15 @@ export async function setupEffectHandlers() {
           value: resolvedChange
         };
         didUpdate = true;
+        updates.changes = updatedChanges;
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `"${effect.name}" resolved change:`, updatedChanges[i]);
       }
     }
 
     // Batch out the updates to the effect
     if (didUpdate) {
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} updated Duration and/or Changes:`, { updatedDuration, updatedChanges });
-      await effect.update({
-        duration: updatedDuration,
-        changes: updatedChanges
-      });
+      await effect.update(updates);
     }
 
     // Automatically set the remaining turns for active effects with a duration in rounds.
