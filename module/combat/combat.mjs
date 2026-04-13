@@ -107,20 +107,29 @@ export class HYP3ECombat extends Combat {
       combatant.clearMovementHistory();
     }
 
+    if (!combatant?.actor) {
+      Hyp3eLogger.warn("HYP3ECombat _onEndTurn", `Combatant has no actor, cannot process temporary effects!`);
+      return;
+    }
+
     // Do we need to apply unconscious or dead statuses right away?
     const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
 
     // Cycle through temporary effects and items, update combatant status
     const actor = combatant.actor;
     if (actor) {
+      Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary effects...`);
+      await actor.processTemporaryEffects();
+      // if (foundry.utils.isNewerVersion(game.version, "14")) {
+        await ActiveEffect.registry.refresh("turnEnd", {
+          actors: new Set([actor])
+        });
+      // }
       Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary items...`);
-        await actor.processTemporaryEffects();
-        await actor.processTemporaryItems(1);
-        if (!resolveDeathAtRoundEnd) {
-          await combatant.updateStatus();
-        }
-    } else {
-      Hyp3eLogger.warn("HYP3ECombat _onEndTurn", `Combatant has no actor, cannot process temporary effects!`);
+      await actor.processTemporaryItems(1);
+      if (!resolveDeathAtRoundEnd) {
+        await combatant.updateStatus();
+      }
     }
   }
 

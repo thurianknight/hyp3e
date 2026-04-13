@@ -55,6 +55,7 @@ export function onManageActiveEffectV2(target, owner) {
     // Hyp3eLogger.info("ActiveEffect onManageActiveEffectV2", `Effect:`, effect);
     switch ( target.dataset.action ) {
         case "createEffect":
+            target.dataset.effectType = target.dataset.effectType || "passive";  // Default to "passive" if no type provided
             _createEffect(owner, target.dataset);
             break;
         case "editEffect":
@@ -82,15 +83,31 @@ export function onManageActiveEffectV2(target, owner) {
 }
 
 function _createEffect(owner, dataset) {
-    return owner.createEmbeddedDocuments("ActiveEffect", [{
+    Hyp3eLogger.info("ActiveEffect _createEffect", `Creating new effect on ${owner.name} with dataset:`, dataset);
+    const effectData = {
         name: "New Effect",
         label: "New Effect",
         img: "icons/svg/aura.svg",
         origin: owner.uuid,
         sourceName: owner.name,
-        "duration.rounds": dataset.effectType === "temporary" ? 1 : undefined,
+        duration: {},
         disabled: dataset.effectType === "inactive"
-    }]);
+    }
+    // Foundry v14 changed the way embedded documents are created, so we have to check 
+    //  the version and use the appropriate method
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    if (majorVersion <= 13) {
+      effectData.duration = {
+        rounds: dataset.effectType === "temporary" ? 1 : undefined,
+      };
+    } else {  // Foundry v13 and earlier
+      effectData.duration = {
+        units: "rounds",
+        value: dataset.effectType === "temporary" ? 1 : undefined,
+        expiry: dataset.effectType === "temporary" ? "roundEnd" : undefined
+      };
+    }
+    return owner.createEmbeddedDocuments("ActiveEffect", [effectData]);
 }
 
 function _toggleEffect(effect, owner) {
@@ -371,11 +388,27 @@ export async function setupEffectHandlers() {
     //  This is useful for effects that are generally applied outside of combat and last for 
     //  multiple turns (much longer than a typical combat spell/effect).
     if (!effect.getFlag("hyp3e", "remainingTurns")) {
-      // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
-      const durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
-      const durationTurns = durationRounds !== null & durationRounds > 0 
-        ? Math.floor(durationRounds / 60) 
-        : null;
+      let durationTurns = null;
+      const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+      if (majorVersion <= 13) {
+        // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
+        const durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
+        durationTurns = durationRounds !== null 
+          ? Math.floor(durationRounds / 60) 
+          : null;
+      } else {
+        // v14 introduced "seconds", and changed "rounds" to "value" with a "unit"
+        if (effect.duration.unit === "rounds" || effect.duration.unit === "turns") {
+          // Handle the same as v13, just with the new "value" property instead of "rounds"
+          const durationRounds = effect.duration.value ?? null;
+          durationTurns = durationRounds !== null 
+            ? Math.floor(durationRounds / 60) 
+            : null;
+        } else if (effect.duration.seconds) {
+          // If the duration is in seconds, convert to turns (3600 seconds = 1 turn)
+          durationTurns = Math.floor(effect.duration.seconds / 600);
+        }
+      }
       await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingTurns to ${durationTurns} for ${effect.name}`);
     }

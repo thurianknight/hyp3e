@@ -3594,19 +3594,29 @@ export class Hyp3eActor extends Actor {
    * @param {*} turn - The current game-world turn number.
    */
   async advanceExplorationTurn(turn) {
+      // Foundry v14 introduced big changes to Active Effects, so we need to check the 
+      //  version to determine how to process them
+      const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+
       // Process active effects
       for (const effect of this.allApplicableEffects()) {
           if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
           Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
-          // Check if the effect has a remaining turns flag
+
+          // Process temporary effect changes
+          this.processTemporaryEffects();
+
+          // Check if the effect has a duration or remaining turns flag
           const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
+          const remaining = effect.duration?.seconds ?? effect.duration?.value ?? null;
           // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
-          if (typeof remainingTurns === "number") {
+          if (typeof remainingTurns === "number") { // Not null or undefined
               const newRemaining = remainingTurns - 1;
               if (newRemaining <= 0) {
                   // Effect has expired -- for effects applied directly to the actor, we delete them...
                   //  but for effects applied via items, we just disable them
-                  if (effect.origin) {
+                  // if (effect.origin) {
+                  if (effect.parent._id != this.id) {
                       effect.update({ disabled: true });
                   } else {
                       await effect.delete();
@@ -3618,8 +3628,6 @@ export class Hyp3eActor extends Actor {
               } else {
                   effect.setFlag("hyp3e", "remainingTurns", newRemaining);
               }
-              // Update temporary effects if not expired yet
-              this.processTemporaryEffects();
           }
       }
       // Update temporary items & delete if expired
@@ -3643,7 +3651,7 @@ export class Hyp3eActor extends Actor {
               effect.setFlag("hyp3e", "remainingTurns", newRemaining);
           }
       }
-      // Update temporary items & delete if expired
+      // Update temporary items
       this.processTemporaryItems(-60); // 60 rounds = 10 minutes = 1 Hyperborea turn
   }
 
