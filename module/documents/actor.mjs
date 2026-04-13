@@ -307,6 +307,7 @@ export class Hyp3eActor extends Actor {
       }
       // Back to standard Foundry code...
 
+      // Foundry v13 vs. v14 changes how effect changes are stored
       const effectChanges = effect?.changes || effect?.system.changes || [];
       changes.push(...effectChanges.map(change => {
         const c = foundry.utils.deepClone(change);
@@ -1221,8 +1222,9 @@ export class Hyp3eActor extends Actor {
           Hyp3eLogger.info("Hyp3eActor updateItemEffects", `"${effect.name}" resolved duration:`, updatedDuration);
         }
 
-        // Store all changes for a batch update at the end
+        // Foundry v13 vs. v14 changes how effect changes are stored
         const effectChanges = effect?.changes || effect?.system.changes || [];
+        // Store all changes for a batch update at the end
         let updatedChanges = [...effectChanges];  // Start with a shallow copy
         Hyp3eLogger.info("Hyp3eActor updateItemEffects", `Checking effect ${effect.name} for changes to resolve...`, effectChanges);
         for (let i = 0; i < updatedChanges.length; i++) {
@@ -1282,15 +1284,11 @@ export class Hyp3eActor extends Actor {
       Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} has ${effect.name} with remaining time ${effect.duration.remaining} rounds/turns:`, effect);
       if (effect.isTemporary && !effect.disabled) {
         if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-          // Effect expired, mark for removal and skip processing its damage
-          // if (effect.origin) {
-          //   // Effects applied from an item/ability must be disabled immediately
-          //   await effect.update({ disabled: true });
-          // }
+          // Effect expired, add to expiredEffects for removal
           Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
           expiredEffects.push(effect);
-          // continue;
         }
+        // Foundry v13 vs. v14 changes how effect changes are stored
         const effectChanges = effect?.changes || effect?.system.changes || [];
         const persistentDamage = effectChanges.find(c => c.key === "system.tempPersistentDamage");
         if (persistentDamage) {
@@ -1378,8 +1376,9 @@ export class Hyp3eActor extends Actor {
           return updateValue; // No effect found, return same value (no change)
       }
 
-      // Store all changes for a single batch update at the end
+      // Foundry v13 vs. v14 changes how effect changes are stored
       const effectChanges = effect?.changes || effect?.system.changes || [];
+      // Store all changes for a single batch update at the end
       let updatedChanges = [...effectChanges];  // Start with a shallow copy
       let didUpdate = false;
       let newValue = 0;
@@ -1421,12 +1420,14 @@ export class Hyp3eActor extends Actor {
     if (!this.isOwner) return []; // safety — only owner can delete
 
     let expired = [];
-    if (ActiveEffect.registry) {
+    if (ActiveEffect?.registry) {
+      // Foundry v14+ has a built-in registry of effects and their statuses
       expired = this.effects.filter(effect => 
         effect.isTemporary && 
         effect.duration?.expired === true
       );
     } else {
+      // For Foundry v13 and earlier, we have to check manually
       expired = this.effects.filter(effect => 
         effect.isTemporary && 
         effect.duration.remaining != null && effect.duration.remaining <= 0
@@ -1437,7 +1438,7 @@ export class Hyp3eActor extends Actor {
 
     // Post all the expirations together in one chat
     const effectNames = expired.map(effect => effect.name)
-    const expiredEffectsMsg = `Effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
+    const expiredEffectsMsg = `Effects have expired on ${this.displayName}...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
     sendSimpleChat(this, "", expiredEffectsMsg)
 
     const deleted = await this.deleteEmbeddedDocuments(

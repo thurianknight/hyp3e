@@ -22,7 +22,7 @@ export async function setupTurnTrackerHooks() {
 
     // Process all tokens on the canvas
     for (const token of canvas.tokens.placeables) {
-      const actor = token.actor;
+      const actor = token?.actor || null;
       if (!actor) continue;
 
       actor.advanceExplorationTurn(turn);
@@ -65,7 +65,7 @@ export async function setupTurnTrackerHooks() {
 
     // Process all tokens on the canvas
     for (const token of canvas.tokens.placeables) {
-      const actor = token.actor;
+      const actor = token?.actor || null;
       if (!actor) continue;
 
       actor.retreatExplorationTurn(turn);

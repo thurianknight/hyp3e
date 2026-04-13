@@ -329,8 +329,9 @@ export async function setupEffectHandlers() {
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `"${effect.name}" resolved duration:`, updatedDuration);
     }
 
-    // Store all changes for a batch update at the end
+    // Foundry v13 vs. v14 changes how effect changes are stored
     const effectChanges = effect?.changes || effect?.system.changes || [];
+    // Store all changes for a batch update at the end
     let updatedChanges = [...effectChanges];  // Start with a shallow copy
 
     for (let i = 0; i < updatedChanges.length; i++) {

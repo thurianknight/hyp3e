@@ -61,19 +61,12 @@ export class HYP3ECombat extends Combat {
     if (game.settings.get(game.system.id, "resolveDeathAtRoundEnd")) {
       await this.setFlag("hyp3e", "deferDefeat", true);
     }
-    // Cycle through all combatants and update status
+    // Cycle through all combatants and process individually, if needed
     for (const combatant of this.combatants) {
-      if (ActiveEffect?.registry) {
-        if (combatant.actor) {
-          // Hyp3eLogger.info("HYP3ECombat _onStartRound", `Refreshing Active Effect registry for ${combatant.actor.displayName}...`);
-          await ActiveEffect.registry.refresh("roundStart", {
-            actors: new Set([combatant.actor])
-          });
-          Hyp3eLogger.info("HYP3ECombat _onStartRound", `Refreshed Active Effect registry for ${combatant.actor.displayName}...`, combatant.actor.effects);
-        }
-      }
-      await combatant.actor.deleteExpiredEffects();
+      // Placeholder, nothing here for now
     }
+    // This will cycle through all combatants for active effects
+    await this._refreshAndCleanupEffects("roundStart", this);
 
     await super._onStartRound(context);
   }
@@ -87,19 +80,10 @@ export class HYP3ECombat extends Combat {
       // Cycle through all combatants and update status
       for (const combatant of this.combatants) {
         await combatant.updateStatus();
-
-        if (ActiveEffect?.registry) {
-          if (combatant.actor) {
-            // Hyp3eLogger.info("HYP3ECombat _onEndRound", `Refreshing Active Effect registry for ${combatant.actor.displayName}...`);
-            await ActiveEffect.registry.refresh("roundEnd", {
-              actors: new Set([combatant.actor])
-            });
-            Hyp3eLogger.info("HYP3ECombat _onEndRound", `Refreshed Active Effect registry for ${combatant.actor.displayName}...`, combatant.actor.effects);
-          }
-        }
-        await combatant.actor.deleteExpiredEffects();
       }
     }
+    // This will cycle through all combatants for active effects
+    await this._refreshAndCleanupEffects("roundEnd", this);
 
     // Reset/keep initiative
     switch(this.#initiativePersistence) {
@@ -133,16 +117,8 @@ export class HYP3ECombat extends Combat {
     }
 
     if (combatant.actor) {
-      // Cycle through combatant's effects and update AE registry
-      // if (foundry.utils.isNewerVersion(game.version, "14")) {
-      if (ActiveEffect?.registry) {
-        // Hyp3eLogger.info("HYP3ECombat _onStartTurn", `Refreshing Active Effect registry for ${combatant.actor.displayName}...`);
-        await ActiveEffect.registry.refresh("turnStart", {
-          actors: new Set([combatant.actor])
-        });
-        Hyp3eLogger.info("HYP3ECombat _onStartTurn", `Refreshed Active Effect registry for ${combatant.actor.displayName}...`, combatant.actor.effects);
-      }
-      await combatant.actor.deleteExpiredEffects();
+      // Process temporary effects on this actor
+      await this._refreshAndCleanupEffects("turnStart", this, combatant.actor);
     }
   }
 
@@ -168,15 +144,7 @@ export class HYP3ECombat extends Combat {
     const actor = combatant.actor;
     Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary effects...`);
     await actor.processTemporaryEffects();
-
-    if (ActiveEffect?.registry) {
-      // Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Refreshing Active Effect registry for ${actor.displayName}...`);
-      await ActiveEffect.registry.refresh("turnEnd", {
-        actors: new Set([actor])
-      });
-      Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Refreshed Active Effect registry for ${actor.displayName}...`, actor.effects);
-    }
-    await actor.deleteExpiredEffects();
+    await this._refreshAndCleanupEffects("turnEnd", this, actor);
 
     Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary items...`);
     await actor.processTemporaryItems(1);
@@ -237,5 +205,38 @@ export class HYP3ECombat extends Combat {
 
     // Try again with the main reset
     await super.resetAll()
+  }
+  /**
+   * Private helper – keeps your four methods clean and DRY
+   */
+  async _refreshAndCleanupEffects(event, combat = null, specificActor = null) {
+    // if (!ActiveEffect?.registry) {
+    //   // v13 fallback, need to handle manually elsewhere
+    //   return;
+    // }
+  
+    const context = { combat };
+    const actors = specificActor ? new Set([specificActor]) : undefined;
+  
+    if (actors) context.actors = actors;
+  
+    // Only Foundry v14+ has the effect registry
+    if (ActiveEffect?.registry) {
+      // Safety net add and refresh registry
+      if (specificActor) {
+        await ActiveEffect.registry.addFromParent(specificActor);
+      }    
+      await ActiveEffect.registry.refresh(event, context);
+    }
+  
+    // Cleanup – only on the relevant actor(s)
+    if (specificActor) {
+      await specificActor.deleteExpiredEffects();
+    } else {
+      // Clean all actors in combat if called without a specific actor
+      for (const c of combat?.combatants || []) {
+        if (c.actor) await c.actor.deleteExpiredEffects();
+      }
+    }
   }
 }

@@ -51,6 +51,8 @@ Hooks.once('init', async function() {
   if (CONFIG.ActiveEffect?.legacyTransferral) {
     CONFIG.ActiveEffect.legacyTransferral = false;
   }
+  CONFIG.ActiveEffect.EXPIRY_EVENTS ??= {};
+  CONFIG.ActiveEffect.EXPIRY_EVENTS["hyperborea.roundEnd"] = "1/60 or an exploration Turn";
 
   // Register our Hyperborea system configuration options
   registerHyp3eConfigurations();
