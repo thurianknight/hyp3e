@@ -1283,13 +1283,13 @@ export class Hyp3eActor extends Actor {
       if (effect.isTemporary && !effect.disabled) {
         if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
           // Effect expired, mark for removal and skip processing its damage
-          if (effect.origin) {
-            // Effects applied from an item/ability must be disabled immediately
-            await effect.update({ disabled: true });
-          }
+          // if (effect.origin) {
+          //   // Effects applied from an item/ability must be disabled immediately
+          //   await effect.update({ disabled: true });
+          // }
           Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
           expiredEffects.push(effect);
-          continue;
+          // continue;
         }
         const effectChanges = effect?.changes || effect?.system.changes || [];
         const persistentDamage = effectChanges.find(c => c.key === "system.tempPersistentDamage");
@@ -1315,19 +1315,6 @@ export class Hyp3eActor extends Actor {
 
           damageMessages.push(`${this.displayName} takes ${roll.total} ${damageType} damage!`);
         }
-
-        // if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-        //   // Effect expired, handle it
-        //   if (effect.origin) {
-        //     // Effects applied from an item/ability must be disabled immediately
-        //     await effect.update({ disabled: true });
-        //   } else {
-        //     // Effects applied directly to the actor can be queued for disabling
-        //     // expiredEffects.push(effect);
-        //   }
-        //   Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
-        //   expiredEffects.push(effect);
-        // }
       }
     }
 
@@ -1343,7 +1330,7 @@ export class Hyp3eActor extends Actor {
     // Delete if possible, otherwise disable expired effects
     const deletable = [];
     const disableOnly = [];
-    
+
     for (const effect of expiredEffects) {
       if (effect.parent?.documentName === "Actor") {
         Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} will delete ${effect.name}...`);
@@ -1354,38 +1341,28 @@ export class Hyp3eActor extends Actor {
       }
     }
     // Run the deletes first
-    if (deletable.length > 0) {
-      await this.deleteEmbeddedDocuments(
-        "ActiveEffect",
-        deletable.map(e => e.id)
-      );
-    }
+    // if (deletable.length > 0) {
+    //   await this.deleteEmbeddedDocuments(
+    //     "ActiveEffect",
+    //     deletable.map(e => e.id)
+    //   );
+    // }
     // Now disable the rest
     if (disableOnly.length > 0) {
       const updates = disableOnly.map(e => ({
         _id: e.id,
         disabled: true,
-        "duration.startRound": null,
-        "duration.startTurn": null
+        // "duration.startRound": null,
+        // "duration.startTurn": null
       }));
       await this.updateEmbeddedDocuments("ActiveEffect", updates);
     }
 
-    if (expiredEffects.length > 0) {
-      // Post all the expirations together in one chat
-      const effectNames = expiredEffects.map(effect => effect.name)
-      const expiredEffectsMsg = `Active effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
-      sendSimpleChat(this, "", expiredEffectsMsg)
-    }
-
     // if (expiredEffects.length > 0) {
-    //   const updates = expiredEffects.map(effect => ({
-    //     _id: effect.id,
-    //     disabled: true,
-    //     "duration.startRound": null,
-    //     "duration.startTurn": null
-    //   }));
-    //   await this.updateEmbeddedDocuments("ActiveEffect", updates);
+    //   // Post all the expirations together in one chat
+    //   const effectNames = expiredEffects.map(effect => effect.name)
+    //   const expiredEffectsMsg = `Active effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
+    //   sendSimpleChat(this, "", expiredEffectsMsg)
     // }
   }
 
@@ -1431,6 +1408,52 @@ export class Hyp3eActor extends Actor {
       // Return any excess that could not be removed from the effect
       return excess;
   }
+
+  /**
+   * Delete all temporary ActiveEffects that are currently marked as expired.
+   * This is intended to be called after `ActiveEffect.registry.refresh(...)`
+   * when CONFIG.ActiveEffect.expiryAction is set to "update".
+   *
+   * @param {object} [options={}]             Additional options passed to deleteEmbeddedDocuments
+   * @returns {Promise<ActiveEffect[]>}       The deleted effects (if any)
+   */
+  async deleteExpiredEffects(options = {}) {
+    if (!this.isOwner) return []; // safety — only owner can delete
+
+    let expired = [];
+    if (ActiveEffect.registry) {
+      expired = this.effects.filter(effect => 
+        effect.isTemporary && 
+        effect.duration?.expired === true
+      );
+    } else {
+      expired = this.effects.filter(effect => 
+        effect.isTemporary && 
+        effect.duration.remaining != null && effect.duration.remaining <= 0
+      );
+    }
+
+    if (expired.length === 0) return [];
+
+    // Post all the expirations together in one chat
+    const effectNames = expired.map(effect => effect.name)
+    const expiredEffectsMsg = `Effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
+    sendSimpleChat(this, "", expiredEffectsMsg)
+
+    const deleted = await this.deleteEmbeddedDocuments(
+      "ActiveEffect", 
+      expired.map(e => e.id),
+      options
+    );
+
+    if (deleted?.length) {
+      Hyp3eLogger.info("Hyp3eActor deleteExpiredEffects", `Deleted ${deleted.length} expired effect(s) on ${this.name}`);
+    }
+
+    return deleted;
+  }
+
+  /** TEMPORARY ITEMS HELPERS --------------------------*/
 
   /**
    * Create a temporary item owned by the actor, using the provided dataset (NOT USED YET)
@@ -3604,7 +3627,9 @@ export class Hyp3eActor extends Actor {
           Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
 
           // Process temporary effect changes
-          this.processTemporaryEffects();
+          await this.processTemporaryEffects();
+          // Delete any expired effects
+          await this.deleteExpiredEffects();
 
           // Check if the effect has a duration or remaining turns flag
           const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");

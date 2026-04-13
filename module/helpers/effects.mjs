@@ -99,12 +99,13 @@ function _createEffect(owner, dataset) {
     if (majorVersion <= 13) {
       effectData.duration = {
         rounds: dataset.effectType === "temporary" ? 1 : undefined,
+        expiry: dataset.effectType === "temporary" ? "roundEnd" : undefined
       };
     } else {  // Foundry v13 and earlier
       effectData.duration = {
         units: "rounds",
         value: dataset.effectType === "temporary" ? 1 : undefined,
-        expiry: dataset.effectType === "temporary" ? "roundEnd" : undefined
+        expiryEvent: dataset.effectType === "temporary" ? "roundEnd" : undefined
       };
     }
     return owner.createEmbeddedDocuments("ActiveEffect", [effectData]);
