@@ -20,17 +20,42 @@ export async function setupTurnTrackerHooks() {
     // Only the GM can run turn advancement logic
     if (!game.user.isGM) return;
 
-    // Process all tokens on the canvas
-    for (const token of canvas.tokens.placeables) {
-      const actor = token?.actor || null;
-      if (!actor) continue;
+    // Build a Set of actors to process
+    const actors = new Set(
+      canvas.tokens.placeables
+        .map(t => t.actor)
+        .filter(Boolean)
+    );
+    Hyp3eLogger.info("explorationTurnAdvanced", `Processing effects on current actors:`, actors);
 
-      actor.advanceExplorationTurn(turn);
+    // Foundry v14 introduced the ActiveEffect registry
+    if (ActiveEffect?.registry) {
+      // Process all tokens on the canvas
+      for (const actor of actors) {
+        await ActiveEffect.registry.addFromParent(actor);
+      }
 
-      // Process equipped items
-      for (const item of actor.items) {
-        if (!item) continue;
-        item.advanceExplorationTurn(turn);
+      // Log the updated registry
+      Hyp3eLogger.info("explorationTurnAdvanced", "ActiveEffect Registry contents:", 
+        Array.from(ActiveEffect.registry)
+      );
+
+      // Simulate 60 rounds passing -- these are the primary events that we expect to see
+      for (let i = 0; i < 60; i++) {
+        await ActiveEffect.registry.refresh("roundStart", { actors });
+        await ActiveEffect.registry.refresh("turnStart", { actors });
+        await ActiveEffect.registry.refresh("turnEnd", { actors });
+        await ActiveEffect.registry.refresh("roundEnd", { actors });
+      }
+
+      // Clean up once at the end and send a single chat message per actor
+      for (const actor of actors) {
+        await actor.deleteExpiredEffects();
+      }
+
+    } else {  // Foundry v13 and earlier
+      for (const actor of actors) {
+        actor.advanceExplorationTurn(turn);
       }
     }
 

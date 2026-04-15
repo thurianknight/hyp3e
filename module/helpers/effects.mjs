@@ -10,13 +10,12 @@ import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
  */
  export function onManageActiveEffect(event, owner) {
     event.preventDefault();
-    // Hyp3eLogger.info("ActiveEffect onManageActiveEffect", `Owner of Effect:`, owner);
     const a = event.currentTarget;
     const li = a.closest("li");
     const effect = li.dataset.effectId ? owner.effects.get(li.dataset.effectId) : null;
-    // Hyp3eLogger.info("ActiveEffect onManageActiveEffect", `Effect:`, effect);
     switch ( a.dataset.action ) {
         case "createEffect":
+            a.dataset.effectType = a.dataset.effectType || "passive";  // Default to "passive" if no type provided
             _createEffect(owner, a.dataset);
             break;
         case "editEffect":
@@ -49,10 +48,8 @@ import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
  * @param {Actor|Item} owner      The owning document which manages this effect
  */
 export function onManageActiveEffectV2(target, owner) {
-    // Hyp3eLogger.info("ActiveEffect onManageActiveEffectV2", `Owner of Effect:`, owner);
     const effectId = $(target).closest(".item-entry").data("effectId")
     const effect = effectId ? owner.effects.get(effectId) : null;
-    // Hyp3eLogger.info("ActiveEffect onManageActiveEffectV2", `Effect:`, effect);
     switch ( target.dataset.action ) {
         case "createEffect":
             target.dataset.effectType = target.dataset.effectType || "passive";  // Default to "passive" if no type provided
@@ -99,13 +96,13 @@ function _createEffect(owner, dataset) {
     if (majorVersion <= 13) {
       effectData.duration = {
         rounds: dataset.effectType === "temporary" ? 1 : undefined,
-        expiry: dataset.effectType === "temporary" ? "roundEnd" : undefined
+        expiryEvent: dataset.effectType === "temporary" ? "turnEnd" : undefined
       };
-    } else {  // Foundry v13 and earlier
+    } else {  // Foundry v14 and later
       effectData.duration = {
         units: "rounds",
         value: dataset.effectType === "temporary" ? 1 : undefined,
-        expiryEvent: dataset.effectType === "temporary" ? "roundEnd" : undefined
+        expiry: dataset.effectType === "temporary" ? "turnEnd" : undefined
       };
     }
     return owner.createEmbeddedDocuments("ActiveEffect", [effectData]);
@@ -305,7 +302,8 @@ export async function setupEffectHandlers() {
     if (!actor?.isOwner) return;
     // Only let the GM create the effect
     if (!game.user.isGM) return;
-    Hyp3eLogger.info("ActiveEffect createActiveEffect", `Create event fired for ${effect.name}:`, effect);
+    const initialEffect = {...effect};
+    Hyp3eLogger.info("ActiveEffect createActiveEffect", `Create event fired for ${effect.name}:`, initialEffect);
 
     // Get data stored in the effect's flags
     const source = effect.getFlag("hyp3e", "source");
@@ -347,6 +345,7 @@ export async function setupEffectHandlers() {
       // Ignore if the key is system.tempPersistentDamage, since that is a special case we 
       //  handle separately in the Actor document
       if (change.key === "system.tempPersistentDamage") {
+        Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" applies persistent damage, so we will skip resolving any formulas.`);
         continue;
       }
       // Parse the change.value string and resolve any variables or math
@@ -382,7 +381,7 @@ export async function setupEffectHandlers() {
 
     // Batch out the updates to the effect
     if (didUpdate) {
-      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} updated Duration and/or Changes:`, { updatedDuration, updatedChanges });
+      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} updated Duration and/or Changes:`, updates);
       await effect.update(updates);
     }
 
@@ -432,10 +431,10 @@ export async function setupEffectHandlers() {
   });
 
   /**
-   * Handle the update of an active effect on an actor. Currently all this does is
-   *  toggle light source effects on and off.
+   * Handle the update of an active effect on an actor.
    */
   Hooks.on("updateActiveEffect", async(effect, change, options, userId) => {
+    Hyp3eLogger.info("ActiveEffect updateActiveEffect", `ActiveEffect ${effect.name} and changes:`, { Effect: effect, Change: change });
     if ("disabled" in change) {
       const wasDisabled = change.disabled;
       if (wasDisabled === true) {

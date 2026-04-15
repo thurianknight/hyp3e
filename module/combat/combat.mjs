@@ -43,15 +43,9 @@ export class HYP3ECombat extends Combat {
   }
 
   async endCombat() {
-    // For each combatant, delete any temporary effects that were previously disabled
-    for (const combatant of this.combatants) {
-      combatant?.actor?.effects.forEach(effect => {
-        if (effect.disabled && effect.isTemporary) {
-          Hyp3eLogger.info("HYP3ECombat endCombat", `Deleting effect ${effect.name} from ${combatant.name}:`, effect);
-          return effect.delete();
-        }
-      });
-    }
+    // This will cycle through all combatants for active effects
+    await this._refreshAndCleanupEffects("combatEnd", this);
+
     // Cleanup the combat object
     await super.endCombat();
   }
@@ -66,7 +60,7 @@ export class HYP3ECombat extends Combat {
       // Placeholder, nothing here for now
     }
     // This will cycle through all combatants for active effects
-    await this._refreshAndCleanupEffects("roundStart", this);
+    // await this._refreshAndCleanupEffects("roundStart", this);
 
     await super._onStartRound(context);
   }
@@ -83,7 +77,7 @@ export class HYP3ECombat extends Combat {
       }
     }
     // This will cycle through all combatants for active effects
-    await this._refreshAndCleanupEffects("roundEnd", this);
+    // await this._refreshAndCleanupEffects("roundEnd", this);
 
     // Reset/keep initiative
     switch(this.#initiativePersistence) {
@@ -118,7 +112,7 @@ export class HYP3ECombat extends Combat {
 
     if (combatant.actor) {
       // Process temporary effects on this actor
-      await this._refreshAndCleanupEffects("turnStart", this, combatant.actor);
+      // await this._refreshAndCleanupEffects("turnStart", this, combatant.actor);
     }
   }
 
@@ -140,14 +134,21 @@ export class HYP3ECombat extends Combat {
     // Do we need to apply unconscious or dead statuses right away?
     const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
 
-    // Cycle through temporary effects and items, update combatant status
+    // Process temporary effects and items, update combatant status
     const actor = combatant.actor;
-    Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary effects...`);
-    await actor.processTemporaryEffects();
+
+    // Update duration and expiration on effects, delete if expired
     await this._refreshAndCleanupEffects("turnEnd", this, actor);
 
+    // Process persistent damage for non-expired effects
+    Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary effects...`);
+    await actor.processTemporaryEffects();
+
+    // Update duration and expiration on temporary items
     Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary items...`);
     await actor.processTemporaryItems(1);
+
+    // Update actor health statuses if mode is "immediate" and not "at round end"
     if (!resolveDeathAtRoundEnd) {
       await combatant.updateStatus();
     }
@@ -206,20 +207,17 @@ export class HYP3ECombat extends Combat {
     // Try again with the main reset
     await super.resetAll()
   }
+
   /**
    * Private helper – keeps your four methods clean and DRY
    */
   async _refreshAndCleanupEffects(event, combat = null, specificActor = null) {
-    // if (!ActiveEffect?.registry) {
-    //   // v13 fallback, need to handle manually elsewhere
-    //   return;
-    // }
-  
+    Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `Refresh and cleanup effects on actor(s) ${specificActor ? specificActor.name : "(all)"}, for event ${event}.`);
     const context = { combat };
     const actors = specificActor ? new Set([specificActor]) : undefined;
-  
+
     if (actors) context.actors = actors;
-  
+
     // Only Foundry v14+ has the effect registry
     if (ActiveEffect?.registry) {
       // Safety net add and refresh registry
@@ -228,14 +226,17 @@ export class HYP3ECombat extends Combat {
       }    
       await ActiveEffect.registry.refresh(event, context);
     }
-  
+
     // Cleanup – only on the relevant actor(s)
     if (specificActor) {
+      Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `${specificActor.name} effects:`, specificActor.effects);
       await specificActor.deleteExpiredEffects();
     } else {
-      // Clean all actors in combat if called without a specific actor
-      for (const c of combat?.combatants || []) {
-        if (c.actor) await c.actor.deleteExpiredEffects();
+      // Clean all actors if combat is ending
+      if (event == "combatEnd") {
+        for (const c of combat?.combatants || []) {
+          if (c.actor) await c.actor.deleteExpiredEffects();
+        }
       }
     }
   }

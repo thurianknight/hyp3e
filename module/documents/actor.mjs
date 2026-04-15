@@ -1283,7 +1283,8 @@ export class Hyp3eActor extends Actor {
     for (const effect of this.allApplicableEffects()) {
       Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} has ${effect.name} with remaining time ${effect.duration.remaining} rounds/turns:`, effect);
       if (effect.isTemporary && !effect.disabled) {
-        if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
+        // if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
+        if (!isNaN(effect.duration.remaining) && effect.duration.remaining <= 0) {
           // Effect expired, add to expiredEffects for removal
           Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
           expiredEffects.push(effect);
@@ -1326,18 +1327,18 @@ export class Hyp3eActor extends Actor {
     }
 
     // Delete if possible, otherwise disable expired effects
-    const deletable = [];
-    const disableOnly = [];
+    // const deletable = [];
+    // const disableOnly = [];
 
-    for (const effect of expiredEffects) {
-      if (effect.parent?.documentName === "Actor") {
-        Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} will delete ${effect.name}...`);
-        deletable.push(effect);
-      } else {
-        Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} will disable ${effect.name}...`);
-        disableOnly.push(effect);
-      }
-    }
+    // for (const effect of expiredEffects) {
+    //   if (effect.parent?.documentName === "Actor") {
+    //     Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} will delete ${effect.name}...`);
+    //     deletable.push(effect);
+    //   } else {
+    //     Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} will disable ${effect.name}...`);
+    //     disableOnly.push(effect);
+    //   }
+    // }
     // Run the deletes first
     // if (deletable.length > 0) {
     //   await this.deleteEmbeddedDocuments(
@@ -1345,15 +1346,22 @@ export class Hyp3eActor extends Actor {
     //     deletable.map(e => e.id)
     //   );
     // }
-    // Now disable the rest
-    if (disableOnly.length > 0) {
-      const updates = disableOnly.map(e => ({
-        _id: e.id,
-        disabled: true,
-        // "duration.startRound": null,
-        // "duration.startTurn": null
-      }));
-      await this.updateEmbeddedDocuments("ActiveEffect", updates);
+
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    if (majorVersion <= 13) {
+      // Disable expired effects for Foundry v13 or earlier
+      // if (disableOnly.length > 0) {
+      if (expiredEffects.length > 0) {
+        const updates = expiredEffects.map(e => ({
+          _id: e.id,
+          disabled: true,
+          // "duration.startRound": null,
+          // "duration.startTurn": null
+        }));
+        await this.updateEmbeddedDocuments("ActiveEffect", updates);
+      }
+    } else {
+      // The ActiveEffect registry in v14 handles effect expiration for us
     }
 
     // if (expiredEffects.length > 0) {
@@ -1418,6 +1426,7 @@ export class Hyp3eActor extends Actor {
    */
   async deleteExpiredEffects(options = {}) {
     if (!this.isOwner) return []; // safety — only owner can delete
+    Hyp3eLogger.info("Hyp3eActor deleteExpiredEffects", `Checking for expired effects on actor ${this.name}.`, this.effects);
 
     let expired = [];
     if (ActiveEffect?.registry) {
@@ -1429,12 +1438,13 @@ export class Hyp3eActor extends Actor {
     } else {
       // For Foundry v13 and earlier, we have to check manually
       expired = this.effects.filter(effect => 
-        effect.isTemporary && 
-        effect.duration.remaining != null && effect.duration.remaining <= 0
+        effect.isTemporary && effect.disabled &&
+        (isNaN(effect.duration.remaining) || effect.duration.remaining <= 0)
       );
     }
 
     if (expired.length === 0) return [];
+    Hyp3eLogger.info("Hyp3eActor deleteExpiredEffects", `Deleting expired effects on actor ${this.name}.`, expired);
 
     // Post all the expirations together in one chat
     const effectNames = expired.map(effect => effect.name)
@@ -3608,9 +3618,9 @@ export class Hyp3eActor extends Actor {
    * Determine whether this container has any items inside
    */
   _itemContainsStuff(itemId) {
-      Hyp3eLogger.info("Hyp3eActor _itemContainsStuff", `Item id ${itemId} contains items:`, this.items.filter(i => i.system.containerId === itemId));
-      const containsItems = this.items.some(i => i.system.containerId == itemId);
-      return containsItems;
+    Hyp3eLogger.info("Hyp3eActor _itemContainsStuff", `Item id ${itemId} contains items:`, this.items.filter(i => i.system.containerId === itemId));
+    const containsItems = this.items.some(i => i.system.containerId == itemId);
+    return containsItems;
   }
 
   /**
@@ -3618,46 +3628,52 @@ export class Hyp3eActor extends Actor {
    * @param {*} turn - The current game-world turn number.
    */
   async advanceExplorationTurn(turn) {
-      // Foundry v14 introduced big changes to Active Effects, so we need to check the 
-      //  version to determine how to process them
-      const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    // Foundry v14 introduced big changes to Active Effects, so we need to check the 
+    //  version to determine how to process them
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
-      // Process active effects
-      for (const effect of this.allApplicableEffects()) {
-          if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
-          Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
+    // Process active effects
+    for (const effect of this.allApplicableEffects()) {
+      if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
+      Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
 
-          // Process temporary effect changes
-          await this.processTemporaryEffects();
-          // Delete any expired effects
-          await this.deleteExpiredEffects();
+      // Process temporary effect changes
+      await this.processTemporaryEffects();
+      // Delete any expired effects
+      await this.deleteExpiredEffects();
 
-          // Check if the effect has a duration or remaining turns flag
-          const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
-          const remaining = effect.duration?.seconds ?? effect.duration?.value ?? null;
-          // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
-          if (typeof remainingTurns === "number") { // Not null or undefined
-              const newRemaining = remainingTurns - 1;
-              if (newRemaining <= 0) {
-                  // Effect has expired -- for effects applied directly to the actor, we delete them...
-                  //  but for effects applied via items, we just disable them
-                  // if (effect.origin) {
-                  if (effect.parent._id != this.id) {
-                      effect.update({ disabled: true });
-                  } else {
-                      await effect.delete();
-                  }
-                  Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Effect ${effect.name} has expired for actor ${this.name}.`);
-                  const msg = `The effect <b>${effect.name}</b> on ${this.displayName} has expired.`;
-                  ui.notifications.info(msg);
-                  sendSimpleChat(this, "", msg);
-              } else {
-                  effect.setFlag("hyp3e", "remainingTurns", newRemaining);
-              }
+      // Check if the effect has a duration or remaining turns flag
+      const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
+      const remaining = effect.duration?.seconds ?? effect.duration?.value ?? null;
+      // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
+      if (typeof remainingTurns === "number") { // Not null or undefined
+        const newRemaining = remainingTurns - 1;
+        if (newRemaining <= 0) {
+          // Effect has expired -- for effects applied directly to the actor, we delete them...
+          //  but for effects applied via items, we just disable them
+          // if (effect.origin) {
+          if (effect.parent._id != this.id) {
+            effect.update({ disabled: true });
+          } else {
+            await effect.delete();
           }
+          Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Effect ${effect.name} has expired for actor ${this.name}.`);
+          const msg = `The effect <b>${effect.name}</b> on ${this.displayName} has expired.`;
+          ui.notifications.info(msg);
+          sendSimpleChat(this, "", msg);
+        } else {
+          effect.setFlag("hyp3e", "remainingTurns", newRemaining);
+        }
       }
-      // Update temporary items & delete if expired
-      this.processTemporaryItems(60); // 60 rounds = 10 minutes = 1 Hyperborea turn
+    }
+
+    // Process this actor's owned items
+    for (const item of this.items) {
+      await item.advanceExplorationTurn(turn);
+    }
+
+    // Update temporary items & delete if expired
+    await this.processTemporaryItems(60); // 60 rounds = 10 minutes = 1 Hyperborea turn
   }
 
   /**
@@ -3665,20 +3681,20 @@ export class Hyp3eActor extends Actor {
    * @param {*} turn - The current game-world turn number.
    */
   async retreatExplorationTurn(turn) {
-      // Process active effects
-      for (const effect of this.effects) {
-          if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
-          Hyp3eLogger.info("Hyp3eActor retreatExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
-          // Check if the effect has a remaining turns flag
-          const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
-          // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
-          if (typeof remainingTurns === "number") {
-              const newRemaining = remainingTurns + 1;
-              effect.setFlag("hyp3e", "remainingTurns", newRemaining);
-          }
+    // Process active effects
+    for (const effect of this.effects) {
+      if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
+      Hyp3eLogger.info("Hyp3eActor retreatExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
+      // Check if the effect has a remaining turns flag
+      const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
+      // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
+      if (typeof remainingTurns === "number") {
+        const newRemaining = remainingTurns + 1;
+        effect.setFlag("hyp3e", "remainingTurns", newRemaining);
       }
-      // Update temporary items
-      this.processTemporaryItems(-60); // 60 rounds = 10 minutes = 1 Hyperborea turn
+    }
+    // Update temporary items
+    this.processTemporaryItems(-60); // 60 rounds = 10 minutes = 1 Hyperborea turn
   }
 
   /** SPECIALIZED SKILL/TASK RESOLUTION ---------------*/
