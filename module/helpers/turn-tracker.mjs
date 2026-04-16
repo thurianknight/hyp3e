@@ -36,7 +36,7 @@ export async function setupTurnTrackerHooks() {
         await ActiveEffect.registry.addFromParent(actor);
       }
       // Log the updated registry
-      logEffectRegistry();
+      // logEffectRegistry();
     }
 
     // Advance the turn for each actor

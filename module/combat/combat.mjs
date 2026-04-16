@@ -216,16 +216,16 @@ export class HYP3ECombat extends Combat {
     if (specificActor) {
       Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `${specificActor.name} effects:`, specificActor.effects);
       if (event == "turnEnd") {
+        // The timer method also handles expiration and deletion
         await specificActor.advanceTempEffectsTimer();
       }
-      // await specificActor.deleteExpiredEffects();
     } else {
       // Clean all actors if combat is ending
       if (event == "combatEnd") {
         for (const c of combat?.combatants || []) {
           if (c.actor) {
+            // The timer method also handles expiration and deletion
             await c.actor.advanceTempEffectsTimer();
-            // await c.actor.deleteExpiredEffects();
           }
         }
       }

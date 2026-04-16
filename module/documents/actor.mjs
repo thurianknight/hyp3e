@@ -3666,8 +3666,8 @@ export class Hyp3eActor extends Actor {
     //  version to determine how to process them
     const v14orLater = ActiveEffect?.registry ? true : false;
 
-    // Process active effects
-    for (const effect of this.allApplicableEffects()) {
+    // Process only active effects directly applied to the actor
+    for (const effect of this.effects) {
       if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
       Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
 
@@ -3720,17 +3720,35 @@ export class Hyp3eActor extends Actor {
    * @param {*} turn - The current game-world turn number.
    */
   async retreatExplorationTurn(turn) {
-    // Process active effects
+    // Foundry v14 introduced big changes to Active Effects, so we need to check the 
+    //  version to determine how to process them
+    const v14orLater = ActiveEffect?.registry ? true : false;
+
+    // Process only active effects directly applied to the actor
     for (const effect of this.effects) {
       if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
       Hyp3eLogger.info("Hyp3eActor retreatExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
-      // Check if the effect has a remaining turns flag
-      const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
-      // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
-      if (typeof remainingTurns === "number") {
-        const newRemaining = remainingTurns + 1;
-        effect.setFlag("hyp3e", "remainingTurns", newRemaining);
+
+      // Reverse the remainingRounds flag by 60, or its maximum value
+      let remainingRounds = effect.getFlag("hyp3e", "remainingRounds");
+      if (remainingRounds) {
+        let maxDuration = null;
+        if (v14orLater && effect.duration.units === "rounds") {
+          maxDuration = effect.duration.value ?? null;
+        } else if (!v14orLater && (effect.duration?.type === "rounds" || effect.duration?.type === "turns")) {
+          maxDuration = effect.duration.rounds ?? effect.duration.turns ?? null;
+        }
+        const newRounds = Math.min(remainingRounds+60, maxDuration);
+        await effect.setFlag("hyp3e", "remainingRounds", newRounds);
       }
+
+      // Check if the effect has a remaining turns flag
+      // const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
+      // // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
+      // if (typeof remainingTurns === "number") {
+      //   const newRemaining = remainingTurns + 1;
+      //   effect.setFlag("hyp3e", "remainingTurns", newRemaining);
+      // }
     }
     // Update temporary items
     this.processTemporaryItems(-60); // 60 rounds = 10 minutes = 1 Hyperborea turn
