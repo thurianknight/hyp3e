@@ -1358,42 +1358,44 @@ export class Hyp3eActor extends Actor {
    * @param {*} updateValue // Value to subtract from the effect's change
    */
   async updateEffectValue(key, updateValue, minVal = 0, maxVal = 100) {
-      // Find the effect specified by key
-      const effect = this.effects.find(e => e.changes.some(c => c.key === key));
-      if (!effect) {
-          return updateValue; // No effect found, return same value (no change)
-      }
+    // Find the effect specified by key
+    const effect = this.effects.find(e => e.changes.some(c => c.key === key));
+    // const allEffects = this.allApplicableEffects();
+    // const effect = allEffects.find(e => e.changes.some(c => c.key === key));
+    if (!effect) {
+      return updateValue; // No effect found, return same value (no change)
+    }
 
-      // Foundry v13 vs. v14 changes how effect changes are stored
-      const effectChanges = effect?.changes || effect?.system.changes || [];
-      // Store all changes for a single batch update at the end
-      let updatedChanges = [...effectChanges];  // Start with a shallow copy
-      let didUpdate = false;
-      let newValue = 0;
-      let excess = 0;
+    // Foundry v13 vs. v14 changes how effect changes are stored
+    const effectChanges = effect?.changes || effect?.system.changes || [];
+    // Store all changes for a single batch update at the end
+    let updatedChanges = [...effectChanges];  // Start with a shallow copy
+    let didUpdate = false;
+    let newValue = 0;
+    let excess = 0;
 
-      for (let i = 0; i < updatedChanges.length; i++) {
-          const change = updatedChanges[i];
-          if (change.key === key) {
-              // Update the value of the change
-              newValue = change.value - updateValue;
-              if (newValue < minVal) {
-                  excess = Math.abs(newValue);
-              }
-              // Clamp the value between minVal and maxVal
-              newValue = Math.max(minVal, Math.min(newValue, maxVal));
-              updatedChanges[i] = { ...change, value: newValue };
-              didUpdate = true;
-          }
+    for (let i = 0; i < updatedChanges.length; i++) {
+      const change = updatedChanges[i];
+      if (change.key === key) {
+        // Update the value of the change
+        newValue = change.value - updateValue;
+        if (newValue < minVal) {
+          excess = Math.abs(newValue);
+        }
+        // Clamp the value between minVal and maxVal
+        newValue = Math.max(minVal, Math.min(newValue, maxVal));
+        updatedChanges[i] = { ...change, value: newValue };
+        didUpdate = true;
       }
-      // Batch out the updates to the effect
-      if (didUpdate) {
-          await effect.update({
-              changes: updatedChanges
-          });
-      }
-      // Return any excess that could not be removed from the effect
-      return excess;
+    }
+    // Batch out the updates to the effect
+    if (didUpdate) {
+      await effect.update({
+        changes: updatedChanges
+      });
+    }
+    // Return any excess that could not be removed from the effect
+    return excess;
   }
 
   /**
@@ -1688,7 +1690,8 @@ export class Hyp3eActor extends Actor {
           // Subtract from any effect that is adding temporary HP first, then from currentHp
           if (tempHp > 0) {
               // Is the temp HP being applied by an ActiveEffect?
-              const tempHpEffect = this.effects.find(e => e.changes.some(c => c.key === "system.hp.tempHp"));
+              const allEffects = this.allApplicableEffects();
+              const tempHpEffect = allEffects.find(e => e.changes.some(c => c.key === "system.hp.tempHp"));
               if (tempHpEffect) {
                   Hyp3eLogger.info("Hyp3eActor applyHealthChange", `ActiveEffect applying temp HP: ${tempHpEffect.name}.`);
                   // Find the effect that is applying temp HP, and update it
