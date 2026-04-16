@@ -564,13 +564,12 @@ export async function checkAndResolveDuration(effect, actorData) {
     resolvedDuration = Hyp3eDice.resolveFormulaWithMath(formula, actorData);  
   }
 
-  // const result = resolveFormula(formula, actorData);
-
   if (resolvedDuration === null) {
     Hyp3eLogger.error("ActiveEffect checkAndResolveDuration", `Could not resolve duration formula "${formula}", returning original value...`);
     return { updatedDuration, updated };
   }
 
+  // Round the duration down, to a minimum of 1
   const rounds = Math.max(1, Math.floor(resolvedDuration));
 
   updatedDuration = { rounds: rounds };

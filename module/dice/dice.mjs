@@ -601,34 +601,10 @@ export class Hyp3eDice {
     // Regex to match Math.fn(...) including nested parentheses
     const mathPattern = /Math\.(\w+)\s*\(([^()]*|\((?:[^()]*|\([^()]*\))*\))*\)/g;
 
-    /**
-     * Replace Math.* calls iteratively until nothing is left to replace.
-     *  This allows nested Math.* calls (though I expect that will be very rare).
-     */
-    let match;
-    while ((match = mathPattern.exec(expr)) !== null) {
-      const fullMatch = match[0];
-      const fnName = match[1];
-      const inner = match[2];
+    // Normalize Math.* calls to the bare functions that Roll understands
+    expr = expr.replace(/Math\.(ceil|floor|round|max|min|abs|pow|sqrt)\s*\(/gi, '$1(');
 
-      // Split the arguments inside Math.fn(a, b, c)
-      const args = Hyp3eDice.splitArgs(inner).map(arg => {
-        const r = new Roll(arg, rollData).evaluateSync();
-        return r.total;
-      });
-
-      if (typeof Math[fnName] !== "function") {
-        Hyp3eLogger.warn("Hyp3eDice resolveFormulaWithMath", `Unsupported Math function: Math.${fnName}`);
-        expr = expr.replace(fullMatch, "0");
-        continue;
-      }
-
-      const value = Math[fnName](...args);
-      expr = expr.replace(fullMatch, value);
-      mathPattern.lastIndex = 0; // reset search due to modified string
-    }
-
-    // After Math.* processing, let Roll handle @variables and anything else
+    // Foundry's Roll class natively supports @variables & ceil/floor/round/max/min/etc.
     try {
       return new Roll(expr, rollData).evaluateSync().total;
     } catch (err) {
