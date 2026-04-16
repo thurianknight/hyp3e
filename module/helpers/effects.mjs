@@ -319,7 +319,7 @@ export async function setupEffectHandlers() {
      *  pre-configured effect, potentially having variables in it, that is being cloned to 
      *  (created on) a recipient actor.
      * 
-     * Note that this is NOT the same as when an item applies an effect to itw owner. In 
+     * Note that this is NOT the same as when an item applies an effect to its owner. In 
      *  such cases, the effect is not actually created on the actor, and this hook does 
      *  not fire at all.
      */
