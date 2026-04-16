@@ -297,23 +297,40 @@ export async function setupEffectHandlers() {
    * applied directly to the actor, not effects coming from an equipped item.
    */
   Hooks.on("createActiveEffect", async (effect, options, userId) => {
-    // Only process if we're the one who owns this actor
-    const actor = effect.parent;
-    if (!actor?.isOwner) return;
-    // Only let the GM create the effect
-    if (!game.user.isGM) return;
     const initialEffect = {...effect};
     Hyp3eLogger.info("ActiveEffect createActiveEffect", `Create event fired for ${effect.name}:`, initialEffect);
 
-    // Get data stored in the effect's flags
+    // Only process if we're the one who owns this actor
+    const actor = effect.parent;
+    if (!actor?.isOwner) return;
+
+    let v14orLater = false;
+    // v14 registry handling
+    if (ActiveEffect?.registry && effect.isExpiryTrackable) {
+      v14orLater = true;
+      // Make sure the new effect gets picked up immediately
+      ActiveEffect.registry.addFromParent(effect.parent);
+      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Registered new temporary effect "${effect.name}" on ${effect.parent.name}`);
+    }
+
+    /**
+     * The rest of this assumes the effect is being created from an actor or item: e.g. a 
+     *  spell effect, a weapon or item that applies an effect, etc. Basically there is a 
+     *  pre-configured effect, potentially having variables in it, that is being cloned to 
+     *  (created on) a recipient actor.
+     * 
+     * Note that this is NOT the same as when an item applies an effect to itw owner. In 
+     *  such cases, the effect is not actually created on the actor, and this hook does 
+     *  not fire at all.
+     */
+
+    // Get data stored in the effect's flags, if it exists
     const source = effect.getFlag("hyp3e", "source");
     Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect source:`, source);
     const srcActorUuid = source?.srcActorUuid ?? "";
-    // const sourceUuid = effect.getFlag("hyp3e", "sourceActorUuid");
     const sourceActor = srcActorUuid ? await fromUuid(srcActorUuid) : effect.parent;
-    // const actorData = sourceActor?.system ?? {};
+    Hyp3eLogger.info("ActiveEffect createActiveEffect", `Actor (if any) applying the effect:`, sourceActor);
     const actorData = sourceActor.getRollData?.() ?? {};
-    Hyp3eLogger.info("ActiveEffect createActiveEffect", `Actor applying the effect:`, actorData);
 
     // Flag to track whether anything needs to be updated
     let didUpdate = false;
@@ -385,6 +402,20 @@ export async function setupEffectHandlers() {
       await effect.update(updates);
     }
 
+    // Automatically set the remaining rounds for a temporary active effect with a duration 
+    //  in rounds. This is used for outside-combat duration tracking and expiration.
+    if (effect.isTemporary) {
+      let durationRounds = null;
+      if (v14orLater && effect.duration.units === "rounds") {
+        durationRounds = effect.duration.value ?? null;
+      } else if (!v14orLater && (effect.duration?.type === "rounds" || effect.duration?.type === "turns")) {
+        durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
+      }
+      await effect.setFlag("hyp3e", "remainingRounds", durationRounds);
+      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingRounds to ${durationRounds} for ${effect.name}`);
+    }
+
+    /**
     // Automatically set the remaining turns for active effects with a duration in rounds.
     //  This is useful for effects that are generally applied outside of combat and last for 
     //  multiple turns (much longer than a typical combat spell/effect).
@@ -413,6 +444,7 @@ export async function setupEffectHandlers() {
       await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingTurns to ${durationTurns} for ${effect.name}`);
     }
+    */
 
     // Does the effect include light source properties?
     const lightProps = effect.getFlag("hyp3e", "lightProps");
@@ -582,7 +614,7 @@ export async function applyTokenLight(token, lightProps) {
  * Send a standardized chat message whenever an ActiveEffect is applied.
  * @param {ActiveEffect} effect - The effect that was just created.
  */
-async function sendEffectChatMessage(effect) {
+export async function sendEffectChatMessage(effect) {
   const messageParts = [];
   // Who is affected
   let target = effect.parent; // usually an Actor
@@ -639,6 +671,21 @@ async function sendEffectChatMessage(effect) {
     speaker: ChatMessage.getSpeaker({ alias: targetName }),
     content
   });
+}
+
+// Write the current ActiveEffect registry to the console in a readable format
+export async function logEffectRegistry() {
+  if (!ActiveEffect?.registry) {
+    Hyp3eLogger.info("ActiveEffect logEffectRegistry", `ActiveEffect.registry not available (v13 or earlier)!`);
+    return;
+  }
+
+  const effects = Array.from(ActiveEffect.registry);
+  console.group("HYP3E ActiveEffect logEffectRegistry", `ActiveEffect Registry: ${effects.length} effects`);
+  effects.forEach((effect, i) => {
+    Hyp3eLogger.info("ActiveEffect logEffectRegistry", `#${i+1}`, effect);
+  });
+  console.groupEnd();
 }
 
 /**********************************************************

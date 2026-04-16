@@ -1,4 +1,5 @@
 import { Hyp3eLogger } from "./logger.mjs";
+import { logEffectRegistry } from "./effects.mjs";
 
 export async function setupTurnTrackerHooks() {
   console.log("[HYP3E] HYP3ETurnTracker: Initializing Turn Tracker hooks...");
@@ -34,29 +35,13 @@ export async function setupTurnTrackerHooks() {
       for (const actor of actors) {
         await ActiveEffect.registry.addFromParent(actor);
       }
-
       // Log the updated registry
-      Hyp3eLogger.info("explorationTurnAdvanced", "ActiveEffect Registry contents:", 
-        Array.from(ActiveEffect.registry)
-      );
+      logEffectRegistry();
+    }
 
-      // Simulate 60 rounds passing -- these are the primary events that we expect to see
-      for (let i = 0; i < 60; i++) {
-        await ActiveEffect.registry.refresh("roundStart", { actors });
-        await ActiveEffect.registry.refresh("turnStart", { actors });
-        await ActiveEffect.registry.refresh("turnEnd", { actors });
-        await ActiveEffect.registry.refresh("roundEnd", { actors });
-      }
-
-      // Clean up once at the end and send a single chat message per actor
-      for (const actor of actors) {
-        await actor.deleteExpiredEffects();
-      }
-
-    } else {  // Foundry v13 and earlier
-      for (const actor of actors) {
-        actor.advanceExplorationTurn(turn);
-      }
+    // Advance the turn for each actor
+    for (const actor of actors) {
+      actor.advanceExplorationTurn(turn);
     }
 
     // Execute any actions defined in the settings for turn advancement

@@ -362,12 +362,42 @@ export async function migrateItemEffects(item) {
     "system.saves.sorcery.value"
   ];
 
+  // This is returned to the caller if any changes were made
   const updates = [];
 
-  if (item.effects.size === 0) return;
+  if (item.effects.size === 0) return null;
 
   const effectUpdates = [];
   for (const effect of item.effects) {
+    // Migrate v13 duration format to v14
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    if (majorVersion >= 14) {
+      Hyp3eLogger.info("migrateItemEffects", `Migrating effect ${effect.name}:`, effect);
+      const duration = effect.duration || {};
+      const flags = effect.flags;
+      let remainingRounds = null;
+      if (effect.isTemporary) {
+        if (duration.rounds || duration.turns) {
+          duration.units = "rounds";
+          duration.value = duration.rounds || duration.turns || 0;
+          duration.expiry = "turnEnd";
+          remainingRounds = duration.rounds || duration.turns || 0;
+        } else {
+          // Some effects may be partially migrated by the v14 upgrade, so we override them here
+          if (duration.units == "turns") duration.units = "rounds";
+          if (duration.expiry == "turnStart") duration.expiry = "turnEnd";
+          remainingRounds = duration.value || 0;
+        }
+        await effect.setFlag("hyp3e", "remainingRounds", remainingRounds);
+        effectUpdates.push({
+          _id: effect.id,
+          duration: duration,
+          flags: flags
+        });
+      }
+    }
+  
+  
     const effectChanges = effect?.changes || effect?.system.changes || [];
     const newChanges = effectChanges.map(change => {
       if (saveKeys.includes(change.key)) {
@@ -403,6 +433,7 @@ export async function migrateItemEffects(item) {
     });
     await item.updateEmbeddedDocuments("ActiveEffect", effectUpdates);
   }
+  return updates;
 }
 
 /**

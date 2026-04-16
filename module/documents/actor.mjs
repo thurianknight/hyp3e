@@ -2,7 +2,7 @@ import { Hyp3eCharacterClass } from "../helpers/character.mjs";
 import { Hyp3eDice, isPureNumber, isPureString, containsDice, containsMathOrVariables, convertToInt } from "../dice/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
-import { checkAndResolveDuration } from "../helpers/effects.mjs";
+import { logEffectRegistry, checkAndResolveDuration } from "../helpers/effects.mjs";
 import { sendSimpleChat, sendRollToChat, renderCustomChat } from "../chat/chat.mjs"
 
 /**
@@ -1289,6 +1289,7 @@ export class Hyp3eActor extends Actor {
           Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
           expiredEffects.push(effect);
         }
+
         // Foundry v13 vs. v14 changes how effect changes are stored
         const effectChanges = effect?.changes || effect?.system.changes || [];
         const persistentDamage = effectChanges.find(c => c.key === "system.tempPersistentDamage");
@@ -1325,27 +1326,6 @@ export class Hyp3eActor extends Actor {
       const persistentDamageMsg = `Applying persistent damage effects...<ul><li>${damageMessages.join("</li><li>")}</li></ul>`;
       sendSimpleChat(this, "", persistentDamageMsg)
     }
-
-    // Delete if possible, otherwise disable expired effects
-    // const deletable = [];
-    // const disableOnly = [];
-
-    // for (const effect of expiredEffects) {
-    //   if (effect.parent?.documentName === "Actor") {
-    //     Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} will delete ${effect.name}...`);
-    //     deletable.push(effect);
-    //   } else {
-    //     Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} will disable ${effect.name}...`);
-    //     disableOnly.push(effect);
-    //   }
-    // }
-    // Run the deletes first
-    // if (deletable.length > 0) {
-    //   await this.deleteEmbeddedDocuments(
-    //     "ActiveEffect",
-    //     deletable.map(e => e.id)
-    //   );
-    // }
 
     const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
     if (majorVersion <= 13) {
@@ -1417,9 +1397,63 @@ export class Hyp3eActor extends Actor {
   }
 
   /**
+   * Decrement the remainingRounds flag on temporary ActiveEffects. If remainingRounds
+   *  goes to zero or negative, delete the effect.
+   */
+  async advanceTempEffectsTimer() {
+    // Is this Foundry v14?
+    if (ActiveEffect?.registry) {
+      // Update the AE registry, used for combat timing
+      await ActiveEffect.registry.addFromParent(this);
+      await ActiveEffect.registry.refresh("roundEnd", { actors: new Set([this]) });
+    }
+
+    // We consider the custom flag to be authoritative when outside of combat
+    const updates = [];
+    const expired = [];
+    for (const effect of this.allApplicableEffects()) {
+      if (!effect.isTemporary) continue;
+
+      let currentRemaining = 0;
+      let newRemaining = 0;
+      let remainingRounds = effect.getFlag("hyp3e", "remainingRounds");
+      if (remainingRounds) {
+        // Decrement remainingRounds and update or delete
+        remainingRounds--;
+
+        if (remainingRounds <= 0) {
+          Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Effect ${effect.name} has expired and will be deleted from ${this.name}.`);
+          expired.push(effect);
+        } else {
+          Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Setting ${effect.name} remaining rounds on ${this.name} to ${remainingRounds}`);
+          updates.push({
+            _id: effect.id,
+            "flags.hyp3e.remainingRounds": remainingRounds,
+            // We try to keep the core duration in sync, but Foundry core tends to overwrite it
+            "duration.remaining": remainingRounds
+          });
+        }
+      }
+    }
+    if (expired.length) {
+      // Post all the expirations together in one chat
+      const effectNames = expired.map(effect => effect.name)
+      const expiredEffectsMsg = `Effects have expired on ${this.displayName}...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
+      sendSimpleChat(this, "", expiredEffectsMsg)
+  
+      Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Deleting ${expired.length} expired effect(s) on ${this.name}`);
+      await this.deleteEmbeddedDocuments("ActiveEffect", expired.map(e => e.id));
+    }
+    if (updates.length) {
+      await this.updateEmbeddedDocuments("ActiveEffect", updates, { diff: false, render: false });
+    }
+
+    // Run this too, in case registry-managed effects are expiring
+    await this.deleteExpiredEffects();
+  }
+
+  /**
    * Delete all temporary ActiveEffects that are currently marked as expired.
-   * This is intended to be called after `ActiveEffect.registry.refresh(...)`
-   * when CONFIG.ActiveEffect.expiryAction is set to "update".
    *
    * @param {object} [options={}]             Additional options passed to deleteEmbeddedDocuments
    * @returns {Promise<ActiveEffect[]>}       The deleted effects (if any)
@@ -3630,18 +3664,22 @@ export class Hyp3eActor extends Actor {
   async advanceExplorationTurn(turn) {
     // Foundry v14 introduced big changes to Active Effects, so we need to check the 
     //  version to determine how to process them
-    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    const v14orLater = ActiveEffect?.registry ? true : false;
 
     // Process active effects
     for (const effect of this.allApplicableEffects()) {
       if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
       Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
 
-      // Process temporary effect changes
-      await this.processTemporaryEffects();
-      // Delete any expired effects
-      await this.deleteExpiredEffects();
+      // Run the passage of 60 rounds for 1 turn
+      for (let i = 0; i < 60; i++) {
+        // Process temporary effect changes
+        await this.processTemporaryEffects();
+        // Advance the temp effects round-timer and delete if expired
+        await this.advanceTempEffectsTimer();  
+      }
 
+      /**
       // Check if the effect has a duration or remaining turns flag
       const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
       const remaining = effect.duration?.seconds ?? effect.duration?.value ?? null;
@@ -3665,6 +3703,7 @@ export class Hyp3eActor extends Actor {
           effect.setFlag("hyp3e", "remainingTurns", newRemaining);
         }
       }
+      */
     }
 
     // Process this actor's owned items

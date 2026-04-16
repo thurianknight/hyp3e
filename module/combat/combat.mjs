@@ -51,7 +51,7 @@ export class HYP3ECombat extends Combat {
   }
 
   async _onStartRound(context) {
-    // Reset the deferDefeat flag
+    // Reset the deferDefeat flag - is this needed?
     if (game.settings.get(game.system.id, "resolveDeathAtRoundEnd")) {
       await this.setFlag("hyp3e", "deferDefeat", true);
     }
@@ -59,9 +59,6 @@ export class HYP3ECombat extends Combat {
     for (const combatant of this.combatants) {
       // Placeholder, nothing here for now
     }
-    // This will cycle through all combatants for active effects
-    // await this._refreshAndCleanupEffects("roundStart", this);
-
     await super._onStartRound(context);
   }
 
@@ -76,8 +73,6 @@ export class HYP3ECombat extends Combat {
         await combatant.updateStatus();
       }
     }
-    // This will cycle through all combatants for active effects
-    // await this._refreshAndCleanupEffects("roundEnd", this);
 
     // Reset/keep initiative
     switch(this.#initiativePersistence) {
@@ -103,17 +98,7 @@ export class HYP3ECombat extends Combat {
   async _onStartTurn(combatant, context) {
     await super._onStartTurn(combatant, context);
     // Log the combatant whose turn is starting
-    Hyp3eLogger.info("HYP3ECombat _onStartTurn", `Start-turn data for ${combatant.name}:`, combatant)
-
-    if (!combatant?.actor) {
-      Hyp3eLogger.warn("HYP3ECombat _onStartTurn", `Combatant has no actor, cannot process temporary effects!`);
-      return;
-    }
-
-    if (combatant.actor) {
-      // Process temporary effects on this actor
-      // await this._refreshAndCleanupEffects("turnStart", this, combatant.actor);
-    }
+    // Hyp3eLogger.info("HYP3ECombat _onStartTurn", `Start-turn data for ${combatant.name}:`, combatant)
   }
 
   async _onEndTurn(combatant, context) {
@@ -137,12 +122,12 @@ export class HYP3ECombat extends Combat {
     // Process temporary effects and items, update combatant status
     const actor = combatant.actor;
 
-    // Update duration and expiration on effects, delete if expired
-    await this._refreshAndCleanupEffects("turnEnd", this, actor);
-
-    // Process persistent damage for non-expired effects
+    // Process persistent damage and other temporary effects
     Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary effects...`);
     await actor.processTemporaryEffects();
+
+    // Update duration and expiration on effects, delete if expired
+    await this._refreshAndCleanupEffects("turnEnd", this, actor);
 
     // Update duration and expiration on temporary items
     Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary items...`);
@@ -230,12 +215,18 @@ export class HYP3ECombat extends Combat {
     // Cleanup – only on the relevant actor(s)
     if (specificActor) {
       Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `${specificActor.name} effects:`, specificActor.effects);
-      await specificActor.deleteExpiredEffects();
+      if (event == "turnEnd") {
+        await specificActor.advanceTempEffectsTimer();
+      }
+      // await specificActor.deleteExpiredEffects();
     } else {
       // Clean all actors if combat is ending
       if (event == "combatEnd") {
         for (const c of combat?.combatants || []) {
-          if (c.actor) await c.actor.deleteExpiredEffects();
+          if (c.actor) {
+            await c.actor.advanceTempEffectsTimer();
+            // await c.actor.deleteExpiredEffects();
+          }
         }
       }
     }

@@ -686,6 +686,31 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
   }
 });
 
+Hooks.on("deleteCombat", async (combat) => {
+  if (!ActiveEffect?.registry) return;   // v13 safety
+
+  Hyp3eLogger.info("deleteCombat", `Combat ended — refreshing effect durations for non-combat tracking`);
+
+  // Re-prepare and re-register all relevant actors
+  const actorsToRefresh = new Set();
+
+  // All actors in the current scene
+  for (const token of canvas.tokens?.placeables ?? []) {
+    if (token.actor && token.actor.isOwner) {
+      actorsToRefresh.add(token.actor);
+    }
+  }
+
+  for (const actor of actorsToRefresh) {
+    // Force full data re-preparation
+    // await actor.prepareData();
+    // await actor.prepareEmbeddedDocuments();
+
+    // Re-register all effects
+    await ActiveEffect.registry.addFromParent(actor);
+  }
+});
+
 /**
  * Capture chat commands for the Turn Tracker and Calendar apps
  */
