@@ -435,7 +435,7 @@ export function registerHyp3eConfigurations() {
         default: false,
         scope: "world",
         type: Boolean,
-        config: showConfigOptions,
+        config: false,
         requiresReload: false,
         onChange: value => {
             CONFIG.HYP3E.enableAdvancedCombatOptions = value;
