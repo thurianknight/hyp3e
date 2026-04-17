@@ -50,7 +50,7 @@
                 {{#if container.system.identified}}
                 <!-- Cast spell button (only shown if item has spells) -->
                 {{#if container.system.spellcasting.spellRefs.length}}
-                <div class="item-prop" style="margin-right: 5px;">
+                <div class="item-prop" style="margin-right: 4px;">
                   <a class="item-cast-spell" 
                       data-action="itemCastSpell" 
                       {{!-- data-roll-mode="publicroll"  --}}
@@ -61,7 +61,7 @@
                 {{/if}}
                 {{!-- Toggle light button (only if item name is in the lightSources table) --}}
                 {{#if container.system.isLightSource}}
-                <div class="item-prop" style="margin-right: 5px;">
+                <div class="item-prop" style="margin-right: 4px;">
                   <a class="item-toggle-light" 
                       data-action="itemToggleLight" 
                       title='{{localize "HYP3E.item.toggleLight"}}'>
@@ -70,7 +70,10 @@
                 </div>
                 {{/if}}
                 {{/if}}
-                <a data-action="dropItemDescription"><span class="item-drop">{{container.name}}</span></a>
+                <span class="item-drop"><a data-action="dropItemDescription">{{container.name}}</a></span>
+                <a class="item-arrow collapse-toggle" aria-expanded="true">
+                  ▼
+                </a>
               </div>
               <div class="item-prop">
                 {{container.system.quantity.value}}
@@ -103,91 +106,93 @@
             </div>
           </li>
           {{!-- Items in a container --}}
-          <ol class="items-list" data-drop="item">
-            {{#each container.contents as |item id|}}
-            <li class="item-entry item draggable" data-item-id="{{item.id}}">
-              <div class="flexrow">
-                <div class="item-name contained-items">
-                  <div class="item-image">
-                    {{#if (or item.system.formula item.effects.size)}}
-                    <a class="rollable" 
-                        data-action="rollThis" 
-                        data-item-id="{{item.id}}" 
-                        data-roll-type="item" 
-                        data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
+          <div class="container-contents">
+            <ol class="items-list" data-drop="item">
+              {{#each container.contents as |item id|}}
+              <li class="item-entry item draggable" data-item-id="{{item.id}}">
+                <div class="flexrow">
+                  <div class="item-name contained-items">
+                    <div class="item-image">
+                      {{#if (or item.system.formula item.effects.size)}}
+                      <a class="rollable" 
+                          data-action="rollThis" 
+                          data-item-id="{{item.id}}" 
+                          data-roll-type="item" 
+                          data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
+                        <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                      </a>
+                      {{else}}
                       <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                      {{/if}}
+                    </div>
+                    {{#if item.system.identified}}
+                    <!-- Cast spell button (only shown if item has spells) -->
+                    {{#if item.system.spellcasting.spellRefs.length}}
+                    <div class="item-prop" style="margin-right: 4px;">
+                      <a class="item-cast-spell" 
+                          data-action="itemCastSpell" 
+                          {{!-- data-roll-mode="publicroll"  --}}
+                          title="{{localize 'HYP3E.item.castSpell'}}">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                      </a>
+                    </div>
+                    {{/if}}
+                    {{!-- Toggle light button (only if item name is in the lightSources table) --}}
+                    {{#if item.system.isLightSource}}
+                    <div class="item-prop" style="margin-right: 4px;">
+                      <a class="item-toggle-light" 
+                          data-action="itemToggleLight" 
+                          title='{{localize "HYP3E.item.toggleLight"}}'>
+                        <i class="fa-solid fa-lightbulb"></i>
+                      </a>
+                    </div>
+                    {{/if}}
+                    {{/if}}
+                    <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+                  </div>
+                  <div class="item-prop">
+                    {{#if item.system.isConsumable}}
+                    <a data-action="itemQtySub" title='{{localize "HYP3E.item.decr"}}'>
+                      <i class="fa fa-minus-circle" aria-hidden="true" style="margin-right: 3px;"></i>
                     </a>
-                    {{else}}
-                    <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                    <a data-action="itemQtyAdd" title='{{localize "HYP3E.item.incr"}}'>
+                      <i class="fa fa-plus-circle" aria-hidden="true" style="margin-right: 3px;"></i>
+                    </a>
+                    {{/if}}
+                    {{item.system.quantity.value}}
+                    {{#if item.system.isConsumable}}
+                    / {{item.system.quantity.max}}
                     {{/if}}
                   </div>
-                  {{#if item.system.identified}}
-                  <!-- Cast spell button (only shown if item has spells) -->
-                  {{#if item.system.spellcasting.spellRefs.length}}
-                  <div class="item-prop" style="margin-right: 5px;">
-                    <a class="item-cast-spell" 
-                        data-action="itemCastSpell" 
-                        {{!-- data-roll-mode="publicroll"  --}}
-                        title="{{localize 'HYP3E.item.castSpell'}}">
-                      <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  <div class="item-prop">{{item.system.carriedWt}}</div>
+                  <div class="item-prop">{{item.system.value}}</div>
+                  <div class="item-prop">{{item.system.location}}</div>
+                  <div class="item-controls">
+                    <a {{#unless item.system.equipped}}class="item-unequipped"{{/unless}}
+                        data-action="toggleItemEquip" 
+                        title='{{localize "HYP3E.item.carry"}}'>
+                      <i class="fas fa-sack"></i>
+                    </a>
+                    <a data-action="displayItem" title='{{localize "HYP3E.item.show"}}'>
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <a data-action="editItem" title="{{localize 'HYP3E.item.edit'}}">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a data-action="deleteItem" title="{{localize 'HYP3E.item.delete'}}">
+                      <i class="fas fa-trash"></i>
                     </a>
                   </div>
-                  {{/if}}
-                  {{!-- Toggle light button (only if item name is in the lightSources table) --}}
-                  {{#if item.system.isLightSource}}
-                  <div class="item-prop" style="margin-right: 5px;">
-                    <a class="item-toggle-light" 
-                        data-action="itemToggleLight" 
-                        title='{{localize "HYP3E.item.toggleLight"}}'>
-                      <i class="fa-solid fa-lightbulb"></i>
-                    </a>
+                </div>
+                <div class="item-summary">
+                  <div class="item-description">
+                    <div class="contained-items">{{{item.system.enrichedDescription}}}</div>
                   </div>
-                  {{/if}}
-                  {{/if}}
-                  <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
                 </div>
-                <div class="item-prop">
-                  {{#if item.system.isConsumable}}
-                  <a data-action="itemQtySub" title='{{localize "HYP3E.item.decr"}}'>
-                    <i class="fa fa-minus-circle" aria-hidden="true" style="margin-right: 5px;"></i>
-                  </a>
-                  <a data-action="itemQtyAdd" title='{{localize "HYP3E.item.incr"}}'>
-                    <i class="fa fa-plus-circle" aria-hidden="true" style="margin-right: 5px;"></i>
-                  </a>
-                  {{/if}}
-                  {{item.system.quantity.value}}
-                  {{#if item.system.isConsumable}}
-                  / {{item.system.quantity.max}}
-                  {{/if}}
-                </div>
-                <div class="item-prop">{{item.system.carriedWt}}</div>
-                <div class="item-prop">{{item.system.value}}</div>
-                <div class="item-prop">{{item.system.location}}</div>
-                <div class="item-controls">
-                  <a {{#unless item.system.equipped}}class="item-unequipped"{{/unless}}
-                      data-action="toggleItemEquip" 
-                      title='{{localize "HYP3E.item.carry"}}'>
-                    <i class="fas fa-sack"></i>
-                  </a>
-                  <a data-action="displayItem" title='{{localize "HYP3E.item.show"}}'>
-                    <i class="fas fa-eye"></i>
-                  </a>
-                  <a data-action="editItem" title="{{localize 'HYP3E.item.edit'}}">
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  <a data-action="deleteItem" title="{{localize 'HYP3E.item.delete'}}">
-                    <i class="fas fa-trash"></i>
-                  </a>
-                </div>
-              </div>
-              <div class="item-summary">
-                <div class="item-description">
-                  <div class="contained-items">{{{item.system.enrichedDescription}}}</div>
-                </div>
-              </div>
-            </li>
-            {{/each}}
-          </ol>
+              </li>
+              {{/each}}
+            </ol>
+          </div>
         {{/each}}
         {{!-- Non-contained and non-container items --}}
         {{#each gear as |item id|}}
@@ -210,7 +215,7 @@
                 {{#if item.system.identified}}
                 <!-- Cast spell button (only shown if item has spells) -->
                 {{#if item.system.spellcasting.spellRefs.length}}
-                <div class="item-prop" style="margin-right: 5px;">
+                <div class="item-prop" style="margin-right: 4px;">
                   <a class="item-cast-spell" 
                       data-action="itemCastSpell" 
                       {{!-- data-roll-mode="publicroll"  --}}
@@ -221,7 +226,7 @@
                 {{/if}}
                 {{!-- Toggle light button if item is a light source --}}
                 {{#if item.system.isLightSource}}
-                <div class="item-prop" style="margin-right: 5px;">
+                <div class="item-prop" style="margin-right: 4px;">
                   <a class="item-toggle-light" 
                       data-action="itemToggleLight" 
                       title='{{localize "HYP3E.item.toggleLight"}}'>
@@ -235,10 +240,10 @@
               <div class="item-prop">
                 {{#if item.system.isConsumable}}
                 <a data-action="itemQtySub" title='{{localize "HYP3E.item.decr"}}'>
-                  <i class="fa fa-minus-circle" aria-hidden="true" style="margin-right: 5px;"></i>
+                  <i class="fa fa-minus-circle" aria-hidden="true" style="margin-right: 3px;"></i>
                 </a>
                 <a data-action="itemQtyAdd" title='{{localize "HYP3E.item.incr"}}'>
-                  <i class="fa fa-plus-circle" aria-hidden="true" style="margin-right: 5px;"></i>
+                  <i class="fa fa-plus-circle" aria-hidden="true" style="margin-right: 3px;"></i>
                 </a>
                 {{/if}}
                 {{item.system.quantity.value}}

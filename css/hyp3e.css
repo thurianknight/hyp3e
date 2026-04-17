@@ -984,9 +984,9 @@
   display: flex;
   flex: 2;
   margin: 0;
+  white-space: nowrap;
   overflow: hidden;
   font-size: 1.1em;
-  text-align: left;
   align-items: center;
 }
 .hyp3e .items-list .item-entry .item-name .item-image {
@@ -1002,11 +1002,46 @@
     content: var(--hyp3e-d20-icon);
   }
 }
+/* Item name expand to fill */
+.hyp3e .items-list .item-entry .item-name .item-drop {
+  flex-grow: 1;                    /* this pushes the arrow to the right */
+  text-align: left;
+  white-space: nowrap;             /* prevent text wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Container show/hide contents arrow */
+.hyp3e .items-list .item-entry .item-name .item-arrow {
+  flex-shrink: 0;
+  font-size: 0.75em;
+  cursor: pointer;
+}
+.hyp3e .items-list .item-entry .item-name .collapse-toggle {
+  transition: transform 0.2s ease;
+}
+/* Rotate the arrow when expanded */
+.hyp3e .items-list .item-entry .item-name .collapse-toggle[aria-expanded="true"] {
+  transform: rotate(180deg);        /* ▼ becomes ▲ */
+}
 
 /* Item drop-down summary */
 .hyp3e .items-list .item-entry .item-summary {
   display: none;
   text-align: left;
+}
+
+/* Collapsible container contents */
+.hyp3e .items-list .container-contents {
+  overflow: hidden;
+  transition: max-height 0.25s ease-out;
+}
+/* When collapsed, hide it */
+.hyp3e .items-list .container-contents.collapsed {
+  max-height: 0 !important;
+}
+/* Optional: nicer closed state */
+.hyp3e .items-list .container-contents:not(.collapsed) {
+  max-height: 500px;               /* arbitrary, big enough for any content */
 }
 
 /* Item properties columns */
@@ -1041,8 +1076,8 @@
 
 /* Indent contained items under their container */
 .hyp3e .items-list .item-entry .contained-items {
-  padding-left: 10px;
-  margin-right: -10px;
+  padding-left: 15px;
+  margin-right: -15px;
 }
 
 /* Item controls, which are clickable button icons */

@@ -770,6 +770,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         if (!this.isEditable) return;
 
         const $html = this.element;
+
+        // Add show/hide toggle to container items
+        this.setupCollapsibleContainers($html)
+
         // Make coin labels draggable for transfer
         $($html).find('label.exploration-label.coins').each((i, label) => {
           label.setAttribute('draggable', true);
@@ -816,6 +820,42 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     _canDragCoin(selector) {
       // Only owner/editor can drag coins
       return this.actor.isOwner;
+    }
+
+    setupCollapsibleContainers(html) {
+      $(html).find('.collapse-toggle').each((i, toggle) => {
+        const $toggle = $(toggle);
+        const $header = $toggle.closest('.item-container');
+        const $contents = $header.next('.container-contents');
+        // const containerId = $header.closest('.item-container').data('item-id');
+        const containerId = $header.data('item-id');
+
+        // Restore saved state if you want persistence
+        const isExpanded = game.user.getFlag("hyp3e", `containerExpanded.${containerId}`) ?? true;
+
+        $contents.toggleClass('collapsed', !isExpanded);
+        $toggle.attr('aria-expanded', isExpanded);
+
+        // $header.on('click', (event) => {
+        $toggle.on('click', (event) => {
+          // Prevent click if user clicked something else inside header
+          // if (event.target.closest('button, .item-icon')) return;
+
+          const expanded = $toggle.attr('aria-expanded') === 'true';
+          const newState = !expanded;
+
+          $toggle.attr('aria-expanded', newState);
+          $contents.toggleClass('collapsed', !newState);
+
+          // Optional: save state per user
+          if (containerId) {
+            game.user.setFlag("hyp3e", `containerExpanded.${containerId}`, newState);
+          }
+
+          // Optional: trigger a sheet re-render or custom hook if needed
+          // Hooks.call('hyp3eContainerToggled', containerId, newState);
+        });
+      });
     }
 
     // ===========================================================================
@@ -1243,23 +1283,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         if (item.system.isContainer || item.type === "container") {
             this._carryOrDropContainer(item)
         }
-
-        // Send a chat message that the item was equipped/unequipped or carried/dropped
-        // const itemName = item.system.friendlyName ? item.system.friendlyName : item.name
-        // let equipText = ""
-        // let containerText = ""
-        // if (item.type === "armor" || item.type === "shield" || item.type === "weapon") {
-        //     equipText = item.system.equipped ? "equipped" : "unequipped"
-        // } else if (item.type === "item" || item.type === "container") {
-        //     equipText = item.system.equipped ? "is carrying" : "dropped"
-        //     // If this is a container, carry or drop the contents too
-        //     if (item.system.isContainer || item.type === "container") {
-        //         this._carryOrDropContainer(item)
-        //         containerText = " and its contents"
-        //     }
-        // }
-        // const message = `${this.actor.displayName} ${equipText} <strong>${itemName}</strong>${containerText}.`
-        // sendSimpleChat(this.actor, "", message);
     }
 
     /**
