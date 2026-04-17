@@ -199,11 +199,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     const {
         sheetClasses, defaultClasses, defaultClass
     } = foundry.applications.apps.DocumentSheetConfig.getSheetClassesForSubType(documentName, type);
-    // const sheetClass = document.flags.core?.sheetClass ?? "";
-    // const config = CONFIG[documentName].sheetClasses[type] ?? {};
-    // const themes = game.settings.get("core", "sheetThemes");
-    // const currentClass = sheetClass || defaultClass;
-    // Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Document data:`, { document, sheetClass, config, themes, currentClass });
 
     // Retrieve base data structure
     const context = await super._prepareContext(options);
@@ -292,26 +287,11 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       return context;
     }
 
-    // Remove parts that aren't for the NPC actor type
-    // if (this.actor.type === "npc" && ["combat","spells","items"].includes(partId)) {
-    //     return null; // returning null skips rendering this part
-    // }
-
-    // Remove parts that aren't for the Merchant actor type
-    // if (this.actor.type === "merchant" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
-    //     return null; // returning null skips rendering this part
-    // }
-
     // Reset the default tab for Merchants
     if (this.actor.type === "merchant" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
       context.tabs["equipment"].active = true;
       context.tabs["equipment"].cssClass = "active";
     }
-
-    // Remove parts that aren't for the Treasure actor type
-    // if (this.actor.type === "treasure" && ["abilities","combat","spells","items","description","effects"].includes(partId)) {
-    //     return null; // returning null skips rendering this part
-    // }
 
     // Reset the default tab for Treasure
     if (this.actor.type === "treasure" && !Object.keys(context.tabs).find(key => context.tabs[key].active)) {
@@ -382,18 +362,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           )
         }
         break;
-      // case "itemTokenDescription":
-      //   if (this.document.type === "itemToken") {
-      //     // Enrich content for display
-      //     context.enrichedBiography = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-      //       this.document.system.biography,
-      //       {
-      //         secrets: this.document.isOwner,
-      //         relativeTo: this.document
-      //       }
-      //     )
-      //   }
-      //   break;
       default:
     }
     return context;
@@ -415,8 +383,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       tabs.tabs.splice(1, 0, { id: 'combat', group: group });
       if (this.actor.system.spellcaster) {
         tabs.tabs.splice(2, 0, { id: 'spells', group: group });
+        tabs.tabs.splice(3, 0, { id: 'items', group: group });
+      } else {
+        tabs.tabs.splice(2, 0, { id: 'items', group: group });
       }
-      tabs.tabs.splice(3, 0, { id: 'items', group: group });
     }
 
     // Merchant tabs
