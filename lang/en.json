@@ -104,6 +104,8 @@
             "forceSpellMemorizeHint": "For PCs, prevent a spell being cast if it is not memorized. NPCs/monsters are not affected by this setting. Disabled by default.",
             "enableCombatSitModDetection": "Enable combat situation mod detection",
             "enableCombatSitModDetectionHint": "The system will try to automatically detect and calculate situational attack modifiers based on a number of token effects, token elevation, etc. Disabled by default.",
+            "enableAdvancedCombatOptions": "Enable advanced combat options declaration",
+            "enableAdvancedCombatOptionsHint": "Adds optional advanced combat options to the Quick-Equip menu. This allows players to declare options that apply situational modifiers to attacks, damage, and/or defense. Disabled by default.",
             "enableEncumbrance": "Enable custom encumbrance formulae",
             "enableEncumbranceHint": "Enables the following GM-defined Strength multipliers as encumbrance formulae, to enforce MV and AC penalties. Disabled by default.",
             "enableCoinWeight": "Enable coin weight",

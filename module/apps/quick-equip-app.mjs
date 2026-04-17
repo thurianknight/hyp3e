@@ -84,9 +84,21 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
 
   async _prepareContext(options) {
     const dex = this.actor.system.attributes.dex.value ?? 0;
+    const enableAdvancedCombatOptions = game.settings.get(game.system.id, "enableAdvancedCombatOptions");
 
     const weapons = this.actor.items.filter(i => i.type === "weapon");
     const shields = this.actor.items.filter(i => i.type === "shield" && i.system.type !== "passive" || (i.type === "armor" && i.system.type === "shield"));
+    const advancedOptionsAll = Object.keys(CONFIG.HYP3E.advancedCombatOptions);
+    const mid = Math.ceil(advancedOptionsAll.length / 2);
+    const advancedOptions1 = {};
+    const advancedOptions2 = {};
+    advancedOptionsAll.forEach((key, index) => {
+      if (index < mid) {
+        advancedOptions1[key] = CONFIG.HYP3E.advancedCombatOptions[key];
+      } else {
+        advancedOptions2[key] = CONFIG.HYP3E.advancedCombatOptions[key];
+      }
+    });
 
     // Main hand: All weapons regardless of type
     const mainHand = weapons.map(w => ({
@@ -115,7 +127,7 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
       }))
     ];
 
-    return { mainHand, offHand };
+    return { mainHand, offHand, enableAdvancedCombatOptions, advancedOptions1, advancedOptions2 };
   }
 
   async render(...args) {

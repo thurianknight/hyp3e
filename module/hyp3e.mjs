@@ -382,6 +382,11 @@ Hooks.once("ready", async function() {
   CONFIG.HYP3E.enableCombatSitModDetection = enableCombatSitModDetection;
   Hyp3eLogger.info("Init", "CONFIG Enable combat situational modifier detection:", CONFIG.HYP3E.enableCombatSitModDetection);
 
+  // Enable advanced combat options declaration
+  const enableAdvancedCombatOptions = game.settings.get(game.system.id, "enableAdvancedCombatOptions");
+  CONFIG.HYP3E.enableAdvancedCombatOptions = enableAdvancedCombatOptions;
+  Hyp3eLogger.info("Init", "CONFIG Enable advanced combat options declaration:", CONFIG.HYP3E.enableAdvancedCombatOptions);
+
   // Enable critical hit rolls
   const critHit = game.settings.get(game.system.id, "critHit");
   CONFIG.HYP3E.critHit = critHit;

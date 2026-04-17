@@ -62,6 +62,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             forceWeaponEquip: game.settings.get(game.system.id, "forceWeaponEquip"),
             forceSpellMemorize: game.settings.get(game.system.id, "forceSpellMemorize"),
             enableCombatSitModDetection: game.settings.get(game.system.id, "enableCombatSitModDetection"),
+            enableAdvancedCombatOptions: game.settings.get(game.system.id, "enableAdvancedCombatOptions"),
             enableAttrChecks: game.settings.get(game.system.id, "enableAttrChecks"),
             critHit: game.settings.get(game.system.id, "critHit"),
             critMiss: game.settings.get(game.system.id, "critMiss"),

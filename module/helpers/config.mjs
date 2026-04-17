@@ -248,4 +248,44 @@ HYP3E.shieldTypes = {
   "passive": "HYP3E.shield.type.passive"
 };
 
+/**
+ * [Optional] Advanced combat options
+ * @type {Object}
+ */
+HYP3E.advancedCombatOptions = {
+  "flank": "Flank Attack",
+  "rear": "Rear Attack",
+  "charge": "Charge Attack",
+  // "withdraw": "Fighting Withdrawal",
+  "runAway": "Run Away",
+  "mounted": "Mounted Combat",
+  "mountedCharge": "Mounted Charge",
+  // "arrowSetting": "Arrow Setting",
+  "conservative": "Conservative Fighting",
+  "disarm": "Disarm Attempt",
+  "dodge": "Dodging",
+  "doubleArrow": "Double Arrow Shot",
+  "doubleFeint": "Double Feint",
+  // "firingMarch": "Firing March",
+  "indirect": "Indirect Fire",
+  "parry": "Off-hand Weapon Parry",
+  "parryAndBlock": "Parry and Block",
+  // "pommel": "Pommel Strike",
+  // "ready": "Ready Shooter",
+  "reckless": "Reckless Fighting",
+  "recumbent": "Recumbent Fire",
+  "runningDodge": "Running Dodge",
+  // "saddleCasting": "Saddle Casting",
+  // "saddleFire": "Saddle Fire",
+  // "shieldBash": "Shield Bash",
+  "shieldBind": "Shield Bind",
+  // "shieldCover": "Shield Cover for Ally",
+  // "shieldSplitter": "Shield Splitter",
+  "shieldWall": "Shield Wall",
+  // "spearCharge": "Spear Charge",
+  "spearSet": "Spear Setting",
+  // "throwAndAttack": "Throw and Attack",
+  // "twoWeaponFighting": "Two-Weapon Fighting"
+};
+
 export default HYP3E;

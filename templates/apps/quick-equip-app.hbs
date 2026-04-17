@@ -1,24 +1,54 @@
-<div class="quick-equip-app row-top">
-  <div class="quick-equip-controls row-top">
-    <button type="button" class="quick-equip-control" data-tooltip="Close" data-action="close"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-  <div class="quick-equip-column main-hand">
-    <h3>Main Hand</h3>
-    <h4>(or dual-wielding)</h4>
-    {{#each mainHand}}
-    <div class="quick-equip-item {{#if equipped}}equipped{{/if}}" data-item-id="{{id}}" data-action="equipItem">
-      <img src="{{img}}"/>
-      <span>{{name}}</span>
+<div class="quick-equip-app">
+  <div class="quick-equip-app row-top">
+    <div class="quick-equip-controls row-top">
+      <button type="button" class="quick-equip-control" data-tooltip="Close" data-action="close"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    {{/each}}
-  </div>
-  <div class="quick-equip-column off-hand">
-    <h3>Off-Hand</h3>
-    {{#each offHand}}
-    <div class="quick-equip-item {{#if equipped}}equipped{{/if}}" data-item-id="{{id}}" data-action="equipItem">
-      <img src="{{img}}" />
-      <span>{{name}}</span>
+    <div class="quick-equip-column main-hand">
+      <h3>Main Hand</h3>
+      <h4>(or dual-wielding)</h4>
+      {{#each mainHand}}
+      <div class="quick-equip-item {{#if equipped}}equipped{{/if}}" data-item-id="{{id}}" data-action="equipItem">
+        <img src="{{img}}"/>
+        <span>{{name}}</span>
+      </div>
+      {{/each}}
     </div>
-    {{/each}}
+    <div class="quick-equip-column off-hand">
+      <div>
+        <h3>Off-Hand</h3>
+        {{#each offHand}}
+        <div class="quick-equip-item {{#if equipped}}equipped{{/if}}" data-item-id="{{id}}" data-action="equipItem">
+          <img src="{{img}}" />
+          <span>{{name}}</span>
+        </div>
+        {{/each}}
+      </div>
+    </div>
   </div>
+  {{#if enableAdvancedCombatOptions}}
+  <div class="quick-equip-column">
+    <hr class="plain-hr" />
+    <h4>Advanced Combat</h4>
+    <div class="flexrow">
+      <div>
+        <ul>
+          {{#each advancedOptions1 as |opt id|}}
+          <li>
+            <a class="combat-option" data-action="toggleCombatOption" data-control="{{id}}">{{opt}}</a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+      <div>
+        <ul>
+          {{#each advancedOptions2 as |opt id|}}
+          <li>
+            <a class="combat-option" data-action="toggleCombatOption" data-control="{{id}}">{{opt}}</a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {{/if}}
 </div>

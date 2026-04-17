@@ -428,6 +428,20 @@ export function registerHyp3eConfigurations() {
         }
     });
 
+    // Enable advanced combat options declaration
+    game.settings.register(game.system.id, "enableAdvancedCombatOptions", {
+        name: game.i18n.localize("HYP3E.settings.enableAdvancedCombatOptions"),
+        hint: game.i18n.localize("HYP3E.settings.enableAdvancedCombatOptionsHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: showConfigOptions,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.enableAdvancedCombatOptions = value;
+        }
+    });
+
     // Enable basic attribute checks
     game.settings.register(game.system.id, "enableAttrChecks", {
         name: game.i18n.localize("HYP3E.settings.enableAttrChecks"),
