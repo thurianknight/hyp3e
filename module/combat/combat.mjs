@@ -124,7 +124,7 @@ export class HYP3ECombat extends Combat {
 
     // Process persistent damage and other temporary effects
     Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary effects...`);
-    await actor.processTemporaryEffects();
+    await actor.processTemporaryEffects(1);
 
     // Update duration and expiration on effects, delete if expired
     await this._refreshAndCleanupEffects("turnEnd", this, actor);
@@ -217,7 +217,7 @@ export class HYP3ECombat extends Combat {
       Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `${specificActor.name} effects:`, specificActor.effects);
       if (event == "turnEnd") {
         // The timer method also handles expiration and deletion
-        await specificActor.advanceTempEffectsTimer();
+        await specificActor.advanceTempEffectsTimer(1);
       }
     } else {
       // Clean all actors if combat is ending
@@ -225,7 +225,7 @@ export class HYP3ECombat extends Combat {
         for (const c of combat?.combatants || []) {
           if (c.actor) {
             // The timer method also handles expiration and deletion
-            await c.actor.advanceTempEffectsTimer();
+            await c.actor.advanceTempEffectsTimer(1);
           }
         }
       }

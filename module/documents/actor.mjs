@@ -1268,23 +1268,29 @@ export class Hyp3eActor extends Actor {
   }
 
   /**
-   * Process temporary effects on the actor, including persistent damage.
+   * Process temporary effects on the actor, primarily persistent damage.
    *  Disable any expired effects. This only works on effects that are directly 
    *  applied to the actor, not effects coming from an item or ability.
    */
-  async processTemporaryEffects() {
+  async processTemporaryEffects(roundCount = null) {
     let totalDamage = 0;
     let damageType = ""
     let rawDamageRoll = ""
     let damageMessages = [];
-    Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Processing temporary ActiveEffects on ${this.name}...`);
+    // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Processing temporary ActiveEffects on ${this.name}...`);
     // Collect updates to disable expired effects
     const expiredEffects = [];
     for (const effect of this.allApplicableEffects()) {
-      Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} has ${effect.name} with remaining time ${effect.duration.remaining} rounds/turns:`, effect);
+      const remainingRounds = effect.getFlag("hyp3e", "remainingRounds");
+      if (!roundCount) {
+        roundCount = 1;
+      } else {
+        roundCount = roundCount < remainingRounds ? roundCount : Math.max(remainingRounds, 1);
+      }
+      // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} has ${effect.name} with remaining time ${effect.duration.remaining} rounds/turns:`, effect);
       if (effect.isTemporary && !effect.disabled) {
         // if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-        if (!isNaN(effect.duration.remaining) && effect.duration.remaining <= 0) {
+        if ((!isNaN(effect.duration.remaining) && effect.duration.remaining <= 0) || remainingRounds <= 0) {
           // Effect expired, add to expiredEffects for removal
           Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
           expiredEffects.push(effect);
@@ -1294,7 +1300,7 @@ export class Hyp3eActor extends Actor {
         const effectChanges = effect?.changes || effect?.system.changes || [];
         const persistentDamage = effectChanges.find(c => c.key === "system.tempPersistentDamage");
         if (persistentDamage) {
-          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} persistent damage:`, persistentDamage);
+          // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} persistent damage:`, persistentDamage);
 
           // Does the value string include a comma separating damage type and formula?
           if (persistentDamage.value.includes(",")) {
@@ -1304,16 +1310,23 @@ export class Hyp3eActor extends Actor {
             rawDamageRoll = persistentDamage.value;
           }
           const damageRollFormula = rawDamageRoll.replace(";", "").trim();
-          Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType}`);
 
-          const roll = new Roll(damageRollFormula);
-          await roll.evaluate({ evaluateSync: true });
-
+          // Run as many times as requested/allowed
+          for (let i = 0; i < roundCount; i++) {
+            // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType} damage...`);
+            const roll = new Roll(damageRollFormula);
+            await roll.evaluate({ evaluateSync: true });
+            Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${effect.name} persistent ${damageType} damage... ${roll.total} HP.`, roll);
+            totalDamage += roll.total;  
+          }
+          // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `Rolling ${damageRollFormula} ${damageType} damage...`);
+          // const roll = new Roll(damageRollFormula);
+          // await roll.evaluate({ evaluateSync: true });
           // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} persistent damage roll:`, roll);
+          // totalDamage += roll.total;
 
-          totalDamage += roll.total;
-
-          damageMessages.push(`${this.displayName} takes ${roll.total} ${damageType} damage!`);
+          // damageMessages.push(`${this.displayName} takes ${roll.total} ${damageType} damage!`);
+          damageMessages.push(`${this.displayName} takes ${totalDamage} ${damageType} damage!`);
         }
       }
     }
@@ -1328,27 +1341,18 @@ export class Hyp3eActor extends Actor {
     }
 
     const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
-    if (majorVersion <= 13) {
+    // if (majorVersion <= 13) {
       // Disable expired effects for Foundry v13 or earlier
       // if (disableOnly.length > 0) {
       if (expiredEffects.length > 0) {
         const updates = expiredEffects.map(e => ({
           _id: e.id,
           disabled: true,
-          // "duration.startRound": null,
-          // "duration.startTurn": null
         }));
         await this.updateEmbeddedDocuments("ActiveEffect", updates);
       }
-    } else {
-      // The ActiveEffect registry in v14 handles effect expiration for us
-    }
-
-    // if (expiredEffects.length > 0) {
-    //   // Post all the expirations together in one chat
-    //   const effectNames = expiredEffects.map(effect => effect.name)
-    //   const expiredEffectsMsg = `Active effects have expired...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
-    //   sendSimpleChat(this, "", expiredEffectsMsg)
+    // } else {
+    //   // The ActiveEffect registry in v14 handles effect expiration for us
     // }
   }
 
@@ -1402,7 +1406,7 @@ export class Hyp3eActor extends Actor {
    * Decrement the remainingRounds flag on temporary ActiveEffects. If remainingRounds
    *  goes to zero or negative, delete the effect.
    */
-  async advanceTempEffectsTimer() {
+  async advanceTempEffectsTimer(roundCount = null) {
     // Is this Foundry v14?
     if (ActiveEffect?.registry) {
       // Update the AE registry, used for combat timing
@@ -1421,7 +1425,11 @@ export class Hyp3eActor extends Actor {
       let remainingRounds = effect.getFlag("hyp3e", "remainingRounds");
       if (remainingRounds) {
         // Decrement remainingRounds and update or delete
-        remainingRounds--;
+        if (roundCount) {
+          remainingRounds -= roundCount;
+        } else {
+          remainingRounds--;
+        }
 
         if (remainingRounds <= 0) {
           Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Effect ${effect.name} has expired and will be deleted from ${this.name}.`);
@@ -3674,13 +3682,10 @@ export class Hyp3eActor extends Actor {
       if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
       Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
 
-      // Run the passage of 60 rounds for 1 turn
-      for (let i = 0; i < 60; i++) {
-        // Process temporary effect changes
-        await this.processTemporaryEffects();
-        // Advance the temp effects round-timer and delete if expired
-        await this.advanceTempEffectsTimer();  
-      }
+      // Simulate the passage of 60 rounds (1 turn)
+      await this.processTemporaryEffects(60);
+      // Advance the temp effects round-timer and delete if expired
+      await this.advanceTempEffectsTimer(60);  
 
       /**
       // Check if the effect has a duration or remaining turns flag
