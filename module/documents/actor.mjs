@@ -1340,7 +1340,7 @@ export class Hyp3eActor extends Actor {
       sendSimpleChat(this, "", persistentDamageMsg)
     }
 
-    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    // const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
     // if (majorVersion <= 13) {
       // Disable expired effects for Foundry v13 or earlier
       // if (disableOnly.length > 0) {
@@ -3612,7 +3612,7 @@ export class Hyp3eActor extends Actor {
       // Check if the token already has a light source
       const hasLight = token.light?.dim || token.light?.bright;
       if (hasLight) {
-          // Remove the light source active effect from actor
+          // Remove any current light source active effect from actor
           // const activeEffects = this.effects.filter(e => e.origin === item.uuid && e.name.startsWith("Light Source:"));
           const activeEffects = this.effects.filter(e => e.name.startsWith("Light Source:"));
           if (activeEffects.length > 0) {
@@ -3641,13 +3641,16 @@ export class Hyp3eActor extends Actor {
           Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Light source properties:`, lightProps);
           if (Object.keys(lightProps).length > 0) {
               ui.notifications.info(`Light source applied to ${token.name}.`);
-
+              const v14orLater = ActiveEffect?.registry ? true: false;
+              const duration = v14orLater 
+                ? { units: "rounds", value: lightProps.duration || undefined, expiry: "turnEnd" } 
+                : { rounds: lightProps.duration || undefined };
               const lightEffect = new ActiveEffect({
                   name: `Light Source: ${item.name}`,
                   img: "icons/svg/light.svg",
                   origin: item.uuid,
                   disabled: false,
-                  duration: { rounds: lightProps.duration || undefined },
+                  duration: duration,
                   flags: {
                       hyp3e: {
                           lightProps: lightProps
