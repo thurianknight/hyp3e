@@ -352,6 +352,60 @@ export function fixFriendlyName(item) {
     return output;
 }
 
+export async function migrateActorEffects() {
+  if (game.release?.generation < 14) return;
+
+  let migratedCount = 0;
+  let errorCount = 0;
+
+  for (const actor of game.actors.contents) {
+    for (const effect of actor.effects) {
+      if (!effect.isTemporary) continue;
+      Hyp3eLogger.info("migrateActorEffects", `Migrating effect ${effect.name}:`, effect);
+
+      const updates = {};
+      const duration = effect.duration || {};
+      const flags = effect.flags;
+      let remainingRounds = null;
+
+      // Fix common migration breakage
+      if (!duration.expiry && (duration?.rounds || duration?.turns)) {
+        updates["duration.units"] = "rounds";
+        updates["duration.expiry"] = "turnEnd";
+        updates["duration.remaining"] = duration.rounds || duration.turns || 0;
+        remainingRounds = duration.rounds || duration.turns || 0;
+      }
+
+      if (duration.remaining === Infinity || duration.remaining == null || isNaN(duration.remaining)) {
+        updates["duration.remaining"] = duration.rounds || duration.turns || 0;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        try {
+          await effect.update(updates, { 
+            diff: false, 
+            render: false,
+            noHook: true          // skip some hooks that can cause issues
+          });
+          migratedCount++;
+          Hyp3eLogger.info("migrateActorEffects", `Migrated effect "${effect.name}" on ${actor.name}`);
+        } catch (err) {
+          errorCount++;
+          Hyp3eLogger.info("migrateActorEffects", `Failed to migrate effect "${effect.name}" on ${actor.name}`, err);
+          // Optional: delete the truly broken effect
+          // await effect.delete();
+        }
+      }
+    }
+  }
+
+  if (migratedCount > 0 || errorCount > 0) {
+    Hyp3eLogger.info("migrateActorEffects", `v14 Actor-Effect Migration complete: ${migratedCount} fixed, ${errorCount} errors`);
+  } else {
+    Hyp3eLogger.info("migrateActorEffects", `v14 Actor-Effect Migration — nothing needed`);
+  }
+}
+
 export async function migrateItemEffects(item) {
   // Transform old saves from .value to .curr
   const saveKeys = [
@@ -370,14 +424,13 @@ export async function migrateItemEffects(item) {
   const effectUpdates = [];
   for (const effect of item.effects) {
     // Migrate v13 duration format to v14
-    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
-    if (majorVersion >= 14) {
+    if (game.release?.generation >= 14) {
       Hyp3eLogger.info("migrateItemEffects", `Migrating effect ${effect.name}:`, effect);
       const duration = effect.duration || {};
       const flags = effect.flags;
       let remainingRounds = null;
       if (effect.isTemporary) {
-        if (duration.rounds || duration.turns) {
+        if (duration?.rounds || duration?.turns) {
           duration.units = "rounds";
           duration.value = duration.rounds || duration.turns || 0;
           duration.expiry = "turnEnd";
@@ -396,8 +449,7 @@ export async function migrateItemEffects(item) {
         });
       }
     }
-  
-  
+
     const effectChanges = effect?.changes || effect?.system.changes || [];
     const newChanges = effectChanges.map(change => {
       if (saveKeys.includes(change.key)) {
