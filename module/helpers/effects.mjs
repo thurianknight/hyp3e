@@ -293,6 +293,21 @@ export async function setupEffectHandlers() {
   });
 
   /**
+   * 
+   */
+  Hooks.on("preCreateActiveEffect", (effect, data) => {
+    Hyp3eLogger.info("ActiveEffect preCreateActiveEffect", `Pre-create event fired for ${effect.name}:`, { Effect: effect, Data: data });
+    if (game.release?.generation < 14) return;
+    // Set Foundry v14 defaults
+    if (data.duration?.units === "rounds" || data.duration?.units === "turns") {  // Rounds are preferred
+      if (!data.duration.expiry) {
+        // Hyperborea standard: expire at the end of the actor's turn/sequence in the round
+        data.duration.expiry = "turnEnd";
+      }
+    }
+  });
+
+  /**
    * Handle the creation of an active effect on an actor. This ONLY applies to effects
    * applied directly to the actor, not effects coming from an equipped item.
    */
@@ -305,12 +320,8 @@ export async function setupEffectHandlers() {
     if (!actor?.isOwner) return;
 
     let v14orLater = false;
-    // v14 registry handling
     if (ActiveEffect?.registry && effect.isExpiryTrackable) {
       v14orLater = true;
-      // Make sure the new effect gets picked up immediately
-      ActiveEffect.registry.addFromParent(effect.parent);
-      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Registered new temporary effect "${effect.name}" on ${effect.parent.name}`);
     }
 
     /**
