@@ -477,6 +477,7 @@ export async function setupEffectHandlers() {
    * Handle the update of an active effect on an actor.
    */
   Hooks.on("updateActiveEffect", async(effect, change, options, userId) => {
+    // All we do here is check if "disabled" is in the effect updates, and toggle light accordingly
     Hyp3eLogger.info("ActiveEffect updateActiveEffect", `ActiveEffect ${effect.name} and changes:`, { Effect: effect, Change: change });
     if ("disabled" in change) {
       const wasDisabled = change.disabled;

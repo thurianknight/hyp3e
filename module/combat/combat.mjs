@@ -129,7 +129,7 @@ export class HYP3ECombat extends Combat {
     await actor.processTemporaryEffects(1);
 
     // Update duration and expiration on effects, delete if expired
-    if (actor.effects.length > 0) await this._refreshAndCleanupEffects("turnEnd", combatant.combat, combatant);
+    await this._refreshAndCleanupEffects("turnEnd", combatant.combat, combatant);
 
     // Update duration and expiration on temporary items
     Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary items...`);

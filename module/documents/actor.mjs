@@ -1360,6 +1360,7 @@ export class Hyp3eActor extends Actor {
    * Update the value of an effect's change
    * @param {*} key // Effect change-key to find
    * @param {*} updateValue // Value to subtract from the effect's change
+   * @returns {Number}  // The remainder after subtraction
    */
   async updateEffectValue(key, updateValue, minVal = 0, maxVal = 100) {
     // Find the effect specified by key
@@ -1367,6 +1368,7 @@ export class Hyp3eActor extends Actor {
     // const allEffects = this.allApplicableEffects();
     // const effect = allEffects.find(e => e.changes.some(c => c.key === key));
     if (!effect) {
+      Hyp3eLogger.info("Hyp3eActor updateEffectValue", `No effect found with key "${key}"`);
       return updateValue; // No effect found, return same value (no change)
     }
 

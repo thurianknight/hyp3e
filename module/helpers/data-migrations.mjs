@@ -353,31 +353,40 @@ export function fixFriendlyName(item) {
 }
 
 export async function migrateActorEffects() {
-  if (game.release?.generation < 14) return;
+  const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+  if (majorVersion < 14) return;
 
+  // Migrate v13 effects to v14
   let migratedCount = 0;
   let errorCount = 0;
 
   for (const actor of game.actors.contents) {
+    Hyp3eLogger.info("migrateActorEffects", `Migrating effects on actor ${actor.name}`, actor.effects);
+
     for (const effect of actor.effects) {
       if (!effect.isTemporary) continue;
       Hyp3eLogger.info("migrateActorEffects", `Migrating effect ${effect.name}:`, effect);
 
       const updates = {};
       const duration = effect.duration || {};
-      const flags = effect.flags;
       let remainingRounds = null;
 
       // Fix common migration breakage
-      if (!duration.expiry && (duration?.rounds || duration?.turns)) {
+      if (duration?.rounds || duration?.turns) {
         updates["duration.units"] = "rounds";
         updates["duration.expiry"] = "turnEnd";
-        updates["duration.remaining"] = duration.rounds || duration.turns || 0;
-        remainingRounds = duration.rounds || duration.turns || 0;
+        updates["duration.value"] = duration.rounds || duration.turns || 10;
+        remainingRounds = duration.rounds || duration.turns || 10;
+      } else {
+        // Some effects may be partially migrated by the v14 upgrade, so we override them here
+        if (!duration.units || duration.units == "turns") 
+          updates["duration.units"] = "rounds";
+        if (!duration.expiry || duration.expiry == "turnStart") 
+          updates["duration.expiry"] = "turnEnd";
+        remainingRounds = duration.value || 10;
       }
-
       if (duration.remaining === Infinity || duration.remaining == null || isNaN(duration.remaining)) {
-        updates["duration.remaining"] = duration.rounds || duration.turns || 0;
+        updates["duration.remaining"] = duration?.rounds || duration?.turns || duration?.value || 0;
       }
 
       if (Object.keys(updates).length > 0) {
@@ -387,6 +396,7 @@ export async function migrateActorEffects() {
             render: false,
             noHook: true          // skip some hooks that can cause issues
           });
+          await effect.setFlag("hyp3e", "remainingRounds", remainingRounds);
           migratedCount++;
           Hyp3eLogger.info("migrateActorEffects", `Migrated effect "${effect.name}" on ${actor.name}`);
         } catch (err) {
@@ -408,82 +418,115 @@ export async function migrateActorEffects() {
 
 export async function migrateItemEffects(item) {
   // Transform old saves from .value to .curr
-  const saveKeys = [
-    "system.saves.death.value",
-    "system.saves.device.value",
-    "system.saves.transformation.value",
-    "system.saves.avoidance.value",
-    "system.saves.sorcery.value"
-  ];
+  // const saveKeys = [
+  //   "system.saves.death.value",
+  //   "system.saves.device.value",
+  //   "system.saves.transformation.value",
+  //   "system.saves.avoidance.value",
+  //   "system.saves.sorcery.value"
+  // ];
 
   // This is returned to the caller if any changes were made
   const updates = [];
 
+  Hyp3eLogger.info("migrateItemEffects", `Migrating effects on item ${item.name}`, item.effects);
   if (item.effects.size === 0) return null;
 
-  const effectUpdates = [];
+  // Migrate v13 effects to v14
+  let migratedCount = 0;
+  let errorCount = 0;
+
+  const effectUpdates = {};
   for (const effect of item.effects) {
+    // const effectChanges = effect?.changes || effect?.system.changes || [];
+    // const newChanges = effectChanges.map(change => {
+    //   if (saveKeys.includes(change.key)) {
+    //     // Replace .value with .curr
+    //     const newKey = change.key.replace(/\.value$/, ".curr");
+    //     if (newKey !== change.key) {
+    //       return { ...change, key: newKey };
+    //     }
+    //   } else if (["system.fa.curr", "system.ca.curr", "system.ta.curr"].includes(change.key)) {
+    //     // Replace .curr with nothing
+    //     const newKey = change.key.replace(/\.curr$/, "");
+    //     if (newKey !== change.key) {
+    //       return { ...change, key: newKey };
+    //     }
+    //   }
+    //   return change;
+    // });
+
     // Migrate v13 duration format to v14
-    if (game.release?.generation >= 14) {
-      Hyp3eLogger.info("migrateItemEffects", `Migrating effect ${effect.name}:`, effect);
+    let remainingRounds = null;
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    if (majorVersion >= 14) {
       const duration = effect.duration || {};
       const flags = effect.flags;
-      let remainingRounds = null;
       if (effect.isTemporary) {
         if (duration?.rounds || duration?.turns) {
-          duration.units = "rounds";
-          duration.value = duration.rounds || duration.turns || 0;
-          duration.expiry = "turnEnd";
-          remainingRounds = duration.rounds || duration.turns || 0;
+          Hyp3eLogger.info("migrateItemEffects", `Migrating effect ${effect.name} from v13:`, effect);
+          effectUpdates["duration.units"] = "rounds";
+          effectUpdates["duration.expiry"] = "turnEnd";
+          effectUpdates["duration.value"] = duration.rounds || duration.turns || 10;
+          remainingRounds = duration.rounds || duration.turns || 10;
         } else {
           // Some effects may be partially migrated by the v14 upgrade, so we override them here
-          if (duration.units == "turns") duration.units = "rounds";
-          if (duration.expiry == "turnStart") duration.expiry = "turnEnd";
-          remainingRounds = duration.value || 0;
+          Hyp3eLogger.info("migrateItemEffects", `Fixing effect ${effect.name} in v14:`, effect);
+          // if (!duration.units || duration.units == "turns") 
+            effectUpdates["duration.units"] = "rounds";
+          // if (!duration.expiry || duration.expiry == "turnStart") 
+            effectUpdates["duration.expiry"] = "turnEnd";
+          remainingRounds = duration.value || 10;
         }
-        await effect.setFlag("hyp3e", "remainingRounds", remainingRounds);
-        effectUpdates.push({
-          _id: effect.id,
-          duration: duration,
-          flags: flags
-        });
+        if (duration.remaining === Infinity || duration.remaining == null || isNaN(duration.remaining)) {
+          effectUpdates["duration.remaining"] = duration?.rounds || duration?.turns || duration?.value || 0;
+        }  
+        // await effect.setFlag("hyp3e", "remainingRounds", remainingRounds);
+        // effectUpdates.push({
+        //   _id: effect.id,
+        //   duration: duration,
+        //   flags: flags
+        // });
       }
     }
 
-    const effectChanges = effect?.changes || effect?.system.changes || [];
-    const newChanges = effectChanges.map(change => {
-      if (saveKeys.includes(change.key)) {
-        // Replace .value with .curr
-        const newKey = change.key.replace(/\.value$/, ".curr");
-        if (newKey !== change.key) {
-          return { ...change, key: newKey };
-        }
-      } else if (["system.fa.curr", "system.ca.curr", "system.ta.curr"].includes(change.key)) {
-        // Replace .curr with nothing
-        const newKey = change.key.replace(/\.curr$/, "");
-        if (newKey !== change.key) {
-          return { ...change, key: newKey };
-        }
-      }
-      return change;
-    });
     // Only queue update if something actually changed
-    if (!foundry.utils.objectsEqual(newChanges, effectChanges)) {
-      effectUpdates.push({
-        _id: effect.id,
-        changes: newChanges
-      });
+    // if (!foundry.utils.objectsEqual(newChanges, effectChanges)) {
+    //   effectUpdates.push({
+    //     _id: effect.id,
+    //     changes: newChanges
+    //   });
+    // }
+    if (Object.keys(effectUpdates).length > 0) {
+      try {
+        await effect.update(effectUpdates, { 
+          diff: false, 
+          render: false,
+          noHook: true          // skip some hooks that can cause issues
+        });
+        await effect.setFlag("hyp3e", "remainingRounds", remainingRounds);
+        migratedCount++;
+        Hyp3eLogger.info("migrateItemEffects", `Migrated effect "${effect.name}" on ${item.name}`);
+      } catch (err) {
+        errorCount++;
+        Hyp3eLogger.info("migrateItemEffects", `Failed to migrate effect "${effect.name}" on ${item.name}`, err);
+        // Optional: delete the truly broken effect
+        // await effect.delete();
+      }
     }
   }
-
-  if (effectUpdates.length > 0) {
-    Hyp3eLogger.info("migrateItemEffects", `Migrating active effects configuration for ${item.name}:`, effectUpdates)
+  if (migratedCount > 0 || errorCount > 0) {
+    Hyp3eLogger.info("migrateItemEffects", `v14 Item-Effect Migration complete: ${migratedCount} fixed, ${errorCount} errors`);
+  } else {
+    Hyp3eLogger.info("migrateItemEffects", `v14 Item-Effect Migration — nothing needed`);
+  }
+  if (migratedCount > 0) {
     updates.push({
       itemId: item.id,
       name: item.name,
-      updatedEffects: effectUpdates.length
+      updatedEffects: migratedCount
     });
-    await item.updateEmbeddedDocuments("ActiveEffect", effectUpdates);
+    // await item.updateEmbeddedDocuments("ActiveEffect", effectUpdates);
   }
   return updates;
 }

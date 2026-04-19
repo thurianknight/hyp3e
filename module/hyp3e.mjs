@@ -868,13 +868,13 @@ async function migrateWorld() {
             await item.update(itemUpdates);
           }
         }
-        // Migrate item effects required for data changes
+        // Migrate item effects required for v14 data changes
         migrateItemEffects(item);
       }
     }
   }
 
-  // Migrate all actor effects
+  // Migrate all actor effects required for v14 data changes
   await migrateActorEffects();
 
   // Skip out early
@@ -893,7 +893,7 @@ async function migrateWorld() {
         await item.update(itemUpdates);
       }
     }
-    // Migrate item effects required for data changes
+    // Migrate item effects required for v14 data changes
     migrateItemEffects(item);
   }
 
@@ -946,7 +946,7 @@ async function migrateWorld() {
                   await item.update(itemUpdates);
                 }
               }
-              // Migrate item effects required for data changes
+              // Migrate item effects required for v14 data changes
               migrateItemEffects(item);
             }
           }
@@ -964,7 +964,7 @@ async function migrateWorld() {
               await doc.update(itemUpdates);
             }
           }
-          // Migrate item effects required for data changes
+          // Migrate item effects required for v14 data changes
           migrateItemEffects(doc);      
           break;
 
