@@ -1290,7 +1290,8 @@ export class Hyp3eActor extends Actor {
       // Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${this.name} has ${effect.name} with remaining time ${effect.duration.remaining} rounds/turns:`, effect);
       if (effect.isTemporary && !effect.disabled) {
         // if (effect.duration.remaining != null && effect.duration.remaining <= 0) {
-        if ((!isNaN(effect.duration.remaining) && effect.duration.remaining <= 0) || remainingRounds <= 0) {
+        if ((effect.duration.remaining && effect.duration.remaining <= 0) 
+            || (remainingRounds && remainingRounds <= 0)) {
           // Effect expired, add to expiredEffects for removal
           Hyp3eLogger.info("Hyp3eActor processTemporaryEffects", `${effect.name} on ${this.name} is expired and will be removed or disabled.`);
           expiredEffects.push(effect);
@@ -1340,10 +1341,9 @@ export class Hyp3eActor extends Actor {
       sendSimpleChat(this, "", persistentDamageMsg)
     }
 
-    // const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
-    // if (majorVersion <= 13) {
+    const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
+    if (majorVersion <= 13) {
       // Disable expired effects for Foundry v13 or earlier
-      // if (disableOnly.length > 0) {
       if (expiredEffects.length > 0) {
         const updates = expiredEffects.map(e => ({
           _id: e.id,
@@ -1351,9 +1351,9 @@ export class Hyp3eActor extends Actor {
         }));
         await this.updateEmbeddedDocuments("ActiveEffect", updates);
       }
-    // } else {
-    //   // The ActiveEffect registry in v14 handles effect expiration for us
-    // }
+    } else {
+      // The ActiveEffect registry in v14 handles effect expiration for us
+    }
   }
 
   /**
@@ -1782,41 +1782,45 @@ export class Hyp3eActor extends Actor {
    * @returns {null}
    */
   async setHealthStatus(statusId) {
-    switch (statusId) {
-      case "conscious":
-        // Leave "prone" status in place if it exists
-        this.removeStatus("unconscious");
-        this.removeStatus("bleeding");
-        this.removeStatus("dead");
-        break;
+    try {
+      switch (statusId) {
+        case "conscious":
+          // Leave "prone" status in place if it exists
+          this.removeStatus("unconscious");
+          this.removeStatus("bleeding");
+          this.removeStatus("dead");
+          break;
 
-      case "unconscious":
-        this.applyStatus("prone");
-        this.applyStatus("unconscious");
-        this.removeStatus("bleeding");
-        this.removeStatus("dead");
-        break;
+        case "unconscious":
+          this.applyStatus("prone");
+          this.applyStatus("unconscious");
+          this.removeStatus("bleeding");
+          this.removeStatus("dead");
+          break;
 
-      case "bleeding":
-        this.applyStatus("prone");
-        this.applyStatus("unconscious");
-        this.applyStatus("bleeding");
-        this.removeStatus("dead");
-        break;
+        case "bleeding":
+          this.applyStatus("prone");
+          this.applyStatus("unconscious");
+          this.applyStatus("bleeding");
+          this.removeStatus("dead");
+          break;
 
-      case "dead":
-        this.applyStatus("prone");
-        this.removeStatus("unconscious");
-        this.removeStatus("bleeding");
-        this.applyStatus("dead");
-        break;
+        case "dead":
+          this.applyStatus("prone");
+          this.removeStatus("unconscious");
+          this.removeStatus("bleeding");
+          this.applyStatus("dead");
+          break;
 
-      default:
-        // Remove all statuses... this will probably never happen
-        this.removeStatus("prone");
-        this.removeStatus("unconscious");
-        this.removeStatus("bleeding");
-        this.removeStatus("dead");
+        default:
+          // Remove all statuses... this will probably never happen
+          this.removeStatus("prone");
+          this.removeStatus("unconscious");
+          this.removeStatus("bleeding");
+          this.removeStatus("dead");
+      }
+    } catch (err) {
+      Hyp3eLogger.info("Hyp3eActor setHealthStatus", `Error setting status ${statusId}:`, err);
     }
   }
 

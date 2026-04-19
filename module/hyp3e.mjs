@@ -20,6 +20,7 @@ import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { migrateActorData, 
       migrateItemData, 
       fixTokenSize,
+      migrateActorEffects,
       migrateItemEffects } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, 
       setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
@@ -872,6 +873,9 @@ async function migrateWorld() {
       }
     }
   }
+
+  // Migrate all actor effects
+  await migrateActorEffects();
 
   // Skip out early
   // return true;
