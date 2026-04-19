@@ -1,3 +1,4 @@
+import { logEffectRegistry } from "../helpers/effects.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 
 /**
@@ -103,6 +104,7 @@ export class HYP3ECombat extends Combat {
 
   async _onEndTurn(combatant, context) {
     await super._onEndTurn(combatant, context);
+
     // Log the combatant whose turn is ending
     Hyp3eLogger.info("HYP3ECombat _onEndTurn", `End-turn data for ${combatant.name}:`, combatant)
 
@@ -127,7 +129,7 @@ export class HYP3ECombat extends Combat {
     await actor.processTemporaryEffects(1);
 
     // Update duration and expiration on effects, delete if expired
-    await this._refreshAndCleanupEffects("turnEnd", this, actor);
+    if (actor.effects.length > 0) await this._refreshAndCleanupEffects("turnEnd", combatant.combat, combatant);
 
     // Update duration and expiration on temporary items
     Hyp3eLogger.info("HYP3ECombat _onEndTurn", `Processing ${actor.displayName} temporary items...`);
@@ -196,29 +198,49 @@ export class HYP3ECombat extends Combat {
   /**
    * Private helper – keeps your four methods clean and DRY
    */
-  async _refreshAndCleanupEffects(event, combat = null, specificActor = null) {
-    Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `Refresh and cleanup effects on actor(s) ${specificActor ? specificActor.name : "(all)"}, for event ${event}.`);
+  async _refreshAndCleanupEffects(event, combat = null, combatant = null) {
+    Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `Event: ${event} | Combatant: ${combatant?.name ?? "(all)"}`);
+    const actor = combatant?.actor;
+
+    // v13 process is very simple
+    if (!ActiveEffect?.registry) {
+      if (actor && event === "turnEnd") {
+        await actor.advanceTempEffectsTimer(1);
+      }
+      return;
+    }
+
+    /**
+     * v14 from here on...
+     */
+
+    // Log the AE registry
+    // logEffectRegistry();
+
     const context = { combat };
-    const actors = specificActor ? new Set([specificActor]) : undefined;
+    if (combatant && (event === "turnStart" || event === "turnEnd")) {
+      context.combatant = combatant;
+    }
+    // Limit to this actor when possible (much more efficient)
+    if (actor) {
+      context.actors = new Set([actor]);
+      await ActiveEffect.registry.addFromParent(actor);
+    }
 
-    if (actors) context.actors = actors;
-
-    // Only Foundry v14+ has the effect registry
-    if (ActiveEffect?.registry) {
-      // Safety net add and refresh registry
-      if (specificActor) {
-        await ActiveEffect.registry.addFromParent(specificActor);
-      }    
+    // Refresh the AE registry
+    try {
       await ActiveEffect.registry.refresh(event, context);
+      const msg = combatant ? `Refreshing ActiveEffect registry with event "${event}", combatant ${combatant.name}` : `Refreshing ActiveEffect registry with event "${event}"`;
+      Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", msg);
+    } catch (err) {
+      Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `Registry refresh failed for event ${event}`, err);
     }
 
     // Cleanup – only on the relevant actor(s)
-    if (specificActor) {
-      Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `${specificActor.name} effects:`, specificActor.effects);
-      if (event == "turnEnd") {
-        // The timer method also handles expiration and deletion
-        await specificActor.advanceTempEffectsTimer(1);
-      }
+    if (actor) {
+      Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `${actor.name} effects:`, actor.effects);
+      // The timer method also handles expiration and deletion
+      await actor.advanceTempEffectsTimer(1);
     } else {
       // Clean all actors if combat is ending
       if (event == "combatEnd") {
