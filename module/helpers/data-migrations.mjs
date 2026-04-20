@@ -417,45 +417,16 @@ export async function migrateActorEffects() {
 }
 
 export async function migrateItemEffects(item) {
-  // Transform old saves from .value to .curr
-  // const saveKeys = [
-  //   "system.saves.death.value",
-  //   "system.saves.device.value",
-  //   "system.saves.transformation.value",
-  //   "system.saves.avoidance.value",
-  //   "system.saves.sorcery.value"
-  // ];
-
-  // This is returned to the caller if any changes were made
-  const updates = [];
-
-  Hyp3eLogger.info("migrateItemEffects", `Migrating effects on item ${item.name}`, item.effects);
   if (item.effects.size === 0) return null;
+  Hyp3eLogger.info("migrateItemEffects", `Migrating effects on item ${item.name}`, item.effects);
 
   // Migrate v13 effects to v14
+  const updates = []; // Returned to the caller
   let migratedCount = 0;
   let errorCount = 0;
 
   const effectUpdates = {};
   for (const effect of item.effects) {
-    // const effectChanges = effect?.changes || effect?.system.changes || [];
-    // const newChanges = effectChanges.map(change => {
-    //   if (saveKeys.includes(change.key)) {
-    //     // Replace .value with .curr
-    //     const newKey = change.key.replace(/\.value$/, ".curr");
-    //     if (newKey !== change.key) {
-    //       return { ...change, key: newKey };
-    //     }
-    //   } else if (["system.fa.curr", "system.ca.curr", "system.ta.curr"].includes(change.key)) {
-    //     // Replace .curr with nothing
-    //     const newKey = change.key.replace(/\.curr$/, "");
-    //     if (newKey !== change.key) {
-    //       return { ...change, key: newKey };
-    //     }
-    //   }
-    //   return change;
-    // });
-
     // Migrate v13 duration format to v14
     let remainingRounds = null;
     const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
@@ -480,23 +451,11 @@ export async function migrateItemEffects(item) {
         }
         if (duration.remaining === Infinity || duration.remaining == null || isNaN(duration.remaining)) {
           effectUpdates["duration.remaining"] = duration?.rounds || duration?.turns || duration?.value || 0;
-        }  
-        // await effect.setFlag("hyp3e", "remainingRounds", remainingRounds);
-        // effectUpdates.push({
-        //   _id: effect.id,
-        //   duration: duration,
-        //   flags: flags
-        // });
+        }
       }
     }
 
     // Only queue update if something actually changed
-    // if (!foundry.utils.objectsEqual(newChanges, effectChanges)) {
-    //   effectUpdates.push({
-    //     _id: effect.id,
-    //     changes: newChanges
-    //   });
-    // }
     if (Object.keys(effectUpdates).length > 0) {
       try {
         await effect.update(effectUpdates, { 

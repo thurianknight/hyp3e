@@ -708,10 +708,6 @@ Hooks.on("deleteCombat", async (combat) => {
   }
 
   for (const actor of actorsToRefresh) {
-    // Force full data re-preparation
-    // await actor.prepareData();
-    // await actor.prepareEmbeddedDocuments();
-
     // Re-register all effects
     await ActiveEffect.registry.addFromParent(actor);
   }

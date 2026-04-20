@@ -364,12 +364,12 @@ export async function setupEffectHandlers() {
       const change = updatedChanges[i];
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" change key "${change.key}" has value ${change.value}, type: ${typeof change.value}`, change);
       // Store the change value regardless of whether it's a formula or not
-      if (!change.flags?.hyp3e?.originalValue) {
-        change.flags = change.flags || {};
-        change.flags.hyp3e = change.flags.hyp3e || {};
-        change.flags.hyp3e.originalValue = change.value;
-        didUpdate = true;
-      }
+      // if (!change.flags?.hyp3e?.originalValue) {
+      //   change.flags = change.flags || {};
+      //   change.flags.hyp3e = change.flags.hyp3e || {};
+      //   change.flags.hyp3e.originalValue = change.value;
+      //   didUpdate = true;
+      // }
       // Ignore if the key is system.tempPersistentDamage, since that is a special case we 
       //  handle separately in the Actor document
       if (change.key === "system.tempPersistentDamage") {
@@ -584,7 +584,11 @@ export async function checkAndResolveDuration(effect, actorData) {
   // Round the duration down, to a minimum of 1
   const rounds = Math.max(1, Math.floor(resolvedDuration));
 
-  updatedDuration = { rounds: rounds };
+  if (game.release?.generation < 14) {
+    updatedDuration = { rounds: rounds };
+  } else {
+    updatedDuration = { value: rounds, units: "rounds", expiry: "turnEnd" };
+  }
   updated = true;
 
   Hyp3eLogger.info("ActiveEffect checkAndResolveDuration", `Resolved duration of effect "${effect.name}" to ${rounds} rounds, applying to ${actorData.actorName}.`);
