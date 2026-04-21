@@ -271,7 +271,7 @@ export class Hyp3eActor extends Actor {
       this.system._hyp3eEffectConditionState = this.system._hyp3eEffectConditionState || {};
       this.system._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
 
-      if (!conditionPasses) {
+      if (conditionPasses === false) {
         Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
         continue;
       }
@@ -361,7 +361,7 @@ export class Hyp3eActor extends Actor {
       this.system._hyp3eEffectConditionState = this.system._hyp3eEffectConditionState || {};
       this.system._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
 
-      if (!conditionPasses) {
+      if (conditionPasses === false) {
         Hyp3eLogger.info("Hyp3eActor applyActiveEffects", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
         continue;
       }
@@ -1106,6 +1106,7 @@ export class Hyp3eActor extends Actor {
 
     const actor = this;
     const rollData = actor.getRollData();
+    // Hyp3eLogger.info("Hyp3eActor _effectApplies", `${actor.name} effect ${effect.name} condition:`, condition);
 
     // Internal function to evaluate a single test
     const evalTest = (test) => {
@@ -1128,12 +1129,13 @@ export class Hyp3eActor extends Actor {
           try {
             right = JSON.parse(trimmed);
           } catch (err) {
-            console.warn("Hyp3eActor _effectApplies", "Conditional effect: invalid array literal:", { right, err });
+            Hyp3eLogger.warn("Hyp3eActor _effectApplies", "Conditional effect: invalid array literal:", { right, err });
             // Allow the effect if we can't evaluate the array
             return true;
           }
         }
       }
+      // Hyp3eLogger.info("Hyp3eActor _effectApplies", `Testing conditional effect "${effect.name}" on ${actor.name}: ${left} ${test.op} ${right}`);
 
       // Apply condition operators
       switch (test.op) {
@@ -1156,6 +1158,7 @@ export class Hyp3eActor extends Actor {
 
     // Evaluate all tests through the above function
     const results = tests.map(evalTest);
+    Hyp3eLogger.info("Hyp3eActor _effectApplies", `Condition test results (on ${actor.name}):`, results);
 
     // Combine results based on mode
     switch (condition.mode) {

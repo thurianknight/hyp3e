@@ -165,7 +165,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
 
   /** 
    * Runs BEFORE Active Effects are applied.
-   * Used for calculating base "curr" values that AEs can then modify.
+   * Used for calculating base values that AEs can use or modify.
    */
   prepareBaseData() {
     super.prepareBaseData?.();
@@ -173,6 +173,10 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     // PCs can drop to -10 hp before they die
     this.hp.min = -10;
     this.weightCarried = 0;
+
+    // Get character base class, used for crit hit & crit miss tables
+    const customClassData = this.getSetting("customClassData");
+    this.baseClass = Hyp3eCharacterClass.classData[this.details.class]?.baseClass ?? customClassData[this.details.class]?.baseClass ?? "npc";
 
     Hyp3eLogger.info("Hyp3eCharacter prepareBaseData", `Base data prepared for character ${this.parent.name}:`, this);
   }
@@ -185,8 +189,8 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     super.prepareDerivedData?.();
 
     // Get character base class, used for crit hit & crit miss tables
-    const customClassData = this.getSetting("customClassData");
-    this.baseClass = Hyp3eCharacterClass.classData[this.details.class]?.baseClass ?? customClassData[this.details.class]?.baseClass ?? "npc";
+    // const customClassData = this.getSetting("customClassData");
+    // this.baseClass = Hyp3eCharacterClass.classData[this.details.class]?.baseClass ?? customClassData[this.details.class]?.baseClass ?? "npc";
 
     // Auto-calculate attribute modifiers if configuration is enabled
     const autoCalcAttrMods = this.getSetting("autoCalcAttrMods");
