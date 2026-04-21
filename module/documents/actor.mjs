@@ -29,38 +29,8 @@ export class Hyp3eActor extends Actor {
     super.prepareBaseData();
 
     const systemData = this.system;
-    // Base/current FA, CA, TA
-    // systemData.fa = systemData?.fightingAbility.value ? systemData.fightingAbility.value : (systemData.fa ?? 0);
-    // systemData.ca = (systemData?.castingAbility.value || systemData?.castingAbility.value === null) ? systemData.castingAbility.value : (systemData.ca ?? null);
-    // systemData.ta = (systemData?.turningAbility.value || systemData?.turningAbility.value === null) ? systemData.turningAbility.value : (systemData.ta ?? null);
-
-    // Fix temporary modifier properties that might be undefined, null, or non-numeric:
-    //  system.hp.tempHp, system.ac.tempAcMod, system.ac.tempDrMod, system.movement.tempMvMod, system.tempAtkMod, system.tempDmgMod
-    // ActiveEffects will be applied after this.
-    // systemData.hp.tempHp = convertToInt(systemData.hp?.tempHp);
-    // systemData.ac.tempAcMod = convertToInt(systemData.ac?.tempAcMod);
-    // systemData.ac.tempDrMod = convertToInt(systemData.ac?.tempDrMod);
-    // systemData.movement.tempMvMod = convertToInt(systemData.movement?.tempMvMod);
-    // systemData.tempAtkMod = convertToInt(systemData?.tempAtkMod);
-    // systemData.tempDmgMod = convertToInt(systemData?.tempDmgMod);
-
-
-    // Base/current saving throws
-    // const saves = systemData.saves;
-    // for (const save of Object.values(saves)) {
-    //   save.curr = save.value ?? 0;
-    // }
 
     if (this.type === 'character') {
-      // // Get/set "curr" value for each character attribute
-      // const attrs = systemData.attributes;
-      // for (const [k, attr] of Object.entries(attrs)) {
-      //   // Convert the original value to a number if necessary
-      //   attr.value = Number(attr.value);
-      //   // If no effect touched curr, derive it from base value
-      //   if (!attr.curr || attr.curr == null || isNaN(attr.curr)) attr.curr = attr.value;
-      // }
-
       // Log the prepared data
       // const sysData = foundry.utils.deepClone(this.system);
       // Hyp3eLogger.info("Hyp3eActor prepareBaseData", `${this.displayName} base data:`, this);
