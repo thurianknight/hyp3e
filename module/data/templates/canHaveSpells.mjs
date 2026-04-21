@@ -15,7 +15,10 @@ export function canHaveSpellsTemplate() {
         value: new fields.NumberField({ nullable: true, initial: null }),
         max: new fields.NumberField({ nullable: true, initial: null })
       }),
-      spellRefs: new fields.ArrayField(new fields.StringField(), { initial: [] })
+      spellRefs: new fields.ArrayField(new fields.SchemaField({
+        uuid: new fields.StringField({ blank: true, initial: "" }),
+        charges: new fields.NumberField({ nullable: true, initial: null })
+      }))
     })
   };
 }

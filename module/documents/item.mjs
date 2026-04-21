@@ -367,6 +367,7 @@ export class Hyp3eItem extends Item {
 
     const uuid = droppedItem.uuid;
     const spellRefs = foundry.utils.deepClone(this.system.spellcasting?.spellRefs ?? []);
+    Hyp3eLogger.info("addSpell", `Current spells on item ${this.name}:`, spellRefs);
 
     // Check for duplicates
     if (spellRefs.some(ref => ref.uuid === uuid)) {
@@ -374,7 +375,8 @@ export class Hyp3eItem extends Item {
       return;
     }
 
-    spellRefs.push({ uuid, charges: 1 });
+    spellRefs.push({ uuid: uuid, charges: 1 });
+    Hyp3eLogger.info("addSpell", `Adding uuid ${uuid} to spells, new spells list:`, spellRefs);
     await this.update({ "system.spellcasting.spellRefs": spellRefs });
   }
 
