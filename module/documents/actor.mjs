@@ -3575,70 +3575,131 @@ export class Hyp3eActor extends Actor {
    * @returns - null
    */
   async toggleLightSource(itemId) {
-      Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Actor ${this.name}:`, this);
-      // const token = this?.token ?? this?.sheet?.token;
-      const token = this.getAssociatedToken();
-      if (!token) {
-          Hyp3eLogger.warn("toggleLightSource", `No token found for actor ${this.name}.`);
-          return;
-      }
-      const item = this.items.get(itemId);
-      if (!item) {
-          Hyp3eLogger.warn("toggleLightSource", `item ${itemId} not found for actor ${this.name}.`);
-          return;
-      }
+    // Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Actor ${this.name}:`, this);
+    // const token = this?.token ?? this?.sheet?.token;
+    const token = this.getAssociatedToken();
+    if (!token) {
+      Hyp3eLogger.warn("toggleLightSource", `No token found for actor ${this.name}.`);
+      return;
+    }
+    const item = this.items.get(itemId);
+    if (!item) {
+      Hyp3eLogger.warn("toggleLightSource", `item ${itemId} not found for actor ${this.name}.`);
+      return;
+    }
 
-      // Check if the token already has a light source
-      const hasLight = token.light?.dim || token.light?.bright;
-      if (hasLight) {
-          // Remove any current light source active effect from actor
-          // const activeEffects = this.effects.filter(e => e.origin === item.uuid && e.name.startsWith("Light Source:"));
-          const activeEffects = this.effects.filter(e => e.name.startsWith("Light Source:"));
-          if (activeEffects.length > 0) {
-              await activeEffects[0].delete();
-              Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Light source active effect removed from actor ${this.name}.`);
-          } else {
-              Hyp3eLogger.info("Hyp3eActor toggleLightSource", `No active effect found for light source on actor ${this.name}.`);
-              // Remove light source from token, if necessary (e.g., if it was applied directly)
-              await token.update({
-                  "light": null
-              });
-          }
-          ui.notifications.info(`Light source removed from ${token.name}.`);
-          Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Light source removed from token ${token.name}.`);
+    // If the token already has a light source, toggle it off and exit
+    const hasLight = token.light?.dim || token.light?.bright;
+    if (hasLight) {
+      // Remove any current light source active effect from actor
+      // const activeEffects = this.effects.filter(e => e.origin === item.uuid && e.name.startsWith("Light Source:"));
+      const activeEffects = this.effects.filter(e => e.name.startsWith("Light Source:"));
+      if (activeEffects.length > 0) {
+        await activeEffects[0].delete();
+        Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Light source active effect removed from actor ${this.name}.`);
       } else {
-          // Apply light source properties
-          const lightProps = foundry.utils.deepClone(item.system.light);
-          // Resolve duration roll formula to number
-          if (lightProps.duration) {
-              const durationRoll = new Roll(lightProps.duration, this.getRollData());
-              await durationRoll.evaluate({ evaluateSync: true });
-              lightProps.duration = durationRoll.total;
-          } else {
-              lightProps.duration = null; // Default to null if no duration specified
-          }
-          Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Light source properties:`, lightProps);
-          if (Object.keys(lightProps).length > 0) {
-              ui.notifications.info(`Light source applied to ${token.name}.`);
-              const v14orLater = ActiveEffect?.registry ? true: false;
-              const duration = v14orLater 
-                ? { units: "rounds", value: lightProps.duration || undefined, expiry: "turnEnd" } 
-                : { rounds: lightProps.duration || undefined };
-              const lightEffect = new ActiveEffect({
-                  name: `Light Source: ${item.name}`,
-                  img: "icons/svg/light.svg",
-                  origin: item.uuid,
-                  disabled: false,
-                  duration: duration,
-                  flags: {
-                      hyp3e: {
-                          lightProps: lightProps
-                      }
-                  }
-              });
-              await this.createEmbeddedDocuments("ActiveEffect", [lightEffect]);
-          }
+        Hyp3eLogger.info("Hyp3eActor toggleLightSource", `No active effect found for light source on actor ${this.name}.`);
+        // Remove light source from token, if necessary (e.g., if it was applied directly)
+        await token.update({
+          "light": null
+        });
       }
+      ui.notifications.info(`Light source removed from ${token.name}.`);
+      Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Light source removed from token ${token.name}.`);
+      return;
+    }
+
+    // Do we require a check for inventory?
+    if (CONFIG.HYP3E.requireLightSourceFuel) {
+      Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Checking for light source and/or fuel...`);
+      // Normalize the name to an array of lower-case single words
+      const lightName = (item.name.toLowerCase().trim()).split(/[\s,]+/);
+      // Assume standard names for light sources: candle, lamp, lantern, torch
+      const sources = ["candle", "lamp", "lantern", "torch"];
+      // Does the light source name appear in the list of standard names?
+      const baseName = lightName.filter(item => sources.includes(item));
+      if (baseName.length > 0) {
+        const base = baseName[0];
+        let fuelId = "";
+        switch (base) {
+          case "candle":
+            fuelId = this._hasFuel("candle");
+            break;
+          case "lamp":
+            fuelId = this._hasFuel("oil");
+            break;
+          case "lantern":
+            fuelId = this._hasFuel("oil");
+            break;
+          case "torch":
+            fuelId = this._hasFuel("torch");
+            break;
+        }
+        if (!fuelId) {
+          const msg = (base == "candle" || base == "torch") 
+            ? `${this.name} does not have a ${base} in inventory!`
+            : `${this.name} does not have oil for the ${base}!`;
+          ui.notifications.warn(msg);
+          Hyp3eLogger.info("Hyp3eActor toggleLightSource", msg);
+          return;
+        }
+      }
+    }
+
+    // Apply light source properties
+    const lightProps = foundry.utils.deepClone(item.system.light);
+    // Resolve duration roll formula to number
+    if (lightProps.duration) {
+      const durationRoll = new Roll(lightProps.duration, this.getRollData());
+      await durationRoll.evaluate({ evaluateSync: true });
+      lightProps.duration = durationRoll.total;
+    } else {
+      lightProps.duration = null; // Default to null if no duration specified
+    }
+    Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Light source properties:`, lightProps);
+    if (Object.keys(lightProps).length > 0) {
+      ui.notifications.info(`Light source applied to ${token.name}.`);
+      const v14orLater = ActiveEffect?.registry ? true : false;
+      const duration = v14orLater 
+        ? { units: "rounds", value: lightProps.duration || undefined, expiry: "turnEnd" } 
+        : { rounds: lightProps.duration || undefined };
+      const lightEffect = new ActiveEffect({
+        name: `Light Source: ${item.name}`,
+        img: "icons/svg/light.svg",
+        origin: item.uuid,
+        disabled: false,
+        duration: duration,
+        flags: {
+          hyp3e: {
+            lightProps: lightProps
+          }
+        }
+      });
+      await this.createEmbeddedDocuments("ActiveEffect", [lightEffect]);
+    }
+  }
+
+  /**
+   * 
+   * @param {String} fuel - Name of the fuel to find
+   * @returns {String|null} itemId of the fuel if found, else null if not or qty == 0
+   */
+  _hasFuel(fuel) {
+    if (!fuel) return null;
+    fuel = fuel.toLowerCase();  // Sanity check
+
+    return this.items.some(item => {
+      const name = item.name?.toLowerCase() ?? "";
+      const qty = item.system?.quantity?.value;
+  
+      // Must include the fuel term
+      if (!name.includes(fuel)) return null;
+  
+      // Special rule: exclude incendiary oil
+      if (fuel === "oil" && name.includes("incendiary")) return null;
+  
+      return qty > 0 ? item._id : null;
+    });
   }
 
   /**

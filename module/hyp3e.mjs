@@ -346,6 +346,11 @@ Hooks.once("ready", async function() {
   CONFIG.HYP3E.heavilyEncumbered = heavilyEncumbered;
   Hyp3eLogger.info("Init", "CONFIG Strength multiplier for heavily encumbered status:", CONFIG.HYP3E.heavilyEncumbered);
 
+  // Require fuel for light sources
+  const requireLightSourceFuel = game.settings.get(game.system.id, "requireLightSourceFuel");
+  CONFIG.HYP3E.requireLightSourceFuel = requireLightSourceFuel;
+  Hyp3eLogger.info("Init", "CONFIG Require fuel for light sources:", CONFIG.HYP3E.requireLightSourceFuel);
+
   // Initiative type: group, phased, or individual
   const initiativeType = game.settings.get(game.system.id, "initiativeType");
   CONFIG.HYP3E.initiativeType = initiativeType;

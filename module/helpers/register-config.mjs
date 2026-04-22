@@ -229,6 +229,20 @@ export function registerHyp3eConfigurations() {
         }
     });
 
+    // Require fuel for light sources
+    game.settings.register(game.system.id, "requireLightSourceFuel", {
+      name: game.i18n.localize("HYP3E.settings.requireLightSourceFuel"),
+      hint: game.i18n.localize("HYP3E.settings.requireLightSourceFuelHint"),
+      default: false,
+      scope: "world",
+      type: Boolean,
+      config: showConfigOptions,
+      requiresReload: false,
+      onChange: value => {
+          CONFIG.HYP3E.requireLightSourceFuel = value;
+      }
+    });
+
     // Reverse situational modifiers on roll-under checks
     game.settings.register(game.system.id, "flipRollUnderMods", {
         name: game.i18n.localize("HYP3E.settings.flipRollUnderMods"),
