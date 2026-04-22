@@ -3643,6 +3643,8 @@ export class Hyp3eActor extends Actor {
           Hyp3eLogger.info("Hyp3eActor toggleLightSource", msg);
           return;
         }
+        // Use the fuel
+        this.useItem(fuelId);
       }
     }
 
@@ -3688,18 +3690,22 @@ export class Hyp3eActor extends Actor {
     if (!fuel) return null;
     fuel = fuel.toLowerCase();  // Sanity check
 
-    return this.items.some(item => {
+    const item = this.items.find(item => {
       const name = item.name?.toLowerCase() ?? "";
       const qty = item.system?.quantity?.value;
-  
+
+      // Tokenize to avoid false positives (e.g., "boiled")
+      const tokens = name.split(/[\s,]+/);
+
       // Must include the fuel term
-      if (!name.includes(fuel)) return null;
-  
+      if (!tokens.includes(fuel)) return false;
+
       // Special rule: exclude incendiary oil
-      if (fuel === "oil" && name.includes("incendiary")) return null;
-  
-      return qty > 0 ? item._id : null;
+      if (fuel === "oil" && name.includes("incendiary")) return false;
+
+      return true;
     });
+    return (item && item.system?.quantity?.value > 0) ? item._id : null;
   }
 
   /**
