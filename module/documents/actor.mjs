@@ -3296,6 +3296,11 @@ export class Hyp3eActor extends Actor {
     // Hopefully we have a target!
     if (target) {
       if (CONFIG.HYP3E.enableCombatSitModDetection) {
+        // Is the target casting a spell?
+        if (target.combatant.isMagic) {
+          sitModSum += 2
+          sitModsArr.push("Defender Casting Spell (+2)")
+        }
         // Don't bother with elevation if we don't have an attacker token
         if (attacker) {
           Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${target.name} elevation (${target?.document.elevation}) vs. Attacker elevation (${attacker?.document.elevation})...`);
