@@ -57,17 +57,17 @@
       </div>
 
       <!-- Separator -->
-      <div style="width: 1px; background: #666;"></div>
+      {{!-- <div style="width: 1px; background: #666;"></div> --}}
 
       <!-- Two Moons -->
       <div id="moons-display" style="display: flex; gap: 8px; opacity: {{moonOpacity}}; transition: opacity 800ms ease;">
-        <span style="filter: drop-shadow(0 0 6px #aa0000);">
+        <span style="filter: drop-shadow(0 0 12px #aa0000);">
           {{!-- 🌙 --}}
-          <img title="Phobos" height="16" src="{{phobosIcon}}" style="margin-top: 4px;">
+          <img id="Phobos" title="Phobos" height="16" src="{{phobosIcon}}" style="margin-top: 4px;">
         </span>
-        <span style="filter: drop-shadow(0 0 6px #aa0000);">
+        <span style="filter: drop-shadow(0 0 12px #aa0000);">
           {{!-- 🌙 --}}
-          <img title="Selene" height="16" src="{{seleneIcon}}" style="margin-top: 4px;">
+          <img id="Selene" title="Selene" height="16" src="{{seleneIcon}}" style="margin-top: 4px;">
         </span>
       </div>
     </div>

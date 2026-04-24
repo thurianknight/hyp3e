@@ -96,22 +96,21 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     const currentTime = game.hyp3e.turnTracker.getTime();
     const currentDate = game.hyp3e.calendar.formatDate(false);
 
-    const date = game.hyp3e.calendar.getCurrentDate();
-    // const currentYear = date.year;
-    // const currentMonth = date.month;
-    // const currentDay = date.day;
-
+    // const date = game.hyp3e.calendar.getCurrentDate();
     const daylightHours = game.hyp3e.turnTracker.getCurrentDaylightHours();
     const daylightFormatted =  game.hyp3e.turnTracker.formatDaylightAsHHMM(daylightHours);
     const assetsPath = HYP3E.assetsPath;
-    // Sun visibility scales with daylight
-    const fraction = game.hyp3e.turnTracker.getDaylightFraction();
-    const sunOpacity = fraction;
-    // Moons visibility scales inversely (brighter at night)
-    const phobosPhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Phobos");
-    const selenePhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Selene");
-    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Phobos: ${phobosPhase}, Selene: ${selenePhase}`);
-    const moonOpacity = Math.max(1 - fraction, 0.2);
+    // // Sun visibility scales with daylight
+    // const daylightFraction = game.hyp3e.turnTracker.getDaylightFraction();
+    // const sunOpacity = daylightFraction;
+    // // Moons visibility scales inversely (brighter at night)
+    // const phobosPhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Phobos");
+    // const selenePhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Selene");
+    // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Phobos: ${phobosPhase}, Selene: ${selenePhase}`);
+    // const moonOpacity = Math.max(1 - daylightFraction, 0.2);
+
+    // Calculate sun/moon visibility and moon phases
+    const { sunOpacity, moonOpacity, phobosPhase, selenePhase } = this._getSunAndMoons();
 
     const context = { 
       currentTurn, 
@@ -356,6 +355,25 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
   }
 
   /**
+   * Calculate the current daylight level and moon phases and return them to the caller
+   * @returns {Object} - {}
+   */
+  _getSunAndMoons() {
+    const date = game.hyp3e.calendar.getCurrentDate();
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _getSunAndMoons", `Current date:`, date);
+    // Sun visibility scales with dawn/daylight/dusk, invisible at night
+    const daylightFraction = game.hyp3e.turnTracker.getDaylightFraction();
+    const sunOpacity = daylightFraction;
+    // Moons visibility scales inversely (brighter at night), but never goes fully invisible
+    const moonOpacity = Math.max(1 - daylightFraction, 0.2);
+    // Get each moon's phase
+    const phobosPhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Phobos");
+    const selenePhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Selene");
+
+    return { sunOpacity, moonOpacity, phobosPhase, selenePhase };
+  }
+
+  /**
    * Refresh only the dynamic parts of the Turn Tracker (turn, time, date)
    * without doing a full re-render. Safe to call from hooks on any client.
    */
@@ -373,7 +391,10 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     const turnField = this._embeddedElement.find("#current-turn");
     if (turnField.length) {
       turnField.val(currentTurn);
-    }
+      // Trigger visual flash
+      turnField.addClass("turn-advance-flash");
+      setTimeout(() => turnField.removeClass("turn-advance-flash"), 600);
+    }  
 
     // Update time
     const currentTime = game.hyp3e.turnTracker.getTime();
@@ -383,36 +404,17 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     const currentDate = game.hyp3e.calendar.formatDate(false);
     this._embeddedElement.find("#current-date")?.text(currentDate);
 
-    // Update sun/moon visibility
-    const fraction = game.hyp3e.turnTracker.getDaylightFraction();
+    // Calculate sun/moon visibility and moon phases
+    const { sunOpacity, moonOpacity, phobosPhase, selenePhase } = this._getSunAndMoons();
     // Sun visibility scales with daylight
     const sunDisplay = this._embeddedElement.find("#sun-display")[0];
-    const sunOpacity = fraction;
     sunDisplay.style.opacity = sunOpacity;
     // Moons visibility scales inversely (brighter at night)
     const moonDisplay = this._embeddedElement.find("#moons-display")[0];
-    const moonOpacity = Math.max(1 - fraction, 0.2);
     moonDisplay.style.opacity = moonOpacity;
-  }
-
-  updateTurnDisplay(turn) {
-    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 updateTurnDisplay", `Updating display for turn: ${turn}.`);
-    if (!this._embeddedElement) return;
-
-    // Update the turn field
-    const turnField = this._embeddedElement.find("#current-turn");
-    turnField.val(turn);
-
-    // Trigger visual flash
-    turnField.addClass("turn-advance-flash");
-    setTimeout(() => turnField.removeClass("turn-advance-flash"), 600);
-
-    // Update time
-    const currentTime = game.hyp3e.turnTracker.getTime();
-    this._embeddedElement.find("#current-time")?.val(currentTime);
-
-    // Update date
-    const currentDate = game.hyp3e.calendar.formatDate(false);
-    this._embeddedElement.find("#current-date")?.text(currentDate);
+    const phobosIcon = this._embeddedElement.find("#Phobos")[0];
+    phobosIcon.src = HYP3ETurnTrackerAppV2.phobosIcons[phobosPhase] ?? null;
+    const seleneIcon = this._embeddedElement.find("#Selene")[0];
+    seleneIcon.src = HYP3ETurnTrackerAppV2.seleneIcons[selenePhase] ?? null;
   }
 }
