@@ -554,6 +554,8 @@ Hooks.once("ready", async function() {
   game.hyp3e.turnTracker.getTurn = () => HYP3ETurnTracker.getTurn();
   game.hyp3e.turnTracker.turnStartTime = () => HYP3ETurnTracker.getTurnStartTime();
   game.hyp3e.turnTracker.getTime = () => HYP3ETurnTracker.getTime();
+  game.hyp3e.turnTracker.getCurrentDaylightHours = () => HYP3ETurnTracker.getCurrentDaylightHours();
+  game.hyp3e.turnTracker.getDaylightFraction = () => HYP3ETurnTracker.getDaylightFraction();
 
   // Initialize the Turn Tracker app
   if (game.settings.get(game.system.id, "enableTurnTracker")) {

@@ -1,3 +1,4 @@
+import { HYP3E_DAYLIGHT_TABLE } from "./daylight-data.mjs"
 import { Hyp3eLogger } from "./logger.mjs";
 import { logEffectRegistry } from "./effects.mjs";
 
@@ -263,7 +264,7 @@ export class HYP3ETurnTracker {
   static getCurrentDaylightHours() {
     const currentTime = game.settings.get("hyp3e", "currentTime");
     let {year, month, day} = game.hyp3e.calendar.getCurrentDate();
-    const week  = ((day - 1) % 7) + 1;   // 1–4
+    const week  = ((day - 1) % 7) + 1;   // Normalize week to numbers 1–4
 
     // Normalize year to the 13-year solar cycle (1–13)
     year = ((year - 1) % 13) + 1;

@@ -38,6 +38,18 @@ export class HYP3ECalendar {
     return game.settings.get("hyp3e", "calendarDate");
   }
 
+  static async setCurrentDate({year, month, day}) {
+    if (!game.user.isGM) {
+      Hyp3eLogger.warn("setCurrentDate", "Only the GM can change the date.");
+      return;
+    }
+
+    await game.settings.set("hyp3e", "calendarDate", {year, month, day});
+
+    // Broadcast a global hook so all apps refresh
+    Hooks.callAll("calendarDateSet", {year, month, day});
+  }
+
   static getCycleYear(year) {
     // Returns 1–13, wrapping properly
     return ((year - 1) % 13) + 1;
@@ -85,18 +97,6 @@ export class HYP3ECalendar {
       else break;
     }
     return lastPhase;
-  }
-
-  static async setCurrentDate({year, month, day}) {
-    if (!game.user.isGM) {
-      Hyp3eLogger.warn("setCurrentDate", "Only the GM can change the date.");
-      return;
-    }
-
-    await game.settings.set("hyp3e", "calendarDate", {year, month, day});
-
-    // Broadcast a global hook so all apps refresh
-    Hooks.callAll("calendarDateSet", {year, month, day});
   }
 
   static async advanceDay(resetTurns = false) {

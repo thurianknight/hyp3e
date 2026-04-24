@@ -2,6 +2,7 @@
 import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { TurnAdvanceActionsConfig } from "./turn-advance-actions-config.mjs";
+import { formatDaylightAsHHMM } from "../helpers/daylight-data.mjs"
 
 const {
   HandlebarsApplicationMixin,
@@ -65,11 +66,22 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     const currentTurn = game.hyp3e.turnTracker.getTurn();
     const currentTime = game.hyp3e.turnTracker.getTime();
     const currentDate = game.hyp3e.calendar.formatDate(false);
+    const daylightHours = game.hyp3e.turnTracker.getCurrentDaylightHours();
+    const daylightFormatted =  formatDaylightAsHHMM(daylightHours);
+    const fraction = game.hyp3e.turnTracker.getDaylightFraction();
+    // Sun visibility scales with daylight
+    const sunOpacity = fraction;
+    // Moons visibility scales inversely (brighter at night)
+    const moonOpacity = 1 - fraction;
+
     const context = { 
       currentTurn, 
       currentTime, 
       showDateInTurnTracker: game.settings.get(game.system.id, "showDateInTurnTracker"),
       currentDate,
+      daylightFormatted,
+      sunOpacity,
+      moonOpacity,
       isGM: game.user.isGM, 
       mode: game.settings.get("hyp3e", "turnTrackerMode") 
     }
