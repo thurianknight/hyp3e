@@ -2,7 +2,6 @@
 import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { TurnAdvanceActionsConfig } from "./turn-advance-actions-config.mjs";
-import { formatDaylightAsHHMM } from "../helpers/daylight-data.mjs"
 
 const {
   HandlebarsApplicationMixin,
@@ -48,6 +47,36 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
 
   static _hooksRegistered = false;
 
+  // static phaseIcons = {
+  //   "New": "🌑",
+  //   "Waxing Crescent": "🌒",
+  //   "First Quarter": "🌓",
+  //   "Waxing Gibbous": "🌔",
+  //   "Waxing": "🌔",
+  //   "Full": "🌕",
+  //   "Waning Gibbous": "🌖",
+  //   "Third Quarter": "🌗",
+  //   "Waning Crescent": "🌘",
+  //   "Waning": "🌘",
+  // };
+  static phobosIcons = {
+    "New": `${HYP3E.assetsPath}/moon-phobos-new.png`,
+    "Waning": `${HYP3E.assetsPath}/moon-phobos-crescent.png`,
+    "First Quarter": `${HYP3E.assetsPath}/moon-phobos-half.png`,
+    "Waxing": `${HYP3E.assetsPath}/moon-phobos-gibbous.png`,
+    "Full": `${HYP3E.assetsPath}/moon-phobos.png`,
+  };
+  static seleneIcons = {
+    "New": `${HYP3E.assetsPath}/moon-selene-new.png`,
+    "Waxing Crescent": `${HYP3E.assetsPath}/moon-selene-crescent.png`,
+    "Waning Crescent": `${HYP3E.assetsPath}/moon-selene-crescent.png`,
+    "First Quarter": `${HYP3E.assetsPath}/moon-selene-half.png`,
+    "Third Quarter": `${HYP3E.assetsPath}/moon-selene-half.png`,
+    "Waxing Gibbous": `${HYP3E.assetsPath}/moon-selene-gibbous.png`,
+    "Waning Gibbous": `${HYP3E.assetsPath}/moon-selene-gibbous.png`,
+    "Full": `${HYP3E.assetsPath}/moon-selene.png`
+  };
+
   constructor(options = {}) {
     super(options);
 
@@ -66,13 +95,23 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     const currentTurn = game.hyp3e.turnTracker.getTurn();
     const currentTime = game.hyp3e.turnTracker.getTime();
     const currentDate = game.hyp3e.calendar.formatDate(false);
+
+    const date = game.hyp3e.calendar.getCurrentDate();
+    // const currentYear = date.year;
+    // const currentMonth = date.month;
+    // const currentDay = date.day;
+
     const daylightHours = game.hyp3e.turnTracker.getCurrentDaylightHours();
-    const daylightFormatted =  formatDaylightAsHHMM(daylightHours);
-    const fraction = game.hyp3e.turnTracker.getDaylightFraction();
+    const daylightFormatted =  game.hyp3e.turnTracker.formatDaylightAsHHMM(daylightHours);
+    const assetsPath = HYP3E.assetsPath;
     // Sun visibility scales with daylight
+    const fraction = game.hyp3e.turnTracker.getDaylightFraction();
     const sunOpacity = fraction;
     // Moons visibility scales inversely (brighter at night)
-    const moonOpacity = 1 - fraction;
+    const phobosPhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Phobos");
+    const selenePhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Selene");
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Phobos: ${phobosPhase}, Selene: ${selenePhase}`);
+    const moonOpacity = Math.max(1 - fraction, 0.2);
 
     const context = { 
       currentTurn, 
@@ -80,12 +119,15 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
       showDateInTurnTracker: game.settings.get(game.system.id, "showDateInTurnTracker"),
       currentDate,
       daylightFormatted,
+      assetsPath,
       sunOpacity,
+      phobosIcon: HYP3ETurnTrackerAppV2.phobosIcons[phobosPhase] ?? null,
+      seleneIcon: HYP3ETurnTrackerAppV2.seleneIcons[selenePhase] ?? null,
       moonOpacity,
       isGM: game.user.isGM, 
       mode: game.settings.get("hyp3e", "turnTrackerMode") 
     }
-    // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", "Turn Tracker context:", context);
+    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Turn Tracker context:`, context);
     return context;
   }
 
@@ -289,6 +331,11 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     new TurnAdvanceActionsConfig().render(true);
   }
 
+  /**
+   * Switch between embedded and floating mode.
+   * @param {*} event 
+   * @param {*} target 
+   */
   static async #toggleMode(event, target) {
     // event.preventDefault();
     const currentMode = game.settings.get("hyp3e", "turnTrackerMode");
@@ -305,7 +352,6 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
         height: rect.height
       });
     }
-
     await game.settings.set("hyp3e", "turnTrackerMode", newMode);
   }
 
@@ -322,20 +368,31 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
 
     Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _refreshDisplay", "Refresh display called from hook");
 
-    // Update date
-    const currentDate = game.hyp3e.calendar.formatDate(false);
-    this._embeddedElement.find("#current-date")?.text(currentDate);
-
-    // Update time
-    const currentTime = game.hyp3e.turnTracker.getTime();
-    this._embeddedElement.find("#current-time")?.val(currentTime);
-
     // Update turn
     const currentTurn = game.hyp3e.turnTracker.getTurn();
     const turnField = this._embeddedElement.find("#current-turn");
     if (turnField.length) {
       turnField.val(currentTurn);
     }
+
+    // Update time
+    const currentTime = game.hyp3e.turnTracker.getTime();
+    this._embeddedElement.find("#current-time")?.val(currentTime);
+
+    // Update date
+    const currentDate = game.hyp3e.calendar.formatDate(false);
+    this._embeddedElement.find("#current-date")?.text(currentDate);
+
+    // Update sun/moon visibility
+    const fraction = game.hyp3e.turnTracker.getDaylightFraction();
+    // Sun visibility scales with daylight
+    const sunDisplay = this._embeddedElement.find("#sun-display")[0];
+    const sunOpacity = fraction;
+    sunDisplay.style.opacity = sunOpacity;
+    // Moons visibility scales inversely (brighter at night)
+    const moonDisplay = this._embeddedElement.find("#moons-display")[0];
+    const moonOpacity = Math.max(1 - fraction, 0.2);
+    moonDisplay.style.opacity = moonOpacity;
   }
 
   updateTurnDisplay(turn) {

@@ -262,7 +262,6 @@ export class HYP3ETurnTracker {
    * @returns {number}
    */
   static getCurrentDaylightHours() {
-    const currentTime = game.settings.get("hyp3e", "currentTime");
     let {year, month, day} = game.hyp3e.calendar.getCurrentDate();
     const week  = ((day - 1) % 7) + 1;   // Normalize week to numbers 1–4
 
@@ -279,9 +278,58 @@ export class HYP3ETurnTracker {
   }
 
   /**
-   * Get daylight fraction (0.0 = total darkness, 1.0 = full 24h daylight)
+   * Convert decimal daylight hours to "hh:mm" format
+   * @param {number} decimalHours - e.g. 8.75, 17.4167, 23.9167, 0, etc.
+   * @returns {string} Formatted as "hh:mm" with leading zeros (e.g. "08:45", "23:55", "00:00")
+   */
+  static formatDaylightAsHHMM(decimalHours) {
+    // Clamp to valid range just in case
+    Hyp3eLogger.info("HYP3ETurnTracker formatDaylightAsHHMM", `decimalHours: ${decimalHours}`);
+    decimalHours = Math.max(0, Math.min(24, decimalHours));
+    // Hyp3eLogger.info("HYP3ETurnTracker formatDaylightAsHHMM", `decimalHours: ${decimalHours}`);
+  
+    const totalMinutes = Math.round(decimalHours * 60);   // round to nearest minute
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+  
+    // Format minutes with leading zeros
+    return `${hours.toString()}h ${minutes.toString().padStart(2, '0')}m`;
+  }
+  
+  /**
+   * Get daylight fraction (0.0 = total darkness, 1.0 = full 24h daylight).
    */
   static getDaylightFraction() {
-    return Math.max(0, Math.min(1, this.getCurrentDaylightHours() / 24));
+    const currentTime = game.settings.get("hyp3e", "currentTime");
+    const daylightHours = this.getCurrentDaylightHours();  // Total hours of daylight, decimal
+    const [currHour, currMinute] = currentTime.split(":").map(Number);
+    const now = currHour + (currMinute <= 15 ? 0 : currMinute <= 30 ? 0.25 : currMinute <= 45 ? 0.5 : 0.75);
+    // Sunrise and sunset are each 1/2 of daylightHours before/after noon
+    const sunrise = 12 - (daylightHours * 0.5);
+    const sunset = 12 + (daylightHours * 0.5);
+  
+    const TWILIGHT = 1; // hours
+  
+    // Twilight windows
+    const sunriseStart = sunrise - TWILIGHT;
+    const sunriseEnd   = sunrise + TWILIGHT < 12 ? sunrise + TWILIGHT : 12;
+    const sunsetStart  = sunset - TWILIGHT > 12 ? sunset - TWILIGHT : 12;
+    const sunsetEnd    = sunset + TWILIGHT;
+  
+    // --- Twilight checks (priority first) ---
+    if (
+      (now >= sunriseStart && now <= sunriseEnd) ||
+      (now >= sunsetStart && now <= sunsetEnd)
+    ) {
+      return 0.5;
+    }
+  
+    // --- Full daylight ---
+    if (now > sunriseEnd && now < sunsetStart) {
+      return 1.0;
+    }
+  
+    // --- Full darkness ---
+    return 0.0;
   }
 }

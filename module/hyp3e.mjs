@@ -538,6 +538,7 @@ Hooks.once("ready", async function() {
   game.hyp3e.calendar.advanceDay = () => HYP3ECalendar.advanceDay();
   game.hyp3e.calendar.retreatDay = () => HYP3ECalendar.retreatDay();
   game.hyp3e.calendar.formatDate = () => HYP3ECalendar.formatDate();
+  game.hyp3e.calendar.getMoonPhase = (year, monthNum, day, moonName) => HYP3ECalendar.getMoonPhase(year, monthNum, day, moonName);
   game.hyp3e.calendar.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
   Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.calendar.formatDate(true)}.`, game.hyp3e.calendar.getCurrentDate());
 
@@ -555,6 +556,7 @@ Hooks.once("ready", async function() {
   game.hyp3e.turnTracker.turnStartTime = () => HYP3ETurnTracker.getTurnStartTime();
   game.hyp3e.turnTracker.getTime = () => HYP3ETurnTracker.getTime();
   game.hyp3e.turnTracker.getCurrentDaylightHours = () => HYP3ETurnTracker.getCurrentDaylightHours();
+  game.hyp3e.turnTracker.formatDaylightAsHHMM = (decimalHours) => HYP3ETurnTracker.formatDaylightAsHHMM(decimalHours);
   game.hyp3e.turnTracker.getDaylightFraction = () => HYP3ETurnTracker.getDaylightFraction();
 
   // Initialize the Turn Tracker app

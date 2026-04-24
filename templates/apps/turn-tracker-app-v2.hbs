@@ -39,27 +39,37 @@
     <div class="controls">
       <span class="time-label" id="current-date">{{currentDate}}</span>
     </div>
-  {{!-- </div>
-  <div class="turn-tracker-row"> --}}
-    <div class="controls" title="{{daylightFormatted}} daylight" style="gap: 12px;">
+  {{!-- </div> --}}
+  <!-- Separator -->
+  <div style="width: 1px; background: #666;"></div>
+
+  {{!-- <div class="turn-tracker-row"> --}}
+    <div class="controls" style="gap: 12px;">
       <!-- Sun -->
-      <div class="hyp3e-sun" style="opacity: {{sunOpacity}}; transition: opacity 800ms ease; filter: drop-shadow(0 0 8px #ffcc44);">
-        ☀️
+      <div id="sun-display" title="{{daylightFormatted}} daylight" style="opacity: {{sunOpacity}}; transition: opacity 800ms ease; 
+            filter:
+              drop-shadow(0 0 6px  #ff6666)
+              drop-shadow(0 0 12px #ff4444)
+              drop-shadow(0 0 24px #f43434)
+              drop-shadow(0 0 48px #aa0000);">
+        {{!-- ☀️ --}}
+        <img height="24" src="{{assetsPath}}/sun-red-giant.png">
       </div>
 
       <!-- Separator -->
       <div style="width: 1px; background: #666;"></div>
 
       <!-- Two Moons -->
-      <div class="hyp3e-moons" style="display: flex; gap: 8px; opacity: {{moonOpacity}}; transition: opacity 800ms ease;">
-        <span style="filter: drop-shadow(0 0 6px #aaddff);">🌙</span>
-        <span style="filter: drop-shadow(0 0 6px #aaddff);">🌙</span>
+      <div id="moons-display" style="display: flex; gap: 8px; opacity: {{moonOpacity}}; transition: opacity 800ms ease;">
+        <span style="filter: drop-shadow(0 0 6px #aa0000);">
+          {{!-- 🌙 --}}
+          <img title="Phobos" height="16" src="{{phobosIcon}}" style="margin-top: 4px;">
+        </span>
+        <span style="filter: drop-shadow(0 0 6px #aa0000);">
+          {{!-- 🌙 --}}
+          <img title="Selene" height="16" src="{{seleneIcon}}" style="margin-top: 4px;">
+        </span>
       </div>
-
-      <!-- Daylight readout -->
-      {{!-- <div style="margin-left: auto;">
-        {{daylightFormatted}} daylight
-      </div> --}}
     </div>
   </div>
   {{/if}}
