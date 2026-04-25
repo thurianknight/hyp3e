@@ -48,21 +48,24 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
   static _hooksRegistered = false;
 
   static phobosIcons = {
-    "New": `${HYP3E.assetsPath}/moon-phobos-new.png`,
-    "Waning": `${HYP3E.assetsPath}/moon-phobos-crescent.png`,
-    "First Quarter": `${HYP3E.assetsPath}/moon-phobos-half.png`,
-    "Waxing": `${HYP3E.assetsPath}/moon-phobos-gibbous.png`,
-    "Full": `${HYP3E.assetsPath}/moon-phobos.png`,
+    "New": `${HYP3E.assetsPath}/moon-phases/moon-phobos-new.png`,
+    "Waxing Crescent": `${HYP3E.assetsPath}/moon-phases/moon-phobos-waxing-crescent.png`,
+    "First Quarter": `${HYP3E.assetsPath}/moon-phases/moon-phobos-first-quarter.png`,
+    "Waxing Gibbous": `${HYP3E.assetsPath}/moon-phases/moon-phobos-waxing-gibbous.png`,
+    "Full": `${HYP3E.assetsPath}/moon-phases/moon-phobos-full.png`,
+    "Waning Gibbous": `${HYP3E.assetsPath}/moon-phases/moon-phobos-waning-gibbous.png`,
+    "Third Quarter": `${HYP3E.assetsPath}/moon-phases/moon-phobos-third-quarter.png`,
+    "Waning Crescent": `${HYP3E.assetsPath}/moon-phases/moon-phobos-waning-crescent.png`,
   };
   static seleneIcons = {
-    "New": `${HYP3E.assetsPath}/moon-selene-new.png`,
-    "Waxing Crescent": `${HYP3E.assetsPath}/moon-selene-crescent.png`,
-    "Waning Crescent": `${HYP3E.assetsPath}/moon-selene-crescent.png`,
-    "First Quarter": `${HYP3E.assetsPath}/moon-selene-half.png`,
-    "Third Quarter": `${HYP3E.assetsPath}/moon-selene-half.png`,
-    "Waxing Gibbous": `${HYP3E.assetsPath}/moon-selene-gibbous.png`,
-    "Waning Gibbous": `${HYP3E.assetsPath}/moon-selene-gibbous.png`,
-    "Full": `${HYP3E.assetsPath}/moon-selene.png`
+    "New": `${HYP3E.assetsPath}/moon-phases/moon-selene-new.png`,
+    "Waxing Crescent": `${HYP3E.assetsPath}/moon-phases/moon-selene-waxing-crescent.png`,
+    "First Quarter": `${HYP3E.assetsPath}/moon-phases/moon-selene-first-quarter.png`,
+    "Waxing Gibbous": `${HYP3E.assetsPath}/moon-phases/moon-selene-waxing-gibbous.png`,
+    "Full": `${HYP3E.assetsPath}/moon-phases/moon-selene-full.png`,
+    "Waning Gibbous": `${HYP3E.assetsPath}/moon-phases/moon-selene-waning-gibbous.png`,
+    "Third Quarter": `${HYP3E.assetsPath}/moon-phases/moon-selene-third-quarter.png`,
+    "Waning Crescent": `${HYP3E.assetsPath}/moon-phases/moon-selene-waning-crescent.png`,
   };
 
   constructor(options = {}) {
@@ -101,7 +104,9 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
       assetsPath,
       sunOpacity,
       phobosIcon: HYP3ETurnTrackerAppV2.phobosIcons[phobosPhase] ?? null,
+      phobosPhase,
       seleneIcon: HYP3ETurnTrackerAppV2.seleneIcons[selenePhase] ?? null,
+      selenePhase,
       moonOpacity,
       isGM: game.user.isGM, 
       mode: game.settings.get("hyp3e", "turnTrackerMode") 
@@ -379,6 +384,8 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     // Update time
     const currentTime = game.hyp3e.turnTracker.getTime();
     this._embeddedElement.find("#current-time")?.val(currentTime);
+
+    if (!game.settings.get(game.system.id, "showDateInTurnTracker")) return;
 
     // Update date
     const currentDate = game.hyp3e.calendar.formatDate(false);

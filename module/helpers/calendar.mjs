@@ -1,4 +1,5 @@
 import { HYP3E_CALENDAR } from "./calendar-data.mjs"
+import { HYP3E } from "./config.mjs"
 import { Hyp3eLogger } from "./logger.mjs";
 
 export async function setupCalendarHooks() {
@@ -78,6 +79,26 @@ export class HYP3ECalendar {
     "Third Quarter": "🌗",
     "Waning Crescent": "🌘",
     "Waning": "🌘",
+  };
+  static phobosIcons = {
+    "New": `${HYP3E.assetsPath}/moon-phases/moon-phobos-new.png`,
+    "Waxing Crescent": `${HYP3E.assetsPath}/moon-phases/moon-phobos-waxing-crescent.png`,
+    "First Quarter": `${HYP3E.assetsPath}/moon-phases/moon-phobos-first-quarter.png`,
+    "Waxing Gibbous": `${HYP3E.assetsPath}/moon-phases/moon-phobos-waxing-gibbous.png`,
+    "Full": `${HYP3E.assetsPath}/moon-phases/moon-phobos-full.png`,
+    "Waning Gibbous": `${HYP3E.assetsPath}/moon-phases/moon-phobos-waning-gibbous.png`,
+    "Third Quarter": `${HYP3E.assetsPath}/moon-phases/moon-phobos-third-quarter.png`,
+    "Waning Crescent": `${HYP3E.assetsPath}/moon-phases/moon-phobos-waning-crescent.png`,
+  };
+  static seleneIcons = {
+    "New": `${HYP3E.assetsPath}/moon-phases/moon-selene-new.png`,
+    "Waxing Crescent": `${HYP3E.assetsPath}/moon-phases/moon-selene-waxing-crescent.png`,
+    "First Quarter": `${HYP3E.assetsPath}/moon-phases/moon-selene-first-quarter.png`,
+    "Waxing Gibbous": `${HYP3E.assetsPath}/moon-phases/moon-selene-waxing-gibbous.png`,
+    "Full": `${HYP3E.assetsPath}/moon-phases/moon-selene-full.png`,
+    "Waning Gibbous": `${HYP3E.assetsPath}/moon-phases/moon-selene-waning-gibbous.png`,
+    "Third Quarter": `${HYP3E.assetsPath}/moon-phases/moon-selene-third-quarter.png`,
+    "Waning Crescent": `${HYP3E.assetsPath}/moon-phases/moon-selene-waning-crescent.png`,
   };
 
   static getMoonPhase(year, monthNum, day, moonName) {

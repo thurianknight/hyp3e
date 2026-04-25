@@ -84,9 +84,9 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
             isToday,
             isFestival,
             phobosPhase,
-            phobosIcon: HYP3ECalendar.phaseIcons[phobosPhase] ?? null,
+            phobosIcon: HYP3ECalendar.phobosIcons[phobosPhase] ?? null,
             selenePhase,
-            seleneIcon: HYP3ECalendar.phaseIcons[selenePhase] ?? null
+            seleneIcon: HYP3ECalendar.seleneIcons[selenePhase] ?? null
           });
         }
         days.push(week);

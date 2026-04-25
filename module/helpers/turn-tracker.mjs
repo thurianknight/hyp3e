@@ -312,7 +312,7 @@ export class HYP3ETurnTracker {
     const sunrise = 12 - (daylightHours * 0.5);
     const sunset = 12 + (daylightHours * 0.5);
   
-    const TWILIGHT = 1; // hours
+    const TWILIGHT = 0.5; // 30 minutes of twilight on either side of sunrise/sunset
   
     // Twilight windows
     const sunriseStart = sunrise - TWILIGHT;

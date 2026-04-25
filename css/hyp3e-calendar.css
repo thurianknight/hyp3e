@@ -114,6 +114,20 @@
   cursor: pointer;
 }
 
+.hyp3e-calendar .calendar-grid td .moon-icons {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  #Phobos {
+    height: 20px;
+    width: 20px;
+  };
+  #Selene {
+    height: 28px;
+    width: 28px;
+  }
+}
+
 .moon-legend {
   display: flex;
   justify-content: center;

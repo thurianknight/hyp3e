@@ -36,10 +36,12 @@
                     <div class="day-number">{{number}}</div>
                     <div class="moon-icons">
                       {{#if phobosIcon}}
-                      <span class="moon-icon" title="Phobos: {{phobosPhase}}">{{phobosIcon}}</span>
+                      {{!-- <span class="moon-icon" title="Phobos: {{phobosPhase}}">{{phobosIcon}}</span> --}}
+                      <img id="Phobos" title="Phobos: {{phobosPhase}}" src="{{phobosIcon}}">
                       {{/if}}
                       {{#if seleneIcon}}
-                      <span class="moon-icon" title="Selene: {{selenePhase}}">{{seleneIcon}}</span>
+                      {{!-- <span class="moon-icon" title="Selene: {{selenePhase}}">{{seleneIcon}}</span> --}}
+                      <img id="Selene" title="Selene: {{selenePhase}}" src="{{seleneIcon}}">
                       {{/if}}
                     </div>
                 </td>
@@ -57,7 +59,7 @@
                 </div>
             </div>
             <div>
-                <div class="moon-legend">
+                {{!-- <div class="moon-legend">
                     <div class="legend-item">Moons Today:</div>
                     <div class="legend-item" title="{{todayPhobos.phase}}">
                         <span class="moon-icon">{{todayPhobos.icon}}</span> Phobos
@@ -65,15 +67,14 @@
                     <div class="legend-item" title="{{todaySelene.phase}}">
                         <span class="moon-icon">{{todaySelene.icon}}</span> Selene
                     </div>
-                </div>
+                </div> --}}
                 <div class="festival-container">
                     {{#if currentFestival}}
-                    <div class="festival-banner">
+                    {{!-- <div class="festival-banner"> --}}
                         Festival: {{currentFestival.name}} (Days {{currentFestival.startDay}}–{{currentFestival.endDay}})
-                    </div>
+                    {{!-- </div> --}}
                     {{/if}}
                 </div>
-
             </div>
         </div>
     </div>
