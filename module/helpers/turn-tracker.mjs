@@ -263,18 +263,22 @@ export class HYP3ETurnTracker {
    */
   static getCurrentDaylightHours() {
     let {year, month, day} = game.hyp3e.calendar.getCurrentDate();
-    const week  = ((day - 1) % 7) + 1;   // Normalize week to numbers 1–4
+    const week  = Math.floor((day - 1) / 7) + 1;   // Normalize week to numbers 1–4
 
     // Normalize year to the 13-year solar cycle (1–13)
     year = ((year - 1) % 13) + 1;
-
+    // Hyp3eLogger.info("HYP3ETurnTracker getCurrentDaylightHours", `year: ${year}, month: ${month}, day: ${day}, week: ${week}`);
     const monthData = HYP3E_DAYLIGHT_TABLE[month];
+    // Hyp3eLogger.info("HYP3ETurnTracker getCurrentDaylightHours", `monthData:`, monthData);
     if (!monthData) return 12; // safe default
 
     const weekData = monthData[week];
+    // Hyp3eLogger.info("HYP3ETurnTracker getCurrentDaylightHours", `weekData:`, weekData);
     if (!weekData || weekData.length < 13) return 12;
 
-    return weekData[year - 1] ?? 12;
+    const daylightHours = weekData[year - 1];
+    // Hyp3eLogger.info("HYP3ETurnTracker getCurrentDaylightHours", `daylightHours: ${daylightHours}`);
+    return daylightHours ?? 12;
   }
 
   /**
@@ -284,7 +288,7 @@ export class HYP3ETurnTracker {
    */
   static formatDaylightAsHHMM(decimalHours) {
     // Clamp to valid range just in case
-    Hyp3eLogger.info("HYP3ETurnTracker formatDaylightAsHHMM", `decimalHours: ${decimalHours}`);
+    // Hyp3eLogger.info("HYP3ETurnTracker formatDaylightAsHHMM", `decimalHours: ${decimalHours}`);
     decimalHours = Math.max(0, Math.min(24, decimalHours));
     // Hyp3eLogger.info("HYP3ETurnTracker formatDaylightAsHHMM", `decimalHours: ${decimalHours}`);
   

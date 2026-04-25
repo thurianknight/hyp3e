@@ -47,18 +47,6 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
 
   static _hooksRegistered = false;
 
-  // static phaseIcons = {
-  //   "New": "🌑",
-  //   "Waxing Crescent": "🌒",
-  //   "First Quarter": "🌓",
-  //   "Waxing Gibbous": "🌔",
-  //   "Waxing": "🌔",
-  //   "Full": "🌕",
-  //   "Waning Gibbous": "🌖",
-  //   "Third Quarter": "🌗",
-  //   "Waning Crescent": "🌘",
-  //   "Waning": "🌘",
-  // };
   static phobosIcons = {
     "New": `${HYP3E.assetsPath}/moon-phobos-new.png`,
     "Waning": `${HYP3E.assetsPath}/moon-phobos-crescent.png`,
@@ -100,14 +88,6 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     const daylightHours = game.hyp3e.turnTracker.getCurrentDaylightHours();
     const daylightFormatted =  game.hyp3e.turnTracker.formatDaylightAsHHMM(daylightHours);
     const assetsPath = HYP3E.assetsPath;
-    // // Sun visibility scales with daylight
-    // const daylightFraction = game.hyp3e.turnTracker.getDaylightFraction();
-    // const sunOpacity = daylightFraction;
-    // // Moons visibility scales inversely (brighter at night)
-    // const phobosPhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Phobos");
-    // const selenePhase = game.hyp3e.calendar.getMoonPhase(date.year, date.month, date.day, "Selene");
-    // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Phobos: ${phobosPhase}, Selene: ${selenePhase}`);
-    // const moonOpacity = Math.max(1 - daylightFraction, 0.2);
 
     // Calculate sun/moon visibility and moon phases
     const { sunOpacity, moonOpacity, phobosPhase, selenePhase } = this._getSunAndMoons();
@@ -356,11 +336,11 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
 
   /**
    * Calculate the current daylight level and moon phases and return them to the caller
-   * @returns {Object} - {}
+   * @returns {Object} - float sunOpacity, float moonOpacity, string phobosPhase, string selenePhase
    */
   _getSunAndMoons() {
     const date = game.hyp3e.calendar.getCurrentDate();
-    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _getSunAndMoons", `Current date:`, date);
+    // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _getSunAndMoons", `Current date:`, date);
     // Sun visibility scales with dawn/daylight/dusk, invisible at night
     const daylightFraction = game.hyp3e.turnTracker.getDaylightFraction();
     const sunOpacity = daylightFraction;
@@ -384,7 +364,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
       return;
     }
 
-    Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _refreshDisplay", "Refresh display called from hook");
+    // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _refreshDisplay", "Refresh display called from hook");
 
     // Update turn
     const currentTurn = game.hyp3e.turnTracker.getTurn();
