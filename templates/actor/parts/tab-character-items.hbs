@@ -314,7 +314,7 @@
               <i class="fas fa-coin"></i>
               {{coin.label}}
             </label>
-            <input type="text" name="system.money.{{key}}.value" value="{{coin.value}}" />
+            <input type="text" name="system.money.{{key}}.value" value="{{formatNumber coin.value}}" />
           </div>
           {{/each}}
         </div>
