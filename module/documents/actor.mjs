@@ -2907,6 +2907,8 @@ export class Hyp3eActor extends Actor {
           if (unit === 'm' || unit === 'meters') value *= 3.28084;
           if (unit === 'mi' || unit === 'miles') value *= 5280;
           Hyp3eLogger.info("Hyp3eActor _parseSpellRange", `Spell range: ${rangeStr} = ${value} feet`);
+          // Fudge short ranges to allow for diagonal or large targets
+          if (value < 7) return 7; // E.g. Base 5ft -> 7 allows diagonal or large target
           return Math.round(value);
       }
       Hyp3eLogger.info("Hyp3eActor _parseSpellRange", `Spell range ${rangeStr} could not be determined!`);
