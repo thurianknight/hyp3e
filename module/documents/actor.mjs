@@ -2490,7 +2490,7 @@ export class Hyp3eActor extends Actor {
       dataset.targetSize = targetData.size;
 
       // Warn if attack or spell requires a target, but no tokens were selected
-      if (item && (item.type === "weapon" || item.type === "spell" && itemData.atkRoll) && !target) {
+      if (item && (item.type === "weapon" || (item.type === "spell" && itemData.atkRoll)) && !target) {
           ui.notifications.warn(`No target selected for ${item.name}!`);
       }
 
@@ -3296,8 +3296,8 @@ export class Hyp3eActor extends Actor {
     // Hopefully we have a target!
     if (target) {
       if (CONFIG.HYP3E.enableCombatSitModDetection) {
-        // Is the target casting a spell?
-        if (target.combatant.isMagic) {
+        // Is the target casting a spell while dodging a melee attack?
+        if (target.combatant.isMagic && !isMissile) {
           sitModSum += 2
           sitModsArr.push("Defender Casting Spell (+2)")
         }
