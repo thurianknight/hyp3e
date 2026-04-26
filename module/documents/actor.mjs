@@ -3299,7 +3299,7 @@ export class Hyp3eActor extends Actor {
     if (target) {
       if (CONFIG.HYP3E.enableCombatSitModDetection) {
         // Is the target casting a spell while dodging a melee attack?
-        if (target.combatant.isMagic && !isMissile) {
+        if (target?.combatant?.isMagic && !isMissile) {
           sitModSum += 2
           sitModsArr.push("Defender Casting Spell (+2)")
         }
