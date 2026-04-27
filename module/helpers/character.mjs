@@ -4690,7 +4690,7 @@ export class Hyp3eCharacterClass {
       const abilityName = entry.name.toLowerCase();
       let newItem;
 
-      // Search in the world Items directory for ann items matching the ability name
+      // Search in the world Items directory for any items matching the ability name
       const matches = game.items.filter(i => i.name.toLowerCase() === abilityName);
       for (let item of matches) {
         Hyp3eLogger.info("Hyp3eCharacterClass getClassAbilities", `Possible match for ${abilityName}:`, item);
