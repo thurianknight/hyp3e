@@ -826,6 +826,7 @@ Hooks.on("preUpdateItem", async (item, update) => {
 
   // Check config setting for weapons & shields
   if (CONFIG.HYP3E.enforceWeaponEquipRules) {
+    Hyp3eLogger.info("preUpdateItem", `Enforcing weapon equippage rules for ${item.name}...`, {item, actor});
     await actor.enforceWeaponEquipRules(item);
   }
 
