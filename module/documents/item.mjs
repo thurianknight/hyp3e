@@ -84,7 +84,7 @@ export class Hyp3eItem extends Item {
   async _onUpdate(changed, options, user) {
     super._onUpdate(changed, options, user);
     Hyp3eLogger.info("Hyp3eItem _onUpdate", `Changed data:`, changed);
-    // Only proceed if this is the active GM
+    // Only proceed if this is the active GM (prevents multiple messages from spamming chat)
     if (!game.user?.isGM || game.users.activeGM !== game.user) return;
 
     // Send a chat message that the item was equipped/unequipped or carried/dropped, 

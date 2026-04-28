@@ -3656,6 +3656,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Apply light source properties
+    const v14orLater = ActiveEffect?.registry ? true : false;
     const lightProps = foundry.utils.deepClone(item.system.light);
     // Resolve duration roll formula to number
     if (lightProps.duration) {
@@ -3667,11 +3668,22 @@ export class Hyp3eActor extends Actor {
     }
     Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Light source properties:`, lightProps);
     if (Object.keys(lightProps).length > 0) {
-      ui.notifications.info(`Light source applied to ${token.name}.`);
-      const v14orLater = ActiveEffect?.registry ? true : false;
-      const duration = v14orLater 
-        ? { units: "rounds", value: lightProps.duration || undefined, expiry: "turnEnd" } 
-        : { rounds: lightProps.duration || undefined };
+      // const duration = v14orLater 
+      //   ? { units: "rounds", value: lightProps.duration || undefined, expiry: "turnEnd" } 
+      //   : { rounds: lightProps.duration || undefined };
+      const duration = {};
+      if (v14orLater) {
+        duration.units = "rounds";
+        if (lightProps.duration) {
+          duration.value = lightProps.duration;
+          duration.expiry = "turnEnd";
+        } else {
+          duration.value = null;
+          duration.expiry = null;
+        }
+      } else {
+        duration.rounds = lightProps.duration;
+      }
       const lightEffect = new ActiveEffect({
         name: `Light Source: ${item.name}`,
         img: "icons/svg/light.svg",
@@ -3685,6 +3697,7 @@ export class Hyp3eActor extends Actor {
         }
       });
       await this.createEmbeddedDocuments("ActiveEffect", [lightEffect]);
+      ui.notifications.info(`Light source applied to ${token.name}.`);
     }
   }
 
