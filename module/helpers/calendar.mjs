@@ -181,7 +181,7 @@ export class HYP3ECalendar {
     await game.time.advance(newTotalSeconds - game.time.worldTime);
 
     // Broadcast a global hook so all apps refresh
-    Hyp3eLogger.info("HYP3ECalendar setCurrentDate", `Calendar date set to ${this.formatDate()}`);
+    Hyp3eLogger.info("HYP3ECalendar setCurrentDate", `Calendar date set to ${this.formatDate(this.getCurrentDate(), false)}`);
     Hooks.callAll("calendarDateSet", {year, month, day});
   }
 
@@ -216,7 +216,7 @@ export class HYP3ECalendar {
     }
 
     const {year, month, day} = this.getCurrentDate();
-    Hyp3eLogger.info("HYP3ECalendar advanceDay", `Calendar advanced to ${this.formatDate()}`);
+    Hyp3eLogger.info("HYP3ECalendar advanceDay", `Calendar advanced to ${this.formatDate(this.getCurrentDate(), false)}`);
     Hooks.callAll("calendarDayAdvanced", { year, month, day });
   }
 
@@ -254,7 +254,7 @@ export class HYP3ECalendar {
     }
 
     const {year, month, day} = this.getCurrentDate();
-    Hyp3eLogger.info("HYP3ECalendar retreatDay", `Calendar retreated to ${this.formatDate()}`);
+    Hyp3eLogger.info("HYP3ECalendar retreatDay", `Calendar retreated to ${this.formatDate(this.getCurrentDate(), false)}`);
     Hooks.callAll("calendarDayRetreated", { year, month, day });
   }
 
@@ -287,13 +287,15 @@ export class HYP3ECalendar {
   }
 
   /**
-   * Formats the current date in a human-readable way
+   * Formats the current date in a human-readable way, with an optional verbose mode that 
+   *  includes more details. Uses the calendar data to get the names of the year and month.
+   * @param {Object} dateObj - expects {year, month, day}
    * @param {Boolean} verbose 
    * @returns {String} - returns the formatted date string
    */
-  static formatDate(verbose = false) {
+  static formatDate(dateObj, verbose = false) {
     Hyp3eLogger.info("HYP3ECalendar formatDate", `formatDate called with verbose: ${verbose}`);
-    const {year, month, day} = this.getCurrentDate();
+    const {year, month, day} = dateObj || this.getCurrentDate();
     Hyp3eLogger.info("HYP3ECalendar formatDate", `Current date:`, {year, month, day})
     const cycleYear = this.getCycleYear(year);
     Hyp3eLogger.info("HYP3ECalendar formatDate", `Cycle year: ${cycleYear}`)
@@ -380,11 +382,10 @@ export class HYP3ECalendar {
   static sendDateToChat() {
     // Get the current time
     const timeString = this.formatTime(this.getCurrentTime());
+    const dateString = this.formatDate(this.getCurrentDate(), game.settings.get("hyp3e", "calendarVerbose"));
     ChatMessage.create({
       user: game.user.id,
-      content: `<div class="hyp3e-calendar-date">${this.formatDate(
-        game.settings.get("hyp3e", "calendarVerbose")
-      )}, time is ${timeString}.</div>`
+      content: `<div class="hyp3e-calendar-date">${dateString}, time is ${timeString}.</div>`
     });
   }
 }

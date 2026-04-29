@@ -51,7 +51,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
     const monthIndex = date.month - 1;
     const { years, months, weekdays } = HYP3E_CALENDAR;
     const verbose = game.settings.get(game.system.id, "calendarVerbose");
-    Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Retrieving Hyperborea calendar date...${HYP3ECalendar.formatDate(verbose)}`)
+    Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Retrieving Hyperborea calendar date...${game.hyp3e.calendar.formatDate(game.hyp3e.calendar.getCurrentDate(), verbose)}`)
 
     try {
       // Get the named year and month... remember arrays are zero-indexed

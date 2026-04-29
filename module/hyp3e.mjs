@@ -544,7 +544,7 @@ Hooks.once("ready", async function() {
   game.hyp3e.calendar.formatTime = (...args) => HYP3ECalendar.formatTime(...args);
   game.hyp3e.calendar.getMoonPhase = (...args) => HYP3ECalendar.getMoonPhase(...args);
   game.hyp3e.calendar.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
-  Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.calendar.formatDate(true)}.`, game.hyp3e.calendar.getCurrentDate());
+  Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.calendar.formatDate(game.hyp3e.calendar.getCurrentDate(), true)}.`, game.hyp3e.calendar.getCurrentDate());
 
   // Initialize the turn tracker
   game.hyp3e.turnTracker = game.hyp3e.turnTracker || new HYP3ETurnTracker();

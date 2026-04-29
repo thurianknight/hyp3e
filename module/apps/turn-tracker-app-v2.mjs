@@ -85,7 +85,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Turn Tracker options:`, options);
     const currentTurn = game.hyp3e.turnTracker.getTurn();
     const timeString = game.hyp3e.calendar.formatTime(game.hyp3e.calendar.getCurrentTime());
-    const currentDate = game.hyp3e.calendar.formatDate(false);
+    const dateString = game.hyp3e.calendar.formatDate(game.hyp3e.calendar.getCurrentDate(), false);
 
     // const date = game.hyp3e.calendar.getCurrentDate();
     const daylightHours = game.hyp3e.turnTracker.getCurrentDaylightHours();
@@ -99,7 +99,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
       currentTurn, 
       timeString, 
       showDateInTurnTracker: game.settings.get(game.system.id, "showDateInTurnTracker"),
-      currentDate,
+      currentDate: dateString,
       daylightFormatted,
       assetsPath,
       sunOpacity,
@@ -388,8 +388,8 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     if (!game.settings.get(game.system.id, "showDateInTurnTracker")) return;
 
     // Update date
-    const currentDate = game.hyp3e.calendar.formatDate(false);
-    this._embeddedElement.find("#current-date")?.text(currentDate);
+    const dateString = game.hyp3e.calendar.formatDate(game.hyp3e.calendar.getCurrentDate(), false);
+    this._embeddedElement.find("#current-date")?.text(dateString);
 
     // Calculate sun/moon visibility and moon phases
     const { sunOpacity, moonOpacity, phobosPhase, selenePhase } = this._getSunAndMoons();
