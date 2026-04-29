@@ -52,8 +52,7 @@ Hooks.once('init', async function() {
   if (CONFIG.ActiveEffect?.legacyTransferral) {
     CONFIG.ActiveEffect.legacyTransferral = false;
   }
-  // CONFIG.ActiveEffect.EXPIRY_EVENTS ??= {};
-  // CONFIG.ActiveEffect.EXPIRY_EVENTS["hyperborea.roundEnd"] = "1/60 of an exploration Turn";
+  CONFIG.debug.time = true; // Enable timing debug logs
 
   // Register our Hyperborea system configuration options
   registerHyp3eConfigurations();
@@ -534,11 +533,11 @@ Hooks.once("ready", async function() {
   }
   // Import the calendar class methods
   game.hyp3e.calendar.getCurrentDate = () => HYP3ECalendar.getCurrentDate();
-  game.hyp3e.calendar.setCurrentDate = () => HYP3ECalendar.setCurrentDate();
-  game.hyp3e.calendar.advanceDay = () => HYP3ECalendar.advanceDay();
-  game.hyp3e.calendar.retreatDay = () => HYP3ECalendar.retreatDay();
-  game.hyp3e.calendar.formatDate = () => HYP3ECalendar.formatDate();
-  game.hyp3e.calendar.getMoonPhase = (year, monthNum, day, moonName) => HYP3ECalendar.getMoonPhase(year, monthNum, day, moonName);
+  game.hyp3e.calendar.setCurrentDate = (...args) => HYP3ECalendar.setCurrentDate(...args);
+  game.hyp3e.calendar.advanceDay = (...args) => HYP3ECalendar.advanceDay(...args);
+  game.hyp3e.calendar.retreatDay = (...args) => HYP3ECalendar.retreatDay(...args);
+  game.hyp3e.calendar.formatDate = (...args) => HYP3ECalendar.formatDate(...args);
+  game.hyp3e.calendar.getMoonPhase = (...args) => HYP3ECalendar.getMoonPhase(...args);
   game.hyp3e.calendar.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
   Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.calendar.formatDate(true)}.`, game.hyp3e.calendar.getCurrentDate());
 
@@ -565,6 +564,9 @@ Hooks.once("ready", async function() {
     game.hyp3e.openTurnTracker = () => game.hyp3e.turnTrackerApp.render(true);
     game.hyp3e.openTurnTracker();
   }
+
+  // Log world time & date
+  Hyp3eLogger.info("Init", `Current world time is ${game.time.worldTime} seconds since epoch.`, game.time);
 
   // Pre-load processing
   if (game.user.isGM) {
@@ -731,33 +733,33 @@ Hooks.on("chatMessage", (chatLog, message, chatData) => {
 
   // Open the Turn Tracker app
   if (parts[0] === "/turn" && parts.length === 1) {
-  game.hyp3e.openTurnTracker();
-  return false;
+    game.hyp3e.openTurnTracker();
+    return false;
   }
 
   // Anyone can open the calendar (read-only for players), or send the date to chat
   if (parts[0] === "/cal" && parts.length === 1) {
-  game.hyp3e.openCalendar();
-  return false;
+    game.hyp3e.openCalendar();
+    return false;
   }
   if (parts[0] === "/cal" && parts[1] === "chat") {
-  game.hyp3e.calendar.sendDateToChat();
-  return false;
+    game.hyp3e.calendar.sendDateToChat();
+    return false;
   }
   // Only GMs can advance the day
   if (parts[1] === "advance" && game.user.isGM) {
-  // "/cal advance reset" will reset the Turn Tracker too (NOT WORKING?)
-  const reset = parts.includes("reset");
-  game.hyp3e.calendar.advanceDay(reset);
-  setTimeout(() => {
-    game.hyp3e.calendar.sendDateToChat();
-  }, 500);
-  return false;
+    // "/cal advance reset" will reset the Turn Tracker too
+    const reset = parts.includes("reset");
+    game.hyp3e.calendar.advanceDay(reset);
+    setTimeout(() => {
+      game.hyp3e.calendar.sendDateToChat();
+    }, 500);
+    return false;
   }
 
   // Invalid commands by non-GMs will be ignored, but GMs get an error message
   if (game.user.isGM) {
-  ui.notifications.warn(`Unknown command: ${message}`);
+    ui.notifications.warn(`Unknown command: ${message}`);
   }
   return false;
 });
@@ -839,6 +841,12 @@ Hooks.on("preUpdateItem", async (item, update) => {
 /* -------------------------------------------- */
 /*  Date & Time-Keeping functions         */
 /* -------------------------------------------- */
+
+// Listen for world clock changes (e.g., GM advances time via calendar)
+Hooks.on("updateWorldTime", (worldTime, dt, options, userId) => {
+  // if (dt === 0) return; // sometimes called with no change
+  Hyp3eLogger.info("updateWorldTime", `World time advanced by ${dt} seconds, current time is now ${worldTime}. Triggered by user ${userId.name}`);
+});
 
 // Register Calendar hooks
 await setupCalendarHooks();

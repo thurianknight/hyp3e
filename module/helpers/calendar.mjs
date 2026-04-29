@@ -8,15 +8,15 @@ export async function setupCalendarHooks() {
    * Custom hooks for handling calendar updates.
    */
   Hooks.on("calendarDayAdvanced", ({ year, month, day }) => {
-    Hyp3eLogger.info("calendarDayAdvanced", `Calendar advanced to ${year}-${month}-${day}`);
+    Hyp3eLogger.info("HYP3ECalendar calendarDayAdvanced", `Calendar advanced to ${year}-${month}-${day}`);
     // Nothing to do at this time...
   });
   Hooks.on("calendarDayRetreated", ({ year, month, day }) => {
-    Hyp3eLogger.info("calendarDayRetreated", `Calendar retreated to ${year}-${month}-${day}`);
+    Hyp3eLogger.info("HYP3ECalendar calendarDayRetreated", `Calendar retreated to ${year}-${month}-${day}`);
     // Nothing to do at this time...
   });
   Hooks.on("calendarDateSet", ({ year, month, day }) => {
-    Hyp3eLogger.info("calendarDateSet", `Calendar date set to ${year}-${month}-${day}`);
+    Hyp3eLogger.info("HYP3ECalendar calendarDateSet", `Calendar date set to ${year}-${month}-${day}`);
     // Nothing to do at this time...
   });
 }
@@ -31,55 +31,11 @@ export class HYP3ECalendar {
     Hyp3eLogger.info("HYP3ECalendar initSync", `Initializing updateSetting hook...`);
     Hooks.on("updateSetting", (setting, value, options, userId) => {
       if (setting.key !== "hyp3e.calendarDate") return;
-      Hyp3eLogger.info("HYP3ECalendar", `Setting updated:`, { setting, value, options, userId });
+      Hyp3eLogger.info("HYP3ECalendar updateSetting", `Setting updated:`, { setting, value, options, userId });
     });
   }
 
-  static getCurrentDate() {
-    return game.settings.get("hyp3e", "calendarDate");
-  }
-
-  static async setCurrentDate({year, month, day}) {
-    if (!game.user.isGM) {
-      Hyp3eLogger.warn("setCurrentDate", "Only the GM can change the date.");
-      return;
-    }
-
-    await game.settings.set("hyp3e", "calendarDate", {year, month, day});
-
-    // Broadcast a global hook so all apps refresh
-    Hooks.callAll("calendarDateSet", {year, month, day});
-  }
-
-  static getCycleYear(year) {
-    // Returns 1–13, wrapping properly
-    return ((year - 1) % 13) + 1;
-  }
-
-  static getSeason(year, month) {
-    const y = HYP3E_CALENDAR.years[this.getCycleYear(year) - 1];
-    Hyp3eLogger.info("getSeason", `Resolved cycle year for ${year} and month ${month}:`, y)
-    if (!y?.season) return "Unknown";
-
-    const parts = y.season.split("|");
-    if (parts.length === 1) return parts[0];
-
-    // Handle split seasons
-    return (month <= 6) ? parts[0] : parts[1];
-  }
-
-  static phaseIcons = {
-    "New": "🌑",
-    "Waxing Crescent": "🌒",
-    "First Quarter": "🌓",
-    "Waxing Gibbous": "🌔",
-    "Waxing": "🌔",
-    "Full": "🌕",
-    "Waning Gibbous": "🌖",
-    "Third Quarter": "🌗",
-    "Waning Crescent": "🌘",
-    "Waning": "🌘",
-  };
+  // Moon phase data is stored in calendar-data.mjs, but these are the icons to use for each phase
   static phobosIcons = {
     "New": `${HYP3E.assetsPath}/moon-phases/moon-phobos-new.png`,
     "Waxing Crescent": `${HYP3E.assetsPath}/moon-phases/moon-phobos-waxing-crescent.png`,
@@ -101,25 +57,125 @@ export class HYP3ECalendar {
     "Waning Crescent": `${HYP3E.assetsPath}/moon-phases/moon-selene-waning-crescent.png`,
   };
 
-  static getMoonPhase(year, monthNum, day, moonName) {
-    const month = HYP3E_CALENDAR.months.find(m => m.num === monthNum);
-    if (!month) return "";
-    const phases = month.moonPhases?.[moonName];
-    if (!phases) return "";
+  /**--------------------------------------------------------------------------
+   * Epoch date/time calculations are based on the Hyperborean calendar, which has:
+   * - 13 months per year
+   * - 28 days per month
+   * - 7-day week (but no named weekdays in the calendar itself, just for formatting)
+   * - Time of day is standard 24-hour clock with minutes
+   * 
+   * The epoch starts at Year 1, Month 1, Day 1, 00:00 
+   *  (Sun-day, 1st of Aries, Year of the Bear, or Genesis)
+   *-------------------------------------------------------------------------*/
 
-    // Direct match, when it happens
-    if (phases[day]) return phases[day];
+  /**
+   * Calculates the number of seconds since the epoch for a given date and time.
+   * @param {*} year 
+   * @param {*} month 
+   * @param {*} day 
+   * @param {*} hour 
+   * @param {*} minute 
+   * @returns 
+   */
+  static _calculateSecondsSinceEpoch(year, month, day, hour, minute) {
+    // Hyperborean epoch starts at Year 1, Month 1, Day 1, 00:00
+    //  I.e. Sun-day, 1st of Aries, Year 1 CÆ (Year of the Bear, or Genesis)
+    const yearsSinceEpoch = year - 1;
+    const monthsSinceEpoch = month - 1;
+    const daysSinceEpoch = day - 1;
 
-    // Find most recent defined phase
-    const days = Object.keys(phases).map(d => parseInt(d)).sort((a, b) => a - b);
-    let lastPhase = "";
-    for (let d of days) {
-      if (d <= day) lastPhase = phases[d];
-      else break;
-    }
-    return lastPhase;
+    const secondsFromYears = yearsSinceEpoch * 13 * 28 * 24 * 60 * 60;
+    const secondsFromMonths = monthsSinceEpoch * 28 * 24 * 60 * 60;
+    const secondsFromDays = daysSinceEpoch * 24 * 60 * 60;
+    const secondsFromHours = hour * 60 * 60;
+    const secondsFromMinutes = minute * 60;
+
+    return secondsFromYears + secondsFromMonths + secondsFromDays + secondsFromHours + secondsFromMinutes;
   }
 
+  /**
+   * Calculates the date components (year, month, day) from a total number of seconds since the epoch.
+   * @param {*} totalSeconds 
+   * @returns 
+   */
+  static _calculateDateFromSeconds(totalSeconds) {
+    const secondsPerDay = 86400;                    // 24 * 60 * 60
+    const secondsPerMonth = secondsPerDay * 28;     // 28 days per month
+    const secondsPerYear = secondsPerMonth * 13;    // 13 months per year
+
+    const years = Math.floor(totalSeconds / secondsPerYear) + 1;
+    const months = Math.floor((totalSeconds % secondsPerYear) / secondsPerMonth) + 1;
+    const days = Math.floor((totalSeconds % secondsPerMonth) / secondsPerDay) + 1;
+
+    return { year: years, month: months, day: days };
+  }
+
+  /**
+   * Calculates the time components (hour, minute) from a total number of seconds since the epoch.
+   * @param {*} totalSeconds 
+   * @returns { hour: number, minute: number }
+   */
+  static _calculateTimeFromSeconds(totalSeconds) {
+    const secondsPerDay = 86400;                    // 24 * 60 * 60
+    const secondsIntoDay = totalSeconds % secondsPerDay;
+
+    const hours = Math.floor(secondsIntoDay / 3600);
+    const minutes = Math.floor((secondsIntoDay % 3600) / 60);
+
+    return { hour: hours, minute: minutes };
+  }
+
+
+  /**--------------------------------------------------------------------------
+   * Date-related methods
+   *  These are the main methods for getting/setting the calendar date, advancing/retreating the day, and formatting the date for display.
+   *  They will also handle syncing with the Foundry world time and broadcasting hooks for other apps to update.
+   *-------------------------------------------------------------------------*/
+
+  static getCurrentDate() {
+    const worldTime = game.time.worldTime;
+    const worldDate = this._calculateDateFromSeconds(worldTime);
+    const worldDateStr = `${worldDate.year}-${worldDate.month}-${worldDate.day}`;
+    const calendarDate = game.settings.get("hyp3e", "calendarDate");
+    const calendarDateStr = `${calendarDate.year}-${calendarDate.month}-${calendarDate.day}`;
+    if (calendarDateStr == worldDateStr) {
+      Hyp3eLogger.info("HYP3ECalendar getCurrentDate", `Hyp3e calendar date is in sync with world time:`, calendarDateStr);
+    } else {
+      Hyp3eLogger.info("HYP3ECalendar getCurrentDate", `Hyp3e calendar date (${calendarDateStr}) is NOT in sync with world date (${worldDateStr}).`);
+    }
+    return calendarDate;
+  }
+
+  static async setCurrentDate({year, month, day}) {
+    if (!game.user.isGM) {
+      Hyp3eLogger.warn("HYP3ECalendar setCurrentDate", "Only the GM can change the date.");
+      return;
+    }
+
+    // Set the hyp3e world setting for the calendar date
+    //  For now, this will override the Foundry built-in calendar
+    await game.settings.set("hyp3e", "calendarDate", {year, month, day});
+
+    // Get current time of day (hh:mm) so we can preserve it
+    const currentTimeStr = game.settings.get("hyp3e", "currentTime");
+    const [hour, minute] = currentTimeStr.split(":").map(Number);
+
+    // Calculate total seconds using the NEW date + CURRENT time
+    const newTotalSeconds = this._calculateSecondsSinceEpoch(year, month, day, hour, minute);
+
+    // Set the Foundry world time
+    await game.time.advance(newTotalSeconds - game.time.worldTime);
+
+    // Broadcast a global hook so all apps refresh
+    Hyp3eLogger.info("HYP3ECalendar setCurrentDate", `Calendar date set to ${this.formatDate()}`);
+    Hooks.callAll("calendarDateSet", {year, month, day});
+  }
+
+  /**
+   * Advances the calendar by one day, with proper handling of month/year boundaries. Only GMs can do this.
+   * @param {*} resetTurns 
+   * @returns 
+   */
   static async advanceDay(resetTurns = false) {
     if (!game.user.isGM) return;
 
@@ -131,19 +187,32 @@ export class HYP3ECalendar {
         month = 1; year++;
       }
     }
-    await this.setCurrentDate({ year, month, day });
 
-    Hyp3eLogger.info("advanceDay", `Calendar advanced to ${this.formatDate()}`);
+    // Set the hyp3e world setting for the calendar date
+    //  For now, this will override the Foundry built-in calendar
+    await game.settings.set("hyp3e", "calendarDate", {year, month, day});
+    // await this.setCurrentDate({ year, month, day });
+
+    // Update the world time to match the new date, preserving the current time of day
+    const secondsPerDay = 86400;                    // 24 * 60 * 60
+    await game.time.advance(secondsPerDay);
+
+    if (resetTurns && game.hyp3e?.turnTrackerApp) {
+      await game.hyp3e.turnTracker.resetTurn();
+    }
+
+    Hyp3eLogger.info("HYP3ECalendar advanceDay", `Calendar advanced to ${this.formatDate()}`);
     Hooks.callAll("calendarDayAdvanced", { year, month, day });
-
-    // if (resetTurns && game.hyp3e?.turnTrackerApp) {
-    //   await game.hyp3e.turnTracker.resetTurn();
-    // }
   }
 
+  /**
+   * Backs up the calendar by one day, with proper handling of month/year boundaries. Only GMs can do this.
+   * @param {*} resetTurns 
+   * @returns 
+   */
   static async retreatDay(resetTurns = false) {
     if (!game.user.isGM) {
-      Hyp3eLogger.warn("retreatDay", "Only the GM can change the date.");
+      Hyp3eLogger.warn("HYP3ECalendar retreatDay", "Only the GM can change the date.");
       return;
     }
 
@@ -156,22 +225,62 @@ export class HYP3ECalendar {
       }
       day = 28;
     }
-    await this.setCurrentDate({ year, month, day });
 
-    Hyp3eLogger.info("retreatDay", `Calendar retreated to ${this.formatDate()}`);
-    Hooks.callAll("calendarDayRetreated", { year, month, day });
+    // Set the hyp3e world setting for the calendar date
+    //  For now, this will override the Foundry built-in calendar
+    await game.settings.set("hyp3e", "calendarDate", {year, month, day});
+
+    // Update the world time to match the new date, preserving the current time of day
+    const secondsPerDay = -86400;                    // 24 * 60 * 60
+    await game.time.advance(secondsPerDay);
 
     if (resetTurns && game.hyp3e?.turnTrackerApp) {
       await game.hyp3e.turnTracker.resetTurn();
     }
+    
+    Hyp3eLogger.info("HYP3ECalendar retreatDay", `Calendar retreated to ${this.formatDate()}`);
+    Hooks.callAll("calendarDayRetreated", { year, month, day });
   }
 
+  /**
+   * Gets the cycle (sidereal) year for a given Hyperborean year, wrapping properly.
+   * @param {*} year 
+   * @returns 
+   */
+  static getCycleYear(year) {
+    // Returns 1–13, wrapping properly
+    return ((year - 1) % 13) + 1;
+  }
+
+  /**
+   * Gets the current season for a given year and month, based on the calendar data. Handles split seasons as well.
+   * @param {*} year 
+   * @param {*} month 
+   * @returns 
+   */
+  static getSeason(year, month) {
+    const y = HYP3E_CALENDAR.years[this.getCycleYear(year) - 1];
+    Hyp3eLogger.info("HYP3ECalendar getSeason", `Resolved cycle year for ${year} and month ${month}:`, y)
+    if (!y?.season) return "Unknown";
+
+    const parts = y.season.split("|");
+    if (parts.length === 1) return parts[0];
+
+    // Handle split seasons
+    return (month <= 6) ? parts[0] : parts[1];
+  }
+
+  /**
+   * Formats the current date in a human-readable way
+   * @param {*} verbose 
+   * @returns 
+   */
   static formatDate(verbose = false) {
-    Hyp3eLogger.info("formatDate", `formatDate called with verbose: ${verbose}`);
+    Hyp3eLogger.info("HYP3ECalendar formatDate", `formatDate called with verbose: ${verbose}`);
     const {year, month, day} = this.getCurrentDate();
-    Hyp3eLogger.info("formatDate", `Current date:`, {year, month, day})
+    Hyp3eLogger.info("HYP3ECalendar formatDate", `Current date:`, {year, month, day})
     const cycleYear = this.getCycleYear(year);
-    Hyp3eLogger.info("formatDate", `Cycle year: ${cycleYear}`)
+    Hyp3eLogger.info("HYP3ECalendar formatDate", `Cycle year: ${cycleYear}`)
 
     const y = HYP3E_CALENDAR.years[cycleYear - 1];
     const m = HYP3E_CALENDAR.months[month - 1];
@@ -193,9 +302,40 @@ export class HYP3ECalendar {
     return `${weekday}, the ${dayOrdinal} of ${m.name}, ${year} (Year of the ${y.name})`;
   }
 
+  /**
+   * Gets the moon phase for a given date and moon name
+   * @param {*} year 
+   * @param {*} monthNum 
+   * @param {*} day 
+   * @param {*} moonName 
+   * @returns 
+   */
+  static getMoonPhase(year, monthNum, day, moonName) {
+    const month = HYP3E_CALENDAR.months.find(m => m.num === monthNum);
+    if (!month) return "";
+    const phases = month.moonPhases?.[moonName];
+    if (!phases) return "";
+
+    // Direct match, when it happens
+    if (phases[day]) return phases[day];
+
+    // Find most recent defined phase
+    const days = Object.keys(phases).map(d => parseInt(d)).sort((a, b) => a - b);
+    let lastPhase = "";
+    for (let d of days) {
+      if (d <= day) lastPhase = phases[d];
+      else break;
+    }
+    return lastPhase;
+  }
+
+  /**
+   * Sends the current date to chat in a nicely formatted way, including the current time from the turn tracker.
+   * This is used by the "/cal chat" command, and can also be called by other apps that want to display the date in chat.
+   */
   static sendDateToChat() {
-    // Get the current time from the turn tracker
-    const currentTime = game.hyp3e.turnTracker.getTime();
+    // Get the current time
+    const currentTime = game.settings.get("hyp3e", "currentTime");
     ChatMessage.create({
       user: game.user.id,
       content: `<div class="hyp3e-calendar-date">${this.formatDate(

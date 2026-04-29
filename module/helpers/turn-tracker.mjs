@@ -1,6 +1,7 @@
 import { HYP3E_DAYLIGHT_TABLE } from "./daylight-data.mjs"
 import { Hyp3eLogger } from "./logger.mjs";
 import { logEffectRegistry } from "./effects.mjs";
+import { HYP3ECalendar } from "./calendar.mjs";
 
 export async function setupTurnTrackerHooks() {
   console.log("[HYP3E] HYP3ETurnTracker: Initializing Turn Tracker hooks...");
@@ -128,7 +129,15 @@ export class HYP3ETurnTracker {
   }
 
   static get currentTime() {
-    return game.settings.get("hyp3e", "currentTime") || "8:00";
+    const worldTime = HYP3ECalendar._calculateTimeFromSeconds(game.time.worldTime);
+    const worldTimeStr = `${worldTime.hour}:${worldTime.minute.toString().padStart(2, '0')}`;
+    const hyp3eTime = game.settings.get("hyp3e", "currentTime") || "8:00";
+    if (worldTimeStr == hyp3eTime) {
+      Hyp3eLogger.info("HYP3ETurnTracker currentTime", `Hyp3e time is in sync with world time:`, hyp3eTime);
+    } else {
+      Hyp3eLogger.info("HYP3ETurnTracker currentTime", `Hyp3e time (${hyp3eTime}) is NOT in sync with world time (${worldTimeStr}).`);
+    }
+    return hyp3eTime;
   }
 
   /** Call this once during system ready */
@@ -155,15 +164,15 @@ export class HYP3ETurnTracker {
         // update cache
         this._lastTurn = newTurn;
 
-        if (newTurn > oldTurn) {
-          Hooks.callAll("explorationTurnAdvanced", newTurn);
-        } else if (newTurn === 1 && oldTurn !== 1) {
-          Hooks.callAll("explorationTurnReset", newTurn);
-        } else if (newTurn < oldTurn) {
-          Hooks.callAll("explorationTurnRetreat", newTurn);
-        } else {
-          Hooks.callAll("explorationTurnUpdated", newTurn);
-        }
+        // if (newTurn > oldTurn) {
+        //   Hooks.callAll("explorationTurnAdvanced", newTurn);
+        // } else if (newTurn === 1 && oldTurn !== 1) {
+        //   Hooks.callAll("explorationTurnReset", newTurn);
+        // } else if (newTurn < oldTurn) {
+        //   Hooks.callAll("explorationTurnRetreat", newTurn);
+        // } else {
+        //   Hooks.callAll("explorationTurnUpdated", newTurn);
+        // }
       }
     });
   }
@@ -174,7 +183,10 @@ export class HYP3ETurnTracker {
 
     const newTurn = this.currentTurn + 1;
     await game.settings.set("hyp3e", "explorationTurn", newTurn);
-    // Hyp3eLogger.info("advanceTurn", `Turn tracker advanced to turn ${newTurn}`);
+
+    Hyp3eLogger.info("advanceTurn", `Turn tracker advanced to turn ${newTurn}`);
+    Hooks.callAll("explorationTurnAdvanced", newTurn);
+
     return newTurn;
   }
 
@@ -197,7 +209,12 @@ export class HYP3ETurnTracker {
     }
     const newTime = `${newHour.toString()}:${newMinute.toString().padStart(2, '0')}`;
     await game.settings.set("hyp3e", "currentTime", newTime);
-    // Hyp3eLogger.info("advanceTime", `Turn tracker time advanced to ${newTime}`);
+
+    // Update the world time to match the new time
+    const secondsPerMinute = 60;
+    await game.time.advance(secondsPerMinute * minutes);
+
+    Hyp3eLogger.info("advanceTime", `Turn tracker time advanced to ${newTime}`);
     return newTime;
   }
 
@@ -208,7 +225,10 @@ export class HYP3ETurnTracker {
 
     const newTurn = this.currentTurn - 1;
     await game.settings.set("hyp3e", "explorationTurn", newTurn);
-    // Hyp3eLogger.info("retreatTurn", `Turn tracker retreated to turn ${newTurn}`);
+
+    Hyp3eLogger.info("retreatTurn", `Turn tracker retreated to turn ${newTurn}`);
+    Hooks.callAll("explorationTurnRetreat", newTurn);
+
     return newTurn;
   }
 
@@ -231,17 +251,38 @@ export class HYP3ETurnTracker {
     }
     const newTime = `${newHour.toString()}:${newMinute.toString().padStart(2, '0')}`;
     await game.settings.set("hyp3e", "currentTime", newTime);
-    // Hyp3eLogger.info("retreatTime", `Turn tracker time retreated to ${newTime}`);
+
+    // Update the world time to match the new time
+    const secondsPerMinute = 60;
+    await game.time.advance(secondsPerMinute * minutes * -1); // Retreat time by advancing negative seconds
+
+    Hyp3eLogger.info("retreatTime", `Turn tracker time retreated to ${newTime}`);
     return newTime;
   }
 
+  /**
+   * Reverse turn counter and time to turn 1 and the calendar-configured start time.
+   * @returns {Number} Turn number reset to 1
+   */
   static async reset() {
     const currentTime = this.turnStartTime;
     await game.settings.set("hyp3e", "currentTime", currentTime); // Reset time to turn start time
 
+    // Update the world time to match the new time
+    let {year, month, day} = game.hyp3e.calendar.getCurrentDate();
+    const [hour, minute] = currentTime.split(":").map(Number);
+    const totalSeconds = HYP3ECalendar._calculateSecondsSinceEpoch(year, month, day, hour, minute);
+    const worldTimeSeconds = game.time.worldTime;
+    // Even if the date was advanced, time reverses back to the start time
+    const secondsToReverse = totalSeconds - worldTimeSeconds;
+    await game.time.advance(secondsToReverse); // Reverse world time to match the day's start time
+
     const newTurn = 1;
     await game.settings.set("hyp3e", "explorationTurn", newTurn);
-    // Hyp3eLogger.info("reset", `Turn tracker reset to turn ${newTurn} and time ${currentTime}.`);
+
+    Hyp3eLogger.info("reset", `Turn tracker reset to turn ${newTurn} and time ${currentTime}.`);
+    Hooks.callAll("explorationTurnReset", newTurn);
+
     return newTurn;
   }
 
@@ -256,6 +297,12 @@ export class HYP3ETurnTracker {
   static getTime() {
     return this.currentTime;
   }
+
+  /**--------------------------------------------------------------------------
+   * Daylight-related methods for display
+   *  These methods calculate the current daylight hours based on the calendar date and the 13-year cycle, and format it for display in the turn tracker.
+   *  They also calculate the daylight fraction for use in dynamic lighting or other effects that depend on the time of day.
+   *-------------------------------------------------------------------------*/
 
   /**
    * Get daylight hours as a decimal (0–24) for the current date in the 13-year cycle
@@ -299,9 +346,10 @@ export class HYP3ETurnTracker {
     // Format minutes with leading zeros
     return `${hours.toString()}h ${minutes.toString().padStart(2, '0')}m`;
   }
-  
+
   /**
    * Get daylight fraction (0.0 = total darkness, 1.0 = full 24h daylight).
+   * @returns {number} 0.0, 0.5, or 1.0 based on current time and daylight hours, with twilight periods as 0.5
    */
   static getDaylightFraction() {
     const currentTime = game.settings.get("hyp3e", "currentTime");

@@ -39,6 +39,9 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
     super(...args);
     this.showAllMoonPhases = game.settings.get("hyp3e", "showAllMoonPhases");
     Hooks.on("calendarDateSet", () => this.render(true));
+    Hooks.on("calendarDayAdvanced", () => this.render(true));
+    Hooks.on("calendarDayRetreated", () => this.render(true));
+    Hooks.on("explorationTurnReset", () => this.render(true));
   }
 
   _prepareContext(options) {
@@ -109,15 +112,6 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         days,
         currentFestival: festival,
         season: HYP3ECalendar.getSeason(currentYear, date.month),
-        phaseIcons: HYP3ECalendar.phaseIcons,
-        todayPhobos: {
-          phase: phobosPhase,
-          icon: HYP3ECalendar.phaseIcons[phobosPhase] || ""
-        },
-        todaySelene: {
-          phase: selenePhase,
-          icon: HYP3ECalendar.phaseIcons[selenePhase] || ""
-        },
         turnStartTime,
         currentTime,
         isGM: game.user.isGM
@@ -155,6 +149,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         }
       });
     }
+
     // Handle Month selection changes
     const monthSelect = this.element.querySelector("#calendar-month");
     if (monthSelect) {
@@ -171,6 +166,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         });
       });
     }
+
     // Only add listener for the GM, not players
     if (game.user.isGM) {
       // Handle date-grid selection changes
@@ -214,9 +210,6 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         Hyp3eLogger.info("HYP3ECalendarApp advanceDay(false)", "Advance day button clicked by GM.");
         // Sending 'false' tells advanceDay() to NOT reset the turn counter
         await HYP3ECalendar.advanceDay(false);
-        // setTimeout(() => {
-        //   this.render(false)
-        // }, 250);
       });
     }
 
@@ -229,10 +222,6 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         Hyp3eLogger.info("HYP3ECalendarApp advanceDay(true)", "Advance day + reset turn button clicked by GM.");
         // Sending 'true' tells advanceDay() to also reset the turn counter
         await HYP3ECalendar.advanceDay(true);
-        await game.hyp3e.turnTracker.resetTurn();
-        // setTimeout(() => {
-        //   this.render(false)
-        // }, 250);
       });
     }
 
@@ -240,19 +229,9 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
       root.querySelector("[data-action='reset']")?.addEventListener("click", async() => {
         Hyp3eLogger.info("HYP3ECalendarApp resetTurn", "Reset turn button clicked by GM.");
         await game.hyp3e.turnTracker.resetTurn();
-        // setTimeout(() => {
-        //   this.render(false);
-        // }, 250);
       });
     }
   }
-
-  /** store toggle state and re-render */
-  // _setShowMoonPhases(showAll) {
-  //     this.showAllMoonPhases = showAll;
-  //     game.settings.set("hyp3e", "showAllMoonPhases", this.showAllMoonPhases);
-  //     this.render();
-  // }
 
   /** Example form handler */
   static async onSubmit(event, form, formData) {
