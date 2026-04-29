@@ -99,8 +99,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
       // Get turn-related time data
       const turnStartTime = game.hyp3e.turnTracker.turnStartTime();
-      const currentTime = game.hyp3e.turnTracker.getTime();
-      // Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Turn start time: ${turnStartTime}, current time: ${currentTime}`);
+      const timeString = game.hyp3e.calendar.formatTime(game.hyp3e.calendar.getCurrentTime());
+      // Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Turn start time: ${turnStartTime}, current time: ${timeString}`);
 
       const context = {
         date,
@@ -113,7 +113,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         currentFestival: festival,
         season: HYP3ECalendar.getSeason(currentYear, date.month),
         turnStartTime,
-        currentTime,
+        timeString,
         isGM: game.user.isGM
       };
       Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Calendar context:`, context)

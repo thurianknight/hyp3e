@@ -84,7 +84,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
   _prepareContext(options) {
     // Hyp3eLogger.info("HYP3ETurnTrackerAppV2 _prepareContext", `Turn Tracker options:`, options);
     const currentTurn = game.hyp3e.turnTracker.getTurn();
-    const currentTime = game.hyp3e.turnTracker.getTime();
+    const timeString = game.hyp3e.calendar.formatTime(game.hyp3e.calendar.getCurrentTime());
     const currentDate = game.hyp3e.calendar.formatDate(false);
 
     // const date = game.hyp3e.calendar.getCurrentDate();
@@ -97,7 +97,7 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
 
     const context = { 
       currentTurn, 
-      currentTime, 
+      timeString, 
       showDateInTurnTracker: game.settings.get(game.system.id, "showDateInTurnTracker"),
       currentDate,
       daylightFormatted,
@@ -304,10 +304,10 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
 
   static #showTurn(event, target) {
     const turn = game.hyp3e.turnTracker.getTurn();
-    const currentTime = game.hyp3e.turnTracker.getTime();
+    const timeString = game.hyp3e.calendar.formatTime(game.hyp3e.calendar.getCurrentTime());
     ChatMessage.create({
       user: game.user.id,
-      content: `Current exploration turn: ${turn}, time is ${currentTime}.`
+      content: `Current exploration turn: ${turn}, time is ${timeString}.`
     });
   }
 
@@ -382,8 +382,8 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
     }  
 
     // Update time
-    const currentTime = game.hyp3e.turnTracker.getTime();
-    this._embeddedElement.find("#current-time")?.val(currentTime);
+    const timeString = game.hyp3e.calendar.formatTime(game.hyp3e.calendar.getCurrentTime());
+    this._embeddedElement.find("#current-time")?.val(timeString);
 
     if (!game.settings.get(game.system.id, "showDateInTurnTracker")) return;
 

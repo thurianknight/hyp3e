@@ -532,11 +532,16 @@ Hooks.once("ready", async function() {
     Hyp3eLogger.error("Init", `Error initializing calendar app.`, err.message)
   }
   // Import the calendar class methods
+  game.hyp3e.calendar.calculateSecondsSinceEpoch = (year, month, day, hour, minute) => HYP3ECalendar._calculateSecondsSinceEpoch(year, month, day, hour, minute);
+  game.hyp3e.calendar.calculateDateFromSeconds = (seconds) => HYP3ECalendar._calculateDateFromSeconds(seconds);
+  game.hyp3e.calendar.calculateTimeFromSeconds = (seconds) => HYP3ECalendar._calculateTimeFromSeconds(seconds);
   game.hyp3e.calendar.getCurrentDate = () => HYP3ECalendar.getCurrentDate();
+  game.hyp3e.calendar.getCurrentTime = () => HYP3ECalendar.getCurrentTime();
   game.hyp3e.calendar.setCurrentDate = (...args) => HYP3ECalendar.setCurrentDate(...args);
   game.hyp3e.calendar.advanceDay = (...args) => HYP3ECalendar.advanceDay(...args);
   game.hyp3e.calendar.retreatDay = (...args) => HYP3ECalendar.retreatDay(...args);
   game.hyp3e.calendar.formatDate = (...args) => HYP3ECalendar.formatDate(...args);
+  game.hyp3e.calendar.formatTime = (...args) => HYP3ECalendar.formatTime(...args);
   game.hyp3e.calendar.getMoonPhase = (...args) => HYP3ECalendar.getMoonPhase(...args);
   game.hyp3e.calendar.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
   Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.calendar.formatDate(true)}.`, game.hyp3e.calendar.getCurrentDate());
@@ -553,7 +558,6 @@ Hooks.once("ready", async function() {
   game.hyp3e.turnTracker.resetTurn = () => HYP3ETurnTracker.reset();
   game.hyp3e.turnTracker.getTurn = () => HYP3ETurnTracker.getTurn();
   game.hyp3e.turnTracker.turnStartTime = () => HYP3ETurnTracker.getTurnStartTime();
-  game.hyp3e.turnTracker.getTime = () => HYP3ETurnTracker.getTime();
   game.hyp3e.turnTracker.getCurrentDaylightHours = () => HYP3ETurnTracker.getCurrentDaylightHours();
   game.hyp3e.turnTracker.formatDaylightAsHHMM = (decimalHours) => HYP3ETurnTracker.formatDaylightAsHHMM(decimalHours);
   game.hyp3e.turnTracker.getDaylightFraction = () => HYP3ETurnTracker.getDaylightFraction();
