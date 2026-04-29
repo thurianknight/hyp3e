@@ -380,9 +380,10 @@ export class HYP3ECalendar {
    * This is used by the "/cal chat" command, and can also be called by other apps that want to display the date in chat.
    */
   static sendDateToChat() {
-    // Get the current time
+    // Format the current date & time
+    const verbose = game.settings.get(game.system.id, "calendarVerbose");
     const timeString = this.formatTime(this.getCurrentTime());
-    const dateString = this.formatDate(this.getCurrentDate(), game.settings.get("hyp3e", "calendarVerbose"));
+    const dateString = this.formatDate(this.getCurrentDate(), verbose);
     ChatMessage.create({
       user: game.user.id,
       content: `<div class="hyp3e-calendar-date">${dateString}, time is ${timeString}.</div>`

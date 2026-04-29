@@ -537,13 +537,17 @@ Hooks.once("ready", async function() {
   game.hyp3e.calendar.calculateTimeFromSeconds = (seconds) => HYP3ECalendar._calculateTimeFromSeconds(seconds);
   game.hyp3e.calendar.getCurrentDate = () => HYP3ECalendar.getCurrentDate();
   game.hyp3e.calendar.getCurrentTime = () => HYP3ECalendar.getCurrentTime();
-  game.hyp3e.calendar.setCurrentDate = (...args) => HYP3ECalendar.setCurrentDate(...args);
-  game.hyp3e.calendar.advanceDay = (...args) => HYP3ECalendar.advanceDay(...args);
-  game.hyp3e.calendar.retreatDay = (...args) => HYP3ECalendar.retreatDay(...args);
-  game.hyp3e.calendar.formatDate = (...args) => HYP3ECalendar.formatDate(...args);
-  game.hyp3e.calendar.formatTime = (...args) => HYP3ECalendar.formatTime(...args);
-  game.hyp3e.calendar.getMoonPhase = (...args) => HYP3ECalendar.getMoonPhase(...args);
+  game.hyp3e.calendar.setCurrentDate = ({year, month, day}) => HYP3ECalendar.setCurrentDate({year, month, day});
+  game.hyp3e.calendar.advanceDay = (resetTurns) => HYP3ECalendar.advanceDay(resetTurns);
+  game.hyp3e.calendar.retreatDay = (resetTurns) => HYP3ECalendar.retreatDay(resetTurns);
+  game.hyp3e.calendar.formatDate = ({year, month, day}, verbose) => HYP3ECalendar.formatDate({year, month, day}, verbose);
+  game.hyp3e.calendar.formatTime = ({hour, minute}) => HYP3ECalendar.formatTime({hour, minute});
+  game.hyp3e.calendar.getMoonPhase = (year, monthNum, day, moonName) => HYP3ECalendar.getMoonPhase(year, monthNum, day, moonName);
+  game.hyp3e.calendar.getCycleYear = (year) => HYP3ECalendar.getCycleYear(year);
+  game.hyp3e.calendar.getSeason = (year, month) => HYP3ECalendar.getSeason(year, month);
   game.hyp3e.calendar.sendDateToChat = () => HYP3ECalendar.sendDateToChat();
+  game.hyp3e.calendar.phobosIcons = HYP3ECalendar.phobosIcons;
+  game.hyp3e.calendar.seleneIcons = HYP3ECalendar.seleneIcons;
   Hyp3eLogger.info("Init", `Hyperborean date is ${game.hyp3e.calendar.formatDate(game.hyp3e.calendar.getCurrentDate(), true)}.`, game.hyp3e.calendar.getCurrentDate());
 
   // Initialize the turn tracker
@@ -567,6 +571,33 @@ Hooks.once("ready", async function() {
     game.hyp3e.turnTrackerApp = game.hyp3e.turnTrackerApp || new HYP3ETurnTrackerAppV2();
     game.hyp3e.openTurnTracker = () => game.hyp3e.turnTrackerApp.render(true);
     game.hyp3e.openTurnTracker();
+  }
+
+  // Log the old calendar and time settings for debugging
+  Hyp3eLogger.info("Init", `Old calendar settings:`, {
+    calendar: game.settings.get(game.system.id, "calendarDate"),
+    time: game.settings.get(game.system.id, "currentTime")
+  });
+
+  // Migrate old calendar and time settings if they exist, then clear them out
+  let oldCalendar = game.settings.get(game.system.id, "calendarDate");
+  let oldTime = game.settings.get(game.system.id, "currentTime");
+  try {
+    if (oldCalendar || oldTime) {
+      const {year, month, day} = oldCalendar ? oldCalendar : {year: 1, month: 1, day: 1};
+      const [hour, minute] = oldTime ? oldTime.split(":").map(s => parseInt(s)) : [0, 0];
+      const secondsSinceEpoch = HYP3ECalendar._calculateSecondsSinceEpoch(year, month, day, hour, minute);
+      await game.time.advance(secondsSinceEpoch - game.time.worldTime);
+      // Clear out old settings
+      await game.settings.set(game.system.id, "calendarDate", {});
+      await game.settings.set(game.system.id, "currentTime", "");
+      Hyp3eLogger.info("Init", `Migrated old calendar and time settings to new system.`, {
+        year, month, day, hour, minute, secondsSinceEpoch
+      });
+    }
+  } catch (err) {
+    Hyp3eLogger.info("Init", `Error migrating old calendar and time settings:`, err.message);
+    Hyp3eLogger.info("Init", `Could not migrate old calendar and time.`, { calendar: oldCalendar, time: oldTime });
   }
 
   // Log world time & date

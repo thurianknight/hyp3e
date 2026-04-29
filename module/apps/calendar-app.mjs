@@ -1,5 +1,5 @@
 import { HYP3E_CALENDAR } from "../helpers/calendar-data.mjs"
-import { HYP3ECalendar } from "../helpers/calendar.mjs";
+// import { HYP3ECalendar } from "../helpers/calendar.mjs";
 import { HYP3E } from "../helpers/config.mjs"
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 
@@ -46,7 +46,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
   _prepareContext(options) {
     Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Calendar options:`, options)
-    const date = HYP3ECalendar.getCurrentDate();
+    const date = game.hyp3e.calendar.getCurrentDate();
     const currentYear = date.year;
     const monthIndex = date.month - 1;
     const { years, months, weekdays } = HYP3E_CALENDAR;
@@ -55,7 +55,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
     try {
       // Get the named year and month... remember arrays are zero-indexed
-      const year = years[HYP3ECalendar.getCycleYear(date.year) - 1];
+      const year = years[game.hyp3e.calendar.getCycleYear(date.year) - 1];
       const month = months[date.month - 1];
       const festival = month.festivals?.name ? month.festivals : null;
       Hyp3eLogger.info("HYP3ECalendarApp _prepareContext", `Array element year (${year.num}) and month (${month.num}).`)
@@ -77,8 +77,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
           let phobosPhase = null;
           let selenePhase = null;
           if (includePhases) {
-            phobosPhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, dayNum, "Phobos");
-            selenePhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, dayNum, "Selene");
+            phobosPhase = game.hyp3e.calendar.getMoonPhase(currentYear, date.month, dayNum, "Phobos");
+            selenePhase = game.hyp3e.calendar.getMoonPhase(currentYear, date.month, dayNum, "Selene");
           }
 
           week.push({
@@ -87,15 +87,15 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
             isToday,
             isFestival,
             phobosPhase,
-            phobosIcon: HYP3ECalendar.phobosIcons[phobosPhase] ?? null,
+            phobosIcon: game.hyp3e.calendar.phobosIcons[phobosPhase] ?? null,
             selenePhase,
-            seleneIcon: HYP3ECalendar.seleneIcons[selenePhase] ?? null
+            seleneIcon: game.hyp3e.calendar.seleneIcons[selenePhase] ?? null
           });
         }
         days.push(week);
       }
-      const phobosPhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, date.day, "Phobos");
-      const selenePhase = HYP3ECalendar.getMoonPhase(currentYear, date.month, date.day, "Selene");
+      const phobosPhase = game.hyp3e.calendar.getMoonPhase(currentYear, date.month, date.day, "Phobos");
+      const selenePhase = game.hyp3e.calendar.getMoonPhase(currentYear, date.month, date.day, "Selene");
 
       // Get turn-related time data
       const turnStartTime = game.hyp3e.turnTracker.turnStartTime();
@@ -111,7 +111,7 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         weekdays,
         days,
         currentFestival: festival,
-        season: HYP3ECalendar.getSeason(currentYear, date.month),
+        season: game.hyp3e.calendar.getSeason(currentYear, date.month),
         turnStartTime,
         timeString,
         isGM: game.user.isGM
@@ -142,8 +142,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
       yearInput.addEventListener("change", async (event) => {
         const newYear = parseInt(event.target.value);
         if (!isNaN(newYear)) {
-          await HYP3ECalendar.setCurrentDate({
-            ...HYP3ECalendar.getCurrentDate(),
+          await game.hyp3e.calendar.setCurrentDate({
+            ...game.hyp3e.calendar.getCurrentDate(),
             year: newYear
           });
         }
@@ -160,8 +160,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
       }
       monthSelect.addEventListener("change", async (event) => {
         const newMonth = parseInt(event.target.value) + 1;
-        await HYP3ECalendar.setCurrentDate({
-          ...HYP3ECalendar.getCurrentDate(),
+        await game.hyp3e.calendar.setCurrentDate({
+          ...game.hyp3e.calendar.getCurrentDate(),
           month: newMonth
         });
       });
@@ -174,8 +174,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
         td.addEventListener("click", async ev => {
           const day = Number(ev.currentTarget.dataset.day);
           console.log("[HYP3E] Clicked day:", day);
-          await HYP3ECalendar.setCurrentDate({
-            ...HYP3ECalendar.getCurrentDate(),
+          await game.hyp3e.calendar.setCurrentDate({
+            ...game.hyp3e.calendar.getCurrentDate(),
             day
           });
         });
@@ -209,19 +209,19 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
       root.querySelector("[data-action='advance']")?.addEventListener("click", async () => {
         Hyp3eLogger.info("HYP3ECalendarApp advanceDay(false)", "Advance day button clicked by GM.");
         // Sending 'false' tells advanceDay() to NOT reset the turn counter
-        await HYP3ECalendar.advanceDay(false);
+        await game.hyp3e.calendar.advanceDay(false);
       });
     }
 
     root.querySelector("[data-action='chat']")?.addEventListener("click", () => {
-      HYP3ECalendar.sendDateToChat();
+      game.hyp3e.calendar.sendDateToChat();
     });
 
     if (game.user.isGM) {
       root.querySelector("[data-action='advance-reset']")?.addEventListener("click", async () => {
         Hyp3eLogger.info("HYP3ECalendarApp advanceDay(true)", "Advance day + reset turn button clicked by GM.");
         // Sending 'true' tells advanceDay() to also reset the turn counter
-        await HYP3ECalendar.advanceDay(true);
+        await game.hyp3e.calendar.advanceDay(true);
       });
     }
 

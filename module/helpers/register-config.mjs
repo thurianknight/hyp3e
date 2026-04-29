@@ -42,7 +42,7 @@ export function registerHyp3eConfigurations() {
         scope: "world",
         config: false,  // Always hidden from UI
         type: Object,
-        default: { year: 576, month: 1, day: 1 }
+        default: {}
     });
 
     // Store the current time
@@ -51,7 +51,7 @@ export function registerHyp3eConfigurations() {
       scope: "world",
       config: false,  // Always hidden from UI
       type: String,
-      default: "8:00",
+      default: "",
     });
 
     // Store the current exploration turn
