@@ -294,11 +294,11 @@ export class HYP3ECalendar {
    * @returns {String} - returns the formatted date string
    */
   static formatDate(dateObj, verbose = false) {
-    Hyp3eLogger.info("HYP3ECalendar formatDate", `formatDate called with verbose: ${verbose}`);
+    // Hyp3eLogger.info("HYP3ECalendar formatDate", `formatDate called with verbose: ${verbose}`);
     const {year, month, day} = dateObj || this.getCurrentDate();
-    Hyp3eLogger.info("HYP3ECalendar formatDate", `Current date:`, {year, month, day})
+    // Hyp3eLogger.info("HYP3ECalendar formatDate", `Current date:`, {year, month, day})
     const cycleYear = this.getCycleYear(year);
-    Hyp3eLogger.info("HYP3ECalendar formatDate", `Cycle year: ${cycleYear}`)
+    // Hyp3eLogger.info("HYP3ECalendar formatDate", `Cycle year: ${cycleYear}`)
 
     const y = HYP3E_CALENDAR.years[cycleYear - 1];
     const m = HYP3E_CALENDAR.months[month - 1];

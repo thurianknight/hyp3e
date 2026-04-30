@@ -52,7 +52,10 @@ Hooks.once('init', async function() {
   if (CONFIG.ActiveEffect?.legacyTransferral) {
     CONFIG.ActiveEffect.legacyTransferral = false;
   }
-  CONFIG.debug.time = true; // Enable timing debug logs
+  // CONFIG.debug.time = true; // Enable timing debug logs
+
+  // Temporary Effects should be deleted when they expire
+  CONFIG.ActiveEffect.expiryAction = "delete";
 
   // Register our Hyperborea system configuration options
   registerHyp3eConfigurations();

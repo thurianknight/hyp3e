@@ -319,13 +319,11 @@ export async function setupEffectHandlers() {
     const actor = effect.parent;
     if (!actor?.isOwner) return;
 
-    let v14orLater = false;
-    if (ActiveEffect?.registry && effect.isExpiryTrackable) {
-      v14orLater = true;
-    }
+    const v14orLater = !!ActiveEffect?.registry;
+    Hyp3eLogger.info("ActiveEffect createActiveEffect", `Foundry v14 or later: ${v14orLater}`);
 
     /**
-     * The rest of this assumes the effect is being created from an actor or item: e.g. a 
+     * The rest of this assumes the effect is being created/cloned from an item: e.g. a 
      *  spell effect, a weapon or item that applies an effect, etc. Basically there is a 
      *  pre-configured effect, potentially having variables in it, that is being cloned to 
      *  (created on) a recipient actor.
@@ -363,13 +361,6 @@ export async function setupEffectHandlers() {
     for (let i = 0; i < updatedChanges.length; i++) {
       const change = updatedChanges[i];
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect "${effect.name}" change key "${change.key}" has value ${change.value}, type: ${typeof change.value}`, change);
-      // Store the change value regardless of whether it's a formula or not
-      // if (!change.flags?.hyp3e?.originalValue) {
-      //   change.flags = change.flags || {};
-      //   change.flags.hyp3e = change.flags.hyp3e || {};
-      //   change.flags.hyp3e.originalValue = change.value;
-      //   didUpdate = true;
-      // }
       // Ignore if the key is system.tempPersistentDamage, since that is a special case we 
       //  handle separately in the Actor document
       if (change.key === "system.tempPersistentDamage") {
@@ -417,10 +408,18 @@ export async function setupEffectHandlers() {
     //  in rounds. This is used for outside-combat duration tracking and expiration.
     if (effect.isTemporary) {
       let durationRounds = null;
-      if (v14orLater && effect.duration.units === "rounds") {
-        durationRounds = effect.duration.value ?? null;
-      } else if (!v14orLater && (effect.duration?.type === "rounds" || effect.duration?.type === "turns")) {
-        durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
+      if (v14orLater) {
+        if (effect.duration?.units === "rounds") {
+          durationRounds = effect.duration.value ?? null;
+        } else if (effect.duration?.seconds > 0) {
+          durationRounds = Math.floor(effect.duration.seconds / 10);
+        }
+      } else { // v13 or earlier
+        if (effect.duration?.type === "rounds" || effect.duration?.type === "turns") {
+          durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
+        } else if (!v14orLater && (effect.duration?.type === "seconds")) {
+          durationRounds = Math.floor(effect.duration.seconds / 10);
+        }
       }
       await effect.setFlag("hyp3e", "remainingRounds", durationRounds);
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingRounds to ${durationRounds} for ${effect.name}`);
@@ -477,7 +476,26 @@ export async function setupEffectHandlers() {
    * Handle the update of an active effect on an actor.
    */
   Hooks.on("updateActiveEffect", async(effect, change, options, userId) => {
-    // All we do here is check if "disabled" is in the effect updates, and toggle light accordingly
+    // Foundry v14+, or earlier?
+    const v14orLater = !!ActiveEffect?.registry;
+
+    // If duration is being updated, update the remainingRounds flag as well
+    if (effect.isTemporary && !effect.duration.expired && "duration" in change) {
+      let durationRounds = null;
+      const duration = effect.duration;
+      if (duration?.units === "rounds") {
+        durationRounds = duration.value ?? null;
+      } else if (duration?.seconds > 0) {
+        durationRounds = Math.floor(duration.seconds / 10);
+      }
+      if (durationRounds !== null) {
+        await effect.setFlag("hyp3e", "remainingRounds", durationRounds);
+      }
+    } else if (effect.isTemporary && effect.duration.expired && "duration" in change) {
+      await effect.setFlag("hyp3e", "remainingRounds", 0);
+    }
+
+    // Check if "disabled" is in the light source effect updates, and toggle light accordingly
     Hyp3eLogger.info("ActiveEffect updateActiveEffect", `ActiveEffect ${effect.name} and changes:`, { Effect: effect, Change: change });
     if ("disabled" in change) {
       const wasDisabled = change.disabled;
@@ -524,7 +542,7 @@ export async function setupEffectHandlers() {
   Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
     const actor = effect.parent;
     if (!actor) return;
-    Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Deleting ${effect.name} from ${effect.parent?.name}:`, effect);
+    Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Deleting ${effect.name} from ${effect.parent?.name}:`, { Effect: effect, Options: options });
     // When an active effect is deleted, check whether it had modified the token's light.
     //  If so, restore the original light settings from the flag.
     const lightProps = effect.getFlag("hyp3e", "lightProps");

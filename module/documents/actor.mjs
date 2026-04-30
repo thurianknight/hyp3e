@@ -1384,11 +1384,14 @@ export class Hyp3eActor extends Actor {
   async advanceTempEffectsTimer(roundCount = null) {
     // Is this Foundry v14?
     if (ActiveEffect?.registry) {
-      // Update the AE registry, used for combat timing
+      // Update the AE registry
       await ActiveEffect.registry.addFromParent(this);
       await ActiveEffect.registry.refresh("roundEnd", { actors: new Set([this]) });
+      // return; // Exit for debugging
     }
 
+    // Only Foundry v13 and earlier should be using this function, since v14 has the AE 
+    //  registry to handle expirations.
     // We consider the custom flag to be authoritative when outside of combat
     const updates = [];
     const expired = [];
@@ -1414,27 +1417,31 @@ export class Hyp3eActor extends Actor {
           updates.push({
             _id: effect.id,
             "flags.hyp3e.remainingRounds": remainingRounds,
-            // We try to keep the core duration in sync, but Foundry core tends to overwrite it
-            "duration.remaining": remainingRounds
           });
         }
       }
     }
-    if (expired.length) {
-      // Post all the expirations together in one chat
-      const effectNames = expired.map(effect => effect.name)
-      const expiredEffectsMsg = `Effects have expired on ${this.displayName}...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
-      sendSimpleChat(this, "", expiredEffectsMsg)
-  
-      Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Deleting ${expired.length} expired effect(s) on ${this.name}`);
-      await this.deleteEmbeddedDocuments("ActiveEffect", expired.map(e => e.id));
-    }
+    // Run updates first, then deletes, so any effects will be expired before being removed
     if (updates.length) {
       await this.updateEmbeddedDocuments("ActiveEffect", updates, { diff: false, render: false });
     }
+    if (expired.length) {
+      // Post all the expirations together in one chat
+      const effectNames = expired.map(effect => effect.name)
+      const expiredEffectsMsg = `Effects have expired on ${this.displayName}...
+                                  <ul><li>
+                                    ${effectNames.join("</li><li>")}
+                                  </li></ul>`;
+      sendSimpleChat(this, "", expiredEffectsMsg)
+  
+      Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Deleting ${expired.length} expired effect(s) on ${this.name}`);
+      if (!ActiveEffect.registry) {
+        await this.deleteEmbeddedDocuments("ActiveEffect", expired.map(e => e.id));
+      }
+    }
 
     // Run this too, in case registry-managed effects are expiring
-    await this.deleteExpiredEffects();
+    // await this.deleteExpiredEffects();
   }
 
   /**
@@ -1449,7 +1456,7 @@ export class Hyp3eActor extends Actor {
 
     let expired = [];
     if (ActiveEffect?.registry) {
-      // Foundry v14+ has a built-in registry of effects and their statuses
+      // The AE registry should have already marked effects as expired, so we filter on that
       expired = this.effects.filter(effect => 
         effect.isTemporary && 
         effect.duration?.expired === true
@@ -1467,7 +1474,10 @@ export class Hyp3eActor extends Actor {
 
     // Post all the expirations together in one chat
     const effectNames = expired.map(effect => effect.name)
-    const expiredEffectsMsg = `Effects have expired on ${this.displayName}...<ul><li>${effectNames.join("</li><li>")}</li></ul>`;
+    const expiredEffectsMsg = `Effects have expired on ${this.displayName}...
+                                <ul><li>
+                                  ${effectNames.join("</li><li>")}
+                                </li></ul>`;
     sendSimpleChat(this, "", expiredEffectsMsg)
 
     const deleted = await this.deleteEmbeddedDocuments(
@@ -1479,6 +1489,8 @@ export class Hyp3eActor extends Actor {
     if (deleted?.length) {
       Hyp3eLogger.info("Hyp3eActor deleteExpiredEffects", `Deleted ${deleted.length} expired effect(s) on ${this.name}`);
     }
+    // Update the AE registry again, in case any of the deleted effects were being tracked there
+    await ActiveEffect.registry.refresh("roundEnd", { actors: new Set([this]) });
 
     return deleted;
   }
