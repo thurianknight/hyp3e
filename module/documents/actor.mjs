@@ -1387,11 +1387,8 @@ export class Hyp3eActor extends Actor {
       // Update the AE registry
       await ActiveEffect.registry.addFromParent(this);
       await ActiveEffect.registry.refresh("roundEnd", { actors: new Set([this]) });
-      // return; // Exit for debugging
     }
 
-    // Only Foundry v13 and earlier should be using this function, since v14 has the AE 
-    //  registry to handle expirations.
     // We consider the custom flag to be authoritative when outside of combat
     const updates = [];
     const expired = [];
@@ -1409,8 +1406,8 @@ export class Hyp3eActor extends Actor {
           remainingRounds--;
         }
 
-        if (remainingRounds <= 0) {
-          Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Effect ${effect.name} has expired and will be deleted from ${this.name}.`);
+        if (remainingRounds <= 0 || effect.duration?.remaining <= 0 || effect.duration?.expired) {
+          Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Effect ${effect.name} has expired and will be deleted from ${this.name}.`, effect);
           expired.push(effect);
         } else {
           Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Setting ${effect.name} remaining rounds on ${this.name} to ${remainingRounds}`);
@@ -1429,9 +1426,7 @@ export class Hyp3eActor extends Actor {
       // Post all the expirations together in one chat
       const effectNames = expired.map(effect => effect.name)
       const expiredEffectsMsg = `Effects have expired on ${this.displayName}...
-                                  <ul><li>
-                                    ${effectNames.join("</li><li>")}
-                                  </li></ul>`;
+                                    ${effectNames.join("</li><li>")}<br />`;
       sendSimpleChat(this, "", expiredEffectsMsg)
   
       Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Deleting ${expired.length} expired effect(s) on ${this.name}`);

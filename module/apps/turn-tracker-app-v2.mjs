@@ -76,6 +76,12 @@ export class HYP3ETurnTrackerAppV2 extends HandlebarsApplicationMixin(Applicatio
       Hooks.on("explorationTurnAdvanced", this._onTurnAdvanced.bind(this));
       Hooks.on("explorationTurnRetreat", this._onTurnRetreat.bind(this));
       Hooks.on("explorationTurnReset", this._onTurnReset.bind(this));
+      // Listen for world clock changes (e.g., GM advances time via combat or calendar)
+      Hooks.on("updateWorldTime", (worldTime, dt, options, userId) => {
+        if (dt === 0) return; // sometimes called with no change
+        Hyp3eLogger.info("updateWorldTime", `World time advanced by ${dt} seconds, current time is now ${worldTime}. Triggered by user ${userId.name}`);
+        this._refreshDisplay();
+      });
       HYP3ETurnTrackerAppV2._hooksRegistered = true;
       Hyp3eLogger.info("HYP3ETurnTrackerAppV2 constructor", "Registered turn tracker hooks.");
     }

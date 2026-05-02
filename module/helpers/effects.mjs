@@ -1,5 +1,6 @@
 import { Hyp3eLogger } from "./logger.mjs";
 import { HYP3E } from "./config.mjs";
+import { sendSimpleChat } from "../chat/chat.mjs";
 import { Hyp3eDice, isPureNumber, isPureString, containsDice, containsMathOrVariables } from "../dice/dice.mjs";
 import { HYP3EConditionEditor } from "../apps/condition-editor.mjs";
 
@@ -543,6 +544,17 @@ export async function setupEffectHandlers() {
     const actor = effect.parent;
     if (!actor) return;
     Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Deleting ${effect.name} from ${effect.parent?.name}:`, { Effect: effect, Options: options });
+
+    // Send chat message if expired, vs. log-only if manually deleted
+    const remainingRounds = effect.getFlag("hyp3e", "remainingRounds");
+    if (effect.duration?.expired || effect.duration?.remaining <= 0 || remainingRounds <= 0) {
+      const msg = `<i>${effect.name}</i> expired on ${actor.name}.`;
+      // sendSimpleChat(actor, "", msg);
+      Hyp3eLogger.info("ActiveEffect deleteActiveEffect", msg, effect);
+    } else {
+      Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `${effect.name} manually removed from ${actor.name}.`, effect);
+    }
+
     // When an active effect is deleted, check whether it had modified the token's light.
     //  If so, restore the original light settings from the flag.
     const lightProps = effect.getFlag("hyp3e", "lightProps");
@@ -650,7 +662,7 @@ export async function applyTokenLight(token, lightProps) {
 export async function sendEffectChatMessage(effect) {
   const messageParts = [];
   // Who is affected
-  let target = effect.parent; // usually an Actor
+  const target = effect.parent; // usually an Actor
   // If target is an item, get its actor/owner
   if (target?.documentName === "Item") {
     target = target.actor;
@@ -676,12 +688,8 @@ export async function sendEffectChatMessage(effect) {
 
   // Does this effect have a Duration?
   if (!effect.disabled) {
-    if (effect.duration && (effect.duration.rounds || effect.duration.turns)) {
-      if (effect.duration.rounds) {
-        messageParts.push(`(${effect.duration.rounds} rounds)`);
-      } else if (effect.duration.turns) {
-        messageParts.push(`(${effect.duration.turns} rounds)`);
-      }
+    if (effect.duration?.label && effect.duration?.label !== "None") {
+      messageParts.push(`(${effect.duration.label})`);
     }
   }
 
@@ -689,21 +697,18 @@ export async function sendEffectChatMessage(effect) {
   messageParts.push(effect.disabled ? "removed from" : "applied to");
 
   // Target name
-  messageParts.push(`<strong>${targetName}</strong>`);
+  messageParts.push(`${targetName}`);
 
   // If it's being added or applied, add source name
   if (sourceName != targetName && sourceName !== "None") messageParts.push(`by ${sourceName}`);
 
   // Build consistently styled content
   const content = `
-    <ul><li>${messageParts.join(" ")}.</li></ul>
+    ${messageParts.join(" ")}.
   `;
 
   // Dispatch the chat message
-  await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ alias: targetName }),
-    content
-  });
+  sendSimpleChat(target, "", content);
 }
 
 // Write the current ActiveEffect registry to the console in a readable format

@@ -586,7 +586,7 @@ Hooks.once("ready", async function() {
   let oldCalendar = game.settings.get(game.system.id, "calendarDate");
   let oldTime = game.settings.get(game.system.id, "currentTime");
   try {
-    if (oldCalendar || oldTime) {
+    if (oldCalendar.year || oldTime) {
       const {year, month, day} = oldCalendar ? oldCalendar : {year: 1, month: 1, day: 1};
       const [hour, minute] = oldTime ? oldTime.split(":").map(s => parseInt(s)) : [0, 0];
       const secondsSinceEpoch = HYP3ECalendar._calculateSecondsSinceEpoch(year, month, day, hour, minute);
@@ -877,14 +877,8 @@ Hooks.on("preUpdateItem", async (item, update) => {
 });
 
 /* -------------------------------------------- */
-/*  Date & Time-Keeping functions         */
+/*  Date & Time-Keeping hooks                   */
 /* -------------------------------------------- */
-
-// Listen for world clock changes (e.g., GM advances time via calendar)
-Hooks.on("updateWorldTime", (worldTime, dt, options, userId) => {
-  // if (dt === 0) return; // sometimes called with no change
-  Hyp3eLogger.info("updateWorldTime", `World time advanced by ${dt} seconds, current time is now ${worldTime}. Triggered by user ${userId.name}`);
-});
 
 // Register Calendar hooks
 await setupCalendarHooks();
