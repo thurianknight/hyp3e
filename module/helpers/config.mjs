@@ -26,6 +26,126 @@ export const HYP3E = {
     },
 };
 
+HYP3E.calendar = {
+  days: {
+    sun: {
+      abbreviation: "HYP3E.calendar.days.sun.abbreviation",
+      name: "HYP3E.calendar.days.sun.name",
+      ordinal: 1
+    },
+    earth: {
+      abbreviation: "HYP3E.calendar.days.earth.abbreviation",
+      name: "HYP3E.calendar.days.earth.name",
+      ordinal: 2
+    },
+    sea: {
+      abbreviation: "HYP3E.calendar.days.sea.abbreviation",
+      name: "HYP3E.calendar.days.sea.name",
+      ordinal: 3
+    },
+    moon: {
+      abbreviation: "HYP3E.calendar.days.moon.abbreviation",
+      name: "HYP3E.calendar.days.moon.name",
+      ordinal: 4
+    },
+    star: {
+      abbreviation: "HYP3E.calendar.days.star.abbreviation",
+      name: "HYP3E.calendar.days.star.name",
+      ordinal: 5
+    },
+    sky: {
+      abbreviation: "HYP3E.calendar.days.sky.abbreviation",
+      name: "HYP3E.calendar.days.sky.name",
+      ordinal: 6
+    },
+    saturn: {
+      abbreviation: "HYP3E.calendar.days.saturn.abbreviation",
+      name: "HYP3E.calendar.days.saturn.name",
+      ordinal: 7
+    }
+  },
+  months: {
+    I: {
+      name: "HYP3E.calendar.months.I.name",
+      abbreviation: "HYP3E.calendar.months.I.abbreviation",
+      days: 28,
+      ordinal: 1
+    },
+    II: {
+      name: "HYP3E.calendar.months.II.name",
+      abbreviation: "HYP3E.calendar.months.II.abbreviation",
+      days: 28,
+      ordinal: 2
+    },
+    III: {
+      name: "HYP3E.calendar.months.III.name",
+      abbreviation: "HYP3E.calendar.months.III.abbreviation",
+      days: 28,
+      ordinal: 3
+    },
+    IV: {
+      name: "HYP3E.calendar.months.IV.name",
+      abbreviation: "HYP3E.calendar.months.IV.abbreviation",
+      days: 28,
+      ordinal: 4
+    },
+    V: {
+      name: "HYP3E.calendar.months.V.name",
+      abbreviation: "HYP3E.calendar.months.V.abbreviation",
+      days: 28,
+      ordinal: 5
+    },
+    VI: {
+      name: "HYP3E.calendar.months.VI.name",
+      abbreviation: "HYP3E.calendar.months.VI.abbreviation",
+      days: 28,
+      ordinal: 6
+    },
+    VII: {
+      name: "HYP3E.calendar.months.VII.name",
+      abbreviation: "HYP3E.calendar.months.VII.abbreviation",
+      days: 28,
+      ordinal: 7
+    },
+    VIII: {
+      name: "HYP3E.calendar.months.VIII.name",
+      abbreviation: "HYP3E.calendar.months.VIII.abbreviation",
+      days: 28,
+      ordinal: 8
+    },
+    IX: {
+      name: "HYP3E.calendar.months.IX.name",
+      abbreviation: "HYP3E.calendar.months.IX.abbreviation",
+      days: 28,
+      ordinal: 9
+    },
+    X: {
+      name: "HYP3E.calendar.months.X.name",
+      abbreviation: "HYP3E.calendar.months.X.abbreviation",
+      days: 28,
+      ordinal: 10
+    },
+    XI: {
+      name: "HYP3E.calendar.months.XI.name",
+      abbreviation: "HYP3E.calendar.months.XI.abbreviation",
+      days: 28,
+      ordinal: 11
+    },
+    XII: {
+      name: "HYP3E.calendar.months.XII.name",
+      abbreviation: "HYP3E.calendar.months.XII.abbreviation",
+      days: 28,
+      ordinal: 12
+    },
+    XIII: {
+      name: "HYP3E.calendar.months.XIII.name",
+      abbreviation: "HYP3E.calendar.months.XIII.abbreviation",
+      days: 28,
+      ordinal: 13
+    },
+  }
+};
+
 /**
  * The six Attribute scores that define a character
  * @type {Object}

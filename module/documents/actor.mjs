@@ -1424,10 +1424,10 @@ export class Hyp3eActor extends Actor {
     }
     if (expired.length) {
       // Post all the expirations together in one chat
-      const effectNames = expired.map(effect => effect.name)
-      const expiredEffectsMsg = `Effects have expired on ${this.displayName}...
-                                    ${effectNames.join("</li><li>")}<br />`;
-      sendSimpleChat(this, "", expiredEffectsMsg)
+      // const effectNames = expired.map(effect => effect.name)
+      // const expiredEffectsMsg = `Effects have expired on ${this.displayName}...<br />
+      //                               <i>${effectNames.join("<br />")}</i>`;
+      // sendSimpleChat(this, "", expiredEffectsMsg)
   
       Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Deleting ${expired.length} expired effect(s) on ${this.name}`);
       if (!ActiveEffect.registry) {

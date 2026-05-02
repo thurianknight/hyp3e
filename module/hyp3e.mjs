@@ -48,11 +48,50 @@ Hooks.once('init', async function() {
   // Get the Foundry version for conditional options
   const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
 
+  // Add custom constants for configuration
+  CONFIG.HYP3E = HYP3E;
+
   // Disable legacy effect transferral
   if (CONFIG.ActiveEffect?.legacyTransferral) {
     CONFIG.ActiveEffect.legacyTransferral = false;
   }
-  // CONFIG.debug.time = true; // Enable timing debug logs
+
+  CONFIG.debug.time = true; // Enable timing debug logs
+  CONFIG.time = foundry.utils.mergeObject(CONFIG.time, {
+    // How many seconds in a "combat round"
+    roundTime: 10,  // 10 seconds per round
+    "worldCalendarConfig.name": "Hyperborean Calendar",
+    "worldCalendarConfig.description": "The calendar used in the world of Hyperborea, consisting of 13 months of 28 days each, with no leap years.",
+    "worldCalendarConfig.days.daysPerYear": 364, // 364 days in a year (13 months of 28 days)
+    "worldCalendarConfig.days.values": [
+      CONFIG.HYP3E.calendar.days.sun,
+      CONFIG.HYP3E.calendar.days.earth,
+      CONFIG.HYP3E.calendar.days.sea,
+      CONFIG.HYP3E.calendar.days.moon,
+      CONFIG.HYP3E.calendar.days.star,
+      CONFIG.HYP3E.calendar.days.sky,
+      CONFIG.HYP3E.calendar.days.saturn
+    ],
+    "worldCalendarConfig.months.values": [
+      CONFIG.HYP3E.calendar.months.I,
+      CONFIG.HYP3E.calendar.months.II,
+      CONFIG.HYP3E.calendar.months.III,
+      CONFIG.HYP3E.calendar.months.IV,
+      CONFIG.HYP3E.calendar.months.V,
+      CONFIG.HYP3E.calendar.months.VI,
+      CONFIG.HYP3E.calendar.months.VII,
+      CONFIG.HYP3E.calendar.months.VIII,
+      CONFIG.HYP3E.calendar.months.IX,
+      CONFIG.HYP3E.calendar.months.X,
+      CONFIG.HYP3E.calendar.months.XI,
+      CONFIG.HYP3E.calendar.months.XII,
+      CONFIG.HYP3E.calendar.months.XIII
+    ],
+    "worldCalendarConfig.years.leapYear": { leapInterval: 0, leapStart: 0 }, // No leap years
+    "worldCalendarConfig.years.yearZero": 1, // Year 1 is the first year of the calendar
+    "worldCalendarConfig.seasons": {}, // Seasons are years-long, not relevant to timekeeping
+  });
+  console.log("CONFIG.time:", CONFIG.time);
 
   // Temporary Effects should be deleted when they expire
   CONFIG.ActiveEffect.expiryAction = "delete";
@@ -62,9 +101,6 @@ Hooks.once('init', async function() {
 
   // Build a list of custom status effects and add to the CONFIG.statusEffects array
   pushCustomStatusEffects();
-
-  // Add custom constants for configuration
-  CONFIG.HYP3E = HYP3E;
 
   // Register data models for Actors and Items. This replaces the "template.json" system.
   // Actors

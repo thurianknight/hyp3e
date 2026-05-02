@@ -701,6 +701,92 @@
             "coverFull": "Full Concealment",
             "flankAttack": "Flank Attack",
             "rearAttack": "Rear Attack"
+        },
+        "calendar": {
+            "days": {
+                "sun": {
+                  "abbreviation": "Sun",
+                  "name": "Sun"
+                },
+                "earth": {
+                  "abbreviation": "Earth",
+                  "name": "Earth"
+                },
+                "sea": {
+                  "abbreviation": "Sea",
+                  "name": "Sea"
+                },
+                "moon": {
+                  "abbreviation": "Moon",
+                  "name": "Moon"
+                },
+                "star": {
+                  "abbreviation": "Star",
+                  "name": "Star"
+                },
+                "sky": {
+                  "abbreviation": "Sky",
+                  "name": "Sky"
+                },
+                "saturn": {
+                  "abbreviation": "Saturn",
+                  "name": "Saturn"
+                }
+            },
+            "months": {
+                "I": {
+                    "name": "Aries",
+                    "abbreviation": "Aries"
+                },
+                "II": {
+                    "name": "Taurus",
+                    "abbreviation": "Taurus"
+                },
+                "III": {
+                    "name": "Gemini",
+                    "abbreviation": "Gemini"
+                },
+                "IV": {
+                    "name": "Cancer",
+                    "abbreviation": "Cancer"
+                },
+                "V": {
+                    "name": "Leo",
+                    "abbreviation": "Leo"
+                },
+                "VI": {
+                    "name": "Virgo",
+                    "abbreviation": "Virgo"
+                },
+                "VII": {
+                    "name": "Libra",
+                    "abbreviation": "Libra"
+                },
+                "VIII": {
+                    "name": "Scorpius",
+                    "abbreviation": "Scorpius"
+                },
+                "IX": {
+                    "name": "Ophiuchus",
+                    "abbreviation": "Ophiuchus"
+                },
+                "X": {
+                    "name": "Sagittarius",
+                    "abbreviation": "Sagittarius"
+                },
+                "XI": {
+                    "name": "Capricorn",
+                    "abbreviation": "Capricorn"
+                },
+                "XII": {
+                    "name": "Aquarius",
+                    "abbreviation": "Aquarius"
+                },
+                "XIII": {
+                    "name": "Pisces",
+                    "abbreviation": "Pisces"
+                }
+            }
         }
     }
 }

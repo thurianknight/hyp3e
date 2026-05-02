@@ -545,14 +545,18 @@ export async function setupEffectHandlers() {
     if (!actor) return;
     Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Deleting ${effect.name} from ${effect.parent?.name}:`, { Effect: effect, Options: options });
 
+    const v14orLater = !!ActiveEffect?.registry;
+
     // Send chat message if expired, vs. log-only if manually deleted
     const remainingRounds = effect.getFlag("hyp3e", "remainingRounds");
     if (effect.duration?.expired || effect.duration?.remaining <= 0 || remainingRounds <= 0) {
       const msg = `<i>${effect.name}</i> expired on ${actor.name}.`;
-      // sendSimpleChat(actor, "", msg);
+      // if (v14orLater) {  // Messaging is handled elsewhere for v13 and earlier
+        sendSimpleChat(actor, "", msg);
+      // }
       Hyp3eLogger.info("ActiveEffect deleteActiveEffect", msg, effect);
     } else {
-      Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `${effect.name} manually removed from ${actor.name}.`, effect);
+      Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `${effect.name} removed from ${actor.name}.`, effect);
     }
 
     // When an active effect is deleted, check whether it had modified the token's light.
