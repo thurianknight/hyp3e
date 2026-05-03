@@ -186,25 +186,6 @@ export class HYP3ETurnTracker {
   static async advanceTime(minutes) {
     if (!game.user.isGM) return;
 
-    // const currentTime = game.settings.get("hyp3e", "currentTime");
-    // const [currHour, currMinute] = currentTime.split(":").map(Number);
-    // let newMinute = currMinute + minutes;
-    // let newHour = currHour;
-    // if (newMinute >= 60) {
-    //   // Reset the minutes and advance the hour
-    //   // Hyp3eLogger.info("advanceTime", `Minute overflow: ${newMinute} minutes, advancing hour.`);
-    //   newHour += Math.floor(newMinute / 60);
-    //   newMinute = newMinute % 60;
-    //   if (newHour >= 24) {
-    //     // Advance the day if hours exceed 24
-    //     // Hyp3eLogger.info("advanceTime", `Hour overflow: ${newHour} hours, rolling over to next day.`);
-    //     newHour = newHour % 24;
-    //     game.hyp3e.calendar.advanceDay(false); // Advance the day
-    //   }
-    // }
-    // const newTime = `${newHour.toString()}:${newMinute.toString().padStart(2, '0')}`;
-    // await game.settings.set("hyp3e", "currentTime", newTime);
-
     // Update the world time to match the new time
     const secondsPerMinute = 60;
     await game.time.advance(secondsPerMinute * minutes);
@@ -232,25 +213,6 @@ export class HYP3ETurnTracker {
 
   static async retreatTime(minutes) {
     if (!game.user.isGM) return;
-
-    // const currentTime = game.settings.get("hyp3e", "currentTime");
-    // const [currHour, currMinute] = currentTime.split(":").map(Number);
-    // let newMinute = currMinute - minutes;
-    // let newHour = currHour;
-    // if (newMinute < 0) {
-    //   // Reset the minutes and retreat the hour
-    //   // Hyp3eLogger.info("retreatTime", `Minute underflow: ${newMinute} minutes, retreating hour.`);
-    //   newHour -= Math.ceil(Math.abs(newMinute) / 60);
-    //   newMinute = (newMinute % 60 + 60) % 60; // Handle negative modulo
-    //   if (newHour < 0) {
-    //     // Retreat the day if hours go below 0
-    //     // Hyp3eLogger.info("retreatTime", `Hour underflow: ${newHour} hours, rolling back to previous day.`);
-    //     newHour = (newHour % 24 + 24) % 24; // Handle negative modulo
-    //     game.hyp3e.calendar.retreatDay(false); // Retreat the day
-    //   }
-    // }
-    // const newTime = `${newHour.toString()}:${newMinute.toString().padStart(2, '0')}`;
-    // await game.settings.set("hyp3e", "currentTime", newTime);
 
     // Update the world time to match the new time
     const secondsPerMinute = 60;

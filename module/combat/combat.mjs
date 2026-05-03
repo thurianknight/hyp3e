@@ -76,10 +76,9 @@ export class HYP3ECombat extends Combat {
     }
 
     // Advance the clock by 10 seconds
-    game.time.advance(10);
-    const newTime = game.hyp3e.calendar.formatTime(game.hyp3e.calendar.getCurrentTime());
-    Hyp3eLogger.info("HYP3ECombat _onEndRound", `Game time advanced by 10 seconds. New time: ${newTime}`);
-    // game.hyp3e.turnTracker
+    // game.time.advance(10);
+    // const newTime = game.hyp3e.calendar.formatTime(game.hyp3e.calendar.getCurrentTime());
+    // Hyp3eLogger.info("HYP3ECombat _onEndRound", `Game time advanced by 10 seconds. New time: ${newTime}`);
 
     // Reset/keep initiative
     switch(this.#initiativePersistence) {

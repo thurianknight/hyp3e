@@ -418,44 +418,13 @@ export async function setupEffectHandlers() {
       } else { // v13 or earlier
         if (effect.duration?.type === "rounds" || effect.duration?.type === "turns") {
           durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
-        } else if (!v14orLater && (effect.duration?.type === "seconds")) {
+        } else if (effect.duration?.type === "seconds") {
           durationRounds = Math.floor(effect.duration.seconds / 10);
         }
       }
       await effect.setFlag("hyp3e", "remainingRounds", durationRounds);
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingRounds to ${durationRounds} for ${effect.name}`);
     }
-
-    /**
-    // Automatically set the remaining turns for active effects with a duration in rounds.
-    //  This is useful for effects that are generally applied outside of combat and last for 
-    //  multiple turns (much longer than a typical combat spell/effect).
-    if (!effect.getFlag("hyp3e", "remainingTurns")) {
-      let durationTurns = null;
-      const majorVersion = Number(game.version?.split(".")[0] ?? game.data.version.split(".")[0]);
-      if (majorVersion <= 13) {
-        // Convert rounds to turns (6 rounds = 1 minute, 10 minutes = 1 turn)
-        const durationRounds = effect.duration.rounds ?? effect.duration.turns ?? null;
-        durationTurns = durationRounds !== null 
-          ? Math.floor(durationRounds / 60) 
-          : null;
-      } else {
-        // v14 introduced "seconds", and changed "rounds" to "value" with a "unit"
-        if (effect.duration.unit === "rounds" || effect.duration.unit === "turns") {
-          // Handle the same as v13, just with the new "value" property instead of "rounds"
-          const durationRounds = effect.duration.value ?? null;
-          durationTurns = durationRounds !== null 
-            ? Math.floor(durationRounds / 60) 
-            : null;
-        } else if (effect.duration.seconds) {
-          // If the duration is in seconds, convert to turns (3600 seconds = 1 turn)
-          durationTurns = Math.floor(effect.duration.seconds / 600);
-        }
-      }
-      await effect.setFlag("hyp3e", "remainingTurns", durationTurns);
-      Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingTurns to ${durationTurns} for ${effect.name}`);
-    }
-    */
 
     // Does the effect include light source properties?
     const lightProps = effect.getFlag("hyp3e", "lightProps");
@@ -543,18 +512,17 @@ export async function setupEffectHandlers() {
   Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
     const actor = effect.parent;
     if (!actor) return;
-    Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Deleting ${effect.name} from ${effect.parent?.name}:`, { Effect: effect, Options: options });
+    // Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Deleting ${effect.name} from ${effect.parent?.name}:`, { Effect: effect, Options: options });
 
     const v14orLater = !!ActiveEffect?.registry;
 
-    // Send chat message if expired, vs. log-only if manually deleted
+    // Send chat message if expired, vs. log-only if not
     const remainingRounds = effect.getFlag("hyp3e", "remainingRounds");
-    if (effect.duration?.expired || effect.duration?.remaining <= 0 || remainingRounds <= 0) {
+    const expiredFlag = effect.getFlag("hyp3e", "expired") ?? false;
+    if (effect.duration?.expired || effect.duration?.remaining <= 0 || remainingRounds <= 0 || expiredFlag) {
       const msg = `<i>${effect.name}</i> expired on ${actor.name}.`;
-      // if (v14orLater) {  // Messaging is handled elsewhere for v13 and earlier
-        sendSimpleChat(actor, "", msg);
-      // }
-      Hyp3eLogger.info("ActiveEffect deleteActiveEffect", msg, effect);
+      sendSimpleChat(actor, "", msg);
+      Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `${effect.name} expired on ${actor.name}.`, effect);
     } else {
       Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `${effect.name} removed from ${actor.name}.`, effect);
     }
