@@ -579,6 +579,10 @@ Hooks.once("ready", async function() {
   game.hyp3e.calendar.setCurrentDate = ({year, month, day}) => HYP3ECalendar.setCurrentDate({year, month, day});
   game.hyp3e.calendar.advanceDay = (resetTurns) => HYP3ECalendar.advanceDay(resetTurns);
   game.hyp3e.calendar.retreatDay = (resetTurns) => HYP3ECalendar.retreatDay(resetTurns);
+  game.hyp3e.calendar.advanceHour = () => HYP3ECalendar.advanceHour();
+  game.hyp3e.calendar.rewindHour = () => HYP3ECalendar.rewindHour();
+  game.hyp3e.calendar.advanceMinute = () => HYP3ECalendar.advanceMinute();
+  game.hyp3e.calendar.rewindMinute = () => HYP3ECalendar.rewindMinute();
   game.hyp3e.calendar.formatDate = ({year, month, day}, verbose) => HYP3ECalendar.formatDate({year, month, day}, verbose);
   game.hyp3e.calendar.formatTime = ({hour, minute}) => HYP3ECalendar.formatTime({hour, minute});
   game.hyp3e.calendar.getMoonPhase = (year, monthNum, day, moonName) => HYP3ECalendar.getMoonPhase(year, monthNum, day, moonName);

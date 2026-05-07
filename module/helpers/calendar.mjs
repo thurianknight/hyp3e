@@ -353,6 +353,50 @@ export class HYP3ECalendar {
    *  date for display.
    *-------------------------------------------------------------------------*/
 
+  static async advanceHour() {
+    if (!game.user.isGM) return;
+
+    const secondsPerHour = 3600;
+    await game.time.advance(secondsPerHour);
+
+    const currentTime = this.getCurrentTime();
+    Hyp3eLogger.info("HYP3ECalendar advanceHour", `Hour advanced. Current time: ${this.formatTime(currentTime)}`);
+    Hooks.callAll("timeAdvanced");
+  }
+  
+  static async rewindHour() {
+    if (!game.user.isGM) return;
+    
+    const secondsPerHour = -3600;
+    await game.time.advance(secondsPerHour);
+
+    const currentTime = this.getCurrentTime();
+    Hyp3eLogger.info("HYP3ECalendar rewindHour", `Hour rewound. Current time: ${this.formatTime(currentTime)}`);
+    Hooks.callAll("timeRewound");
+  }
+
+  static async advanceMinute() {
+    if (!game.user.isGM) return;
+
+    const secondsPerMinute = 60;
+    await game.time.advance(secondsPerMinute);
+
+    const currentTime = this.getCurrentTime();
+    Hyp3eLogger.info("HYP3ECalendar advanceMinute", `Minute advanced. Current time: ${this.formatTime(currentTime)}`);
+    Hooks.callAll("timeAdvanced");
+  }
+  
+  static async rewindMinute() {
+    if (!game.user.isGM) return;
+    
+    const secondsPerMinute = -60;
+    await game.time.advance(secondsPerMinute);
+
+    const currentTime = this.getCurrentTime();
+    Hyp3eLogger.info("HYP3ECalendar rewindMinute", `Minute rewound. Current time: ${this.formatTime(currentTime)}`);
+    Hooks.callAll("timeRewound");
+  }
+
   /**
    * Gets the current time from the world time, calculating hours and minutes based on the 
    *  total seconds since epoch.

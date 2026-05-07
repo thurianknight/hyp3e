@@ -42,6 +42,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
     Hooks.on("calendarDayAdvanced", () => this.render(true));
     Hooks.on("calendarDayRetreated", () => this.render(true));
     Hooks.on("explorationTurnReset", () => this.render(true));
+    Hooks.on("timeAdvanced", () => this.render(true));
+    Hooks.on("timeRewound", () => this.render(true));
   }
 
   _prepareContext(options) {
@@ -204,7 +206,29 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
       });
     }
 
-    // Button listeners
+    // Button listeners for time changes
+    if (game.user.isGM) {
+      root.querySelector("[data-action='advanceHour']")?.addEventListener("click", async () => {
+        await game.hyp3e.calendar.advanceHour(false);
+      });
+    }
+    if (game.user.isGM) {
+      root.querySelector("[data-action='rewindHour']")?.addEventListener("click", async () => {
+        await game.hyp3e.calendar.rewindHour(false);
+      });
+    }
+    if (game.user.isGM) {
+      root.querySelector("[data-action='advanceMinute']")?.addEventListener("click", async () => {
+        await game.hyp3e.calendar.advanceMinute(false);
+      });
+    }
+    if (game.user.isGM) {
+      root.querySelector("[data-action='rewindMinute']")?.addEventListener("click", async () => {
+        await game.hyp3e.calendar.rewindMinute(false);
+      });
+    }
+
+    // Button listeners for date advance & turn reset
     if (game.user.isGM) {
       root.querySelector("[data-action='advance']")?.addEventListener("click", async () => {
         // Hyp3eLogger.info("HYP3ECalendarApp advanceDay(false)", "Advance day button clicked by GM.");

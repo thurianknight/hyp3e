@@ -162,7 +162,6 @@
     font-size: 1em;
     min-width: 50px;
     max-width: 70px;
-    margin: 0 5px;
   }
 }
 
@@ -171,13 +170,32 @@
   justify-content: center;
   margin: 0 0.5em;
   font-size: 1.5em;
+  gap: 4px;
 }
 
 .time-banner {
+  display: flex;
+  flex-direction: row;
   font-weight: normal;
   justify-content: center;
-  margin: 0 0.5em;
+  align-items: center;
   font-size: 1em;
+  gap: 4px;
+}
+.time-banner .time-controls {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.75em;
+  cursor: pointer;
+  a:hover {
+    color: var(--color-warm-1);
+  }
+  a:active {
+    color: var(--button-text-color);
+  }
 }
 
 .hyp3e-calendar .calendar-toolbar {
