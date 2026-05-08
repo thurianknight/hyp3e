@@ -4433,7 +4433,7 @@ export class Hyp3eCharacterClass {
     const armorItems = await this.getDefaultItemsForClass({
       actor: actor,
       itemType: "armor",
-      folderNames: ["armor", "armour"],
+      folderNames: ["armor", "armour", "armor & shields", "armour & shields"],
       packKey: "armour"
     });
     if (armorItems && armorItems.length > 0) {
@@ -4445,7 +4445,7 @@ export class Hyp3eCharacterClass {
     const weaponItems = await this.getDefaultItemsForClass({
       actor: actor,
       itemType: "weapon",
-      folderNames: ["weapons"],
+      folderNames: ["weapons", "melee", "missile"],
       packKey: "weapons"
     });
     if (weaponItems && weaponItems.length > 0) {
@@ -4457,7 +4457,7 @@ export class Hyp3eCharacterClass {
     const generalItems = await this.getDefaultItemsForClass({
       actor: actor,
       itemType: "item",
-      folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items", "weapons"],
+      folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items", "weapons", "ammunition"],
       packKey: "equipment - general"
     });
     if (generalItems && generalItems.length > 0) {
