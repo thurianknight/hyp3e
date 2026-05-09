@@ -213,8 +213,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
       });
     }
     if (game.user.isGM) {
-      root.querySelector("[data-action='rewindHour']")?.addEventListener("click", async () => {
-        await game.hyp3e.calendar.rewindHour(false);
+      root.querySelector("[data-action='retreatHour']")?.addEventListener("click", async () => {
+        await game.hyp3e.calendar.retreatHour(false);
       });
     }
     if (game.user.isGM) {
@@ -223,8 +223,8 @@ export class HYP3ECalendarApp extends HandlebarsApplicationMixin(ApplicationV2) 
       });
     }
     if (game.user.isGM) {
-      root.querySelector("[data-action='rewindMinute']")?.addEventListener("click", async () => {
-        await game.hyp3e.calendar.rewindMinute(false);
+      root.querySelector("[data-action='retreatMinute']")?.addEventListener("click", async () => {
+        await game.hyp3e.calendar.retreatMinute(false);
       });
     }
 

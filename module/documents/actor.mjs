@@ -3752,33 +3752,7 @@ export class Hyp3eActor extends Actor {
       // Simulate the passage of 60 rounds (1 turn)
       await this.processTemporaryEffects(60);
       // Advance the temp effects round-timer and delete if expired
-      await this.advanceTempEffectsTimer(60);  
-
-      /**
-      // Check if the effect has a duration or remaining turns flag
-      const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
-      const remaining = effect.duration?.seconds ?? effect.duration?.value ?? null;
-      // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
-      if (typeof remainingTurns === "number") { // Not null or undefined
-        const newRemaining = remainingTurns - 1;
-        if (newRemaining <= 0) {
-          // Effect has expired -- for effects applied directly to the actor, we delete them...
-          //  but for effects applied via items, we just disable them
-          // if (effect.origin) {
-          if (effect.parent._id != this.id) {
-            effect.update({ disabled: true });
-          } else {
-            await effect.delete();
-          }
-          Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Effect ${effect.name} has expired for actor ${this.name}.`);
-          const msg = `The effect <b>${effect.name}</b> on ${this.displayName} has expired.`;
-          ui.notifications.info(msg);
-          sendSimpleChat(this, "", msg);
-        } else {
-          effect.setFlag("hyp3e", "remainingTurns", newRemaining);
-        }
-      }
-      */
+      await this.advanceTempEffectsTimer(60);
     }
 
     // Process this actor's owned items

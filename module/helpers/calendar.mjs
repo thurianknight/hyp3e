@@ -364,14 +364,14 @@ export class HYP3ECalendar {
     Hooks.callAll("timeAdvanced");
   }
   
-  static async rewindHour() {
+  static async retreatHour() {
     if (!game.user.isGM) return;
     
     const secondsPerHour = -3600;
     await game.time.advance(secondsPerHour);
 
     const currentTime = this.getCurrentTime();
-    Hyp3eLogger.info("HYP3ECalendar rewindHour", `Hour rewound. Current time: ${this.formatTime(currentTime)}`);
+    Hyp3eLogger.info("HYP3ECalendar retreatHour", `Hour rewound. Current time: ${this.formatTime(currentTime)}`);
     Hooks.callAll("timeRewound");
   }
 
@@ -386,14 +386,14 @@ export class HYP3ECalendar {
     Hooks.callAll("timeAdvanced");
   }
   
-  static async rewindMinute() {
+  static async retreatMinute() {
     if (!game.user.isGM) return;
     
     const secondsPerMinute = -60;
     await game.time.advance(secondsPerMinute);
 
     const currentTime = this.getCurrentTime();
-    Hyp3eLogger.info("HYP3ECalendar rewindMinute", `Minute rewound. Current time: ${this.formatTime(currentTime)}`);
+    Hyp3eLogger.info("HYP3ECalendar retreatMinute", `Minute rewound. Current time: ${this.formatTime(currentTime)}`);
     Hooks.callAll("timeRewound");
   }
 
