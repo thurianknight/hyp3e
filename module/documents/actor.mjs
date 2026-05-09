@@ -3735,40 +3735,43 @@ export class Hyp3eActor extends Actor {
     return containsItems;
   }
 
+  async advanceTime(rounds) {
+    // Process only active effects directly applied to the actor
+    for (const effect of this.effects) {
+      if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
+      Hyp3eLogger.info("Hyp3eActor advanceTime", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
+
+      // Simulate the passage of rounds
+      await this.processTemporaryEffects(rounds);
+      // Advance the temp effects round-timer and delete if expired
+      await this.advanceTempEffectsTimer(rounds);
+    }
+
+    // Process this actor's owned items
+    for (const item of this.items) {
+      // await item.advanceTime(rounds);
+    }
+
+    // Update temporary item durations & delete if expired
+    await this.processTemporaryItems(rounds);
+  }
+
   /**
    * Handle active effects that might expire, or events that occur, with a new turn.
    * @param {*} turn - The current game-world turn number.
    */
   async advanceExplorationTurn(turn) {
-    // Foundry v14 introduced big changes to Active Effects, so we need to check the 
-    //  version to determine how to process them
-    const v14orLater = ActiveEffect?.registry ? true : false;
+    // Process active effects and temporary items with the passage of one turn (60 rounds)
+    this.advanceTime(60);
 
-    // Process only active effects directly applied to the actor
-    for (const effect of this.effects) {
-      if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
-      Hyp3eLogger.info("Hyp3eActor advanceExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
-
-      // Simulate the passage of 60 rounds (1 turn)
-      await this.processTemporaryEffects(60);
-      // Advance the temp effects round-timer and delete if expired
-      await this.advanceTempEffectsTimer(60);
-    }
-
-    // Process this actor's owned items
-    for (const item of this.items) {
-      await item.advanceExplorationTurn(turn);
-    }
-
-    // Update temporary items & delete if expired
-    await this.processTemporaryItems(60); // 60 rounds = 10 minutes = 1 Hyperborea turn
+    // Process this actor's owned items - not currently used, but we may want to add 
+    //  item-specific turn-based effects/events in the future
+    // for (const item of this.items) {
+    //   await item.advanceExplorationTurn(turn);
+    // }
   }
 
-  /**
-   * Handle active effects that might expire, or events that occur, by retreating one turn.
-   * @param {*} turn - The current game-world turn number.
-   */
-  async retreatExplorationTurn(turn) {
+  async retreatTime(rounds) {
     // Foundry v14 introduced big changes to Active Effects, so we need to check the 
     //  version to determine how to process them
     const v14orLater = ActiveEffect?.registry ? true : false;
@@ -3790,17 +3793,21 @@ export class Hyp3eActor extends Actor {
         const newRounds = Math.min(remainingRounds+60, maxDuration);
         await effect.setFlag("hyp3e", "remainingRounds", newRounds);
       }
-
-      // Check if the effect has a remaining turns flag
-      // const remainingTurns = effect.getFlag("hyp3e", "remainingTurns");
-      // // An active effect "turn" is only a round, but a Hyperborea "turn" is 10 minutes or 60 rounds
-      // if (typeof remainingTurns === "number") {
-      //   const newRemaining = remainingTurns + 1;
-      //   effect.setFlag("hyp3e", "remainingTurns", newRemaining);
-      // }
     }
-    // Update temporary items
-    this.processTemporaryItems(-60); // 60 rounds = 10 minutes = 1 Hyperborea turn
+
+    // Update temporary item durations & restore if necessary
+    await this.processTemporaryItems(-rounds);
+  }
+
+  /**
+   * Handle active effects that might expire, or events that occur, by retreating one turn.
+   * @param {*} turn - The current game-world turn number.
+   */
+  async retreatExplorationTurn(turn) {
+    // Attempt to reverse the passage of time by 60 rounds, updating time remaining on temporary 
+    //  active effects and items. This is a best effort, since we can't truly reverse time, but 
+    //  it should help mitigate some of the issues with time passage in exploration mode.
+    this.retreatTime(60);
   }
 
   /** SPECIALIZED SKILL/TASK RESOLUTION ---------------*/
