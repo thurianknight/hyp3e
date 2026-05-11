@@ -439,7 +439,9 @@ export async function setupEffectHandlers() {
     Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} created on ${actor.name}:`, effect);
 
     // Send a chat message that the effect was applied
-    sendEffectChatMessage(effect)
+    if (game.user.isGM) {
+      sendEffectChatMessage(effect);
+    }
   });
 
   /**
@@ -519,9 +521,13 @@ export async function setupEffectHandlers() {
     // Send chat message if expired, vs. log-only if not
     const remainingRounds = effect.getFlag("hyp3e", "remainingRounds");
     const expiredFlag = effect.getFlag("hyp3e", "expired") ?? false;
-    if (effect.duration?.expired || effect.duration?.remaining <= 0 || remainingRounds <= 0 || expiredFlag) {
+    if (effect.duration?.expired || 
+        (effect.duration?.remaining && effect.duration?.remaining <= 0) || 
+        (remainingRounds && remainingRounds <= 0) || expiredFlag) {
       const msg = `<i>${effect.name}</i> expired on ${actor.name}.`;
-      sendSimpleChat(actor, "", msg);
+      if (game.user.isGM) {
+        sendSimpleChat(actor, "", msg);
+      }
       Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `${effect.name} expired on ${actor.name}.`, effect);
     } else {
       Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `${effect.name} removed from ${actor.name}.`, effect);
@@ -862,7 +868,7 @@ export async function enableTransferrableEffectToItemOwner(item, effectId, actor
               });
 
   // Send a chat message that the effect was enabled
-  sendEffectChatMessage(effect)
+  sendEffectChatMessage(effect);
 }
 
 /**
@@ -956,7 +962,7 @@ export async function disableTransferrableEffectOnItemOwner(item, effectId, acto
   await effect.update({ disabled: true });
 
   // Send a chat message that the effect was disabled
-  sendEffectChatMessage(effect)
+  sendEffectChatMessage(effect);
 }
 
 /**
