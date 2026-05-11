@@ -1508,60 +1508,60 @@ export class Hyp3eActor extends Actor {
    */
   async processTemporaryItems(rounds = 1) {
     Hyp3eLogger.info("Hyp3eActor processTemporaryItems", `Processing temp items on ${this.name}...`);
-      // Filter items with numeric duration > 0
-      const tempItems = this.items.filter(item => {
-        // Convert to a number if possible
-        const dur = item.getNumericDuration(item.system?.duration);
-        return dur !== null && dur > 0 &&
-          item.type !== "spell" &&
-          item.type !== "feature";
-      });
+    // Filter items with numeric duration > 0
+    const tempItems = this.items.filter(item => {
+      // Convert to a number if possible
+      const dur = item.getNumericDuration(item.system?.duration);
+      return dur !== null && dur > 0 &&
+        item.type !== "spell" &&
+        item.type !== "feature";
+    });
 
-      // Log items to decrement duration
-      const namesToReduce = tempItems.map(item => item.name);
-      if (namesToReduce.length > 0) {
-          Hyp3eLogger.info("Hyp3eActor processTemporaryItems", `Updating duration for ${namesToReduce.join(", ")}...`)
+    // Log items to be updated
+    const namesToReduce = tempItems.map(item => item.name);
+    if (namesToReduce.length > 0) {
+      Hyp3eLogger.info("Hyp3eActor processTemporaryItems", `Updating duration for ${namesToReduce.join(", ")}...`)
+    }
+
+    // Update duration on temporary items
+    const updates = [];
+    for (const item of tempItems) {
+      const dur = Number(item.system?.duration);
+      // Duration must be a positive number
+      if (dur > 0) {
+        updates.push({
+          _id: item.id,
+          "system.duration": dur - rounds
+        });
       }
+    }
+    if (updates.length > 0) {
+      await this.updateEmbeddedDocuments("Item", updates);
+    }
 
-      // Update duration on temporary items
-      const updates = [];
-      for (const item of tempItems) {
-          const dur = Number(item.system?.duration);
-          // Duration must be a positive number
-          if (dur > 0) {
-              updates.push({
-                  _id: item.id,
-                  "system.duration": dur - rounds
-              });
-          }
-      }
-      if (updates.length > 0) {
-          await this.updateEmbeddedDocuments("Item", updates);
-      }
+    // Filter items with numeric duration <= 0
+    const expiredItems = this.items.filter(item => {
+      // Convert to a number if possible
+      const dur = item.getNumericDuration(item.system?.duration);
+      return dur !== null && dur <= 0 &&
+        item.type !== "spell" &&
+        item.type !== "feature";
+    });
 
-      // Filter items with numeric duration <= 0
-      const expiredItems = this.items.filter(item => {
-        // Convert to a number if possible
-        const dur = item.getNumericDuration(item.system?.duration);
-        return dur !== null && dur <= 0 &&
-          item.type !== "spell" &&
-          item.type !== "feature";
-      });
+    if (expiredItems.length == 0) return;
 
-      if (expiredItems.length == 0) return;
+    // Log items to delete
+    const namesToDelete = expiredItems.map(item => item.name);
+    if (namesToDelete.length > 0) {
+      Hyp3eLogger.info("Hyp3eActor processTemporaryItems", `Deleting ${namesToDelete.join(", ")}...`)
+      // Post all the item expiration messages together
+      const chatContent = `<p>Conjured item has expired...</p><ul><li>${namesToDelete.join("</li><li>")}</li></ul>`;
+      sendSimpleChat(this, "", chatContent)
+    }
 
-      // Log items to delete
-      const namesToDelete = expiredItems.map(item => item.name);
-      if (namesToDelete.length > 0) {
-          Hyp3eLogger.info("Hyp3eActor processTemporaryItems", `Deleting ${namesToDelete.join(", ")}...`)
-          // Post all the item expiration messages together
-          const chatContent = `<p>Conjured item has expired...</p><ul><li>${namesToDelete.join("</li><li>")}</li></ul>`;
-          sendSimpleChat(this, "", chatContent)
-      }
-
-      // Delete all expired items
-      const idsToDelete = expiredItems.map(item => item.id);
-      await this.deleteEmbeddedDocuments("Item", idsToDelete);
+    // Delete all expired items
+    const idsToDelete = expiredItems.map(item => item.id);
+    await this.deleteEmbeddedDocuments("Item", idsToDelete);
   }
 
   getNumericDuration(raw) {
@@ -3747,10 +3747,11 @@ export class Hyp3eActor extends Actor {
       await this.advanceTempEffectsTimer(rounds);
     }
 
-    // Process this actor's owned items
-    for (const item of this.items) {
-      // await item.advanceTime(rounds);
-    }
+    // Process this actor's owned items - not currently used, but we may want to add 
+    //  item-specific time-based effects/events in the future
+    // for (const item of this.items) {
+    //   await item.advanceTime(rounds);
+    // }
 
     // Update temporary item durations & delete if expired
     await this.processTemporaryItems(rounds);
@@ -3763,12 +3764,6 @@ export class Hyp3eActor extends Actor {
   async advanceExplorationTurn(turn) {
     // Process active effects and temporary items with the passage of one turn (60 rounds)
     this.advanceTime(60);
-
-    // Process this actor's owned items - not currently used, but we may want to add 
-    //  item-specific turn-based effects/events in the future
-    // for (const item of this.items) {
-    //   await item.advanceExplorationTurn(turn);
-    // }
   }
 
   async retreatTime(rounds) {
@@ -3781,7 +3776,7 @@ export class Hyp3eActor extends Actor {
       if (!effect.isTemporary || effect.disabled) continue; // Skip non-temporary or disabled effects
       Hyp3eLogger.info("Hyp3eActor retreatExplorationTurn", `Processing effect ${effect.name} for actor ${this.name}...`, effect);
 
-      // Reverse the remainingRounds flag by 60, or its maximum value
+      // Reverse the remainingRounds flag by the specified rounds, but not exceeding the original value
       let remainingRounds = effect.getFlag("hyp3e", "remainingRounds");
       if (remainingRounds) {
         let maxDuration = null;
@@ -3790,7 +3785,7 @@ export class Hyp3eActor extends Actor {
         } else if (!v14orLater && (effect.duration?.type === "rounds" || effect.duration?.type === "turns")) {
           maxDuration = effect.duration.rounds ?? effect.duration.turns ?? null;
         }
-        const newRounds = Math.min(remainingRounds+60, maxDuration);
+        const newRounds = Math.min(remainingRounds + rounds, maxDuration);
         await effect.setFlag("hyp3e", "remainingRounds", newRounds);
       }
     }

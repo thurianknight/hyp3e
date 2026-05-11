@@ -359,6 +359,26 @@ export class HYP3ECalendar {
     const secondsPerHour = 3600;
     await game.time.advance(secondsPerHour);
 
+    // Build a Set of actors to process
+    const actors = new Set(
+      canvas.tokens.placeables
+        .map(t => t.actor)
+        .filter(Boolean)
+    );
+    Hyp3eLogger.info("HYP3ECalendar advanceHour", `Advancing the time on current actors:`, actors);
+
+    // Advance the time for each actor on the canvas
+    for (const actor of actors) {
+      // Foundry v14 introduced the ActiveEffect registry
+      if (ActiveEffect?.registry) {
+        await ActiveEffect.registry.addFromParent(actor);
+      }  
+      actor.advanceTime(360); // Advance by 360 rounds (1 hour) and process any time-based effects
+    }
+
+    // const secondsPerHour = 3600;
+    // await game.time.advance(secondsPerHour);
+
     const currentTime = this.getCurrentTime();
     Hyp3eLogger.info("HYP3ECalendar advanceHour", `Hour advanced. Current time: ${this.formatTime(currentTime)}`);
     Hooks.callAll("timeAdvanced");
@@ -366,9 +386,25 @@ export class HYP3ECalendar {
   
   static async retreatHour() {
     if (!game.user.isGM) return;
-    
+
     const secondsPerHour = -3600;
     await game.time.advance(secondsPerHour);
+
+    // Build a Set of actors to process
+    const actors = new Set(
+      canvas.tokens.placeables
+        .map(t => t.actor)
+        .filter(Boolean)
+    );
+    Hyp3eLogger.info("HYP3ECalendar retreatHour", `Rewinding the time on current actors:`, actors);
+
+    // Retreat the time for each actor
+    for (const actor of actors) {
+      actor.retreatTime(360); // Retreat by 360 rounds (1 hour)
+    }
+
+    // const secondsPerHour = -3600;
+    // await game.time.advance(secondsPerHour);
 
     const currentTime = this.getCurrentTime();
     Hyp3eLogger.info("HYP3ECalendar retreatHour", `Hour rewound. Current time: ${this.formatTime(currentTime)}`);
@@ -381,6 +417,26 @@ export class HYP3ECalendar {
     const secondsPerMinute = 60;
     await game.time.advance(secondsPerMinute);
 
+    // Build a Set of actors to process
+    const actors = new Set(
+      canvas.tokens.placeables
+        .map(t => t.actor)
+        .filter(Boolean)
+    );
+    Hyp3eLogger.info("HYP3ECalendar advanceMinute", `Advancing the time on current actors:`, actors);
+
+    // Advance the time for each actor on the canvas
+    for (const actor of actors) {
+      // Foundry v14 introduced the ActiveEffect registry
+      if (ActiveEffect?.registry) {
+        await ActiveEffect.registry.addFromParent(actor);
+      }  
+      actor.advanceTime(6); // Advance by 6 rounds (60 seconds) and process any time-based effects
+    }
+
+    // const secondsPerMinute = 60;
+    // await game.time.advance(secondsPerMinute);
+
     const currentTime = this.getCurrentTime();
     Hyp3eLogger.info("HYP3ECalendar advanceMinute", `Minute advanced. Current time: ${this.formatTime(currentTime)}`);
     Hooks.callAll("timeAdvanced");
@@ -388,9 +444,25 @@ export class HYP3ECalendar {
   
   static async retreatMinute() {
     if (!game.user.isGM) return;
-    
+
     const secondsPerMinute = -60;
     await game.time.advance(secondsPerMinute);
+
+    // Build a Set of actors to process
+    const actors = new Set(
+      canvas.tokens.placeables
+        .map(t => t.actor)
+        .filter(Boolean)
+    );
+    Hyp3eLogger.info("HYP3ECalendar retreatMinute", `Rewinding the time on current actors:`, actors);
+
+    // Retreat the time for each actor
+    for (const actor of actors) {
+      actor.retreatTime(6); // Retreat by 6 rounds (60 seconds)
+    }
+
+    // const secondsPerMinute = -60;
+    // await game.time.advance(secondsPerMinute);
 
     const currentTime = this.getCurrentTime();
     Hyp3eLogger.info("HYP3ECalendar retreatMinute", `Minute rewound. Current time: ${this.formatTime(currentTime)}`);

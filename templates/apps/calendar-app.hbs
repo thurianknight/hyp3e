@@ -70,13 +70,17 @@
       <div class="time-banner">
         Current Time: 
         <div class="time-controls">
+          {{#if isGM}}
           <a data-action="advanceHour" title="Advance Hour">▲</a>
           <a data-action="retreatHour" title="retreat Hour">▼</a>
+          {{/if}}
         </div>
         <input id="current-time" type="text" value="{{timeString}}" disabled />
         <div class="time-controls">
+          {{#if isGM}}
           <a data-action="advanceMinute" title="Advance Minute">▲</a>
           <a data-action="retreatMinute" title="retreat Minute">▼</a>
+          {{/if}}
         </div>
       </div>
     </div>
