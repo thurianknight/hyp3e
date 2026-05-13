@@ -56,7 +56,7 @@ Hooks.once('init', async function() {
     CONFIG.ActiveEffect.legacyTransferral = false;
   }
 
-  CONFIG.debug.time = true; // Enable timing debug logs
+  // CONFIG.debug.time = true; // Enable timing debug logs
   CONFIG.time = foundry.utils.mergeObject(CONFIG.time, {
     // How many seconds in a "combat round"
     roundTime: 10,  // 10 seconds per round

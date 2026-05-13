@@ -1378,6 +1378,7 @@ export class Hyp3eActor extends Actor {
     // Is this Foundry v14?
     if (ActiveEffect?.registry) {
       // Update the AE registry and return early, since it handles expiration and deletion
+      Hyp3eLogger.info("Hyp3eActor advanceTempEffectsTimer", `Refreshing effect registry for ${this.name}...`);
       await ActiveEffect.registry.addFromParent(this);
       await ActiveEffect.registry.refresh("roundEnd", { actors: new Set([this]) });
       return;
