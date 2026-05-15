@@ -46,7 +46,7 @@ export class Hyp3eItem extends Item {
       updateData["system.location"] = "";
     }
 
-    if (data.type === "item") {
+    if (data.type === "item" && !data.system.isLightSource) {
       // Try to match item name to a light source in the lookup table
       const lightSourceProps = Hyp3eItem.getLightSourceProperties(data.name);
       if (lightSourceProps) {

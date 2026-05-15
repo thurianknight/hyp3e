@@ -610,6 +610,7 @@ export async function checkAndResolveDuration(effect, actorData) {
  * @param {*} lightProps - An object containing the light properties to apply
  */
 export async function applyTokenLight(token, lightProps) {
+  Hyp3eLogger.info("ActiveEffect applyTokenLight", `Applying light source properties to ${token.name}:`, lightProps);
   // Prepare the light data
   const lightSource = {
     dim: lightProps.dim,
@@ -630,7 +631,7 @@ export async function applyTokenLight(token, lightProps) {
     "vision": true // Ensure the token can see
   });
 
-  Hyp3eLogger.info("ActiveEffect applyTokenLight", `Applied light source to token ${token.name}`);
+  // Hyp3eLogger.info("ActiveEffect applyTokenLight", `Applied light source to token ${token.name}`);
 }
 
 /**
