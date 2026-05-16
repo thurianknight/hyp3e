@@ -514,7 +514,7 @@ export async function setupEffectHandlers() {
   Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
     const actor = effect.parent;
     if (!actor) return;
-    // Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Deleting ${effect.name} from ${effect.parent?.name}:`, { Effect: effect, Options: options });
+    Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Deleting ${effect.name} from ${effect.parent?.name}:`, { Effect: effect, Options: options });
 
     const v14orLater = !!ActiveEffect?.registry;
 
