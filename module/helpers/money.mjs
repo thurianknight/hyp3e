@@ -254,26 +254,36 @@ export async function sellToMerchant(merchant, seller, item) {
     const buyMult = parseFloat(merchant.system?.buyMultiplier) ?? 1.0;
     // Final price is rounded to the nearest .01, or half a copper piece
     const buyPrice = Math.round(basePrice * buyMult * 100)/100;
-    // const sellerQty = parseInt(item.system.quantity?.value) ?? 1;
-    const sellerQty = toNumber(item.system.quantity?.value) ?? 1;
     Hyp3eLogger.info("sellToMerchant", `Merchant's buying price in gp:`, buyPrice)
+
+    let rawQty = toNumber(item.system.quantity?.value) ?? 1;
+    let sellerQty = rawQty;
+    // Is the item sold in bundles?
+    let bundleAmt = "units";
+    if (item.system.quantity?.bundle && item.system.quantity.bundle > 1) {
+      bundleAmt = `bundles of ${item.system.quantity.bundle}`;
+      sellerQty = Math.floor(sellerQty / item.system.quantity.bundle);
+    }
+    Hyp3eLogger.info("sellToMerchant", `Seller's quantity of ${itemName}: ${sellerQty} ${bundleAmt}`);
+
+    if (sellerQty <= 0) {
+      if (item.system.quantity?.bundle && item.system.quantity.bundle > 1) {
+        return ui.notifications.warn(`${seller.displayName} does not have a full bundle of ${itemName} to sell!`);
+      } else {
+        return ui.notifications.warn(`${seller.displayName} has no ${itemName} to sell!`);
+      }
+    }
 
     const merchantFunds = getTotalMoney(merchant.system.money);
     Hyp3eLogger.info("sellToMerchant", `Merchant's available funds in gp:`, merchantFunds)
 
     // Handle max purchase qty based on seller qty and merchant wealth
-    if (sellerQty <= 0) {
-        return ui.notifications.warn(`${seller.displayName} has no ${itemName} to sell!`);
-    }
-    const maxQty = Math.min(sellerQty, Math.floor(merchantFunds / buyPrice));
-    if (maxQty <= 0) {
-        return ui.notifications.warn(`${merchant.displayName} cannot afford ${buyPrice} gp.`);
-    }
+    let maxQty = Math.min(sellerQty, Math.floor(merchantFunds / buyPrice));
 
-    // Is the item sold in bundles?
-    const bundleAmt = item.system.quantity?.bundle && item.system.quantity.bundle > 1
-        ? `bundles of ${item.system.quantity.bundle}`
-        : "";
+    // Sanity check affordability before prompting for quantity
+    if (maxQty <= 0) {
+      return ui.notifications.warn(`${merchant.displayName} cannot afford ${buyPrice} gp.`);
+    }
 
     const qty = await Dialog.prompt({
         title: `${itemName} Sell Quantity`,
@@ -307,6 +317,7 @@ export async function sellToMerchant(merchant, seller, item) {
         }
     });
     if (!qty) return;
+    Hyp3eLogger.info("sellToMerchant", `Quantity to sell: ${qty} ${bundleAmt}`);
 
     const totalPrice = Math.round(buyPrice * qty * 100) / 100;
 
@@ -321,13 +332,13 @@ export async function sellToMerchant(merchant, seller, item) {
 
     // Adjust the seller's qty on hand
     let newSellerQty = 0;
-    if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+    if (item.system.quantity?.bundle && item.system.quantity.bundle > 1) {
         // For bundled items, reduce qty based on number of bundles sold
         const unitsSold = qty * item.system.quantity.bundle;
-        newSellerQty = Math.ceil(sellerQty - unitsSold, 0);
+        newSellerQty = Math.ceil(rawQty - unitsSold, 0);
     } else {
         // Normal unbundled item
-        newSellerQty = Math.ceil(sellerQty - qty, 0);
+        newSellerQty = Math.ceil(rawQty - qty, 0);
     }
     if (newSellerQty <= 0) {
         await item.delete(); // Seller sold it all
@@ -552,11 +563,12 @@ export async function transferFromActor(recipient, giver, item) {
     return ui.notifications.warn(`${giver.displayName} has no ${itemName} in inventory.`);
   }
   let maxQty = giverQty;
-
+  let bundleAmt = "";
   // Is the item sold in bundles?
-  const bundleAmt = item.system.quantity?.bundle && item.system.quantity.bundle > 1
-    ? `bundles of ${item.system.quantity.bundle}`
-    : "";
+  if (item.system.quantity?.bundle && item.system.quantity.bundle > 1) {
+    bundleAmt = `bundles of ${item.system.quantity.bundle}`;
+    maxQty = Math.floor(giverQty / item.system.quantity.bundle);
+  }
 
   // Prompt for quantity to transfer
   const qty = await Dialog.prompt({
