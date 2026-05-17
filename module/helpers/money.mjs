@@ -570,6 +570,14 @@ export async function transferFromActor(recipient, giver, item) {
     maxQty = Math.floor(giverQty / item.system.quantity.bundle);
   }
 
+  if (maxQty <= 0) {
+    if (item.system.quantity?.bundle && item.system.quantity.bundle > 1) {
+      return ui.notifications.warn(`${giver.displayName} does not have a full bundle of ${itemName} to transfer!`);
+    } else {
+      return ui.notifications.warn(`${giver.displayName} has no ${itemName} to transfer!`);
+    }
+  }
+
   // Prompt for quantity to transfer
   const qty = await Dialog.prompt({
     title: `${itemName} Transfer Quantity`,
