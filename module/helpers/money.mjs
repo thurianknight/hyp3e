@@ -353,9 +353,9 @@ export async function sellToMerchant(merchant, seller, item) {
     );
 
     // Add to merchant's existing qty or create new
+    let bundlesOf = "";
     if (existing) {
         let newQty = 0;
-        let bundlesOf = "";
         if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
             // For bundled items, increase qty based on number of bundles bought
             bundlesOf = `bundle(s) of ${item.system.quantity.bundle}`;
