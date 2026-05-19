@@ -1496,15 +1496,27 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     async _onDropItem(event, item) {
       // Hyp3eLogger.info("HYP3EActorSheetV2 _onDropItem", `Item dropped event:`, { event, item })
 
-      // Handle merchant -> character drag
+      // Who or what currently owns the item being dropped? Currently 5 possibilities:
+      //  1) A merchant -- merchants require a monetary transaction
+      //  2) A character
+      //  3) An NPC
+      //  4) A treasure
+      //  5) No one, the item is being dragged in from the sidebar or compendium
       const sourceActor = item?.parent;
+
+      /**----------------------------------------------------------------------
+       * Handle merchant transactions
+       *---------------------------------------------------------------------*/
+
+      // Handle merchant -> anyone drag
       if (sourceActor?.type === "merchant" && this.actor.type !== "merchant") {
         // Perform the merchant transaction and exit early
         await buyFromMerchant(this.actor, sourceActor, item);
         return; // Prevent super._onDropItem()
       }
-      // Handle character -> merchant drag
-      if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "merchant") {
+
+      // Handle character/npc/treasure -> merchant drag
+      if (["character","npc", "treasure"].includes(sourceActor?.type) && this.actor.type === "merchant") {
         // If selling a container, it must be empty
         if (item._isContainer() && item.contents.length > 0) {
           const msg = `Container ${item.name} is not empty! Remove all items from it first, before selling it.`;
@@ -1517,14 +1529,20 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         return; // Prevent super._onDropItem()
       }
 
-      // Handle treasure -> character drag
+
+      /**----------------------------------------------------------------------
+       * Handle treasure transfers
+       *---------------------------------------------------------------------*/
+
+      // Handle treasure -> anyone drag (except merchant, which is handled above)
       if (sourceActor?.type === "treasure" && this.actor.type !== "treasure") {
         // Perform the item transfer and exit early
         await transferFromActor(this.actor, sourceActor, item);
         return; // Prevent super._onDropItem()
       }
-      // Handle character -> treasure drag
-      if (["character","npc"].includes(sourceActor?.type) && this.actor.type === "treasure") {
+
+      // Handle character/npc/treasure -> treasure drag
+      if (["character","npc","treasure"].includes(sourceActor?.type) && this.actor.type === "treasure") {
         // Do not transfer spells or features
         if (["spell","feature","effectTemplate"].includes(item.type)) {
           const msg = `${this.actor.name} cannot hold ${item.type}s!`;
@@ -1537,14 +1555,27 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         return; // Prevent super._onDropItem()
       }
 
-      // Handle any item dragged to an ItemToken
+
+      /**----------------------------------------------------------------------
+       * Handle dropping any source item on to an ItemToken actor
+       *---------------------------------------------------------------------*/
+
       if (this.actor.type === "itemToken") {
+        // You cannot link an item token to an effect template
+        if (this.type === "effectTemplate") {
+          const msg = `Effect Templates cannot be linked to Item Tokens.`;
+          Hyp3eLogger.warn("_onDropItem", msg);
+          ui.notifications.warn(msg);
+          return; // Prevent super._onDropItem()
+        }
+        // An item token can only be linked to one item -- that's the whole point
         if (this.actor.system?.linkedItemUuid && this.actor.system.linkedItemUuid !== "") {
           const msg = `This Item Token is already linked to an item.`;
           Hyp3eLogger.warn("_onDropItem", msg);
           ui.notifications.warn(msg);
           return; // Prevent super._onDropItem()
         }
+
         // Clone important properties from item to actor
         const updates = {
           "name": item.system?.friendlyName || item.name,
@@ -1573,8 +1604,20 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         return super._onDropItem(event, item) // Copy the item to the itemToken actor
       }
 
-      // If an effectTemplate was dropped, add the effect to the actor
+
+      /**----------------------------------------------------------------------
+       * Handle dropping an Effect Template on to a character or npc actor
+       *---------------------------------------------------------------------*/
+
       if (item.type === "effectTemplate") {
+        // Only allow if dropped on character or npc
+        if (this.type !== "character" && this.type !== "npc") {
+          const msg = `Only characters and NPCs can have effects applied to them.`;
+          Hyp3eLogger.warn("_onDropItem", msg);
+          ui.notifications.warn(msg);
+          return; // Prevent super._onDropItem()
+        }
+
         const droppedEffectNames = item.effects.map(e => e.name);
         const existing = this.actor.effects.find(e => droppedEffectNames.includes(e.name));
         if (existing) { 
@@ -1585,7 +1628,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           return; 
         }
 
-        // Copy the effectTemplate's ActiveEffects to this actor
+        // Get the template's Active Effects, and prepare them by setting the origin and source name
         const effects = item.effects.contents.map(e => {
           let effectData = e.toObject();
           effectData.origin = this.actor.uuid;
@@ -1608,6 +1651,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         ui.notifications.info(msg);
         return;
       }
+
 
       // Otherwise let normal copy-item behavior proceed
       return super._onDropItem(event, item)
