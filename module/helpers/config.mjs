@@ -372,7 +372,7 @@ HYP3E.shieldTypes = {
  * [Optional] Advanced combat options
  * @type {Object}
  */
-HYP3E.advancedCombatOptions = {
+HYP3E.combatOptions = {
   "flank": "Flank Attack",
   "rear": "Rear Attack",
   "charge": "Charge Attack",

@@ -664,7 +664,8 @@
             "delete": "Delete",
             "createClass": "Create New Class",
             "buyMultiplier": "Buy/Offer Fraction",
-            "sellMultiplier": "Sell/Cost Multiplier"
+            "sellMultiplier": "Sell/Cost Multiplier",
+            "combatOptions": "Combat Options"
         },
         "combat": {
             "rollInitiative": "Group {initGroup} rolls for Initiative!",

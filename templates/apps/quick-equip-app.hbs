@@ -1,7 +1,10 @@
 <div class="quick-equip-app">
   <div class="quick-equip-app row-top">
-    <div class="quick-equip-controls row-top">
+    <div class="quick-equip-controls">
       <button type="button" class="quick-equip-control" data-tooltip="Close" data-action="close"><i class="fa-solid fa-xmark"></i></button>
+      {{#if enableAdvancedCombatOptions}}
+      <button type="button" class="quick-equip-control" data-tooltip="Combat Options" data-action="openCombatOptions"><i class="fa-solid fa-arrow-left"></i></button>
+      {{/if}}
     </div>
     <div class="quick-equip-column main-hand">
       <h3>Main Hand</h3>
@@ -25,16 +28,16 @@
       </div>
     </div>
   </div>
-  {{#if enableAdvancedCombatOptions}}
+  {{!-- {{#if showOptionsMenu}}
   <div class="quick-equip-column">
     <hr class="plain-hr" />
-    <h4>Advanced Combat</h4>
+    <h4>Combat Options</h4>
     <div class="flexrow">
       <div>
         <ul>
           {{#each advancedOptions1 as |opt id|}}
           <li>
-            <a class="combat-option" data-action="toggleCombatOption" data-control="{{id}}">{{opt}}</a>
+            <a class="combat-option" data-action="toggleCombatOption" data-option="{{id}}">{{opt}}</a>
           </li>
           {{/each}}
         </ul>
@@ -50,5 +53,5 @@
       </div>
     </div>
   </div>
-  {{/if}}
+  {{/if}} --}}
 </div>

@@ -1,4 +1,5 @@
 import { HYP3E } from "../helpers/config.mjs"
+import { HYP3EActorCombatOptions } from "./actor-combat-options.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 
 const { 
@@ -17,7 +18,9 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
     popOut: true,
     anchor: null,
     actions: {
-      equipItem: HYP3EQuickEquipApp.#equipItem
+      equipItem: HYP3EQuickEquipApp.#equipItem,
+      openCombatOptions: HYP3EQuickEquipApp.#openCombatOptions,
+      toggleCombatOption: HYP3EQuickEquipApp.#toggleCombatOption
     }
   };
 
@@ -88,17 +91,6 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
 
     const weapons = this.actor.items.filter(i => i.type === "weapon");
     const shields = this.actor.items.filter(i => i.type === "shield" && i.system.type !== "passive" || (i.type === "armor" && i.system.type === "shield"));
-    const advancedOptionsAll = Object.keys(CONFIG.HYP3E.advancedCombatOptions);
-    const mid = Math.ceil(advancedOptionsAll.length / 2);
-    const advancedOptions1 = {};
-    const advancedOptions2 = {};
-    advancedOptionsAll.forEach((key, index) => {
-      if (index < mid) {
-        advancedOptions1[key] = CONFIG.HYP3E.advancedCombatOptions[key];
-      } else {
-        advancedOptions2[key] = CONFIG.HYP3E.advancedCombatOptions[key];
-      }
-    });
 
     // Main hand: All weapons regardless of type
     const mainHand = weapons.map(w => ({
@@ -127,7 +119,7 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
       }))
     ];
 
-    return { mainHand, offHand, enableAdvancedCombatOptions, advancedOptions1, advancedOptions2 };
+    return { mainHand, offHand, enableAdvancedCombatOptions };
   }
 
   async render(...args) {
@@ -156,7 +148,7 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
 
     // App size (fallback if height not yet calculated)
     // const appWidth = this.position.width ?? 500;
-    const appWidth = this.element.getBoundingClientRect().width || 500;
+    const appWidth = this.element.getBoundingClientRect().width || 400;
     const appHeight = this.element.getBoundingClientRect().height || 300;
 
     // Position app left of token, vertically centered
@@ -178,6 +170,27 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
     const currentlyEquipped = item.system.equipped;
     await item.update({ "system.equipped": !currentlyEquipped });
     // Pause to let items update, then re-render the app
+    setTimeout(() => this.render(false), 250);
+  }
+
+  static async #openCombatOptions(event, target) {
+    HYP3EActorCombatOptions.openForActor(this.actor);
+  }
+
+  static async #toggleCombatOption(event, target) {
+    const option = target.dataset.option;
+    const currentValue = this.actor.system.combatOptions?.[option] ?? false;
+    const newValue = !currentValue;
+
+    // Update the actor's combat options
+    const updatedCombatOptions = {
+      ...this.actor.system.combatOptions,
+      [option]: newValue
+    };
+
+    await this.actor.update({ "system.combatOptions": updatedCombatOptions });
+
+    // Pause to let actor update, then re-render the app
     setTimeout(() => this.render(false), 250);
   }
 }

@@ -1,0 +1,17 @@
+<div>
+  <h3>{{actor.name}}</h3>
+  <hr class="plain-hr"/>
+  <span style="font-weight: bold; font-style: italic;">{{localize 'HYP3E.dataLabel.combatOptions'}} <i>({{localize 'HYP3E.settings.clickToToggle'}})</i></span>
+  <ul>
+    {{#each combatOptions as |opt id|}}
+    <li class="combat-options" data-optionId="{{../id}}">
+      <a class='item-control {{#ifInList id ../actorCombatOptions}}item-in-list{{/ifInList}}' 
+          data-tooltip="{{id}}" data-action="toggleOption"
+          data-control="{{optionId}}" role="button"
+        >
+        {{opt}}
+      </a>
+    </li>
+    {{/each}}
+  </ul>
+</div>
