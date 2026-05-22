@@ -369,41 +369,104 @@ HYP3E.shieldTypes = {
 };
 
 /**
- * [Optional] Advanced combat options
+ * [Optional] Combat options, many of which are optional/Advanced
  * @type {Object}
  */
 HYP3E.combatOptions = {
-  "flank": "Flank Attack",
-  "rear": "Rear Attack",
-  "charge": "Charge Attack",
+  "flank": { 
+    "name": "Flank Attack (+1 attack)", 
+    "attack": 1 
+  },
+  "rear": { 
+    "name": "Rear Attack (+2 attack)", 
+    "attack": 2 
+  },
+  "charge": { 
+    "name": "Charge Attack (+2 damage, -2 AC)", 
+    "damage": 2, 
+    "ac": -2 
+  },
   // "withdraw": "Fighting Withdrawal",
-  "runAway": "Run Away",
-  "mounted": "Mounted Combat",
-  "mountedCharge": "Mounted Charge",
-  // "arrowSetting": "Arrow Setting",
-  "conservative": "Conservative Fighting",
-  "disarm": "Disarm Attempt",
-  "dodge": "Dodging",
-  "doubleArrow": "Double Arrow Shot",
-  "doubleFeint": "Double Feint",
+  "runAway": { 
+    "name": "Run Away (-2 AC)", 
+    "ac": -2 
+  },
+  "mounted": { 
+    "name": "Mounted Combat (+1 attack & +1 AC vs. foot)", 
+    "attack": 1, 
+    "ac": 1 
+  },
+  "mountedCharge": { 
+    "name": "Mounted Charge (+1 attack, +2 damage, -2 AC)", 
+    "attack": 1, 
+    "damage": 2, 
+    "ac": -2 
+  },
+  // "arrowSetting": "Arrow Setting (+1/2 RoF)",
+  "conservative": { 
+    "name": "Conservative Fighting (+1 AC, -2 attack)", 
+    "ac": 1, 
+    "attack": -2 
+  },
+  "disarm": { 
+    "name": "Disarm Attempt (-4 attack)", 
+    "attack": -4 
+  },
+  "dodge": { 
+    "name": "Dodging (+2 AC, no attack)", 
+    "ac": 2 
+  },
+  "doubleArrow": { 
+    "name": "Double Arrow Shot (-2 attack)", 
+    "attack": -2 
+  },
+  "doubleFeint": { 
+    "name": "Double Feint (+2 attack)", 
+    "attack": 2 
+  },
   // "firingMarch": "Firing March",
-  "indirect": "Indirect Fire",
-  "parry": "Off-hand Weapon Parry",
-  "parryAndBlock": "Parry and Block",
+  "indirect": { 
+    "name": "Indirect Fire (-2 attack, ignore nearby allies)", 
+    "attack": -2 
+  },
+  "parry": { 
+    "name": "Off-hand Weapon Parry (+1 AC, no off-hand attack)", 
+    "ac": 1 
+  },
+  "parryAndBlock": { 
+    "name": "Parry and Block (+2 AC, + ST attack mod)", 
+    "ac": 2, 
+  },
   // "pommel": "Pommel Strike",
   // "ready": "Ready Shooter",
-  "reckless": "Reckless Fighting",
-  "recumbent": "Recumbent Fire",
-  "runningDodge": "Running Dodge",
+  "reckless": { 
+    "name": "Reckless Fighting (+1 attack, -2 AC)", 
+    "attack": 1, 
+    "ac": -2
+  },
+  "recumbent": { 
+    "name": "Recumbent Fire (+2 AC, -4 attack)", 
+    "ac": 2, 
+    "attack": -4 
+  },
+  "runningDodge": { 
+    "name": "Running Dodge (+2 AC, no attack)", 
+    "ac": 2
+  },
   // "saddleCasting": "Saddle Casting",
   // "saddleFire": "Saddle Fire",
   // "shieldBash": "Shield Bash",
-  "shieldBind": "Shield Bind",
+  "shieldBind": { 
+    "name": "Shield Bind (cancels shield AC bonuses)" 
+  },
   // "shieldCover": "Shield Cover for Ally",
   // "shieldSplitter": "Shield Splitter",
-  "shieldWall": "Shield Wall",
+  "shieldWall": { 
+    "name": "Shield Wall (+4 AC, replaces shield AC)", 
+    "ac": 2   // Net +2 bonus w/ large shield already calculated
+  },
   // "spearCharge": "Spear Charge",
-  "spearSet": "Spear Setting",
+  // "spearSet": "Spear Setting",
   // "throwAndAttack": "Throw and Attack",
   // "twoWeaponFighting": "Two-Weapon Fighting"
 };

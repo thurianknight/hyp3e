@@ -1657,25 +1657,25 @@
 }
 
 .bg-trans-yellow {
-    animation: fadeYellow 3s ease-in-out infinite;
-    background-color:lightyellow;
+  animation: fadeYellow 3s ease-in-out infinite;
+  background-color:lightyellow;
 }
 
 @keyframes fadeYellow {
-    0% {background-color: transparent;}
-    50% {background-color: lightyellow;}
-    100% {background-color: transparent;}
+  0% {background-color: transparent;}
+  50% {background-color: lightyellow;}
+  100% {background-color: transparent;}
 }
 
 .color-trans-red {
-    animation: fadeRed 2s ease-in-out infinite;
-    color:red;
+  animation: fadeRed 2s ease-in-out infinite;
+  color:red;
 }
 
 @keyframes fadeRed {
-    0% {color: black;}
-    50% {color: red;}
-    100% {color: black;}
+  0% {color: black;}
+  50% {color: red;}
+  100% {color: black;}
 }
 
 
@@ -1690,14 +1690,21 @@
 
 /* Styles for item alternate damage app */
 .item-set-alt-dmg {
-    text-align: left;
+  text-align: left;
 }
 
 /* Styles for item annotations app */
 .item-set-annotations {
-    ul {
-        list-style-type: none;
-    }
+  ul {
+    list-style-type: none;
+  }
+}
+
+/* Styles for combat options app */
+.combat-options {
+  ul {
+    list-style-type: none;
+  }
 }
 
 /* Table of contents styles? Not sure if these are used... */

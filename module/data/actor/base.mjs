@@ -94,6 +94,7 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
       tempModifiers: new fields.ArrayField(new fields.ObjectField(), { initial: [] }),
 
       baseClass: new fields.StringField({ required: true, blank: true, initial: "" }),
+      combatOptions: new fields.ArrayField(new fields.StringField(), { initial: [] }),   // array of combat option IDs
       _hyp3eEffectConditionState: new fields.ObjectField({ initial: {} })   // { [effectUuid]: "active" | "inactive" }
     };
   }

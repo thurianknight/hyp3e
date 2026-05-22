@@ -68,13 +68,7 @@ export class HYP3EActorCombatOptions extends HandlebarsApplicationMixin(Applicat
     this.initialize();
     Hyp3eLogger.info("HYP3EActorCombatOptions openForActor", `Opening Combat Options app for actor ${actor.name}.`)
 
-    // Keep one instance per actor
-    const existing = this.instances?.get(actor.uuid);
-    if (existing) return existing.render(true);
-
     const app = new this(actor);
-    this.instances ??= new Map();
-    this.instances.set(actor.uuid, app);
     app.render(true);
 
     return app;
@@ -94,7 +88,6 @@ export class HYP3EActorCombatOptions extends HandlebarsApplicationMixin(Applicat
 
   /** Clean up hook when app closes */
   async close(options = {}) {
-    this.constructor.instances?.delete(this.actor.uuid);
     return super.close(options);
   }
 
@@ -106,7 +99,6 @@ export class HYP3EActorCombatOptions extends HandlebarsApplicationMixin(Applicat
   async _prepareContext(_options) {
     Hyp3eLogger.info("HYP3EActorCombatOptions _prepareContext", `Context options: `, _options);
 
-    // const actor = await fromUuid(_options.actorUuid);
     const actor = this.actor;
     if (!actor) {
       const msg = `No actor provided for Combat Options app!`;
@@ -139,41 +131,42 @@ export class HYP3EActorCombatOptions extends HandlebarsApplicationMixin(Applicat
   static async toggleOption(event, target) {
     Hyp3eLogger.info("HYP3EActorCombatOptions toggleOption", `Combat Options Target:`, target);
 
-    const item = await fromUuid(target.dataset.itemUuid)
-    if (!item) {
-      const msg = `No item found for itemUuid ${target.dataset.itemUuid}!`;
+    // const id = target.dataset.optionId;
+    const actor = this.actor;
+    if (!actor) {
+      const msg = `No actor found to apply combat option ${target.dataset.optionId}!`;
       Hyp3eLogger.warn("HYP3EActorCombatOptions toggleOption", msg);
       ui.notifications.warn(msg);
-      return
+      return;
     }
 
-    // Check to see if the annotation is already in the list, return true or false
-    function checkAnnot(annot) {
-      return annot != target.dataset.control
+    // Check to see if the option is already selected, return true or false
+    function checkOption(id) {
+      return id != target.dataset.optionId;
     }
 
-    // Toggle this annotation on/off for the item
-    let newList = []
-    let annotations
-    if (item.system?.annotations) {
-      annotations = item.system.annotations
+    // Toggle this option on/off for the actor
+    let newList = [];
+    let combatOptions;
+    if (actor.system?.combatOptions) {
+      combatOptions = actor.system.combatOptions;
     } else {
-      annotations = []
+      combatOptions = [];
     }
-    
+
     // The filter function will delete any entries that match the clicked item, thus toggling it off
-    newList = annotations.filter(checkAnnot)
-    if (newList.length == annotations.length) {
+    newList = combatOptions.filter(checkOption)
+    if (newList.length == combatOptions.length) {
       // Nothing was deleted, so we will add this to the list, thus toggling it on
-      annotations.push(target.dataset.control)
+      combatOptions.push(target.dataset.optionId)
     } else {
-      // If something was deleted before, replace annotations with newList
-      annotations = newList
+      // If something was deleted before, replace combatOptions with newList
+      combatOptions = newList
     }
-    // Log the results and update the item
-    Hyp3eLogger.info("HYP3EActorCombatOptions toggleOption", `Annotations on ${item.name}: `, annotations);
-    await item.update({system: {annotations: annotations}})
+    // Log the results and update the actor
+    Hyp3eLogger.info("HYP3EActorCombatOptions toggleOption", `Combat Options on ${actor.name}: `, combatOptions);
+    await actor.update({system: {combatOptions: combatOptions}})
 
-    this.render(true, { itemUuid: target.dataset.itemUuid, focus: true })
+    this.render(true, { actor: this.actor, focus: true })
   }
 }

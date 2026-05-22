@@ -35,7 +35,7 @@ export default class HYP3ECharacterSetLanguages extends HandlebarsApplicationMix
             closeOnSubmit: false
         },
         position: {
-            width: 400,
+            width: 300,
             height: "auto"
         }
     }

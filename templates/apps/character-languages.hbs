@@ -1,10 +1,10 @@
-<div>
+<div class="item-set-annotations">
     <h3>{{actor.name}}</h3>
     <hr class="plain-hr"/>
     <span style="font-weight: bold;">{{localize 'HYP3E.details.languages'}} <i>({{localize 'HYP3E.settings.clickToToggle'}})</i></span>
     <ul>
         {{#each languages as |language|}}
-        <li class="item-set-annotations" data-actor-uuid="{{../actorUuid}}">
+        <li data-actor-uuid="{{../actorUuid}}">
             <a class='item-control {{#ifInList language ../actor.system.knownLanguages}}item-in-list{{/ifInList}}' 
                 data-tooltip="{{language}}" data-action="toggleLanguage"
                 data-control="{{language}}" data-actor-uuid="{{../actorUuid}}"

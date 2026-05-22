@@ -1,15 +1,15 @@
-<div>
+<div class="combat-options">
   <h3>{{actor.name}}</h3>
   <hr class="plain-hr"/>
-  <span style="font-weight: bold; font-style: italic;">{{localize 'HYP3E.dataLabel.combatOptions'}} <i>({{localize 'HYP3E.settings.clickToToggle'}})</i></span>
+  <span style="font-weight: bold;">{{localize 'HYP3E.dataLabel.combatOptions'}} <i>({{localize 'HYP3E.settings.clickToToggle'}})</i></span>
   <ul>
     {{#each combatOptions as |opt id|}}
-    <li class="combat-options" data-optionId="{{../id}}">
+    <li>
       <a class='item-control {{#ifInList id ../actorCombatOptions}}item-in-list{{/ifInList}}' 
-          data-tooltip="{{id}}" data-action="toggleOption"
-          data-control="{{optionId}}" role="button"
+          data-action="toggleOption"
+          data-option-id="{{id}}" role="button"
         >
-        {{opt}}
+        {{opt.name}}
       </a>
     </li>
     {{/each}}

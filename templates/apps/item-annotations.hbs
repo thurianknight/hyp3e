@@ -1,10 +1,10 @@
-<div>
+<div class="item-set-annotations">
     <h3>{{item.name}}</h3>
     <hr class="plain-hr"/>
     <span style="font-weight: bold;">{{localize 'HYP3E.dataLabel.annotations'}} <i>({{localize 'HYP3E.settings.clickToToggle'}})</i></span>
     <ul>
         {{#each annotList as |annot id|}}
-        <li class="item-set-annotations" data-item-uuid="{{../itemUuid}}">
+        <li data-item-uuid="{{../itemUuid}}">
             <a class='item-control {{#ifInList id ../item.system.annotations}}item-in-list{{/ifInList}}' 
                 data-tooltip="{{id}}" data-action="toggleAnnotation"
                 data-control="{{id}}" data-item-uuid="{{../itemUuid}}"
