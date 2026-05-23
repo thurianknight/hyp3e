@@ -9,6 +9,12 @@
             <label class="dialog-label">{{localize "HYP3E.rollFormula"}}</label>
             <input type="text" name="baseRollFormula" value="{{dataset.roll}}" disabled />
         </div>
+        {{#if dataset.combatOptionsList}}
+        <div class="flexrow form-group">
+            <label class="dialog-label">{{localize "HYP3E.dataLabel.combatOptions"}}</label>
+            <span style="font-style: italic; padding: 5px 0; display: inline-flex; align-items: center;">{{dataset.combatOptionsList}}</span>
+        </div>
+        {{/if}}
         {{!-- {{#unless dataset.noRoll}} --}}
         <div class="flexrow form-group">
             <label class="dialog-label">{{localize "HYP3E.sitMod"}}</label>
@@ -16,7 +22,7 @@
         </div>
         {{#if dataset.sitModList}}
         <div class="flexrow form-group" style="padding-left: 15px;">
-            <span style="font-style: italic">{{dataset.sitModList}}</span>
+            <span style="font-style: italic; padding-bottom: 5px; display: inline-flex; align-items: center;">{{dataset.sitModList}}</span>
         </div>
         {{/if}}
         {{!-- {{/unless}} --}}

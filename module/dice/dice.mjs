@@ -51,21 +51,21 @@ export class Hyp3eDice {
     // If the formula includes a fixed number like +1, integrate that into the base roll.
     //   This is a bit of a hack, but it works.
     if (atkRollParts.length > 1) {
-        // Regex to match +1, -1, +2, -2, etc.
-        const reNum = /[\+|\-]*\s*\d/;
-        // Loop through the array and find a match if it exists
-        atkRollParts.forEach((part, index) => {
-            // Skip the first element, that should always be "1d20"
-            if (index == 0) return;
-            if (part.match(reNum)) {
-                Hyp3eLogger.info("Hyp3eDice buildAttackFormula", "Found a fixed number in the formula: ", part);
-                // If we find a match, remove it from the array
-                atkRollParts.splice(index, 1);
-                // Add it to the first element in the array
-                let baseRoll = atkRollParts[0];
-                atkRollParts[0] = `${baseRoll} + ${part}`;
-            }
-        })
+      // Regex to match +1, -1, +2, -2, etc.
+      const reNum = /[\+|\-]*\s*\d/;
+      // Loop through the array and find a match if it exists
+      atkRollParts.forEach((part, index) => {
+        // Skip the first element, that should always be "1d20"
+        if (index == 0) return;
+        if (part.match(reNum)) {
+          Hyp3eLogger.info("Hyp3eDice buildAttackFormula", "Found a fixed number in the formula: ", part);
+          // If we find a match, remove it from the array
+          atkRollParts.splice(index, 1);
+          // Add it to the first element in the array
+          let baseRoll = atkRollParts[0];
+          atkRollParts[0] = `${baseRoll} + ${part}`;
+        }
+      })
     }
     // Start setting up the debug attack roll table & array
     debugAtkRollFormula = "<b>Attack formula elements:</b><table class='chat-table'>";
@@ -77,9 +77,9 @@ export class Hyp3eDice {
     // Strip '@item.atkMod' out since we add it automatically anyway...
     //   Ideally this won't ever happen, but some items might have it in their formula.
     if (atkRollParts.includes("@item.atkMod")) {
-        Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `${rollData.itemName} still has @itemData.atkMod in its formula!`);
-        atkRollParts = atkRollParts.filter(part => (part != "@item.atkMod"));
-        debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@item.atkMod"));
+      Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `${rollData.itemName} still has @itemData.atkMod in its formula!`);
+      atkRollParts = atkRollParts.filter(part => (part != "@item.atkMod"));
+      debugAtkRollParts = debugAtkRollParts.filter(part => (part != "@item.atkMod"));
     }
 
     // Apply the item attack mod if needed
@@ -181,35 +181,44 @@ export class Hyp3eDice {
 
     // Add Weapon Mastery mod if applicable
     if (masteryMod > 0) {
-        // Is the actor using a bow or crossbow, and is the target at point-blank range?
-        let pointBlank = ""
-        if (rollData.itemName.toLowerCase().includes("crossbow")) {
-            if (rollData.gridDistance >= 6 && rollData.gridDistance <= 50) {
-                masteryMod += 1
-                pointBlank = " + point blank"
-            }
-        } else if (rollData.itemName.toLowerCase().includes("bow")) {
-            if (rollData.gridDistance >= 6 && rollData.gridDistance <= 30) {
-                masteryMod += 1
-                pointBlank = " + point blank"
-            }
+      // Is the actor using a bow or crossbow, and is the target at point-blank range?
+      let pointBlank = ""
+      if (rollData.itemName.toLowerCase().includes("crossbow")) {
+        if (rollData.gridDistance >= 6 && rollData.gridDistance <= 50) {
+          masteryMod += 1
+          pointBlank = " + point blank"
         }
-        // Apply the weapon mastery/grandmastery mod
-        atkRollParts.push(masteryMod)
-        debugAtkRollParts.push(`<tr><td>Mastery Mod${pointBlank}</td><td>+${masteryMod}</td></tr>`)
+      } else if (rollData.itemName.toLowerCase().includes("bow")) {
+        if (rollData.gridDistance >= 6 && rollData.gridDistance <= 30) {
+          masteryMod += 1
+          pointBlank = " + point blank"
+        }
+      }
+      // Apply the weapon mastery/grandmastery mod
+      atkRollParts.push(masteryMod)
+      debugAtkRollParts.push(`<tr><td>Mastery Mod${pointBlank}</td><td>+${masteryMod}</td></tr>`)
+    }
+
+    // Add combat option modifiers, if any
+    if (rollData?.combatOptions) {
+      rollData.combatOptions.forEach(opt => {
+        atkRollParts.push(opt.attack);
+        const optionMod = parseInt(opt.attack) > 0 ? `+${parseInt(opt.attack)}` : `${parseInt(opt.attack)}`;
+        debugAtkRollParts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
+      });
     }
 
     // Add situational modifier from the roll dialog
     if (rollData?.sitMod && parseInt(rollData.sitMod) !== 0) {
-        atkRollParts.push(rollData.sitMod)
-        const rollSitMod = parseInt(rollData.sitMod) > 0 ? `+${parseInt(rollData.sitMod)}` : `${parseInt(rollData.sitMod)}`;
-        debugAtkRollParts.push(`<tr><td>Sit Mod</td><td>${rollSitMod}</td></tr>`)
+      atkRollParts.push(rollData.sitMod)
+      const rollSitMod = parseInt(rollData.sitMod) > 0 ? `+${parseInt(rollData.sitMod)}` : `${parseInt(rollData.sitMod)}`;
+      debugAtkRollParts.push(`<tr><td>Sit Mod</td><td>${rollSitMod}</td></tr>`)
     }
 
     // Add range modifier from the roll dialog, if needed
     if (rollData?.rangeMod) {
-        atkRollParts.push(rollData.rangeMod)
-        debugAtkRollParts.push(`<tr><td>Range Mod</td><td>${rollData.rangeMod}</td></tr>`)
+      atkRollParts.push(rollData.rangeMod)
+      debugAtkRollParts.push(`<tr><td>Range Mod</td><td>${rollData.rangeMod}</td></tr>`)
     }
 
     // Log the attack roll parts & the constructed formula
@@ -232,12 +241,13 @@ export class Hyp3eDice {
    * @param {Object} ammoData
    * @param {Object} actorData
    */
-  static buildDamageFormula(itemData, ammoData = null, actorData = null) {
+  static buildDamageFormula(itemData, ammoData = null, actorData = null, damageModifiers = null) {
     let dmgRollParts = [];
     let debugDmgRollParts = [];
     let dmgIcons = [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Item damage type: ${itemData?.dmgType}`);
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Actor data:`, actorData);
+    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Combat options:`, damageModifiers);
 
     // Format these output strings for later
     let formattedStrDmgMod = "0";
@@ -428,6 +438,19 @@ export class Hyp3eDice {
         dmgRoll2Parts.push(tempDmgMod.replace("+", ""))
         debugDmgRoll2Parts.push(`<tr><td>Effect Mod</td><td>${tempDmgMod}</td></tr>`)
       }
+    }
+
+    // Does the actor have any combat options specified that apply to damage?
+    if (damageModifiers) {
+      damageModifiers.forEach(opt => {
+        dmgRollParts.push(opt.damage);
+        const optionMod = parseInt(opt.damage) > 0 ? `+${parseInt(opt.damage)}` : `${parseInt(opt.damage)}`;
+        debugDmgRollParts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
+        if (itemData.damage2h) {
+          dmgRoll2Parts.push(opt.damage)
+          debugDmgRoll2Parts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
+        }
+      });
     }
 
     // Before alts, record how many parts are for base (for both 1H and 2H)

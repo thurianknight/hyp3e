@@ -44,6 +44,9 @@ export class HYP3ECombat extends Combat {
   }
 
   async endCombat() {
+    // Remove combat options from all combatants
+    await this._removeCombatOptions();
+
     // This will cycle through all combatants for active effects
     await this._refreshAndCleanupEffects("combatEnd", this);
 
@@ -65,6 +68,10 @@ export class HYP3ECombat extends Combat {
 
   async _onEndRound(context) {
     Hyp3eLogger.info("HYP3ECombat _onEndRound", `End-round data:`, this)
+
+    // Remove combat options from all combatants
+    await this._removeCombatOptions();
+
     // Do we need to apply unconscious or dead statuses?
     const resolveDeathAtRoundEnd = game.settings.get(game.system.id, "resolveDeathAtRoundEnd");
     if (resolveDeathAtRoundEnd) {
@@ -200,8 +207,22 @@ export class HYP3ECombat extends Combat {
     await super.resetAll()
   }
 
+  async _removeCombatOptions() {
+    Hyp3eLogger.info("HYP3ECombat _removeCombatOptions", `Removing declared combat options from combatants...`);
+    // Clean all combatant-actors
+    for (const c of this?.combatants || []) {
+      if (c.actor) {
+        const combatOptions = c.actor.system?.combatOptions;
+        // Only update if there is something to remove
+        if (typeof combatOptions === "object" && Object.keys(combatOptions).length > 0) {
+          await c.actor.update( { system: { combatOptions: {} } } );
+        }
+      }
+    }
+  }
+
   /**
-   * Private helper – keeps your four methods clean and DRY
+   * Update effect timers and remove if expired
    */
   async _refreshAndCleanupEffects(event, combat = null, combatant = null) {
     Hyp3eLogger.info("HYP3ECombat _refreshAndCleanupEffects", `Event: ${event} | Combatant: ${combatant?.name ?? "(all)"}`);
@@ -216,7 +237,7 @@ export class HYP3ECombat extends Combat {
     }
 
     /**
-     * v14 from here on...
+     * v14+ from here on...
      */
 
     // Log the AE registry
@@ -226,7 +247,7 @@ export class HYP3ECombat extends Combat {
     if (combatant && (event === "turnStart" || event === "turnEnd")) {
       context.combatant = combatant;
     }
-    // Limit to this actor when possible (much more efficient)
+    // Limit to this actor when possible
     if (actor) {
       context.actors = new Set([actor]);
       await ActiveEffect.registry.addFromParent(actor);

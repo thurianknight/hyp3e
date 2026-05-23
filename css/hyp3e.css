@@ -263,22 +263,22 @@
 /* ------------------------------------------------------------------------- */
 /* Generic styles used wherever I need them                                  */
 /* ------------------------------------------------------------------------- */
-.hyp3e .row-top {
+.row-top {
   display: flex;            /* lay out children in a row */
   flex-direction: row;      /* default behavior of 'flex' above, but explicit here */
   align-items: flex-start;  /* align items to the top of the container */
 }
-.hyp3e .row-stretch {
+.row-stretch {
   display: flex;            /* lay out children in a row */
   flex-direction: row;      /* default, but explicit */
   align-items: stretch;     /* evenly space items from left to right in the container */
 }
-.hyp3e .column-top {
+.column-top {
   display: flex;
   flex-direction: column;       /* stack children vertically */
   justify-content: flex-start;  /* align them at the top of the column */
 }
-.hyp3e .column-stretch {
+.column-stretch {
   display: flex;
   flex-direction: column;   /* stack children vertically */
   justify-content: stretch; /* evenly space items from top to bottom in the container */

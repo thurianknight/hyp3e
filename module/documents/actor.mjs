@@ -87,58 +87,7 @@ export class Hyp3eActor extends Actor {
    */
   _prepareCharacterData() {
     if (this.type !== 'character') return;
-
-    // Make modifications to base data here
-    // const systemData = this.system;
-
-    // Calculated fields go here...
-
-    // // Add actor type & base class, used for crit hit & crit miss tables
-    // const customClassData = game.settings.get(game.system.id, "customClassData");
-    // try {
-    //   systemData.baseClass = Hyp3eCharacterClass.classData[systemData.details.class]?.baseClass ?? customClassData[systemData.details.class]?.baseClass;
-    // } catch (err) {
-    //   // No match found (happens with custom classes), use "npc"
-    //   systemData.baseClass = "npc"
-    // }
-
-    // Auto-calculate attribute modifiers if configuration is enabled
-    // if (game.settings.get(game.system.id, "autoCalcAttrMods")) {
-    //   const attributeData = this._calcAttrMods(this.id, systemData);
-    //   if (attributeData) {
-    //     systemData.attributes = attributeData;
-    //   }
-    // }
-
-    // Calculate weight carried & encumbrance
-    // systemData.weightCarried = this._calcWeightCarried();
-
-    // What weight-class of armor (if any) is worn?
-    // const items = this._getEquippedProtectionItems();
-    // let armorType = "unarmored";
-    // for (const item of items) {
-    //   const sys = item.system ?? {};
-    //   if (item.type === "armor" && sys.type !== "shield") {
-    //     armorType = sys.type || "unarmored";
-    //     break; // We assume only one armor will be worn, so break after the first match
-    //   }
-    // }
-    // systemData.wornArmorType = armorType;
-
-    // Get encumbered status
-    // systemData.encumberedState = this._getEncumberedStatus(systemData);
-
-    // Auto-calculate AC, DR, MV if configuration is enabled
-    // if (game.settings.get(game.system.id, "autoCalcAc")) {
-    //   this.updateCharacterAcAndMv(systemData)
-    // }
-
-    // Apply temp AC, DR, and MV modifiers
-    // this._applyTempModifiers(systemData);
-
-    // Log the prepared data
-    // const sysData = foundry.utils.deepClone(systemData);
-    // Hyp3eLogger.info("Hyp3eActor _prepareCharacterData", `${this.name} system data:`, sysData);
+    // All of the code that was here has been moved to the data schema file ../data/character.mjs
   }
 
   /**
@@ -146,17 +95,7 @@ export class Hyp3eActor extends Actor {
    */
   _prepareNpcData() {
     if (this.type !== 'npc') return;
-
-    // Make modifications to data here
-    // const systemData = this.system
-
-    // Calculated fields go here...
-
-    // Apply temp AC, DR, and MV modifiers
-    // this._applyTempModifiers(systemData);
-
-    // Add actor base class, used for crit hit & crit miss tables
-    // systemData.baseClass = "npc"
+    // All of the code that was here has been moved to the data schema file ../data/npc.mjs
   }
 
   /**
@@ -445,423 +384,6 @@ export class Hyp3eActor extends Actor {
     // Anything to load?
     return data;
   }
-
-  /**
-   * Apply temporary AC, DR, and MV modifiers to the actor's system data.
-   * Centralized helper used by both character and NPC preparation functions.
-   * @param {Object} systemData
-   */
-  // _applyTempModifiers(systemData) {
-  //   const tempAcMod = parseInt(systemData.ac?.tempAcMod) || 0;
-  //   const tempDrMod = parseInt(systemData.ac?.tempDrMod) || 0;
-  //   const tempMvMod = parseInt(systemData.movement?.tempMvMod) || 0;
-
-  //   if (tempAcMod) {
-  //     Hyp3eLogger.info("Hyp3eActor _applyTempModifiers", `Applying temp AC mod: ${tempAcMod}`);
-  //     systemData.ac.value = Math.clamp(systemData.ac.value - tempAcMod, -9, 9);
-  //   }
-
-  //   if (tempDrMod) {
-  //     Hyp3eLogger.info("Hyp3eActor _applyTempModifiers", `Applying temp DR mod: ${tempDrMod}`);
-  //     systemData.ac.dr += tempDrMod;
-  //   }
-
-  //   if (tempMvMod) {
-  //     Hyp3eLogger.info("Hyp3eActor _applyTempModifiers", `Applying temp MV mod: ${tempMvMod}`);
-  //     systemData.movement.base.value += tempMvMod;
-  //   }
-  // }
-
-  /**
-   * Automatically calculate and populate character attribute modifiers
-   * @param {string} actorId - this actor's ID, used for lookup
-   * @param {object} - this actor's system data
-   * @returns {object} - JSON object of attributes and modifiers
-   */
-  // _calcAttrMods(actorId, systemData) {
-  //   if (!actorId) return;
-  //   // Calculate the entire attributes object
-  //   const attributeData = Hyp3eCharacterClass.calcAttrMods(systemData);
-  //   // Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Initial attribute data for ${this.name}:`, attributeData);
-
-  //   // Starting here, we apply active effects that update the modifiers...
-  //   const allowedKeys = [
-  //     "system.attributes.str.atkMod", 
-  //     "system.attributes.str.dmgMod", 
-  //     "system.attributes.str.test", 
-  //     "system.attributes.str.feat", 
-  //     "system.attributes.dex.atkMod", 
-  //     "system.attributes.dex.defMod", 
-  //     "system.attributes.dex.test", 
-  //     "system.attributes.dex.feat", 
-  //     "system.attributes.con.hpMod", 
-  //     "system.attributes.con.poisRadMod", 
-  //     "system.attributes.con.traumaSurvive", 
-  //     "system.attributes.con.test", 
-  //     "system.attributes.con.feat", 
-  //     "system.attributes.int.languages", 
-  //     "system.attributes.int.bonusSpells.lvl1", 
-  //     "system.attributes.int.bonusSpells.lvl2", 
-  //     "system.attributes.int.bonusSpells.lvl3", 
-  //     "system.attributes.int.bonusSpells.lvl4", 
-  //     "system.attributes.int.learnSpell", 
-  //     "system.attributes.wis.willMod", 
-  //     "system.attributes.wis.bonusSpells.lvl1", 
-  //     "system.attributes.wis.bonusSpells.lvl2", 
-  //     "system.attributes.wis.bonusSpells.lvl3", 
-  //     "system.attributes.wis.bonusSpells.lvl4", 
-  //     "system.attributes.wis.learnSpell", 
-  //     "system.attributes.cha.reaction", 
-  //     "system.attributes.cha.maxHenchmen", 
-  //     "system.attributes.cha.turnUndead", 
-  //   ];
-
-  //   const changes = [];
-  //   for ( const effect of this.allApplicableEffects() ) {
-  //     // Skip if disabled or not active
-  //     if ( effect.disabled || !effect.active ) continue;
-
-  //     // Validate effect condition is met before applying changes
-  //     const conditionPasses = this._effectApplies(effect);
-  //     // Store temporary effect condition state in actor (used by actor-sheet)
-  //     systemData._hyp3eEffectConditionState = systemData._hyp3eEffectConditionState || {};
-  //     systemData._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
-
-  //     if (!conditionPasses) {
-  //       Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
-  //       continue;
-  //     }
-
-  //     // Only include changes to allowed keys
-  //     const filtered = effect.changes
-  //       .filter(change => allowedKeys.includes(change.key))
-  //       .map(change => {
-  //         const c = foundry.utils.deepClone(change);
-  //         c.effect = effect;
-  //         c.priority = c.priority ?? (c.mode * 10);
-  //         return c;
-  //       });
-  //     changes.push(...filtered);
-  //   }
-
-  //   // Do we have any changes to apply?
-  //   if ( changes.length > 0 ) {
-  //     // Organize effects by their priority (though it probably doesn't matter)
-  //     changes.sort((a, b) => a.priority - b.priority);
-
-  //     // Update attributeData object with ActiveEffect changes
-  //     for (const change of changes) {
-  //       // Parse the change.value string and resolve it into a number if possible
-  //       let resolvedChange = null;
-  //       if (isPureNumber(change.value)) {
-  //         resolvedChange = Number(change.value) || 0;
-  //       } else if (isPureString(change.value)) {
-  //         resolvedChange = change.value;
-  //       } else if (containsDice(change.value)) {
-  //         // Dice rolls require async processing, which we can't do during _prepareData
-  //         Hyp3eLogger.warn("Hyp3eActor _calcAttrMods", `Change "${change.value}" contains a dice roll formula, which is not allowed for attribute modifiers. Skipping...`);
-  //         continue;
-  //       } else if (containsMathOrVariables(change.value)) {
-  //         // No dice rolls, we can do it synchronously
-  //         resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);
-  //       }
-
-  //       Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Applying ${change.effect.name} to ${this.name}'s ${change.key}:`, { resolvedChange, change });
-
-  //       let path = change.key; // e.g. "system.attributes.str.atkMod"
-  //       path = path.replace(/^system\.attributes\./, "");
-  //       let attrModValue = foundry.utils.getProperty(attributeData, path);
-  //       // Convert strings to numbers if necessary, but leave booleans alone
-  //       if (isPureNumber(attrModValue)) attrModValue = Number(attrModValue);
-  //       // Apply change based on mode
-  //       switch (change.mode) {
-  //         case CONST.ACTIVE_EFFECT_MODES.ADD: attrModValue += resolvedChange; break;
-  //         case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: attrModValue *= resolvedChange; break;
-  //         case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: attrModValue = resolvedChange; break;
-  //         // Pretty sure we don't need the other effect modes
-  //       }
-  //       foundry.utils.setProperty(attributeData, path, attrModValue);
-  //     }
-  //   }
-  //   Hyp3eLogger.info("Hyp3eActor _calcAttrMods", `Calculated attribute data for ${this.name}:`, attributeData);
-  //   return attributeData;
-  // }
-
-  /**
-   * Calculate the total weight carried by the actor. Only used with characters.
-   * @returns {number} Total weight carried, rounded to one decimal place
-   */
-  // _calcWeightCarried() {
-  //   let carriedWt = 0;
-  //   // Start with carried/equipped items. We ignore weight of non-equipped items since they are not being carried.
-  //   for (let item of this.items) {
-  //     // Calculate total weight carried by the character. For weapons & armor, the equipped
-  //     //  status is ignored and the item weight is always added to encumbrance.
-  //     //  For non-weapon items, the equipped status is used to determine if the item
-  //     //  is carried or not.
-  //     const normalGear = ['item', 'container'];
-  //     const combatGear = ['weapon', 'armor', 'shield'];
-  //     if (item.system.weight && item.system.quantity.value) {
-  //       // Is this a normal item, and is it carried?
-  //       if (normalGear.includes(item.type) && item.system.equipped) {
-  //         if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
-  //           // For bundled items, we calculate weight based on number of bundles
-  //           carriedWt += (item.system.weight * (item.system.quantity.value / item.system.quantity.bundle))
-  //         } else {
-  //           // Normal unbundled item
-  //           carriedWt += (item.system.weight * item.system.quantity.value)
-  //         }
-  //       } else if (combatGear.includes(item.type)) {
-  //         if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
-  //           // For bundled items, we calculate weight based on number of bundles
-  //           carriedWt += (item.system.weight * (item.system.quantity.value / item.system.quantity.bundle))
-  //         } else {
-  //             carriedWt += (item.system.weight * item.system.quantity.value)
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   // If enabled, add coin weight (100 coins = 1 lb)
-  //   if (CONFIG.HYP3E.enableCoinWeight) {
-  //     for (const [coinType, coinData] of Object.entries(this.system.money)) {
-  //       if (coinData.value) {
-  //         let val = convertToInt(coinData.value);
-  //         if (!isNaN(val) && val > 0) {
-  //           carriedWt += val / 100;
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   // Round to one decimal place
-  //   carriedWt = Math.round(carriedWt * 10)/10;
-
-  //   // Log the calculated weight
-  //   Hyp3eLogger.info("Hyp3eActor _calcWeightCarried", `${this.name} is carrying ${carriedWt} pounds.`);
-
-  //   // Return the final carried weight
-  //   return carriedWt;
-  // }
-
-  /**
-   * Determine the actor's encumbrance status based on weight carried and strength.
-   * @param {*} systemData - The actor system data object
-   * @returns {string} - "unencumbered", "encumbered", or "heavilyEncumbered"
-   */
-  // _getEncumberedStatus(systemData) {
-  //   // Calc constants for encumbrance thresholds
-  //   const encumberedWt = this.system.attributes.str.curr * CONFIG.HYP3E.encumbered
-  //   const heavilyEncumberedWt = this.system.attributes.str.curr * CONFIG.HYP3E.heavilyEncumbered
-  //   if (CONFIG.HYP3E.enableEncumbrance) {
-  //     // this.encumbrance is currently calculated by the ActorSheet, though I would
-  //     //  like to move that to the Actor data preparation phase eventually.
-  //     if (systemData.weightCarried > heavilyEncumberedWt) {
-  //       return "heavilyEncumbered";
-  //     } else if (systemData.weightCarried > encumberedWt) {
-  //       return "encumbered";
-  //     } else {
-  //       return "unencumbered";
-  //     }
-  //   }
-  //   return "unencumbered";
-  // }
-
-  /**
-   * Mutate the character's AC, DR, and MV in the actor's system data
-   * @param {*} systemData - The actor system data object
-   */
-  // updateCharacterAcAndMv(systemData) {
-  //     Hyp3eLogger.info("Hyp3eActor updateCharacterAcAndMv", `Calculating AC, DR, and MV for actor ${this.name}...`);
-  //     const { ac, dr, mv } = this._calculateAcDrMv(systemData);
-  //     systemData.ac.value = ac;
-  //     systemData.ac.dr = dr;
-  //     systemData.movement.base.value = mv;
-  // }
-
-  /**
-   * Calculate the character's AC, DR, and MV based on equipped armor, shields, etc.
-   * @param {*} systemData - The actor system data object
-   * @returns 
-   */
-  // _calculateAcDrMv(systemData) {
-  //   let ac = 9;
-  //   let mv = 40;
-  //   let dr = 0;
-  //   let shieldMod = 0;
-
-  //   const items = this._getEquippedProtectionItems();
-  //   // Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `${this.name} has equipped protection items:`, items);
-
-  //   for (const item of items) {
-  //     const sys = item.system ?? {};
-
-  //     if (this._isHandShield(item)) {
-  //       // Shield = stacking AC mod
-  //       shieldMod += sys.ac || 0;
-  //     } else if (this._isPassiveAc(item)) {
-  //       // Passive protection items (rings, cloaks, etc) stack too
-  //       shieldMod += sys.ac || 0;
-  //     } else {
-  //       // Armor (or passive AC) = pick the best
-  //       //  It shouldn't even be possible to equip multiple armors, but just in case...
-  //       if (sys.ac < ac) {
-  //         ac = sys.ac;
-  //         dr = sys.dr || dr;
-  //       }
-  //       // Movement
-  //       if (sys.mv !== mv) {
-  //         mv = sys.mv ?? mv;
-  //       }
-  //     }
-  //   }
-
-  //   // Encumbrance
-  //   if (CONFIG.HYP3E.enableEncumbrance) {
-  //     if (systemData.encumberedState === "encumbered") {
-  //       ac += 1; mv -= 10;
-  //     } else if (systemData.encumberedState === "heavilyEncumbered") {
-  //       ac += 2; mv -= 20;
-  //     }
-  //   }
-
-  //   // Dex and shields
-  //   ac -= (systemData.attributes.dex.defMod || 0) + shieldMod;
-
-  //   // Active effects can add their changes after this point...
-  //   const allowedKeys = [
-  //     "system.ac.value",
-  //     "system.ac.dr",
-  //     "system.movement.base.value"
-  //   ];
-  //   // Use these to update AC, DR, MV from effects
-  //   let finalAc = ac;
-  //   let finalDr = dr;
-  //   let finalMv = mv;
-
-  //   const changes = [];
-  //   for ( const effect of this.allApplicableEffects() ) {
-  //     // Skip if disabled or not active
-  //     if ( effect.disabled || !effect.active ) continue;
-
-  //     // Validate effect condition is met before applying changes
-  //     const conditionPasses = this._effectApplies(effect);
-  //     // Store temporary effect condition state in actor (used by actor-sheet)
-  //     systemData._hyp3eEffectConditionState = systemData._hyp3eEffectConditionState || {};
-  //     systemData._hyp3eEffectConditionState[effect.uuid] = conditionPasses ? "active" : "inactive";
-
-  //     if (!conditionPasses) {
-  //       Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Skipping effect "${effect.name}" on ${this.name} — condition not met:`, effect.flags.hyp3e?.condition);
-  //       continue;
-  //     }
-
-  //     // Only include changes to allowed keys
-  //     const filtered = effect.changes
-  //       .filter(change => allowedKeys.includes(change.key))
-  //       .map(change => {
-  //         const c = foundry.utils.deepClone(change);
-  //         c.effect = effect;
-  //         c.priority = c.priority ?? (c.mode * 10);
-  //         return c;
-  //       });
-  //     changes.push(...filtered);
-  //   }
-  //   // Do we have any changes to apply?
-  //   if ( changes.length > 0 ) {
-  //     // Organize effects by their priority (though it probably doesn't matter)
-  //     changes.sort((a, b) => a.priority - b.priority);
-
-  //     // Accumulate ActiveEffect changes
-  //     for (const change of changes) {
-  //       // Parse the change.value string and resolve it into a number if possible
-  //       let resolvedChange = 0;
-  //       if (isPureNumber(change.value)) {
-  //         resolvedChange = Number(change.value) || 0;
-  //       } else if (containsDice(change.value)) {
-  //         // Dice rolls require async processing, which we can't do during _prepareData
-  //         Hyp3eLogger.warn("Hyp3eActor _calculateAcDrMv", `Change "${change.value}" contains a dice roll formula, which is not allowed for AC, DR, and MV effects. Skipping...`);
-  //         continue;
-  //       } else if (containsMathOrVariables(change.value)) {
-  //         // No dice rolls, we can do it synchronously
-  //         resolvedChange = Hyp3eDice.resolveFormulaWithMath(change.value, systemData);
-  //       }
-  //       switch (change.key) {
-  //         case "system.ac.value":
-  //           Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s AC:`, change);
-  //           // Apply change based on mode
-  //           switch (change.mode) {
-  //             case CONST.ACTIVE_EFFECT_MODES.ADD: finalAc += resolvedChange; break;
-  //             case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalAc *= resolvedChange; break;
-  //             case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalAc = resolvedChange; break;
-  //             // Pretty sure we don't need the other effect modes
-  //           }  
-  //           break;
-  //         case "system.ac.dr":
-  //           Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s DR:`, change);
-  //           // Apply change based on mode
-  //           switch (change.mode) {
-  //             case CONST.ACTIVE_EFFECT_MODES.ADD: finalDr += resolvedChange; break;
-  //             case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalDr *= resolvedChange; break;
-  //             case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalDr = resolvedChange; break;
-  //             // Pretty sure we don't need the other effect modes
-  //           }
-  //           break;
-  //         case "system.movement.base.value":
-  //           Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Applying ${change.effect.name} ${resolvedChange} to ${this.name}'s MV:`, change);
-  //           // Apply change based on mode
-  //           switch (change.mode) {
-  //             case CONST.ACTIVE_EFFECT_MODES.ADD: finalMv += resolvedChange; break;
-  //             case CONST.ACTIVE_EFFECT_MODES.MULTIPLY: finalMv *= resolvedChange; break;
-  //             case CONST.ACTIVE_EFFECT_MODES.OVERRIDE: finalMv = resolvedChange; break;
-  //             // Pretty sure we don't need the other effect modes
-  //           }  
-  //           break;
-  //         default:
-  //           break;
-  //       }
-  //     }
-  //   }
-  //   // Hyp3eLogger.info("Hyp3eActor _calculateAcDrMv", `Final calculated AC, DR, MV for ${this.name}:`, { ac: finalAc, dr: finalDr, mv: finalMv });
-  //   // Return the final results
-  //   return {
-  //     ac: Math.clamp(finalAc, -9, 9),
-  //     dr: finalDr,
-  //     mv: finalMv
-  //   };
-  // }
-
-  /**
-   * Gather equipped protection items (armor, shields).
-   * @returns {Array} Array of equipped armor and shield items
-   */
-  // _getEquippedProtectionItems() {
-  //   const items = [];
-  //   for (const [type, collection] of Object.entries(this.itemTypes)) {
-  //     if (type === "armor" || type === "shield") {
-  //       for (const obj of Object.values(collection)) {
-  //         if (obj.system?.equipped) items.push(obj);
-  //       }
-  //     }
-  //   }
-  //   return items;
-  // }
-
-  /**
-   * Return true if the item should be treated as a hand-using shield.
-   */
-  // _isHandShield(item) {
-  //   return (
-  //     (item.type === "shield" && item.system.type !== "passive") ||
-  //     (item.type === "armor" && item.system.type === "shield")
-  //   );
-  // }
-
-  /**
-   * Return true if the item is a passive AC item (ring, cloak, etc).
-   */
-  // _isPassiveAc(item) {
-  //   return (item.type === "shield" && item.system.type === "passive");
-  // }
 
   /**
    * Handle adding and removing a bonus spell
@@ -2504,6 +2026,31 @@ export class Hyp3eActor extends Actor {
       const carriedAmmo = this._getCarriedAmmo();
       const selectedAmmo = itemData.usesAmmo ? item.getFlag("hyp3e", "usedAmmoId") : null;
 
+      // Get selected combat options, if any
+      const combatOptions = this._getCombatOptions() ?? {};
+
+      // Select all options that have an 'attack' property
+      const attackModifiers = Object.entries(combatOptions)
+        .filter(([, value]) => value.hasOwnProperty('attack') || 'attack' in value)
+        .map(([key, value]) => ({
+          key: key,
+          ...value
+        }));
+      dataset.combatOptions = attackModifiers ?? [];
+      // Extract names and join them with commas
+      dataset.combatOptionsList = attackModifiers
+        .map(mod => mod.name)
+        .join(', ');
+      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Combat option attack mods:`, attackModifiers);
+
+      // Get combat options that have a 'damage' property (to be used later, if a hit succeeds)
+      const damageModifiers = Object.entries(combatOptions)
+      .filter(([, value]) => value.hasOwnProperty('damage') || 'damage' in value)
+      .map(([key, value]) => ({
+        key: key,
+        ...value
+      }));
+
       dataset.sitMod = 0;
       dataset.sitModList = "";
       const sitModObj = this._getCombatantSitMods(attacker, target, !!itemData?.missile);
@@ -2526,6 +2073,7 @@ export class Hyp3eActor extends Actor {
           isGrenade: itemData?.isGrenade ?? false, // Pass grenade status
           itemName: itemName // Ensure item name is in dialog data
       };
+      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Attack roll dialog data:`, dialogData);
 
       // Show Dialog and Get User Input
       let rollResponse;
@@ -2567,38 +2115,38 @@ export class Hyp3eActor extends Actor {
 
         // Save the source caster's (or item's) UUID and casting ability in the effect flags
         for (const effect of item.effects.contents) {
-            const data = effect.toObject();
+          const data = effect.toObject();
 
-            data.flags ??= {};
-            data.flags.hyp3e ??= {};
-            data.flags.hyp3e.source ??= {};
-            data.flags.hyp3e.source.srcItemUuid = dataset.isItemSpell ? item.uuid : null;
-            data.flags.hyp3e.source.srcActorUuid = this.uuid;
-            data.flags.hyp3e.source.appliedBy = this.name;
-            // data.flags.hyp3e.sourceActorUuid = this.uuid;
+          data.flags ??= {};
+          data.flags.hyp3e ??= {};
+          data.flags.hyp3e.source ??= {};
+          data.flags.hyp3e.source.srcItemUuid = dataset.isItemSpell ? item.uuid : null;
+          data.flags.hyp3e.source.srcActorUuid = this.uuid;
+          data.flags.hyp3e.source.appliedBy = this.name;
+          // data.flags.hyp3e.sourceActorUuid = this.uuid;
 
-            // Optionally store spell-level data, too
-            data.flags.hyp3e.spellUuid = item.uuid;
-            data.flags.hyp3e.spellLevel = item.system.spellLevel ?? null;
+          // Optionally store spell-level data, too
+          data.flags.hyp3e.spellUuid = item.uuid;
+          data.flags.hyp3e.spellLevel = item.system.spellLevel ?? null;
 
-            // Update the temporary copy before rendering to chat
-            effect.updateSource(data);
+          // Update the temporary copy before rendering to chat
+          effect.updateSource(data);
         }
       }
 
       // If there's no item roll formula (typically a spell), send a chat message and exit
       if (!itemData.formula) {
-          actorData.img = this.img
-          item._displayItemInChat(actorData);
-          return null;
+        actorData.img = this.img
+        item._displayItemInChat(actorData);
+        return null;
       }
       // Use ammo or consumable item, and return ammo atk/dmg mods if applicable
       const { ammoMods, ammoUpdated } = await this._consumeAmmoOrItem(rollResponse, item, itemData);
       if (ammoUpdated) {
-          // If ammo was used, save its id in the item flags
-          const ammo = this.items.get(rollResponse.ammunition);
-          await item.setFlag("hyp3e", "usedAmmoId", ammo.id);
-          // this.sheet.render(false);
+        // If ammo was used, save its id in the item flags
+        const ammo = this.items.get(rollResponse.ammunition);
+        await item.setFlag("hyp3e", "usedAmmoId", ammo.id);
+        // this.sheet.render(false);
       }
 
       // Update dataset with final situational mods and roll mode from dialog
@@ -2606,8 +2154,8 @@ export class Hyp3eActor extends Actor {
       dataset.rollMode = rollResponse.rollMode;
       // Only for missile weapons
       if (item.type === "weapon" && itemData.missile) {
-          // Calculate range mod based on range to target
-          dataset.rangeMod = this._getRangeModifier(rollResponse.rangeGroup);
+        // Calculate range mod based on range to target
+        dataset.rangeMod = this._getRangeModifier(rollResponse.rangeGroup);
       }
 
       // Build Roll Formula
@@ -2635,25 +2183,25 @@ export class Hyp3eActor extends Actor {
       let damageFormulas = {};
       const isCritMiss = naturalRoll === 1 && CONFIG.HYP3E.critMiss;
       if ((hit || isCritMiss) && item && Roll.validate(itemData.damage)) {
-          damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);
+        damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData, damageModifiers);
       }
 
       // Embed damage data in the crit-miss footer so the crit miss handler can offer damage rolls
       let resolvedCritFooter = critFooter;
       if (isCritMiss && damageFormulas.primary) {
-          const df = damageFormulas.primary;
-          resolvedCritFooter = `<div class='critical-miss'` +
-              ` data-base-class='${this.system.baseClass}'` +
-              ` data-actor-id='${this.id}'` +
-              ` data-formula='${df.formula}'` +
-              ` data-debug-formula='${df.debugFormula}'` +
-              ` data-base-damage='${itemData.damage}'` +
-              ` data-damage-type='${itemData.dmgType}'` +
-              ` data-item-id='${item.id}'` +
-              ` data-item-uuid='${item.uuid}'` +
-              ` data-token-id='${attacker?.id ?? ""}'` +
-              ` data-source-type='${item.type}'` +
-              ` data-damage-groups='${JSON.stringify(df.damageGroups)}'></div>`;
+        const df = damageFormulas.primary;
+        resolvedCritFooter = `<div class='critical-miss'` +
+                              ` data-base-class='${this.system.baseClass}'` +
+                              ` data-actor-id='${this.id}'` +
+                              ` data-formula='${df.formula}'` +
+                              ` data-debug-formula='${df.debugFormula}'` +
+                              ` data-base-damage='${itemData.damage}'` +
+                              ` data-damage-type='${itemData.dmgType}'` +
+                              ` data-item-id='${item.id}'` +
+                              ` data-item-uuid='${item.uuid}'` +
+                              ` data-token-id='${attacker?.id ?? ""}'` +
+                              ` data-source-type='${item.type}'` +
+                              ` data-damage-groups='${JSON.stringify(df.damageGroups)}'></div>`;
       }
 
       // Render chat message
@@ -2829,51 +2377,68 @@ export class Hyp3eActor extends Actor {
    * @returns {{target: Token|null, targetData: {ac: number, name: string, size: string}, gridDistance: number}}
    */
   _getTargetDetails(attacker) {
-      const userTargets = Array.from(game.user.targets);
-      const target = userTargets.length > 0 ? userTargets[0] : null;
-      let targetData = { ac: 9, name: "", size: "" }; // Default values
-      let gridDistance = 0;
+    const userTargets = Array.from(game.user.targets);
+    const target = userTargets.length > 0 ? userTargets[0] : null;
+    let targetData = { ac: 9, name: "", size: "" }; // Default values
+    let gridDistance = 0;
 
-      if (target && target.actor && attacker) {
-          const targetActorData = target.actor.system;
-          targetData.ac = targetActorData.ac?.value ?? 9;
-          // Use token name if possible, otherwise actor name
-          targetData.name = target.name ? target.name : target.actor.displayName;
-          targetData.size = targetActorData.size ?? "M";
-          // Get the attacker's actual token size
-          const attackerWidth = attacker.document.width ?? 1; // Default to 1 if not found
-          const attackerHeight = attacker.document.height ?? 1; // Default to 1 if not found
-          // Get the target's actual token size
-          const targetWidth = target.document.width ?? 1; // Default to 1 if not found
-          const targetHeight = target.document.height ?? 1; // Default to 1 if not found
+    if (target && target.actor && attacker) {
+      const targetActorData = target.actor.system;
+      let effectiveAc = targetActorData.ac?.value ?? 9;
 
-          // Calculate distance
-          const attackerPos = attacker.center;
-          const targetPos = target.center;
-          const dx = targetPos.x - attackerPos.x;
-          const dy = targetPos.y - attackerPos.y;
-          const distancePixels = Math.sqrt(dx * dx + dy * dy);
-          gridDistance = (distancePixels / canvas.grid.size) * canvas.scene.grid.distance;
-          gridDistance = Math.round(gridDistance);
+      // Get combat options that have an 'ac' property
+      const combatOptions = target.actor._getCombatOptions() ?? {};
+      const acModifiers = Object.entries(combatOptions)
+      .filter(([, value]) => value.hasOwnProperty('ac') || 'ac' in value)
+      .map(([key, value]) => ({
+        key: key,
+        ...value
+      }));
+      // Apply each modifier to effectiveAc to get the target's final AC value
+      acModifiers.forEach(opt => {
+        effectiveAc -= parseInt(opt.ac);
+      })
+      targetData.ac = effectiveAc;
 
-          // If either token is larger than 1, reduce the grid distance to account for reach
-          if (attackerWidth > 1 || attackerHeight > 1) {
-              gridDistance -= (Math.max(attackerWidth, attackerHeight) - 1) * 5;
-          }
-          if (targetWidth > 1 || targetHeight > 1) {
-              gridDistance -= (Math.max(targetWidth, targetHeight) - 1) * 5;
-          }
-          // Ensure distance is not negative
-          if (gridDistance < 0) gridDistance = 0;
+      // Use token name if possible, otherwise actor name
+      targetData.name = target.name ? target.name : target.actor.displayName;
+      targetData.size = targetActorData.size ?? "M";
 
-          Hyp3eLogger.info("Hyp3eActor _getTargetDetails", `Target:`, target);
-          Hyp3eLogger.info("Hyp3eActor _getTargetDetails", `Target Data:`, targetData);
-          Hyp3eLogger.info("Hyp3eActor _getTargetDetails", `Distance:`, gridDistance);
-      } else {
-          Hyp3eLogger.info("Hyp3eActor getTargetDetails", `No target selected or attacker missing.`);
+      // Get the attacker's actual token size
+      const attackerWidth = attacker.document.width ?? 1; // Default to 1 if not found
+      const attackerHeight = attacker.document.height ?? 1; // Default to 1 if not found
+
+      // Get the target's actual token size
+      const targetWidth = target.document.width ?? 1; // Default to 1 if not found
+      const targetHeight = target.document.height ?? 1; // Default to 1 if not found
+
+      // Calculate distance
+      const attackerPos = attacker.center;
+      const targetPos = target.center;
+      const dx = targetPos.x - attackerPos.x;
+      const dy = targetPos.y - attackerPos.y;
+      const distancePixels = Math.sqrt(dx * dx + dy * dy);
+      gridDistance = (distancePixels / canvas.grid.size) * canvas.scene.grid.distance;
+      gridDistance = Math.round(gridDistance);
+
+      // If either token is larger than 1, reduce the grid distance to account for reach
+      if (attackerWidth > 1 || attackerHeight > 1) {
+        gridDistance -= (Math.max(attackerWidth, attackerHeight) - 1) * 5;
       }
+      if (targetWidth > 1 || targetHeight > 1) {
+        gridDistance -= (Math.max(targetWidth, targetHeight) - 1) * 5;
+      }
+      // Ensure distance is not negative
+      if (gridDistance < 0) gridDistance = 0;
 
-      return { target, targetData, gridDistance };
+      Hyp3eLogger.info("Hyp3eActor _getTargetDetails", `Target:`, target);
+      Hyp3eLogger.info("Hyp3eActor _getTargetDetails", `Target Data:`, targetData);
+      Hyp3eLogger.info("Hyp3eActor _getTargetDetails", `Distance:`, gridDistance);
+    } else {
+      Hyp3eLogger.info("Hyp3eActor getTargetDetails", `No target selected or attacker missing.`);
+    }
+
+    return { target, targetData, gridDistance };
   }
 
   /**
@@ -3140,12 +2705,13 @@ export class Hyp3eActor extends Actor {
    * @param {object} itemData - System data of the item.
    * @param {object} ammoMods - Modifiers from ammunition.
    * @param {object} actorData - Roll data context.
+   * @param {object} damageModifiers - Combat options that include a damage modifier
    * @returns {object} Object containing primary and secondary damage formulas {primary: {formula, debugFormula}, secondary: {formula, debugFormula}}.
    */
-  _prepareDamageFormulas(itemData, ammoMods, actorData) {
+  _prepareDamageFormulas(itemData, ammoMods, actorData, damageModifiers) {
       const dmgFormulas = {};
       // Build primary damage formula
-      const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData);
+      const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, damageModifiers);
       dmgFormulas.primary = {
           formula: dmgObj.formula,
           debugFormula: dmgObj.debugFormula,
@@ -3191,6 +2757,25 @@ export class Hyp3eActor extends Actor {
       // Log the parsed item data
       Hyp3eLogger.info("Hyp3eActor _parseItemMod", `Item mod data:`, itemData);
       return itemData
+  }
+
+  /**
+   * Get the array this.system.combatOptions, lookup the associated modifiers, and return those
+   * @returns {Object|null} combatOptions
+   */
+  _getCombatOptions() {
+    const combatOptionsArr = this.system?.combatOptions;
+    if (!combatOptionsArr || combatOptionsArr.length === 0) return null;
+
+    Hyp3eLogger.info("Hyp3eActor _getCombatOptions", `Combat options applied to ${this.name}...`, combatOptionsArr);
+
+    const combatOptions = {};
+    combatOptionsArr.forEach(id => {
+      combatOptions[id] = CONFIG.HYP3E.combatOptions[id];
+    });
+    Hyp3eLogger.info("Hyp3eActor _getCombatOptions", `Expanded combat options data for ${this.name}...`, combatOptions);
+
+    return combatOptions;
   }
 
   /**

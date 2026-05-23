@@ -165,7 +165,7 @@ export class HYP3EActorCombatOptions extends HandlebarsApplicationMixin(Applicat
     }
     // Log the results and update the actor
     Hyp3eLogger.info("HYP3EActorCombatOptions toggleOption", `Combat Options on ${actor.name}: `, combatOptions);
-    await actor.update({system: {combatOptions: combatOptions}})
+    await actor.update({ system: { combatOptions: combatOptions } })
 
     this.render(true, { actor: this.actor, focus: true })
   }

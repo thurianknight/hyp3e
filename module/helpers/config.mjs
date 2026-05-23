@@ -369,100 +369,120 @@ HYP3E.shieldTypes = {
 };
 
 /**
- * [Optional] Combat options, many of which are optional/Advanced
+ * [Optional] Combat options, many of which are optional/Advanced.
+ *  Allowed modifier properties: ac, attack, and damage
  * @type {Object}
  */
 HYP3E.combatOptions = {
   "flank": { 
-    "name": "Flank Attack (+1 attack)", 
+    "nameLong": "Flank Attack (+1 attack)", 
+    "name": "Flank Attack", 
     "attack": 1 
   },
   "rear": { 
-    "name": "Rear Attack (+2 attack)", 
+    "nameLong": "Rear Attack (+2 attack)", 
+    "name": "Rear Attack", 
     "attack": 2 
   },
   "charge": { 
-    "name": "Charge Attack (+2 damage, -2 AC)", 
+    "nameLong": "Charge Attack (+2 damage, -2 AC)", 
+    "name": "Charge Attack", 
     "damage": 2, 
     "ac": -2 
   },
   // "withdraw": "Fighting Withdrawal",
   "runAway": { 
-    "name": "Run Away (-2 AC)", 
+    "nameLong": "Run Away (-2 AC)", 
+    "name": "Run Away", 
     "ac": -2 
   },
   "mounted": { 
-    "name": "Mounted Combat (+1 attack & +1 AC vs. foot)", 
+    "nameLong": "Mounted Combat (+1 attack & +1 AC vs. foot)", 
+    "name": "Mounted Combat vs. Foot", 
     "attack": 1, 
     "ac": 1 
   },
   "mountedCharge": { 
-    "name": "Mounted Charge (+1 attack, +2 damage, -2 AC)", 
+    "nameLong": "Mounted Charge (+1 attack, +2 damage, -2 AC)", 
+    "name": "Mounted Charge", 
     "attack": 1, 
     "damage": 2, 
     "ac": -2 
   },
   // "arrowSetting": "Arrow Setting (+1/2 RoF)",
   "conservative": { 
-    "name": "Conservative Fighting (+1 AC, -2 attack)", 
+    "nameLong": "Conservative Fighting (+1 AC, -2 attack)", 
+    "name": "Conservative Fighting", 
     "ac": 1, 
     "attack": -2 
   },
   "disarm": { 
-    "name": "Disarm Attempt (-4 attack)", 
+    "nameLong": "Disarm Attempt (-4 attack)", 
+    "name": "Disarm Attempt", 
     "attack": -4 
   },
   "dodge": { 
-    "name": "Dodging (+2 AC, no attack)", 
+    "nameLong": "Dodging (+2 AC, no attack)", 
+    "name": "Dodging", 
     "ac": 2 
   },
   "doubleArrow": { 
-    "name": "Double Arrow Shot (-2 attack)", 
+    "nameLong": "Double Arrow Shot (-2 attack)", 
+    "name": "Double Arrow Shot", 
     "attack": -2 
   },
   "doubleFeint": { 
-    "name": "Double Feint (+2 attack)", 
+    "nameLong": "Double Feint (+2 attack)", 
+    "name": "Double Feint", 
     "attack": 2 
   },
   // "firingMarch": "Firing March",
   "indirect": { 
-    "name": "Indirect Fire (-2 attack, ignore nearby allies)", 
+    "nameLong": "Indirect Fire (-2 attack, ignore nearby allies)", 
+    "name": "Indirect Fire", 
     "attack": -2 
   },
   "parry": { 
-    "name": "Off-hand Weapon Parry (+1 AC, no off-hand attack)", 
+    "nameLong": "Off-hand Weapon Parry (+1 AC, no off-hand attack)", 
+    "name": "Off-hand Weapon Parry", 
     "ac": 1 
   },
   "parryAndBlock": { 
-    "name": "Parry and Block (+2 AC, + ST attack mod)", 
+    "nameLong": "Parry and Block (+2 AC, + ST attack mod)", 
+    "name": "Parry and Block", 
     "ac": 2, 
   },
   // "pommel": "Pommel Strike",
   // "ready": "Ready Shooter",
   "reckless": { 
-    "name": "Reckless Fighting (+1 attack, -2 AC)", 
+    "nameLong": "Reckless Fighting (+1 attack, -2 AC)", 
+    "name": "Reckless Fighting", 
     "attack": 1, 
     "ac": -2
   },
   "recumbent": { 
-    "name": "Recumbent Fire (+2 AC, -4 attack)", 
+    "nameLong": "Recumbent Fire (+2 AC, -4 attack)", 
+    "name": "Recumbent Fire", 
     "ac": 2, 
     "attack": -4 
   },
   "runningDodge": { 
-    "name": "Running Dodge (+2 AC, no attack)", 
+    "namelong": "Running Dodge (+2 AC, no attack)", 
+    "name": "Running Dodge", 
     "ac": 2
   },
   // "saddleCasting": "Saddle Casting",
   // "saddleFire": "Saddle Fire",
   // "shieldBash": "Shield Bash",
   "shieldBind": { 
-    "name": "Shield Bind (cancels shield AC bonuses)" 
+    "nameLong": "Shield Bind (cancels shield AC bonuses)", 
+    "name": "Shield Bind" 
   },
   // "shieldCover": "Shield Cover for Ally",
   // "shieldSplitter": "Shield Splitter",
   "shieldWall": { 
-    "name": "Shield Wall (+4 AC, replaces shield AC)", 
+    "nameLong": "Shield Wall (+4 AC, replaces shield AC)", 
+    "name": "Shield Wall", 
     "ac": 2   // Net +2 bonus w/ large shield already calculated
   },
   // "spearCharge": "Spear Charge",

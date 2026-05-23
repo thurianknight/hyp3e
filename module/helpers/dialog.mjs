@@ -81,7 +81,7 @@ export class Hyp3eDialog {
       ranges: dataset.ranges ?? null,
       chosen: dataset.chosenRange ?? null
     }
-    // Log dataset, ammo, ranges
+    // Log the dataset
     Hyp3eLogger.info("Hyp3eDialog ShowAttackRollDialog", `Dialog dataset:`, dataset);
     const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
     const dialogHtml = await renderTemplate(template, dialogData)
