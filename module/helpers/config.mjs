@@ -474,16 +474,22 @@ HYP3E.combatOptions = {
   // "saddleCasting": "Saddle Casting",
   // "saddleFire": "Saddle Fire",
   // "shieldBash": "Shield Bash",
-  "shieldBind": { 
-    "nameLong": "Shield Bind (cancels shield AC bonuses)", 
-    "name": "Shield Bind" 
-  },
+  // "shieldBind": { 
+  //   "nameLong": "Shield Bind (cancels shield AC bonuses)", 
+  //   "name": "Shield Bind" 
+  // },
   // "shieldCover": "Shield Cover for Ally",
   // "shieldSplitter": "Shield Splitter",
   "shieldWall": { 
     "nameLong": "Shield Wall (+4 AC, replaces shield AC)", 
     "name": "Shield Wall", 
     "ac": 2   // Net +2 bonus w/ large shield already calculated
+  },
+  "behindShieldWall": {
+    "nameLong": "2nd Rank Behind Shield Wall (+4 AC, -2 attack)",
+    "name": "Behind Shield Wall",
+    "ac": 4,
+    "attack": -2
   },
   // "spearCharge": "Spear Charge",
   // "spearSet": "Spear Setting",
