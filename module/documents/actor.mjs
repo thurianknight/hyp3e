@@ -1985,234 +1985,223 @@ export class Hyp3eActor extends Actor {
    * @param {object} dataset - Initial data for the roll (label, itemId, tokenId, etc.).
    */
   async rollAttackOrSpell(dataset) {
-      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Rolling ${dataset.label}...`, dataset);
+    Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Rolling ${dataset.label}...`, dataset);
 
-      // Gather Initial Information
-      const { attacker, attackerPos } = await this._getAttackerDetails(dataset);
-      const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
-      const actorData = this.getRollData();
-      // const actorData = foundry.utils.deepClone(this.system); // Clone this to avoid unintended side effects
+    // Gather Initial Information
+    const { attacker, attackerPos } = await this._getAttackerDetails(dataset);
+    const { item, itemData, itemName, attackTextBase } = await this._getItemDetails(dataset.itemId);
+    const actorData = this.getRollData();
 
-      // If item lookup fails, exit with a warning
-      if (!item) {
-          const msg = `No item found for ID ${dataset.itemId}.`;
-          Hyp3eLogger.warn("rollAttackOrSpell", msg);
-          ui.notifications.warn(msg);
-          return null;
-      }
-      dataset.itemName = itemName || "";
+    // If item lookup fails, exit with a warning
+    if (!item) {
+      const msg = `No item found for ID ${dataset.itemId}.`;
+      Hyp3eLogger.warn("rollAttackOrSpell", msg);
+      ui.notifications.warn(msg);
+      return null;
+    }
+    dataset.itemName = itemName || "";
 
-      // Gather Target Information & Calculate Distance/Range
-      const { target, targetData, gridDistance } = this._getTargetDetails(attacker);
-      dataset.rangeUoM = canvas.scene?.grid.units || "ft";
-      dataset.gridDistance = gridDistance;
-      dataset.targetName = targetData.name;
-      dataset.targetAc = targetData.ac;
-      dataset.targetSize = targetData.size;
+    // Gather Target Information & Calculate Distance/Range
+    const { target, targetData, gridDistance } = this._getTargetDetails(attacker);
+    dataset.rangeUoM = canvas.scene?.grid.units || "ft";
+    dataset.gridDistance = gridDistance;
+    dataset.targetName = targetData.name;
+    dataset.targetAc = targetData.ac;
+    dataset.targetSize = targetData.size;
 
-      // Warn if attack or spell requires a target, but no tokens were selected
-      if (item && (item.type === "weapon" || (item.type === "spell" && itemData.atkRoll)) && !target) {
-          ui.notifications.warn(`No target selected for ${item.name}!`);
-      }
+    // Warn if attack or spell requires a target, but no tokens were selected
+    if (item && (item.type === "weapon" || (item.type === "spell" && itemData.atkRoll)) && !target) {
+      ui.notifications.warn(`No target selected for ${item.name}!`);
+    }
 
-      // Prepare Data for Dialog (Range, Ammo, Initial Mods)
-      const { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance);
-      rangeMessages.forEach(msg => ui.notifications.warn(msg)); // Show range warnings immediately
-      if (isOutOfRange && CONFIG.HYP3E.forceRangeLimit) {
-          Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Target out of range, or too close, and forceRangeLimit enabled. Aborting.`);
-          return null; // Abort if out of range and setting is enabled
-      }
+    // Prepare Data for Dialog (Range, Ammo, Initial Mods)
+    const { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance);
+    rangeMessages.forEach(msg => ui.notifications.warn(msg)); // Show range warnings immediately
+    if (isOutOfRange && CONFIG.HYP3E.forceRangeLimit) {
+      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Target out of range, or too close, and forceRangeLimit enabled. Aborting.`);
+      return null; // Abort if out of range and setting is enabled
+    }
 
-      const carriedAmmo = this._getCarriedAmmo();
-      const selectedAmmo = itemData.usesAmmo ? item.getFlag("hyp3e", "usedAmmoId") : null;
+    const carriedAmmo = this._getCarriedAmmo();
+    const selectedAmmo = itemData.usesAmmo ? item.getFlag("hyp3e", "usedAmmoId") : null;
 
-      // Get selected combat options, if any
-      const combatOptions = this._getCombatOptions() ?? {};
+    // Get selected combat options, if any
+    const combatOptions = this._getCombatOptions() ?? {};
 
-      // Select all options that have an 'attack' property
-      const attackModifiers = Object.entries(combatOptions)
-        .filter(([, value]) => value.hasOwnProperty('attack') || 'attack' in value)
-        .map(([key, value]) => ({
-          key: key,
-          ...value
-        }));
-      dataset.combatOptions = attackModifiers ?? [];
-      // Extract names and join them with commas
-      dataset.combatOptionsList = attackModifiers
-        .map(mod => mod.name)
-        .join(', ');
-      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Combat option attack mods:`, attackModifiers);
+    // Select all options that have an 'attack' property
+    const attackOptions = Object.fromEntries(
+      Object.entries(combatOptions)
+        .filter(([, value]) => 'attack' in value)
+    );
+    Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Combat option attack mods:`, attackOptions);
+    // Extract names and join them with commas
+    const combatOptionsList = Object.values(attackOptions)
+      .map(opt => opt.name)
+      .join(', ');
+    dataset.combatOptionsList = combatOptionsList;
 
-      // Get combat options that have a 'damage' property (to be used later, if a hit succeeds)
-      const damageModifiers = Object.entries(combatOptions)
-      .filter(([, value]) => value.hasOwnProperty('damage') || 'damage' in value)
-      .map(([key, value]) => ({
-        key: key,
-        ...value
-      }));
+    dataset.sitMod = 0;
+    dataset.sitModList = "";
+    const sitModObj = this._getCombatantSitMods(attacker, target, !!itemData?.missile);
+    dataset.sitMod = parseInt(sitModObj?.sitModSum || 0);
+    dataset.sitModList = sitModObj?.sitModList || "";
 
-      dataset.sitMod = 0;
-      dataset.sitModList = "";
-      const sitModObj = this._getCombatantSitMods(attacker, target, !!itemData?.missile);
-      dataset.sitMod = parseInt(sitModObj?.sitModSum || 0);
-      dataset.sitModList = sitModObj?.sitModList || "";
+    // Combine item/roll specific data for the dialog
+    const dialogData = {
+      ...dataset, // Include initial dataset
+      showAmmo: itemData?.usesAmmo ?? false,
+      showRanges: !!itemData?.missile,
+      carriedAmmo: carriedAmmo,
+      selectedAmmo: selectedAmmo,
+      rangeGroup: rangeGroup,
+      ranges: ranges,
+      chosenRange: chosenRange,
+      showSpellRange: item?.type === "spell" && itemData?.atkRoll,
+      spellRange: itemData?.range, // Use descriptive range text for spells
+      rangeText: rangeText,
+      isGrenade: itemData?.isGrenade ?? false, // Pass grenade status
+      itemName: itemName // Ensure item name is in dialog data
+    };
+    Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Attack roll dialog data:`, dialogData);
 
-      // Combine item/roll specific data for the dialog
-      const dialogData = {
-          ...dataset, // Include initial dataset
-          showAmmo: itemData?.usesAmmo ?? false,
-          showRanges: !!itemData?.missile,
-          carriedAmmo: carriedAmmo,
-          selectedAmmo: selectedAmmo,
-          rangeGroup: rangeGroup,
-          ranges: ranges,
-          chosenRange: chosenRange,
-          showSpellRange: item?.type === "spell" && itemData?.atkRoll,
-          spellRange: itemData?.range, // Use descriptive range text for spells
-          rangeText: rangeText,
-          isGrenade: itemData?.isGrenade ?? false, // Pass grenade status
-          itemName: itemName // Ensure item name is in dialog data
-      };
-      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Attack roll dialog data:`, dialogData);
-
-      // Show Dialog and Get User Input
-      let rollResponse;
-      try {
-          rollResponse = await this._showRollDialog(dialogData, item?.type);
-          if (!rollResponse) { // Handle dialog cancellation
-              Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Dialog canceled by user.`);
-              return null;
-          }
-      } catch (err) {
-          Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Error displaying dialog:`, err);
-          return null;
-      }
-
-      /**
-       *  
-       * If we have reached this point, the attack has been made or the spell cast.
-       * Time to determine the results!
-       * 
-       * **/
-
-      if (item?.type === "spell") {
-
-        // Temporarily override the actor's CA if spell was cast from an item
-        if (dataset.isItemSpell) {
-          actorData.castingAbility.value = dataset.itemCa
-          actorData.ca = dataset.itemCa
-        }
-
-        // Handle spell memorization/slot consumption if applicable
-        if (!dataset.isItemSpell && itemData?.quantity?.value > 0) {
-          await this._consumeSpellSlot(item);
-        }
-
-        // Handle Runegraver spellcasting hit point bleed if applicable
-        if (this.system?.details?.class.toLowerCase() === "runegraver" && item.name.toLowerCase().includes("rune")) {
-          await this.applyHealthChange(parseInt(item.system.spellLevel), "basic", false);
-        }
-
-        // Save the source caster's (or item's) UUID and casting ability in the effect flags
-        for (const effect of item.effects.contents) {
-          const data = effect.toObject();
-
-          data.flags ??= {};
-          data.flags.hyp3e ??= {};
-          data.flags.hyp3e.source ??= {};
-          data.flags.hyp3e.source.srcItemUuid = dataset.isItemSpell ? item.uuid : null;
-          data.flags.hyp3e.source.srcActorUuid = this.uuid;
-          data.flags.hyp3e.source.appliedBy = this.name;
-          // data.flags.hyp3e.sourceActorUuid = this.uuid;
-
-          // Optionally store spell-level data, too
-          data.flags.hyp3e.spellUuid = item.uuid;
-          data.flags.hyp3e.spellLevel = item.system.spellLevel ?? null;
-
-          // Update the temporary copy before rendering to chat
-          effect.updateSource(data);
-        }
-      }
-
-      // If there's no item roll formula (typically a spell), send a chat message and exit
-      if (!itemData.formula) {
-        actorData.img = this.img
-        item._displayItemInChat(actorData);
+    // Show Dialog and Get User Input
+    let rollResponse;
+    try {
+      rollResponse = await this._showRollDialog(dialogData, item?.type);
+      if (!rollResponse) { // Handle dialog cancellation
+        Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Dialog canceled by user.`);
         return null;
       }
-      // Use ammo or consumable item, and return ammo atk/dmg mods if applicable
-      const { ammoMods, ammoUpdated } = await this._consumeAmmoOrItem(rollResponse, item, itemData);
-      if (ammoUpdated) {
-        // If ammo was used, save its id in the item flags
-        const ammo = this.items.get(rollResponse.ammunition);
-        await item.setFlag("hyp3e", "usedAmmoId", ammo.id);
-        // this.sheet.render(false);
+    } catch (err) {
+      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Error displaying dialog:`, err);
+      return null;
+    }
+
+    /**
+     *  
+     * If we have reached this point, the attack has been made or the spell cast.
+     * Time to determine the results!
+     * 
+     * **/
+
+    if (item?.type === "spell") {
+
+      // Temporarily override the actor's CA if spell was cast from an item
+      if (dataset.isItemSpell) {
+        actorData.castingAbility.value = dataset.itemCa
+        actorData.ca = dataset.itemCa
       }
 
-      // Update dataset with final situational mods and roll mode from dialog
-      dataset.sitMod = rollResponse.sitMod;
-      dataset.rollMode = rollResponse.rollMode;
-      // Only for missile weapons
-      if (item.type === "weapon" && itemData.missile) {
-        // Calculate range mod based on range to target
-        dataset.rangeMod = this._getRangeModifier(rollResponse.rangeGroup);
+      // Handle spell memorization/slot consumption if applicable
+      if (!dataset.isItemSpell && itemData?.quantity?.value > 0) {
+        await this._consumeSpellSlot(item);
       }
 
-      // Build Roll Formula
-      const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData);
-      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Final attack formula:`, rollFormula);
-
-      // Execute the Roll
-      const { atkRoll, naturalRoll } = await this._executeRoll(rollFormula, actorData);
-      if (!atkRoll) {
-        Hyp3eLogger.error("rollAttackOrSpell", `Roll execution failed.`);
-        return null;
+      // Handle Runegraver spellcasting hit point bleed if applicable
+      if (this.system?.details?.class.toLowerCase() === "runegraver" && item.name.toLowerCase().includes("rune")) {
+        await this.applyHealthChange(parseInt(item.system.spellLevel), "basic", false);
       }
 
-      // Determine Hit/Miss Result
-      const { hit, attackTextResult, critFooter } = this._determineHitResult(
-        atkRoll,
-        naturalRoll,
-        itemData,
-        dataset.targetAc,
-        dataset.targetSize
-      );
-      atkRoll.hit = hit; // Attach hit status to the roll object
+      // Save the source caster's (or item's) UUID and casting ability in the effect flags
+      for (const effect of item.effects.contents) {
+        const data = effect.toObject();
 
-      // Prepare Damage Formula (if hit, or on crit miss so damage data is available for hitAlly/hitSelf outcomes)
-      let damageFormulas = {};
-      const isCritMiss = naturalRoll === 1 && CONFIG.HYP3E.critMiss;
-      if ((hit || isCritMiss) && item && Roll.validate(itemData.damage)) {
-        damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData, damageModifiers);
+        data.flags ??= {};
+        data.flags.hyp3e ??= {};
+        data.flags.hyp3e.source ??= {};
+        data.flags.hyp3e.source.srcItemUuid = dataset.isItemSpell ? item.uuid : null;
+        data.flags.hyp3e.source.srcActorUuid = this.uuid;
+        data.flags.hyp3e.source.appliedBy = this.name;
+        // data.flags.hyp3e.sourceActorUuid = this.uuid;
+
+        // Optionally store spell-level data, too
+        data.flags.hyp3e.spellUuid = item.uuid;
+        data.flags.hyp3e.spellLevel = item.system.spellLevel ?? null;
+
+        // Update the temporary copy before rendering to chat
+        effect.updateSource(data);
       }
+    }
 
-      // Embed damage data in the crit-miss footer so the crit miss handler can offer damage rolls
-      let resolvedCritFooter = critFooter;
-      if (isCritMiss && damageFormulas.primary) {
-        const df = damageFormulas.primary;
-        resolvedCritFooter = `<div class='critical-miss'` +
-                              ` data-base-class='${this.system.baseClass}'` +
-                              ` data-actor-id='${this.id}'` +
-                              ` data-formula='${df.formula}'` +
-                              ` data-debug-formula='${df.debugFormula}'` +
-                              ` data-base-damage='${itemData.damage}'` +
-                              ` data-damage-type='${itemData.dmgType}'` +
-                              ` data-item-id='${item.id}'` +
-                              ` data-item-uuid='${item.uuid}'` +
-                              ` data-token-id='${attacker?.id ?? ""}'` +
-                              ` data-source-type='${item.type}'` +
-                              ` data-damage-groups='${JSON.stringify(df.damageGroups)}'></div>`;
-      }
+    // If there's no item roll formula (typically a spell), send a chat message and exit
+    if (!itemData.formula) {
+      actorData.img = this.img
+      item._displayItemInChat(actorData);
+      return null;
+    }
+    // Use ammo or consumable item, and return ammo atk/dmg mods if applicable
+    const { ammoMods, ammoUpdated } = await this._consumeAmmoOrItem(rollResponse, item, itemData);
+    if (ammoUpdated) {
+      // If ammo was used, save its id in the item flags
+      const ammo = this.items.get(rollResponse.ammunition);
+      await item.setFlag("hyp3e", "usedAmmoId", ammo.id);
+      // this.sheet.render(false);
+    }
 
-      // Render chat message
-      const chatLabel = this._createChatLabel(this.img, itemName);
-      const attackHeader = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
+    // Update dataset with final situational mods and roll mode from dialog
+    dataset.sitMod = rollResponse.sitMod;
+    dataset.rollMode = rollResponse.rollMode;
+    // Only for missile weapons
+    if (item.type === "weapon" && itemData.missile) {
+      // Calculate range mod based on range to target
+      dataset.rangeMod = this._getRangeModifier(rollResponse.rangeGroup);
+    }
 
-      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Chat data:`, {chatLabel, attackHeader, resolvedCritFooter});
-      await renderCustomChat(atkRoll, item, damageFormulas, this, attacker?.id, chatLabel, debugAtkRollFormula, attackHeader, resolvedCritFooter, rollResponse.rollMode);
+    // Build Roll Formula
+    const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData);
+    Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Final attack formula:`, rollFormula);
 
-      // Return Roll Result
-      return atkRoll;
+    // Execute the Roll
+    const { atkRoll, naturalRoll } = await this._executeRoll(rollFormula, actorData);
+    if (!atkRoll) {
+      Hyp3eLogger.error("rollAttackOrSpell", `Roll execution failed.`);
+      return null;
+    }
+
+    // Determine Hit/Miss Result
+    const { hit, attackTextResult, critFooter } = this._determineHitResult(
+      atkRoll,
+      naturalRoll,
+      itemData,
+      dataset.targetAc,
+      dataset.targetSize
+    );
+    atkRoll.hit = hit; // Attach hit status to the roll object
+
+    // Prepare Damage Formula (if hit, or on crit miss so damage data is available for hitAlly/hitSelf outcomes)
+    let damageFormulas = {};
+    const isCritMiss = naturalRoll === 1 && CONFIG.HYP3E.critMiss;
+    if ((hit || isCritMiss) && item && Roll.validate(itemData.damage)) {
+      damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);
+    }
+
+    // Embed damage data in the crit-miss footer so the crit miss handler can offer damage rolls
+    let resolvedCritFooter = critFooter;
+    if (isCritMiss && damageFormulas.primary) {
+      const df = damageFormulas.primary;
+      resolvedCritFooter = `<div class='critical-miss'` +
+                            ` data-base-class='${this.system.baseClass}'` +
+                            ` data-actor-id='${this.id}'` +
+                            ` data-formula='${df.formula}'` +
+                            ` data-debug-formula='${df.debugFormula}'` +
+                            ` data-base-damage='${itemData.damage}'` +
+                            ` data-damage-type='${itemData.dmgType}'` +
+                            ` data-item-id='${item.id}'` +
+                            ` data-item-uuid='${item.uuid}'` +
+                            ` data-token-id='${attacker?.id ?? ""}'` +
+                            ` data-source-type='${item.type}'` +
+                            ` data-damage-groups='${JSON.stringify(df.damageGroups)}'></div>`;
+    }
+
+    // Render chat message
+    const chatLabel = this._createChatLabel(this.img, itemName);
+    const attackHeader = `${attackTextBase}${dataset.targetName ? ` vs. ${dataset.targetName}` : ''}... ${attackTextResult}`;
+
+    Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Chat data:`, {chatLabel, attackHeader, resolvedCritFooter});
+    await renderCustomChat(atkRoll, item, damageFormulas, this, attacker?.id, chatLabel, debugAtkRollFormula, attackHeader, resolvedCritFooter, rollResponse.rollMode);
+
+    // Return Roll Result
+    return atkRoll;
   }
 
   /** ITEM, ATTACK & SPELL ROLL HELPERS ---------------*/
@@ -2389,14 +2378,21 @@ export class Hyp3eActor extends Actor {
       // Get combat options that have an 'ac' property
       const combatOptions = target.actor._getCombatOptions() ?? {};
       const acModifiers = Object.entries(combatOptions)
-      .filter(([, value]) => value.hasOwnProperty('ac') || 'ac' in value)
-      .map(([key, value]) => ({
-        key: key,
-        ...value
-      }));
+        .filter(([, value]) => value.hasOwnProperty('ac') || 'ac' in value)
+        .map(([key, value]) => ({
+          key: key,
+          ...value
+        }));
+      Hyp3eLogger.info("Hyp3eActor _getTargetDetails", `Target defensive combat options:`, acModifiers);
       // Apply each modifier to effectiveAc to get the target's final AC value
       acModifiers.forEach(opt => {
-        effectiveAc -= parseInt(opt.ac);
+        if (opt.key === "parryAndBlock") {
+          const atkMod = parseInt(targetActorData?.attributes?.str?.atkMod ?? 0);
+          Hyp3eLogger.info("Hyp3eActor _getTargetDetails", `Target attack mod:`, atkMod);
+          effectiveAc -= (parseInt(opt.ac) + atkMod);
+        } else {
+          effectiveAc -= parseInt(opt.ac);
+        }
       })
       targetData.ac = effectiveAc;
 
@@ -2705,13 +2701,12 @@ export class Hyp3eActor extends Actor {
    * @param {object} itemData - System data of the item.
    * @param {object} ammoMods - Modifiers from ammunition.
    * @param {object} actorData - Roll data context.
-   * @param {object} damageModifiers - Combat options that include a damage modifier
    * @returns {object} Object containing primary and secondary damage formulas {primary: {formula, debugFormula}, secondary: {formula, debugFormula}}.
    */
-  _prepareDamageFormulas(itemData, ammoMods, actorData, damageModifiers) {
+  _prepareDamageFormulas(itemData, ammoMods, actorData) {
       const dmgFormulas = {};
       // Build primary damage formula
-      const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, damageModifiers);
+      const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData);
       dmgFormulas.primary = {
           formula: dmgObj.formula,
           debugFormula: dmgObj.debugFormula,

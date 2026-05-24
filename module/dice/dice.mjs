@@ -8,6 +8,11 @@ export class Hyp3eDice {
    * @param {Object} actorData
    */
   static buildAttackFormula(rollData, itemData, ammoData = null, actorData = null) {
+    // Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Roll data:`, rollData);
+    // Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Item data:`, itemData);
+    // Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Ammo data:`, ammoData);
+    // Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Actor data:`, actorData);
+
     let atkRollParts = [];
     let masteryMod = 0;
     let debugAtkRollParts = [];
@@ -46,7 +51,7 @@ export class Hyp3eDice {
       return s.startsWith("+") ? s.slice(1) : s;
     });
 
-    Hyp3eLogger.info("Hyp3eDice buildAttackFormula", "Base attack roll parts:", atkRollParts);
+    Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Base attack roll parts:`, atkRollParts);
 
     // If the formula includes a fixed number like +1, integrate that into the base roll.
     //   This is a bit of a hack, but it works.
@@ -200,12 +205,24 @@ export class Hyp3eDice {
     }
 
     // Add combat option modifiers, if any
-    if (rollData?.combatOptions) {
-      rollData.combatOptions.forEach(opt => {
+    if (actorData?.combatOptions && actorData.combatOptions.length > 0) {
+      // Expand the actor's combat options array into a collection of objects
+      const combatOptionsArr = actorData.combatOptions;  
+      const combatOptions = {};
+      combatOptionsArr.forEach(id => {
+        combatOptions[id] = CONFIG.HYP3E.combatOptions[id];
+      });
+  
+      // Select all combat options that have an 'attack' property, and apply those
+      const attackOptions = Object.fromEntries(
+        Object.entries(combatOptions)
+          .filter(([, value]) => 'attack' in value)
+      );
+      for (const [key, opt] of Object.entries(attackOptions)) {
         atkRollParts.push(opt.attack);
         const optionMod = parseInt(opt.attack) > 0 ? `+${parseInt(opt.attack)}` : `${parseInt(opt.attack)}`;
         debugAtkRollParts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
-      });
+      }
     }
 
     // Add situational modifier from the roll dialog
@@ -241,13 +258,12 @@ export class Hyp3eDice {
    * @param {Object} ammoData
    * @param {Object} actorData
    */
-  static buildDamageFormula(itemData, ammoData = null, actorData = null, damageModifiers = null) {
+  static buildDamageFormula(itemData, ammoData = null, actorData = null) {
     let dmgRollParts = [];
     let debugDmgRollParts = [];
     let dmgIcons = [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Item damage type: ${itemData?.dmgType}`);
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Actor data:`, actorData);
-    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Combat options:`, damageModifiers);
 
     // Format these output strings for later
     let formattedStrDmgMod = "0";
@@ -440,9 +456,21 @@ export class Hyp3eDice {
       }
     }
 
-    // Does the actor have any combat options specified that apply to damage?
-    if (damageModifiers) {
-      damageModifiers.forEach(opt => {
+    // Add damage-related combat options, if any
+    if (actorData?.combatOptions && actorData.combatOptions.length > 0) {
+      // Expand the actor's combat options array into a collection of objects
+      const combatOptionsArr = actorData.combatOptions;  
+      const combatOptions = {};
+      combatOptionsArr.forEach(id => {
+        combatOptions[id] = CONFIG.HYP3E.combatOptions[id];
+      });
+  
+      // Select all combat options that have a 'damage' property, and apply those
+      const damageOptions = Object.fromEntries(
+        Object.entries(combatOptions)
+          .filter(([, value]) => 'damage' in value)
+      );
+      for (const [key, opt] of Object.entries(damageOptions)) {
         dmgRollParts.push(opt.damage);
         const optionMod = parseInt(opt.damage) > 0 ? `+${parseInt(opt.damage)}` : `${parseInt(opt.damage)}`;
         debugDmgRollParts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
@@ -450,8 +478,19 @@ export class Hyp3eDice {
           dmgRoll2Parts.push(opt.damage)
           debugDmgRoll2Parts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
         }
-      });
+      }
     }
+    // if (damageOptions) {
+    //   damageOptions.forEach(opt => {
+    //     dmgRollParts.push(opt.damage);
+    //     const optionMod = parseInt(opt.damage) > 0 ? `+${parseInt(opt.damage)}` : `${parseInt(opt.damage)}`;
+    //     debugDmgRollParts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
+    //     if (itemData.damage2h) {
+    //       dmgRoll2Parts.push(opt.damage)
+    //       debugDmgRoll2Parts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
+    //     }
+    //   });
+    // }
 
     // Before alts, record how many parts are for base (for both 1H and 2H)
     const numBaseParts = dmgRollParts.length;
