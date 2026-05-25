@@ -20,7 +20,6 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
     actions: {
       equipItem: HYP3EQuickEquipApp.#equipItem,
       openCombatOptions: HYP3EQuickEquipApp.#openCombatOptions,
-      toggleCombatOption: HYP3EQuickEquipApp.#toggleCombatOption
     }
   };
 
@@ -175,22 +174,5 @@ export class HYP3EQuickEquipApp extends HandlebarsApplicationMixin(ApplicationV2
 
   static async #openCombatOptions(event, target) {
     HYP3EActorCombatOptions.openForActor(this.actor);
-  }
-
-  static async #toggleCombatOption(event, target) {
-    const option = target.dataset.option;
-    const currentValue = this.actor.system.combatOptions?.[option] ?? false;
-    const newValue = !currentValue;
-
-    // Update the actor's combat options
-    const updatedCombatOptions = {
-      ...this.actor.system.combatOptions,
-      [option]: newValue
-    };
-
-    await this.actor.update({ "system.combatOptions": updatedCombatOptions });
-
-    // Pause to let actor update, then re-render the app
-    setTimeout(() => this.render(false), 250);
   }
 }

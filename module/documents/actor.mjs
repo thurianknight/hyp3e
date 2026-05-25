@@ -2929,6 +2929,15 @@ export class Hyp3eActor extends Actor {
                 sitModSum += 4
                 sitModsArr.push("Defender Stunned (+4)")
               }
+              if (effect.statuses.has("shieldBound")) {
+                const equippedShield = target.actor._getEquippedShields("");
+                Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `${target.name} has equipped shield:`, equippedShield);
+                if (equippedShield && equippedShield.length > 0) {
+                  const acMod = equippedShield[0].system.ac ?? 1;
+                  sitModSum += acMod;
+                  sitModsArr.push(`Defender Shield Bound (+${acMod})`)
+                }
+              }
               // Concealment only affects missile attacks
               if (isMissile) {
                 if (effect.statuses.has("coverPartial")) {

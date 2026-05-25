@@ -698,6 +698,7 @@
         "statusEffects": {
             "hasted": "Hasted",
             "slowed": "Slowed",
+            "shieldBound": "Shield Bound",
             "coverPartial": "Partial Concealment",
             "coverFull": "Full Concealment",
             "flankAttack": "Flank Attack",

@@ -198,21 +198,13 @@ export function pushCustomStatusEffects() {
   }
   CONFIG.statusEffects.push(slowed)
 
-  const flankAttack = {
-    id: "flankAttack",
-    name: "HYP3E.statusEffects.flankAttack",
-    img: `${HYP3E.assetsPath}/backup.svg`,
+  const shieldBound = {
+    id: "shieldBound",
+    name: "HYP3E.statusEffects.shieldBound",
+    img: `${HYP3E.assetsPath}/shield-opposition.svg`,
     isActive: false
   }
-  CONFIG.statusEffects.push(flankAttack)
-
-  const rearAttack = {
-    id: "rearAttack",
-    name: "HYP3E.statusEffects.rearAttack",
-    img: `${HYP3E.assetsPath}/backstab.svg`,
-    isActive: false
-  }
-  CONFIG.statusEffects.push(rearAttack)
+  CONFIG.statusEffects.push(shieldBound)
 
   const coverPartial = {
     id: "coverPartial",
@@ -230,6 +222,24 @@ export function pushCustomStatusEffects() {
   }
   CONFIG.statusEffects.push(coverFull)
 
+  // Only include flank and rear attack if advanced options are disabled
+  if (!game.settings.get(game.system.id, "enableAdvancedCombatOptions")) {
+    const flankAttack = {
+      id: "flankAttack",
+      name: "HYP3E.statusEffects.flankAttack",
+      img: `${HYP3E.assetsPath}/backup.svg`,
+      isActive: false
+    }
+    CONFIG.statusEffects.push(flankAttack)
+
+    const rearAttack = {
+      id: "rearAttack",
+      name: "HYP3E.statusEffects.rearAttack",
+      img: `${HYP3E.assetsPath}/backstab.svg`,
+      isActive: false
+    }
+    CONFIG.statusEffects.push(rearAttack)
+  }
 }
 
 
