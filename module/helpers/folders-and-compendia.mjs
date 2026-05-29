@@ -50,7 +50,7 @@ export async function findItemsByFolderOrCompendiumName(includeFragments, itemTy
     if (!shouldInclude(label) || shouldExclude(label)) continue;
 
     const index = await pack.getIndex({ fields: ["name", "type", "folder"] });
-    Hyp3eLogger.info("findItemsByFolderOrCompendiumName", `Searching pack ${pack.collection} (${index.size} entries)`);
+    Hyp3eLogger.info("findItemsByFolderOrCompendiumName", `Searching pack ${pack.collection} (${index.size} entries):`, index);
 
     // Build Folder ID to Name map for current compendium to avoid repeated lookups
     const folderNameMap = await buildCompendiumFolderMap(pack);
@@ -71,6 +71,7 @@ export async function findItemsByFolderOrCompendiumName(includeFragments, itemTy
         // Hyp3eLogger.info("findItemsByFolderOrCompendiumName", `Found folder name: ${folderName} for item ${entry.name} in pack ${pack.collection}`);
         const folderName = folderNameMap.get(entry.folder);
         if (folderName) {
+          // Hyp3eLogger.info("findItemsByFolderOrCompendiumName", `Found folder name: ${folderName} for item ${entry.name} in pack ${pack.collection}`);
           if (!shouldInclude(folderName) || shouldExclude(folderName)) continue;
         }
       }
@@ -98,17 +99,25 @@ export async function findItemsByFolderOrCompendiumName(includeFragments, itemTy
 async function buildCompendiumFolderMap(pack) {
   const folderMap = new Map();
 
-  // Get all Folder documents in this pack
-  const folderIndex = await pack.getIndex({ 
-    fields: ["name"], 
-    type: "Folder"   // Only get items in folders
-  });
-  Hyp3eLogger.info("buildCompendiumFolderMap", `Building folder map for pack ${pack.collection} with ${folderIndex.size} folders:`, folderIndex);
-
-  for (const f of folderIndex) {
-    folderMap.set(f._id, f.name);
+  // Preferred method: get actual Folder documents
+  const allDocs = await pack.getDocuments();
+  Hyp3eLogger.info("buildCompendiumFolderMap", `Found ${allDocs.length} documents in pack ${pack.collection}:`, allDocs);
+  // const folderDocs = await pack.getDocuments({ type: "Folder" });
+  // Hyp3eLogger.info("buildCompendiumFolderMap", `Found ${folderDocs.length} folder documents in pack ${pack.collection}:`, folderDocs);
+  // for (const f of folderDocs) {
+  for (const f of allDocs.filter(d => d.folder !== null)) {
+    folderMap.set(f.folder.id, f.folder.name);
   }
-  Hyp3eLogger.info("buildCompendiumFolderMap", `Completed folder map for pack ${pack.collection}:`, folderMap);
+
+  // Fallback if no folders found via getDocuments
+  if (folderMap.size === 0) {
+    const index = await pack.getIndex({ fields: ["name", "type"] });
+    for (const entry of index) {
+      if (entry.type === "Folder") {
+        folderMap.set(entry._id, entry.name);
+      }
+    }
+  }
 
   return folderMap;
 }
