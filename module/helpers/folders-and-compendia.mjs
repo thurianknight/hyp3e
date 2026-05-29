@@ -61,28 +61,14 @@ export async function findItemsByFolderOrCompendiumName(includeFragments, itemTy
       if (entry.type !== itemTypeFilter) continue;
 
       // Check whether the folder name also matches the include/exclude criteria
-      // const folderId = entry.folder;
-      // let folderName = null;
-      // if (folderId) {
       if (entry.folder) {
-        // Try to get folder from compendium metadata
-        // const fullDoc = await pack.getDocument(entry._id);
-        // folderName = fullDoc.folder?.name ?? null;
-        // Hyp3eLogger.info("findItemsByFolderOrCompendiumName", `Found folder name: ${folderName} for item ${entry.name} in pack ${pack.collection}`);
         const folderName = folderNameMap.get(entry.folder);
         if (folderName) {
-          // Hyp3eLogger.info("findItemsByFolderOrCompendiumName", `Found folder name: ${folderName} for item ${entry.name} in pack ${pack.collection}`);
           if (!shouldInclude(folderName) || shouldExclude(folderName)) continue;
         }
       }
-      // Apply folder name filters
-      // if (folderName) {
-      //     if (!shouldInclude(folderName) || shouldExclude(folderName)) continue;
-      // }
 
       // All checks passed, include the item
-      // const item = await pack.getDocument(entry._id);
-      // matchedItems.push(item.name);
       matchedItems.add(entry.name);
     }
   }
@@ -102,9 +88,6 @@ async function buildCompendiumFolderMap(pack) {
   // Preferred method: get actual Folder documents
   const allDocs = await pack.getDocuments();
   Hyp3eLogger.info("buildCompendiumFolderMap", `Found ${allDocs.length} documents in pack ${pack.collection}:`, allDocs);
-  // const folderDocs = await pack.getDocuments({ type: "Folder" });
-  // Hyp3eLogger.info("buildCompendiumFolderMap", `Found ${folderDocs.length} folder documents in pack ${pack.collection}:`, folderDocs);
-  // for (const f of folderDocs) {
   for (const f of allDocs.filter(d => d.folder !== null)) {
     folderMap.set(f.folder.id, f.folder.name);
   }
