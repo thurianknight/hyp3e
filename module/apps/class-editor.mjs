@@ -32,7 +32,7 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
             resizable: true,
         },
         position: {
-            width: 700,
+            width: 720,
             height: "auto",
         },
         form: {
