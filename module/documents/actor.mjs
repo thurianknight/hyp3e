@@ -1166,7 +1166,7 @@ export class Hyp3eActor extends Actor {
       }
 
       // Calculate Net Change (Applying DR if applicable)
-      let netChange = amount; // This is the raw amount before DR/clamping affects the *final* HP
+      let netChange = amount; // This is the raw amount before DR/clamping affects the final HP
 
       // Apply Damage Reduction only if it's damage and the flag is set
       if (isDamage && applyDr) {
