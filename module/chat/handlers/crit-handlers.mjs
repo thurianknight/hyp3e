@@ -73,10 +73,10 @@ export async function handleCritMissOrHitButtons(html) {
         debugFormula: $(b).data('debugFormula'),
         baseDamage:   $(b).data('baseDamage'),
         damageType:   $(b).data('damageType'),
-        itemId:     $(b).data('itemId'),
-        itemUuid:   $(b).data('itemUuid'),
-        actorId:    actorId,
-        tokenId:    $(b).data('tokenId'),
+        itemId:       $(b).data('itemId'),
+        itemUuid:     $(b).data('itemUuid'),
+        actorId:      actorId,
+        tokenId:      $(b).data('tokenId'),
         sourceType:   $(b).data('sourceType'),
         damageGroups: $(b).data('damageGroups'),
       } : null;
@@ -109,14 +109,14 @@ export async function handleCritMissOrHitButtons(html) {
       if (dmgEl.length > 0) {
         const dmg2hEl = html$.find(".dmg-roll-button2h");
         const dmgData = {
-          formula:    dmgEl.data('formula'),
+          formula:      dmgEl.data('formula'),
           debugFormula: dmgEl.data('debugFormula'),
           baseDamage:   dmgEl.data('baseDamage'),
           damageType:   dmgEl.data('damageType'),
-          itemId:     dmgEl.data('itemId'),
-          itemUuid:   dmgEl.data('itemUuid'),
-          actorId:    dmgEl.data('actorId'),
-          tokenId:    dmgEl.data('tokenId'),
+          itemId:       dmgEl.data('itemId'),
+          itemUuid:     dmgEl.data('itemUuid'),
+          actorId:      dmgEl.data('actorId'),
+          tokenId:      dmgEl.data('tokenId'),
           sourceType:   dmgEl.data('sourceType'),
           damageGroups: dmgEl.data('damageGroups'),
         };
