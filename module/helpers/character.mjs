@@ -1887,6 +1887,7 @@ export class Hyp3eCharacterClass {
           { "name": "Dagger, silver", "quantity": 1 },
           { "name": "Quarterstaff", "quantity": 1 },
           { "name": "Sling", "quantity": 1 },
+          { "name": "Oil, incendiary, thrown", "quantity": 1 },
         ],
         "equipment - general": [
           { "name": "Backpack", "quantity": 1 },
@@ -1896,7 +1897,6 @@ export class Hyp3eCharacterClass {
           { "name": "Bullets, sling, lead (x20)", "quantity": 20 },
           { "name": "Chalk", "quantity": 1 },
           { "name": "Ink and quill", "quantity": 1 },
-          { "name": "Oil, incendiary", "quantity": 1 },
           { "name": "Parchment", "quantity": 2 },
           { "name": "Pouch, soft leather (small)", "quantity": 1 },
           { "name": "Rope, silk", "quantity": 1 },
@@ -2190,6 +2190,7 @@ export class Hyp3eCharacterClass {
           { "name": "Sickle", "quantity": 1 },
           { "name": "Sling", "quantity": 1 },
           { "name": "Whip", "quantity": 1 },
+          { "name": "Oil, incendiary, thrown", "quantity": 1 },
         ],
         "equipment - general": [
           { "name": "Backpack", "quantity": 1 },
@@ -2200,7 +2201,6 @@ export class Hyp3eCharacterClass {
           { "name": "Ink and quill", "quantity": 1 },
           { "name": "Lantern, hooded", "quantity": 1 },
           { "name": "Mirror, steel or copper", "quantity": 1 },
-          { "name": "Oil, incendiary", "quantity": 1 },
           { "name": "Oil, lamp", "quantity": 2 },
           { "name": "Parchment", "quantity": 3 },
           { "name": "Pouch, hard leather (large)", "quantity": 1 },
@@ -2833,6 +2833,7 @@ export class Hyp3eCharacterClass {
           { "name": "Dart", "quantity": 4 },
           { "name": "Quarterstaff", "quantity": 1 },
           { "name": "Scimitar, long", "quantity": 1 },
+          { "name": "Oil, incendiary, thrown", "quantity": 1 },
         ],
         "equipment - general": [
           { "name": "Backpack", "quantity": 1 },
@@ -2841,7 +2842,6 @@ export class Hyp3eCharacterClass {
           { "name": "Book, spell", "quantity": 1 },
           { "name": "Chalk", "quantity": 1 },
           { "name": "Ink and quill", "quantity": 1 },
-          { "name": "Oil, incendiary", "quantity": 1 },
           { "name": "Parchment", "quantity": 5 },
           { "name": "Pouch, hard leather (large)", "quantity": 1 },
           { "name": "Pouch, soft leather (small)", "quantity": 1 },
