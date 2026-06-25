@@ -9,7 +9,7 @@ export default class Hyp3eItem extends Hyp3eItemBase {
   static defineSchema() {
     const fields = foundry.data.fields;
     let schema = super.defineSchema();
-    
+
     // Merge shared data templates
     schema = this.mergeSchema(schema, physicalTemplate);
     schema = this.mergeSchema(schema, equippableTemplate);
@@ -23,7 +23,7 @@ export default class Hyp3eItem extends Hyp3eItemBase {
 
     return schema;
   }
-  
+
   /** 
    * Cleanup any missing or invalid data, and set up any derived values that AEs might modify.
    */

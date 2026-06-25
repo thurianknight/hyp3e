@@ -35,6 +35,11 @@
           </div>
         {{/if}}
         <div class="flexrow flexshrink flex-group-left bg-attributes">
+          <label class="resource-label">{{localize 'HYP3E.item.inStorage'}}</label>
+          <input id="system.inStorage" name="system.inStorage" type="checkbox" {{checked system.inStorage}}>
+          <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.inStorage'}}</div>
+        </div>
+        <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.bundleQty'}}</label>
           <input type="text" name="system.quantity.bundle" value="{{system.quantity.bundle}}" />
           <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.bundleQty'}}</div>

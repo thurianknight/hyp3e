@@ -401,6 +401,8 @@
             "consumable": "Consumable",
             "ammunition": "Ammunition",
             "bundleQty": "Bundle Qty",
+            "container": "Container",
+            "inStorage": "In Storage",
             "lightSource": "Light Source",
             "toggleLight": "Toggle Light",
             "light": {
@@ -415,7 +417,6 @@
             "usesAmmo": "Uses ammo",
             "grenade": "Grenade-like item",
             "areaEffect": "Area effect attack",
-            "container": "Container",
             "duration": "Duration",
             "hasSpells": "Has Spells",
             "hideCharges": "Hide Charges",
@@ -445,6 +446,7 @@
                 "lightAlpha": "Intensity of the light color, from 0 (no color) to 1 (full color).",
                 "lightDuration": "Duration in rounds (roll formula allowed) for a light source. Leave blank if permanent.",
                 "isContainer": "The Container tag allows this item to contain other non-container items.",
+                "inStorage": "The In Storage tag indicates that this item is in storage, not carried (no encumbrance, but also not equippable).",
                 "duration": "Duration in rounds (numbers only) for a conjured or ephemeral item. Leave blank if permanent.",
                 "hasSpells": "The Has Spells tag allows this item to have one or more spells as usable powers.",
                 "hideCharges": "The Hide Charges tag prevents spell charges from being displayed to players."

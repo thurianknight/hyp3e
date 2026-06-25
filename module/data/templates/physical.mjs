@@ -23,6 +23,9 @@ export function physicalTemplate() {
     cost: new fields.StringField({ required: true, blank: true, initial: "0" }),
     xp: new fields.StringField({ required: true, blank: true, initial: "" }),
 
-    containerId: new fields.StringField({ required: true, blank: true, initial: "" })
+    // ID string of the container item that this item is in, if any
+    containerId: new fields.StringField({ required: true, blank: true, initial: "" }),
+    // Flag indicating whether this item is stored elsewhere (not in the actor's inventory)
+    inStorage: new fields.BooleanField({ initial: false })
   };
 }
