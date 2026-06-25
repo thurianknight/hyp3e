@@ -646,6 +646,7 @@
   padding-top: 0.2em;
   font-size: 0.8em;
   font-weight: normal;
+  margin: 0 5px;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1011,20 +1012,6 @@
   text-overflow: ellipsis;
 }
 
-/* Spells show/hide arrow */
-.hyp3e .items-list .item-name .item-arrow {
-  flex-shrink: 0;
-  font-size: 0.75em;
-  cursor: pointer;
-}
-.hyp3e .items-list .item-name .collapse-spells-toggle {
-  transition: transform 0.2s ease;
-}
-/* Rotate the arrow when expanded */
-.hyp3e .items-list .item-name .collapse-spells-toggle[aria-expanded="true"] {
-  transform: rotate(180deg);        /* ▼ becomes ▲ */
-}
-
 /* Container show/hide contents arrow */
 .hyp3e .items-list .item-entry .item-name .item-arrow {
   flex-shrink: 0;
@@ -1043,20 +1030,6 @@
 .hyp3e .items-list .item-entry .item-summary {
   display: none;
   text-align: left;
-}
-
-/* Collapsible spell lists */
-.hyp3e .items-list .spells-list {
-  overflow: hidden;
-  transition: max-height 0.25s ease-out;
-}
-/* When collapsed, hide it */
-.hyp3e .items-list .spells-list.collapsed {
-  max-height: 0 !important;
-}
-/* Optional: nicer closed state */
-.hyp3e .items-list .spells-list:not(.collapsed) {
-  max-height: 500px;               /* arbitrary, big enough for any content */
 }
 
 /* Collapsible container contents */
@@ -1328,6 +1301,44 @@
   font-family: "Herculanum", sans-serif;
   font-weight: bold;
   padding: 5px 5px;
+}
+
+/* Spell level header expand to fill */
+.hyp3e .items-header .item-name .name-expand {
+  flex-grow: 1;                    /* push the sort & arrow icons to the right */
+  text-align: left;
+  white-space: nowrap;             /* prevent text wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Spells show/hide arrow */
+.hyp3e .items-list .item-name .item-arrow {
+  flex-shrink: 0;
+  font-size: 0.75em;
+  cursor: pointer;
+  margin: 0 5px;
+}
+.hyp3e .items-list .item-name .collapse-spells-toggle {
+  transition: transform 0.2s ease;
+}
+/* Rotate the arrow when expanded */
+.hyp3e .items-list .item-name .collapse-spells-toggle[aria-expanded="true"] {
+  transform: rotate(180deg);        /* ▼ becomes ▲ */
+}
+
+/* Collapsible spell lists */
+.hyp3e .items-list .spells-list {
+  overflow: hidden;
+  transition: max-height 0.25s ease-out;
+}
+/* When collapsed, hide it */
+.hyp3e .items-list .spells-list.collapsed {
+  max-height: 0 !important;
+}
+/* Optional: nicer closed state */
+.hyp3e .items-list .spells-list:not(.collapsed) {
+  max-height: 500px;               /* arbitrary, big enough for any content */
 }
 
 /* Character Items-tab styles */

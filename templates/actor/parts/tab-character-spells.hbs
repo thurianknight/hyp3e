@@ -89,11 +89,11 @@
         {{#each spells as |spells spellLevel|}}
           <li class="flexrow items-header" data-spell-level="{{@root.actor.id}}{{spellLevel}}">
             <h3 class="item-name">
-              {{localize 'HYP3E.details.level'}} {{spellLevel}} {{localize 'HYP3E.dataLabel.spells'}} 
-              <a class="sort-items" data-action="sortAz" data-item-type="spell" title="Sort Items A-Z" style="margin-left: 5px;">
+              <span class="name-expand">{{localize 'HYP3E.details.level'}} {{spellLevel}} {{localize 'HYP3E.dataLabel.spells'}}</span> 
+              <a class="sort-items" data-action="sortAz" data-item-type="spell" title="Sort Items A-Z">
                 <i class="fas fa-sort-alpha-down"></i>
               </a>
-              <a class="item-arrow collapse-spells-toggle" aria-expanded="true" style="margin-left: 10px;">
+              <a class="item-arrow collapse-spells-toggle" aria-expanded="true">
                 ▼
               </a>
             </h3>
