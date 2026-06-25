@@ -741,6 +741,9 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
         const $html = this.element;
 
+        // Add show/hide toggle to spells by level sections
+        this.setupCollapsibleSpells($html)
+
         // Add show/hide toggle to container items
         this.setupCollapsibleContainers($html)
 
@@ -790,6 +793,34 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     _canDragCoin(selector) {
       // Only owner/editor can drag coins
       return this.actor.isOwner;
+    }
+
+    setupCollapsibleSpells(html) {
+      $(html).find('.collapse-spells-toggle').each((i, toggle) => {
+        const $toggle = $(toggle);
+        const $header = $toggle.closest('.items-header');
+        const $contents = $header.next('.spells-list');
+        const spellLevel = $header.data('spellLevel');
+
+        // Restore saved state
+        const isExpanded = game.user.getFlag("hyp3e", `containerExpanded.${spellLevel}`) ?? true;
+
+        $contents.toggleClass('collapsed', !isExpanded);
+        $toggle.attr('aria-expanded', isExpanded);
+
+        $toggle.on('click', (event) => {
+          const expanded = $toggle.attr('aria-expanded') === 'true';
+          const newState = !expanded;
+
+          $toggle.attr('aria-expanded', newState);
+          $contents.toggleClass('collapsed', !newState);
+
+          // Save display state
+          if (spellLevel) {
+            game.user.setFlag("hyp3e", `containerExpanded.${spellLevel}`, newState);
+          }
+        });
+      });
     }
 
     setupCollapsibleContainers(html) {
