@@ -507,51 +507,51 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
   }
 
-    /**
-     * Organize and classify Data for NPC sheets.
-     * @param {Object} context The actor to prepare.
-     * @return {undefined}
-     */
-    _prepareNpcData(context) {
-      // Load creature sizes
-      context.creatureSizes = CONFIG.HYP3E.creatureSizes
-      // Load Phenotypes
-      context.phenotypes = CONFIG.HYP3E.phenotypes
-    }
+  /**
+   * Organize and classify Data for NPC sheets.
+   * @param {Object} context The actor to prepare.
+   * @return {undefined}
+   */
+  _prepareNpcData(context) {
+    // Load creature sizes
+    context.creatureSizes = CONFIG.HYP3E.creatureSizes
+    // Load Phenotypes
+    context.phenotypes = CONFIG.HYP3E.phenotypes
+  }
 
-    /**
-     * Organize and classify Data for NPC sheets.
-     * @param {Object} context The actor to prepare.
-     * @return {undefined}
-     */
-    _prepareMerchantData(context) {
-      // Handle money types
-      for (let [k, v] of Object.entries(context.system.money)) {
-        v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
-      }
+  /**
+   * Organize and classify Data for NPC sheets.
+   * @param {Object} context The actor to prepare.
+   * @return {undefined}
+   */
+  _prepareMerchantData(context) {
+    // Handle money types
+    for (let [k, v] of Object.entries(context.system.money)) {
+      v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
     }
+  }
 
-    /**
-     * Organize and classify Data for NPC sheets.
-     * @param {Object} context The actor to prepare.
-     * @return {undefined}
-     */
-    _prepareTreasureData(context) {
-      // Handle money types
-      for (let [k, v] of Object.entries(context.system.money)) {
-        v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
-      }
+  /**
+   * Organize and classify Data for NPC sheets.
+   * @param {Object} context The actor to prepare.
+   * @return {undefined}
+   */
+  _prepareTreasureData(context) {
+    // Handle money types
+    for (let [k, v] of Object.entries(context.system.money)) {
+      v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
     }
+  }
 
-    /**
-     * Organize and classify Data for Item Token sheets.
-     * @param {Object} context The actor to prepare.
-     * @return {undefined}
-     */
-    _prepareItemTokenData(context) {
-      // Load sizes for token creation
-      context.creatureSizes = CONFIG.HYP3E.creatureSizes
-    }
+  /**
+   * Organize and classify Data for Item Token sheets.
+   * @param {Object} context The actor to prepare.
+   * @return {undefined}
+   */
+  _prepareItemTokenData(context) {
+    // Load sizes for token creation
+    context.creatureSizes = CONFIG.HYP3E.creatureSizes
+  }
 
     /**
      * Organize and classify Items for Character sheets.
@@ -647,7 +647,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
                 i.system.value = 0
             }
 
-            // Append to containers.
+            // Append to containers
             if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
                 // Get contained items and add to their container
                 i.contents = this.getContents(i.id)
