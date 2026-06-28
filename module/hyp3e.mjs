@@ -104,20 +104,21 @@ Hooks.once('init', async function() {
 
   // Register data models for Actors and Items. This replaces the "template.json" system.
   // Actors
-  CONFIG.Actor.dataModels.character = HYP3E_DATA_MODELS.Hyp3eCharacter;
-  CONFIG.Actor.dataModels.npc       = HYP3E_DATA_MODELS.Hyp3eNPC;
-  CONFIG.Actor.dataModels.merchant  = HYP3E_DATA_MODELS.Hyp3eMerchant;
-  CONFIG.Actor.dataModels.treasure  = HYP3E_DATA_MODELS.Hyp3eTreasure;
-  CONFIG.Actor.dataModels.itemToken = HYP3E_DATA_MODELS.Hyp3eItemToken;
+  CONFIG.Actor.dataModels.character     = HYP3E_DATA_MODELS.Hyp3eCharacter;
+  CONFIG.Actor.dataModels.npc           = HYP3E_DATA_MODELS.Hyp3eNPC;
+  CONFIG.Actor.dataModels.merchant      = HYP3E_DATA_MODELS.Hyp3eMerchant;
+  CONFIG.Actor.dataModels.treasure      = HYP3E_DATA_MODELS.Hyp3eTreasure;
+  CONFIG.Actor.dataModels.itemToken     = HYP3E_DATA_MODELS.Hyp3eItemToken;
 
   // Items
-  CONFIG.Item.dataModels.armor        = HYP3E_DATA_MODELS.Hyp3eArmor;
-  CONFIG.Item.dataModels.shield       = HYP3E_DATA_MODELS.Hyp3eShield;
-  CONFIG.Item.dataModels.weapon       = HYP3E_DATA_MODELS.Hyp3eWeapon;
-  CONFIG.Item.dataModels.spell        = HYP3E_DATA_MODELS.Hyp3eSpell;
-  CONFIG.Item.dataModels.feature      = HYP3E_DATA_MODELS.Hyp3eFeature;
-  CONFIG.Item.dataModels.item         = HYP3E_DATA_MODELS.Hyp3eItem;
+  CONFIG.Item.dataModels.armor          = HYP3E_DATA_MODELS.Hyp3eArmor;
+  CONFIG.Item.dataModels.shield         = HYP3E_DATA_MODELS.Hyp3eShield;
+  CONFIG.Item.dataModels.weapon         = HYP3E_DATA_MODELS.Hyp3eWeapon;
+  CONFIG.Item.dataModels.spell          = HYP3E_DATA_MODELS.Hyp3eSpell;
+  CONFIG.Item.dataModels.feature        = HYP3E_DATA_MODELS.Hyp3eFeature;
+  CONFIG.Item.dataModels.item           = HYP3E_DATA_MODELS.Hyp3eItem;
   CONFIG.Item.dataModels.effectTemplate = HYP3E_DATA_MODELS.Hyp3eEffectTemplate;
+  CONFIG.Item.dataModels.classTemplate  = HYP3E_DATA_MODELS.Hyp3eClassTemplate;
 
   console.log("Hyperborea | DataModels registered - template.json no longer used.");
 
