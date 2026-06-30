@@ -385,7 +385,8 @@
             "shield": "Shield",
             "spell": "Spell", 
             "weapon": "Weapon", 
-            "effectTemplate": "Effect Template"
+            "effectTemplate": "Effect Template",
+            "classTemplate": "Class Template"
         },
         "item": {
             "add": "Add Item",

@@ -640,6 +640,28 @@ export function registerHyp3eConfigurations() {
         requiresReload: true
     });
 
+    // Game/world setup is complete
+    game.settings.register(game.system.id, "setupComplete", {
+        name: game.i18n.localize("HYP3E.settings.setupComplete"),
+        hint: game.i18n.localize("HYP3E.settings.setupComplete"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: false,  // Always hidden from UI
+        requiresReload: false,
+    });
+
+    // Re-run game/world setup on next launch
+    game.settings.register(game.system.id, "reRunSetup", {
+        name: game.i18n.localize("HYP3E.settings.reRunSetup"),
+        hint: game.i18n.localize("HYP3E.settings.reRunSetupHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: showConfigOptions,
+        requiresReload: true,
+    });
+
     // Re-run world migration on next launch
     game.settings.register(game.system.id, "reRunMigration", {
         name: game.i18n.localize("HYP3E.settings.reRunMigration"),

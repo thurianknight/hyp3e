@@ -1,5 +1,6 @@
 // module/data/item/classTemplate.mjs
 import Hyp3eItemBase from "./base.mjs";
+import { Hyp3eLogger } from "../../helpers/logger.mjs";
 
 export default class Hyp3eClassTemplate extends Hyp3eItemBase {
   static defineSchema() {

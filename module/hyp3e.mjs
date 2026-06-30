@@ -541,8 +541,22 @@ Hooks.once("ready", async function() {
     Hyp3eLogger.info("Init", "CONFIG Armor Types:", CONFIG.HYP3E.armorTypes);
   }
 
-  // If we need to do a system migration, do it after the other settings are loaded
+  // If we need to do a system setup or migration, do it after the other settings are loaded
   if (game.user.isGM) {
+    // Initial game setup for new worlds or missing data
+    const setupComplete = game.settings.get(game.system.id, `setupComplete`);
+    const rerunSetup = game.settings.get(game.system.id, `reRunSetup`);
+    if (!setupComplete || rerunSetup) {
+      Hyp3eLogger.info("Init", "Running one-time system setup...");
+      await setupSystem();
+      await game.settings.set(game.system.id, `setupComplete`, true);
+      await game.settings.set(game.system.id, `reRunSetup`, false);
+      Hyp3eLogger.info("Init", "System setup complete.");
+    } else {
+      Hyp3eLogger.info("Init", "System setup has been run before, no need to do it again.");
+    }
+
+    // Data migration for version updates and patches
     const reRunMigration = game.settings.get(game.system.id, `reRunMigration`);
     const migrationHasRun = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
     // const migrationHasRun = false  // FOR DEBUGGING, TO FORCE A RE-RUN
@@ -917,6 +931,7 @@ Hooks.on("preUpdateItem", async (item, update) => {
   }
 });
 
+
 /* -------------------------------------------- */
 /*  Date & Time-Keeping hooks                   */
 /* -------------------------------------------- */
@@ -927,8 +942,25 @@ await setupCalendarHooks();
 // Register Turn Tracker hooks
 await setupTurnTrackerHooks();
 
+
 /* -------------------------------------------- */
-/*  Migrate system/world functions        */
+/*  Setup system/world functions                */
+/* -------------------------------------------- */
+async function setupSystem() {
+  Hyp3eLogger.info("setupSystem", "Running system setup...");
+
+  // Check for Classes folder in world Items directory, create if needed
+  const classesFolder = game.folders.find(f => f.name === "Classes" && f.type === "Item");
+  if (!classesFolder) {
+    Hyp3eLogger.info("setupSystem", "Creating Classes folder in world Items directory...");
+    await Folder.create({ name: "Classes", type: "Item", parent: null });
+  }
+
+}
+
+
+/* -------------------------------------------- */
+/*  Migrate system/world functions              */
 /* -------------------------------------------- */
 async function migrateWorld() {
   Hyp3eLogger.info("migrateWorld", `Migrating world ${game.system.version}...`);
