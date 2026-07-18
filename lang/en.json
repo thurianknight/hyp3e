@@ -294,6 +294,7 @@
                 "abbrev": "Sorcery"
             }
         },
+        "resistancesAndVulnerabilities": "Resistances & Vulnerabilities",
         "fightingAbility": "Fighting Ability",
         "fa": "FA",
         "unskilled": "Unskilled",

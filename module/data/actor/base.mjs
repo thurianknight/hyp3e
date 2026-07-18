@@ -72,6 +72,7 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
           curr: new fields.NumberField({ integer: true, initial: 0 })
         })
       }),
+      resistancesVulnerabilities: new fields.StringField({ required: true, blank: true, initial: "" }),
 
       movement: new fields.SchemaField({
         base:        new fields.SchemaField({ value: new fields.NumberField({ integer: true, initial:40 }) }),

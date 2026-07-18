@@ -904,6 +904,17 @@
   font-weight: bold;
   font-size: 1.25em;
 }
+.hyp3e .resistances-vulnerabilities {
+  display: flex;
+  flex-direction: row;
+  input[type=text] {
+    text-align: left;
+    min-width: 250px;
+    max-width: 450px;
+    margin-bottom: 2px;
+    margin-right: 15px;
+  }
+}
 
 /* Items-list styles used on all sheets & tabs.
   "Items" includes the Class & NPC Abilities lists, Weapons & Armor lists, 
