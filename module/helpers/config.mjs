@@ -320,7 +320,9 @@ HYP3E.damageTypes = {
     "piercing": "HYP3E.weapon.damageTypes.piercing",
     "slashing": "HYP3E.weapon.damageTypes.slashing",
     "acid": "HYP3E.weapon.damageTypes.acid",
+    "asphyxiation": "HYP3E.weapon.damageTypes.asphyxiation",
     "cold": "HYP3E.weapon.damageTypes.cold",
+    "crushing": "HYP3E.weapon.damageTypes.crushing",
     "electricity": "HYP3E.weapon.damageTypes.electricity",
     "fire": "HYP3E.weapon.damageTypes.fire",
     "gas": "HYP3E.weapon.damageTypes.gas",
@@ -328,6 +330,7 @@ HYP3E.damageTypes = {
     "pain": "HYP3E.weapon.damageTypes.pain",
     "poison": "HYP3E.weapon.damageTypes.poison",
     "positive": "HYP3E.weapon.damageTypes.positive",
+    "radiation": "HYP3E.weapon.damageTypes.radiation",
     "healing": "HYP3E.weapon.damageTypes.healing",
 }
 HYP3E.damageTypeIcons = {
@@ -336,7 +339,9 @@ HYP3E.damageTypeIcons = {
     "piercing": `${HYP3E.assetsPath}/damage-icons/broadhead-arrow-red.svg`,
     "slashing": `${HYP3E.assetsPath}/damage-icons/broadsword-red.svg`,
     "acid": `${HYP3E.assetsPath}/damage-icons/chemical-bolt-red.svg`,
+    "asphyxiation": `${HYP3E.assetsPath}/damage-icons/gas-mask-red.svg`,
     "cold": `${HYP3E.assetsPath}/damage-icons/snowflake-2-red.svg`,
+    "crushing": `${HYP3E.assetsPath}/damage-icons/weight-crush-red.svg`,
     "electricity": `${HYP3E.assetsPath}/damage-icons/lightning-helix-red.svg`,
     "fire": `${HYP3E.assetsPath}/damage-icons/small-fire-red.svg`,
     "gas": `${HYP3E.assetsPath}/damage-icons/poison-gas-red.svg`,
@@ -344,6 +349,7 @@ HYP3E.damageTypeIcons = {
     "pain": `${HYP3E.assetsPath}/damage-icons/back-pain-red.svg`,
     "poison": `${HYP3E.assetsPath}/damage-icons/poison-bottle-red.svg`,
     "positive": `${HYP3E.assetsPath}/damage-icons/rolling-energy-red.svg`,
+    "radiation": `${HYP3E.assetsPath}/damage-icons/thunder-skull-red.svg`,
     "healing": `${HYP3E.assetsPath}/damage-icons/caduceus-red.svg`
 };
 

@@ -495,7 +495,9 @@
                 "piercing": "Piercing",
                 "slashing": "Slashing",
                 "acid": "Acid",
+                "asphyxiation": "Asphyxiation",
                 "cold": "Cold",
+                "crushing": "Crushing",
                 "electricity": "Electricity",
                 "fire": "Fire",
                 "gas": "Gas",
@@ -503,6 +505,7 @@
                 "pain": "Pain",
                 "poison": "Poison",
                 "positive": "Positive Energy",
+                "radiation": "Radiation",
                 "healing": "Healing"
             },
             "attributes": {
