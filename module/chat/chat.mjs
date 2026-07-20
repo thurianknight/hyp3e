@@ -140,13 +140,19 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
   // Only add damage/heal buttons to "unflavored" dice roll chat messages
   if (_msg.flavor !== "") {
     Hyp3eLogger.info("addChatMessageButtons", "Flavored chat message:", _msg.flavor);
-    // addGenericDmgHealBtns = false;
+    if (!chatFlavorHasDamageType(_msg)) {
+      addGenericDmgHealBtns = false;
+    }
   }
 
   if (!addGenericDmgHealBtns) return;
   await handleGenericDamageHealButtons(_msg, html);
 }
 
+
+/**********************************************************
+ * Chat Helper Functions
+ **********************************************************/
 
 /**
  * Hook listener for truncating long content in chat messages... fires on renderChatMessage event.
@@ -180,4 +186,19 @@ export const truncateLongContent = async function(_msg, html, _data) {
       description[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }    
   });
+}
+
+/**
+ * Check to see if a chat message's flavor text contains a damage type from CONFIG.HYP3E.damageTypes
+ * @param {*} chatMessage 
+ * @returns {Boolean} true if the flavor text contains a damage type, false otherwise
+ */
+export const chatFlavorHasDamageType = function(chatMessage) {
+  if (!chatMessage || !chatMessage.flavor) return false;
+  const flavor = chatMessage.flavor;
+  // Test to see if the flavor text contains a valid damage type from CONFIG.HYP3E.damageTypes
+  // const flavorWords = flavor.split(/\s+/);
+  const damageTypes = Object.values(CONFIG.HYP3E.damageTypes).join("|");
+  const damageTypeRegex = new RegExp(`\\b(${damageTypes})\\b`, "i");
+  return damageTypeRegex.test(flavor);
 }
