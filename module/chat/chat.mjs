@@ -137,14 +137,14 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
   if (_msg.flags?.core?.RollTable || _msg.flags?.documentType === "RollTable") {
     addGenericDmgHealBtns = false;
   }
-  // Only add damage/heal buttons to "unflavored" dice roll chat messages
+  // Add generic damage/heal buttons to "unflavored" dice roll chat messages
+  //    or messages with a flavor that contains a valid damage type
   if (_msg.flavor !== "") {
     Hyp3eLogger.info("addChatMessageButtons", "Flavored chat message:", _msg.flavor);
     if (!chatFlavorHasDamageType(_msg)) {
       addGenericDmgHealBtns = false;
     }
   }
-
   if (!addGenericDmgHealBtns) return;
   await handleGenericDamageHealButtons(_msg, html);
 }
@@ -196,8 +196,11 @@ export const truncateLongContent = async function(_msg, html, _data) {
 export const chatFlavorHasDamageType = function(chatMessage) {
   if (!chatMessage || !chatMessage.flavor) return false;
   const flavor = chatMessage.flavor;
+  
+  // Test for "Save vs." and exit, because "Save vs. Death/Poison/Radiation" incorrectly returns true
+  if (flavor.toLowerCase().includes("save vs.")) return false;
+
   // Test to see if the flavor text contains a valid damage type from CONFIG.HYP3E.damageTypes
-  // const flavorWords = flavor.split(/\s+/);
   const damageTypes = Object.values(CONFIG.HYP3E.damageTypes).join("|");
   const damageTypeRegex = new RegExp(`\\b(${damageTypes})\\b`, "i");
   return damageTypeRegex.test(flavor);
