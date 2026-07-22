@@ -77,6 +77,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       dropItemDescription: Hyp3eActorSheetV2._toggleItemSummary,
       toggleItemEquip: Hyp3eActorSheetV2._toggleItemEquip,
       displayItem: Hyp3eActorSheetV2._displayItemInChat,
+      rollDamage: Hyp3eActorSheetV2._rollItemDamage,
       editItem: Hyp3eActorSheetV2._editItem,
       deleteItem: Hyp3eActorSheetV2._deleteItem,
       // Actions on the sheet header
@@ -1301,6 +1302,23 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         const actorData = this.actor.getRollData()
         // Use the item's display function to do it
         item._displayItemInChat(actorData)
+    }
+
+    /**
+     * Roll a weapon's damage directly from the character/npc sheet.
+     * @param {*} event 
+     * @param {*} target 
+     */
+    static async _rollItemDamage(event, target) {
+        event.preventDefault()
+        Hyp3eLogger.info("HYP3EActorSheetV2 _rollItemDamage", `Rolling damage for item...`, { event, target });
+        const itemId = $(target).closest(".item-entry").data("itemId")
+        const item = this.actor.items.get(itemId)
+        // Use actor's system data to pass to item._rollDamage()
+        const actorData = this.actor.getRollData()
+        // Use the item's rollDamage function to do it
+        // item._rollDamage(actorData)
+        ui.notifications.warn("Rolling damage here is not yet implemented in HYP3E. Coming soon!")
     }
 
     /**
