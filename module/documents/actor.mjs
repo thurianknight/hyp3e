@@ -3565,7 +3565,7 @@ export class Hyp3eActor extends Actor {
 
       // Now we can setup our description output from the results
       if (turnOrCommand == 'turn') {
-          turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]] for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
+          turnUndeadHtml = `<p>Roll [[/r ${rollAffected}]]{2d6 Turned} for the total number of undead affected. Starting from the weakest (lowest Type)...</p><ul>`
       } else {
           turnUndeadHtml = `<p>The total hit dice value of undead affected is ${this.system.ta * 2} HD (2 HD per TA level). Starting from the weakest (lowest Type)...</p><ul>`
       }
