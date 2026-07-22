@@ -1971,8 +1971,9 @@ export class Hyp3eActor extends Actor {
           // Default option: simple Success/Fail message for a standard check
           checkHeader += success ? "<b>Success!</b>" : "<b>Fail.</b>";
       }
-      // Hit must be false so we don't display any damage buttons
-      roll.hit = false
+      // Hit & showDmgButtons must be false so we don't display any damage buttons
+      roll.showDmgButtons = false;
+      roll.hit = false;
 
       // Construct a custom chat card for the check
       await renderCustomChat(roll, item, {}, this, tokenId, label, "", checkHeader, checkFooter, rollResponse.rollMode)
@@ -2166,11 +2167,15 @@ export class Hyp3eActor extends Actor {
       dataset.targetAc,
       dataset.targetSize
     );
+    atkRoll.showDmgButtons = true; // Show damage buttons in the chat card
     atkRoll.hit = hit; // Attach hit status to the roll object
 
     // Prepare Damage Formula (if hit, or on crit miss so damage data is available for hitAlly/hitSelf outcomes)
     let damageFormulas = {};
     const isCritMiss = naturalRoll === 1 && CONFIG.HYP3E.critMiss;
+    if (isCritMiss) {
+      atkRoll.showDmgButtons = false; // Hide damage buttons for crit miss -- no override allowed
+    }
     // if ((hit || isCritMiss) && item && Roll.validate(itemData.damage)) {
     if (item && Roll.validate(itemData.damage)) {
       damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);

@@ -582,7 +582,8 @@
                 "thief": "Critical hit roll for thief-class...",
                 "npc": "Critical hit roll for npc/monster...",
                 "other": "Critical hit roll for cleric/thief/monster..."
-            }
+            },
+            "overrideMiss": "Override miss & roll damage anyway..."
         },
         "roll": "Roll",
         "reroll": "Reroll",

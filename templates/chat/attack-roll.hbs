@@ -32,27 +32,28 @@
         <div class="dice-total">{{roll.total}}</div>
     </div>
 </div>
-{{#unless roll.hit}}
-<div class="dice-result">
-    <div style="font-style:italic; margin-top: 5px;"><em>Override & roll damage anyway...</div>
-</div>
-{{/unless}}
-{{!-- {{#if roll.hit}} --}}
-<div class='dmg-roll-button' style='padding-top: 5px' data-item-id='{{item.id}}' 
-    data-item-uuid='{{item.uuid}}' data-actor-id='{{actorId}}' data-token-id='{{tokenId}}' 
-    data-base-damage='{{item.system.damage}}' data-damage-type='{{item.system.dmgType}}' 
-    data-formula='{{dmgObj.primary.formula}}' data-debug-formula='{{dmgObj.primary.debugFormula}}' 
-    data-damage-groups='{{{json dmgObj.primary.damageGroups}}}' data-source-type='{{item.type}}'>
-</div>
-{{#if dmgObj.secondary.formula}}
-<div class='dmg-roll-button2h' style='padding-top: 2px' data-item-id='{{item.id}}' 
-    data-item-uuid='{{item.uuid}}' data-actor-id='{{actorId}}' data-token-id='{{tokenId}}' 
-    data-base-damage='{{item.system.damage2h}}' data-damage-type='{{item.system.dmgType}}' 
-    data-formula='{{dmgObj.secondary.formula}}' data-debug-formula='{{dmgObj.secondary.debugFormula}}' 
-    data-damage-groups='{{{json dmgObj.secondary.damageGroups}}}' data-source-type='{{item.type}}'>
-</div>
+{{#if roll.showDmgButtons}}
+  {{#unless roll.hit}}
+    <div class="dice-result">
+        <div style="font-style: italic; margin-top: 10px;">{{localize "HYP3E.attack.overrideMiss"}}</div>
+    </div>
+  {{/unless}}
+  {{!-- {{#if roll.hit}} --}}
+  <div class='dmg-roll-button' style='padding-top: 5px' data-item-id='{{item.id}}' 
+      data-item-uuid='{{item.uuid}}' data-actor-id='{{actorId}}' data-token-id='{{tokenId}}' 
+      data-base-damage='{{item.system.damage}}' data-damage-type='{{item.system.dmgType}}' 
+      data-formula='{{dmgObj.primary.formula}}' data-debug-formula='{{dmgObj.primary.debugFormula}}' 
+      data-damage-groups='{{{json dmgObj.primary.damageGroups}}}' data-source-type='{{item.type}}'>
+  </div>
+  {{#if dmgObj.secondary.formula}}
+    <div class='dmg-roll-button2h' style='padding-top: 2px' data-item-id='{{item.id}}' 
+        data-item-uuid='{{item.uuid}}' data-actor-id='{{actorId}}' data-token-id='{{tokenId}}' 
+        data-base-damage='{{item.system.damage2h}}' data-damage-type='{{item.system.dmgType}}' 
+        data-formula='{{dmgObj.secondary.formula}}' data-debug-formula='{{dmgObj.secondary.debugFormula}}' 
+        data-damage-groups='{{{json dmgObj.secondary.damageGroups}}}' data-source-type='{{item.type}}'>
+    </div>
+  {{/if}}
 {{/if}}
-{{!-- {{/if}} --}}
 
 <div style="padding-top: 5px">
     {{{footerHTML}}}
