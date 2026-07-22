@@ -434,8 +434,8 @@ export class Hyp3eItem extends Item {
     // Chat message header text
     const label = this._renderItemHeader(typeLabel, itemName, image);
 
-    let content = itemData.description || "";
-    content += this._renderItemProperties(item, itemData, actorData);
+    // let content = itemData.description || "";
+    let content = this._renderItemProperties(item, itemData, actorData);
 
     // Items might have Effects, but only show the button if item is identified
     if (item.effects.size > 0 && itemData.identified) {
@@ -445,6 +445,8 @@ export class Hyp3eItem extends Item {
     if (itemData.save && itemData.save !== "" && itemData.identified) {
       content += `<div class='save-button' data-save='${itemData.save}'></div>`;
     }
+    // FInally add the item's description at the end, if it exists
+    content += `<div>${itemData.description}</div>` || "";
 
     // Setup & display the item in chat
     const templateData = { content };
@@ -494,6 +496,9 @@ export class Hyp3eItem extends Item {
 
   _renderWeaponSection(itemData, item, actorData) {
     const parts = [];
+    // Insert the damage-roll button at the top
+    parts.push(this._renderDamageRoll(itemData, item, actorData));
+
     if (itemData.rof) parts.push(`<p>Atk Rate: ${itemData.rof}</p>`);
     if (itemData.type === 'missile') {
       parts.push(`<p>Range: ${itemData.range.short} / ${itemData.range.medium} / ${itemData.range.long}</p>`);
@@ -503,12 +508,15 @@ export class Hyp3eItem extends Item {
     // If the weapon has annotations, render them before the Damage button
     parts.push(this._renderAnnotations(itemData));
     // Add the damage-roll button
-    parts.push(this._renderDamageRoll(itemData, item, actorData));
+    // parts.push(this._renderDamageRoll(itemData, item, actorData));
     return parts.join("");
   }
 
   _renderSpellSection(itemData, item, actorData) {
     const parts = [];
+    // Insert the damage-roll button at the top
+    parts.push(this._renderDamageRoll(itemData, item, actorData));
+
     if (itemData.range) parts.push(`<p>Range: ${itemData.range}</p>`);
     if (itemData.duration) {
       parts.push(itemData.duration.match(/.*d[1-9].*/) && Roll.validate(itemData.duration) ?
@@ -519,7 +527,7 @@ export class Hyp3eItem extends Item {
         `<p># Affected: [[/r ${itemData.affected}]]</p>` : `<p># Affected: ${itemData.affected}</p>`);
     }
     // Add the damage-roll button
-    parts.push(this._renderDamageRoll(itemData, item, actorData));
+    // parts.push(this._renderDamageRoll(itemData, item, actorData));
     return parts.join("");
   }
 
@@ -528,12 +536,26 @@ export class Hyp3eItem extends Item {
     if (!Roll.validate(itemData.damage)) return `<p>Damage: ${itemData.damage || ""}</p>`;
 
     const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData);
+    Hyp3eLogger.info("Hyp3eItem _renderDamageRoll", `Damage formula object for ${item.name}:`, dmgObj);
     const roll = new Roll(dmgObj.formula, actorData);
-    return `<hr class='plain-hr' />
-      <div class='dmg-roll-button' data-item-id='${item.id}' data-item-uuid='${item.uuid}' 
-      data-actor-id='${actorData.actorId}' data-formula='${roll.formula}' 
-      data-damage-type='${itemData.dmgType}' data-debug-formula='${dmgObj.debugFormula}' 
-      data-damage-groups='${JSON.stringify(dmgObj.damageGroups)}' data-source-type='${item.type}'></div>`;
+    let html = `
+        <div class='dmg-roll-button' style='padding-top: 2px' data-item-id='${item.id}' 
+        data-item-uuid='${item.uuid}' data-actor-id='${actorData.actorId}' data-token-id='${actorData.tokenId}' 
+        data-base-damage='${item.system.damage}' data-damage-type='${itemData.dmgType}' 
+        data-formula='${dmgObj.formula}' data-debug-formula='${dmgObj.debugFormula}' 
+        data-damage-groups='${JSON.stringify(dmgObj.damageGroups)}' data-source-type='${item.type}'>
+      </div>`;
+    if (dmgObj.formula2h) {
+      html += `<div class='dmg-roll-button2h' style='padding-top: 2px' data-item-id='${item.id}' 
+          data-item-uuid='${item.uuid}' data-actor-id='${actorData.actorId}' data-token-id='${actorData.tokenId}' 
+          data-base-damage='${item.system.damage2h}' data-damage-type='${item.system.dmgType}' 
+          data-formula='${dmgObj.formula2h}' data-debug-formula='${dmgObj.debugFormula2h}' 
+          data-damage-groups='${JSON.stringify(dmgObj.damageGroups2h)}' data-source-type='${item.type}'>
+        </div>`;
+    }
+
+    // return `<hr class='plain-hr' />...
+    return html;
   }
 
   _renderItemCheckSection(itemData) {

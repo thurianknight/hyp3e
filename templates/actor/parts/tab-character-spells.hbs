@@ -143,10 +143,17 @@
                 <div class="item-prop">{{item.system.duration}}</div>
                 <div class="item-prop">{{item.system.save}}</div>
                 <div class="item-controls">
+                  {{#if item.system.damage}}
+                  <a data-action="displayItem" 
+                      title='{{localize "HYP3E.item.rollDamage"}}'>
+                    <i class="fas fa-droplet"></i>
+                  </a>
+                  {{else}}
                   <a data-action="displayItem" 
                       title='{{localize "HYP3E.item.show"}}'>
                     <i class="fas fa-eye"></i>
                   </a>
+                  {{/if}}
                   <a data-action="editItem" 
                       title="{{localize 'HYP3E.item.edit'}}">
                     <i class="fas fa-edit"></i>
