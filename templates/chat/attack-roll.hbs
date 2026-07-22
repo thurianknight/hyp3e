@@ -32,7 +32,12 @@
         <div class="dice-total">{{roll.total}}</div>
     </div>
 </div>
-{{#if roll.hit}}
+{{#unless roll.hit}}
+<div class="dice-result">
+    <div style="font-style:italic; margin-top: 5px;"><em>Override & roll damage anyway...</div>
+</div>
+{{/unless}}
+{{!-- {{#if roll.hit}} --}}
 <div class='dmg-roll-button' style='padding-top: 5px' data-item-id='{{item.id}}' 
     data-item-uuid='{{item.uuid}}' data-actor-id='{{actorId}}' data-token-id='{{tokenId}}' 
     data-base-damage='{{item.system.damage}}' data-damage-type='{{item.system.dmgType}}' 
@@ -47,7 +52,7 @@
     data-damage-groups='{{{json dmgObj.secondary.damageGroups}}}' data-source-type='{{item.type}}'>
 </div>
 {{/if}}
-{{/if}}
+{{!-- {{/if}} --}}
 
 <div style="padding-top: 5px">
     {{{footerHTML}}}

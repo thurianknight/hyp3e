@@ -2171,7 +2171,8 @@ export class Hyp3eActor extends Actor {
     // Prepare Damage Formula (if hit, or on crit miss so damage data is available for hitAlly/hitSelf outcomes)
     let damageFormulas = {};
     const isCritMiss = naturalRoll === 1 && CONFIG.HYP3E.critMiss;
-    if ((hit || isCritMiss) && item && Roll.validate(itemData.damage)) {
+    // if ((hit || isCritMiss) && item && Roll.validate(itemData.damage)) {
+    if (item && Roll.validate(itemData.damage)) {
       damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);
     }
 
