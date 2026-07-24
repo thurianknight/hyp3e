@@ -321,6 +321,7 @@ HYP3E.damageTypes = {
     "slashing": "HYP3E.weapon.damageTypes.slashing",
     "acid": "HYP3E.weapon.damageTypes.acid",
     "asphyxiation": "HYP3E.weapon.damageTypes.asphyxiation",
+    "bleeding": "HYP3E.weapon.damageTypes.bleeding",
     "cold": "HYP3E.weapon.damageTypes.cold",
     "crushing": "HYP3E.weapon.damageTypes.crushing",
     "electricity": "HYP3E.weapon.damageTypes.electricity",
