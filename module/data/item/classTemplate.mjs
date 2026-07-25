@@ -7,8 +7,11 @@ export default class Hyp3eClassTemplate extends Hyp3eItemBase {
     const fields = foundry.data.fields;
     let schema = super.defineSchema();
 
+    // The class name is in the actual root name property of the item, so we don't 
+    //  need to store it in the schema
+
     // Class template fields
-    schema.class = new fields.StringField({ initial: "" });
+    // schema.className = new fields.StringField({ initial: "" });
     schema.baseClass = new fields.StringField({ initial: "" });
     schema.hitDie = new fields.StringField({ initial: "" });
     schema.attrReqs = new fields.SchemaField({});
@@ -24,8 +27,8 @@ export default class Hyp3eClassTemplate extends Hyp3eItemBase {
     });
     schema.unskilled = new fields.NumberField({ nullable: true, initial: 0 });
     schema.weaponProficiencies = new fields.SchemaField({
-      favoredWeapons: new fields.ArrayField(new fields.SchemaField({}), { initial: [] }),
-      exceptions: new fields.ArrayField(new fields.SchemaField({}), { initial: [] }),
+      favoredWeapons: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
+      exceptions: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
     });
     schema.levelAdvancement = new fields.SchemaField({
       1: new fields.SchemaField({
@@ -113,7 +116,7 @@ export default class Hyp3eClassTemplate extends Hyp3eItemBase {
         ta: new fields.NumberField({ nullable: true, initial: null }),
       }),
     });
-    schema.abilities = new fields.ArrayField(new fields.StringField(), { initial: [] });
+    schema.abilities = new fields.ArrayField(new fields.SchemaField({}), { initial: [] });
     schema.startingPack = new fields.SchemaField({
       gold: new fields.StringField({ initial: "1d4+1" }),
       armour: new fields.ArrayField(new fields.SchemaField({}), { initial: [] }),

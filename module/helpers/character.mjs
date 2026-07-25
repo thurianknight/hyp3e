@@ -4367,19 +4367,150 @@ export class Hyp3eCharacterClass {
   }
 
   /**
+   * Apply a class template to an actor, setting the appropriate attributes, abilities, and starting equipment.
+   * @param {*} actor 
+   * @param {*} classTemplate 
+   */
+  static async applyClassTemplate(actor, classTemplate) {
+    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Applying class template to ${actor.name}:`, classTemplate);
+    // Set the class in the actor's details
+    await actor.update({ "system.details.class": classTemplate.name });
+
+    // Roll the attributes for the actor and ensure they meet class requirements
+    const attributes = await this.rollAttributesForClass(actor);
+    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Attributes:`, attributes);
+    if (attributes) {
+      // Set the attributes in the actor
+      for (let [k, v] of Object.entries(attributes)) {
+        await actor.update({ system: { attributes: { [k]: { value: v } } } })
+        actor.system.attributes[k].value = v
+      }
+      const setAttrOk = await this.setAttributeMods(dataset, true)
+      if (!setAttrOk) return false; // If setting attribute mods failed, exit early
+
+      const roll = new Roll(`${actor.system.hd} + ${actor.system.attributes.con.hpMod}`);
+      await roll.evaluate({ evaluateSync: true });
+      Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `HP roll result:`, roll);
+      if (roll != undefined && roll.total != undefined) {
+        await actor.update({
+          system: {
+            hp: {
+              value: roll.total,
+              max: roll.total
+            }
+          }
+        });
+        // Set the HP values in the actor
+        actor.system.hp.value = roll.total;
+        actor.system.hp.max = roll.total;
+      } else {
+        Hyp3eLogger.error("Hyp3eCharacterClass applyClassTemplate", `HP roll failed to evaluate properly.`);
+        return false;
+      }
+    } else {
+      Hyp3eLogger.error("Hyp3eCharacterClass applyClassTemplate", `Attributes roll failed.`);
+      return false;
+    }
+
+    // Check to see if the Items directory has the class abilities/features that we need.
+    // Alternatively, we can also check for compendia with class abilities.
+    const abilities = await this.getClassAbilities({
+      actor: actor,
+      itemType: "feature",
+      folderNames: ["features", "abilities", "class features", "class abilities", "class abilities & features"],
+      abilitiesKey: "abilities"
+    });
+    if (abilities && abilities.length > 0) {
+      // Add the features to the actor's list
+      await actor.createEmbeddedDocuments("Item", abilities);
+    }
+
+    // Check to see if the Items directory has the folders & items we need.
+    // Alternatively, we can also check for compendia with the items we need.
+    // Start with armor...
+    const armorItems = await this.getDefaultItemsForClass({
+      actor: actor,
+      itemType: "armor",
+      folderNames: ["armor", "armour", "armor & shields", "armour & shields"],
+      packKey: "armour"
+    });
+    if (armorItems && armorItems.length > 0) {
+      // Add the armor to the actor's inventory
+      await actor.createEmbeddedDocuments("Item", armorItems);
+    }
+
+    // Next we do weapons...
+    const weaponItems = await this.getDefaultItemsForClass({
+      actor: actor,
+      itemType: "weapon",
+      folderNames: ["weapons", "melee", "missile"],
+      packKey: "weapons"
+    });
+    if (weaponItems && weaponItems.length > 0) {
+      // Add the weapons to the actor's inventory
+      await actor.createEmbeddedDocuments("Item", weaponItems);
+    }
+
+    // Next we do all the equipment items...
+    const generalItems = await this.getDefaultItemsForClass({
+      actor: actor,
+      itemType: "item",
+      folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items", "weapons", "ammunition"],
+      packKey: "equipment - general"
+    });
+    if (generalItems && generalItems.length > 0) {
+      // Add the items to the actor's inventory
+      await actor.createEmbeddedDocuments("Item", generalItems);
+    }
+    const provisionItems = await this.getDefaultItemsForClass({
+      actor: actor,
+      itemType: "item",
+      folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
+      packKey: "equipment - provisions"
+    });
+    if (provisionItems && provisionItems.length > 0) {
+      // Add the items to the actor's inventory
+      await actor.createEmbeddedDocuments("Item", provisionItems);
+    }
+    const religiousItems = await this.getDefaultItemsForClass({
+      actor: actor,
+      itemType: "item",
+      folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
+      packKey: "equipment - religious"
+    });
+    if (religiousItems && religiousItems.length > 0) {
+      // Add the items to the actor's inventory
+      await actor.createEmbeddedDocuments("Item", religiousItems);
+    }
+
+    // Get starting gold
+    const gold = await this.getStartingGoldForClass(actor);
+    if (gold && gold > 0) {
+      // Add the gold to the actor's inventory
+      await actor.update({"system.money.gp.value": gold});
+      actor.system.money.gp.value = gold;
+    }
+
+    // All good? Disable the quick-create button so it can't be used
+    actor.setFlag(game.system.id, "disableQuickCreate", true)
+    return true;
+  }
+
+  /**
    * Quickly create a character actor from a basic dataset.
    * @param {Object} dataset - The dataset from the actor.
    * @return {boolean} Success or failure of the character creation.
    */
   static async quickCreateCharacter(dataset) {
     Hyp3eLogger.info("Hyp3eCharacterClass quickCreateCharacter", `Incoming dataset:`, dataset);
-    let actor = game.actors.get(dataset.actorId)
+    const actor = game.actors.get(dataset.actorId)
     if (!actor) {
       Hyp3eLogger.error("Hyp3eCharacterClass quickCreateCharacter", `Actor not found for id ${dataset.actorId}`);
       return false;
     }
 
-    const attributes = await this.rollAttributesForClass(actor, dataset);
+    // const attributes = await this.rollAttributesForClass(actor, dataset);
+    const attributes = await this.rollAttributesForClass(actor);
     Hyp3eLogger.info("Hyp3eCharacterClass quickCreateCharacter", `Attributes:`, attributes);
     if (attributes) {
       // Set the attributes in the actor
@@ -4504,7 +4635,8 @@ export class Hyp3eCharacterClass {
    * @param {object} dataset - The dataset containing character creation data
    * @returns {Object} - Returns an object with the rolled attributes
    */
-  static async rollAttributesForClass(actor, dataset) {
+  // static async rollAttributesForClass(actor, dataset) {
+  static async rollAttributesForClass(actor) {
     const charClass = actor.system.details.class;
     Hyp3eLogger.info("Hyp3eCharacterClass rollAttributesForClass", `Class to roll:`, charClass);
     // Get the class attribute requirements

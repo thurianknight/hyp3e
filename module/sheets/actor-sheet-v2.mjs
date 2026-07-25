@@ -1702,10 +1702,37 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       }
 
 
+      /**----------------------------------------------------------------------
+       * Handle dropping a Class Template on to a character actor
+       *---------------------------------------------------------------------*/
+      if (item.type === "classTemplate") {
+        // Only allow if dropped on character
+        if (this.type !== "character") {
+          const msg = `Only characters can have class templates applied to them.`;
+          Hyp3eLogger.warn("_onDropItem", msg);
+          ui.notifications.warn(msg);
+          return; // Prevent super._onDropItem()
+        }
+
+        // Apply the class template to the character
+        await Hyp3eCharacterClass.applyClassTemplate(this.actor, item);
+
+        const msg = `Applied class template "${item.name}" to ${this.actor.name}.`;
+        Hyp3eLogger.info("_onDropItem", msg);
+        ui.notifications.info(msg);
+        return;
+      }
+
       // Otherwise let normal copy-item behavior proceed
       return super._onDropItem(event, item)
     }
 
+    /**
+     * Sort items in various item lists: features/abilities, weapons, armor, gear, spells, etc.
+     * @param {*} event 
+     * @param {*} item 
+     * @returns 
+     */
     async _onSortItem(event, item) {
       // Hyp3eLogger.info("HYP3EActorSheetV2 _onSortItem", `Item sort event:`, { event, item })
 
