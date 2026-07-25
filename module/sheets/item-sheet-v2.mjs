@@ -242,13 +242,14 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
   /** @override */
   _getTabsConfig(group) {
     const tabs = foundry.utils.deepClone(super._getTabsConfig(group))
-    const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified") || this.item.system.identified;
+    const isIdentified = this.document.system?.identified ?? true; // Default to true if not present
+    const isGM = game.user.isGM;
 
     // No matter what, the details tab is always present
     tabs.tabs.push({ id: 'details', group: group });
 
-    // The remaining tabs are only present if the item is identified
-    if (isIdentified) {
+    // The remaining tabs are only present if the item is identified or user is GM
+    if (isIdentified || isGM) {
       // Insert Attributes tab
       tabs.tabs.push({ id: 'attributes', group: group });
 
