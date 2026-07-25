@@ -62,9 +62,9 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
   static TABS = {
     primary: {
       tabs: [
-        { id: 'details' },
-        { id: 'attributes' },
-        { id: 'effects' }
+        // { id: 'details' },
+        // { id: 'attributes' },
+        // { id: 'effects' }
       ],
       labelPrefix: 'HYP3E.tabs',
       initial: 'details'
@@ -242,11 +242,24 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
   /** @override */
   _getTabsConfig(group) {
     const tabs = foundry.utils.deepClone(super._getTabsConfig(group))
+    const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified") || this.item.system.identified;
 
-    // Insert Spells tab if item has spellcasting ability
-    if (this.document.system?.spellcasting?.hasSpells) {
-      // tabs.tabs.push({ id: 'spells', group: 'primary' })
-      tabs.tabs.splice(tabs.tabs.length - 1, 0, { id: 'spells', group: 'primary' });
+    // No matter what, the details tab is always present
+    tabs.tabs.push({ id: 'details', group: group });
+
+    // The remaining tabs are only present if the item is identified
+    if (isIdentified) {
+      // Insert Attributes tab
+      tabs.tabs.push({ id: 'attributes', group: group });
+
+      // Insert Spells tab if item has spellcasting ability
+      if (this.document.system?.spellcasting?.hasSpells) {
+        tabs.tabs.push({ id: 'spells', group: group })
+        // tabs.tabs.splice(tabs.tabs.length - 1, 0, { id: 'spells', group: group });
+      }
+
+      // Insert Effects tab at the end of the list
+      tabs.tabs.push({ id: 'effects', group: group });
     }
     return tabs
   }
