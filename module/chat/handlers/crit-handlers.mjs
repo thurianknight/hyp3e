@@ -6,7 +6,7 @@
  */
 import { HYP3E } from "../../helpers/config.mjs"
 import { Hyp3eLogger } from "../../helpers/logger.mjs";
-import { applyHealthChange, rollDmgButton } from "./damage-handlers.mjs";
+import { applyHealthChange, canCurrentUserRollDamage, rollDmgButton } from "./damage-handlers.mjs";
 
 /**
  * 
@@ -124,6 +124,9 @@ export async function handleCritMissOrHitButtons(html) {
         // Hide separate damage button(s) — the combined button covers them
         dmgEl.hide();
         if (dmg2hEl.length > 0) dmg2hEl.hide();
+
+        // Damage controls are only available to a GM or an owner of the attacking actor.
+        if (!canCurrentUserRollDamage(dmgData.actorId, dmgData.tokenId)) return;
 
         const critDmgButton = $(long_button('hit', `Roll Critical Damage`, icon));
         critHitElement.append(critDmgButton);

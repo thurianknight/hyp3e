@@ -8,6 +8,29 @@ import { HYP3E } from "../../helpers/config.mjs"
 import { Hyp3eLogger } from "../../helpers/logger.mjs";
 
 /**
+ * Resolve the actor that originated a damage roll.
+ * Prefer the token actor so unlinked token actors use their effective ownership.
+ * @param {string} actorId - ID of the actor making the attack
+ * @param {string} tokenId - ID of the actor's token
+ * @returns {Actor|null}
+ */
+export function resolveDamageRollActor(actorId, tokenId) {
+  const tokenActor = tokenId ? canvas?.tokens?.get(tokenId)?.actor : null;
+  return tokenActor ?? game.actors?.get(actorId) ?? null;
+}
+
+/**
+ * Determine whether the current user may roll damage for an actor.
+ * @param {string} actorId - ID of the actor making the attack
+ * @param {string} tokenId - ID of the actor's token
+ * @returns {boolean}
+ */
+export function canCurrentUserRollDamage(actorId, tokenId) {
+  const actor = resolveDamageRollActor(actorId, tokenId);
+  return Boolean(actor && (game.user?.isGM || actor.isOwner));
+}
+
+/**
  * Insert 1-Hand damage roll button into chat messages and hook up it's event handler.
  * @param {*} html - The chat message HTML
  * @returns {Boolean} - True if buttons were added, false if not
@@ -30,6 +53,8 @@ export async function handleDamageRollButtons(html) {
     const actorId = $(b).data('actorId');
     const tokenId = $(b).data('tokenId');
     const buttonText = damageType.toLowerCase().includes("heal") ? "Roll Healing" : "Roll Damage"
+
+    if (!canCurrentUserRollDamage(actorId, tokenId)) return;
 
     let dmgButton = $(
       `<button class="chat-btn-full-width" title="Roll damage"><i class="fas fa-dice"></i>${buttonText}</button>`
@@ -67,6 +92,8 @@ export async function handleDamageRoll2hButtons(html) {
     const itemUuid = $(b).data('itemUuid');
     const actorId = $(b).data('actorId');
     const tokenId = $(b).data('tokenId');
+
+    if (!canCurrentUserRollDamage(actorId, tokenId)) return;
 
     let dmgButton2h = $(
       `<button class="chat-btn-full-width" title="Roll 2H damage"><i class="fas fa-dice"></i>2-Hand Damage</button>`
@@ -242,24 +269,21 @@ export async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula
     formula = `${formula}d1`
   }
 
-  let actor = {}
-
-  // Log the attacking token, if available
-  const token = canvas?.tokens.get(tokenId);
-  Hyp3eLogger.info("rollDmgButton", `Token (ID ${tokenId}): `, token);
-  if (token) {
-    // Get the token's actor
-    actor = token.actor;
-  } else {
-    // Get the game actor
-    actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
-  }
+  const actor = resolveDamageRollActor(actorId, tokenId);
   if (!actor) {
     const msg = `Actor ${actorId} not found!`;
     Hyp3eLogger.error("rollDmgButton", msg);
     ui.notifications?.error(msg);
     return;
   }
+
+  if (!game.user?.isGM && !actor.isOwner) {
+    const msg = `Only a GM or an owner of ${actor.name} can roll this damage.`;
+    Hyp3eLogger.warn("rollDmgButton", msg);
+    ui.notifications?.warn(msg);
+    return;
+  }
+
   Hyp3eLogger.info("rollDmgButton", `Actor: `, actor);
   const actorData = actor.getRollData();
 
