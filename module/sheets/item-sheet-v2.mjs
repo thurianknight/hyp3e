@@ -296,19 +296,19 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     // const formDataObj = formData.object;
     const formDataObj = foundry.utils.expandObject(formData.object);
     // Not all item types have identification, so default to identified=true
-    const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified") || this.item.system.identified;
+    const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified") ?? this.item.system.identified;
     Hyp3eLogger.info("_processFormData", `Is item identified?`, isIdentified);
 
     // Apply name and description based on identification state.
     if (isIdentified) {
       const realName = foundry.utils.getProperty(formDataObj, "system.realName") || this.item.system.realName;
-      const realDesc = foundry.utils.getProperty(formDataObj, "system.realDescription") || this.item.system.realDescription;
+      const realDesc = foundry.utils.getProperty(formDataObj, "system.realDescription") ?? this.item.system.realDescription;
 
       formDataObj["name"] = realName;
       formDataObj["system.description"] = realDesc;
     } else {
       let aliasName = foundry.utils.getProperty(formDataObj, "system.itemAlias") || this.item.system.itemAlias;
-      const aliasDesc = foundry.utils.getProperty(formDataObj, "system.aliasDescription") || this.item.system.aliasDescription;
+      const aliasDesc = foundry.utils.getProperty(formDataObj, "system.aliasDescription") ?? this.item.system.aliasDescription;
 
       // Ensure aliasName is not empty or just whitespace
       if (!aliasName || aliasName.trim() === "") {
