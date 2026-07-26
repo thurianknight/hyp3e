@@ -26,3 +26,12 @@ export function getRollModeChoices(config = CONFIG) {
 export function getRollMessageOptions(mode, generation = game.release?.generation) {
   return generation >= 14 ? { messageMode: mode } : { rollMode: mode };
 }
+
+/**
+ * Return the mergeObject option that enables deletion/operator processing.
+ * @param {number} [generation=game.release?.generation] - Foundry generation
+ * @returns {{performDeletions: boolean}|{applyOperators: boolean}}
+ */
+export function getMergeObjectDeletionOptions(generation = game.release?.generation) {
+  return generation >= 14 ? { applyOperators: true } : { performDeletions: true };
+}

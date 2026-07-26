@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  getMergeObjectDeletionOptions,
   getRollMessageOptions,
   getRollModeChoices
 } from "../module/helpers/foundry-compat.mjs";
@@ -36,4 +37,15 @@ test("Foundry v14 converts CONFIG.ChatMessage.modes and uses messageMode", () =>
     gm: "CHAT.RollPrivate"
   });
   assert.deepEqual(getRollMessageOptions("gm", 14), { messageMode: "gm" });
+});
+
+test("mergeObject deletion processing uses the option supported by each generation", () => {
+  assert.deepEqual(
+    getMergeObjectDeletionOptions(13),
+    { performDeletions: true }
+  );
+  assert.deepEqual(
+    getMergeObjectDeletionOptions(14),
+    { applyOperators: true }
+  );
 });

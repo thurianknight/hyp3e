@@ -1,5 +1,8 @@
 import { HYP3E } from "../helpers/config.mjs"
-import { getRollModeChoices } from "../helpers/foundry-compat.mjs";
+import {
+  getMergeObjectDeletionOptions,
+  getRollModeChoices
+} from "../helpers/foundry-compat.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import {onManageActiveEffectV2, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 import HYP3EItemSetAnnotations from "../apps/item-set-annotations.mjs";
@@ -469,7 +472,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
     // Merge updated formDataObj back into formData.object, and log the data
     Hyp3eLogger.info("Hyp3eItemSheetV2 _processFormData", `Updated form data:`, formDataObj);
-    foundry.utils.mergeObject(formData.object, formDataObj, {performDeletions: true});
+    foundry.utils.mergeObject(formData.object, formDataObj, getMergeObjectDeletionOptions());
     Hyp3eLogger.info("Hyp3eItemSheetV2 _processFormData", `Merged form data:`, formData);
 
     return super._processFormData(event, form, formData);
