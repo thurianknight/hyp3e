@@ -108,7 +108,7 @@ export class TurnAdvanceActionsConfig extends HandlebarsApplicationMixin(Applica
         if (!form) return;
 
         // Collect data
-        const fd = new FormDataExtended(form);
+        const fd = new foundry.applications.ux.FormDataExtended(form);
         const formData = fd.object; // returns a deep object of all form fields
         Hyp3eLogger.info("#saveActions", `Form data:`, formData);
 

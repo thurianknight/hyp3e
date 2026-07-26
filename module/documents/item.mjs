@@ -453,7 +453,7 @@ export class Hyp3eItem extends Item {
     const templateData = { content };
 
     const template = `${HYP3E.templatePath}/chat/show-item.hbs`;
-    const itemChat = await renderTemplate(template, templateData);
+    const itemChat = await foundry.applications.handlebars.renderTemplate(template, templateData);
     // Log the rendered chat message
     ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: actorData.actorId }),

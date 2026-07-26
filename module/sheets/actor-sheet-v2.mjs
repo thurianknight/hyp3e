@@ -1,4 +1,5 @@
 import { HYP3E } from "../helpers/config.mjs"
+import { getRollModeChoices } from "../helpers/foundry-compat.mjs";
 import { Hyp3eCharacterClass } from "../helpers/character.mjs";
 import { parseGpValue, 
           buyFromMerchant,
@@ -499,7 +500,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     context.languages = CONFIG.HYP3E.languages
 
     // System-defined roll modes
-    context.rollModes = CONFIG.Dice.rollModes
+    context.rollModes = getRollModeChoices()
 
     // Set encumbrance flags for the sheet
     if (CONFIG.HYP3E.enableEncumbrance) {
@@ -779,15 +780,15 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             name: game.i18n.localize("HYP3E.item.splitStack"),
             icon: '<i class="fas fa-scissors"></i>',
             condition: (target) => {
-              const item = this.actor.items.get($(target).data("itemId"));
+              const item = this.actor.items.get(target.dataset.itemId);
               return item?.system?.quantity?.value > 1;
             },
             callback: (target) => {
-              const itemId = $(target).data("itemId");
+              const itemId = target.dataset.itemId;
               Hyp3eActorSheetV2._splitItemStack.call(this, itemId);
             }
           }
-        ]);
+        ], { jQuery: false });
 
         // Log render completion
         Hyp3eLogger.info("HYP3EActorSheetV2 _onRender", `Actor Sheet rendered.`, { context, options, sheet: this });
