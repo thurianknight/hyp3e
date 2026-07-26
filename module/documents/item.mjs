@@ -25,13 +25,14 @@ export class Hyp3eItem extends Item {
     // Replace default image for new items, but if an image is defined, leave it be
     const TYPE_IMAGES = {
       armor: `${HYP3E.assetsPath}/breastplate_wht.svg`,
-      effectTemplate: "icons/svg/aura.svg",
       feature: "icons/svg/target.svg",
       item: "icons/svg/item-bag.svg",
       shield: "icons/svg/shield.svg",
       spell: "icons/svg/book.svg",
       weapon: "icons/svg/combat.svg",
-      container: "icons/svg/item-bag.svg"
+      classTemplate: "icons/svg/mystery-man.svg",
+      effectTemplate: "icons/svg/aura.svg",
+      container: "icons/svg/item-bag.svg",
     };
     if (!data.img || data.img === "") {
       updateData.img = TYPE_IMAGES[data.type] || "icons/svg/item-bag.svg";

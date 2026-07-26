@@ -117,8 +117,8 @@ Hooks.once('init', async function() {
   CONFIG.Item.dataModels.spell          = HYP3E_DATA_MODELS.Hyp3eSpell;
   CONFIG.Item.dataModels.feature        = HYP3E_DATA_MODELS.Hyp3eFeature;
   CONFIG.Item.dataModels.item           = HYP3E_DATA_MODELS.Hyp3eItem;
-  CONFIG.Item.dataModels.effectTemplate = HYP3E_DATA_MODELS.Hyp3eEffectTemplate;
   CONFIG.Item.dataModels.classTemplate  = HYP3E_DATA_MODELS.Hyp3eClassTemplate;
+  CONFIG.Item.dataModels.effectTemplate = HYP3E_DATA_MODELS.Hyp3eEffectTemplate;
 
   console.log("Hyperborea | DataModels registered - template.json no longer used.");
 

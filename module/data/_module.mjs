@@ -13,5 +13,5 @@ export { default as Hyp3eWeapon } from "./item/weapon.mjs";
 export { default as Hyp3eSpell } from "./item/spell.mjs";
 export { default as Hyp3eFeature } from "./item/feature.mjs";
 export { default as Hyp3eItem } from "./item/item.mjs";
-export { default as Hyp3eEffectTemplate } from "./item/effectTemplate.mjs";
 export { default as Hyp3eClassTemplate } from "./item/classTemplate.mjs";
+export { default as Hyp3eEffectTemplate } from "./item/effectTemplate.mjs";

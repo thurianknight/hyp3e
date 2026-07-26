@@ -2,7 +2,7 @@
   "id": "hyp3e",
   "title": "Hyperborea 3rd Edition",
   "description": "The Hyperborea 3rd Edition system for FoundryVTT!",
-  "version": "3.8.2",
+  "version": "3.8.3",
   "compatibility": {
     "minimum": "13",
     "verified": "14.364",
@@ -63,9 +63,6 @@
       "armor": {
         "htmlFields": ["description", "realDescription"]
       },
-      "effectTemplate": {
-        "htmlFields": ["description", "realDescription"]
-      },
       "feature": {
         "htmlFields": ["description", "realDescription"]
       },
@@ -79,6 +76,12 @@
         "htmlFields": ["description", "realDescription"]
       },
       "weapon": {
+        "htmlFields": ["description", "realDescription"]
+      },
+      "classTemplate": {
+        "htmlFields": ["description", "realDescription"]
+      },
+      "effectTemplate": {
         "htmlFields": ["description", "realDescription"]
       }
     }

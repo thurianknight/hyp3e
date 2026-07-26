@@ -14,6 +14,7 @@
           "shield": "Shield", 
           "spell": "Spell", 
           "weapon": "Weapon",
+          "classTemplate": "Class Template",
           "effectTemplate": "Effect Template"
       },
       "Actor": {
@@ -30,6 +31,7 @@
         "shield": "Shield", 
         "spell": "Spell", 
         "weapon": "Weapon",
+        "classTemplate": "Class Template",
         "effectTemplate": "Effect Template"
       }
     },
@@ -383,11 +385,11 @@
             "armor": "Armour", 
             "feature": "Feature", 
             "item": "Item", 
-            "shield": "Shield",
+            "shield": "Shield", 
             "spell": "Spell", 
             "weapon": "Weapon", 
-            "effectTemplate": "Effect Template",
-            "classTemplate": "Class Template"
+            "classTemplate": "Class Template", 
+            "effectTemplate": "Effect Template"
         },
         "item": {
             "add": "Add Item",

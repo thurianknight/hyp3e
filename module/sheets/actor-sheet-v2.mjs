@@ -1423,7 +1423,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         Hyp3eLogger.info("HYP3EActorSheetV2 _onSetAttributeMods", `Set attribute mods dataset:`, dataset);
 
         // Take the attribute scores and class, and lookup/calculate modifiers
-        const setAttrOk = await Hyp3eCharacterClass.setAttributeMods(dataset, false)
+        const setAttrOk = await Hyp3eCharacterClass.setAttributeMods(this.actor, false)
             .then(setAttrOk => {
                 if (setAttrOk) {
                     this.render()
@@ -1592,8 +1592,8 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
       // Handle character/npc/treasure -> treasure drag
       if (["character","npc","treasure"].includes(sourceActor?.type) && this.actor.type === "treasure") {
-        // Do not transfer spells or features
-        if (["spell","feature","effectTemplate"].includes(item.type)) {
+        // Do not transfer spells and other invalid types
+        if (["spell","feature","classTemplate","effectTemplate"].includes(item.type)) {
           const msg = `${this.actor.name} cannot hold ${item.type}s!`;
           Hyp3eLogger.warn("_onDropItem", msg);
           ui.notifications.warn(msg);
@@ -1610,9 +1610,9 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
        *---------------------------------------------------------------------*/
 
       if (this.actor.type === "itemToken") {
-        // You cannot link an item token to an effect template
-        if (this.type === "effectTemplate") {
-          const msg = `Effect Templates cannot be linked to Item Tokens.`;
+        // You cannot link an item token to an effect or class template
+        if (item.type === "effectTemplate" || item.type === "classTemplate") {
+          const msg = `${item.type}s cannot be linked to Item Tokens.`;
           Hyp3eLogger.warn("_onDropItem", msg);
           ui.notifications.warn(msg);
           return; // Prevent super._onDropItem()
@@ -1660,7 +1660,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
       if (item.type === "effectTemplate") {
         // Only allow if dropped on character or npc
-        if (this.type !== "character" && this.type !== "npc") {
+        if (this.actor.type !== "character" && this.actor.type !== "npc") {
           const msg = `Only characters and NPCs can have effects applied to them.`;
           Hyp3eLogger.warn("_onDropItem", msg);
           ui.notifications.warn(msg);
@@ -1707,7 +1707,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
        *---------------------------------------------------------------------*/
       if (item.type === "classTemplate") {
         // Only allow if dropped on character
-        if (this.type !== "character") {
+        if (this.actor.type !== "character") {
           const msg = `Only characters can have class templates applied to them.`;
           Hyp3eLogger.warn("_onDropItem", msg);
           ui.notifications.warn(msg);

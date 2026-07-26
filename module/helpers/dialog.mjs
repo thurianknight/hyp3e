@@ -281,7 +281,7 @@ export class Hyp3eDialog {
    * Handle Set Attribute Mods confirmation dialog
    * @param dataset
    */
-  static async ShowSetModifiersDialog(dataset) {
+  static async ShowSetModifiersDialog() {
     // Dialog to confirm setting modifiers
     return new Promise((resolve, reject) => {
       new Dialog({

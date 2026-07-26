@@ -279,6 +279,7 @@ HYP3E.itemTypes = {
     "shield": "HYP3E.itemTypes.shield", 
     "spell": "HYP3E.itemTypes.spell", 
     "weapon": "HYP3E.itemTypes.weapon", 
+    "classTemplate": "HYP3E.itemTypes.classTemplate", 
     "effectTemplate": "HYP3E.itemTypes.effectTemplate"
 }
 

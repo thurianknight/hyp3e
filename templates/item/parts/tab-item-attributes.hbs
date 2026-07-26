@@ -12,9 +12,6 @@
       {{#if (eq item.type "shield")}}
         {{!-- {{> "shield-attributes"}} --}}
       {{/if}}
-      {{#if (eq item.type "effectTemplate")}}
-        {{> "effect-attributes"}}
-      {{/if}}
       {{#if (eq item.type "feature")}}
         {{> "feature-attributes"}}
       {{/if}}
@@ -26,6 +23,9 @@
       {{/if}}
       {{#if (eq item.type "weapon")}}
         {{> "weapon-attributes"}}
+      {{/if}}
+      {{#if (eq item.type "effectTemplate")}}
+        {{> "effect-attributes"}}
       {{/if}}
       {{!-- All physical item attributes --}}
       {{#if system.isPhysical}}

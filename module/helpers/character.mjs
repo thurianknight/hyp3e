@@ -4385,7 +4385,7 @@ export class Hyp3eCharacterClass {
         await actor.update({ system: { attributes: { [k]: { value: v } } } })
         actor.system.attributes[k].value = v
       }
-      const setAttrOk = await this.setAttributeMods(dataset, true)
+      const setAttrOk = await this.setAttributeMods(actor, true)
       if (!setAttrOk) return false; // If setting attribute mods failed, exit early
 
       const roll = new Roll(`${actor.system.hd} + ${actor.system.attributes.con.hpMod}`);
@@ -4518,7 +4518,7 @@ export class Hyp3eCharacterClass {
         await actor.update({ system: { attributes: { [k]: { value: v } } } })
         actor.system.attributes[k].value = v
       }
-      const setAttrOk = await this.setAttributeMods(dataset, true)
+      const setAttrOk = await this.setAttributeMods(actor, true)
       if (!setAttrOk) return false; // If setting attribute mods failed, exit early
 
       const roll = new Roll(`${actor.system.hd} + ${actor.system.attributes.con.hpMod}`);
@@ -4975,12 +4975,13 @@ export class Hyp3eCharacterClass {
         // Set default image for new items based on type
         const TYPE_IMAGES = {
           armor: `${HYP3E.assetsPath}/breastplate_wht.svg`,
-          effectTemplate: "icons/svg/aura.svg",
           feature: "icons/svg/target.svg",
           item: "icons/svg/item-bag.svg",
           shield: "icons/svg/shield.svg",
           spell: "icons/svg/book.svg",
           weapon: "icons/svg/combat.svg",
+          classTemplate: "icons/svg/mystery-man.svg",
+          effectTemplate: "icons/svg/aura.svg",
           container: "icons/svg/item-bag.svg"
         };
         const img = TYPE_IMAGES[itemType] || "icons/svg/item-bag.svg";
@@ -5211,19 +5212,21 @@ export class Hyp3eCharacterClass {
    * Set or reset all attribute modifiers
    * @param {*} dataset 
    */
-  static async setAttributeMods(dataset, skipPrompt = false) {
-    let actor = game.actors.get(dataset.actorId)
+  static async setAttributeMods(actor, skipPrompt = false) {
+    // let actor = game.actors.get(dataset.actorId)
     if (!actor) {
-      Hyp3eLogger.error("Hyp3eCharacterClass setAttributeMods", `Actor not found for id ${dataset.actorId}`)
+      // Hyp3eLogger.error("Hyp3eCharacterClass setAttributeMods", `Actor not found for id ${dataset.actorId}`)
+      Hyp3eLogger.error("Hyp3eCharacterClass setAttributeMods", `Actor not supplied!`)
       return false
     }
     // Log the dataset before the dialog renders
-    Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `${actor.name} dataset: `, dataset);
+    // Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `${actor.name} dataset: `, dataset);
+    Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `${actor.name}: `, actor);
 
     if (!skipPrompt) {
       // Display the confirmation dialog, and exit if the user cancels this action
       try {
-        let rollResponse = await Hyp3eDialog.ShowSetModifiersDialog(dataset)
+        let rollResponse = await Hyp3eDialog.ShowSetModifiersDialog()
       } catch(err) {
         Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Roll dialog canceled.`, err)
         return false
