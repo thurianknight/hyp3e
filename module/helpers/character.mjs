@@ -4226,8 +4226,8 @@ export class Hyp3eCharacterClass {
 
   static isAttributeLow(actorData, attr) {
     Hyp3eLogger.info("Hyp3eCharacterClass isAttributeLow", `Checking ${attr} attribute for ${actorData.details.class}...`)
-    const attrReqs = this.classData[actorData.details.class]?.attrReqs || CONFIG.HYP3E.customClassData[actorData.details.class];
-    if (attrReqs[attr]) {
+    const attrReqs = this.classData[actorData.details.class]?.attrReqs;
+    if (attrReqs && attrReqs[attr]) {
       if (actorData.attributes[attr].value < attrReqs[attr]) {
         return true
       }  
@@ -4266,7 +4266,7 @@ export class Hyp3eCharacterClass {
           attributes.str.test = this._valueFromTable(this.testOfAttr, attributes.str.curr)
           attributes.str.feat = this._valueFromTable(this.featOfAttr, attributes.str.curr)
           if (data.details.class) {
-            if (thisClass.featBonus && thisClass.featBonus.str) {
+            if (thisClass?.featBonus && thisClass?.featBonus?.str) {
             attributes.str.feat += thisClass.featBonus.str
             }
           }
@@ -4278,7 +4278,7 @@ export class Hyp3eCharacterClass {
           attributes.dex.test = this._valueFromTable(this.testOfAttr, attributes.dex.curr)
           attributes.dex.feat = this._valueFromTable(this.featOfAttr, attributes.dex.curr)
           if (data.details.class) {
-            if (thisClass.featBonus && thisClass.featBonus.dex) {
+            if (thisClass?.featBonus && thisClass?.featBonus?.dex) {
               attributes.dex.feat += thisClass.featBonus.dex
             }
           }
@@ -4291,7 +4291,7 @@ export class Hyp3eCharacterClass {
           attributes.con.test = this._valueFromTable(this.testOfAttr, attributes.con.curr)
           attributes.con.feat = this._valueFromTable(this.featOfAttr, attributes.con.curr)
           if (data.details.class) {
-            if (thisClass.featBonus && thisClass.featBonus.con) {
+            if (thisClass?.featBonus && thisClass?.featBonus?.con) {
               attributes.con.feat += thisClass.featBonus.con
             }
           }
@@ -4373,49 +4373,122 @@ export class Hyp3eCharacterClass {
    */
   static async applyClassTemplate(actor, classTemplate) {
     Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Applying class template to ${actor.name}:`, classTemplate);
-    // Set the class in the actor's details
-    await actor.update({ "system.details.class": classTemplate.name });
+    // Set the class & baseClass in the actor's details
+    await actor.update({ 
+      "system.details.class": classTemplate.name, 
+      "system.baseClass": classTemplate.system.baseClass
+    });
+
+    // Clone the actor's system data to hold data for batch update
+    let actorData = foundry.utils.deepClone(actor.system);
 
     // Roll the attributes for the actor and ensure they meet class requirements
-    const attributes = await this.rollAttributesForClass(actor);
-    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Attributes:`, attributes);
-    if (attributes) {
-      // Set the attributes in the actor
-      for (let [k, v] of Object.entries(attributes)) {
-        await actor.update({ system: { attributes: { [k]: { value: v } } } })
-        actor.system.attributes[k].value = v
-      }
-      const setAttrOk = await this.setAttributeMods(actor, true)
-      if (!setAttrOk) return false; // If setting attribute mods failed, exit early
-
-      const roll = new Roll(`${actor.system.hd} + ${actor.system.attributes.con.hpMod}`);
-      await roll.evaluate({ evaluateSync: true });
-      Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `HP roll result:`, roll);
-      if (roll != undefined && roll.total != undefined) {
-        await actor.update({
-          system: {
-            hp: {
-              value: roll.total,
-              max: roll.total
-            }
-          }
-        });
-        // Set the HP values in the actor
-        actor.system.hp.value = roll.total;
-        actor.system.hp.max = roll.total;
-      } else {
-        Hyp3eLogger.error("Hyp3eCharacterClass applyClassTemplate", `HP roll failed to evaluate properly.`);
-        return false;
-      }
-    } else {
+    const attributes = await this.rollAttributesForClass(actor, classTemplate);
+    if (!attributes) {
       Hyp3eLogger.error("Hyp3eCharacterClass applyClassTemplate", `Attributes roll failed.`);
       return false;
     }
+    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Attributes:`, attributes);
+
+    // Set the attributes in the actor
+    for (let [k, v] of Object.entries(attributes)) {
+      actorData.attributes[k].value = v;
+    };
+
+    // Update actor attributes with the rolled values, so we can calculate the attribute modifiers
+    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Updating actor attributes...`, actorData.attributes); 
+    await actor.update({ "system.attributes": actorData.attributes });
+
+    // Now we update all the data fields are don't need to be rolled, but are set by the class template
+    await actor.update({
+      system: {
+        hd: classTemplate.system.levelAdvancement["1"].hpRoll,
+        atkRate: classTemplate.system.atkRate,
+        fa: classTemplate.system.levelAdvancement["1"].fa,
+        fightingAbility: {
+          value: classTemplate.system.levelAdvancement["1"].fa
+        },
+        ca: classTemplate.system.levelAdvancement["1"].ca,
+        castingAbility: {
+          value: classTemplate.system.levelAdvancement["1"].ca
+        },
+        ta: classTemplate.system.levelAdvancement["1"].ta,
+        turningAbility: {
+          value: classTemplate.system.levelAdvancement["1"].ta
+        },
+        saves: {
+          base: {
+            value: classTemplate.system.saves.base,
+            curr: classTemplate.system.saves.base
+          },
+          death: {
+            value: classTemplate.system.saves.death,
+            curr: classTemplate.system.saves.death
+          },
+          device: {
+            value: classTemplate.system.saves.device,
+            curr: classTemplate.system.saves.device
+          },
+          transformation: {
+            value: classTemplate.system.saves.transformation,
+            curr: classTemplate.system.saves.transformation
+          },
+          avoidance: {
+            value: classTemplate.system.saves.avoidance,
+            curr: classTemplate.system.saves.avoidance
+          },
+          sorcery: {
+            value: classTemplate.system.saves.sorcery,
+            curr: classTemplate.system.saves.sorcery
+          }
+        },
+        spellcaster: classTemplate.system.spellLists && classTemplate.system.spellLists.length > 0 ? true : false,
+        spellList: classTemplate.system.spellLists && classTemplate.system.spellLists.length > 0 ? classTemplate.system.spellLists[0] : "",
+        spellList2: classTemplate.system.spellLists && classTemplate.system.spellLists.length > 1 ? classTemplate.system.spellLists[1] : "",
+        unskilled: classTemplate.system.unskilled,
+        proficiencies: {
+          class: classTemplate.system.weaponProficiencies.favoredWeapons + (classTemplate.system.weaponProficiencies.exceptions && classTemplate.system.weaponProficiencies.exceptions != "" ? ` *except* ${classTemplate.system.weaponProficiencies.exceptions}` : ""),
+        }
+      }
+    });
+
+    // Delete actorData and re-clone it so we can continue updating more properties
+    actorData = null;
+    actorData = foundry.utils.deepClone(actor.system);
+    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Actor data after update:`, actorData);
+
+    // Time to make one more roll, for starting HP
+    const roll = new Roll(`${classTemplate.system.levelAdvancement["1"].hpRoll} + ${actorData.attributes.con.hpMod}`);
+    await roll.evaluate({ evaluateSync: true });
+    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `HP roll result:`, roll);
+    if (roll == undefined || roll.total == undefined) {
+      Hyp3eLogger.error("Hyp3eCharacterClass applyClassTemplate", `HP roll failed to evaluate properly.`);
+      return false;
+    }
+    await actor.update({
+      system: {
+        hp: {
+          value: roll.total,
+          max: roll.total
+        }
+      }
+    });
+
+    // Roll starting gold & update the actor's money
+    const rollFormula = classTemplate.system.startingPack.gold;
+    const gpRoll = new Roll(rollFormula);
+    await gpRoll.roll();
+    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Rolled ${gpRoll.total} gold for ${classTemplate.name} using formula ${rollFormula}.`);
+    const gold = gpRoll.total;
+    // Last update before we start adding child documents
+    await actor.update({ "system.money.gp.value": gold });
+
 
     // Check to see if the Items directory has the class abilities/features that we need.
     // Alternatively, we can also check for compendia with class abilities.
     const abilities = await this.getClassAbilities({
       actor: actor,
+      classTemplate: classTemplate,
       itemType: "feature",
       folderNames: ["features", "abilities", "class features", "class abilities", "class abilities & features"],
       abilitiesKey: "abilities"
@@ -4430,6 +4503,7 @@ export class Hyp3eCharacterClass {
     // Start with armor...
     const armorItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: classTemplate,
       itemType: "armor",
       folderNames: ["armor", "armour", "armor & shields", "armour & shields"],
       packKey: "armour"
@@ -4442,6 +4516,7 @@ export class Hyp3eCharacterClass {
     // Next we do weapons...
     const weaponItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: classTemplate,
       itemType: "weapon",
       folderNames: ["weapons", "melee", "missile"],
       packKey: "weapons"
@@ -4454,6 +4529,7 @@ export class Hyp3eCharacterClass {
     // Next we do all the equipment items...
     const generalItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: classTemplate,
       itemType: "item",
       folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items", "weapons", "ammunition"],
       packKey: "equipment - general"
@@ -4464,6 +4540,7 @@ export class Hyp3eCharacterClass {
     }
     const provisionItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: classTemplate,
       itemType: "item",
       folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
       packKey: "equipment - provisions"
@@ -4474,6 +4551,7 @@ export class Hyp3eCharacterClass {
     }
     const religiousItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: classTemplate,
       itemType: "item",
       folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
       packKey: "equipment - religious"
@@ -4481,14 +4559,6 @@ export class Hyp3eCharacterClass {
     if (religiousItems && religiousItems.length > 0) {
       // Add the items to the actor's inventory
       await actor.createEmbeddedDocuments("Item", religiousItems);
-    }
-
-    // Get starting gold
-    const gold = await this.getStartingGoldForClass(actor);
-    if (gold && gold > 0) {
-      // Add the gold to the actor's inventory
-      await actor.update({"system.money.gp.value": gold});
-      actor.system.money.gp.value = gold;
     }
 
     // All good? Disable the quick-create button so it can't be used
@@ -4518,7 +4588,7 @@ export class Hyp3eCharacterClass {
         await actor.update({ system: { attributes: { [k]: { value: v } } } })
         actor.system.attributes[k].value = v
       }
-      const setAttrOk = await this.setAttributeMods(actor, true)
+      const setAttrOk = await this.setAttributeMods(actor, null, true)
       if (!setAttrOk) return false; // If setting attribute mods failed, exit early
 
       const roll = new Roll(`${actor.system.hd} + ${actor.system.attributes.con.hpMod}`);
@@ -4549,6 +4619,7 @@ export class Hyp3eCharacterClass {
     // Alternatively, we can also check for compendia with class abilities.
     const abilities = await this.getClassAbilities({
       actor: actor,
+      classTemplate: null,
       itemType: "feature",
       folderNames: ["features", "abilities", "class features", "class abilities", "class abilities & features"],
       abilitiesKey: "abilities"
@@ -4563,6 +4634,7 @@ export class Hyp3eCharacterClass {
     // Start with armor...
     const armorItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: null,
       itemType: "armor",
       folderNames: ["armor", "armour", "armor & shields", "armour & shields"],
       packKey: "armour"
@@ -4575,6 +4647,7 @@ export class Hyp3eCharacterClass {
     // Next we do weapons...
     const weaponItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: null,
       itemType: "weapon",
       folderNames: ["weapons", "melee", "missile"],
       packKey: "weapons"
@@ -4587,6 +4660,7 @@ export class Hyp3eCharacterClass {
     // Next we do all the equipment items...
     const generalItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: null,
       itemType: "item",
       folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items", "weapons", "ammunition"],
       packKey: "equipment - general"
@@ -4597,6 +4671,7 @@ export class Hyp3eCharacterClass {
     }
     const provisionItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: null,
       itemType: "item",
       folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
       packKey: "equipment - provisions"
@@ -4607,6 +4682,7 @@ export class Hyp3eCharacterClass {
     }
     const religiousItems = await this.getDefaultItemsForClass({
       actor: actor,
+      classTemplate: null,
       itemType: "item",
       folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
       packKey: "equipment - religious"
@@ -4636,11 +4712,11 @@ export class Hyp3eCharacterClass {
    * @returns {Object} - Returns an object with the rolled attributes
    */
   // static async rollAttributesForClass(actor, dataset) {
-  static async rollAttributesForClass(actor) {
+  static async rollAttributesForClass(actor, classTemplate = null) {
     const charClass = actor.system.details.class;
     Hyp3eLogger.info("Hyp3eCharacterClass rollAttributesForClass", `Class to roll:`, charClass);
-    // Get the class attribute requirements
-    let classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+    // If no template was provided, get the class attribute requirements
+    const classData = classTemplate.system || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
     if (!classData) {
       Hyp3eLogger.error("Hyp3eCharacterClass rollAttributesForClass", `Class data not found for class ${charClass}!`);
       return null;
@@ -4653,11 +4729,11 @@ export class Hyp3eCharacterClass {
     let metReqs = false;
     let attributes = {};
     while (!metReqs) {
-      attributes = await this._rollAttributes(actor);
+      attributes = await this._rollAttributes(actor, classData);
       if (rollFormula == "4d6dl") {   // Method III: Arrange/optimize rolls for class
-        attributes = this._optimizeAttributesForClass(charClass, attributes);
+        attributes = this._optimizeAttributesForClass(classData, attributes);
       }
-      metReqs = await this._checkAttrRequirements(charClass, attributes);
+      metReqs = await this._checkAttrRequirements(classData, attributes);
       if (metReqs) {
         Hyp3eLogger.info("Hyp3eCharacterClass rollAttributesForClass", `Character meets class requirements for ${charClass}, attributes rolled:`, attributes);
       } else {
@@ -4668,15 +4744,15 @@ export class Hyp3eCharacterClass {
     return attributes;
   }
 
-  static async _rollAttributes(actor) {
+  static async _rollAttributes(actor, classData) {
     const rollFormula = game.settings.get(game.system.id, "quickCreateChars")
     Hyp3eLogger.info("Hyp3eCharacterClass _rollAttributes", `Rolling attributes using formula ${rollFormula}...`);
     // Just roll and return the attributes
     let attributes = {};
     if (rollFormula === "4d6dl,3d6") {
       // Special case: Roll 4d6 drop lowest for prime attributes; 3d6 for non-primes
-      const classData = this.classData[actor.system.details.class] || CONFIG.HYP3E.customClassData[actor.system.details.class];
-      const primeAttrs = Object.keys(classData.attrReqs);
+      // const classData = this.classData[actor.system.details.class] || CONFIG.HYP3E.customClassData[actor.system.details.class];
+      const primeAttrs = Object.keys(classData.attrReqs).filter( key => classData.attrReqs[key] !== null && classData.attrReqs[key] !== undefined);
       for (const attr of Object.keys(actor.system.attributes)) {
         let roll;
         if (primeAttrs.includes(attr)) {
@@ -4701,14 +4777,14 @@ export class Hyp3eCharacterClass {
     return attributes;
   }
 
-  static _optimizeAttributesForClass(charClass, attributes) {
-    const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+  static _optimizeAttributesForClass(classData, attributes) {
+    // const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
     if (!classData) {
-      Hyp3eLogger.error("Hyp3eCharacterClass _optimizeAttributesForClass", `Class data not found for class ${charClass}!`);
+      Hyp3eLogger.error("Hyp3eCharacterClass _optimizeAttributesForClass", `Class data not found for class ${classData.realName}!`);
       return attributes;
     }
-    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `Optimizing attributes for ${charClass} with rolls:`, attributes);
-    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${charClass} attribute requirements:`, classData.attrReqs);
+    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `Optimizing attributes for ${classData.realName} with rolls:`, attributes);
+    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${classData.realName} attribute requirements:`, classData.attrReqs);
 
     // Clone to avoid mutation
     const optimizedAttributes = {};
@@ -4724,7 +4800,7 @@ export class Hyp3eCharacterClass {
       return classData.attrReqs[b] - classData.attrReqs[a];
     });
 
-    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${charClass} prime attributes:`, primeReqsSorted);
+    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${classData.realName} prime attributes:`, primeReqsSorted);
 
     // Take top N values for prime attributes
     const topValues = [...rolledValues]
@@ -4744,30 +4820,30 @@ export class Hyp3eCharacterClass {
       const idx = remainingValues.indexOf(val);
       if (idx !== -1) remainingValues.splice(idx, 1);
     });
-    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${charClass} remaining attribute values without primes:`, remainingValues);
+    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${classData.realName} remaining attribute values without primes:`, remainingValues);
 
     // Assign remaining values to non-primes, in original roll order
     const nonPrimes = attributeOrder.filter(a => !classPrimes.includes(a));
     nonPrimes.forEach((attr, i) => {
       optimizedAttributes[attr] = remainingValues[i];
     });
-    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${charClass} assigned attributes:`, optimizedAttributes);
+    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${classData.realName} assigned attributes:`, optimizedAttributes);
     return optimizedAttributes;
   }
 
-  static async _checkAttrRequirements(charClass, attributes) {
-    const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+  static async _checkAttrRequirements(classData, attributes) {
+    // const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
     if (!classData) {
-      Hyp3eLogger.error("Hyp3eCharacterClass _checkAttrRequirements", `Class data not found for class ${charClass}!`);
+      Hyp3eLogger.error("Hyp3eCharacterClass _checkAttrRequirements", `Class data not found for class ${classData.realName}!`);
       return false;
     }
     Hyp3eLogger.info("Hyp3eCharacterClass _checkAttrRequirements", `Checking attribute list:`, attributes);
 
     // Check if the character meets the attribute requirements
     for (const [attr, minValue] of Object.entries(classData.attrReqs)) {
-      Hyp3eLogger.info("Hyp3eCharacterClass _checkAttrRequirements", `Checking ${attr} requirement for class ${charClass}: Required: ${minValue}, Rolled: ${attributes[attr]}`);
+      Hyp3eLogger.info("Hyp3eCharacterClass _checkAttrRequirements", `Checking ${attr} requirement for class ${classData.realName}: Required: ${minValue}, Rolled: ${attributes[attr]}`);
       if (attributes[attr] < minValue) {
-        Hyp3eLogger.info("Hyp3eCharacterClass _checkAttrRequirements", `Character does not meet ${attr} requirement for class ${charClass}. Required: ${minValue}, Rolled: ${attributes[attr]}`);
+        Hyp3eLogger.info("Hyp3eCharacterClass _checkAttrRequirements", `Character does not meet ${attr} requirement for class ${classData.realName}. Required: ${minValue}, Rolled: ${attributes[attr]}`);
         return false;
       }
     }
@@ -4782,9 +4858,9 @@ export class Hyp3eCharacterClass {
    * @param {string} abilitiesKey - The key for the abilities list in the class data
    * @returns {Promise<Array>} - Returns a promise that resolves to an array of abilities
    */
-  static async getClassAbilities({ actor, itemType, folderNames, abilitiesKey }) {
+  static async getClassAbilities({ actor, classTemplate, itemType, folderNames, abilitiesKey }) {
     const charClass = actor.system.details.class;
-    const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+    const classData = classTemplate.system || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
 
     if (!classData) {
       Hyp3eLogger.error("Hyp3eCharacterClass getClassAbilities", `Class data not found for class ${charClass}!`);
@@ -4894,9 +4970,9 @@ export class Hyp3eCharacterClass {
    * @param {string} packKey - The key for the starting pack in the class data
    * @returns {Promise<Array>} - Returns a promise that resolves to an array of armor items
    */
-  static async getDefaultItemsForClass({ actor, itemType, folderNames, packKey }) {
+  static async getDefaultItemsForClass({ actor, classTemplate, itemType, folderNames, packKey }) {
     const charClass = actor.system.details.class;
-    const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+    const classData = classTemplate.system || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
 
     if (!classData) {
       Hyp3eLogger.error("Hyp3eCharacterClass getDefaultItemsForClass", `Class data not found for class ${charClass}!`);
@@ -5210,9 +5286,12 @@ export class Hyp3eCharacterClass {
 
   /**
    * Set or reset all attribute modifiers
-   * @param {*} dataset 
+   * @param {*} actor - The actor object to set the attribute modifiers for
+   * @param {*} classTemplate - The class template to use for setting the attribute modifiers (optional)
+   * @param {boolean} skipPrompt - Whether to skip the confirmation dialog (default: false)
+   * @returns {boolean} - Returns true if the attribute modifiers were set successfully, false otherwise 
    */
-  static async setAttributeMods(actor, skipPrompt = false) {
+  static async setAttributeMods(actor, classTemplate = null, skipPrompt = false) {
     // let actor = game.actors.get(dataset.actorId)
     if (!actor) {
       // Hyp3eLogger.error("Hyp3eCharacterClass setAttributeMods", `Actor not found for id ${dataset.actorId}`)
@@ -5249,7 +5328,7 @@ export class Hyp3eCharacterClass {
       // Override label if character class selected
       label = `<div><b>Values for ${data.details.class} updated...</b></div>`
       Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Setting ${data.details.class} hit die...`);
-      thisClass = this.classData[data.details.class] || CONFIG.HYP3E.customClassData[data.details.class];
+      thisClass = classTemplate.system ||this.classData[data.details.class] || CONFIG.HYP3E.customClassData[data.details.class];
       Hyp3eLogger.info("Hyp3eCharacterClass setAttributeMods", `Class Data for ${data.details.class}:`, thisClass);
       data.hd = thisClass.hitDie
       content += `<li>Hit Die: ${thisClass.hitDie}</li>`

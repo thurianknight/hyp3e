@@ -175,8 +175,10 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     this.weightCarried = 0;
 
     // Get character base class, used for crit hit & crit miss tables
-    const customClassData = this.getSetting("customClassData");
-    this.baseClass = Hyp3eCharacterClass.classData[this.details.class]?.baseClass ?? customClassData[this.details.class]?.baseClass ?? "npc";
+    if (!this.baseClass || this.baseClass == "") {
+      const customClassData = this.getSetting("customClassData");
+      this.baseClass = Hyp3eCharacterClass.classData[this.details.class]?.baseClass ?? customClassData[this.details.class]?.baseClass ?? "npc";
+    }
 
     Hyp3eLogger.info("Hyp3eCharacter prepareBaseData", `Base data prepared for character ${this.parent.name}:`, this);
   }
@@ -187,10 +189,6 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
    */
   prepareDerivedData() {
     super.prepareDerivedData?.();
-
-    // Get character base class, used for crit hit & crit miss tables
-    // const customClassData = this.getSetting("customClassData");
-    // this.baseClass = Hyp3eCharacterClass.classData[this.details.class]?.baseClass ?? customClassData[this.details.class]?.baseClass ?? "npc";
 
     // Auto-calculate attribute modifiers if configuration is enabled
     const autoCalcAttrMods = this.getSetting("autoCalcAttrMods");

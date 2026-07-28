@@ -14,9 +14,28 @@ export default class Hyp3eClassTemplate extends Hyp3eItemBase {
     // schema.className = new fields.StringField({ initial: "" });
     schema.baseClass = new fields.StringField({ initial: "" });
     schema.hitDie = new fields.StringField({ initial: "" });
-    schema.attrReqs = new fields.SchemaField({});
-    schema.xpBonusReq = new fields.SchemaField({});
-    schema.featBonus = new fields.SchemaField({});
+    schema.attrReqs = new fields.SchemaField({
+      str: new fields.NumberField({ nullable: true, initial: null }),
+      dex: new fields.NumberField({ nullable: true, initial: null }),
+      con: new fields.NumberField({ nullable: true, initial: null }),
+      int: new fields.NumberField({ nullable: true, initial: null }),
+      wis: new fields.NumberField({ nullable: true, initial: null }),
+      cha: new fields.NumberField({ nullable: true, initial: null })
+    });
+    schema.xpBonusReq = new fields.SchemaField({
+      str: new fields.NumberField({ nullable: true, initial: null }),
+      dex: new fields.NumberField({ nullable: true, initial: null }),
+      con: new fields.NumberField({ nullable: true, initial: null }),
+      int: new fields.NumberField({ nullable: true, initial: null }),
+      wis: new fields.NumberField({ nullable: true, initial: null }),
+      cha: new fields.NumberField({ nullable: true, initial: null })
+    });
+    schema.featBonus = new fields.SchemaField({
+      str: new fields.NumberField({ nullable: true, initial: null }),
+      dex: new fields.NumberField({ nullable: true, initial: null }),
+      con: new fields.NumberField({ nullable: true, initial: null }),
+    });
+
     schema.saves = new fields.SchemaField({
       base: new fields.NumberField({ nullable: true, initial: 16 }),
       death: new fields.NumberField({ nullable: true, initial: 16 }),
@@ -25,11 +44,15 @@ export default class Hyp3eClassTemplate extends Hyp3eItemBase {
       avoidance: new fields.NumberField({ nullable: true, initial: 16 }),
       sorcery: new fields.NumberField({ nullable: true, initial: 16 }),
     });
+
     schema.unskilled = new fields.NumberField({ nullable: true, initial: 0 });
     schema.weaponProficiencies = new fields.SchemaField({
       favoredWeapons: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
       exceptions: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
     });
+
+    schema.spellLists = new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] });
+
     schema.levelAdvancement = new fields.SchemaField({
       1: new fields.SchemaField({
         xp: new fields.NumberField({ nullable: false, initial: 0 }), 
@@ -116,14 +139,33 @@ export default class Hyp3eClassTemplate extends Hyp3eItemBase {
         ta: new fields.NumberField({ nullable: true, initial: null }),
       }),
     });
-    schema.abilities = new fields.ArrayField(new fields.SchemaField({}), { initial: [] });
+
+    schema.abilities = new fields.ArrayField(new fields.SchemaField({ 
+      name: new fields.StringField({ initial: "" }) 
+    }), { initial: [] });
+
     schema.startingPack = new fields.SchemaField({
       gold: new fields.StringField({ initial: "1d4+1" }),
-      armour: new fields.ArrayField(new fields.SchemaField({}), { initial: [] }),
-      weapons: new fields.ArrayField(new fields.SchemaField({}), { initial: [] }),
-      "equipment - general": new fields.ArrayField(new fields.SchemaField({}), { initial: [] }),
-      "equipment - provisions": new fields.ArrayField(new fields.SchemaField({}), { initial: [] }),
-      "equipment - religious": new fields.ArrayField(new fields.SchemaField({}), { initial: [] }),
+      armour: new fields.ArrayField(new fields.SchemaField({
+        name: new fields.StringField({ initial: "" }),
+        quantity: new fields.NumberField({ nullable: false, initial: 1 }),
+      }), { initial: [] }),
+      weapons: new fields.ArrayField(new fields.SchemaField({
+        name: new fields.StringField({ initial: "" }),
+        quantity: new fields.NumberField({ nullable: false, initial: 1 }),
+      }), { initial: [] }),
+      "equipment - general": new fields.ArrayField(new fields.SchemaField({
+        name: new fields.StringField({ initial: "" }),
+        quantity: new fields.NumberField({ nullable: false, initial: 1 }),
+      }), { initial: [] }),
+      "equipment - provisions": new fields.ArrayField(new fields.SchemaField({
+        name: new fields.StringField({ initial: "" }),
+        quantity: new fields.NumberField({ nullable: false, initial: 1 }),
+      }), { initial: [] }),
+      "equipment - religious": new fields.ArrayField(new fields.SchemaField({
+        name: new fields.StringField({ initial: "" }),
+        quantity: new fields.NumberField({ nullable: false, initial: 1 }),
+      }), { initial: [] }),
     });
 
     return schema;

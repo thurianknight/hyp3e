@@ -2,10 +2,10 @@
   "id": "hyp3e",
   "title": "Hyperborea 3rd Edition",
   "description": "The Hyperborea 3rd Edition system for FoundryVTT!",
-  "version": "3.8.3",
+  "version": "3.9.0",
   "compatibility": {
     "minimum": "13",
-    "verified": "14.364",
+    "verified": "14.365",
     "maximum": "14"
   },
   "authors": [
@@ -43,6 +43,21 @@
       "name": "English",
       "path": "lang/en.json",
       "flags": {}
+    }
+  ],
+  "packs": [
+    {
+      "name": "hyp3e-character-classes",
+      "label": "Character Classes",
+      "path": "packs/classes",
+      "type": "Item",
+      "system": "hyp3e",
+      "ownership": {
+        "PLAYER": "NONE",
+        "TRUSTED": "NONE",
+        "ASSISTANT": "OWNER",
+        "GAMEMASTER": "OWNER"
+      }
     }
   ],
   "documentTypes": {
