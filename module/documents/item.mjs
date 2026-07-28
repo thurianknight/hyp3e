@@ -478,7 +478,7 @@ export class Hyp3eItem extends Item {
   _renderItemProperties(item, itemData, actorData) {
     const parts = [];
 
-    if (item.type === 'feature') parts.push(this._renderFeatureSection(itemData));
+    if (item.type === 'feature') parts.push(this._renderFeatureSection(itemData, item, actorData));
     if (item.type === 'weapon') parts.push(this._renderWeaponSection(itemData, item, actorData));
     if (item.type === 'spell') parts.push(this._renderSpellSection(itemData, item, actorData));
     if (item.type === 'item') parts.push(this._renderItemCheckSection(itemData));
@@ -488,11 +488,13 @@ export class Hyp3eItem extends Item {
     return parts.join("");
   }
 
-  _renderFeatureSection(itemData) {
+  _renderFeatureSection(itemData, item, actorData) {
+    const parts = [];
+    parts.push(this._renderDamageRoll(itemData, item, actorData));
     if (itemData.formula && itemData.tn) {
-      return `<p>Ability Check: ${itemData.formula} equal or under ${itemData.tn}</p>`;
+      parts.push(`<p>Ability Check: ${itemData.formula} equal or under ${itemData.tn}</p>`);
     }
-    return "";
+    return parts.join("");
   }
 
   _renderWeaponSection(itemData, item, actorData) {
