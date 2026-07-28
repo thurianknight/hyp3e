@@ -7,6 +7,10 @@ const npcItemsTemplateUrl = new URL(
   "../templates/actor/parts/section-npc-items.hbs",
   import.meta.url
 );
+const featureSidebarTemplateUrl = new URL(
+  "../templates/item/parts/sidebar-feature.hbs",
+  import.meta.url
+);
 
 test("Features with damage render a damage roll in chat", async () => {
   const source = await readFile(itemDocumentUrl, "utf8");
@@ -36,5 +40,20 @@ test("NPC Feature rows identify damaging Features with a damage action", async (
   assert.match(
     featuresSection,
     /data-action="displayItem"[\s\S]*?HYP3E\.item\.rollDamage[\s\S]*?fa-droplet/
+  );
+});
+
+test("Feature item sheets expose damage formula and damage type controls", async () => {
+  const template = await readFile(featureSidebarTemplateUrl, "utf8");
+
+  assert.match(
+    template,
+    /<input[^>]+name="system\.damage"[^>]+value="{{system\.damage}}"/,
+    "Feature item sheets must provide an editable damage formula"
+  );
+  assert.match(
+    template,
+    /data-action="setDmgTypes"/,
+    "Feature item sheets must provide the shared damage-type selector"
   );
 });
