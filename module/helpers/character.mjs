@@ -907,7 +907,7 @@ export class Hyp3eCharacterClass {
       },
       "unskilled": -4,
       "weaponProficiencies": {
-        "favoredWeapons": "axe (hand), dagger, dart, dart, pick (horseman's), quarterstaff, spear (short)",
+        "favoredWeapons": "axe (hand), dagger, dart, pick (horseman's), quarterstaff, spear (short)",
         "exceptions": ""
       },
       "levelAdvancement": {
@@ -2736,7 +2736,7 @@ export class Hyp3eCharacterClass {
       },
       "unskilled": -4,
       "weaponProficiencies": {
-        "favoredWeapons": "dagger, dart, falcata, morning star, quarterstaff quarterstaff, scimitar (short, long)",
+        "favoredWeapons": "dagger, dart, falcata, morning star, quarterstaff, scimitar (short, long)",
         "exceptions": ""
       },
       "levelAdvancement": {
