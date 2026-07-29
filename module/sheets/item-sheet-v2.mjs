@@ -114,7 +114,15 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     context.isGM = game.user.isGM
     Hyp3eLogger.info("_prepareContext", `Preparing Item Sheet for type "${this.item.type}"...`, { item: this.item, options })
 
-    // Retrieve the actor's roll data for TinyMCE editors.
+    // For class templates, build baseClass names and spell list names
+    if (this.item.type == "classTemplate") {
+      const baseClassNames = ["cleric", "fighter", "magician", "thief"];
+      context.baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
+      const spellcasters = ["Cleric", "Druid", "Magician", "Cryomancer", "Illusionist", "Necromancer", "Pyromancer", "Witch"];
+      context.spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
+    }
+
+    // Retrieve the owner-actor's roll data for TinyMCE editors.
     context.rollData = this.item.actor?.getRollData() ?? {};
     Hyp3eLogger.info("_prepareContext", `Roll Data in ItemSheet:`, context.rollData);
 

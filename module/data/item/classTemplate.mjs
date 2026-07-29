@@ -51,6 +51,7 @@ export default class Hyp3eClassTemplate extends Hyp3eItemBase {
       exceptions: new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] }),
     });
 
+    schema.spellcaster = new fields.BooleanField({ initial: true });
     schema.spellLists = new fields.ArrayField(new fields.StringField({ initial: "" }), { initial: [] });
 
     schema.levelAdvancement = new fields.SchemaField({
