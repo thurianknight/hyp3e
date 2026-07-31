@@ -463,6 +463,17 @@
     margin: 1px 2px;
 }
 
+/* Button styles */
+.hyp3e button.button-narrow {
+  width: 40px;
+  max-width: 80px;
+  margin: 2px 2px;
+}
+.hyp3e button.button-wide {
+  width: 100%;
+  margin: 2px 2px;
+}
+
 /* Toggle button/icons that go dim when false or unselected */
 .hyp3e .not-selected {
   opacity: 0.3;

@@ -149,7 +149,12 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       }
       context.savingThrows = savingThrows;
 
-      const armorNames = await findItemsByFolderOrCompendiumName("armor, armour", "armor", "magic, magical");
+      const abilities = [...this.item.system.abilities] || [""];
+      context.abilities = Object.fromEntries(abilities.map(n => [n, n]));
+
+      const armorNames = await findItemsByFolderOrCompendiumName("armor, armour, shield, shields", "armor", "magic, magical");
+      const shieldNames = await findItemsByFolderOrCompendiumName("armor, armour, shield, shields", "shield", "magic, magical");
+      armorNames.push(...shieldNames);
       context.armorOptions = Object.fromEntries(armorNames.map(n => [n, n]));
 
       const weaponNames = await findItemsByFolderOrCompendiumName("weapons, melee, missile, ammunition", "weapon", "magic, magical");

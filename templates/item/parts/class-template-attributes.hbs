@@ -46,3 +46,15 @@
           </fieldset>
       </div>
       <hr class="plain-hr"/>
+      <fieldset>
+        <legend title="{{localize 'HYP3E.classEditor.classFeaturesNote'}}">{{localize 'HYP3E.classEditor.classFeatures'}}</legend>
+        <div class="flex">
+          {{#each system.abilities}}
+          <div class="flex flexrow flex-group-center form-group container">
+              <input class="input-big" type="text" name="system.abilities.{{@index}}.name" value="{{this.name}}" placeholder="{{localize 'HYP3E.classEditor.featureNamePlaceholder'}}" /><br />
+              <button type="button" class="button-narrow" data-action="deleteFeature" data-index="{{@index}}"><i class="fas fa-trash"></i> {{localize 'HYP3E.classEditor.delete'}}</button>
+          </div>
+          {{/each}}
+        </div>
+        <button type="button" data-action="addFeature"><i class="fas fa-plus"></i> {{localize 'HYP3E.classEditor.add'}}</button>
+      </fieldset>
