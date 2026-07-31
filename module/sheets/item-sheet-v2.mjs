@@ -3,6 +3,7 @@ import { Hyp3eLogger } from "../helpers/logger.mjs";
 import {onManageActiveEffectV2, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 import HYP3EItemSetAnnotations from "../apps/item-set-annotations.mjs";
 import HYP3EItemSetDmgTypes from "../apps/item-set-dmg-types.mjs";
+import { findItemsByFolderOrCompendiumName } from "../helpers/folders-and-compendia.mjs"
 
 const { HandlebarsApplicationMixin } = foundry.applications.api
 const { ItemSheetV2 } = foundry.applications.sheets
@@ -39,7 +40,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       resizable: true,
     },
     actions: {
-      // This is where we will define the sheet's clickable actions
+      // Item-sheet clickable actions
       editImage: Hyp3eItemSheetV2._onEditImage,
       toggleIdentified: Hyp3eItemSheetV2._toggleIdentified,
       toggleWeaponType: Hyp3eItemSheetV2._toggleWeaponType,
@@ -52,10 +53,17 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       setDmgTypes: Hyp3eItemSheetV2._openDmgTypesApp,
       setAnnotations: Hyp3eItemSheetV2._openAnnotationsApp,
       dropItemDescription: Hyp3eItemSheetV2._toggleItemSummary,
+      // ActiveEffect actions
       createEffect: Hyp3eItemSheetV2._onManageActiveEffect,
       editEffect: Hyp3eItemSheetV2._onManageActiveEffect,
       deleteEffect: Hyp3eItemSheetV2._onManageActiveEffect,
       toggleEffect: Hyp3eItemSheetV2._onManageActiveEffect,
+      // Class template actions
+      toggleSpells: Hyp3eItemSheetV2._toggleSpells,
+      addItem: Hyp3eItemSheetV2._addItem,
+      deleteItem: Hyp3eItemSheetV2._deleteItem,
+      addFeature: Hyp3eItemSheetV2._addFeature,
+      deleteFeature: Hyp3eItemSheetV2._deleteFeature,
     },
   }
 
@@ -95,6 +103,14 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       template: `${HYP3E.templatePath}/item/parts/tab-item-effects.hbs`,
       scrollable: ["", ".main-content"],
     },
+    classAdvancement: {
+      template: `${HYP3E.templatePath}/item/parts/tab-class-advancement.hbs`,
+      scrollable: ["", ".main-content"],
+    },
+    classEquipment: {
+      template: `${HYP3E.templatePath}/item/parts/tab-class-equipment.hbs`,
+      scrollable: ["", ".main-content"],
+    }
   }
 
   // ===========================================================================
@@ -120,6 +136,33 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       context.baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
       const spellcasters = ["Cleric", "Druid", "Magician", "Cryomancer", "Illusionist", "Necromancer", "Pyromancer", "Witch"];
       context.spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
+      context.spells0 = this.item.system.spellLists[0] ?? "";
+      context.spells1 = this.item.system.spellLists[1] ?? "";
+      const saves = CONFIG.HYP3E.saves;
+      delete saves["base"];
+      const savingThrows = {};
+      for (const save of Object.keys(saves)) {
+        savingThrows[save] = {
+          label: game.i18n.localize(`HYP3E.saves.${save}.name`),
+          value: this.item.system.saves?.[save] ?? 16,
+        };
+      }
+      context.savingThrows = savingThrows;
+
+      const armorNames = await findItemsByFolderOrCompendiumName("armor, armour", "armor", "magic, magical");
+      context.armorOptions = Object.fromEntries(armorNames.map(n => [n, n]));
+
+      const weaponNames = await findItemsByFolderOrCompendiumName("weapons, melee, missile, ammunition", "weapon", "magic, magical");
+      context.weaponOptions = Object.fromEntries(weaponNames.map(n => [n, n]));
+
+      const gearNames = await findItemsByFolderOrCompendiumName("equipment, gear, general, clothing, weapons, ammunition", "item", "religious, religion, provisions, provision, food, supplies, magic, magical");
+      context.gearOptions = Object.fromEntries(gearNames.map(n => [n, n]));
+
+      const provisionNames = await findItemsByFolderOrCompendiumName("equipment, provision, provisions, food, supplies", "item", "clothing, gear, general, religious, religion, magic, magical");
+      context.provisionOptions = Object.fromEntries(provisionNames.map(n => [n, n]));
+
+      const religiousNames = await findItemsByFolderOrCompendiumName("equipment, religious, religion", "item", "clothing, gear, general, provisions, provision, food, supplies, magic, magical");
+      context.religiousOptions = Object.fromEntries(religiousNames.map(n => [n, n]));
     }
 
     // Retrieve the owner-actor's roll data for TinyMCE editors.
@@ -257,7 +300,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     tabs.tabs.push({ id: 'details', group: group });
 
     // The remaining tabs are only present if the item is identified or user is GM
-    if (isIdentified || isGM) {
+    if ((isIdentified || isGM) && this.document.type !== "classTemplate") {
       // Insert Attributes tab
       tabs.tabs.push({ id: 'attributes', group: group });
 
@@ -270,6 +313,14 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       // Insert Effects tab at the end of the list
       tabs.tabs.push({ id: 'effects', group: group });
     }
+
+    // Class templates are special!
+    if (this.document.type === "classTemplate") {
+      tabs.tabs.push({ id: 'attributes', group: group });
+      tabs.tabs.push({ id: 'classAdvancement', group: group });
+      tabs.tabs.push({ id: 'classEquipment', group: group });
+    }
+
     return tabs
   }
 
@@ -509,6 +560,87 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     if (item?.sheet) item.sheet.render(true);
   }
 
+  
+  // ===========================================================================
+  // CLASS TEMPLATE FUNCTIONS
+  // ===========================================================================
+
+  /**
+   * Toggles the spellcaster flag true/false, which controls whether the Spell Lists section is shown
+   * @param {*} event 
+   * @param {*} target
+   */
+  static async _toggleSpells(event, target) {
+    const value = target.dataset.value;
+    Hyp3eLogger.info("HYP3EItemSheetV2 _toggleSpells", `Toggle spells clicked:`, target);
+    await this.item.update({ "system.spellcaster": !this.item.system.spellcaster });
+  }
+
+  /**
+   * Add a blank class feature
+   * @param {*} event 
+   * @param {*} target 
+   * @returns 
+   */
+  static async _addFeature(event, target) {
+    const features = [...this.item.system.abilities];
+    features.push("");
+    await this.item.update({ "system.abilities": features });
+  }
+  
+  /**
+   * Delete a feature from the class features list
+   * @param {*} event 
+   * @param {*} target 
+   */
+  static async _deleteFeature(event, target) {
+      const index = parseInt(target.dataset.index);
+      const features = [...this.item.system.abilities];
+
+      // Log the delete data
+      Hyp3eLogger.info("deleteFeature", "Deleting feature:", { index });
+
+      if (!isNaN(index)) features.splice(index, 1);
+      await this.item.update({ "system.abilities": features });
+  }
+
+  /**
+   * Add a blank item to the requested items list
+   * @param {*} event 
+   * @param {*} target 
+   */
+  static async _addItem(event, target) {
+    const packName = target.dataset.pack;
+    const pack = [...this.item.system.startingPack[packName]];
+    Hyp3eLogger.info("HYP3EItemSheetV2 _addItem", `Adding new item to ${packName}:`, pack);
+
+    // Add the new item to the correct pack
+    pack.push({ name: "", quantity: 1 });
+    await this.item.update({ [`system.startingPack.${packName}`]: pack });
+  }
+
+  /**
+   * Delete an item from the requested items list
+   * @param {*} event 
+   * @param {*} target 
+   */
+  static async _deleteItem(event, target) {
+      const packName = target.dataset.pack;
+      const index = parseInt(target.dataset.index);
+      const pack = [...this.item.system.startingPack[packName]];
+
+      // Log the delete data
+      Hyp3eLogger.info("deleteItem", `Deleting item ${index} from ${packName}:`, pack);
+
+      if (!isNaN(index)) pack.splice(index, 1);
+      await this.item.update({ [`system.startingPack.${packName}`]: pack });
+  }
+
+
+  // ===========================================================================
+  // DRAG AND DROP HANDLERS
+  // ===========================================================================
+
   /**
    * Helper for drag & drop events, to get the element dataset
    * @param {*} element 
@@ -521,10 +653,6 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     }
     return element?.dataset[attribute] || null
   }
-
-  // ===========================================================================
-  // DRAG AND DROP HANDLERS
-  // ===========================================================================
 
   async _onDragStart(event) {
     event.stopPropagation();

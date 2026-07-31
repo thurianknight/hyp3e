@@ -2,7 +2,7 @@
         <div class="resource flexrow flex-group-center">
           <span class="flex-item">
             <input type="text" name="system.hitDie" value="{{system.hitDie}}" placeholder="e.g., 1d8" /><br />
-            <label for="system.hitDie">{{localize 'HYP3E.details.hitDie'}}</label>
+            <label for="system.hitDie" title="{{localize 'HYP3E.classEditor.hitDieNote'}}">{{localize 'HYP3E.details.hitDie'}}</label>
           </span>
         </div>
         <div class="resource flexrow flex-group-center">
@@ -12,7 +12,6 @@
               {{selectOptions baseClasses selected=system.baseClass localize=false}}
             </select><br />
             <label for="system.baseClass" title="{{localize 'HYP3E.classEditor.baseClassNote'}}">{{localize 'HYP3E.classEditor.baseClass'}}</label>
-            {{!-- <p style="font-style: italic;">{{localize 'HYP3E.classEditor.baseClassNote'}}</p> --}}
           </span>
         </div>
         <div class="resource flexrow flex-group-center">
@@ -32,22 +31,4 @@
             </label>
           </div>
         </div>
-      </div>
-      <div class="flexrow">
-        <fieldset>
-          <legend>{{localize 'HYP3E.classEditor.spellLists'}}</legend>
-          {{!-- <p>{{localize 'HYP3E.classEditor.spellListsNote'}}</p> --}}
-          <div class="flex flexrow flex-group-center form-group container">
-            {{#each system.spellLists}}
-            <span class="flex-item">
-              <select name="system.spellLists.{{@index}}">
-                <option value=""></option>
-                {{selectOptions @root.spellLists selected=this localize=false}}
-              </select>
-              <br />
-              <label for="system.spellLists.{{@index}}">{{localize 'HYP3E.classEditor.spellList'}} {{add @index 1}}</label>        
-            </span>
-            {{/each}}
-          </div>
-        </fieldset>
       </div>

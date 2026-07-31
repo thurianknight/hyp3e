@@ -24,12 +24,16 @@
       {{#if (eq item.type "weapon")}}
         {{> "weapon-attributes"}}
       {{/if}}
-      {{#if (eq item.type "effectTemplate")}}
-        {{> "effect-attributes"}}
-      {{/if}}
       {{!-- All physical item attributes --}}
       {{#if system.isPhysical}}
         {{> "physical-attributes"}}
+      {{/if}}
+      {{!-- Class and Effect Templates --}}
+      {{#if (eq item.type "classTemplate")}}
+        {{> "class-template-attributes"}}
+      {{/if}}
+      {{#if (eq item.type "effectTemplate")}}
+        {{> "effect-attributes"}}
       {{/if}}
   </div>
 </section>

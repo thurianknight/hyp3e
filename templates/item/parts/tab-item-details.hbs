@@ -28,6 +28,40 @@
 
         {{!-- Description --}}
         <div class="item-description">
+          {{#if system.spellcaster}}
+          <fieldset>
+            <legend title="{{localize 'HYP3E.classEditor.spellListsNote'}}">{{localize 'HYP3E.classEditor.spellLists'}}</legend>
+            <div class="flex flexrow flex-group-center form-group container">
+              <span class="flex-item">
+                <select name="system.spellLists.0">
+                  <option value=""></option>
+                  {{selectOptions @root.spellLists selected=spells0 localize=false}}
+                </select>
+                <br />
+                <label for="system.spellLists.0">{{localize 'HYP3E.classEditor.spellList'}} 1</label>        
+              </span>
+              <span class="flex-item">
+                <select name="system.spellLists.1">
+                  <option value=""></option>
+                  {{selectOptions @root.spellLists selected=spells1 localize=false}}
+                </select>
+                <br />
+                <label for="system.spellLists.1">{{localize 'HYP3E.classEditor.spellList'}} 2</label>        
+              </span>
+            </div>
+          </fieldset>
+          {{/if}}
+          <fieldset style="padding-inline-start: 5px; padding-inline-end: 5px;">
+            <legend title="{{localize 'HYP3E.classEditor.saveThrowsNote'}}">{{localize 'HYP3E.classEditor.saveThrows'}}</legend>
+            <div class="flex flexrow flex-group-center form-group container">
+              {{#each savingThrows}}
+              <span>
+                <input type="number" class="input-small" name="system.saves.{{@key}}" value="{{this.value}}" /><br />
+                <label for="system.saves.{{@key}}">{{this.label}}</label>
+              </span>
+              {{/each}}
+            </div>
+          </fieldset>
           <h3>{{localize 'HYP3E.tabs.description'}}</h3>
           {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
           {{#if isGM}}

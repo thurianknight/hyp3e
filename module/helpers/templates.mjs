@@ -39,6 +39,7 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/item/parts/sidebar-spell.hbs`,
         `${HYP3E.templatePath}/item/parts/sidebar-weapon.hbs`,
         // Item V2 partials - attributes
+        `${HYP3E.templatePath}/item/parts/class-template-attributes.hbs`,
         `${HYP3E.templatePath}/item/parts/effect-attributes.hbs`,
         `${HYP3E.templatePath}/item/parts/feature-attributes.hbs`,
         `${HYP3E.templatePath}/item/parts/item-attributes.hbs`,

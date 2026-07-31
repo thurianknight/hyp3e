@@ -1,0 +1,35 @@
+<section 
+    class="tab {{tabs.classAdvancement.cssClass}}"
+    data-tab="{{tabs.classAdvancement.id}}"
+    data-group="primary"
+>
+  <div class="main-content">
+    {{!-- Class Advancement --}}
+    <h3>{{localize 'HYP3E.classEditor.levelAdvancement'}}</h3>
+    <table>
+      <thead>
+        <tr class="level-advancement">
+          <th style="text-align:center;">{{localize 'HYP3E.details.level'}}</th>
+          <th style="text-align:left;"><span style="margin-left: 10px;">{{localize 'HYP3E.details.xp'}}</span></th>
+          <th style="text-align:center;">{{localize 'HYP3E.classEditor.hpRoll'}}</th>
+          <th style="text-align:center;">{{localize 'HYP3E.fa'}}</th>
+          <th style="text-align:center;">{{localize 'HYP3E.ca'}}</th>
+          <th style="text-align:center;">{{localize 'HYP3E.ta'}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each system.levelAdvancement}}
+        <tr class="level-advancement">
+          <td style="text-align:center;">{{@key}}</td>
+          <td><input type="number" name="system.levelAdvancement.{{@key}}.xp" value="{{this.xp}}" /></td>
+          <td><input class="input-med50" type="text" name="system.levelAdvancement.{{@key}}.hpRoll" value="{{this.hpRoll}}" /></td>
+          <td><input class="input-small" type="number" name="system.levelAdvancement.{{@key}}.fa" value="{{this.fa}}" /></td>
+          <td><input class="input-small" type="number" name="system.levelAdvancement.{{@key}}.ca" value="{{this.ca}}" /></td>
+          <td><input class="input-small" type="number" name="system.levelAdvancement.{{@key}}.ta" value="{{this.ta}}" /></td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+
+</section>

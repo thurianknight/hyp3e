@@ -138,7 +138,9 @@
             "fightingGear": "Fighting Gear",
             "treasureAll": "Items in Treasure",
             "itemTokenAbilities": "Item Details",
-            "itemTokenDescription": "Item Description"
+            "itemTokenDescription": "Item Description",
+            "classAdvancement": "Advancement",
+            "classEquipment": "Equipment"
         },
         "headers": {
             "name": "Name",
@@ -608,6 +610,7 @@
             "defaultName": "New Class",
             "classInfo": "Class Info",
             "className": "Class Name",
+            "hitDieNote": "Die used to roll hit points at each class level.",
             "baseClass": "Base Class",
             "baseClassNote": "Determines the critical hit & miss columns to use.",
             "attrReqs": "Attribute Requirements / Minimums",

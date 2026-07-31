@@ -336,6 +336,7 @@
   background-color: var(--hyp3e-color-primary-10);
   border: none;
 }
+
 .hyp3e textarea {
   font-size: 0.9em;
   resize: none;
@@ -349,6 +350,20 @@
 .hyp3e select optgroup {
   color: var(--hyp3e-input-text-color);
   background-color: var(--hyp3e-color-select-option-bg);
+}
+
+.hyp3e input.input-small {
+  text-align: center;
+  max-width: 40px;
+}
+
+.hyp3e input.input-med50 {
+  text-align: center;
+  max-width: 50px;
+}
+.hyp3e input.input-med60 {
+  text-align: center;
+  max-width: 60px;
 }
 
 /* Checkbox styles */

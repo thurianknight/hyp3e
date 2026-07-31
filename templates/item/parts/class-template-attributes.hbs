@@ -1,0 +1,48 @@
+      {{!-- Class template attributes --}}
+      <div class="resource">
+        <h3>Class Attributes</h3>
+          <fieldset>
+            <legend>{{localize 'HYP3E.classEditor.attrReqs'}}</legend>
+            <div class="flex flexrow flex-group-center form-group container">
+              {{#each system.attrReqs}}
+              <span>
+                <input type="number" class="input-small" name="system.attrReqs.{{@key}}" value="{{this}}" /><br />
+                <label for="system.attrReqs.{{@key}}">{{@key}}</label>
+              </span>
+              {{/each}}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>{{localize 'HYP3E.classEditor.xpBonusReqs'}}</legend>
+            <p>{{localize 'HYP3E.classEditor.xpBonusReqsNote'}}</p>
+            <div class="flex flexrow flex-group-center form-group container">
+              {{#each system.xpBonusReq}}
+              <span>
+                <input type="number" class="input-small" name="system.xpBonusReq.{{@key}}" value="{{this}}" /><br />
+                <label for="system.xpBonusReq.{{@key}}">{{@key}}</label>
+              </span>
+              {{/each}}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>{{localize 'HYP3E.classEditor.extrFeatReqs'}}</legend>
+            <p>{{localize 'HYP3E.classEditor.extrFeatReqsNote'}}</p>
+            <div class="flex flexrow flex-group-center form-group container">
+              <span>
+                <input type="number" class="input-small" name="system.featBonus.str" value="{{system.featBonus.str}}" /><br />
+                <label for="system.featBonus.str">{{localize 'HYP3E.attributes.str.feat'}}</label>
+              </span>
+              <span>
+                <input type="number" class="input-small" name="system.featBonus.dex" value="{{system.featBonus.dex}}" /><br />
+                <label for="system.featBonus.dex">{{localize 'HYP3E.attributes.dex.feat'}}</label>
+              </span>
+              <span>
+                <input type="number" class="input-small" name="system.featBonus.con" value="{{system.featBonus.con}}" /><br />
+                <label for="system.featBonus.con">{{localize 'HYP3E.attributes.con.feat'}}</label>
+              </span>
+            </div>
+          </fieldset>
+      </div>
+      <hr class="plain-hr"/>
