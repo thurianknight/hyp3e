@@ -1781,6 +1781,18 @@
   }
 }
 
+/* Styles for weapon proficiencies apps */
+.hyp3e.class-weapon-proficiencies .window-content, .hyp3e.class-weapon-exceptions .window-content {
+  flex: 1 1 auto;      /* take remaining space */
+  overflow-y: auto;    /* scroll if content overflows */
+  padding-right: 8px;  /* avoids scrollbar overlap */
+}
+.class-set-weapon-proficiencies {
+  ul {
+    list-style-type: none;
+  }
+}
+
 /* Styles for combat options app */
 .combat-options {
   ul {

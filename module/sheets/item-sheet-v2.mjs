@@ -5,6 +5,7 @@ import HYP3EItemSetAnnotations from "../apps/item-set-annotations.mjs";
 import HYP3EItemSetDmgTypes from "../apps/item-set-dmg-types.mjs";
 import { findItemsByFolderOrCompendiumName } from "../helpers/folders-and-compendia.mjs"
 import HYP3EClassWeaponProficiencies from "../apps/class-weapon-proficiencies.mjs";
+import HYP3EClassWeaponExceptions from "../apps/class-weapon-exceptions.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api
 const { ItemSheetV2 } = foundry.applications.sheets
@@ -18,7 +19,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
   static ITEM_ANNOTATIONS_APP = new HYP3EItemSetAnnotations();
   static ITEM_SET_DMG_TYPES_APP = new HYP3EItemSetDmgTypes();
   static WEAPONS_APP = new HYP3EClassWeaponProficiencies();
-  // static EXCEPTIONS_APP = new HYP3EClassWeaponExceptions();
+  static EXCEPTIONS_APP = new HYP3EClassWeaponExceptions();
 
   // ===========================================================================
   // ITEM SHEET SETUP
@@ -65,6 +66,8 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       toggleSpells: Hyp3eItemSheetV2._toggleSpells,
       setWeapons: Hyp3eItemSheetV2._openWeaponsApp,
       setExceptions: Hyp3eItemSheetV2._openExceptionsApp,
+      clearFavoredWeapons: Hyp3eItemSheetV2._clearFavoredWeapons,
+      clearExceptions: Hyp3eItemSheetV2._clearExceptions,
       addItem: Hyp3eItemSheetV2._addItem,
       deleteItem: Hyp3eItemSheetV2._deleteItem,
       addFeature: Hyp3eItemSheetV2._addFeature,
@@ -153,14 +156,17 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     context.isGM = game.user.isGM
     Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Preparing Item Sheet for type "${this.item.type}"...`, { item: this.item, options })
 
-    // For class templates, build baseClass names and spell list names
+    // For class templates, build baseClass names, spell list names, etc.
     if (this.item.type == "classTemplate") {
       const baseClassNames = ["cleric", "fighter", "magician", "thief"];
       context.baseClasses = Object.fromEntries(baseClassNames.map(n => [n, n.charAt(0).toUpperCase() + n.slice(1)]));
-      const spellcasters = ["Cleric", "Druid", "Magician", "Cryomancer", "Illusionist", "Necromancer", "Pyromancer", "Witch"];
+
+      // const spellcasters = ["Cleric", "Druid", "Magician", "Cryomancer", "Illusionist", "Necromancer", "Pyromancer", "Witch"];
+      const spellcasters = CONFIG.HYP3E.spellLists ? Object.values(CONFIG.HYP3E.spellLists) : [];
       context.spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
       context.spells0 = this.item.system.spellLists[0] ?? "";
       context.spells1 = this.item.system.spellLists[1] ?? "";
+
       const saves = CONFIG.HYP3E.saves;
       delete saves["base"];
       const savingThrows = {};
@@ -620,9 +626,21 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     Hyp3eItemSheetV2.WEAPONS_APP.render(true, { classTemplateUuid: this.item.uuid, focus: true });
   }
 
+  // Clear the Favoured Weapons list
+  static async _clearFavoredWeapons() {
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _clearFavoredWeapons", `Clearing Favoured Weapons list...`, { item: this.item });
+    await this.item.update({ "system.weaponProficiencies.favoredWeapons": [] });
+  }
+
   // Open the Exceptions app
   static _openExceptionsApp() {
     Hyp3eItemSheetV2.EXCEPTIONS_APP.render(true, { classTemplateUuid: this.item.uuid, focus: true });
+  }
+
+  // Clear the Exceptions list
+  static async _clearExceptions() {
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _clearExceptions", `Clearing Exceptions list...`, { item: this.item });
+    await this.item.update({ "system.weaponProficiencies.exceptions": [] });
   }
 
   /**

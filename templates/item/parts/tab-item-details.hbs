@@ -75,6 +75,13 @@
                     data-action="setWeapons">
                   <i class="fas fa-book" style="font-size: small"></i>
                 </a>
+                <a class="languages-button item-control icon-btn" 
+                    aria-label="{{localize 'HYP3E.classEditor.clearList'}}" 
+                    role="button" 
+                    data-tooltip="HYP3E.classEditor.clearList" 
+                    data-action="clearFavoredWeapons">
+                  <i class="fas fa-eraser" style="font-size: small"></i>
+                </a>
                 <textarea name="system.weaponProficiencies.favoredWeapons" disabled>{{system.weaponProficiencies.favoredWeapons}}</textarea>
               </div>
               <div class="flexrow flex-group-center">
@@ -85,6 +92,13 @@
                     data-tooltip="HYP3E.classEditor.exceptions" 
                     data-action="setExceptions">
                   <i class="fas fa-book" style="font-size: small"></i>
+                </a>
+                <a class="languages-button item-control icon-btn" 
+                    aria-label="{{localize 'HYP3E.classEditor.clearList'}}" 
+                    role="button" 
+                    data-tooltip="HYP3E.classEditor.clearList" 
+                    data-action="clearExceptions">
+                  <i class="fas fa-eraser" style="font-size: small"></i>
                 </a>
                 <input type="text" class="flex-xlarge" name="system.weaponProficiencies.exceptions" value="{{system.weaponProficiencies.exceptions}}" disabled />
               </div>

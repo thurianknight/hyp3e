@@ -276,9 +276,7 @@ Hooks.once('init', async function() {
   });
 
   Handlebars.registerHelper('ifInList', function(str, arr, options) {
-    if (!Array.isArray(arr)) {
-      return options.inverse(this);
-    }
+    console.log("ifInList helper called with str:", str, "arr:", arr);
     if (arr.includes(str)) {
       return options.fn(this)
     }
@@ -487,6 +485,15 @@ Hooks.once("ready", async function() {
     const phenotypesArray = phenotypes.split(",");
     phenotypesArray.forEach((l, i) => (CONFIG.HYP3E.phenotypes[l.trim()] = l.trim()));
     Hyp3eLogger.info("Init", "CONFIG Phenotypes:", CONFIG.HYP3E.phenotypes);
+  }
+
+  // Load Spell Lists list
+  const spellLists = game.settings.get(game.system.id, "spellLists");
+  if (spellLists != "") {
+    CONFIG.HYP3E.spellLists = {}
+    const spellListsArray = spellLists.split(",");
+    spellListsArray.forEach((l, i) => (CONFIG.HYP3E.spellLists[l.trim()] = l.trim()));
+    Hyp3eLogger.info("Init", "CONFIG Spell Lists:", CONFIG.HYP3E.spellLists);
   }
 
   // Load Weapons list

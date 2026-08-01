@@ -602,11 +602,22 @@ export function registerHyp3eConfigurations() {
         requiresReload: true,
     });
 
-    // Weapons list for fovoured weapons / proficiencies
+    // Creature Phenotypes 
+    game.settings.register(game.system.id, "spellLists", {
+        name: game.i18n.localize("HYP3E.settings.spellLists"),
+        hint: game.i18n.localize("HYP3E.settings.spellListsHint"),
+        default: "Cleric, Druid, Magician, Cryomancer, Illusionist, Necromancer, Pyromancer, Witch",
+        scope: "world",
+        type: String,
+        config: showConfigOptions,
+        requiresReload: true,
+    });
+
+    // Weapons list for favoured weapons and exceptions
     game.settings.register(game.system.id, "weapons", {
       name: game.i18n.localize("HYP3E.settings.weapons"),
       hint: game.i18n.localize("HYP3E.settings.weaponsHint"),
-      default: "Axe, Battle; Axe, Great; Axe, Hand; Blowgun; Bola; Boomerang; Bow, Long; Bow, Long, Composite; Bow, Short; Bow, Short, Composite; Cæstuses; Chain Whip; Club, Light; Club, War; Crossbow, Heavy; Crossbow, Light; Crossbow, Repeating; Dagger; Dart; Falcata; Flail, Footman's; Flail, Horseman's; Halberd; Hammer, Great; Hammer, Horseman's; Hammer, War; Hooked Throwing Knife; Javelin; Lance; Lasso; Mace, Footman's; Mace, Great; Mace, Horseman's; Morning Star; Net, Fighting; Pick, Horseman's; Pick, War; Pike; Quarterstaff; Scimitar, Long; Scimitar, Short; Scimitar, Two-handed; Sickle; Sling; Spear, Great; Spear, Long; Spear, Short; Staff, Spiked; Sword, Bastard; Sword, Broad; Sword, Long; Sword, Short; Sword, Two-handed; Tonfa; Trident, Hand; Trident, Long; Whip",
+      default: "*Any; Axe, Battle; Axe, Great; Axe, Hand; Blowgun; Bola; Boomerang; Bow, Long; Bow, Long, Composite; Bow, Short; Bow, Short, Composite; Cæstuses; Chain Whip; Club, Light; Club, War; Crossbow, Heavy; Crossbow, Light; Crossbow, Repeating; Dagger; Dart; Falcata; Flail, Footman's; Flail, Horseman's; Halberd; Hammer, Great; Hammer, Horseman's; Hammer, War; Hooked Throwing Knife; Javelin; Lance; Lasso; Mace, Footman's; Mace, Great; Mace, Horseman's; Morning Star; Net, Fighting; Pick, Horseman's; Pick, War; Pike; Quarterstaff; Scimitar, Long; Scimitar, Short; Scimitar, Two-handed; Sickle; Sling; Spear, Great; Spear, Long; Spear, Short; Staff, Spiked; Sword, Bastard; Sword, Broad; Sword, Long; Sword, Short; Sword, Two-handed; Tonfa; Trident, Hand; Trident, Long; Whip",
       scope: "world",
       type: String,
       config: showConfigOptions,

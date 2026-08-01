@@ -6,7 +6,7 @@ const {
     ApplicationV2
 } = foundry.applications.api;
 
-export default class HYP3EClassWeaponProficiencies extends HandlebarsApplicationMixin(ApplicationV2) {
+export default class HYP3EClassWeaponExceptions extends HandlebarsApplicationMixin(ApplicationV2) {
     // _highlighted;
     constructor(classTemplateUuid, options={}) {
         super(options);
@@ -18,16 +18,16 @@ export default class HYP3EClassWeaponProficiencies extends HandlebarsApplication
     // ===========================================================================
     static DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
-        id: "class-weapon-proficiencies",
-        classes: ["hyp3e", "class-weapon-proficiencies"],
+        id: "class-weapon-exceptions",
+        classes: ["hyp3e", "class-weapon-exceptions"],
         tag: "form",
         window: {
-            title: "HYP3E.classEditor.favoredWeapons",
+            title: "HYP3E.classEditor.exceptions",
             icon: "fa-book",
             contentClasses: ["standard-form"]
         },
         actions: {
-            toggleWeapon: HYP3EClassWeaponProficiencies.toggleWeapon
+            toggleWeapon: HYP3EClassWeaponExceptions.toggleWeapon
         },
         form: {
             handler: undefined,
@@ -46,7 +46,7 @@ export default class HYP3EClassWeaponProficiencies extends HandlebarsApplication
 
     static PARTS = {
         main: {
-            template: `${HYP3E.templatePath}/apps/weapon-proficiencies.hbs`
+            template: `${HYP3E.templatePath}/apps/weapon-exceptions.hbs`
         }
     }
 
@@ -59,7 +59,7 @@ export default class HYP3EClassWeaponProficiencies extends HandlebarsApplication
         const classTemplate = await fromUuid(_options.classTemplateUuid)
         if (!classTemplate) {
             const msg = `No class template found for Uuid ${_options.classTemplateUuid}!`;
-            Hyp3eLogger.warn("HYP3EClassWeaponProficiencies _prepareContext", msg)
+            Hyp3eLogger.warn("HYP3EClassWeaponExceptions _prepareContext", msg)
             ui.notifications.warn(msg)
             return
         }
@@ -86,7 +86,7 @@ export default class HYP3EClassWeaponProficiencies extends HandlebarsApplication
         const classTemplate = await fromUuid(target.dataset.classTemplateUuid)
         if (!classTemplate) {
             const msg = `No class template found for Uuid ${target.dataset.classTemplateUuid}!`
-            Hyp3eLogger.warn("HYP3EClassWeaponProficiencies toggleWeapon", msg);
+            Hyp3eLogger.warn("HYP3EClassWeaponExceptions toggleWeapon", msg);
             ui.notifications.warn(msg)
             return
         }
@@ -100,7 +100,7 @@ export default class HYP3EClassWeaponProficiencies extends HandlebarsApplication
         let newList = [];
         let weapons;
         if (classTemplate.system?.weaponProficiencies) {
-            weapons = [...classTemplate.system.weaponProficiencies.favoredWeapons];
+            weapons = [...classTemplate.system.weaponProficiencies.exceptions];
         } else {
             weapons = []
         }
@@ -120,8 +120,8 @@ export default class HYP3EClassWeaponProficiencies extends HandlebarsApplication
             return a.localeCompare(b);
         });
         // Log the results and update the class template
-        Hyp3eLogger.info("HYP3EClassWeaponProficiencies toggleWeapon", `${classTemplate.name} favored weapons:`, weapons);
-        await classTemplate.update({ "system.weaponProficiencies.favoredWeapons": weapons });
+        Hyp3eLogger.info("HYP3EClassWeaponExceptions toggleWeapon", `${classTemplate.name} exceptions:`, weapons);
+        await classTemplate.update({ "system.weaponProficiencies.exceptions": weapons });
 
         this.render(true, { classTemplateUuid: target.dataset.classTemplateUuid, focus: true })
     }
