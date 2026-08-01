@@ -28,6 +28,7 @@
 
         {{!-- Description --}}
         <div class="item-description">
+          {{#if (eq item.type "classTemplate")}}
           {{#if system.spellcaster}}
           <fieldset>
             <legend title="{{localize 'HYP3E.classEditor.spellListsNote'}}">{{localize 'HYP3E.classEditor.spellLists'}}</legend>
@@ -62,6 +63,34 @@
               {{/each}}
             </div>
           </fieldset>
+          <fieldset style="padding-inline-start: 5px; padding-inline-end: 5px;">
+            <legend>{{localize 'HYP3E.classEditor.proficiencies'}}</legend>
+            <div class="flex">
+              <div class="flex">
+                <label for="system.weaponProficiencies.favoredWeapons">{{localize "HYP3E.classEditor.favoredWeapons"}}</label>
+                <a class="languages-button item-control icon-btn" 
+                    aria-label="{{localize 'HYP3E.classEditor.favoredWeapons'}}" 
+                    role="button" 
+                    data-tooltip="HYP3E.classEditor.favoredWeapons" 
+                    data-action="setWeapons">
+                  <i class="fas fa-book" style="font-size: small"></i>
+                </a>
+                <textarea name="system.weaponProficiencies.favoredWeapons" disabled>{{system.weaponProficiencies.favoredWeapons}}</textarea>
+              </div>
+              <div class="flexrow flex-group-center">
+                <label for="system.weaponProficiencies.exceptions">{{localize "HYP3E.classEditor.exceptions"}}:</label>
+                <a class="languages-button item-control icon-btn" 
+                    aria-label="{{localize 'HYP3E.classEditor.exceptions'}}" 
+                    role="button" 
+                    data-tooltip="HYP3E.classEditor.exceptions" 
+                    data-action="setExceptions">
+                  <i class="fas fa-book" style="font-size: small"></i>
+                </a>
+                <input type="text" class="flex-xlarge" name="system.weaponProficiencies.exceptions" value="{{system.weaponProficiencies.exceptions}}" disabled />
+              </div>
+            </div>
+          </fieldset>
+          {{/if}}
           <h3>{{localize 'HYP3E.tabs.description'}}</h3>
           {{!-- To render inline rolls in a TinyMCE editor, you need to pass the parent actor's (if any) roll data to the rollData prop. --}}
           {{#if isGM}}

@@ -7,7 +7,7 @@
               {{#each system.attrReqs}}
               <span>
                 <input type="number" class="input-small" name="system.attrReqs.{{@key}}" value="{{this}}" /><br />
-                <label for="system.attrReqs.{{@key}}">{{@key}}</label>
+                <label for="system.attrReqs.{{@key}}">{{localize (concat "HYP3E.attributes." @key ".abbrev")}}</label>
               </span>
               {{/each}}
             </div>
@@ -20,7 +20,7 @@
               {{#each system.xpBonusReq}}
               <span>
                 <input type="number" class="input-small" name="system.xpBonusReq.{{@key}}" value="{{this}}" /><br />
-                <label for="system.xpBonusReq.{{@key}}">{{@key}}</label>
+                <label for="system.xpBonusReq.{{@key}}">{{localize (concat "HYP3E.attributes." @key ".abbrev")}}</label>
               </span>
               {{/each}}
             </div>

@@ -77,6 +77,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             languages: game.settings.get(game.system.id, "languages"),
             characterClasses: game.settings.get(game.system.id, "characterClasses"),
             phenotypes: game.settings.get(game.system.id, "phenotypes"),
+            weapons: game.settings.get(game.system.id, "weapons"),
             // Technical Options
             logLevel: game.settings.get(game.system.id, "logLevel"),
             reRunMigration: game.settings.get(game.system.id, "reRunMigration"),

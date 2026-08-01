@@ -276,6 +276,9 @@ Hooks.once('init', async function() {
   });
 
   Handlebars.registerHelper('ifInList', function(str, arr, options) {
+    if (!Array.isArray(arr)) {
+      return options.inverse(this);
+    }
     if (arr.includes(str)) {
       return options.fn(this)
     }
@@ -484,6 +487,15 @@ Hooks.once("ready", async function() {
     const phenotypesArray = phenotypes.split(",");
     phenotypesArray.forEach((l, i) => (CONFIG.HYP3E.phenotypes[l.trim()] = l.trim()));
     Hyp3eLogger.info("Init", "CONFIG Phenotypes:", CONFIG.HYP3E.phenotypes);
+  }
+
+  // Load Weapons list
+  const weaponsList = game.settings.get(game.system.id, "weapons");
+  if (weaponsList != "") {
+    CONFIG.HYP3E.weapons = [];
+    const weaponsArray = weaponsList.split(";");
+    weaponsArray.forEach((l, i) => CONFIG.HYP3E.weapons.push(l.trim()));
+    Hyp3eLogger.info("Init", "CONFIG Weapons:", CONFIG.HYP3E.weapons);
   }
 
   // Load saving throws

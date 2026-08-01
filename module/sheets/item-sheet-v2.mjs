@@ -4,6 +4,7 @@ import {onManageActiveEffectV2, prepareActiveEffectCategories} from "../helpers/
 import HYP3EItemSetAnnotations from "../apps/item-set-annotations.mjs";
 import HYP3EItemSetDmgTypes from "../apps/item-set-dmg-types.mjs";
 import { findItemsByFolderOrCompendiumName } from "../helpers/folders-and-compendia.mjs"
+import HYP3EClassWeaponProficiencies from "../apps/class-weapon-proficiencies.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api
 const { ItemSheetV2 } = foundry.applications.sheets
@@ -16,6 +17,8 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
   static ITEM_ANNOTATIONS_APP = new HYP3EItemSetAnnotations();
   static ITEM_SET_DMG_TYPES_APP = new HYP3EItemSetDmgTypes();
+  static WEAPONS_APP = new HYP3EClassWeaponProficiencies();
+  // static EXCEPTIONS_APP = new HYP3EClassWeaponExceptions();
 
   // ===========================================================================
   // ITEM SHEET SETUP
@@ -60,6 +63,8 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       toggleEffect: Hyp3eItemSheetV2._onManageActiveEffect,
       // Class template actions
       toggleSpells: Hyp3eItemSheetV2._toggleSpells,
+      setWeapons: Hyp3eItemSheetV2._openWeaponsApp,
+      setExceptions: Hyp3eItemSheetV2._openExceptionsApp,
       addItem: Hyp3eItemSheetV2._addItem,
       deleteItem: Hyp3eItemSheetV2._deleteItem,
       addFeature: Hyp3eItemSheetV2._addFeature,
@@ -123,12 +128,30 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
   }
 
   /** @override */
+  _configureRenderOptions(options) {
+    super._configureRenderOptions(options);
+
+    // Class template needs a greater sheet size
+    const heights = {
+      classTemplate: 700
+    };
+    const widths = {
+      classTemplate: 650
+    }
+
+    const type = this.document.type;
+    options.position ??= {};
+    options.position.width = widths[type] ?? 600;
+    options.position.height = heights[type] ?? 550;
+  }
+
+  /** @override */
   async _prepareContext(options) {
     // Retrieve base data structure.
     const context = await super._prepareContext(options);
     context.item = this.item
     context.isGM = game.user.isGM
-    Hyp3eLogger.info("_prepareContext", `Preparing Item Sheet for type "${this.item.type}"...`, { item: this.item, options })
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Preparing Item Sheet for type "${this.item.type}"...`, { item: this.item, options })
 
     // For class templates, build baseClass names and spell list names
     if (this.item.type == "classTemplate") {
@@ -172,7 +195,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
     // Retrieve the owner-actor's roll data for TinyMCE editors.
     context.rollData = this.item.actor?.getRollData() ?? {};
-    Hyp3eLogger.info("_prepareContext", `Roll Data in ItemSheet:`, context.rollData);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Roll Data in ItemSheet:`, context.rollData);
 
     // Prepare item-spell list
     const spellRefs = this.item.system?.spellcasting?.spellRefs ?? [];
@@ -193,7 +216,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     context.tabs = this._prepareTabs("primary");
 
     // Log item-sheet context data
-    Hyp3eLogger.info("_prepareContext", `Item-Sheet Context Data:`, context);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Item-Sheet Context Data:`, context);
     // Prepare item data & return context
     this._prepareItemData(context);
     return context;
@@ -244,7 +267,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
           })
         }
       } catch (err) {
-        Hyp3eLogger.error("_prepareItemData", `Error loading weapon annotations:`, err)
+        Hyp3eLogger.error("Hyp3eItemSheetV2 _prepareItemData", `Error loading weapon annotations:`, err)
       }
     }
   }
@@ -256,11 +279,11 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       return context;
     }
     if (!context.tabs || !context.tabs[partId]) {
-      Hyp3eLogger.info("_preparePartContext", `No tab data found for part "${partId}".`);
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _preparePartContext", `No tab data found for part "${partId}".`);
       return context;
     }
     // Process tabs
-    Hyp3eLogger.info("_preparePartContext", `Preparing tab part "${partId}"...`, context);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _preparePartContext", `Preparing tab part "${partId}"...`, context);
     if (context.tabs[partId].active) {
       context.tab = context.tabs[partId];
     }
@@ -336,6 +359,17 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     // If the sheet is not editable, exit early
     if (!this.isEditable) return;
 
+    // Disable mouse wheel and up/down arrows from incrementing or decrementing number input fields
+    this.element.querySelectorAll('input[type="number"]').forEach(input => {
+      input.addEventListener("wheel", e => {
+        if (document.activeElement === input) e.preventDefault();
+      }, { passive: false });
+  
+      input.addEventListener("keydown", e => {
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") e.preventDefault();
+      });
+    });
+
     // Enable drag & drop functionality
     new CONFIG.ux.DragDrop({
       dragSelector: ":is([data-effect-id], [data-spell-id])",
@@ -348,20 +382,20 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     }).bind(this.element);
 
     // Log render completion
-    Hyp3eLogger.info("_onRender", `Item Sheet rendered and listeners activated.`, { context, options, sheet: this });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _onRender", `Item Sheet rendered and listeners activated.`, { context, options, sheet: this });
   }
 
   /** @override */
   _processFormData(event, form, formData) {
     // This is where we can manipulate the formData before it's applied to the item
-    Hyp3eLogger.info("_processFormData", `Processing form data...`, { event, form, formData });
-    Hyp3eLogger.info("_processFormData", `this item:`, this.item);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _processFormData", `Processing form data...`, { event, form, formData });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _processFormData", `this item:`, this.item);
 
     // const formDataObj = formData.object;
     const formDataObj = foundry.utils.expandObject(formData.object);
     // Not all item types have identification, so default to identified=true
     const isIdentified = foundry.utils.getProperty(formDataObj, "system.identified") ?? this.item.system.identified;
-    Hyp3eLogger.info("_processFormData", `Is item identified?`, isIdentified);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _processFormData", `Is item identified?`, isIdentified);
 
     // Apply name and description based on identification state.
     if (isIdentified) {
@@ -392,15 +426,15 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     }
 
     // Merge updated formDataObj back into formData.object, and log the data
-    Hyp3eLogger.info("_processFormData", `Updated form data:`, formDataObj);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _processFormData", `Updated form data:`, formDataObj);
     foundry.utils.mergeObject(formData.object, formDataObj, {performDeletions: true});
-    Hyp3eLogger.info("_processFormData", `Merged form data:`, formData);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _processFormData", `Merged form data:`, formData);
 
     return super._processFormData(event, form, formData);
   }
 
   _prepareSubmitData(event, form, formData, updateData) {
-    Hyp3eLogger.info("_prepareSubmitData", `Preparing submitted data...`, { formData, updateData });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareSubmitData", `Preparing submitted data...`, { formData, updateData });
     return super._prepareSubmitData(event, form, formData, updateData);
   }
 
@@ -433,7 +467,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
    * @param {*} target 
    */
   static async _toggleIdentified(event, target) {
-    Hyp3eLogger.info("_toggleIdentified", `Toggling item identified state...`, { event, target });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _toggleIdentified", `Toggling item identified state...`, { event, target });
     const identified = target.checked;
     await this.item.toggleIdentified(identified);
   }
@@ -444,7 +478,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
    * @param {*} target 
    */
   static async _toggleWeaponType(event, target) {
-    Hyp3eLogger.info("_toggleWeaponType", `Toggling weapon type...`, { event, target });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _toggleWeaponType", `Toggling weapon type...`, { event, target });
     const attackType = target.dataset["attackType"];
     await this.item.updateWeaponType(attackType);
     await this.item.applyAttackFormula();
@@ -456,7 +490,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
    * @param {*} target 
    */
   static async _toggleWeaponHands(event, target) {
-    Hyp3eLogger.info("_toggleWeaponHands", `Toggling weapon hands...`, { event, target });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _toggleWeaponHands", `Toggling weapon hands...`, { event, target });
     const hands = target.dataset["hands"];
     await this.item.updateWeaponHands(hands);
   }
@@ -467,7 +501,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
    * @param {*} target 
    */
   static async _handleWeaponMastery(event, target) {
-    Hyp3eLogger.info("_handleWeaponMastery", `Updating weapon mastery...`, { event, target });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _handleWeaponMastery", `Updating weapon mastery...`, { event, target });
     const mastery = target.dataset["mastery"];
     await this.item.updateWeaponMastery(mastery);
   }
@@ -478,7 +512,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
    * @param {*} target 
    */
   static async _toggleAtkRoll(event, target) {
-    Hyp3eLogger.info("_toggleAtkRoll", `Toggling spell attack roll...`, { event, target });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _toggleAtkRoll", `Toggling spell attack roll...`, { event, target });
     if (target.checked) {
       // Set a default spell attack roll formula
       const atkRoll = "1d20 + @fa";
@@ -495,12 +529,12 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
    * @private
    */
   static async _onSetGrenadeOrAreaEffect(event, target) {
-    Hyp3eLogger.info("_onSetGrenadeOrAreaEffect", `Handling grenade/area-effect checkbox change...`, { event, target });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _onSetGrenadeOrAreaEffect", `Handling grenade/area-effect checkbox change...`, { event, target });
     // The trick is that we need to get the current state of both checkboxes, not just the one that was clicked
     const html = $(event.currentTarget).closest("form");
     const isGrenade = html.find('input[name="system.isGrenade"]').prop("checked");
     const isAreaEffect = html.find('input[name="system.isAreaEffect"]').prop("checked");
-    Hyp3eLogger.info("_onSetGrenadeOrAreaEffect", `isGrenade: ${isGrenade}, isAreaEffect: ${isAreaEffect}`);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _onSetGrenadeOrAreaEffect", `isGrenade: ${isGrenade}, isAreaEffect: ${isAreaEffect}`);
 
     // Update the item with both values
     await this.item.updateGrenadeOrAreaEffect(isGrenade, isAreaEffect);
@@ -528,7 +562,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     event.stopPropagation();
     const action = target.dataset["action"];
     // Log the action and then handle it
-    Hyp3eLogger.info("_onManageActiveEffect", `Managing active effect...`, { event, target, action });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _onManageActiveEffect", `Managing active effect...`, { event, target, action });
     await onManageActiveEffectV2(target, this.item);
 
     // Re-render the sheet to reflect changes
@@ -549,7 +583,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
    */
   static _toggleItemSummary(event, target) {
     event.preventDefault()
-    Hyp3eLogger.info("_toggleItemSummary", `Toggling item summary...`, { event, target });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _toggleItemSummary", `Toggling item summary...`, { event, target });
     const summary = target.closest(".item-entry.item").querySelector(".item-summary");
     summary.style.display = summary.style.display === "block" ? "" : "block";
   }
@@ -560,7 +594,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
    * @private
    */
   static async _openItemSheet(event, target) {
-    Hyp3eLogger.info("_openItemSheet", `Opening spell sheet...`, { event, target });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _openItemSheet", `Opening spell sheet...`, { event, target });
     const item = await fromUuid(target.dataset["spellId"]);
     if (item?.sheet) item.sheet.render(true);
   }
@@ -579,6 +613,16 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     const value = target.dataset.value;
     Hyp3eLogger.info("HYP3EItemSheetV2 _toggleSpells", `Toggle spells clicked:`, target);
     await this.item.update({ "system.spellcaster": !this.item.system.spellcaster });
+  }
+
+  // Open the Favoured Weapons app
+  static _openWeaponsApp() {
+    Hyp3eItemSheetV2.WEAPONS_APP.render(true, { classTemplateUuid: this.item.uuid, focus: true });
+  }
+
+  // Open the Exceptions app
+  static _openExceptionsApp() {
+    Hyp3eItemSheetV2.EXCEPTIONS_APP.render(true, { classTemplateUuid: this.item.uuid, focus: true });
   }
 
   /**
@@ -603,7 +647,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       const features = [...this.item.system.abilities];
 
       // Log the delete data
-      Hyp3eLogger.info("deleteFeature", "Deleting feature:", { index });
+      Hyp3eLogger.info("Hyp3eItemSheetV2 deleteFeature", "Deleting feature:", { index });
 
       if (!isNaN(index)) features.splice(index, 1);
       await this.item.update({ "system.abilities": features });
@@ -635,7 +679,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       const pack = [...this.item.system.startingPack[packName]];
 
       // Log the delete data
-      Hyp3eLogger.info("deleteItem", `Deleting item ${index} from ${packName}:`, pack);
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _deleteItem", `Deleting item ${index} from ${packName}:`, pack);
 
       if (!isNaN(index)) pack.splice(index, 1);
       await this.item.update({ [`system.startingPack.${packName}`]: pack });
@@ -661,7 +705,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
   async _onDragStart(event) {
     event.stopPropagation();
-    Hyp3eLogger.info("_onDragStart", `Drag start event:`, event);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _onDragStart", `Drag start event:`, event);
     const index = Hyp3eItemSheetV2.findDataset(event.target, "index");
     const dragData = {
       type: "Item",
@@ -673,7 +717,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       }
     };
     event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-    Hyp3eLogger.info("_onDragStart", `Started dragging item...`, { event, dragData });
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _onDragStart", `Started dragging item...`, { event, dragData });
   }
 
   _onDragOver(event) {
@@ -697,7 +741,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     let dropData;
     try {
       dropData = JSON.parse(dataTransfer);
-      Hyp3eLogger.info("_onDrop", `Dropped data:`, dropData);
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _onDrop", `Dropped data:`, dropData);
     } catch {
       return;
     }
@@ -711,10 +755,10 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
     droppedItem = await fromUuid(uuid);
     if (!droppedItem) {
       // This shouldn't happen, but just in case
-      Hyp3eLogger.warn("_onDrop", `Could not retrieve dropped item with UUID: ${uuid}. Trying effects...`);
+      Hyp3eLogger.warn("Hyp3eItemSheetV2 _onDrop", `Could not retrieve dropped item with UUID: ${uuid}. Trying effects...`);
       droppedItem = this.item.effects.get(uuid);
     }
-    Hyp3eLogger.info("_onDrop", `Dropped item:`, droppedItem);
+    Hyp3eLogger.info("Hyp3eItemSheetV2 _onDrop", `Dropped item:`, droppedItem);
     if (!droppedItem) return;
 
     // If a spell was dropped, either re-sort the list or add the spell to this item
@@ -724,7 +768,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       const toElement = event.target.closest(".spell-entry");
       const toIndex = Number(toElement?.dataset.index);
       if (Number.isInteger(fromIndex) && Number.isInteger(toIndex) && fromIndex !== toIndex) {
-        Hyp3eLogger.info("_onDrop", `Handling spell re-ordering...`, { fromIndex, toElement });
+        Hyp3eLogger.info("Hyp3eItemSheetV2 _onDrop", `Handling spell re-ordering...`, { fromIndex, toElement });
         await this.item.reorderSpell(fromIndex, toIndex);
         this.render();
       }
@@ -736,7 +780,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
         // Prevent duplicate inserts
         const msg = `Spell ${droppedItem.name} is already linked to this item.`;
         ui.notifications.warn(msg);
-        Hyp3eLogger.warn("_onDrop", msg);
+        Hyp3eLogger.warn("Hyp3eItemSheetV2 _onDrop", msg);
         return;
       }
       await this.item.addSpell(droppedItem);
@@ -752,7 +796,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
         // Prevent duplicate inserts
         const msg = `Effect ${existing.name} is already linked to this item.`;
         ui.notifications.warn(msg);
-        Hyp3eLogger.warn("_onDrop", msg);
+        Hyp3eLogger.warn("Hyp3eItemSheetV2 _onDrop", msg);
         return; 
       }
 
@@ -766,7 +810,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
       if (!effects.length) {
         const msg = `No ActiveEffects found on template: ${droppedItem.name}`;
-        Hyp3eLogger.warn("_onDrop", msg);
+        Hyp3eLogger.warn("Hyp3eItemSheetV2 _onDrop", msg);
         ui.notifications.warn(msg);
         return;
       }
@@ -775,7 +819,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       await this.item.createEmbeddedDocuments("ActiveEffect", effects);
 
       const msg = `Applied ${effects.length} effect(s) from template "${droppedItem.name}" to ${this.item.name}.`;
-      Hyp3eLogger.info("_onDrop", msg);
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _onDrop", msg);
       ui.notifications.info(msg);
     }
 

@@ -1,0 +1,18 @@
+<div class="item-set-annotations">
+  <h3>{{classTemplate.name}}</h3>
+  <hr class="plain-hr"/>
+  <span style="font-weight: bold;">{{localize 'HYP3E.classEditor.favoredWeapons'}} <i>({{localize 'HYP3E.settings.clickToToggle'}})</i></span>
+  <ul>
+    {{#each weapons as |weapon|}}
+    <li data-class-template-uuid="{{../classTemplateUuid}}">
+      <a class='item-control {{#ifInList weapon ../classTemplate.system.weaponProficiencies.favouredWeapons}}item-in-list{{/ifInList}}' 
+          data-tooltip="{{weapon}}" data-action="toggleWeapon"
+          data-control="{{weapon}}" data-actor-uuid="{{../classTemplateUuid}}"
+          role="button"
+      >
+        {{weapon}}
+      </a>
+    </li>
+    {{/each}}
+  </ul>
+</div>
