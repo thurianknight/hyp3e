@@ -178,6 +178,9 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       }
       context.savingThrows = savingThrows;
 
+      context.favoredWeapons = this.item.system.weaponProficiencies?.favoredWeapons?.join("; ") ?? "";
+      context.exceptions = this.item.system.weaponProficiencies?.exceptions?.join("; ") ?? "";
+
       const abilities = [...this.item.system.abilities] || [""];
       context.abilities = Object.fromEntries(abilities.map(n => [n, n]));
 

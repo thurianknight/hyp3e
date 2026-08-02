@@ -10,6 +10,7 @@
       <div class="column-top" style="margin-right: 2px;">
         {{!-- General Equipment --}}
         {{#each system.startingPack}}
+
           {{#if (eq @key "equipment - general")}}
           <div class="flex">
             <label class="dialog-label">{{capitalizeWords @key}}</label>
@@ -25,21 +26,20 @@
             {{/each}}
             <button type="button" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> {{localize 'HYP3E.classEditor.add'}}</button>
           </div>
-          {{!-- <hr /> --}}
           {{/if}}
         {{/each}}
       </div>
       <div class="flex">
         {{!-- Other categories: gold, armour, weapons, provisions, religious items --}}
         {{#each system.startingPack}}
+
           {{#if (eq @key "gold")}}
           <div class="flexrow flex-group-center">
             <label class="dialog-label">{{capitalizeWords @key}}</label>
             <input type="text" name="system.startingPack.gold" value="{{this}}" placeholder="Gold Amount" />
           </div>
-          {{!-- <hr /> --}}
           {{/if}}
-          {{!-- {{else}} --}}
+
           {{#if (eq @key "armour")}}
           <div class="column-top">
             <label class="dialog-label" style="padding-top: 20px;">{{capitalizeWords @key}}</label>
@@ -55,8 +55,8 @@
             {{/each}}
             <button type="button" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> {{localize 'HYP3E.classEditor.add'}}</button>
           </div>
-          {{!-- <hr /> --}}
           {{/if}}
+
           {{#if (eq @key "weapons")}}
           <div class="column-top">
             <label class="dialog-label" style="padding-top: 20px;">{{capitalizeWords @key}}</label>
@@ -72,8 +72,8 @@
             {{/each}}
             <button type="button" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> {{localize 'HYP3E.classEditor.add'}}</button>
           </div>
-          {{!-- <hr /> --}}
           {{/if}}
+
           {{#if (eq @key "equipment - provisions")}}
           <div class="column-top">
             <label class="dialog-label" style="padding-top: 20px;">{{capitalizeWords @key}}</label>
@@ -89,8 +89,8 @@
             {{/each}}
             <button type="button" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> {{localize 'HYP3E.classEditor.add'}}</button>
           </div>
-          {{!-- <hr /> --}}
           {{/if}}
+
           {{#if (eq @key "equipment - religious")}}
           <div class="column-top">
             <label class="dialog-label" style="padding-top: 20px;">{{capitalizeWords @key}}</label>
@@ -106,7 +106,6 @@
             {{/each}}
             <button type="button" data-action="addItem" data-pack="{{@key}}"><i class="fas fa-plus"></i> {{localize 'HYP3E.classEditor.add'}}</button>
           </div>
-          {{!-- <hr /> --}}
           {{/if}}
         {{/each}}
       </div>
