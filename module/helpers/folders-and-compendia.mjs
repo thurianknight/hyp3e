@@ -179,3 +179,53 @@ export async function getClassTemplate(name) {
 
   return null; // not found
 }
+
+/**
+ * Load the plain-text list from a specific Journal Entry page
+ * that lives in the specified compendium.
+ *
+ * @param {string} packName     Name of the compendium pack (e.g. "Equipment Lists")
+ * @param {string} journalName  Name of the JournalEntry (e.g. "Armour")
+ * @param {string} pageName     Name of the page inside it (e.g. "Shields")
+ * @returns {Promise<string[]>} Array of cleaned paragraph texts
+ */
+export async function getJournalPageList(packName, journalName, pageName) {
+  // 1. Find the compendium pack
+  const pack = game.packs.find(p =>
+    p.metadata.label === packName || p.metadata.name === packName
+  );
+  if (!pack) {
+    console.warn(`Compendium "${packName}" not found.`);
+    return [];
+  }
+
+  // 2. Find the Journal Entry inside the pack (use the index first)
+  const entry = pack.index.find(i => i.name === journalName);
+  if (!entry) {
+    console.warn(`JournalEntry "${journalName}" not found in "${packName}".`);
+    return [];
+  }
+
+  const journal = await pack.getDocument(entry._id);
+  if (!journal) return [];
+
+  // 3. Find the page
+  const page = journal.pages.getName(pageName);
+  if (!page) {
+    console.warn(`Page "${pageName}" not found in journal "${journalName}".`);
+    return [];
+  }
+
+  // 4. Get the HTML content and extract <p> texts
+  const html = page.text?.content ?? "";
+  if (!html) return [];
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  const list = Array.from(doc.querySelectorAll("p"))
+    .map(p => p.textContent.trim())
+    .filter(text => text.length > 0);
+
+  return list;
+}

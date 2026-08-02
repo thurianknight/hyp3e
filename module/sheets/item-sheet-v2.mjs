@@ -3,7 +3,7 @@ import { Hyp3eLogger } from "../helpers/logger.mjs";
 import {onManageActiveEffectV2, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 import HYP3EItemSetAnnotations from "../apps/item-set-annotations.mjs";
 import HYP3EItemSetDmgTypes from "../apps/item-set-dmg-types.mjs";
-import { findItemsByFolderOrCompendiumName } from "../helpers/folders-and-compendia.mjs"
+import { findItemsByFolderOrCompendiumName, getJournalPageList } from "../helpers/folders-and-compendia.mjs"
 import HYP3EClassWeaponProficiencies from "../apps/class-weapon-proficiencies.mjs";
 import HYP3EClassWeaponExceptions from "../apps/class-weapon-exceptions.mjs";
 
@@ -184,22 +184,54 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       const abilities = [...this.item.system.abilities] || [""];
       context.abilities = Object.fromEntries(abilities.map(n => [n, n]));
 
-      const armorNames = await findItemsByFolderOrCompendiumName("armor, armour, shield, shields", "armor", "magic, magical");
-      const shieldNames = await findItemsByFolderOrCompendiumName("armor, armour, shield, shields", "shield", "magic, magical");
-      armorNames.push(...shieldNames);
-      context.armorOptions = Object.fromEntries(armorNames.map(n => [n, n]));
+      const armorNames = await getJournalPageList("Equipment Lists", "Armour", "Armour");
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Retrieved armor names from Journal:`, armorNames);
+      const compendiumArmor = await findItemsByFolderOrCompendiumName("armor, armour, shield, shields", "armor", "magic, magical");
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Retrieved compendium armor names:`, compendiumArmor);
+      const shieldNames = await getJournalPageList("Equipment Lists", "Armour", "Shields");
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Retrieved shield names from Journal:`, shieldNames);
+      const compendiumShields = await findItemsByFolderOrCompendiumName("armor, armour, shield, shields", "shield", "magic, magical");
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Retrieved compendium shield names:`, compendiumShields);
+      const allArmor = [];
+      allArmor.push(...armorNames, ...shieldNames, ...compendiumArmor, ...compendiumShields);
+      allArmor.sort();
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Combined and sorted armor/shield names:`, allArmor);
+      context.armorOptions = Object.fromEntries(allArmor.map(n => [n, n]));
 
-      const weaponNames = await findItemsByFolderOrCompendiumName("weapons, melee, missile, ammunition", "weapon", "magic, magical");
-      context.weaponOptions = Object.fromEntries(weaponNames.map(n => [n, n]));
+      const weaponMeleeNames = await getJournalPageList("Equipment Lists", "Weapons", "Melee");
+      const weaponMissileNames = await getJournalPageList("Equipment Lists", "Weapons", "Missile");
+      const compendiumWeapons = await findItemsByFolderOrCompendiumName("weapons, melee, missile, ammunition", "weapon", "magic, magical");
+      const allWeapons = [];
+      allWeapons.push(...weaponMeleeNames, ...weaponMissileNames, ...compendiumWeapons);
+      allWeapons.sort();
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Combined and sorted weapon names:`, allWeapons);
+      context.weaponOptions = Object.fromEntries(allWeapons.map(n => [n, n]));
 
-      const gearNames = await findItemsByFolderOrCompendiumName("equipment, gear, general, clothing, weapons, ammunition", "item", "religious, religion, provisions, provision, food, supplies, magic, magical");
-      context.gearOptions = Object.fromEntries(gearNames.map(n => [n, n]));
+      const clothingNames = await getJournalPageList("Equipment Lists", "Equipment", "Clothing");
+      const ammunitionNames = await getJournalPageList("Equipment Lists", "Weapons", "Ammunition");
+      const gearNames = await getJournalPageList("Equipment Lists", "Equipment", "General");
+      const compendiumGear = await findItemsByFolderOrCompendiumName("equipment, gear, general, clothing, weapons, ammunition", "item", "religious, religion, provisions, provision, food, supplies, magic, magical");
+      const allGear = [];
+      allGear.push(...clothingNames, ...ammunitionNames, ...gearNames, ...compendiumGear);
+      allGear.sort();
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Combined and sorted gear names:`, allGear);
+      context.gearOptions = Object.fromEntries(allGear.map(n => [n, n]));
 
-      const provisionNames = await findItemsByFolderOrCompendiumName("equipment, provision, provisions, food, supplies", "item", "clothing, gear, general, religious, religion, magic, magical");
-      context.provisionOptions = Object.fromEntries(provisionNames.map(n => [n, n]));
+      const provisionNames = await getJournalPageList("Equipment Lists", "Equipment", "Provisions");
+      const compendiumProvisions = await findItemsByFolderOrCompendiumName("equipment, provision, provisions, food, supplies", "item", "clothing, gear, general, religious, religion, magic, magical");
+      const allProvisions = [];
+      allProvisions.push(...provisionNames, ...compendiumProvisions);
+      allProvisions.sort();
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Combined and sorted provision names:`, allProvisions);
+      context.provisionOptions = Object.fromEntries(allProvisions.map(n => [n, n]));
 
-      const religiousNames = await findItemsByFolderOrCompendiumName("equipment, religious, religion", "item", "clothing, gear, general, provisions, provision, food, supplies, magic, magical");
-      context.religiousOptions = Object.fromEntries(religiousNames.map(n => [n, n]));
+      const religiousNames = await getJournalPageList("Equipment Lists", "Equipment", "Religious");
+      const compendiumReligious = await findItemsByFolderOrCompendiumName("equipment, religious, religion", "item", "clothing, gear, general, provisions, provision, food, supplies, magic, magical");
+      const allReligious = [];
+      allReligious.push(...religiousNames, ...compendiumReligious);
+      allReligious.sort();
+      Hyp3eLogger.info("Hyp3eItemSheetV2 _prepareContext", `Combined and sorted religious names:`, allReligious);
+      context.religiousOptions = Object.fromEntries(allReligious.map(n => [n, n]));
     }
 
     // Retrieve the owner-actor's roll data for TinyMCE editors.

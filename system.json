@@ -53,8 +53,21 @@
       "type": "Item",
       "system": "hyp3e",
       "ownership": {
-        "PLAYER": "NONE",
-        "TRUSTED": "NONE",
+        "PLAYER": "OBSERVER",
+        "TRUSTED": "OBSERVER",
+        "ASSISTANT": "OWNER",
+        "GAMEMASTER": "OWNER"
+      }
+    },
+    {
+      "name": "hyp3e-equipment-lists",
+      "label": "Equipment Lists",
+      "path": "packs/equipment-lists",
+      "type": "JournalEntry",
+      "system": "hyp3e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "TRUSTED": "OBSERVER",
         "ASSISTANT": "OWNER",
         "GAMEMASTER": "OWNER"
       }
