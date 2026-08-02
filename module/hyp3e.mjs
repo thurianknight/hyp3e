@@ -32,6 +32,7 @@ import { HYP3EQuickEquipApp } from "./apps/quick-equip-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
 import { registerHyp3eConfigurations } from "./helpers/register-config.mjs";
 import { applyChatFontSizeSetting } from "./chat/chat.mjs";
+import { getClassTemplate, getClassTemplateNames } from "./helpers/folders-and-compendia.mjs"
 
 // Set this now, to use later
 let trackerInitialized = false;
@@ -462,21 +463,24 @@ Hooks.once("ready", async function() {
   }
 
   // Load class list
-  const characterClasses = game.settings.get(game.system.id, "characterClasses");
-  if (characterClasses != "") {
-    CONFIG.HYP3E.characterClasses = {}
-    const classArray = characterClasses.split(",");
-    classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
+  CONFIG.HYP3E.characterClasses = {}
+  const characterClasses = await getClassTemplateNames(); // Returns an array of class template names from world and compendia
+  // const characterClasses = game.settings.get(game.system.id, "characterClasses");
+  // if (characterClasses != "") {
+  if (characterClasses.length > 0) {
+    // const classArray = characterClasses.split(",");
+    // classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
+    characterClasses.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
     Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
   }
-  // Load custom classes
-  CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
-  Hyp3eLogger.info("Init", "CONFIG Custom Classes:", CONFIG.HYP3E.customClassData);
-  for (const [className, classData] of Object.entries(CONFIG.HYP3E.customClassData)) {
-    // Append the class name to characterClasses
-    CONFIG.HYP3E.characterClasses[className] = className;
-  }
-  Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
+  // // Load custom classes
+  // CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
+  // Hyp3eLogger.info("Init", "CONFIG Custom Classes:", CONFIG.HYP3E.customClassData);
+  // for (const [className, classData] of Object.entries(CONFIG.HYP3E.customClassData)) {
+  //   // Append the class name to characterClasses
+  //   CONFIG.HYP3E.characterClasses[className] = className;
+  // }
+  // Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
 
   // Load Phenotypes list
   const phenotypes = game.settings.get(game.system.id, "phenotypes");
@@ -968,12 +972,12 @@ await setupTurnTrackerHooks();
 async function setupSystem() {
   Hyp3eLogger.info("setupSystem", "Running system setup...");
 
-  // Check for Classes folder in world Items directory, create if needed
-  const classesFolder = game.folders.find(f => f.name === "Classes" && f.type === "Item");
-  if (!classesFolder) {
-    Hyp3eLogger.info("setupSystem", "Creating Classes folder in world Items directory...");
-    await Folder.create({ name: "Classes", type: "Item", parent: null });
-  }
+  // Check for Class Templates folder in world Items directory, create if needed
+  // const classTemplatesFolder = game.folders.find(f => f.name === "Class Templates" && f.type === "Item");
+  // if (!classTemplatesFolder) {
+  //   Hyp3eLogger.info("setupSystem", "Creating Class Templates folder in world Items directory...");
+  //   await Folder.create({ name: "Class Templates", type: "Item", parent: null });
+  // }
 
 }
 

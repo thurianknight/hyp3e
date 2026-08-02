@@ -81,8 +81,10 @@ export async function findItemsByFolderOrCompendiumName(includeFragments, itemTy
 
 /**
  * Build a Map of folderIds and itemNames from a compendium
+ * @param {CompendiumCollection} pack - The compendium pack to build the map from.
+ * @returns {Promise<Map<string, string>>} Map of folderId to folderName.
  */
-async function buildCompendiumFolderMap(pack) {
+export async function buildCompendiumFolderMap(pack) {
   const folderMap = new Map();
 
   // Preferred method: get actual Folder documents
@@ -103,4 +105,77 @@ async function buildCompendiumFolderMap(pack) {
   }
 
   return folderMap;
+}
+
+/**
+ * Build a collection of all available class templates from both the world and compendia.
+ * @returns {Promise<Array>} Array of class template items
+ */
+export async function getClassTemplates() {
+  const results = game.items.filter(i => i.type === "classTemplate");
+
+  for (const pack of game.packs) {
+    if (pack.documentName !== "Item") continue;
+
+    // Filter the lightweight index first
+    const matches = pack.index.filter(i => i.type === "classTemplate");
+    if (!matches.length) continue;
+
+    const docs = await Promise.all(matches.map(m => pack.getDocument(m._id)));
+    results.push(...docs);
+  }
+
+  return results;
+}
+
+/**
+ * Build a list of available class template names from both the world and compendia.
+ * @returns {Promise<Array<string>>} Array of class template names
+ */
+export async function getClassTemplateNames() {
+  // World items
+  const names = game.items
+    .filter(i => i.type === "classTemplate")
+    .map(i => i.name);
+
+  // Compendium packs – use the index so we never load full documents
+  for (const pack of game.packs) {
+    if (pack.documentName !== "Item") continue;
+
+    const packNames = pack.index
+      .filter(i => i.type === "classTemplate")
+      .map(i => i.name);
+
+    names.push(...packNames);
+  }
+
+  return names.sort();
+}
+
+/**
+ * Find a class template by name, searching both world items and compendia.
+ * @param {*} name of classTemplate
+ * @returns {Promise<Item|null>} The class template item or null if not found
+ */
+export async function getClassTemplate(name) {
+  // Check world items first, as they take precedence if the same name exists in both
+  const worldItem = game.items.find(i => 
+    i.type === "classTemplate" && i.name.toLowerCase() === name.toLowerCase()
+  );
+  if (worldItem) return worldItem;
+
+  // Not found? Search Item compendia
+  for (const pack of game.packs) {
+    if (pack.documentName !== "Item") continue;
+
+    // Use the index so we only load the matching document
+    const entry = pack.index.find(i => 
+      i.type === "classTemplate" && i.name.toLowerCase() === name.toLowerCase()
+    );
+    if (!entry) continue;
+
+    return await pack.getDocument(entry._id);
+  }
+
+  return null; // not found
 }

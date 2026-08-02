@@ -12,6 +12,7 @@ import { enableAllTransferrableItemEffectsToItemOwner,
           prepareActiveEffectCategories } from "../helpers/effects.mjs";
 import { sendSimpleChat } from "../chat/chat.mjs"
 import HYP3EActorSetLanguages from "../apps/character-set-languages.mjs";
+import { getClassTemplate, getClassTemplateNames } from "../helpers/folders-and-compendia.mjs"
 
 const { HandlebarsApplicationMixin } = foundry.applications.api
 const { ActorSheetV2 } = foundry.applications.sheets
@@ -1363,25 +1364,48 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @returns 
      */
     static async _onQuickCreate(event, target) {
-        event.preventDefault();
-        const dataset = target.dataset;
+      event.preventDefault();
+      const dataset = target.dataset;
 
-        if (!this.actor.system.details.class) {
-            ui.notifications.warn("Please select a character class!");
-            return;
-        }
-        // Quickly roll up a character of the selected class
-        dataset.actorId = this.actor.id
-        dataset.baseClass = this.actor.system.baseClass
-        // Log the dataset
-        Hyp3eLogger.info("HYP3EActorSheetV2 _onLevelUp", `Level up dataset:`, dataset);
-        let createOk = await Hyp3eCharacterClass.quickCreateCharacter(dataset);
-        if (createOk) {
-            ui.notifications.info("Character created!")
-            this.render()
-        } else {
-            ui.notifications.error("Character creation failed. Please check the console for errors.")
-        }
+      if (this.actor.getFlag(game.system.id, "disableQuickCreate")) {
+        ui.notifications.warn("This character has already been generated! Quick-create is disabled.");
+        return;
+      }
+
+      if (!this.actor.system.details.class) {
+        ui.notifications.warn("Please select a character class!");
+        return;
+      }
+      // Log the dataset
+      Hyp3eLogger.info("HYP3EActorSheetV2 _onQuickCreate", `Quick-create dataset:`, dataset);
+
+      const classTemplate = await getClassTemplate(this.actor.system.details.class);
+      if (!classTemplate) {
+        const msg = `Class template not found for class "${this.actor.system.details.class}".`;
+        Hyp3eLogger.error("HYP3EActorSheetV2 _onQuickCreate", msg);
+        ui.notifications.error(msg);
+        return;
+      }
+
+      // Apply the class template to the character
+      await Hyp3eCharacterClass.applyClassTemplate(this.actor, classTemplate);
+
+      const msg = `Applied class template "${classTemplate.name}" to ${this.actor.name}.`;
+      Hyp3eLogger.info("HYP3EActorSheetV2 _onQuickCreate", msg);
+      ui.notifications.info(msg);
+
+      // Quickly roll up a character of the selected class
+      // dataset.actorId = this.actor.id
+      // dataset.baseClass = this.actor.system.baseClass
+      // // Log the dataset
+      // Hyp3eLogger.info("HYP3EActorSheetV2 _onQuickCreate", `Quick-create dataset:`, dataset);
+      // let createOk = await Hyp3eCharacterClass.quickCreateCharacter(dataset);
+      // if (createOk) {
+      //     ui.notifications.info("Character created!")
+      //     this.render()
+      // } else {
+      //     ui.notifications.error("Character creation failed. Please check the console for errors.")
+      // }
     }
 
     /**
@@ -1705,6 +1729,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       /**----------------------------------------------------------------------
        * Handle dropping a Class Template on to a character actor
        *---------------------------------------------------------------------*/
+
       if (item.type === "classTemplate") {
         // Only allow if dropped on character
         if (this.actor.type !== "character") {
@@ -1714,6 +1739,11 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           return; // Prevent super._onDropItem()
         }
 
+        if (this.actor.getFlag(game.system.id, "disableQuickCreate")) {
+          ui.notifications.warn("This character has already been generated! Quick-create is disabled.");
+          return;
+        }
+  
         // Apply the class template to the character
         await Hyp3eCharacterClass.applyClassTemplate(this.actor, item);
 

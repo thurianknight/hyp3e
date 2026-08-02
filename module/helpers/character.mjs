@@ -4394,6 +4394,27 @@ export class Hyp3eCharacterClass {
     for (let [k, v] of Object.entries(attributes)) {
       actorData.attributes[k].value = v;
     };
+    // Build the prime attributes string
+    const primeAttrs = Object.entries(classTemplate.system.xpBonusReq)
+      .filter(([, value]) => value !== null)
+      .map(([key]) => game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[key]))
+      .join(", ");
+    // Do the attributes allow for a 10% XP bonus?
+    let xpBonus = 0;
+    for (let [k, v] of Object.entries(classTemplate.system.xpBonusReq)) {
+      if (v != null) {
+        if (actorData.attributes[k].value >= v) {
+          // If all of the attributes are above the requirement, then XP bonus is true
+          xpBonus = 10;
+        } else {
+          // If any of the attributes are below the requirement, then no XP bonus
+          xpBonus = 0;
+          break;
+        }
+      }
+    }
+
+    const weaponProficiencies = classTemplate.system.weaponProficiencies.favoredWeapons.join("; ") + (classTemplate.system.weaponProficiencies.exceptions.length > 0 ? `; except ${classTemplate.system.weaponProficiencies.exceptions.join("; ")}` : "")
 
     // Update actor attributes with the rolled values, so we can calculate the attribute modifiers
     Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Updating actor attributes...`, actorData.attributes); 
@@ -4442,12 +4463,19 @@ export class Hyp3eCharacterClass {
             curr: classTemplate.system.saves.sorcery
           }
         },
-        spellcaster: classTemplate.system.spellLists && classTemplate.system.spellLists.length > 0 ? true : false,
+        spellcaster: classTemplate.system.spellcaster,
         spellList: classTemplate.system.spellLists && classTemplate.system.spellLists.length > 0 ? classTemplate.system.spellLists[0] : "",
         spellList2: classTemplate.system.spellLists && classTemplate.system.spellLists.length > 1 ? classTemplate.system.spellLists[1] : "",
         unskilled: classTemplate.system.unskilled,
         proficiencies: {
-          class: classTemplate.system.weaponProficiencies.favoredWeapons + (classTemplate.system.weaponProficiencies.exceptions && classTemplate.system.weaponProficiencies.exceptions != "" ? ` *except* ${classTemplate.system.weaponProficiencies.exceptions}` : ""),
+          class: weaponProficiencies,
+        },
+        details: {
+          xp: {
+            toNextLvl: classTemplate.system.levelAdvancement["2"].xp,
+            primeAttr: primeAttrs,
+            bonus: xpBonus
+          }
         }
       }
     });
@@ -4559,6 +4587,13 @@ export class Hyp3eCharacterClass {
     if (religiousItems && religiousItems.length > 0) {
       // Add the items to the actor's inventory
       await actor.createEmbeddedDocuments("Item", religiousItems);
+    }
+
+    // Create a Journal report of the character's starting stats, abilities, and equipment
+    const journalReport = await this.createCharacterReport(actor, classTemplate);
+    if (!journalReport) {
+      Hyp3eLogger.error("Hyp3eCharacterClass applyClassTemplate", `Failed to create character report for ${actor.name}.`);
+      return false;
     }
 
     // All good? Disable the quick-create button so it can't be used
@@ -5782,6 +5817,134 @@ export class Hyp3eCharacterClass {
         content: content ?? ''
       })
     }
+    return true;
+  }
+
+  /**
+   * Write the character data to a new Journal Entry, and display a confirmation chat message
+   * @param {*} actor 
+   * @param {*} classTemplate 
+   * @returns 
+   */
+  static async createCharacterReport(actor, classTemplate) {
+    if (!actor) {
+      Hyp3eLogger.error("Hyp3eCharacterClass createCharacterReport", `Actor not supplied!`);
+      return false;
+    }
+    // Log the dataset before the dialog renders
+    Hyp3eLogger.info("Hyp3eCharacterClass createCharacterReport", `${actor.name}: `, actor);
+
+    // Initialize some vars
+    const actorData = foundry.utils.deepClone(actor.system);
+    const thisClass = classTemplate.system;
+
+    // Combine spell lists into a single string for display
+    let spellLists = actorData.spellList;
+    if (actorData.spellList2 && actorData.spellList2 != "") {
+      spellLists += `, ${actorData.spellList2}`;
+    }
+
+    // Setup journal report content
+    let journalContent = `
+          <h2>Character ${actor.name} (${actorData.details.class})</h2>
+          <ul>
+            <li>Hit Die: ${actorData.hd}</li>
+            <li>Hit Points: ${actorData.hp.value}</li>
+            <li>Fighting Ability: ${actorData.fa}</li>
+            <li>Casting Ability: ${actorData.ca}</li>
+            <li>Spellcaster: ${actorData.spellcaster}</li>
+            <li>Spell List(s): ${spellLists}</li>
+            <li>Turning Ability: ${actorData.ta}</li>
+            <li>Unskilled Weapon Penalty: ${actorData.unskilled}</li>
+            <li>Favoured Weapons: ${actorData.proficiencies.class}</li>
+            <li>Saving Throws vs:</li>
+            <ul>
+              <li>Death: ${actorData.saves.death.value}</li>
+              <li>Device: ${actorData.saves.device.value}</li>
+              <li>Transformation: ${actorData.saves.transformation.value}</li>
+              <li>Avoidance: ${actorData.saves.avoidance.value}</li>
+              <li>Sorcery: ${actorData.saves.sorcery.value}</li>
+            </ul>
+            <li>Strength (ST): ${actorData.attributes.str.value}</li>
+            <ul>
+              <li>Melee Attack Mod: ${actorData.attributes.str.atkMod}</li>
+              <li>Damage Mod: ${actorData.attributes.str.dmgMod}</li>
+              <li>Test of ST: ${actorData.attributes.str.test}</li>
+              <li>Feat of ST: ${actorData.attributes.str.feat}</li>
+            </ul>
+            <li>Dexterity (DX): ${actorData.attributes.dex.value}</li><ul>
+              <li>Missile Attack Mod: ${actorData.attributes.dex.atkMod}</li>
+              <li>Defence Mod: ${actorData.attributes.dex.defMod}</li>
+              <li>Test of DX: ${actorData.attributes.dex.test}</li>
+              <li>Feat of DX: ${actorData.attributes.dex.feat}</li>
+            </ul>
+            <li>Constitution (CN): ${actorData.attributes.con.value}</li>
+            <ul>
+              <li>Hit Point Mod: ${actorData.attributes.con.hpMod}</li>
+              <li>Poison/Radiation Mod: ${actorData.attributes.con.poisRadMod}</li>
+              <li>Trauma Survive %: ${actorData.attributes.con.traumaSurvive}</li>
+              <li>Test of CN: ${actorData.attributes.con.test}</li>
+              <li>Feat of CN: ${actorData.attributes.con.feat}</li>
+            </ul>
+            <li>Intelligence (IN): ${actorData.attributes.int.value}</li>
+            <ul>
+              <li>Languages: ${actorData.attributes.int.languages}</li>
+              <li>Level 1 Bonus Spell: ${actorData.attributes.int.bonusSpells.lvl1}</li>
+              <li>Level 2 Bonus Spell: ${actorData.attributes.int.bonusSpells.lvl2}</li>
+              <li>Level 3 Bonus Spell: ${actorData.attributes.int.bonusSpells.lvl3}</li>
+              <li>Level 4 Bonus Spell: ${actorData.attributes.int.bonusSpells.lvl4}</li>
+              <li>% Chance to Learn Spell: ${actorData.attributes.int.learnSpell}</li>
+            </ul>
+            <li>Wisdom (WS): ${actorData.attributes.wis.value}</li>
+            <ul>
+              <li>Will Mod: ${actorData.attributes.wis.willMod}</li>
+              <li>Level 1 Bonus Spell: ${actorData.attributes.wis.bonusSpells.lvl1}</li>
+              <li>Level 2 Bonus Spell: ${actorData.attributes.wis.bonusSpells.lvl2}</li>
+              <li>Level 3 Bonus Spell: ${actorData.attributes.wis.bonusSpells.lvl3}</li>
+              <li>Level 4 Bonus Spell: ${actorData.attributes.wis.bonusSpells.lvl4}</li>
+              <li>% Chance to Learn Spell: ${actorData.attributes.wis.learnSpell}</li>
+            </ul>
+            <li>Charisma (CH): ${actorData.attributes.cha.value}</li>
+            <ul>
+              <li>Reaction Mod: ${actorData.attributes.cha.reaction}</li>
+              <li>Max Henchmen: ${actorData.attributes.cha.maxHenchmen}</li>
+              <li>Turn Undead Mod: ${actorData.attributes.cha.turnUndead}</li>
+            </ul>
+            <li>Prime Attribute(s): ${actorData.details.xp.primeAttr}</li>
+            <li>XP Bonus: ${actorData.details.xp.bonus}</li>
+            <li>XP to Next Level: ${actorData.details.xp.toNextLvl}</li>
+          </ul>`
+
+    // Find or create a JournalEntry for character reports
+    let je = game.journal.getName("Character Reports");
+    if (!je) {
+      const data = {
+        name: `Character Reports`,
+        ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED }
+      };
+      je = await JournalEntry.create(data);
+    }
+    // Create a new JournalEntryPage for the character report
+    const [page] = await je.createEmbeddedDocuments("JournalEntryPage", [
+      {
+        name: actor.name,
+        type: "text",
+        text: {
+          content: journalContent,
+        },
+        sort: 0
+      }
+    ]);
+
+    // Pop open the JournalEntry to show the new page
+    je.sheet.render(true, { pageId: page.id });
+
+    // Send a chat message to the user
+    const chatMsg = `<p>Character <b>${actor.name}</b> (${actorData.details.class}) generated! See the Journal for details.</p>`
+    ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: actor }),
+      content: chatMsg
+    });
     return true;
   }
 }
