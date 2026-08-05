@@ -1465,25 +1465,26 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @param {*} target 
      */
     static async _onSetAttributeMods(event, target) {
-        event.preventDefault();
-        const dataset = target.dataset;
-        dataset.actorId = this.actor.id
-        dataset.baseClass = this.actor.system.baseClass
+      notifications.ui.info("This feature has been disabled by the developer. You should either enable automatic calculation of attribute modifiers in your Hyp3e system settings, or manually set the attribute modifiers in the character sheet.");
+    //     event.preventDefault();
+    //     const dataset = target.dataset;
+    //     dataset.actorId = this.actor.id
+    //     dataset.baseClass = this.actor.system.baseClass
 
-        Hyp3eLogger.info("HYP3EActorSheetV2 _onSetAttributeMods", `Set attribute mods dataset:`, dataset);
+    //     Hyp3eLogger.info("HYP3EActorSheetV2 _onSetAttributeMods", `Set attribute mods dataset:`, dataset);
 
-        // Take the attribute scores and class, and lookup/calculate modifiers
-        const setAttrOk = await Hyp3eCharacterClass.setAttributeMods(this.actor, false)
-            .then(setAttrOk => {
-                if (setAttrOk) {
-                    this.render()
-                    this.actor.setFlag(game.system.id, "disableQuickCreate", true)
-                }
-            })
-            .catch(err => {
-                // Log the error
-                Hyp3eLogger.error("_onSetAttributeMods", `Error:`, err)
-            })
+    //     // Take the attribute scores and class, and lookup/calculate modifiers
+    //     const setAttrOk = await Hyp3eCharacterClass.setAttributeMods(this.actor, false)
+    //         .then(setAttrOk => {
+    //             if (setAttrOk) {
+    //                 this.render()
+    //                 this.actor.setFlag(game.system.id, "disableQuickCreate", true)
+    //             }
+    //         })
+    //         .catch(err => {
+    //             // Log the error
+    //             Hyp3eLogger.error("_onSetAttributeMods", `Error:`, err)
+    //         })
     }
 
     /**
