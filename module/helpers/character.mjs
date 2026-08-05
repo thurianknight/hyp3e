@@ -4235,6 +4235,18 @@ export class Hyp3eCharacterClass {
     return false
   }
 
+  static getClassTemplate(className) {
+    // Lookup the class template document in the compendium
+    const compendium = game.packs.get("hyp3e.hyp3e-character-classes");
+    const entry = compendium.index.find(e => e.name === className);
+    if (!entry) {
+      Hyp3eLogger.info("Hyp3eCharacterClass getClassTemplate", `Class template not found for ${className}`);
+      return null;
+    }
+    const thisClass = compendium.getDocument(entry._id);
+    return thisClass
+  }
+
   /**
    * @param {string} data - The actor's system data object
    * @return {object} - The attribute data object 
@@ -4751,7 +4763,7 @@ export class Hyp3eCharacterClass {
     const charClass = actor.system.details.class;
     Hyp3eLogger.info("Hyp3eCharacterClass rollAttributesForClass", `Class to roll:`, charClass);
     // If no template was provided, get the class attribute requirements
-    const classData = classTemplate.system || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+    const classData = classTemplate.system; // || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
     if (!classData) {
       Hyp3eLogger.error("Hyp3eCharacterClass rollAttributesForClass", `Class data not found for class ${charClass}!`);
       return null;
@@ -4895,7 +4907,7 @@ export class Hyp3eCharacterClass {
    */
   static async getClassAbilities({ actor, classTemplate, itemType, folderNames, abilitiesKey }) {
     const charClass = actor.system.details.class;
-    const classData = classTemplate.system || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+    const classData = classTemplate.system; // || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
 
     if (!classData) {
       Hyp3eLogger.error("Hyp3eCharacterClass getClassAbilities", `Class data not found for class ${charClass}!`);
@@ -5007,7 +5019,7 @@ export class Hyp3eCharacterClass {
    */
   static async getDefaultItemsForClass({ actor, classTemplate, itemType, folderNames, packKey }) {
     const charClass = actor.system.details.class;
-    const classData = classTemplate.system || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+    const classData = classTemplate.system; // || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
 
     if (!classData) {
       Hyp3eLogger.error("Hyp3eCharacterClass getDefaultItemsForClass", `Class data not found for class ${charClass}!`);
@@ -5123,22 +5135,22 @@ export class Hyp3eCharacterClass {
    * @param {*} actor 
    * @returns {Number} - The number of gp
    */
-  static async getStartingGoldForClass(actor) {
-    const charClass = actor.system.details.class;
-    const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
-    if (!classData) {
-      Hyp3eLogger.error("Hyp3eCharacterClass getStartingGoldForClass", `Class data not found for class ${charClass}!`);
-      return 0;
-    }
-    Hyp3eLogger.info("Hyp3eCharacterClass getStartingGoldForClass", `Getting starting gold for class ${charClass}:`, classData.startingPack.gold);
-    // Roll the starting gold using the defined formula
-    const rollFormula = classData.startingPack.gold;
-    const roll = new Roll(rollFormula);
-    await roll.roll();
-    Hyp3eLogger.info("Hyp3eCharacterClass getStartingGoldForClass", `Rolled ${roll.total} gold for class ${charClass}`);
-    // Return the rolled gold amount
-    return roll.total;
-  }
+  // static async getStartingGoldForClass(actor) {
+  //   const charClass = actor.system.details.class;
+  //   const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+  //   if (!classData) {
+  //     Hyp3eLogger.error("Hyp3eCharacterClass getStartingGoldForClass", `Class data not found for class ${charClass}!`);
+  //     return 0;
+  //   }
+  //   Hyp3eLogger.info("Hyp3eCharacterClass getStartingGoldForClass", `Getting starting gold for class ${charClass}:`, classData.startingPack.gold);
+  //   // Roll the starting gold using the defined formula
+  //   const rollFormula = classData.startingPack.gold;
+  //   const roll = new Roll(rollFormula);
+  //   await roll.roll();
+  //   Hyp3eLogger.info("Hyp3eCharacterClass getStartingGoldForClass", `Rolled ${roll.total} gold for class ${charClass}`);
+  //   // Return the rolled gold amount
+  //   return roll.total;
+  // }
 
   /**
    * Check the character's XP and level-up if possible

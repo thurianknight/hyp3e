@@ -18,7 +18,8 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
         atkMod: new fields.NumberField({ integer: true, initial: 0 }),
         dmgMod: new fields.NumberField({ integer: true, initial: 0 }),
         test: new fields.NumberField({ integer: true, initial: 0 }),
-        feat: new fields.NumberField({ integer: true, initial: 0 })
+        feat: new fields.NumberField({ integer: true, initial: 0 }),
+        min: new fields.NumberField({ integer: true, initial: 3 })
       }),
       dex: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
@@ -26,7 +27,8 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
         atkMod: new fields.NumberField({ integer: true, initial: 0 }),
         defMod: new fields.NumberField({ integer: true, initial: 0 }),
         test: new fields.NumberField({ integer: true, initial: 0 }),
-        feat: new fields.NumberField({ integer: true, initial: 0 })
+        feat: new fields.NumberField({ integer: true, initial: 0 }),
+        min: new fields.NumberField({ integer: true, initial: 3 })
       }),
       con: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
@@ -35,7 +37,8 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
         poisRadMod: new fields.NumberField({ integer: true, initial: 0 }),
         traumaSurvive: new fields.NumberField({ integer: true, initial: 0 }),
         test: new fields.NumberField({ integer: true, initial: 0 }),
-        feat: new fields.NumberField({ integer: true, initial: 0 })
+        feat: new fields.NumberField({ integer: true, initial: 0 }),
+        min: new fields.NumberField({ integer: true, initial: 3 })
       }),
       int: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
@@ -47,7 +50,8 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
           lvl3: new fields.BooleanField({ initial: false }),
           lvl4: new fields.BooleanField({ initial: false })
         }),
-        learnSpell: new fields.NumberField({ integer: true, initial: 0 })
+        learnSpell: new fields.NumberField({ integer: true, initial: 0 }),
+        min: new fields.NumberField({ integer: true, initial: 3 })
       }),
       wis: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
@@ -59,14 +63,16 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
           lvl3: new fields.BooleanField({ initial: false }),
           lvl4: new fields.BooleanField({ initial: false })
         }),
-        learnSpell: new fields.NumberField({ integer: true, initial: 0 })
+        learnSpell: new fields.NumberField({ integer: true, initial: 0 }),
+        min: new fields.NumberField({ integer: true, initial: 3 })
       }),
       cha: new fields.SchemaField({
         value: new fields.NumberField({ integer: true, initial: 10 }),
         curr: new fields.NumberField({ integer: true, initial: 10 }),
         reaction: new fields.NumberField({ integer: true, initial: 0 }),
         maxHenchmen: new fields.NumberField({ integer: true, initial: 0 }),
-        turnUndead: new fields.NumberField({ integer: true, initial: 0 })
+        turnUndead: new fields.NumberField({ integer: true, initial: 0 }),
+        min: new fields.NumberField({ integer: true, initial: 3 })
       })
     });
 
@@ -176,8 +182,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
 
     // Get character base class, used for crit hit & crit miss tables
     if (!this.baseClass || this.baseClass == "") {
-      const customClassData = this.getSetting("customClassData");
-      this.baseClass = Hyp3eCharacterClass.classData[this.details.class]?.baseClass ?? customClassData[this.details.class]?.baseClass ?? "npc";
+      this.baseClass = Hyp3eCharacterClass.getClassTemplate(this.details.class)?.baseClass ?? "npc";
     }
 
     Hyp3eLogger.info("Hyp3eCharacter prepareBaseData", `Base data prepared for character ${this.parent.name}:`, this);

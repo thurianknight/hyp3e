@@ -428,37 +428,43 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Flag attributes that are too low for the character class
         switch (k) {
           case "str":
-            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            // if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            if (this._isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `ST is too low for ${context.system.details.class}!`)
               context.warnStr = true
             }
             break
           case "dex":
-            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            // if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            if (this._isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `DX is too low for ${context.system.details.class}!`)
               context.warnDex = true
             }
             break
           case "con":
-            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            // if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            if (this._isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `CN is too low for ${context.system.details.class}!`)
               context.warnCon = true
             }
             break
           case "int":
-            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            // if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+              if (this._isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `IN is too low for ${context.system.details.class}!`)
               context.warnInt = true
             }
             break
           case "wis":
-            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            // if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            if (this._isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `WS is too low for ${context.system.details.class}!`)
               context.warnWis = true
             }
             break
           case "cha":
-            if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            // if (Hyp3eCharacterClass.isAttributeLow(actorData, k)) {
+            if (this._isAttributeLow(actorData, k)) {
               Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `CH is too low for ${context.system.details.class}!`)
               context.warnCha = true
             }
@@ -785,6 +791,26 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         // Log render completion
         Hyp3eLogger.info("HYP3EActorSheetV2 _onRender", `Actor Sheet rendered.`, { context, options, sheet: this });
     }
+
+
+    // ===========================================================================
+    // DATA CHECKS
+    // ===========================================================================
+
+    /**
+     * Determine whether an attribute is too low for the character's class, and return true/false.
+     * @param {*} actorData - The actor system data to check
+     * @param {*} attribute - The attribute to check (e.g., "str", "dex", etc.)
+     * @returns 
+     */
+    _isAttributeLow(actorData, attribute) {
+      return actorData.attributes[attribute]?.curr < actorData.attributes[attribute]?.min ?? false;
+    }
+
+
+    // ===========================================================================
+    // UI HANDLERS
+    // ===========================================================================
 
     /**
      * Determine if the current user is allowed to drag a coin label.
