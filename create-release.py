@@ -44,6 +44,7 @@ items = [
     ("lang", True),
     ("lib", True),
     ("module", True),
+    ("packs", True),
     ("templates", True),
     ("ACTIVE_EFFECTS.md", False),
     ("CHANGELOG.md", False),
