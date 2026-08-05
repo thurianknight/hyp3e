@@ -73,6 +73,17 @@
       }
     }
   ],
+  "packFolders": [
+    {
+      "name": "Hyp3e Core Data",
+      "type": "Compendium",
+      "sorting": "a",
+      "packs": [
+        "hyp3e-character-classes",
+        "hyp3e-equipment-lists"
+      ]
+    }
+  ],
   "documentTypes": {
     "Actor": {
       "character": {

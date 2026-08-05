@@ -505,3 +505,236 @@ export function toNumber(value) {
   const n = Number(value);
   return isNaN(n) ? 0 : n;
 }
+
+/**
+ * Migrate custom class data to new classTemplate (Item document) format
+ */
+export async function migrateCustomClasses() {
+  const classData = game.settings.get(game.system.id, "customClassData") || {};
+  // Do we even have any classes to migrate?
+  if (Object.keys(classData).length === 0) {
+    Hyp3eLogger.info("migrateCustomClasses", "No custom classes found to migrate.");
+    return;
+  }
+  // Clone the custom class data so we can delete migrated classes from it
+  const allCustomClasses = foundry.utils.duplicate(game.settings.get(game.system.id, "customClassData"));
+
+  // Check for Class Templates folder in world Items directory, create if needed
+  let classTemplatesFolder = game.folders.find(f => f.name === "Class Templates" && f.type === "Item");
+  if (!classTemplatesFolder) {
+    classTemplatesFolder = await Folder.create({ name: "Class Templates", type: "Item", parent: null });
+    Hyp3eLogger.info("setupSystem", "Created Class Templates folder in world Items directory.", classTemplatesFolder);
+  }
+
+  Hyp3eLogger.info("migrateCustomClasses", `Migrating ${Object.keys(classData).length} custom classes...`);
+  const migratedClasses = {};
+  for (const [className, classInfo] of Object.entries(classData)) {
+    Hyp3eLogger.info("migrateCustomClasses", `Migrating class "${className}"...`, classInfo);
+
+    // Reformat the class abilities into the new Item document structure
+    let abilities = [];
+    Hyp3eLogger.info("migrateCustomClasses", `Building abilities array for class "${className}"...`, classInfo.abilities);
+    for (const [index, data] of Object.entries(classInfo.abilities || [])) {
+      abilities.push({ "name": data["name"] });
+    }
+
+    // Reformat the armor, weapons, and all equipment types into the new Item document structure
+    let armor = [];
+    Hyp3eLogger.info("migrateCustomClasses", `Building armour array for class "${className}"...`, classInfo.startingPack?.armour);
+    for (const [index, data] of Object.entries(classInfo.startingPack?.armour || [])) {
+      armor.push({ "name": data["name"], "quantity": data["quantity"] });
+    }
+    let weapons = [];
+    Hyp3eLogger.info("migrateCustomClasses", `Building weapons array for class "${className}"...`, classInfo.startingPack?.weapons);
+    for (const [index, data] of Object.entries(classInfo.startingPack?.weapons || [])) {
+      weapons.push({ "name": data["name"], "quantity": data["quantity"] });
+    }
+    let generalEquipment = [];
+    Hyp3eLogger.info("migrateCustomClasses", `Building general equipment array for class "${className}"...`, classInfo.startingPack?.["equipment - general"]);
+    for (const [index, data] of Object.entries(classInfo.startingPack?.["equipment - general"] || [])) {
+      generalEquipment.push({ "name": data["name"], "quantity": data["quantity"] });
+    }
+    let provisions = [];
+    Hyp3eLogger.info("migrateCustomClasses", `Building provisions array for class "${className}"...`, classInfo.startingPack?.["equipment - provisions"]);
+    for (const [index, data] of Object.entries(classInfo.startingPack?.["equipment - provisions"] || [])) {
+      provisions.push({ "name": data["name"], "quantity": data["quantity"] });
+    }
+    let religiousItems = [];
+    Hyp3eLogger.info("migrateCustomClasses", `Building religious items array for class "${className}"...`, classInfo.startingPack?.["equipment - religious"]);
+    for (const [index, data] of Object.entries(classInfo.startingPack?.["equipment - religious"] || [])) {
+      religiousItems.push({ "name": data["name"], "quantity": data["quantity"] });
+    }
+
+    // Put it all together into a new systemData object
+    const systemData = {
+      "friendlyName": "",
+      "description": "",
+      "identified": true,
+      "realName": className,
+      "realDescription": "",
+      "itemAlias": "",
+      "aliasDescription": "",
+      "baseClass": classInfo.baseClass || "",
+      "hitDie": classInfo.hitDie || "",
+      "attrReqs": {
+        "con": classInfo.attrReqs?.con || null,
+        "int": classInfo.attrReqs?.int || null,
+        "str": classInfo.attrReqs?.str || null,
+        "dex": classInfo.attrReqs?.dex || null,
+        "wis": classInfo.attrReqs?.wis || null,
+        "cha": classInfo.attrReqs?.cha || null
+      },
+      "xpBonusReq": {
+        "con": classInfo.xpBonusReq?.con || null,
+        "int": classInfo.xpBonusReq?.int || null,
+        "str": classInfo.xpBonusReq?.str || null,
+        "dex": classInfo.xpBonusReq?.dex || null,
+        "wis": classInfo.xpBonusReq?.wis || null,
+        "cha": classInfo.xpBonusReq?.cha || null
+      },
+      "featBonus": {
+        "con": classInfo.featBonus?.con || null,
+        "str": classInfo.featBonus?.str || null,
+        "dex": classInfo.featBonus?.dex || null
+      },
+      "saves": {
+        "base": classInfo.saves?.base || null,
+        "death": classInfo.saves?.death || 16,
+        "device": classInfo.saves?.device || 14,
+        "transformation": classInfo.saves?.transformation || 16,
+        "avoidance": classInfo.saves?.avoidance || 16,
+        "sorcery": classInfo.saves?.sorcery || 14
+      },
+      // These few things don't exist in the original cust class data
+      "unskilled": null,
+      "weaponProficiencies": {
+        "favoredWeapons": [],
+        "exceptions": []
+      },
+      "levelAdvancement": {
+        "1": {
+          "xp": classInfo.levelAdvancement?.["1"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["1"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["1"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["1"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["1"]?.ta || null
+        },
+        "2": {
+          "xp": classInfo.levelAdvancement?.["2"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["2"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["2"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["2"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["2"]?.ta || null
+        },
+        "3": {
+          "xp": classInfo.levelAdvancement?.["3"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["3"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["3"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["3"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["3"]?.ta || null
+        },
+        "4": {
+          "xp": classInfo.levelAdvancement?.["4"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["4"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["4"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["4"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["4"]?.ta || null
+        },
+        "5": {
+          "xp": classInfo.levelAdvancement?.["5"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["5"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["5"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["5"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["5"]?.ta || null
+        },
+        "6": {
+          "xp": classInfo.levelAdvancement?.["6"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["6"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["6"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["6"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["6"]?.ta || null
+        },
+        "7": {
+          "xp": classInfo.levelAdvancement?.["7"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["7"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["7"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["7"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["7"]?.ta || null
+        },
+        "8": {
+          "xp": classInfo.levelAdvancement?.["8"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["8"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["8"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["8"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["8"]?.ta || null
+        },
+        "9": {
+          "xp": classInfo.levelAdvancement?.["9"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["9"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["9"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["9"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["9"]?.ta || null
+        },
+        "10": {
+          "xp": classInfo.levelAdvancement?.["10"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["10"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["10"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["10"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["10"]?.ta || null
+        },
+        "11": {
+          "xp": classInfo.levelAdvancement?.["11"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["11"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["11"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["11"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["11"]?.ta || null
+        },
+        "12": {
+          "xp": classInfo.levelAdvancement?.["12"]?.xp || 0,
+          "hpRoll": classInfo.levelAdvancement?.["12"]?.hpRoll || "",
+          "fa": classInfo.levelAdvancement?.["12"]?.fa || 0,
+          "ca": classInfo.levelAdvancement?.["12"]?.ca || null,
+          "ta": classInfo.levelAdvancement?.["12"]?.ta || null
+        }
+      },
+      "abilities": abilities,
+      "startingPack": {
+        "gold": classInfo.startingPack?.gold || "1d4+1",
+        "armour": armor,
+        "weapons": weapons,
+        "equipment - general": generalEquipment,
+        "equipment - provisions": provisions,
+        "equipment - religious": religiousItems,
+      },
+      "spellLists": [
+        classInfo.spellLists["0"] || "",
+        classInfo.spellLists["1"] || ""
+      ],
+      "spellcaster": classInfo?.spellLists["0"].trim() !== "" ? true : false
+    }
+
+    try {
+      // Create a new Item document for the class
+      const classItemData = {
+        name: className,
+        type: "classTemplate",
+        system: systemData,
+        folder: classTemplatesFolder.id
+      };
+      const classItem = await Item.implementation.create(classItemData, {
+        renderSheet: false
+      });
+      migratedClasses[className] = classItem.id;
+      Hyp3eLogger.info("migrateCustomClasses", `Migrated class "${className}" to Item ID ${classItem.id}`);
+
+      // Delete the old class data from the cloned data
+      delete allCustomClasses[className];
+    } catch (err) {
+      Hyp3eLogger.error("migrateCustomClasses", `Failed to migrate class "${className}":`, err);
+    }
+  }
+
+  // Now we do the batch delete of all custom classes
+  // await game.settings.set(game.system.id, "customClassData", allCustomClasses);
+  Hyp3eLogger.info("migrateCustomClasses", `Deleted all migrated class data. ${Object.keys(migratedClasses).length} migrated, ${Object.keys(allCustomClasses).length} remain.`);
+}

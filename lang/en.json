@@ -38,6 +38,8 @@
 
     "HYP3E": {
         "settings": {
+            "reRunSetup": "Re-run world setup",
+            "reRunSetupHint": "When this world is loaded again, re-run world setup to create folders and core compendia. Does not include compendia migration (below).",
             "reRunMigration": "Re-run world migration",
             "reRunMigrationHint": "When this world is loaded again, re-run world data migrations included with the most recent release. Does not include compendia.",
             "migrateCompendia": "Migrate compendia",

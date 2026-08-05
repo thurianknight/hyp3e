@@ -4606,139 +4606,139 @@ export class Hyp3eCharacterClass {
    * @param {Object} dataset - The dataset from the actor.
    * @return {boolean} Success or failure of the character creation.
    */
-  static async quickCreateCharacter(dataset) {
-    Hyp3eLogger.info("Hyp3eCharacterClass quickCreateCharacter", `Incoming dataset:`, dataset);
-    const actor = game.actors.get(dataset.actorId)
-    if (!actor) {
-      Hyp3eLogger.error("Hyp3eCharacterClass quickCreateCharacter", `Actor not found for id ${dataset.actorId}`);
-      return false;
-    }
+  // static async quickCreateCharacter(dataset) {
+  //   Hyp3eLogger.info("Hyp3eCharacterClass quickCreateCharacter", `Incoming dataset:`, dataset);
+  //   const actor = game.actors.get(dataset.actorId)
+  //   if (!actor) {
+  //     Hyp3eLogger.error("Hyp3eCharacterClass quickCreateCharacter", `Actor not found for id ${dataset.actorId}`);
+  //     return false;
+  //   }
 
-    // const attributes = await this.rollAttributesForClass(actor, dataset);
-    const attributes = await this.rollAttributesForClass(actor);
-    Hyp3eLogger.info("Hyp3eCharacterClass quickCreateCharacter", `Attributes:`, attributes);
-    if (attributes) {
-      // Set the attributes in the actor
-      for (let [k, v] of Object.entries(attributes)) {
-        await actor.update({ system: { attributes: { [k]: { value: v } } } })
-        actor.system.attributes[k].value = v
-      }
-      const setAttrOk = await this.setAttributeMods(actor, null, true)
-      if (!setAttrOk) return false; // If setting attribute mods failed, exit early
+  //   // const attributes = await this.rollAttributesForClass(actor, dataset);
+  //   const attributes = await this.rollAttributesForClass(actor);
+  //   Hyp3eLogger.info("Hyp3eCharacterClass quickCreateCharacter", `Attributes:`, attributes);
+  //   if (attributes) {
+  //     // Set the attributes in the actor
+  //     for (let [k, v] of Object.entries(attributes)) {
+  //       await actor.update({ system: { attributes: { [k]: { value: v } } } })
+  //       actor.system.attributes[k].value = v
+  //     }
+  //     const setAttrOk = await this.setAttributeMods(actor, null, true)
+  //     if (!setAttrOk) return false; // If setting attribute mods failed, exit early
 
-      const roll = new Roll(`${actor.system.hd} + ${actor.system.attributes.con.hpMod}`);
-      await roll.evaluate({ evaluateSync: true });
-      Hyp3eLogger.info("Hyp3eCharacterClass quickCreateCharacter", `HP roll result:`, roll);
-      if (roll != undefined && roll.total != undefined) {
-        await actor.update({
-          system: {
-            hp: {
-              value: roll.total,
-              max: roll.total
-            }
-          }
-        });
-        // Set the HP values in the actor
-        actor.system.hp.value = roll.total;
-        actor.system.hp.max = roll.total;
-      } else {
-        Hyp3eLogger.error("Hyp3eCharacterClass quickCreateCharacter", `HP roll failed to evaluate properly.`);
-        return false;
-      }
-    } else {
-      Hyp3eLogger.error("Hyp3eCharacterClass quickCreateCharacter", `Attributes roll failed.`);
-      return false;
-    }
+  //     const roll = new Roll(`${actor.system.hd} + ${actor.system.attributes.con.hpMod}`);
+  //     await roll.evaluate({ evaluateSync: true });
+  //     Hyp3eLogger.info("Hyp3eCharacterClass quickCreateCharacter", `HP roll result:`, roll);
+  //     if (roll != undefined && roll.total != undefined) {
+  //       await actor.update({
+  //         system: {
+  //           hp: {
+  //             value: roll.total,
+  //             max: roll.total
+  //           }
+  //         }
+  //       });
+  //       // Set the HP values in the actor
+  //       actor.system.hp.value = roll.total;
+  //       actor.system.hp.max = roll.total;
+  //     } else {
+  //       Hyp3eLogger.error("Hyp3eCharacterClass quickCreateCharacter", `HP roll failed to evaluate properly.`);
+  //       return false;
+  //     }
+  //   } else {
+  //     Hyp3eLogger.error("Hyp3eCharacterClass quickCreateCharacter", `Attributes roll failed.`);
+  //     return false;
+  //   }
 
-    // Check to see if the Items directory has the class abilities/features that we need.
-    // Alternatively, we can also check for compendia with class abilities.
-    const abilities = await this.getClassAbilities({
-      actor: actor,
-      classTemplate: null,
-      itemType: "feature",
-      folderNames: ["features", "abilities", "class features", "class abilities", "class abilities & features"],
-      abilitiesKey: "abilities"
-    });
-    if (abilities && abilities.length > 0) {
-      // Add the features to the actor's list
-      await actor.createEmbeddedDocuments("Item", abilities);
-    }
+  //   // Check to see if the Items directory has the class abilities/features that we need.
+  //   // Alternatively, we can also check for compendia with class abilities.
+  //   const abilities = await this.getClassAbilities({
+  //     actor: actor,
+  //     classTemplate: null,
+  //     itemType: "feature",
+  //     folderNames: ["features", "abilities", "class features", "class abilities", "class abilities & features"],
+  //     abilitiesKey: "abilities"
+  //   });
+  //   if (abilities && abilities.length > 0) {
+  //     // Add the features to the actor's list
+  //     await actor.createEmbeddedDocuments("Item", abilities);
+  //   }
 
-    // Check to see if the Items directory has the folders & items we need.
-    // Alternatively, we can also check for compendia with the items we need.
-    // Start with armor...
-    const armorItems = await this.getDefaultItemsForClass({
-      actor: actor,
-      classTemplate: null,
-      itemType: "armor",
-      folderNames: ["armor", "armour", "armor & shields", "armour & shields"],
-      packKey: "armour"
-    });
-    if (armorItems && armorItems.length > 0) {
-      // Add the armor to the actor's inventory
-      await actor.createEmbeddedDocuments("Item", armorItems);
-    }
+  //   // Check to see if the Items directory has the folders & items we need.
+  //   // Alternatively, we can also check for compendia with the items we need.
+  //   // Start with armor...
+  //   const armorItems = await this.getDefaultItemsForClass({
+  //     actor: actor,
+  //     classTemplate: null,
+  //     itemType: "armor",
+  //     folderNames: ["armor", "armour", "armor & shields", "armour & shields"],
+  //     packKey: "armour"
+  //   });
+  //   if (armorItems && armorItems.length > 0) {
+  //     // Add the armor to the actor's inventory
+  //     await actor.createEmbeddedDocuments("Item", armorItems);
+  //   }
 
-    // Next we do weapons...
-    const weaponItems = await this.getDefaultItemsForClass({
-      actor: actor,
-      classTemplate: null,
-      itemType: "weapon",
-      folderNames: ["weapons", "melee", "missile"],
-      packKey: "weapons"
-    });
-    if (weaponItems && weaponItems.length > 0) {
-      // Add the weapons to the actor's inventory
-      await actor.createEmbeddedDocuments("Item", weaponItems);
-    }
+  //   // Next we do weapons...
+  //   const weaponItems = await this.getDefaultItemsForClass({
+  //     actor: actor,
+  //     classTemplate: null,
+  //     itemType: "weapon",
+  //     folderNames: ["weapons", "melee", "missile"],
+  //     packKey: "weapons"
+  //   });
+  //   if (weaponItems && weaponItems.length > 0) {
+  //     // Add the weapons to the actor's inventory
+  //     await actor.createEmbeddedDocuments("Item", weaponItems);
+  //   }
 
-    // Next we do all the equipment items...
-    const generalItems = await this.getDefaultItemsForClass({
-      actor: actor,
-      classTemplate: null,
-      itemType: "item",
-      folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items", "weapons", "ammunition"],
-      packKey: "equipment - general"
-    });
-    if (generalItems && generalItems.length > 0) {
-      // Add the items to the actor's inventory
-      await actor.createEmbeddedDocuments("Item", generalItems);
-    }
-    const provisionItems = await this.getDefaultItemsForClass({
-      actor: actor,
-      classTemplate: null,
-      itemType: "item",
-      folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
-      packKey: "equipment - provisions"
-    });
-    if (provisionItems && provisionItems.length > 0) {
-      // Add the items to the actor's inventory
-      await actor.createEmbeddedDocuments("Item", provisionItems);
-    }
-    const religiousItems = await this.getDefaultItemsForClass({
-      actor: actor,
-      classTemplate: null,
-      itemType: "item",
-      folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
-      packKey: "equipment - religious"
-    });
-    if (religiousItems && religiousItems.length > 0) {
-      // Add the items to the actor's inventory
-      await actor.createEmbeddedDocuments("Item", religiousItems);
-    }
+  //   // Next we do all the equipment items...
+  //   const generalItems = await this.getDefaultItemsForClass({
+  //     actor: actor,
+  //     classTemplate: null,
+  //     itemType: "item",
+  //     folderNames: ["equipment - general", "equipment - provisions", "equipment - religious", "gear", "equipment", "items", "weapons", "ammunition"],
+  //     packKey: "equipment - general"
+  //   });
+  //   if (generalItems && generalItems.length > 0) {
+  //     // Add the items to the actor's inventory
+  //     await actor.createEmbeddedDocuments("Item", generalItems);
+  //   }
+  //   const provisionItems = await this.getDefaultItemsForClass({
+  //     actor: actor,
+  //     classTemplate: null,
+  //     itemType: "item",
+  //     folderNames: ["equipment - provisions", "equipment - general", "gear", "equipment", "items"],
+  //     packKey: "equipment - provisions"
+  //   });
+  //   if (provisionItems && provisionItems.length > 0) {
+  //     // Add the items to the actor's inventory
+  //     await actor.createEmbeddedDocuments("Item", provisionItems);
+  //   }
+  //   const religiousItems = await this.getDefaultItemsForClass({
+  //     actor: actor,
+  //     classTemplate: null,
+  //     itemType: "item",
+  //     folderNames: ["equipment - religious", "equipment - general", "gear", "equipment", "items"],
+  //     packKey: "equipment - religious"
+  //   });
+  //   if (religiousItems && religiousItems.length > 0) {
+  //     // Add the items to the actor's inventory
+  //     await actor.createEmbeddedDocuments("Item", religiousItems);
+  //   }
 
-    // Get starting gold
-    const gold = await this.getStartingGoldForClass(actor);
-    if (gold && gold > 0) {
-      // Add the gold to the actor's inventory
-      await actor.update({"system.money.gp.value": gold});
-      actor.system.money.gp.value = gold;
-    }
+  //   // Get starting gold
+  //   const gold = await this.getStartingGoldForClass(actor);
+  //   if (gold && gold > 0) {
+  //     // Add the gold to the actor's inventory
+  //     await actor.update({"system.money.gp.value": gold});
+  //     actor.system.money.gp.value = gold;
+  //   }
 
-    // All good? Disable the quick-create button so it can't be used again.
-    actor.setFlag(game.system.id, "disableQuickCreate", true)
-    return true;
-  }
+  //   // All good? Disable the quick-create button so it can't be used again.
+  //   actor.setFlag(game.system.id, "disableQuickCreate", true)
+  //   return true;
+  // }
 
   /**
    * Roll attributes for a character of the given class

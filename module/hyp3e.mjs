@@ -21,7 +21,8 @@ import { migrateActorData,
       migrateItemData, 
       fixTokenSize,
       migrateActorEffects,
-      migrateItemEffects } from "./helpers/data-migrations.mjs"
+      migrateItemEffects,
+      migrateCustomClasses } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, 
       setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
 import { HYP3ETurnTrackerAppV2 } from "./apps/turn-tracker-app-v2.mjs";
@@ -972,6 +973,22 @@ await setupTurnTrackerHooks();
 async function setupSystem() {
   Hyp3eLogger.info("setupSystem", "Running system setup...");
 
+  // Folder definition for core compendia
+  const folderDefs = [
+    {
+      name: "Hyp3e Core Data",
+      type: "Compendium",
+      sorting: "a",
+      packs: [
+        "hyp3e-character-classes",
+        "hyp3e-equipment-lists"
+      ],
+    }
+  ];
+
+  // Create folder for core compendia, if it doesn't exist
+  await createCompendiumFolders(folderDefs);
+
   // Check for Class Templates folder in world Items directory, create if needed
   // const classTemplatesFolder = game.folders.find(f => f.name === "Class Templates" && f.type === "Item");
   // if (!classTemplatesFolder) {
@@ -981,6 +998,57 @@ async function setupSystem() {
 
 }
 
+/**
+ * Recursively create compendium folder for the core Hyp3e data.
+ * This is idempotent — it won't duplicate if they already exist.
+ * @param {Array} folderDefs - Array of folder definitions, each with name, type, sorting, color, packs, and subfolders
+ * @param {string|null} parentId - The ID of the parent folder, or null for top-level
+ */
+async function createCompendiumFolders(folderDefs, parentId = null) {
+  const systemId = "hyp3e";
+  for (const def of folderDefs) {
+    // Check if a folder with this name already exists at this level
+    let folder = game.folders.find(f => 
+      f.name === def.name && 
+      f.type === "Compendium"
+    );
+
+    if (!folder) {
+      console.log(`Creating compendium folder: ${def.name} ${parentId ? `(parent folder: ${parentId})` : '(top-level)'}`);
+      folder = await Folder.create({
+        name: def.name,
+        type: "Compendium",
+        sorting: def.sorting || "a",
+        color: def.color || null,
+        parent: parentId,
+        folder: parentId
+      });
+
+      // Small pause to let the collection update
+      await new Promise(r => setTimeout(r, 50));
+      folder = game.folders.get(folder.id); // Re-fetch fresh reference
+    }
+    console.log(`Found folder: ${folder.name} (id: ${folder.id}):`, folder);
+
+    // Assign packs to this folder (if any)
+    if (def.packs?.length) {
+      for (const packName of def.packs) {
+        const pack = game.packs.get(`${systemId}.${packName}`);
+        if (pack && pack.folder !== folder?.id) {
+          await pack.configure({ folder: folder.id });
+          console.log(`Assigned Hyp3e pack ${packName} to folder ${def.name}`, pack);
+        } else {
+          console.warn(`Hyp3e pack ${packName} not found for folder ${def.name}`);
+        }
+      }
+    }
+
+    // Recurse into subfolders
+    if (def.folders?.length) {
+      await ensureCompendiumFolders(def.folders, folder.id);
+    }
+  }
+}
 
 /* -------------------------------------------- */
 /*  Migrate system/world functions              */
@@ -1038,6 +1106,9 @@ async function migrateWorld() {
     // Migrate item effects required for v14 data changes
     migrateItemEffects(item);
   }
+
+  // Migrate custom classes, if any exist
+  await migrateCustomClasses();
 
   // We only migrate the Hyperborea compendium if the GM requests it.
   // We don't want to migrate compendia every time the game is loaded, as it may take a long time.
