@@ -6,7 +6,7 @@ import { Hyp3eItem } from "../documents/item.mjs";
  * @param {*} actor - Actor document to process for data migrations
  * @returns {Object} - JSON of update data
  */
-export function migrateActorData(actor) {
+export function migrateActorData(actor, classTemplate = null) {
     // Hyp3eLogger.info("migrateActorData", `Migrating data for ${actor.name}...:`, actor)
     // let newActor = {...actor};
     let updates = {};
@@ -21,6 +21,16 @@ export function migrateActorData(actor) {
     }
 
     // Migrate, fix, or delete old data
+
+    // Ensure that physical-attribute class feat bonuses are valid
+    if (classTemplate) {
+      for (const [key, value] of Object.entries(classTemplate.system.featBonus || {})) {
+        if (value !== null && value !== undefined && !isNaN(value)) {
+          updates = { ...updates, [`system.attributes.${key}.classFeatBonus`]: value };
+        }
+      }
+    }
+
     // If fightingAbility is missing, assume same issue for casting and turning, 
     //  and migrate all three from old properties
     if (actor.system.fightingAbility === undefined) {

@@ -419,6 +419,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
    * @return {undefined}
    */
   _prepareCharacterData(context) {
+    Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `Context:`, context)
     // Handle attribute scores
     for (let [k, v] of Object.entries(context.system.attributes)) {
       v.label = game.i18n.localize(CONFIG.HYP3E.attributeAbbreviations[k]) ?? k;

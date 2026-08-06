@@ -1060,8 +1060,9 @@ async function migrateWorld() {
   Hyp3eLogger.info("migrateWorld", `Migrating data for ${game.actors.contents.length} actors in the directory...`);
   for (const actor of game.actors.contents) {
     // Migrate actor data
-    const origActor = foundry.utils.deepClone(actor)
-    const actorUpdates = migrateActorData(origActor)
+    const classTemplate = await getClassTemplate(actor.system?.details?.class) ?? null;
+    const origActor = foundry.utils.deepClone(actor);
+    const actorUpdates = migrateActorData(origActor, classTemplate);
     if (actorUpdates && Object.keys(actorUpdates).length > 0) {
       await actor.update(actorUpdates);
     }

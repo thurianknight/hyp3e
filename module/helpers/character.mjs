@@ -1,4 +1,5 @@
 import { Hyp3eActor } from "../documents/actor.mjs";
+import { getClassTemplate, getClassTemplateNames } from "./folders-and-compendia.mjs"
 import { HYP3E } from "./config.mjs"
 import {Hyp3eDialog} from "./dialog.mjs";
 import { Hyp3eLogger } from "./logger.mjs";
@@ -4242,17 +4243,17 @@ export class Hyp3eCharacterClass {
     // return false
   }
 
-  static getClassTemplate(className) {
-    // Lookup the class template document in the compendium
-    const compendium = game.packs.get("hyp3e.hyp3e-character-classes");
-    const entry = compendium.index.find(e => e.name === className);
-    if (!entry) {
-      Hyp3eLogger.info("Hyp3eCharacterClass getClassTemplate", `Class template not found for ${className}`);
-      return null;
-    }
-    const thisClass = compendium.getDocument(entry._id);
-    return thisClass
-  }
+  // static getClassTemplate(className) {
+  //   // Lookup the class template document in the compendium
+  //   const compendium = game.packs.get("hyp3e.hyp3e-character-classes");
+  //   const entry = compendium.index.find(e => e.name === className);
+  //   if (!entry) {
+  //     Hyp3eLogger.info("Hyp3eCharacterClass getClassTemplate", `Class template not found for ${className}`);
+  //     return null;
+  //   }
+  //   const thisClass = compendium.getDocument(entry._id);
+  //   return thisClass
+  // }
 
   /**
    * Calculate attribute modifiers for the actor based on their class.
@@ -4263,8 +4264,9 @@ export class Hyp3eCharacterClass {
     // Actor system data for lookups
     // const data = actor.system;
     // let thisClass = this.classData[data.details.class];
-    let thisClass = this.getClassTemplate(data.details.class)?.system;
+    // let thisClass = await getClassTemplate(data.details.class)?.system;
     // if (!thisClass) {
+    //   Hyp3eLogger.info("Hyp3eCharacterClass calcAttrMods", `No template found for ${data.details.class}!`);
     //   const customClassData = game.settings.get(game.system.id, "customClassData");
     //   thisClass = customClassData[data.details.class];
     // }
@@ -4282,9 +4284,8 @@ export class Hyp3eCharacterClass {
           attributes.str.dmgMod = this._valueFromTable(this.strDmgMod, attributes.str.curr)
           attributes.str.test = this._valueFromTable(this.testOfAttr, attributes.str.curr)
           attributes.str.feat = this._valueFromTable(this.featOfAttr, attributes.str.curr)
-          if (data.details.class) {
-            attributes.str.feat += (thisClass?.featBonus?.str ? thisClass.featBonus.str : 0);
-          }
+          // Add any class feat bonus to the feat of strength
+          attributes.str.feat += attributes.str?.classFeatBonus ?? 0;
           break;
 
         case "dex":
@@ -4292,9 +4293,8 @@ export class Hyp3eCharacterClass {
           attributes.dex.defMod = this._valueFromTable(this.dexDefMod, attributes.dex.curr)
           attributes.dex.test = this._valueFromTable(this.testOfAttr, attributes.dex.curr)
           attributes.dex.feat = this._valueFromTable(this.featOfAttr, attributes.dex.curr)
-          if (data.details.class) {
-            attributes.dex.feat += (thisClass?.featBonus?.dex ? thisClass.featBonus.dex : 0);
-          }
+          // Add any class feat bonus to the feat of dexterity
+          attributes.dex.feat += attributes.dex?.classFeatBonus ?? 0;
           break;
 
         case "con":
@@ -4303,9 +4303,8 @@ export class Hyp3eCharacterClass {
           attributes.con.traumaSurvive = this._valueFromTable(this.conTraumaSurvive, attributes.con.curr)
           attributes.con.test = this._valueFromTable(this.testOfAttr, attributes.con.curr)
           attributes.con.feat = this._valueFromTable(this.featOfAttr, attributes.con.curr)
-          if (data.details.class) {
-            attributes.con.feat += (thisClass?.featBonus?.con ? thisClass.featBonus.con : 0);
-          }
+          // Add any class feat bonus to the feat of constitution
+          attributes.con.feat += attributes.con?.classFeatBonus ?? 0;
           break;
 
         case "int":
@@ -4405,6 +4404,15 @@ export class Hyp3eCharacterClass {
     for (let [k, v] of Object.entries(attributes)) {
       actorData.attributes[k].value = v;
     };
+    // Add class-based feat of attribute bonuses to the physical attributes
+    actorData.attributes.str.classFeatBonus = classTemplate.system.featBonus?.str ?? 0;
+    actorData.attributes.dex.classFeatBonus = classTemplate.system.featBonus?.dex ?? 0;
+    actorData.attributes.con.classFeatBonus = classTemplate.system.featBonus?.con ?? 0;
+
+    // Update actor attributes so we can calculate the attribute modifiers
+    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Updating actor attributes...`, actorData.attributes); 
+    await actor.update({ "system.attributes": actorData.attributes });
+
     // Build the prime attributes string
     const primeAttrs = Object.entries(classTemplate.system.xpBonusReq)
       .filter(([, value]) => value !== null)
@@ -4426,10 +4434,6 @@ export class Hyp3eCharacterClass {
     }
 
     const weaponProficiencies = classTemplate.system.weaponProficiencies.favoredWeapons.join("; ") + (classTemplate.system.weaponProficiencies.exceptions.length > 0 ? `; except ${classTemplate.system.weaponProficiencies.exceptions.join("; ")}` : "")
-
-    // Update actor attributes with the rolled values, so we can calculate the attribute modifiers
-    Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Updating actor attributes...`, actorData.attributes); 
-    await actor.update({ "system.attributes": actorData.attributes });
 
     // Now we update all the data fields are don't need to be rolled, but are set by the class template
     await actor.update({
@@ -4885,7 +4889,7 @@ export class Hyp3eCharacterClass {
     }
     Hyp3eLogger.info("Hyp3eCharacterClass _checkAttrRequirements", `Checking attribute list:`, attributes);
 
-    // Check if the character meets the attribute requirements
+    // Check if the character meets all attribute requirements
     for (const [attr, minValue] of Object.entries(classData.attrReqs)) {
       Hyp3eLogger.info("Hyp3eCharacterClass _checkAttrRequirements", `Checking ${attr} requirement for class ${classData.realName}: Required: ${minValue}, Rolled: ${attributes[attr]}`);
       if (attributes[attr] < minValue) {
@@ -5156,7 +5160,7 @@ export class Hyp3eCharacterClass {
    * @param {*} dataset
    */
   static async levelUp(dataset) {
-    let actor = game.actors.get(dataset.actorId)
+    const actor = game.actors.get(dataset.actorId)
     if (!actor) {
       Hyp3eLogger.error("Hyp3eCharacterClass levelUp", `Actor not found for id ${dataset.actorId}`);
       return false;
@@ -5166,8 +5170,8 @@ export class Hyp3eCharacterClass {
 
     // Get the class & level data
     // let thisClass = this.classData[actor.system.details.class] || CONFIG.HYP3E.customClassData[actor.system.details.class];
-    let thisClass = this.getClassTemplate(actor.system.details.class)?.system;
-    let currLevel = actor.system.details.level.value ? parseInt(actor.system.details.level.value) : 1
+    const thisClass = await getClassTemplate(actor.system.details.class)?.system;
+    const currLevel = actor.system.details.level.value ? parseInt(actor.system.details.level.value) : 1
 
     // Is the character already level 12? Then exit...
     if (currLevel >= 12) {
@@ -5177,27 +5181,21 @@ export class Hyp3eCharacterClass {
 
     // Display the confirmation dialog, and exit if the user cancels this action
     try {
-      let rollResponse = await Hyp3eDialog.ShowLevelUpDialog(dataset)
+      const rollResponse = await Hyp3eDialog.ShowLevelUpDialog(dataset)
     } catch(err) {
       Hyp3eLogger.info("Hyp3eCharacterClass levelUp", `Dialog canceled.`, err);
       return false;
     }
 
     // Initialize character data
-    let data = foundry.utils.deepClone(actor.system)
+    const data = foundry.utils.deepClone(actor.system)
 
-    let nextLevel = currLevel + 1
-    let requiredXp = thisClass.levelAdvancement[nextLevel].xp
-    let nextLevelXp
-    if (nextLevel <= 11) {
-      nextLevelXp = thisClass.levelAdvancement[nextLevel+1].xp
-    } else {
-      // No more "Next Level XP" after level 12
-      nextLevelXp = thisClass.levelAdvancement[12].xp
-    }
+    const nextLevel = currLevel + 1
+    const requiredXp = thisClass.levelAdvancement[nextLevel].xp
+    const nextLevelXp = (nextLevel <= 11) ? thisClass.levelAdvancement[nextLevel+1].xp : thisClass.levelAdvancement[12].xp
 
     // Do we have enough XP to level up?
-    let currentXp = parseInt((data.details.xp.value).replace(/,|\./g, ""))
+    const currentXp = parseInt((data.details.xp.value).replace(/,|\./g, ""))
     if (currentXp < requiredXp) {
       ui.notifications.warn(`Not enough XP to level up! ${currentXp} < ${requiredXp}`)
       Hyp3eLogger.info("Hyp3eCharacterClass levelUp", `Not enough XP to level up! ${currentXp} < ${requiredXp}`)
@@ -5228,8 +5226,8 @@ export class Hyp3eCharacterClass {
     if (thisClass.levelAdvancement[nextLevel].ta) { data.turningAbility.value = thisClass.levelAdvancement[nextLevel].ta }
 
     // Update saving throws, if needed
-    let currentSave = this._valueFromTable(this.savingThrows, currLevel)
-    let newSave = this._valueFromTable(this.savingThrows, nextLevel)
+    const currentSave = this._valueFromTable(this.savingThrows, currLevel)
+    const newSave = this._valueFromTable(this.savingThrows, nextLevel)
     if (newSave < currentSave) {
       // It's as easy as subtracting 1 from each save...
       data.saves.base.value -= 1
@@ -5241,7 +5239,7 @@ export class Hyp3eCharacterClass {
     }
 
     // Use the modified data clone to create a clean update object for the character
-    let updateData = {
+    const updateData = {
       system: {
         hd: data.hd,
         hp: {
@@ -5296,11 +5294,8 @@ export class Hyp3eCharacterClass {
       Hyp3eLogger.error("Hyp3eCharacterClass levelUp", `Actor update error:`, err)
     }
 
-    // Update the actor with the new data
-    // await actor.update(updateData)
-
     // Setup a chat message to show the level-up values
-    let label = `<div><b>Level Up!</b></div>`
+    const label = `<div><b>Level Up!</b></div>`
     let content = `<ul>`
     content += `<li>New Level: ${nextLevel}</li>`
     content += `<li>XP: ${currentXp} / ${nextLevelXp}</li>`

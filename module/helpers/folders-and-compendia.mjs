@@ -154,29 +154,37 @@ export async function getClassTemplateNames() {
 
 /**
  * Find a class template by name, searching both world items and compendia.
- * @param {*} name of classTemplate
+ * @param {*} className of classTemplate
  * @returns {Promise<Item|null>} The class template item or null if not found
  */
-export async function getClassTemplate(name) {
+export async function getClassTemplate(className) {
+  if (!className || className.trim().length === 0) return null;
   // Check world items first, as they take precedence if the same name exists in both
+  Hyp3eLogger.info("getClassTemplate", `Checking world items for ${className} class template...`);
   const worldItem = game.items.find(i => 
-    i.type === "classTemplate" && i.name.toLowerCase() === name.toLowerCase()
+    i.type === "classTemplate" && i.name.toLowerCase() === className.toLowerCase()
   );
-  if (worldItem) return worldItem;
+  if (worldItem) {
+    Hyp3eLogger.info("getClassTemplate", `Found ${className} class template in world items!`);
+    return worldItem;
+  }
 
   // Not found? Search Item compendia
+  Hyp3eLogger.info("getClassTemplate", `Checking item compendia for ${className} class template...`);
   for (const pack of game.packs) {
     if (pack.documentName !== "Item") continue;
 
     // Use the index so we only load the matching document
     const entry = pack.index.find(i => 
-      i.type === "classTemplate" && i.name.toLowerCase() === name.toLowerCase()
+      i.type === "classTemplate" && i.name.toLowerCase() === className.toLowerCase()
     );
     if (!entry) continue;
 
+    Hyp3eLogger.info("getClassTemplate", `Found ${className} class template in ${pack.metadata.label} compendium!`);
     return await pack.getDocument(entry._id);
   }
 
+  Hyp3eLogger.info("getClassTemplate", `Template ${className} was not found anywhere!`);
   return null; // not found
 }
 
