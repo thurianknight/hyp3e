@@ -19,6 +19,7 @@ export class Hyp3eCharacterClass {
    *   Huntsman, Illusionist, Legerdemainist, Magician, Monk, Necromancer, Paladin, Priest, 
    *   Purloiner, Pyromancer, Ranger, Runegraver, Scout, Shaman, Thief, Warlock, Witch
    */
+  /**
   static classData = {
     "Assassin": {
       "baseClass": "thief",
@@ -3917,6 +3918,7 @@ export class Hyp3eCharacterClass {
       },
     },
   }
+  */
 
   /**
    * Str attack mods, from -2 to +2.
@@ -5170,7 +5172,11 @@ export class Hyp3eCharacterClass {
 
     // Get the class & level data
     // let thisClass = this.classData[actor.system.details.class] || CONFIG.HYP3E.customClassData[actor.system.details.class];
-    const thisClass = await getClassTemplate(actor.system.details.class)?.system;
+    const classTemplate = await getClassTemplate(actor.system.details.class);
+    Hyp3eLogger.info("Hyp3eCharacterClass levelUp", `Class template:`, classTemplate);
+    const thisClass = classTemplate.system;
+
+    // Get current level, defaulting to 1 if not set
     const currLevel = actor.system.details.level.value ? parseInt(actor.system.details.level.value) : 1
 
     // Is the character already level 12? Then exit...
