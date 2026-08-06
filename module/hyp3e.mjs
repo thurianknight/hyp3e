@@ -466,22 +466,10 @@ Hooks.once("ready", async function() {
   // Load class list
   CONFIG.HYP3E.characterClasses = {}
   const characterClasses = await getClassTemplateNames(); // Returns an array of class template names from world and compendia
-  // const characterClasses = game.settings.get(game.system.id, "characterClasses");
-  // if (characterClasses != "") {
   if (characterClasses.length > 0) {
-    // const classArray = characterClasses.split(",");
-    // classArray.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
     characterClasses.forEach((l, i) => (CONFIG.HYP3E.characterClasses[l.trim()] = l.trim()));
     Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
   }
-  // // Load custom classes
-  // CONFIG.HYP3E.customClassData = game.settings.get(game.system.id, "customClassData");
-  // Hyp3eLogger.info("Init", "CONFIG Custom Classes:", CONFIG.HYP3E.customClassData);
-  // for (const [className, classData] of Object.entries(CONFIG.HYP3E.customClassData)) {
-  //   // Append the class name to characterClasses
-  //   CONFIG.HYP3E.characterClasses[className] = className;
-  // }
-  // Hyp3eLogger.info("Init", "CONFIG Classes:", CONFIG.HYP3E.characterClasses);
 
   // Load Phenotypes list
   const phenotypes = game.settings.get(game.system.id, "phenotypes");
