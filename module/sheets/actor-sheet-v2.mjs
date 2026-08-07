@@ -775,20 +775,27 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         }
 
         // Right-click context menu on item entries
-        new foundry.applications.ux.ContextMenu.implementation(this.element, ".item-entry", [
-          {
-            name: game.i18n.localize("HYP3E.item.splitStack"),
-            icon: '<i class="fas fa-scissors"></i>',
-            condition: (target) => {
-              const item = this.actor.items.get(target.dataset.itemId);
-              return item?.system?.quantity?.value > 1;
-            },
-            callback: (target) => {
-              const itemId = target.dataset.itemId;
-              Hyp3eActorSheetV2._splitItemStack.call(this, itemId);
-            }
-          }
-        ], { jQuery: false });
+        const splitStackLabel = game.i18n.localize("HYP3E.item.splitStack");
+        const canSplitStack = (target) => {
+          const item = this.actor.items.get(target.dataset.itemId);
+          return item?.system?.quantity?.value > 1;
+        };
+        const splitStack = (target) => {
+          Hyp3eActorSheetV2._splitItemStack.call(this, target.dataset.itemId);
+        };
+        const splitStackEntry = {
+          icon: '<i class="fas fa-scissors"></i>',
+          ...(Number(game.version.split(".")[0]) >= 14
+            ? { label: splitStackLabel, visible: canSplitStack, onClick: splitStack }
+            : { name: splitStackLabel, condition: canSplitStack, callback: splitStack })
+        };
+
+        new foundry.applications.ux.ContextMenu.implementation(
+          this.element,
+          ".item-entry",
+          [splitStackEntry],
+          { jQuery: false }
+        );
 
         // Log render completion
         Hyp3eLogger.info("HYP3EActorSheetV2 _onRender", `Actor Sheet rendered.`, { context, options, sheet: this });
