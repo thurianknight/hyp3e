@@ -413,7 +413,7 @@ export async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula
   };
 
   const template = `${HYP3E.templatePath}/chat/damage-roll.hbs`;
-  const html = await renderTemplate(template, templateData);
+  const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
   // Send to chat
   dmgRoll.toMessage({
@@ -465,7 +465,7 @@ async function rollCriticalDamage(total, extraRoll, damageType, applyDr) {
   };
 
   const template = `${HYP3E.templatePath}/chat/apply-damage.hbs`;
-  const html = await renderTemplate(template, templateData);
+  const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
   const chatData = {
     author: game.user_id,
     content: html
@@ -568,7 +568,7 @@ export async function applyHealthChange(total, damageType = "basic", applyDr = t
   };
 
   const template = `${HYP3E.templatePath}/chat/apply-damage.hbs`;
-  const html = await renderTemplate(template, templateData);
+  const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
   const chatData = {
     author: game.user_id,

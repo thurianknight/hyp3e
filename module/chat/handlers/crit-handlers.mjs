@@ -223,7 +223,7 @@ async function rollCritHit(charType, actorId) {
     diceRoll: await roll.render()
   };
   const template = `${HYP3E.templatePath}/chat/crit-roll.hbs`;
-  const html = await renderTemplate(template, templateData);
+  const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
   const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
   if (!actor) {
@@ -374,7 +374,7 @@ async function rollCritMiss(charType, actorId, dmgData = null) {
     diceRoll: await roll.render()
   };
   const template = `${HYP3E.templatePath}/chat/crit-roll.hbs`;
-  const html = await renderTemplate(template, templateData);
+  const html = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
   const actor = game.actors.get(actorId) ? game.actors.get(actorId) : null
   if (!actor) {

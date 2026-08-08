@@ -171,7 +171,7 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
         if (!form) return;
 
         // Collect data
-        const fd = new FormDataExtended(form);
+        const fd = new foundry.applications.ux.FormDataExtended(form);
         const formData = fd.object; // returns a deep object of all form fields
         Hyp3eLogger.info("#addFeature", `Form data:`, formData);
 
@@ -206,7 +206,7 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
         if (!form) return;
 
         // Collect data
-        const fd = new FormDataExtended(form);
+        const fd = new foundry.applications.ux.FormDataExtended(form);
         const formData = fd.object; // returns a deep object of all form fields
         Hyp3eLogger.info("#addItem", `Form data:`, formData);
 
@@ -278,7 +278,7 @@ export class HYP3EClassEditor extends HandlebarsApplicationMixin(ApplicationV2) 
         if (!form) return;
 
         // Collect data
-        const fd = new FormDataExtended(form);
+        const fd = new foundry.applications.ux.FormDataExtended(form);
         const formData = fd.object; // returns a deep object of all form fields
         Hyp3eLogger.info("#saveClass", `Form data:`, formData);
 

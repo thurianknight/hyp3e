@@ -1,4 +1,5 @@
 import { HYP3E } from "./config.mjs"
+import { getRollModeChoices } from "./foundry-compat.mjs"
 import { Hyp3eLogger } from "./logger.mjs"
 
 export class Hyp3eDialog {
@@ -14,12 +15,12 @@ export class Hyp3eDialog {
       ?? "publicroll";
     let dialogData = {
       dataset: dataset,
-      rollModes: CONFIG.Dice.rollModes,
+      rollModes: getRollModeChoices(),
       rollMode: rollMode
     }
     Hyp3eLogger.info("Hyp3eDialog ShowBasicRollDialog", `Dialog dataset:`, dialogData);
     const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
-    const dialogHtml = await renderTemplate(template, dialogData)
+    const dialogHtml = await foundry.applications.handlebars.renderTemplate(template, dialogData)
 
     // Roll dialog for item and ability checks
     return new Promise((resolve, reject) => {
@@ -32,7 +33,7 @@ export class Hyp3eDialog {
             label: dataset.rollButtonLabel,
             callback: (html) => {
               const formElement = html[0].querySelector('form')
-              const formData = new FormDataExtended(formElement)
+              const formData = new foundry.applications.ux.FormDataExtended(formElement)
               const formDataObj = formData.object
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
@@ -73,7 +74,7 @@ export class Hyp3eDialog {
       ?? "publicroll";
     let dialogData = {
       dataset: dataset,
-      rollModes: CONFIG.Dice.rollModes,
+      rollModes: getRollModeChoices(),
       rollMode: rollMode,
       ammoTypes: dataset.carriedAmmo ?? null,
       selectedAmmo: dataset.selectedAmmo ?? null,
@@ -84,7 +85,7 @@ export class Hyp3eDialog {
     // Log the dataset
     Hyp3eLogger.info("Hyp3eDialog ShowAttackRollDialog", `Dialog dataset:`, dataset);
     const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
-    const dialogHtml = await renderTemplate(template, dialogData)
+    const dialogHtml = await foundry.applications.handlebars.renderTemplate(template, dialogData)
 
     // Roll dialog for attacks
     return new Promise((resolve, reject) => {
@@ -97,7 +98,7 @@ export class Hyp3eDialog {
             label: "Attack",
             callback: (html) => {
               const formElement = html[0].querySelector('form')
-              const formData = new FormDataExtended(formElement)
+              const formData = new foundry.applications.ux.FormDataExtended(formElement)
               const formDataObj = formData.object
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
@@ -136,12 +137,12 @@ export class Hyp3eDialog {
       // roll: dataset.roll,
       enableRoll: dataset.enableRoll,
       dataset: dataset,
-      rollModes: CONFIG.Dice.rollModes,
+      rollModes: getRollModeChoices(),
       rollMode: rollMode
     }
     Hyp3eLogger.info("Hyp3eDialog ShowSpellcastingDialog", `Dialog dataset:`, dataset);
     const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
-    const dialogHtml = await renderTemplate(template, dialogData)
+    const dialogHtml = await foundry.applications.handlebars.renderTemplate(template, dialogData)
 
     // Roll dialog for casting spells
     return new Promise((resolve, reject) => {
@@ -154,7 +155,7 @@ export class Hyp3eDialog {
             label: "Cast Spell",
             callback: (html) => {
               const formElement = html[0].querySelector('form')
-              const formData = new FormDataExtended(formElement)
+              const formData = new foundry.applications.ux.FormDataExtended(formElement)
               const formDataObj = formData.object
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
@@ -192,12 +193,12 @@ export class Hyp3eDialog {
     let dialogData = {
       // roll: dataset.roll,
       dataset: dataset,
-      rollModes: CONFIG.Dice.rollModes,
+      rollModes: getRollModeChoices(),
       rollMode: rollMode
     }
     Hyp3eLogger.info("Hyp3eDialog ShowSaveRollDialog", `Dialog dataset:`, dataset);
     const template = `${HYP3E.templatePath}/dialog/roll-dialog.hbs`
-    const dialogHtml = await renderTemplate(template, dialogData)
+    const dialogHtml = await foundry.applications.handlebars.renderTemplate(template, dialogData)
 
     // Roll dialog for saving throws, with save modifiers
     return new Promise((resolve, reject) => {
@@ -210,7 +211,7 @@ export class Hyp3eDialog {
             label: "Roll Save",
             callback: (html) => {
               const formElement = html[0].querySelector('form')
-              const formData = new FormDataExtended(formElement)
+              const formData = new foundry.applications.ux.FormDataExtended(formElement)
               const formDataObj = formData.object
               // No situational modifier? Set it to 0
               if (formDataObj.sitMod == '') { formDataObj.sitMod = 0 }
@@ -223,7 +224,7 @@ export class Hyp3eDialog {
             label: "Avoidance Mod",
             callback: (html) => {
               const formElement = html[0].querySelector('form')
-              const formData = new FormDataExtended(formElement)
+              const formData = new foundry.applications.ux.FormDataExtended(formElement)
               const formDataObj = formData.object
               formDataObj.avoidMod = dataset.avoidMod
               // No situational modifier? Set it to 0
@@ -237,7 +238,7 @@ export class Hyp3eDialog {
             label: "Poison/Rad Mod",
             callback: (html) => {
               const formElement = html[0].querySelector('form')
-              const formData = new FormDataExtended(formElement)
+              const formData = new foundry.applications.ux.FormDataExtended(formElement)
               const formDataObj = formData.object
               formDataObj.poisonMod = dataset.poisonMod
               // No situational modifier? Set it to 0
@@ -251,7 +252,7 @@ export class Hyp3eDialog {
             label: "Willpower Mod",
             callback: (html) => {
               const formElement = html[0].querySelector('form')
-              const formData = new FormDataExtended(formElement)
+              const formData = new foundry.applications.ux.FormDataExtended(formElement)
               const formDataObj = formData.object
               formDataObj.willMod = dataset.willMod
               // No situational modifier? Set it to 0

@@ -1,4 +1,5 @@
 import { HYP3E } from "../helpers/config.mjs"
+import { getRollMessageOptions } from "../helpers/foundry-compat.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { 
     handleDamageRollButtons, 
@@ -47,9 +48,7 @@ export function sendRollToChat(roll, actor, label, content, rollMode) {
     speaker: ChatMessage.getSpeaker({ alias: speaker }),
     flavor: label,
     content: content
-  },{
-    rollMode: rollMode
-  })
+  }, getRollMessageOptions(rollMode))
 }
 
 /**
@@ -78,7 +77,7 @@ export async function renderCustomChat(roll, item, dmgObj, actor, tokenId, label
       footerHTML: footerHTML,
     };
     const template = `${HYP3E.templatePath}/chat/attack-roll.hbs`;
-    let customChat = await renderTemplate(template, templateData);
+    let customChat = await foundry.applications.handlebars.renderTemplate(template, templateData);
 
     // Send to chat
     roll.toMessage({
@@ -86,9 +85,7 @@ export async function renderCustomChat(roll, item, dmgObj, actor, tokenId, label
       speaker: ChatMessage.getSpeaker({ alias: speaker }),
       flavor: label,
       content: customChat
-    },{
-      rollMode: rollMode
-    })
+    }, getRollMessageOptions(rollMode))
 }
 
 /**********************************************************
