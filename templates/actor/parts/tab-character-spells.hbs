@@ -22,8 +22,17 @@
             </div>
         </div>
         <div class="flexrow">
-            <div class="spells-block flex-xlarge">
-                <input type="text" class="spell-list" name="system.spellList" value="{{system.spellList}}"/>
+            <div class="spells-block flexlarge">
+                {{!-- <input type="text" class="spell-list" name="system.spellList" value="{{system.spellList}}"/> --}}
+                <span class="flex-item">
+                  <select name="system.spellList">
+                    <option value=""></option>
+                    {{selectOptions @root.spellLists selected=system.spellList localize=false}}
+                  </select>
+                  {{!-- <label for="system.spellLists.0">{{localize 'HYP3E.classEditor.spellList'}} 1</label>         --}}
+                </span>
+            </div>
+            <div class="spells-block">
                 <span class="spells-label">{{localize 'HYP3E.dataLabel.spellsPerDay'}}:</span>
             </div>
             <div class="spells-block">
@@ -53,8 +62,17 @@
         </div>
         {{#if system.spellList2}}
         <div class="flexrow">
-            <div class="spells-block flex-xlarge">
-                <input type="text" class="spell-list" style="min-width: 100px" name="system.spellList2" value="{{system.spellList2}}"/>
+            <div class="spells-block flexlarge">
+                {{!-- <input type="text" class="spell-list" style="min-width: 100px" name="system.spellList2" value="{{system.spellList2}}"/> --}}
+                <span class="flex-item">
+                  <select name="system.spellList2">
+                    <option value=""></option>
+                    {{selectOptions @root.spellLists selected=system.spellList2 localize=false}}
+                  </select>
+                  {{!-- <label for="system.spellLists.1">{{localize 'HYP3E.classEditor.spellList'}} 2</label>         --}}
+                </span>
+            </div>
+            <div class="spells-block">
                 <span class="spells-label">{{localize 'HYP3E.dataLabel.spellsPerDay'}}:</span>
             </div>
             <div class="spells-block">

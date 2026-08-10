@@ -1314,8 +1314,8 @@
 
 /* Character Spells-tab styles */
 .hyp3e .spells-block {
-  padding: 0 5px;
-  margin-right: 5px;
+  /* padding: 0 5px; */
+  margin-right: 10px;
   .spell-list {
     text-align: center;
     width: 100px;

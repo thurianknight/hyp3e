@@ -209,6 +209,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     context.isGM = game.user.isGM
     context.autoCalcAttrMods = CONFIG.HYP3E.autoCalcAttrMods;
 
+    // Add spell lists to context for use in spell list selection dropdowns
+    const spellcasters = CONFIG.HYP3E.spellLists ? Object.values(CONFIG.HYP3E.spellLists) : [];
+    context.spellLists = Object.fromEntries(spellcasters.map(n => [n, n]));
+
     // Use a safe clone of the actor data for further operations
     const actorData = this.actor.toObject(false);
     Hyp3eLogger.info("HYP3EActorSheetV2 _prepareContext", `Actor data for sheet:`, actorData);
