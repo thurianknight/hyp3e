@@ -55,6 +55,12 @@
             <span>&nbsp;</span>
             <span class="mod-label">{{localize 'Base | Current'}}</span>
           </div>
+          {{#if (eq system.npcType "npc")}}
+          <div class="attribute-row flexrow">
+            <label for="system.attributes.str.value" class="combat-label">{{localize "HYP3E.attributes.str.abbrev"}}</label>
+            <input type="text" name="system.attributes.str.value" value="{{system.attributes.str.value}}" data-dtype="Number" />
+          </div>
+          {{/if}}
           <div class="attribute-row flexrow">
             <label for="system.attributes.dex.value" class="combat-label">{{localize "HYP3E.attributes.dex.abbrev"}}</label>
             <input type="text" name="system.attributes.dex.value" value="{{system.attributes.dex.value}}" data-dtype="Number" />

@@ -1,13 +1,19 @@
 {{!-- Abilities, and features appear here --}}
 <div class="flexrow">
-  <div class="flex-xlarge">
+  <div class="flexlarge">
     <h3>{{localize 'HYP3E.headers.abilitiesItems'}}</h3>
   </div>
   <div class="align-center">
+    {{#if (eq system.npcType "npc")}}
     <label for="system.encumbrance" class="exploration-label">Wt Carried:</label>
-  </div>
-  <div class="align-center">
     <span>{{encumbrance}} pounds</span>
+    {{#if isEncumbered}}
+    <br /><span style="color: red;">Encumbered!</span>
+    {{/if}}
+    {{#if isHeavilyEncumbered}}
+    <br /><span style="color: red; font-weight: bold;">Heavily Encumbered!</span>
+    {{/if}}
+    {{/if}}
   </div>
 </div>
 <ol class="items-list" data-drop="item">

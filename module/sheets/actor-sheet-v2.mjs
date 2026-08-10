@@ -227,6 +227,20 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       ...i.toObject(),
     }));
 
+    // Set encumbrance flags for the sheet
+    if (CONFIG.HYP3E.enableEncumbrance) {
+      if (this.actor.system?.encumberedState === "heavilyEncumbered") {
+        context.isHeavilyEncumbered = true
+        context.isEncumbered = false
+      } else if (this.actor.system?.encumberedState === "encumbered") {
+        context.isEncumbered = true
+        context.isHeavilyEncumbered = false
+      } else {
+        context.isEncumbered = false
+        context.isHeavilyEncumbered = false
+      }
+    }
+
     // Prepare character data and items
     if (actorData.type == 'character') {
       await this._prepareItems(context);
@@ -505,20 +519,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     // System-defined roll modes
     context.rollModes = getRollModeChoices()
-
-    // Set encumbrance flags for the sheet
-    if (CONFIG.HYP3E.enableEncumbrance) {
-      if (this.actor.system.encumberedState === "heavilyEncumbered") {
-        context.isHeavilyEncumbered = true
-        context.isEncumbered = false
-      } else if (this.actor.system.encumberedState === "encumbered") {
-        context.isEncumbered = true
-        context.isHeavilyEncumbered = false
-      } else {
-        context.isEncumbered = false
-        context.isHeavilyEncumbered = false
-      }
-    }
   }
 
   /**
