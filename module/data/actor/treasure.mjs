@@ -30,5 +30,8 @@ export default class Hyp3eTreasure extends Hyp3eActorBase {
 
     // Calculate weight carried & encumbrance
     this.weightCarried = this._calcWeightCarried();
+
+    // Get encumbered status
+    this.encumberedState = this._getEncumberedStatus();
   }
 }

@@ -469,6 +469,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
    * Determine the charactor's encumbrance status based on weight carried and strength.
    * @returns {string} - "unencumbered", "encumbered", or "heavilyEncumbered"
    */
+  /**
   _getEncumberedStatus() {
     const enableEncumbrance = this.getSetting("enableEncumbrance");
     const encumbered = this.getSetting("encumbered");
@@ -487,6 +488,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     }
     return "unencumbered";
   }
+  */
 
   /**
    * Gather equipped protection items (armor, shields).

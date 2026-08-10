@@ -63,6 +63,9 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
     // Calculate weight carried & encumbrance
     this.weightCarried = this._calcWeightCarried();
 
+    // Get encumbered status
+    this.encumberedState = this._getEncumberedStatus();
+
     // Apply temp AC, DR, and MV modifiers
     this._applyTempModifiers();
 

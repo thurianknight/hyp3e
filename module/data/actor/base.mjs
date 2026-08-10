@@ -215,7 +215,7 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
     }, 0);
 
     // If enabled, add coin weight (100 coins = 1 lb)
-    if (enableCoinWeight) {
+    if (enableCoinWeight && this?.money) {
       for (const [coinType, coinData] of Object.entries(this.money)) {
         if (coinData.value) {
           let val = convertToInt(coinData.value);
@@ -234,5 +234,29 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
 
     // Return the final carried weight
     return carriedWt;
+  }
+
+  /**
+   * Determine the charactor's encumbrance status based on weight carried and strength.
+   * @returns {string} - "unencumbered", "encumbered", or "heavilyEncumbered"
+   */
+  _getEncumberedStatus() {
+    const enableEncumbrance = this.getSetting("enableEncumbrance");
+    const encumbered = this.getSetting("encumbered");
+    const heavilyEncumbered = this.getSetting("heavilyEncumbered");
+    const strength = this?.attributes?.str?.curr ?? 10;
+    // Calc constants for encumbrance thresholds
+    const encumberedWt = strength * encumbered
+    const heavilyEncumberedWt = strength * heavilyEncumbered
+    if (enableEncumbrance) {
+      if (this.weightCarried > heavilyEncumberedWt) {
+        return "heavilyEncumbered";
+      } else if (this.weightCarried > encumberedWt) {
+        return "encumbered";
+      } else {
+        return "unencumbered";
+      }
+    }
+    return "unencumbered";
   }
 }
