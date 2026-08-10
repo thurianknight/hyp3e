@@ -60,6 +60,9 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
   prepareDerivedData() {
     super.prepareDerivedData?.();
 
+    // Calculate weight carried & encumbrance
+    this.weightCarried = this._calcWeightCarried();
+
     // Apply temp AC, DR, and MV modifiers
     this._applyTempModifiers();
 

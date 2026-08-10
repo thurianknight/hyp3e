@@ -12,4 +12,23 @@ export default class Hyp3eTreasure extends Hyp3eActorBase {
 
     return schema;
   }
+
+  /** 
+   * Runs BEFORE Active Effects are applied.
+   * Used for calculating base values that AEs can use or modify.
+   */
+  prepareBaseData() {
+    super.prepareBaseData?.();
+  }
+
+  /** 
+   * Runs AFTER Active Effects.
+   * Use this for final totals, clamping, or anything that depends on post-AE values.
+   */
+  prepareDerivedData() {
+    super.prepareDerivedData?.();
+
+    // Calculate weight carried & encumbrance
+    this.weightCarried = this._calcWeightCarried();
+  }
 }

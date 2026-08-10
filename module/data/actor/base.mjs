@@ -175,4 +175,64 @@ export default class Hyp3eActorBase extends Hyp3eDataModel {
       this.movement.base.value += tempMvMod;
     }
   }
+
+  /**
+   * Calculate the total weight carried by the character. Only used with characters.
+   * @returns {number} Total weight carried, rounded to one decimal place
+   */
+  _calcWeightCarried() {
+    const enableCoinWeight = this.getSetting("enableCoinWeight");
+    if (!this.parent?.items && !enableCoinWeight) return 0;
+
+    let carriedWt = this.parent.items.reduce((total, item) => {
+      // Start with carried/equipped items. We ignore weight of non-equipped 
+      //  items since they are assumed to have been removed or dropped.
+      // For weapons & armor, the equipped status is ignored and the item weight 
+      //  is always added to encumbrance.
+      const normalGear = ['item', 'container']; // 'container' has been deprecated but may still exist
+      const combatGear = ['weapon', 'armor', 'shield'];
+      let weight = 0;
+      if (item.system.weight > 0 && item.system.quantity.value > 0) {
+        // Is this a normal item, and is it carried?
+        if (normalGear.includes(item.type) && item.system.equipped) {
+          if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+            // For bundled items, we calculate weight based on number of bundles
+            weight = (item.system.weight * (item.system.quantity.value / item.system.quantity.bundle))
+          } else {
+            // Normal unbundled item
+            weight = (item.system.weight * item.system.quantity.value)
+          }
+        } else if (combatGear.includes(item.type)) {
+          if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
+            // For bundled items, we calculate weight based on number of bundles
+            weight = (item.system.weight * (item.system.quantity.value / item.system.quantity.bundle))
+          } else {
+            weight = (item.system.weight * item.system.quantity.value)
+          }
+        }
+      }
+      return total + weight;
+    }, 0);
+
+    // If enabled, add coin weight (100 coins = 1 lb)
+    if (enableCoinWeight) {
+      for (const [coinType, coinData] of Object.entries(this.money)) {
+        if (coinData.value) {
+          let val = convertToInt(coinData.value);
+          if (!isNaN(val) && val > 0) {
+            carriedWt += val / 100;
+          }
+        }
+      }
+    }
+
+    // Round to one decimal place
+    carriedWt = Math.round(carriedWt * 10)/10;
+
+    // Log the calculated weight
+    Hyp3eLogger.info("Hyp3eCharacter _calcWeightCarried", `${this.parent.name} is carrying ${carriedWt} pounds.`);
+
+    // Return the final carried weight
+    return carriedWt;
+  }
 }

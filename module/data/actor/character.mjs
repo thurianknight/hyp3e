@@ -407,6 +407,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
    * Calculate the total weight carried by the character. Only used with characters.
    * @returns {number} Total weight carried, rounded to one decimal place
    */
+  /**
   _calcWeightCarried() {
     const enableCoinWeight = this.getSetting("enableCoinWeight");
     if (!this.parent?.items && !enableCoinWeight) return 0;
@@ -462,6 +463,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     // Return the final carried weight
     return carriedWt;
   }
+  */
 
   /**
    * Determine the charactor's encumbrance status based on weight carried and strength.
