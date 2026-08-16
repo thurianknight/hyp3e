@@ -13,6 +13,7 @@ import { enableAllTransferrableItemEffectsToItemOwner,
           prepareActiveEffectCategories } from "../helpers/effects.mjs";
 import { sendSimpleChat } from "../chat/chat.mjs"
 import HYP3EActorSetLanguages from "../apps/character-set-languages.mjs";
+import HYP3ECharacterWeaponProficiencies from "../apps/character-weapon-proficiencies.mjs"
 import { getClassTemplate, getClassTemplateNames } from "../helpers/folders-and-compendia.mjs"
 
 const { HandlebarsApplicationMixin } = foundry.applications.api
@@ -25,6 +26,7 @@ const { ActorSheetV2 } = foundry.applications.sheets
 export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) {
 
   static LANGUAGES_APP = new HYP3EActorSetLanguages();
+  static FAVORED_WEAPONS_APP = new HYP3ECharacterWeaponProficiencies();
 
   // ===========================================================================
   // ITEM SHEET SETUP
@@ -93,6 +95,8 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       setAttributeMods: Hyp3eActorSheetV2._onSetAttributeMods,
       updateBonusSpell: Hyp3eActorSheetV2._updateBonusSpell,
       // Actions on the Combat tab
+      setFavoredWeapons: Hyp3eActorSheetV2._openFavoredWeaponsApp,
+      clearFavoredWeapons: Hyp3eActorSheetV2._clearFavoredWeapons,
       itemToggleLight: Hyp3eActorSheetV2._itemToggleLight,
       itemCastSpell: Hyp3eActorSheetV2._itemCastSpell,
       itemQtySub: Hyp3eActorSheetV2._decrementItemQty,
@@ -531,6 +535,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     context.creatureSizes = CONFIG.HYP3E.creatureSizes
     // Load Phenotypes
     context.phenotypes = CONFIG.HYP3E.phenotypes
+    // Handle money types
+    for (let [k, v] of Object.entries(context.system.money)) {
+      v.label = game.i18n.localize(CONFIG.HYP3E.money[k]) ?? k;
+    }
   }
 
   /**
@@ -1470,6 +1478,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     // Open the Languages app
     static _openLanguagesApp() {
         Hyp3eActorSheetV2.LANGUAGES_APP.render(true, { actorUuid: this.actor.uuid, focus: true });
+    }
+
+    static _openFavoredWeaponsApp() {
+      Hyp3eActorSheetV2.FAVORED_WEAPONS_APP.render(true, { actorUuid: this.actor.uuid, focus: true });
     }
 
     /**

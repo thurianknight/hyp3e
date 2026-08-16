@@ -46,7 +46,7 @@ export default class HYP3EClassWeaponProficiencies extends HandlebarsApplication
 
     static PARTS = {
         main: {
-            template: `${HYP3E.templatePath}/apps/weapon-proficiencies.hbs`
+            template: `${HYP3E.templatePath}/apps/class-weapon-proficiencies.hbs`
         }
     }
 

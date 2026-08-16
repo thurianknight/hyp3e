@@ -7,7 +7,7 @@ export default class Hyp3eMerchant extends Hyp3eActorBase {
     const fields = foundry.data.fields;
     let schema = super.defineSchema();
 
-    // Money template
+    // Add the Money template
     schema = this.mergeSchema(schema, moneyTemplate);
 
     // Merchant-specific fields

@@ -109,6 +109,12 @@ export function migrateActorData(actor, classTemplate = null) {
         // Add new default values
 
         // Migrate, fix, or delete old data
+
+        // Migrate weapon proficiencies
+        const { favoured, exceptions } = parseWeaponList(actor.system.proficiencies.class);
+        Hyp3eLogger.info("migrateActorData", `${actor.name} weapon proficiencies:`, { favoured, exceptions });
+
+        // Delete old explorationSkills
         if ("explorationSkills" in actor.system) {
             Hyp3eLogger.info("migrateActorData", `Removing old explorationSkills from ${actor.name}...`);
             updates = { ...updates, "system.-=explorationSkills": null };
@@ -747,4 +753,227 @@ export async function migrateCustomClasses() {
   // Now we do the batch delete of all custom classes
   // await game.settings.set(game.system.id, "customClassData", allCustomClasses);
   Hyp3eLogger.info("migrateCustomClasses", `Deleted all migrated class data. ${Object.keys(migratedClasses).length} migrated, ${Object.keys(allCustomClasses).length} remain.`);
+}
+
+/******************************************************************************
+ * 
+ * The following methods are all about migrating the Favoured Weapons list/string 
+ * into a favoured[] array and an exceptions[] array.
+ * 
+ ******************************************************************************/
+
+/**
+ * Parse a free-text weapon list into normalised favoured + exception arrays.
+ * @param {string} raw
+ * @returns {{ favoured: string[], exceptions: string[] }}
+ */
+export function parseWeaponList(raw) {
+  if (typeof raw !== "string" || !raw.trim()) {
+    return { favoured: [], exceptions: [] };
+  }
+
+  // Ensure the lookup table exists
+  _ensureLookup();
+
+  let text = raw.trim();
+
+  // Special "any / all"
+  if (/^\s*\*?any\*?\s*$/i.test(text) || /^\s*\*?all\*?\s*$/i.test(text)) {
+    return { favoured: ["*Any"], exceptions: [] };
+  }
+
+  // Split on "except"
+  const exceptRe = /^(.*?)\s*\*?except\*?\s*(.*)$/is;
+  const m = text.match(exceptRe);
+  let favouredStr = text;
+  let exceptStr = "";
+
+  if (m) {
+    favouredStr = m[1].trim();
+    exceptStr   = m[2].trim();
+  }
+
+  return {
+    favoured:   _parseSide(favouredStr),
+    exceptions: _parseSide(exceptStr)
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Internal state & helpers
+// ---------------------------------------------------------------------------
+
+const CANONICAL = [
+  "Axe, Battle", "Axe, Great", "Axe, Hand",
+  "Bardiche", "Bill", "Cæstuses", "Chain Whip",
+  "Club, Light", "Club, War",
+  "Dagger", "Dagger, Silver",
+  "Falcata", "Fauchard",
+  "Flail, Footman's", "Flail, Horseman's",
+  "Garrotte", "Glaive", "Halberd",
+  "Hammer, Great", "Hammer, Horseman's", "Hammer, War",
+  "Javelin", "Lance", "Lasso",
+  "Mace, Footman's", "Mace, Great", "Mace, Horseman's",
+  "Monk's Empty Hand Attack", "Morning Star",
+  "Pick, Horseman's", "Pick, War",
+  "Pike", "Poleaxe", "Quarterstaff",
+  "Scimitar, Great", "Scimitar, Long", "Scimitar, Short", "Scimitar, Two-handed",
+  "Sickle",
+  "Spear, Great", "Spear, Long", "Spear, Short",
+  "Staff, Spiked",
+  "Sword, Bastard", "Sword, Broad", "Sword, Great", "Sword, Long", "Sword, Short", "Sword, Two-handed",
+  "Tonfa", "Trident, Hand", "Trident, Long", "Whip",
+  "Blowgun", "Bola", "Boomerang",
+  "Bow, Long", "Bow, Long, Composite", "Bow, Short", "Bow, Short, Composite",
+  "Crossbow, Heavy", "Crossbow, Light", "Crossbow, Repeating",
+  "Dart",
+  "Holy Water/Oil (thrown)", "Hooked Throwing Knife",
+  "Needle, Blowgun", "Net, Fighting",
+  "Oil, Incendiary (thrown)", "Sling"
+];
+
+const EXTRA_ALIASES = {
+  // Wildcards
+  "any":                  "*Any",
+  "any weapon":           "*Any",
+  "any weapons":          "*Any",
+  "all":                  "*Any",
+  "all weapon":           "*Any",
+  "all weapons":          "*Any",
+  // Swords
+  "longsword":            "Sword, Long",
+  "long sword":           "Sword, Long",
+  "shortsword":           "Sword, Short",
+  "short sword":          "Sword, Short",
+  "greatsword":           "Sword, Great",
+  "great sword":          "Sword, Great",
+  "bastard sword":        "Sword, Bastard",
+  "two handed sword":     "Sword, Two-handed",
+  "two-handed sword":     "Sword, Two-handed",
+  "2h sword":             "Sword, Two-handed",
+
+  // Axes / hammers / etc.
+  "hand axe":             "Axe, Hand",
+  "battle axe":           "Axe, Battle",
+  "great axe":            "Axe, Great",
+  "war hammer":           "Hammer, War",
+  "warhammer":            "Hammer, War",
+  "morningstar":          "Morning Star",
+  "quarter staff":        "Quarterstaff",
+  "spiked staff":         "Staff, Spiked",
+  "caestuses":            "Cæstuses",
+  "cestuses":             "Cæstuses",
+
+  // Bows
+  "longbow":              "Bow, Long",
+  "shortbow":             "Bow, Short",
+  "composite longbow":    "Bow, Long, Composite",
+  "composite shortbow":   "Bow, Short, Composite",
+  "long composite bow":   "Bow, Long, Composite",
+  "short composite bow":  "Bow, Short, Composite",
+
+  // Crossbows
+  "lightcrossbow":        "Crossbow, Light",
+  "heavycrossbow":        "Crossbow, Heavy",
+  "repeatingcrossbow":    "Crossbow, Repeating"
+};
+
+/** @type {Map<string, string> | null} */
+let LOOKUP = null;
+
+function _ensureLookup() {
+  if (LOOKUP) return;
+
+  LOOKUP = new Map();
+
+  for (const name of CANONICAL) {
+    LOOKUP.set(_makeKey(name), name);
+  }
+
+  for (const [alias, canon] of Object.entries(EXTRA_ALIASES)) {
+    LOOKUP.set(_makeKey(alias), canon);
+  }
+}
+
+function _parseSide(str) {
+  if (!str) return [];
+
+  str = _expandParentheticals(str);
+
+  str = str
+    .replace(/[;\/|&\n\r]+|\s+and\s+/gi, ",")
+    .replace(/\s*,\s*/g, ",")
+    .replace(/,+/g, ",")
+    .replace(/^,|,$/g, "")
+    .trim();
+
+  if (!str) return [];
+
+  const tokens = str.split(",").map(t => t.trim()).filter(Boolean);
+  const result = [];
+  let i = 0;
+
+  while (i < tokens.length) {
+    let matched = false;
+    const maxLen = Math.min(5, tokens.length - i);
+
+    for (let len = maxLen; len >= 1; len--) {
+      const candidate = tokens.slice(i, i + len).join(" ");
+      const canon = LOOKUP.get(_makeKey(candidate));
+      if (canon) {
+        result.push(canon);
+        i += len;
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched) {
+      result.push(_titleCase(tokens[i]));
+      i += 1;
+    }
+  }
+
+  return [...new Set(result)].sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: "base" })
+  );
+}
+
+function _expandParentheticals(str) {
+  let prev;
+  do {
+    prev = str;
+    str = str.replace(
+      /([a-zA-ZæÆ'’]+(?:\s+[a-zA-ZæÆ'’]+)*)\s*[\(\[]\s*([^\)\]]+?)\s*[\)\]]/gi,
+      (_, base, mods) => {
+        const modList = mods
+          .split(/[,;\/|&]+|\s+and\s+/i)
+          .map(m => m.trim())
+          .filter(Boolean);
+        return modList.map(mod => `${base.trim()} ${mod}`).join(", ");
+      }
+    );
+  } while (str !== prev);
+  return str;
+}
+
+function _makeKey(s) {
+  return s
+    .toLowerCase()
+    .replace(/æ/g, "ae")
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .sort()
+    .join(" ");
+}
+
+function _titleCase(s) {
+  return s
+    .toLowerCase()
+    .split(/\s+/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }

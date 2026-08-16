@@ -437,6 +437,25 @@
   {{/each}}
 </ol>
 
+{{!-- Money appears here --}}
+{{#if (eq system.npcType "npc")}}
+<div class="money-block flexrow">
+  {{#each system.money as |coin key|}}
+  <div class="ability align-center">
+    <div>
+      <label for="system.money.{{key}}.value" class="exploration-label coins coin-{{key}}">
+        <i class="fas fa-coin"></i>
+        {{coin.label}}
+      </label>
+    </div>
+    <div>
+      <input type="text" name="system.money.{{key}}.value" value="{{formatNumber coin.value}}" />
+    </div>
+  </div>
+  {{/each}}
+</div>
+{{/if}}
+
 {{!-- Spells appear here --}}
 {{#if system.ca}}
 <h3>{{localize 'HYP3E.dataLabel.spells'}}</h3>

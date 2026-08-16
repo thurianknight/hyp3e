@@ -1,5 +1,6 @@
 /* Import External Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Metamorphous&display=swap');
 @import url("../assets/Herculanum.ttf");
 
 /* Import additional CSS files */
@@ -473,6 +474,11 @@
   max-width: 80px;
   margin: 2px 2px;
 }
+.hyp3e button.button-medium {
+  width: 80px;
+  max-width: 120px;
+  margin: 2px 2px;
+}
 .hyp3e button.button-wide {
   width: 100%;
   margin: 2px 2px;
@@ -485,8 +491,8 @@
 
 /* Shrink font size for some field labels */
 .hyp3e .small-label {
-  font-family: "Herculanum", sans-serif;
-  font-size: 0.9em;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
+  font-size: 0.8em;
   font-weight: bold;
 }
 
@@ -569,17 +575,18 @@
   min-width: 300px;
   height: 48px;
   margin: 0;
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
+  font-size: 0.9em;
   color: var(--hyp3e-input-text-color);
 }
 
 .hyp3e h1, .hyp3e h2, .hyp3e h3, .hyp3e h4 {
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
   color: var(--hyp3e-color-text-primary);
 }
 
 .hyp3e h2 {
-  font-size: 1.75em;
+  font-size: 1.5em;
   margin-bottom: 5px;
 }
 .hyp3e h2 input[type=text] {
@@ -587,7 +594,7 @@
 }
 
 .hyp3e h3 {
-  font-size: 1.5em;
+  font-size: 1.4em;
   margin: 5px 0;
 }
 .hyp3e h3 input[type=text] {
@@ -595,7 +602,7 @@
 }
 
 .hyp3e h4 {
-  font-size: 0.9em;
+  font-size: 0.8em;
 }
 
 .hyp3e .hyp3e-metal img {
@@ -604,23 +611,25 @@
 }
 
 .hyp3e .header-label {
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
   font-weight: bold;
+  font-size: 0.9em;
   margin: 5px 5px;
   padding: 0 0;
   min-width: 60px;
 }
 .hyp3e .header-label-small {
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
   font-weight: bold;
-  font-size: 0.8em;
+  font-size: 0.7em;
   padding: 5px 10px;
   text-wrap: nowrap;
   min-width: 60px;
 }
 .hyp3e .header-label-wide {
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
   font-weight: bold;
+  font-size: 0.9em;
   margin: 5px 5px;
   padding: 0 0;
   min-width: 90px;
@@ -631,7 +640,7 @@
   /* -webkit-box-flex: 0;
   -ms-flex: 0; */
   flex: 0;
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
 }
 .hyp3e .sheet-tabs a {
   color: var(--hyp3e-color-text-primary);
@@ -639,7 +648,7 @@
 .hyp3e .sheet-tabs a.active {
   color: var(--hyp3e-color-shadow-highlight);
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.15em;
   text-shadow: 0 0 5px var(--hyp3e-color-shadow-primary), 0 0 10px var(--hyp3e-color-shadow-primary), 0 0 15px var(--hyp3e-color-shadow-primary);
 }
 /* Fix for Light theme active tab text */
@@ -665,8 +674,9 @@
   margin-right: 5px;
 }
 .hyp3e .resource-label {
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
   font-weight: bold;
+  font-size: 0.9em;
   padding: 5px 5px;
 }
 
@@ -807,21 +817,32 @@
     font-size: 1.25em;
   }
   .class-weapons {
+    /* text-align: right; */
+    margin-top: 5px;
+    padding: 0 5px;
+    fieldset {
+      padding-inline: 4px;
+      padding-block: 4px;
+      margin: 4px;
+      border: 2px solid var(--hyp3e-color-subtle-border);
+    }
+    /* input[type=text] { */
+    textarea {
+      width: 100%;
+      height: 8lh;
+      font-size: 0.75em;
+      margin-bottom: 2px;
+      margin-right: 5px;
+    }
+  }
+  /* .weapon-field {
     text-align: right;
     input[type=text] {
       min-width: 200px;
       margin-bottom: 2px;
       margin-right: 15px;
     }
-  }
-  .weapon-field {
-    text-align: right;
-    input[type=text] {
-      min-width: 200px;
-      margin-bottom: 2px;
-      margin-right: 15px;
-    }
-  }
+  } */
   .combat-stats {
     min-width: 350px;
     max-width: 450px;
@@ -848,19 +869,20 @@
   padding: 5px 5px;
 } */
 .hyp3e .combat-label {
-  font-family: "Herculanum", sans-serif;
-  font-weight: bold;
-  padding: 5px 10px;
-}
-.hyp3e .combat-label-small {
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
   font-weight: bold;
   font-size: 0.9em;
   padding: 5px 10px;
 }
+.hyp3e .combat-label-small {
+  font-family: "Metamorphous", "Herculanum", sans-serif;
+  font-weight: bold;
+  font-size: 0.85em;
+  padding: 5px 10px;
+}
 .hyp3e .combat-label-smaller {
-  font-family: "Herculanum", sans-serif;
-  font-size: 0.75em;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
+  font-size: 0.65em;
   padding: 5px 10px;
 }
 
@@ -967,18 +989,19 @@
   align-items: center;
   background: var(--hyp3e-color-primary-10);
   border: 2px groove var(--hyp3e-color-accent-25);
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
+  font-size: 0.9em;
 }
 /* Column header text */
 .hyp3e .items-list .items-header h3 {
-  font-size: 1.2em;
+  font-size: 1.1em;
   margin: 0;
   text-align: center;
   white-space: nowrap;
   overflow-x: hidden;
 }
 .hyp3e .items-list .items-header h4 {
-  font-size: 1em;
+  font-size: 0.9em;
   margin: 0;
   align-items: center;
   white-space: nowrap;
@@ -988,14 +1011,14 @@
 .hyp3e .items-list .items-header h3.item-name {
   display: flex;
   flex: 2;
-  font-size: 1.2em;
+  font-size: 1.15em;
   padding-left: 10px;
   margin-right: -10px;
   text-align: left;
 }
 /* Handle the item-controls column header specially */
 .hyp3e .items-list .items-header h4.item-controls {
-  font-size: 0.85em;
+  font-size: 0.7em;
   padding-right: 5px;
   display: flex;
   flex: 0 0 100px;
@@ -1092,7 +1115,7 @@
   text-align: center;
   align-items: center;
   justify-content: center;
-  font-size: 0.9em;
+  font-size: 0.8em;
   /* border-left: 1px solid var(--hyp3e-color-accent); */
   /* border-right: 1px solid var(--hyp3e-color-accent); */
 }
@@ -1203,8 +1226,8 @@
   padding-bottom: 5px;
 }
 .hyp3e .attribute-label {
-  font-family: "Herculanum", sans-serif;
-  font-size: 1.4em;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
+  font-size: 1.3em;
   font-weight: bold;
   padding: 5px 5px;
 }
@@ -1234,8 +1257,9 @@
   }
 }
 .hyp3e .exploration-label {
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
   font-weight: bold;
+  font-size: 0.9em;
   padding: 5px 5px;
 }
 
@@ -1271,8 +1295,9 @@
 
 /* Saving throw labels */
 .hyp3e .saves-label {
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
   font-weight: bold;
+  font-size: 0.9em;
   padding: 5px 5px;
 }
 
@@ -1339,8 +1364,9 @@
   font-size: 1.25em;
 }
 .hyp3e .spells-label {
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
   font-weight: bold;
+  font-size: 0.9em;
   padding: 5px 5px;
 }
 
@@ -1457,7 +1483,8 @@
   font-weight: bold;
   padding: 5px 5px;
   max-width: 135px;
-  font-family: "Herculanum", sans-serif;
+  font-family: "Metamorphous", "Herculanum", sans-serif;
+  font-size: 0.9em;
 }
 .hyp3e .biography-block {
   padding: 0 2px;
@@ -1788,6 +1815,16 @@
   padding-right: 8px;  /* avoids scrollbar overlap */
 }
 .class-set-weapon-proficiencies {
+  ul {
+    list-style-type: none;
+  }
+}
+.hyp3e.character-weapon-proficiencies .window-content, .hyp3e.character-weapon-exceptions .window-content {
+  flex: 1 1 auto;      /* take remaining space */
+  overflow-y: auto;    /* scroll if content overflows */
+  padding-right: 8px;  /* avoids scrollbar overlap */
+}
+.character-weapon-proficiencies {
   ul {
     list-style-type: none;
   }

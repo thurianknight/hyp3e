@@ -1,0 +1,115 @@
+<div class="character-weapon-proficiencies">
+  <div class="flexrow">
+    <div><h3>{{actor.name}}</h3></div>
+    <div>
+      <button type="button" style="justify-self: flex-end;" class="button-medium" data-action="addWeapon" data-actor-uuid="{{actorUuid}}">
+        <i class="fas fa-sword"></i> {{localize 'HYP3E.classEditor.add'}}
+      </button>
+    </div>
+  </div>
+  <hr class="plain-hr"/>
+  <ul>
+    <li>
+      <div class="flexrow flex-group-center">
+        <div>{{localize 'HYP3E.classEditor.favoredWeapons'}}</div>
+        <div>Level Gained</div>
+        <div>Forbidden</div>
+        <div>Remove</div>
+      </div>
+    </li>
+    {{#each actor.system.weaponProficiencies as |entry idx|}}
+    {{#if (not entry.exception)}}
+    <li data-actor-uuid="{{../actorUuid}}">
+      <div class="flexrow flex-group-center">
+        <div style="width: 150px;">
+          <select class="weapon-select" 
+            name="system.weaponProficiencies.{{idx}}.weapon" 
+            data-actor-uuid="{{../ actorUuid}}" 
+            data-index="{{idx}}"
+            data-field-name="weapon" >
+              <option value=""></option>
+              {{selectOptions @root.weapons selected=entry.weapon localize=false}}
+          </select>
+        </div>
+        <div>
+          <input style="max-width: 50px;" type="text" 
+            name="system.weaponProficiencies[{{idx}}].level" 
+            data-actor-uuid="{{../ actorUuid}}" 
+            data-index="{{idx}}" 
+            data-field-name="level" 
+            value="{{entry.level}}" data-dtype="Number">
+        </div>
+        <div>
+          <input type="checkbox" name="system.weaponProficiencies[{{idx}}].exception" 
+            data-actor-uuid="{{../ actorUuid}}" 
+            data-index="{{idx}}" 
+            data-field-name="exception" 
+            {{checked entry.exception}} />
+        </div>
+        <div>
+          <button type="button" class="button-narrow" 
+            data-action="removeWeapon" 
+            data-actor-uuid="{{../ actorUuid}}" 
+            data-index="{{idx}}">
+              <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </li>
+    {{/if}}
+    {{/each}}
+  </ul><br />
+  {{#if hasWeaponExceptions}}
+  <ul>
+    <li>
+      <div class="flexrow flex-group-center">
+        <div>{{localize 'HYP3E.classEditor.exceptions'}}</div>
+        <div>Level Gained</div>
+        <div>Forbidden</div>
+        <div>Remove</div>
+      </div>
+    </li>
+    {{#each actor.system.weaponProficiencies as |entry idx|}}
+    {{#if entry.exception}}
+    <li data-actor-uuid="{{../actorUuid}}">
+      <div class="flexrow flex-group-center">
+        <div style="width: 150px;">
+          <select class="weapon-select" 
+            name="system.weaponProficiencies.{{idx}}.weapon" 
+            data-actor-uuid="{{../ actorUuid}}" 
+            data-index="{{idx}}"
+            data-field-name="weapon" >
+              <option value=""></option>
+              {{selectOptions @root.weapons selected=entry.weapon localize=false}}
+          </select>
+        </div>
+        <div>
+          <input style="max-width: 50px;" type="text" data-index="{{idx}}" 
+            name="system.weaponProficiencies[{{idx}}].level" 
+            data-actor-uuid="{{../ actorUuid}}" 
+            data-index="{{index}}" 
+            data-field-name="level" 
+            value="{{entry.level}}" data-dtype="Number">
+        </div>
+        <div>
+          <input type="checkbox" name="system.weaponProficiencies[{{idx}}].exception" 
+            data-actor-uuid="{{../ actorUuid}}" 
+            data-index="{{idx}}" 
+            data-field-name="exception" 
+            {{checked entry.exception}} />
+        </div>
+        <div>
+          <button type="button" class="button-narrow" 
+            data-action="removeWeapon" 
+            data-actor-uuid="{{../ actorUuid}}" 
+            data-index="{{idx}}">
+              <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </li>
+    {{/if}}
+    {{/each}}
+  </ul>
+  {{/if}}
+</div>

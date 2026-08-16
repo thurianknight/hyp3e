@@ -1,6 +1,7 @@
 // module/data/actor/npc.mjs
 import Hyp3eActorBase from "./base.mjs";
 import { Hyp3eLogger } from "../../helpers/logger.mjs";
+import { moneyTemplate } from "../templates/money.mjs";
 
 export default class Hyp3eNpc extends Hyp3eActorBase {
   static defineSchema() {
@@ -26,10 +27,12 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
     schema.cost = new fields.StringField({ blank: true, initial: "0" });
     schema.xp = new fields.StringField({ blank: true, initial: "0" });
     schema.treasure = new fields.StringField({ blank: true, initial: "" });
-    // schema.dx = new fields.NumberField({ initial: 11 });
     schema.rollHD = new fields.BooleanField({ initial: true });
     schema.phenotype = new fields.StringField({ blank: true, initial: "" });
     schema.npcType = new fields.StringField({ blank: true, initial: "monster" });
+
+    // Add the Money template
+    schema = this.mergeSchema(schema, moneyTemplate);
 
     return schema;
   }

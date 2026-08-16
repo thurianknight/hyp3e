@@ -132,6 +132,16 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
       lvl8: new fields.StringField({ blank: true }),
       lvl12: new fields.StringField({ blank: true })
     });
+    schema.weaponProficiencies = new fields.ArrayField(new fields.SchemaField({
+      weapon: new fields.StringField({ initial: "" }), // Name of the weapon
+      level: new fields.NumberField({ initial: 1 }), // Character level at which this was gained
+      mastery: new fields.NumberField({ initial: 0 }), // Mastery level: 0 (proficient), 1 (master), 2 (grandmaster)
+      exception: new fields.BooleanField({ initial: false }) // Is this weapon a forbidden instead of favored?
+    }), { initial: [] });
+    // schema.weaponMasteries = new fields.SchemaField({
+    //   weapon: new fields.StringField({ initial: "" }), // Name of the weapon
+    //   level: new fields.NumberField({ initial: 1 }) // Character level at which this was gained
+    // });
 
     // Money template
     schema = this.mergeSchema(schema, moneyTemplate);
