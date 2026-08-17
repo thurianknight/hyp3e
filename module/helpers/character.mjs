@@ -4245,18 +4245,6 @@ export class Hyp3eCharacterClass {
     // return false
   }
 
-  // static getClassTemplate(className) {
-  //   // Lookup the class template document in the compendium
-  //   const compendium = game.packs.get("hyp3e.hyp3e-character-classes");
-  //   const entry = compendium.index.find(e => e.name === className);
-  //   if (!entry) {
-  //     Hyp3eLogger.info("Hyp3eCharacterClass getClassTemplate", `Class template not found for ${className}`);
-  //     return null;
-  //   }
-  //   const thisClass = compendium.getDocument(entry._id);
-  //   return thisClass
-  // }
-
   /**
    * Calculate attribute modifiers for the actor based on their class.
    * @param {string} data - The actor's system data object
@@ -4402,9 +4390,10 @@ export class Hyp3eCharacterClass {
     }
     Hyp3eLogger.info("Hyp3eCharacterClass applyClassTemplate", `Attributes:`, attributes);
 
-    // Set the attributes in the actor
+    // Set the attributes + minimums in the actor
     for (let [k, v] of Object.entries(attributes)) {
       actorData.attributes[k].value = v;
+      actorData.attributes[k].min = (classTemplate.system?.attrReqs[k] ?? 3);
     };
     // Add class-based feat of attribute bonuses to the physical attributes
     actorData.attributes.str.classFeatBonus = classTemplate.system.featBonus?.str ?? 0;
@@ -4796,6 +4785,12 @@ export class Hyp3eCharacterClass {
     return attributes;
   }
 
+  /**
+   * 
+   * @param {*} actor - The actor object to roll attributes for
+   * @param {*} classData - The dataset containing class template data
+   * @returns {Object} - Returns an object with the rolled attributes
+   */
   static async _rollAttributes(actor, classData) {
     const rollFormula = game.settings.get(game.system.id, "quickCreateChars")
     Hyp3eLogger.info("Hyp3eCharacterClass _rollAttributes", `Rolling attributes using formula ${rollFormula}...`);
@@ -4814,6 +4809,7 @@ export class Hyp3eCharacterClass {
         }
         await roll.roll();
         attributes[attr] = roll.total;
+        // attributes[attr].min = (classData.attrReqs[attr] ?? 3);
       }
       Hyp3eLogger.info("Hyp3eCharacterClass _rollAttributes", `Rolled attributes with Method VI:`, attributes);
       return attributes;
@@ -4824,6 +4820,7 @@ export class Hyp3eCharacterClass {
       let roll = new Roll(rollFormula);
       await roll.roll();
       attributes[attr] = roll.total;
+      // attributes[attr].min = (classData.attrReqs[attr] ?? 3);
     }
     Hyp3eLogger.info("Hyp3eCharacterClass _rollAttributes", `Rolled attributes:`, attributes);
     return attributes;
@@ -4883,6 +4880,12 @@ export class Hyp3eCharacterClass {
     return optimizedAttributes;
   }
 
+  /**
+   * Determine whether all six rolled attributes meet whatever the class requirements are.
+   * @param {*} classData - The system object from the class template
+   * @param {*} attributes - The object set of rolled attributes
+   * @returns {Boolean} - True if meets requirements, False if not
+   */
   static async _checkAttrRequirements(classData, attributes) {
     // const classData = this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
     if (!classData) {

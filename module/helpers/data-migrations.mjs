@@ -1,12 +1,13 @@
-import { Hyp3eLogger } from "./logger.mjs";
 import { Hyp3eItem } from "../documents/item.mjs";
+import { getClassTemplate } from "./folders-and-compendia.mjs"
+import { Hyp3eLogger } from "./logger.mjs";
 
 /**
  * Migrate Actor data to new formats, properties, etc.
  * @param {*} actor - Actor document to process for data migrations
  * @returns {Object} - JSON of update data
  */
-export function migrateActorData(actor, classTemplate = null) {
+export async function migrateActorData(actor, classTemplate = null) {
     // Hyp3eLogger.info("migrateActorData", `Migrating data for ${actor.name}...:`, actor)
     // let newActor = {...actor};
     let updates = {};
@@ -106,13 +107,93 @@ export function migrateActorData(actor, classTemplate = null) {
 
     // PCs only
     if (actor.type === "character") {
+        // Get the base class template info
+        const classTemplate = await getClassTemplate(actor.system.details.class);
+
         // Add new default values
+
+        // Set the attribute minimums in the actor
+        const attributes = foundry.utils.deepClone(actor.system.attributes);
+        for (let [k, v] of Object.entries(attributes)) {
+          attributes[k].min = (classTemplate.system?.attrReqs[k] ?? 3);
+        };
+        Hyp3eLogger.info("migrateActorData", `${actor.name} attribute minumums updated:`, attributes);
+        updates = { ...updates, "system.attributes": attributes };
 
         // Migrate, fix, or delete old data
 
         // Migrate weapon proficiencies
-        const { favoured, exceptions } = parseWeaponList(actor.system.proficiencies.class);
-        Hyp3eLogger.info("migrateActorData", `${actor.name} weapon proficiencies:`, { favoured, exceptions });
+        const proficiencies = foundry.utils.deepClone(actor.system.proficiencies);
+
+        // Get the starting favoured weapons & exceptions lists for the character class
+        let weaponProficiencies = [];
+        const weaponsList = classTemplate?.system.weaponProficiencies.favoredWeapons ?? [];
+        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed Level 1 favored weapons:`, weaponsList);
+        if (weaponsList.length > 0) {
+          weaponProficiencies = weaponsList.map((item, index) => ({
+            weapon: item,
+            level: 1,
+            mastery: 0,
+            exception: false
+          }));
+        }
+
+        let weaponExceptions = [];
+        const exceptionsList = classTemplate?.system.weaponProficiencies.exceptions ?? [];
+        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed weapon exceptions:`, exceptionsList);
+        if (exceptionsList.length > 0) {
+          weaponExceptions = exceptionsList.map((item, index) => ({
+            weapon: item,
+            level: 1,
+            mastery: 0,
+            exception: true
+          }));
+          weaponProficiencies = [...weaponProficiencies, ...weaponExceptions];
+        }
+
+        // Parse the lvl4 field for an additional weapon proficiency at that level
+        let { favoured, exceptions } = parseWeaponList(proficiencies.lvl4);
+        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed level 4 weapon:`, favoured);
+        if (favoured.length > 0 && favoured[0].trim() !== "") {
+          weaponProficiencies.push({
+            weapon: favoured[0],
+            level: 4,
+            mastery: 0,
+            exception: false
+          })
+        }
+        ({ favoured, exceptions } = "");
+
+        // Parse the lvl8 field for an additional weapon proficiency at that level
+        ({ favoured, exceptions } = parseWeaponList(proficiencies.lvl8));
+        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed level 8 weapon:`, favoured);
+        if (favoured.length > 0 && favoured[0].trim() !== "") {
+          weaponProficiencies.push({
+            weapon: favoured[0],
+            level: 8,
+            mastery: 0,
+            exception: false
+          })
+        }
+        ({ favoured, exceptions } = "");
+
+        // Parse the lvl12 field for an additional weapon proficiency at that level
+        ({ favoured, exceptions } = parseWeaponList(proficiencies.lvl12));
+        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed level 12 weapon:`, favoured);
+        if (favoured.length > 0 && favoured[0].trim() !== "") {
+          weaponProficiencies.push({
+            weapon: favoured[0],
+            level: 12,
+            mastery: 0,
+            exception: false
+          })
+        }
+
+        Hyp3eLogger.info("migrateActorData", `${actor.name} weapon proficiencies:`, weaponProficiencies);
+        updates = { ...updates, "system.weaponProficiencies": weaponProficiencies };
+
+        // Write a Proficiency Migration report for the actor
+        await createProficiencyMigrationReport(actor, weaponProficiencies)
 
         // Delete old explorationSkills
         if ("explorationSkills" in actor.system) {
@@ -120,6 +201,7 @@ export function migrateActorData(actor, classTemplate = null) {
             updates = { ...updates, "system.-=explorationSkills": null };
         }
         // Alignment is under system instead of system.details
+        //    (Only characters have a details property, but monsters also need alignment)
         if (!actor.system.alignment && actor.system.details.alignment) {
             Hyp3eLogger.info("migrateActorData", `Fixing alignment for ${actor.name}...`);
             const fixAlignment = { "system.alignment": actor.system.details.alignment }
@@ -901,7 +983,8 @@ function _parseSide(str) {
   str = _expandParentheticals(str);
 
   str = str
-    .replace(/[;\/|&\n\r]+|\s+and\s+/gi, ",")
+    .replace(/master(y|ed|ing|s)?/gi, "")
+    .replace(/[;:\/|&\n\r-]+|\s+and\s+/gi, ",")
     .replace(/\s*,\s*/g, ",")
     .replace(/,+/g, ",")
     .replace(/^,|,$/g, "")
@@ -976,4 +1059,86 @@ function _titleCase(s) {
     .split(/\s+/)
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
+}
+
+/**
+ * Write the character data to a new Journal Entry, and display a confirmation chat message
+ * @param {*} actor 
+ * @param {*} classTemplate 
+ * @returns 
+ */
+async function createProficiencyMigrationReport(actor, weaponProficiencies) {
+  if (!actor) {
+    Hyp3eLogger.error("Hyp3eCharacterClass createProficiencyMigrationReport", `Actor not supplied!`);
+    return false;
+  }
+  // Log the dataset before the dialog renders
+  Hyp3eLogger.info("Hyp3eCharacterClass createProficiencyMigrationReport", `${actor.name}: `, actor);
+
+  // Initialize some vars
+  const origProficiencies = foundry.utils.deepClone(actor.system.proficiencies);
+
+  // Build html for migrated weapon proficiencies
+  let favouredWeapons = "";
+  let exceptions = "";
+  for (const weapon of weaponProficiencies) {
+    if (weapon && weapon.weapon !== "undefined") {
+      if (!weapon.exception) {
+        favouredWeapons += `<li>${weapon.weapon} - Lvl ${weapon.level}</li>`
+      } else {
+        exceptions += `<li>${weapon.weapon} - Lvl ${weapon.level}</li>`
+      }
+    }
+  }
+
+  // Setup journal report content
+  let journalContent = `
+        <h2>${actor.name}</h2>
+        <h3>Original Favoured Weapons and Later Proficiencies</h3>
+        <ul>
+          <li>Favoured Weapons: ${origProficiencies.class}</li>
+          <li>Level 4 Weapon: ${(origProficiencies?.lvl4 ?? "")}</li>
+          <li>Level 8 Weapon: ${(origProficiencies?.lvl8 ?? "")}</li>
+          <li>Level 12 Weapon: ${(origProficiencies?.lvl12 ?? "")}</li>
+        </ul>
+        <h3>Migrated Weapon Proficiencies</h3>
+        <h4>Favoured Weapons</h4>
+        <ul>
+        ${favouredWeapons}
+        </ul>
+      `;
+  if (exceptions !== "") {
+      journalContent += `
+        <h4>Weapon Exceptions (Forbidden to Class)</h4>
+        <ul>
+        ${exceptions}
+        </ul>
+      `;
+  }
+
+  // Find or create a JournalEntry for character reports
+  let je = await game.journal.getName("Character Reports");
+  if (!je) {
+    const data = {
+      name: `Character Reports`,
+      ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.LIMITED }
+    };
+    je = await JournalEntry.create(data);
+  }
+  // Create a new JournalEntryPage for the weapon proficiencies report
+  const [page] = await je.createEmbeddedDocuments("JournalEntryPage", [
+    {
+      name: `${actor.name} Data Migration`,
+      type: "text",
+      text: {
+        content: journalContent,
+      },
+      sort: 0
+    }
+  ]);
+
+  // Pop open the JournalEntry to show the new page
+  je.sheet.render(true, { pageId: page.id });
+
+  return true;
 }

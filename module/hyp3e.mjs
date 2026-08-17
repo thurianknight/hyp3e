@@ -1050,7 +1050,7 @@ async function migrateWorld() {
     // Migrate actor data
     const classTemplate = await getClassTemplate(actor.system?.details?.class) ?? null;
     const origActor = foundry.utils.deepClone(actor);
-    const actorUpdates = migrateActorData(origActor, classTemplate);
+    const actorUpdates = await migrateActorData(origActor, classTemplate);
     if (actorUpdates && Object.keys(actorUpdates).length > 0) {
       await actor.update(actorUpdates);
     }
@@ -1131,7 +1131,7 @@ async function migrateWorld() {
       case "Actor":
         // Migrate actor data
         const origActor = foundry.utils.deepClone(doc);
-        const actorUpdates = migrateActorData(origActor);
+        const actorUpdates = await migrateActorData(origActor);
         if (actorUpdates && Object.keys(actorUpdates).length > 0) {
           await doc.update(actorUpdates);
         }
