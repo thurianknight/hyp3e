@@ -115,7 +115,7 @@ export async function migrateActorData(actor, classTemplate = null) {
         // Set the attribute minimums in the actor
         const attributes = foundry.utils.deepClone(actor.system.attributes);
         for (let [k, v] of Object.entries(attributes)) {
-          attributes[k].min = (classTemplate.system?.attrReqs[k] ?? 3);
+          attributes[k].min = (classTemplate?.system?.attrReqs[k] ?? 3);
         };
         Hyp3eLogger.info("migrateActorData", `${actor.name} attribute minumums updated:`, attributes);
         updates = { ...updates, "system.attributes": attributes };
