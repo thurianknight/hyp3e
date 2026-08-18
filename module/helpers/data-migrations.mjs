@@ -122,78 +122,13 @@ export async function migrateActorData(actor, classTemplate = null) {
 
         // Migrate, fix, or delete old data
 
-        // Migrate weapon proficiencies
-        const proficiencies = foundry.utils.deepClone(actor.system.proficiencies);
-
-        // Get the starting favoured weapons & exceptions lists for the character class
-        let weaponProficiencies = [];
-        const weaponsList = classTemplate?.system.weaponProficiencies.favoredWeapons ?? [];
-        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed Level 1 favored weapons:`, weaponsList);
-        if (weaponsList.length > 0) {
-          weaponProficiencies = weaponsList.map((item, index) => ({
-            weapon: item,
-            level: 1,
-            mastery: 0,
-            exception: false
-          }));
+        // Migrate legacy weapon proficiencies, if data exists to migrate
+        if (actor.system.proficiencies.class !== "") {
+          const newProficiencies = migrateProficiencies(actor, classTemplate);
+          updates = { ...updates, "system.weaponProficiencies": newProficiencies };
+          // Write a Proficiency Migration report for the actor
+          await createProficiencyMigrationReport(actor, newProficiencies)
         }
-
-        let weaponExceptions = [];
-        const exceptionsList = classTemplate?.system.weaponProficiencies.exceptions ?? [];
-        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed weapon exceptions:`, exceptionsList);
-        if (exceptionsList.length > 0) {
-          weaponExceptions = exceptionsList.map((item, index) => ({
-            weapon: item,
-            level: 1,
-            mastery: 0,
-            exception: true
-          }));
-          weaponProficiencies = [...weaponProficiencies, ...weaponExceptions];
-        }
-
-        // Parse the lvl4 field for an additional weapon proficiency at that level
-        let { favoured, exceptions } = parseWeaponList(proficiencies.lvl4);
-        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed level 4 weapon:`, favoured);
-        if (favoured.length > 0 && favoured[0].trim() !== "") {
-          weaponProficiencies.push({
-            weapon: favoured[0],
-            level: 4,
-            mastery: 0,
-            exception: false
-          })
-        }
-        ({ favoured, exceptions } = "");
-
-        // Parse the lvl8 field for an additional weapon proficiency at that level
-        ({ favoured, exceptions } = parseWeaponList(proficiencies.lvl8));
-        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed level 8 weapon:`, favoured);
-        if (favoured.length > 0 && favoured[0].trim() !== "") {
-          weaponProficiencies.push({
-            weapon: favoured[0],
-            level: 8,
-            mastery: 0,
-            exception: false
-          })
-        }
-        ({ favoured, exceptions } = "");
-
-        // Parse the lvl12 field for an additional weapon proficiency at that level
-        ({ favoured, exceptions } = parseWeaponList(proficiencies.lvl12));
-        Hyp3eLogger.info("migrateActorData", `${actor.name} parsed level 12 weapon:`, favoured);
-        if (favoured.length > 0 && favoured[0].trim() !== "") {
-          weaponProficiencies.push({
-            weapon: favoured[0],
-            level: 12,
-            mastery: 0,
-            exception: false
-          })
-        }
-
-        Hyp3eLogger.info("migrateActorData", `${actor.name} weapon proficiencies:`, weaponProficiencies);
-        updates = { ...updates, "system.weaponProficiencies": weaponProficiencies };
-
-        // Write a Proficiency Migration report for the actor
-        await createProficiencyMigrationReport(actor, weaponProficiencies)
 
         // Delete old explorationSkills
         if ("explorationSkills" in actor.system) {
@@ -844,6 +779,81 @@ export async function migrateCustomClasses() {
  * 
  ******************************************************************************/
 
+export function migrateProficiencies(actor, classTemplate) {
+  const proficiencies = foundry.utils.deepClone(actor.system.proficiencies);
+  // Get the starting favoured weapons & exceptions lists for the character class
+  let weaponProficiencies = [];
+  const weaponsList = classTemplate?.system.weaponProficiencies.favoredWeapons ?? [];
+  Hyp3eLogger.info("migrateProficiencies", `${actor.name} parsed Level 1 favored weapons:`, weaponsList);
+  if (weaponsList.length > 0) {
+    weaponProficiencies = weaponsList.map((item, index) => ({
+      weapon: item,
+      level: 1,
+      mastery: 0,
+      exception: false
+    }));
+  }
+
+  let weaponExceptions = [];
+  const exceptionsList = classTemplate?.system.weaponProficiencies.exceptions ?? [];
+  Hyp3eLogger.info("migrateProficiencies", `${actor.name} parsed weapon exceptions:`, exceptionsList);
+  if (exceptionsList.length > 0) {
+    weaponExceptions = exceptionsList.map((item, index) => ({
+      weapon: item,
+      level: 1,
+      mastery: 0,
+      exception: true
+    }));
+    weaponProficiencies = [...weaponProficiencies, ...weaponExceptions];
+  }
+
+  // Parse the lvl4 field for an additional weapon proficiency at that level
+  let { favoured, exceptions } = parseWeaponList(proficiencies.lvl4);
+  Hyp3eLogger.info("migrateProficiencies", `${actor.name} parsed level 4 weapon:`, favoured);
+  if (favoured.length > 0 && favoured[0].trim() !== "") {
+    weaponProficiencies.push({
+      weapon: favoured[0],
+      level: 4,
+      mastery: 0,
+      exception: false
+    })
+  }
+  ({ favoured, exceptions } = "");
+
+  // Parse the lvl8 field for an additional weapon proficiency at that level
+  ({ favoured, exceptions } = parseWeaponList(proficiencies.lvl8));
+  Hyp3eLogger.info("migrateProficiencies", `${actor.name} parsed level 8 weapon:`, favoured);
+  if (favoured.length > 0 && favoured[0].trim() !== "") {
+    weaponProficiencies.push({
+      weapon: favoured[0],
+      level: 8,
+      mastery: 0,
+      exception: false
+    })
+  }
+  ({ favoured, exceptions } = "");
+
+  // Parse the lvl12 field for an additional weapon proficiency at that level
+  ({ favoured, exceptions } = parseWeaponList(proficiencies.lvl12));
+  Hyp3eLogger.info("migrateProficiencies", `${actor.name} parsed level 12 weapon:`, favoured);
+  if (favoured.length > 0 && favoured[0].trim() !== "") {
+    weaponProficiencies.push({
+      weapon: favoured[0],
+      level: 12,
+      mastery: 0,
+      exception: false
+    })
+  }
+
+  // Sort the weaponProficiencies array by level, then weapon (name)
+  const sorted = [...weaponProficiencies].sort((a, b) => 
+    a.level - b.level || a.weapon.localeCompare(b.weapon)
+  );
+
+  Hyp3eLogger.info("migrateProficiencies", `${actor.name} weapon proficiencies:`, sorted);
+  return sorted;
+}
+
 /**
  * Parse a free-text weapon list into normalised favoured + exception arrays.
  * @param {string} raw
@@ -879,6 +889,40 @@ export function parseWeaponList(raw) {
     favoured:   _parseSide(favouredStr),
     exceptions: _parseSide(exceptStr)
   };
+}
+
+/**
+ * Calculate the mastery level of a weapon based on *Any + 1 or 2 additional 
+ *    proficiencies, or 2 or 3 total proficiencies of the weapon.
+ * @param {String} weaponName - the weapon name to be checked
+ * @param {Object} weaponProficiencies - the actor's full weaponProficiencies object
+ * @returns {Number} mastery - 0, 1, or 2
+ */
+export function calcMastery(weaponName, weaponProficiencies) {
+  let mastery = 0;
+  for (const w of weaponProficiencies) {
+    if (!w.exception && weaponName !== "*Any" && weaponName !== "") {
+      if (w.weapon == weaponName || w.weapon == "*Any") mastery ++;
+    }
+  }
+  return Math.max(mastery - 1, 0);
+}
+
+/**
+ * Calculate mastery-level for an actor's full set of weapon proficiencies
+ * @param {*} actor 
+ * @returns {Object} weaponProficiencies - the updated object data
+ */
+export function updateWeaponMasteries(actor) {
+  const weaponProficiencies = foundry.utils.deepClone(actor.system.weaponProficiencies);
+  for (const w of weaponProficiencies) {
+    if (w.weapon !== "*Any" && !w.exception) {
+      w.mastery = calcMastery(w.weapon, weaponProficiencies);
+    } else {
+      w.mastery = 0;
+    }
+  }
+  return weaponProficiencies;
 }
 
 // ---------------------------------------------------------------------------

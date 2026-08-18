@@ -4234,15 +4234,8 @@ export class Hyp3eCharacterClass {
    * @returns 
    */
   static isAttributeLow(actorData, attr) {
-    Hyp3eLogger.info("Hyp3eCharacterClass isAttributeLow", `Checking ${attr} attribute for ${actorData.details.class}...`)
+    // Hyp3eLogger.info("Hyp3eCharacterClass isAttributeLow", `Checking ${attr} attribute for ${actorData.details.class}...`)
     return actorData.attributes[attr]?.curr < actorData.attributes[attr]?.min ?? false;
-    // const attrReqs = this.classData[actorData.details.class]?.attrReqs;
-    // if (attrReqs && attrReqs[attr]) {
-    //   if (actorData.attributes[attr].value < attrReqs[attr]) {
-    //     return true
-    //   }  
-    // }
-    // return false
   }
 
   /**
@@ -4251,16 +4244,6 @@ export class Hyp3eCharacterClass {
    * @return {object} - The attribute data object 
    */
   static calcAttrMods(data) {
-    // Actor system data for lookups
-    // const data = actor.system;
-    // let thisClass = this.classData[data.details.class];
-    // let thisClass = await getClassTemplate(data.details.class)?.system;
-    // if (!thisClass) {
-    //   Hyp3eLogger.info("Hyp3eCharacterClass calcAttrMods", `No template found for ${data.details.class}!`);
-    //   const customClassData = game.settings.get(game.system.id, "customClassData");
-    //   thisClass = customClassData[data.details.class];
-    // }
-
     // Clone attributes so we can safely work with the modifiers
     const attributes = foundry.utils.deepClone(data.attributes);
 

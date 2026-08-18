@@ -72,7 +72,7 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
       actorUuid: _options.actorUuid,
       actor: actor,
       weapons: weapons,
-      hasWeaponExceptions: true
+      hasWeaponExceptions: this._hasExceptions(actor.system.weaponProficiencies)
     }
   }
 
@@ -106,6 +106,10 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _addWeapon", `${actor.name} favored weapons updated:`, weaponProficiencies);
     await actor.update({"system.weaponProficiencies": weaponProficiencies});
 
+    // Re-calc weapon masteries
+    await this._updateMasteries(actor)
+
+    // Refresh the display
     this.render(true, { actorUuid: target.dataset.actorUuid, focus: true })
   }
 
@@ -137,7 +141,15 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     // What was changed?
     switch (fieldName) {
       case "weapon":
-        weaponName = event.target.value;
+        if (event.target.value == "*Any" && weaponProficiencies.some(wp => wp.weapon == "*Any")) {
+          ui.notifications.warn("You cannot select *Any more than once.")
+          weaponName = "";
+        } else if (this._isException(event.target.value, weaponProficiencies)) {
+          ui.notifications.warn(`${event.target.value} is forbidden to this character/class.`)
+          weaponName = "";
+        } else {
+          weaponName = event.target.value;
+        }
         break;
       case "level":
         level = event.target.value;
@@ -153,6 +165,10 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
       default:
         // Do nothing
     }
+
+    // Re-calc weapon proficiency/mastery
+    mastery = this._calcMastery(weaponName, weaponProficiencies);
+
     // Update the selected proficiency data
     weaponProficiencies[index] = {
       weapon: weaponName,
@@ -161,10 +177,18 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
       exception: exception
     }
 
-    // Log the results and update the character
-    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateWeapon", `${actor.name} favored weapons updated:`, weaponProficiencies);
-    await actor.update({"system.weaponProficiencies": weaponProficiencies});
+    const sorted = [...weaponProficiencies].sort((a, b) => 
+      a.level - b.level || a.weapon.localeCompare(b.weapon)
+    );
 
+    // Log the results and update the character
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateWeapon", `${actor.name} favored weapons updated:`, sorted);
+    await actor.update({"system.weaponProficiencies": sorted});
+
+    // Re-calc weapon masteries
+    await this._updateMasteries(actor)
+
+    // Refresh the display
     this.render(true, { actorUuid: event.target.dataset.actorUuid, focus: true })
   }
 
@@ -190,50 +214,65 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _removeWeapon", `${actor.name} favored weapons updated:`, weaponProficiencies);
     await actor.update({"system.weaponProficiencies": weaponProficiencies});
 
+    // Re-calc weapon masteries
+    await this._updateMasteries(actor)
+
+    // Refresh the display
     this.render(true, { actorUuid: target.dataset.actorUuid, focus: true })
   }
 
-  static async toggleWeapon(event, target) {
-    const actor = await fromUuid(target.dataset.actorUuid);
-    if (!actor) {
-      const msg = `No character found for Uuid ${target.dataset.actorUuid}!`;
-      Hyp3eLogger.warn("HYP3ECharacterWeaponProficiencies toggleWeapon", msg);
-      ui.notifications.warn(msg);
-      return;
+  /**
+   * Determine whether the actor's weaponProficiencies list has at least one exception
+   * @param {*} weaponProficiencies - the actor's full weaponProficiencies object
+   * @returns {Boolean} - whether or not there is an exception found
+   */
+  _hasExceptions(weaponProficiencies) {
+    return weaponProficiencies.some(wp => wp.exception);
+  }
+
+  /**
+   * Determine whether the specified weapon is already set as an exception
+   * @param {*} weaponName - the weapon name to be checked
+   * @param {*} weaponProficiencies - the actor's full weaponProficiencies object
+   * @returns {Boolean} - whether or not this weapon is already an exception
+   */
+  _isException(weaponName, weaponProficiencies) {
+    for (const w of weaponProficiencies) {
+      if (w.exception && w.weapon === weaponName) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Calculate the mastery level of a weapon based on *Any + 1 or 2 additional 
+   *    proficiencies, or 2 or 3 total proficiencies of the weapon.
+   * @param {*} weaponName - the weapon name to be checked
+   * @param {*} weaponProficiencies - the actor's full weaponProficiencies object
+   * @returns {Number} mastery - 0, 1, or 2
+   */
+  _calcMastery(weaponName, weaponProficiencies) {
+    let mastery = 0;
+    for (const w of weaponProficiencies) {
+      if (!w.exception && weaponName !== "*Any" && weaponName !== "") {
+        if (w.weapon == weaponName || w.weapon == "*Any") mastery ++;
+      }
+    }
+    return Math.max(mastery - 1, 0);
+  }
+
+  async _updateMasteries(actor) {
+    const weaponProficiencies = foundry.utils.deepClone(actor.system.weaponProficiencies);
+    for (const w of weaponProficiencies) {
+      if (w.weapon !== "*Any" && !w.exception) {
+        w.mastery = this._calcMastery(w.weapon, weaponProficiencies);
+      } else {
+        w.mastery = 0;
+      }
     }
 
-    // Check to see if the weapon is already in the list, return true or false
-    function checkWeapon(weapon) {
-      return weapon != target.dataset.control;
-    }
-
-    // Toggle this weapon on/off for the character
-    let newList = [];
-    let weapons;
-    if (actor.system?.weaponProficiencies) {
-      weapons = [...actor.system.weaponProficiencies];
-    } else {
-      weapons = [];
-    }
-
-    // The filter function will delete any entries that match the clicked item, thus toggling it off
-    newList = weapons.filter(checkWeapon);
-    if (newList.length == weapons.length) {
-      // Nothing was deleted, so we will add this to the list, thus toggling it on
-      weapons.push(target.dataset.control);
-    } else {
-      // If something was deleted before, replace weapons with newList
-      weapons = newList;
-    }
-
-    // Sort the weapons alphabetically
-    weapons.sort((a, b) => {
-      return a.localeCompare(b);
-    });
-    // Log the results and update the character
-    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies toggleWeapon", `${actor.name} favored weapons:`, weapons);
-    await actor.update({ "system.weaponProficiencies.favoredWeapons": weapons });
-
-    this.render(true, { actorUuid: target.dataset.actorUuid, focus: true })
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateMasteries", `${actor.name} weapon masteries updated:`, weaponProficiencies);
+    await actor.update({ "system.weaponProficiencies": weaponProficiencies });
   }
 }

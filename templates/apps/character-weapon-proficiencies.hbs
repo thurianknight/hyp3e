@@ -11,7 +11,8 @@
   <ul>
     <li>
       <div class="flexrow flex-group-center">
-        <div>{{localize 'HYP3E.classEditor.favoredWeapons'}}</div>
+        <div class="flex-xlarge">{{localize 'HYP3E.classEditor.favoredWeapons'}}</div>
+        <div>&nbsp;</div>
         <div>Level Gained</div>
         <div>Forbidden</div>
         <div>Remove</div>
@@ -21,7 +22,7 @@
     {{#if (not entry.exception)}}
     <li data-actor-uuid="{{../actorUuid}}">
       <div class="flexrow flex-group-center">
-        <div style="width: 150px;">
+        <div class="flex-xlarge">
           <select class="weapon-select" 
             name="system.weaponProficiencies.{{idx}}.weapon" 
             data-actor-uuid="{{../ actorUuid}}" 
@@ -31,8 +32,12 @@
               {{selectOptions @root.weapons selected=entry.weapon localize=false}}
           </select>
         </div>
+        <div style="text-align: left;">
+          {{#if (eq entry.mastery 1)}}<i>master</i>{{/if}}
+          {{#if (eq entry.mastery 2)}}<i>g-master</i>{{/if}}
+        </div>
         <div>
-          <input style="max-width: 50px;" type="text" 
+          <input class="input-med50" type="text" 
             name="system.weaponProficiencies[{{idx}}].level" 
             data-actor-uuid="{{../ actorUuid}}" 
             data-index="{{idx}}" 
@@ -46,7 +51,7 @@
             data-field-name="exception" 
             {{checked entry.exception}} />
         </div>
-        <div>
+        <div class="align-center">
           <button type="button" class="button-narrow" 
             data-action="removeWeapon" 
             data-actor-uuid="{{../ actorUuid}}" 
@@ -63,7 +68,8 @@
   <ul>
     <li>
       <div class="flexrow flex-group-center">
-        <div>{{localize 'HYP3E.classEditor.exceptions'}}</div>
+        <div class="flex-xlarge">{{localize 'HYP3E.classEditor.exceptions'}}</div>
+        <div>&nbsp;</div>
         <div>Level Gained</div>
         <div>Forbidden</div>
         <div>Remove</div>
@@ -73,7 +79,7 @@
     {{#if entry.exception}}
     <li data-actor-uuid="{{../actorUuid}}">
       <div class="flexrow flex-group-center">
-        <div style="width: 150px;">
+        <div class="flex-xlarge">
           <select class="weapon-select" 
             name="system.weaponProficiencies.{{idx}}.weapon" 
             data-actor-uuid="{{../ actorUuid}}" 
@@ -83,8 +89,9 @@
               {{selectOptions @root.weapons selected=entry.weapon localize=false}}
           </select>
         </div>
+        <div>&nbsp;</div>
         <div>
-          <input style="max-width: 50px;" type="text" data-index="{{idx}}" 
+          <input class="input-med50" type="text" data-index="{{idx}}" 
             name="system.weaponProficiencies[{{idx}}].level" 
             data-actor-uuid="{{../ actorUuid}}" 
             data-index="{{index}}" 
@@ -98,7 +105,7 @@
             data-field-name="exception" 
             {{checked entry.exception}} />
         </div>
-        <div>
+        <div class="align-center">
           <button type="button" class="button-narrow" 
             data-action="removeWeapon" 
             data-actor-uuid="{{../ actorUuid}}" 

@@ -229,7 +229,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     }
 
     // Calculate weight carried & encumbrance
-    this.weightCarried = this._calcWeightCarried();
+    this.weightCarried = this._calcWeightCarried(); // _calcWeightCarried() is in base.mjs
 
     // What weight-class of armor (if any) is worn?
     const items = this._getEquippedProtectionItems();
@@ -244,7 +244,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     this.wornArmorType = armorType;
 
     // Get encumbered status
-    this.encumberedState = this._getEncumberedStatus();
+    this.encumberedState = this._getEncumberedStatus(); // _getEncumberedStatus() is in base.mjs
 
     // Auto-calculate AC, DR, MV if configuration is enabled
     const autoCalcAc = this.getSetting("autoCalcAc");
@@ -412,93 +412,6 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     Hyp3eLogger.info("Hyp3eCharacter _applyActiveEffectsToAttributes", `Updated attribute data with active effects for ${this.parent.name}:`, attributeData);
     return attributeData;
   }
-
-  /**
-   * Calculate the total weight carried by the character. Only used with characters.
-   * @returns {number} Total weight carried, rounded to one decimal place
-   */
-  /**
-  _calcWeightCarried() {
-    const enableCoinWeight = this.getSetting("enableCoinWeight");
-    if (!this.parent?.items && !enableCoinWeight) return 0;
-
-    let carriedWt = this.parent.items.reduce((total, item) => {
-      // Start with carried/equipped items. We ignore weight of non-equipped 
-      //  items since they are assumed to have been removed or dropped.
-      // For weapons & armor, the equipped status is ignored and the item weight 
-      //  is always added to encumbrance.
-      const normalGear = ['item', 'container']; // 'container' has been deprecated but may still exist
-      const combatGear = ['weapon', 'armor', 'shield'];
-      let weight = 0;
-      if (item.system.weight > 0 && item.system.quantity.value > 0) {
-        // Is this a normal item, and is it carried?
-        if (normalGear.includes(item.type) && item.system.equipped) {
-          if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
-            // For bundled items, we calculate weight based on number of bundles
-            weight = (item.system.weight * (item.system.quantity.value / item.system.quantity.bundle))
-          } else {
-            // Normal unbundled item
-            weight = (item.system.weight * item.system.quantity.value)
-          }
-        } else if (combatGear.includes(item.type)) {
-          if (item.system.quantity.bundle && item.system.quantity.bundle > 1) {
-            // For bundled items, we calculate weight based on number of bundles
-            weight = (item.system.weight * (item.system.quantity.value / item.system.quantity.bundle))
-          } else {
-            weight = (item.system.weight * item.system.quantity.value)
-          }
-        }
-      }
-      return total + weight;
-    }, 0);
-
-    // If enabled, add coin weight (100 coins = 1 lb)
-    if (enableCoinWeight) {
-      for (const [coinType, coinData] of Object.entries(this.money)) {
-        if (coinData.value) {
-          let val = convertToInt(coinData.value);
-          if (!isNaN(val) && val > 0) {
-            carriedWt += val / 100;
-          }
-        }
-      }
-    }
-
-    // Round to one decimal place
-    carriedWt = Math.round(carriedWt * 10)/10;
-
-    // Log the calculated weight
-    Hyp3eLogger.info("Hyp3eCharacter _calcWeightCarried", `${this.parent.name} is carrying ${carriedWt} pounds.`);
-
-    // Return the final carried weight
-    return carriedWt;
-  }
-  */
-
-  /**
-   * Determine the charactor's encumbrance status based on weight carried and strength.
-   * @returns {string} - "unencumbered", "encumbered", or "heavilyEncumbered"
-   */
-  /**
-  _getEncumberedStatus() {
-    const enableEncumbrance = this.getSetting("enableEncumbrance");
-    const encumbered = this.getSetting("encumbered");
-    const heavilyEncumbered = this.getSetting("heavilyEncumbered");
-    // Calc constants for encumbrance thresholds
-    const encumberedWt = this.attributes.str.curr * encumbered
-    const heavilyEncumberedWt = this.attributes.str.curr * heavilyEncumbered
-    if (enableEncumbrance) {
-      if (this.weightCarried > heavilyEncumberedWt) {
-        return "heavilyEncumbered";
-      } else if (this.weightCarried > encumberedWt) {
-        return "encumbered";
-      } else {
-        return "unencumbered";
-      }
-    }
-    return "unencumbered";
-  }
-  */
 
   /**
    * Gather equipped protection items (armor, shields).

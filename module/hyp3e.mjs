@@ -18,6 +18,7 @@ import { getAvailableTokenNumber,
       overlayEquippedWeaponAndShield } from "./helpers/tokens.mjs";
 import { HYP3ECustomClassList } from "./apps/class-list.mjs";
 import { migrateActorData, 
+      updateWeaponMasteries,
       migrateItemData, 
       fixTokenSize,
       migrateActorEffects,
@@ -1053,6 +1054,11 @@ async function migrateWorld() {
     const actorUpdates = await migrateActorData(origActor, classTemplate);
     if (actorUpdates && Object.keys(actorUpdates).length > 0) {
       await actor.update(actorUpdates);
+      // For PCs only, re-calc weapon masteries after the primary update
+      if (actor.type === "character") {
+        const weaponProficiencies = updateWeaponMasteries(actor);
+        await actor.update({ "system.weaponProficiencies": weaponProficiencies });
+      }
     }
     // Migrate the actor's items
     if (actor.items) {
@@ -1134,6 +1140,11 @@ async function migrateWorld() {
         const actorUpdates = await migrateActorData(origActor);
         if (actorUpdates && Object.keys(actorUpdates).length > 0) {
           await doc.update(actorUpdates);
+        }
+        // For PCs only, re-calc weapon masteries after the primary update
+        if (doc.type === "character") {
+          const weaponProficiencies = updateWeaponMasteries(doc);
+          await doc.update({ "system.weaponProficiencies": weaponProficiencies });
         }
         // Migrate the actor's items
         if (doc.items) {

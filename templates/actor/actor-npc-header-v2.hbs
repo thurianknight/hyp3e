@@ -45,29 +45,29 @@
             </span>
         </div>
         <div class="npc-header-block flexrow">
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <select name="system.size">
               <option value=""></option>
               {{selectOptions creatureSizes selected=system.size localize=false}}
             </select><br/>
             <label for="system.size" class="small-label">{{localize 'HYP3E.size'}}</label>
           </div>
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <input type="text" name="system.alignment" value="{{system.alignment}}" />
             <label for="system.alignment" class="small-label">{{localize 'HYP3E.alignment'}}</label>
           </div>
           {{#if (eq system.npcType "monster")}}
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <input type="text" name="system.encWild" value="{{system.encWild}}" />
             <label for="system.encWild" class="small-label">{{localize 'HYP3E.encWild'}}</label>
           </div>
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <input type="text" name="system.encLair" value="{{system.encLair}}" />
             <label for="system.encLair" class="small-label">{{localize 'HYP3E.encLair'}}</label>
           </div>
           {{/if}}
           {{#if (eq system.npcType "npc")}}
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <input type="text" name="system.cost" value="{{system.cost}}" />
             <label for="system.cost" class="small-label">{{localize 'HYP3E.cost'}}</label>
           </div>
@@ -75,7 +75,7 @@
         </div>
         <div class="npc-header-block flexrow">
           {{#if (eq system.npcType "monster")}}
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <select name="system.phenotype">
               <option value=""></option>
               {{selectOptions phenotypes selected=system.phenotype localize=false}}
@@ -85,7 +85,7 @@
           {{/if}}
           {{#if (eq system.npcType "npc")}}
           {{#if isGM}}
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <input type="text" name="system.loyalty" value="{{system.loyalty}}" data-dtype="Number" />
             <a class="rollable small-label" 
                 data-action="rollThis" 
@@ -99,7 +99,7 @@
           </div>
           {{/if}}
           {{/if}}
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <input type="text" name="system.morale" value="{{system.morale}}" data-dtype="Number" />
             <a class="rollable small-label" 
                 data-action="rollThis" 
@@ -111,11 +111,11 @@
               <i class="fas fa-dice"></i>
             </a>
           </div>
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <input type="text" name="system.xp" value="{{system.xp}}" />
             <label for="system.xp" class="small-label">{{localize 'HYP3E.xp'}}</label>
           </div>
-          <div class="npc-field align-center">
+          <div class="npc-field flex-group-center">
             <input type="text" name="system.treasure" value="{{system.treasure}}" />
             <label for="system.treasure" class="small-label">{{localize 'HYP3E.treasure'}}</label>
           </div>

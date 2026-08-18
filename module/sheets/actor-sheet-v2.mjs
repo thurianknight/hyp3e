@@ -504,6 +504,23 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       }
     }
 
+    // Format favoured weapons and exceptions into one set
+    context.weaponProficiencies = "";
+    let favouredWeapons = "";
+    let exceptions = "";
+    for (const weapon of context.system.weaponProficiencies) {
+      if (!weapon.exception) {
+        if (favouredWeapons.includes(weapon.weapon)) continue;
+        const mastery = (weapon.mastery > 1 ? " (gm)" : (weapon.mastery > 0 ? " (m)" : ""));
+        favouredWeapons += `${weapon.weapon}${mastery}; `;
+      } else {
+        exceptions += `${weapon.weapon}; `;
+      }
+    }
+    favouredWeapons = favouredWeapons.substring(0, favouredWeapons.length - 2);
+    exceptions = (exceptions !== "" ? exceptions.substring(0, exceptions.length - 2) : "");
+    context.weaponProficiencies = favouredWeapons + (exceptions !== "" ? `; \n*Except ${exceptions}` : "");
+
     // Handle movement types
     for (let [k, v] of Object.entries(context.system.movement)) {
       if (k == "tempMvMod") continue;
@@ -1434,25 +1451,12 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         return;
       }
 
-      // Apply the class template to the character
+      // Roll up the new character using the selected class template
       await Hyp3eCharacterClass.applyClassTemplate(this.actor, classTemplate);
 
       const msg = `Applied class template "${classTemplate.name}" to ${this.actor.name}.`;
       Hyp3eLogger.info("HYP3EActorSheetV2 _onQuickCreate", msg);
       ui.notifications.info(msg);
-
-      // Quickly roll up a character of the selected class
-      // dataset.actorId = this.actor.id
-      // dataset.baseClass = this.actor.system.baseClass
-      // // Log the dataset
-      // Hyp3eLogger.info("HYP3EActorSheetV2 _onQuickCreate", `Quick-create dataset:`, dataset);
-      // let createOk = await Hyp3eCharacterClass.quickCreateCharacter(dataset);
-      // if (createOk) {
-      //     ui.notifications.info("Character created!")
-      //     this.render()
-      // } else {
-      //     ui.notifications.error("Character creation failed. Please check the console for errors.")
-      // }
     }
 
     /**
@@ -1480,8 +1484,23 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         Hyp3eActorSheetV2.LANGUAGES_APP.render(true, { actorUuid: this.actor.uuid, focus: true });
     }
 
+    // Open the Favoured Weapons app
     static _openFavoredWeaponsApp() {
       Hyp3eActorSheetV2.FAVORED_WEAPONS_APP.render(true, { actorUuid: this.actor.uuid, focus: true });
+    }
+
+    // Clear the legacy proficiency fields
+    static async _clearFavoredWeapons() {
+      const actor = this.actor;
+      const proficiencies = {
+        class: "",
+        lvl1: "",
+        lvl4: "",
+        lvl8: "",
+        lvl12: "",
+      }
+      ui.notifications.info(`Clearing the legacy weapopn proficiency fields for ${actor.name}...`);
+      await actor.update({ "system.proficiencies": proficiencies });
     }
 
     /**

@@ -14,7 +14,7 @@
           <div class="npc-header-block">
             <div class="money-block flexrow">
               {{#each system.money as |coin key|}}
-              <div class="ability align-center">
+              <div class="ability flex-group-center">
                 <div>
                   <label for="system.money.{{key}}.value" class="exploration-label coin-{{key}}">
                     <i class="fas fa-coin"></i>
@@ -27,17 +27,17 @@
               </div>
               {{/each}}
             </div>
-            <div class="money-block align-left">
+            <div class="money-block flex-group-left">
               <input type="checkbox" name="system.ignoreQty" {{checked system.ignoreQty}} />
               <label for="system.ignoreQty" class="small-label">{{localize 'Ignore merchant qty'}}</label>
             </div>
           </div>
           <div class="npc-header-block">
-            <div class="money-block align-center">
+            <div class="money-block flex-group-center">
               <input type="number" step="0.1" name="system.sellMultiplier" value="{{system.sellMultiplier}}" />
               <label for="system.sellMultiplier" class="small-label">{{localize 'HYP3E.dataLabel.sellMultiplier'}}</label>
             </div>
-            <div class="money-block align-center">
+            <div class="money-block flex-group-center">
               <input type="number" step="0.1" name="system.buyMultiplier" value="{{system.buyMultiplier}}" />
               <label for="system.buyMultiplier" class="small-label">{{localize 'HYP3E.dataLabel.buyMultiplier'}}</label>
             </div>

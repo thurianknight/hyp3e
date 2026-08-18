@@ -30,43 +30,28 @@
             </div>
             {{!-- <div class="resource-content class-weapons flexrow"> --}}
             <div class="resource-content class-weapons">
-              {{!-- <fieldset> --}}
-                {{!-- <legend> --}}
-                  <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.wpnSkills"}}</label>
-                  <a class="languages-button item-control icon-btn" 
-                      aria-label="{{localize 'HYP3E.classEditor.favoredWeapons'}}" 
-                      role="button" 
-                      data-tooltip="HYP3E.classEditor.favoredWeapons" 
-                      data-action="setFavoredWeapons">
-                    <i class="fas fa-book" style="font-size: small"></i>
-                  </a>
-                  <a class="languages-button item-control icon-btn" 
-                      aria-label="{{localize 'HYP3E.classEditor.clearList'}}" 
-                      role="button" 
-                      data-tooltip="HYP3E.classEditor.clearList" 
-                      data-action="clearFavoredWeapons">
-                    <i class="fas fa-eraser" style="font-size: small"></i>
-                  </a>
-                {{!-- </legend> --}}
-                {{!-- <input type="text" name="system.proficiencies.class" value="{{system.proficiencies.class}}"/> --}}
-                <div class="flex">
-                  <textarea name="system.proficiencies.class" disabled>{{system.proficiencies.class}} | {{system.proficiencies.lvl4}} | {{system.proficiencies.lvl8}} | {{system.proficiencies.lvl12}}</textarea>
-                  {{!-- {{system.proficiencies.class}} | {{system.proficiencies.lvl4}} | {{system.proficiencies.lvl8}} | {{system.proficiencies.lvl12}} --}}
-                </div>
-              {{!-- </fieldset> --}}
+              <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.wpnSkills"}}</label>
+              <a class="languages-button item-control icon-btn" 
+                  aria-label="{{localize 'HYP3E.classEditor.favoredWeapons'}}" 
+                  role="button" 
+                  data-tooltip="HYP3E.classEditor.favoredWeapons" 
+                  data-action="setFavoredWeapons">
+                <i class="fas fa-book" style="font-size: small"></i>
+              </a>
+              {{#unless (eq system.proficiencies.class "")}}
+              <a class="languages-button item-control icon-btn" 
+                  aria-label="{{localize 'HYP3E.classEditor.clearLegacy'}}" 
+                  role="button" 
+                  data-tooltip="HYP3E.classEditor.clearLegacy" 
+                  data-action="clearFavoredWeapons">
+                <i class="fas fa-eraser" style="font-size: small"></i>
+              </a>
+              {{/unless}}
+              <div class="flex">
+                <textarea name="system.proficiencies.class" disabled>{{weaponProficiencies}}</textarea>
+                {{!-- {{system.proficiencies.class}} | {{system.proficiencies.lvl4}} | {{system.proficiencies.lvl8}} | {{system.proficiencies.lvl12}} --}}
+              </div>
             </div>
-            {{!-- <div class="resource-content weapon-field flexrow">
-                <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.level4"}}</label>
-                <input type="text" name="system.proficiencies.lvl4" value="{{system.proficiencies.lvl4}}"/>
-            </div>
-            <div class="resource-content weapon-field flexrow">
-                <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.level8"}}</label>
-                <input type="text" name="system.proficiencies.lvl8" value="{{system.proficiencies.lvl8}}"/>
-            </div>
-            <div class="resource-content weapon-field flexrow">
-                <label for="system.proficiencies" class="combat-label">{{localize "HYP3E.level12"}}</label>
-                <input type="text" name="system.proficiencies.lvl12" value="{{system.proficiencies.lvl12}}"/>
-            </div> --}}
         </section>
         {{!-- Hit Points, Armor Class, Movement --}}
         <section class="combat-block combat-stats flexcol">
