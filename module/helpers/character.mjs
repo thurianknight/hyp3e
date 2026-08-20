@@ -4407,7 +4407,17 @@ export class Hyp3eCharacterClass {
       }
     }
 
-    const weaponProficiencies = classTemplate.system.weaponProficiencies.favoredWeapons.join("; ") + (classTemplate.system.weaponProficiencies.exceptions.length > 0 ? `; except ${classTemplate.system.weaponProficiencies.exceptions.join("; ")}` : "")
+    // Legacy formatted string for favoured weapons & exceptions
+    const legacyProficiencies = classTemplate.system.weaponProficiencies.favoredWeapons.join("; ") + (classTemplate.system.weaponProficiencies.exceptions.length > 0 ? `; except ${classTemplate.system.weaponProficiencies.exceptions.join("; ")}` : "");
+
+    // New structured array for favoured weapons & exceptions
+    const weaponProficiencies = [];
+    for (const weapon of classTemplate.system.weaponProficiencies.favoredWeapons) {
+      weaponProficiencies.push({ weapon: weapon, level: 1, mastery: 0, exception: false });
+    }
+    for (const weapon of classTemplate.system.weaponProficiencies.exceptions) {
+      weaponProficiencies.push({ weapon: weapon, level: 1, mastery: 0, exception: true });
+    }
 
     // Now we update all the data fields are don't need to be rolled, but are set by the class template
     await actor.update({
@@ -4457,8 +4467,9 @@ export class Hyp3eCharacterClass {
         spellList2: classTemplate.system.spellLists && classTemplate.system.spellLists.length > 1 ? classTemplate.system.spellLists[1] : "",
         unskilled: classTemplate.system.unskilled,
         proficiencies: {
-          class: weaponProficiencies,
+          class: legacyProficiencies,
         },
+        weaponProficiencies: weaponProficiencies,
         details: {
           xp: {
             toNextLvl: classTemplate.system.levelAdvancement["2"].xp,
@@ -5843,6 +5854,15 @@ export class Hyp3eCharacterClass {
       spellLists += `, ${actorData.spellList2}`;
     }
 
+    // Combine the favoured weapons and exceptions into simple name-only arrays
+    const favouredWeapons = actorData.weaponProficiencies
+      .filter(w => !w.exception)
+      .map(w => w.weapon);
+    const exceptions = actorData.weaponProficiencies
+      .filter(w => w.exception)
+      .map(w => w.weapon);
+    const favouredWeaponsString = favouredWeapons.join("; ") + (exceptions.length > 0 ? "; Except " + exceptions.join("; ") : "")
+
     // Setup journal report content
     let journalContent = `
           <h2>Character ${actor.name} (${actorData.details.class})</h2>
@@ -5855,7 +5875,7 @@ export class Hyp3eCharacterClass {
             <li>Spell List(s): ${spellLists}</li>
             <li>Turning Ability: ${actorData.ta}</li>
             <li>Unskilled Weapon Penalty: ${actorData.unskilled}</li>
-            <li>Favoured Weapons: ${actorData.proficiencies.class}</li>
+            <li>Favoured Weapons: ${favouredWeaponsString}</li>
             <li>Saving Throws vs:</li>
             <ul>
               <li>Death: ${actorData.saves.death.value}</li>
