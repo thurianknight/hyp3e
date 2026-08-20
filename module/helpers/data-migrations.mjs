@@ -122,8 +122,8 @@ export async function migrateActorData(actor, classTemplate = null) {
 
         // Migrate, fix, or delete old data
 
-        // Migrate legacy weapon proficiencies, if data exists to migrate
-        if (actor.system.proficiencies.class !== "") {
+        // Migrate legacy weapon proficiencies, if it hasn't already been done
+        if (actor.system.proficiencies.class !== "" && actor.system.weaponProficiencies.length == 0) {
           const newProficiencies = migrateProficiencies(actor, classTemplate);
           updates = { ...updates, "system.weaponProficiencies": newProficiencies };
           // Write a Proficiency Migration report for the actor
