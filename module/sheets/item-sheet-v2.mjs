@@ -275,9 +275,12 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
    */
   _prepareItemData(context) {
     // All item sheets get the same basic data
-    context.weaponTypes = CONFIG.HYP3E.weaponTypes;
     context.armorTypes = CONFIG.HYP3E.armorTypes;
     context.shieldTypes = CONFIG.HYP3E.shieldTypes;
+    context.weaponTypes = CONFIG.HYP3E.weaponTypes;
+    context.baseWeapons = Object.fromEntries(
+      CONFIG.HYP3E.weapons.map(w => [w, w])
+    );
     context.weaponAnnotations = CONFIG.HYP3E.weaponAnnotations;
     context.damageTypes = CONFIG.HYP3E.damageTypes;
     context.blindRollOpts = CONFIG.HYP3E.blindRollOpts;

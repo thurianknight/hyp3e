@@ -51,6 +51,34 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     }
   }
 
+  static CANONICAL = [
+    "Axe, Battle", "Axe, Great", "Axe, Hand",
+    "Bardiche", "Bill", "Cæstuses", "Chain Whip",
+    "Club, Light", "Club, War",
+    "Dagger", "Dagger, Silver",
+    "Falcata", "Fauchard",
+    "Flail, Footman's", "Flail, Horseman's",
+    "Garrotte", "Glaive", "Halberd",
+    "Hammer, Great", "Hammer, Horseman's", "Hammer, War",
+    "Javelin", "Lance", "Lasso",
+    "Mace, Footman's", "Mace, Great", "Mace, Horseman's",
+    "Monk's Empty Hand Attack", "Morning Star",
+    "Pick, Horseman's", "Pick, War",
+    "Pike", "Poleaxe", "Quarterstaff",
+    "Scimitar, Great", "Scimitar, Long", "Scimitar, Short", "Scimitar, Two-handed",
+    "Sickle",
+    "Spear, Great", "Spear, Long", "Spear, Short",
+    "Staff, Spiked",
+    "Sword, Bastard", "Sword, Broad", "Sword, Great", "Sword, Long", "Sword, Short", "Sword, Two-handed",
+    "Tonfa", "Trident, Hand", "Trident, Long", "Whip",
+    "Blowgun", "Bola", "Boomerang",
+    "Bow, Long", "Bow, Long, Composite", "Bow, Short", "Bow, Short, Composite",
+    "Crossbow, Heavy", "Crossbow, Light", "Crossbow, Repeating",
+    "Dart",
+    "Holy Water/Oil (thrown)", "Hooked Throwing Knife",
+    "Needle, Blowgun", "Net, Fighting",
+    "Oil, Incendiary (thrown)", "Sling"
+  ];
 
   // ===========================================================================
   // RENDER SETUP
@@ -105,9 +133,6 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     // Log the results and update the character
     Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _addWeapon", `${actor.name} favored weapons updated:`, weaponProficiencies);
     await actor.update({"system.weaponProficiencies": weaponProficiencies});
-
-    // Re-calc weapon masteries
-    await this._updateMasteries(actor)
 
     // Refresh the display
     this.render(true, { actorUuid: target.dataset.actorUuid, focus: true })
@@ -209,13 +234,14 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
 
     // Remove the weapon from the list
     const weaponProficiencies = [...actor.system.weaponProficiencies];
+    const removedWeapon = weaponProficiencies[index];
     weaponProficiencies.splice(index, 1);
     // Log the results and update the character
     Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _removeWeapon", `${actor.name} favored weapons updated:`, weaponProficiencies);
     await actor.update({"system.weaponProficiencies": weaponProficiencies});
 
     // Re-calc weapon masteries
-    await this._updateMasteries(actor)
+    await this._removeMastery(actor, removedWeapon)
 
     // Refresh the display
     this.render(true, { actorUuid: target.dataset.actorUuid, focus: true })
@@ -262,17 +288,107 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     return Math.max(mastery - 1, 0);
   }
 
+  /**
+   * Update all weapon masteries for an actor based on its selected proficiencies
+   * @param {*} actor 
+   */
   async _updateMasteries(actor) {
     const weaponProficiencies = foundry.utils.deepClone(actor.system.weaponProficiencies);
-    for (const w of weaponProficiencies) {
-      if (w.weapon !== "*Any" && !w.exception) {
-        w.mastery = this._calcMastery(w.weapon, weaponProficiencies);
+    for (const wp of weaponProficiencies) {
+      if (wp.weapon !== "*Any" && !wp.exception) {
+        wp.mastery = this._calcMastery(wp.weapon, weaponProficiencies);
+        await this._updateActorWeapons(actor, wp);
       } else {
-        w.mastery = 0;
+        wp.mastery = 0;
       }
     }
 
     Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateMasteries", `${actor.name} weapon masteries updated:`, weaponProficiencies);
     await actor.update({ "system.weaponProficiencies": weaponProficiencies });
+  }
+
+  async _removeMastery(actor, removedWeapon) {
+    const ownedWeapons = actor.items.filter(i => i.type === "weapon");
+    for (const weapon of ownedWeapons) {
+      if (this._isMatch(weapon.name, removedWeapon.weapon) || this._isMatch(weapon.system.friendlyName, removedWeapon.weapon)) {
+        Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _removeMastery", `Removing ${weapon.name} mastery...`);
+        await weapon.update({ "system.wpnMaster": false, "system.wpnGrandmaster": false });
+      }
+    }
+  }
+
+  // Update mastery flags on an actor's owned weapons, based on the actor's masteries
+  async _updateActorWeapons(actor, weaponProficiency) {
+    const ownedWeapons = actor.items.filter(i => i.type === "weapon");
+    let wpnMaster = false;
+    let wpnGrandmaster = false;
+    for (const weapon of ownedWeapons) {
+      if (this._isMatch(weapon.name, weaponProficiency.weapon) || this._isMatch(weapon.system.friendlyName, weaponProficiency.weapon)) {
+        Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateActorWeapons", `Setting ${weapon.name} mastery to ${weaponProficiency.mastery}...`);
+        switch (weaponProficiency.mastery) {
+          case 0:
+            wpnMaster = false;
+            wpnGrandmaster = false;
+            break;
+          case 1:
+            wpnMaster = true;
+            wpnGrandmaster = false;
+            break;
+          case 2:
+            wpnMaster = false;
+            wpnGrandmaster = true;
+            break;
+          default:
+            wpnMaster = false;
+            wpnGrandmaster = false;
+            break;
+        }
+        await weapon.update({ "system.wpnMaster": wpnMaster, "system.wpnGrandmaster": wpnGrandmaster });
+      }
+    }
+  }
+
+  /**
+   * Normalize a weapon name for fuzzy comparison.
+   * Returns both a space-separated sorted token string and a fully compacted version.
+   */
+  _normalizeWeaponName(name) {
+    if (!name || typeof name !== "string") return { sorted: "", compact: "" };
+  
+    const cleaned = name
+      .toLowerCase()
+      .replace(/æ/g, "ae")                     // Cæstuses → caestuses
+      .replace(/œ/g, "oe")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // strip remaining diacritics
+      .replace(/[^a-z0-9\s]/g, " ")           // keep only letters, digits, spaces
+      .replace(/\s+/g, " ")
+      .trim();
+  
+    const tokens = cleaned.split(" ").filter(Boolean).sort();
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _normalizeWeaponName", `${name} normalized to tokens:`, tokens);
+    return {
+      sorted: tokens.join(" "),
+      compact: tokens.join("")                 // "long sword" → "longsword"
+    };
+  }
+
+  /**
+   * Fuzzy match a weapon name against a single canonical name.
+   * @param {string} weaponName
+   * @param {string} canonicalName
+   * @returns {boolean}
+   */
+  _isMatch(weaponName, canonicalName) {
+    const input = this._normalizeWeaponName(weaponName);
+    const target = this._normalizeWeaponName(canonicalName);
+    if (!input.compact || !target.compact) return false;
+
+    // Primary: compact form (handles "longsword" ↔ "Sword, Long")
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _isMatch", `Does ${input.compact} match ${target.compact}?`);
+    if (input.compact === target.compact) return true;
+  
+    // Secondary: sorted tokens (handles remaining order/spacing differences)
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _isMatch", `Does ${input.sorted} match ${target.sorted}?`);
+    return input.sorted === target.sorted;
   }
 }

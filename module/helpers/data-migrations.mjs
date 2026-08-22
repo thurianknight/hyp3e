@@ -267,6 +267,15 @@ export function migrateItemData(item) {
 
     // Weapons only
     if (item.type === "weapon") {
+        // Ensure baseWeapon is populated
+        if (!item.system.baseWeapon) {
+          const match = findCanonicalWeapon(item.name);
+          if (match) {
+            updates = { ...updates, "system.baseWeapon": match };
+          } else {
+            Hyp3eLogger.info("migrateItemData", `No canonical match found for ${item.name}`);
+          }
+        }
         // Ensure quantities and weight are numbers
         if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
             updates = { ...updates, ...qtyAndWeightUpdates(item) };
@@ -775,7 +784,7 @@ export async function migrateCustomClasses() {
 /******************************************************************************
  * 
  * The following methods are all about migrating the Favoured Weapons list/string 
- * into a favoured[] array and an exceptions[] array.
+ * into favoured[] and exceptions[] arrays.
  * 
  ******************************************************************************/
 
@@ -925,6 +934,57 @@ export function updateWeaponMasteries(actor) {
   return weaponProficiencies;
 }
 
+/**
+ * Find the best matching canonical weapon name.
+ * @param {string} name - Any variant of a weapon name
+ * @returns {string|null} The matching canonical name, or null if none found
+ */
+function findCanonicalWeapon(name) {
+  // Ensure the lookup table exists
+  _ensureLookup();
+
+  const input = normalizeWeaponName(name);
+  if (!input.compact) return null;
+  Hyp3eLogger.info("findCanonicalWeapon", `${name} normalized to ${input.compact} and ${input.sorted}`);
+  
+  // Prefer exact compact match (handles "longsword" vs "Sword, Long")
+  // let match = CANONICAL.find(c => c.compact === input.compact);
+  let match = LOOKUP.get(input.compact);
+  Hyp3eLogger.info("findCanonicalWeapon", `Matching on ${input.compact}...:`, (match ? true : false));
+  // if (match) return match.original;
+  if (match) return match;
+
+  // Fallback to sorted-token match (handles remaining order/spacing cases)
+  // match = CANONICAL.find(c => c.sorted === input.sorted);
+  match = LOOKUP.get(input.sorted);
+  Hyp3eLogger.info("findCanonicalWeapon", `Matching on ${input.sorted}...:`, (match ? true : false));
+  return match ? match : null;
+}
+
+/**
+ * Normalize a weapon name for comparison.
+ * Returns both a space-separated sorted token string and a fully compacted version.
+ */
+function normalizeWeaponName(name) {
+  if (!name || typeof name !== "string") return { sorted: "", compact: "" };
+
+  const cleaned = name
+    .toLowerCase()
+    .replace(/æ/g, "ae")                        // Cæstuses → caestuses
+    .replace(/[+\-]\s*\d+/g, "")                // Remove +1, -2, etc. from magic weapons
+    .replace(/\b(cursed|silver|thrown)\b/g, "") // Remove "cursed", "silver", "thrown"
+    .replace(/['’ʻʼ]/g, "")                     // All common apostrophe variants, just in case
+    .replace(/[^a-z\s]/g, " ")                  // Keep only letters and spaces
+    .replace(/\s+/g, " ")                       // Collapse multiple spaces in a row, to one
+    .trim();
+
+  const tokens = cleaned.split(" ").filter(Boolean).sort();
+  return {
+    sorted: tokens.join(" "),
+    compact: tokens.join("")                 // "long sword" → "longsword"
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Internal state & helpers
 // ---------------------------------------------------------------------------
@@ -943,11 +1003,11 @@ const CANONICAL = [
   "Monk's Empty Hand Attack", "Morning Star",
   "Pick, Horseman's", "Pick, War",
   "Pike", "Poleaxe", "Quarterstaff",
-  "Scimitar, Great", "Scimitar, Long", "Scimitar, Short", "Scimitar, Two-handed",
+  "Scimitar, Long", "Scimitar, Short", "Scimitar, Two-handed",
   "Sickle",
   "Spear, Great", "Spear, Long", "Spear, Short",
   "Staff, Spiked",
-  "Sword, Bastard", "Sword, Broad", "Sword, Great", "Sword, Long", "Sword, Short", "Sword, Two-handed",
+  "Sword, Bastard", "Sword, Broad", "Sword, Long", "Sword, Short", "Sword, Two-handed",
   "Tonfa", "Trident, Hand", "Trident, Long", "Whip",
   "Blowgun", "Bola", "Boomerang",
   "Bow, Long", "Bow, Long, Composite", "Bow, Short", "Bow, Short, Composite",
@@ -971,13 +1031,16 @@ const EXTRA_ALIASES = {
   "long sword":           "Sword, Long",
   "shortsword":           "Sword, Short",
   "short sword":          "Sword, Short",
-  "greatsword":           "Sword, Great",
-  "great sword":          "Sword, Great",
+  "greatsword":           "Sword, Two-handed",
+  "great sword":          "Sword, Two-handed",
+  "sword great":          "Sword, Two-handed",
   "bastard sword":        "Sword, Bastard",
   "two handed sword":     "Sword, Two-handed",
   "two-handed sword":     "Sword, Two-handed",
   "2h sword":             "Sword, Two-handed",
-
+  "scimitar great":       "Scimitar, Two-handed",
+  "great scimitar":       "Scimitar, Two-handed",
+  "2h scimitar":          "Scimitar, Two-handed",
   // Axes / hammers / etc.
   "hand axe":             "Axe, Hand",
   "battle axe":           "Axe, Battle",
@@ -989,7 +1052,6 @@ const EXTRA_ALIASES = {
   "spiked staff":         "Staff, Spiked",
   "caestuses":            "Cæstuses",
   "cestuses":             "Cæstuses",
-
   // Bows
   "longbow":              "Bow, Long",
   "shortbow":             "Bow, Short",
@@ -997,7 +1059,6 @@ const EXTRA_ALIASES = {
   "composite shortbow":   "Bow, Short, Composite",
   "long composite bow":   "Bow, Long, Composite",
   "short composite bow":  "Bow, Short, Composite",
-
   // Crossbows
   "lightcrossbow":        "Crossbow, Light",
   "heavycrossbow":        "Crossbow, Heavy",

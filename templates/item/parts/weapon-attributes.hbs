@@ -5,10 +5,14 @@
           <label class="resource-label">{{localize 'HYP3E.rollFormula'}}</label>
           <input type="text" name="system.formula" value="{{system.formula}}" />
         </div>
-        {{!-- <div class="flexrow flexshrink flex-group-left bg-attributes-xwide">
+        <div class="flexrow flexshrink flex-group-left bg-attributes-xwide">
           <label class="resource-label">{{localize 'HYP3E.dataLabel.baseWeapon'}}</label>
-          <input type="text" name="system.baseWeapon" value="{{system.baseWeapon}}" />
-        </div> --}}
+          <select class="weapon-select" name="system.baseWeapon" >
+            <option value=""></option>
+            {{selectOptions @root.baseWeapons selected=system.baseWeapon localize=false}}
+          </select>
+          <div class="flexlarge">{{localize 'HYP3E.item.attributes.baseWeapon'}}</div>
+        </div>
         <div class="flexrow flexshrink flex-group-left bg-attributes">
           <label class="resource-label">{{localize 'HYP3E.item.consumable'}}</label>
           <input name="system.isConsumable" type="checkbox" {{checked system.isConsumable}} />

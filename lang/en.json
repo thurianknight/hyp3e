@@ -449,6 +449,7 @@
             "attributes": {
                 "equipped": "The Equipped tag indicates whether this item is equipped or not.",
                 "carried": "The Carried tag allows this item to be carried or dropped.",
+                "baseWeapon": "The Weapon Proficiency required to wield this weapon without penalty.",
                 "isConsumable": "The Consumable tag gives this item the increment/decrement buttons.",
                 "isAmmunition": "The Ammunition tag causes this item to display on the Combat tab.",
                 "bundleQty": "If used, indicates how many individual items are sold in a bundle.",
