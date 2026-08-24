@@ -34,7 +34,7 @@ import { HYP3EQuickEquipApp } from "./apps/quick-equip-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
 import { registerHyp3eConfigurations } from "./helpers/register-config.mjs";
 import { applyChatFontSizeSetting } from "./chat/chat.mjs";
-import { getClassTemplate, getClassTemplateNames } from "./helpers/folders-and-compendia.mjs"
+import { getClassTemplate, getClassTemplateNames, findItemsByFolderOrCompendiumName, getJournalPageList } from "./helpers/folders-and-compendia.mjs"
 
 // Set this now, to use later
 let trackerInitialized = false;
@@ -183,15 +183,9 @@ Hooks.once('init', async function() {
     break;
   }
 
-  if (majorVersion >= 13) {
-  // Load v13-specific Combat Tracker class
+  // Load v13+ compatible Combat Tracker class
   const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v13.mjs");
   CONFIG.ui.combat = HYP3ECombatTracker;
-  } else {
-  // Load v12-specific Combat Tracker class
-  // const { HYP3ECombatTracker } = await import( "./combat/combat-tracker-v12.mjs");
-  // CONFIG.ui.combat = HYP3ECombatTracker;
-  }
 
   /* -------------------------------------------- */
   /*  Handlebars Helpers              */
@@ -553,6 +547,69 @@ Hooks.once("ready", async function() {
     }
     Hyp3eLogger.info("Init", "CONFIG Armor Types:", CONFIG.HYP3E.armorTypes);
   }
+
+  // Load item lists from the Hyp3e Core compendium and other compendia
+  const armorNames = await getJournalPageList("Equipment Lists", "Armour", "Armour");
+  Hyp3eLogger.info("Init", `Retrieved armor names from Core Journal:`, armorNames);
+  const compendiumArmor = await findItemsByFolderOrCompendiumName("armor, armour, shield, shields", "armor", "magic, magical");
+  Hyp3eLogger.info("Init", `Retrieved compendium armor names:`, compendiumArmor);
+  const allArmor = [...new Set([...armorNames, ...compendiumArmor])].sort();
+  Hyp3eLogger.info("Init", `Core Journal and compendia armor list compiled:`, allArmor);
+  CONFIG.HYP3E.armorList = allArmor;
+
+  const shieldNames = await getJournalPageList("Equipment Lists", "Armour", "Shields");
+  Hyp3eLogger.info("Init", `Retrieved shield names from Core Journal:`, shieldNames);
+  const compendiumShields = await findItemsByFolderOrCompendiumName("armor, armour, shield, shields", "shield", "magic, magical");
+  Hyp3eLogger.info("Init", `Retrieved compendium shield names:`, compendiumShields);
+  const allShields = [...new Set([...shieldNames, ...compendiumShields])].sort();
+  Hyp3eLogger.info("Init", `Core Journal and compendia shield list compiled:`, allShields);
+  CONFIG.HYP3E.shieldList = allShields;
+
+  const weaponMeleeNames = await getJournalPageList("Equipment Lists", "Weapons", "Melee");
+  Hyp3eLogger.info("Init", `Retrieved melee weapons from Core Journal:`, weaponMeleeNames);
+  const weaponMissileNames = await getJournalPageList("Equipment Lists", "Weapons", "Missile");
+  Hyp3eLogger.info("Init", `Retrieved missile weapons from Core Journal:`, weaponMissileNames);
+  const compendiumWeapons = await findItemsByFolderOrCompendiumName("weapons, melee, missile, ammunition", "weapon", "magic, magical");
+  // const allWeapons = [];
+  // allWeapons.push(...weaponMeleeNames, ...weaponMissileNames, ...compendiumWeapons);
+  // allWeapons.sort();
+  const allWeapons = [...new Set([...weaponMeleeNames, ...weaponMissileNames, ...compendiumWeapons])].sort();
+  Hyp3eLogger.info("Init", `Core Journal and compendia weapons list compiled:`, allWeapons);
+  CONFIG.HYP3E.weaponsList = allWeapons;
+
+  const clothingNames = await getJournalPageList("Equipment Lists", "Equipment", "Clothing");
+  Hyp3eLogger.info("Init", `Retrieved clothing from Core Journal:`, clothingNames);
+  const ammunitionNames = await getJournalPageList("Equipment Lists", "Weapons", "Ammunition");
+  Hyp3eLogger.info("Init", `Retrieved ammunition from Core Journal:`, ammunitionNames);
+  const gearNames = await getJournalPageList("Equipment Lists", "Equipment", "General");
+  Hyp3eLogger.info("Init", `Retrieved equipment/gear from Core Journal:`, gearNames);
+  const compendiumGear = await findItemsByFolderOrCompendiumName("equipment, gear, general, clothing, weapons, ammunition", "item", "religious, religion, provisions, provision, food, supplies, magic, magical");
+  // const allGear = [];
+  // allGear.push(...clothingNames, ...ammunitionNames, ...gearNames, ...compendiumGear);
+  // allGear.sort();
+  const allGear = [...new Set([...clothingNames, ...ammunitionNames, ...gearNames, ...compendiumGear])].sort();
+  Hyp3eLogger.info("Init", `Core Journal and compendia equipment list compiled:`, allGear);
+  CONFIG.HYP3E.gearList = allGear;
+
+  const provisionNames = await getJournalPageList("Equipment Lists", "Equipment", "Provisions");
+  Hyp3eLogger.info("Init", `Retrieved provisions from Core Journal:`, provisionNames);
+  const compendiumProvisions = await findItemsByFolderOrCompendiumName("equipment, provision, provisions, food, supplies", "item", "clothing, gear, general, religious, religion, magic, magical");
+  // const allProvisions = [];
+  // allProvisions.push(...provisionNames, ...compendiumProvisions);
+  // allProvisions.sort();
+  const allProvisions = [...new Set([...provisionNames, ...compendiumProvisions])].sort();
+  Hyp3eLogger.info("Init", `Core Journal and compendia provisions list compiled:`, allProvisions);
+  CONFIG.HYP3E.provisionsList = allProvisions;
+
+  const religiousNames = await getJournalPageList("Equipment Lists", "Equipment", "Religious");
+  Hyp3eLogger.info("Init", `Retrieved religious items from Journal:`, religiousNames);
+  const compendiumReligious = await findItemsByFolderOrCompendiumName("equipment, religious, religion", "item", "clothing, gear, general, provisions, provision, food, supplies, magic, magical");
+  // const allReligious = [];
+  // allReligious.push(...religiousNames, ...compendiumReligious);
+  // allReligious.sort();
+  const allReligious = [...new Set([...religiousNames, ...compendiumReligious])].sort();
+  Hyp3eLogger.info("Init", `Core Journal and compendia religious items list compiled:`, allReligious);
+  CONFIG.HYP3E.religiousList = allReligious;
 
   // If we need to do a system setup or migration, do it after the other settings are loaded
   if (game.user.isGM) {
