@@ -211,7 +211,7 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     await actor.update({"system.weaponProficiencies": sorted});
 
     // Re-calc weapon masteries
-    await this._updateMasteries(actor)
+    await this._updateActorMasteries(actor)
 
     // Refresh the display
     this.render(true, { actorUuid: event.target.dataset.actorUuid, focus: true })
@@ -241,7 +241,7 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     await actor.update({"system.weaponProficiencies": weaponProficiencies});
 
     // Re-calc weapon masteries
-    await this._removeMastery(actor, removedWeapon)
+    await this._removeWeaponMastery(actor, removedWeapon)
 
     // Refresh the display
     this.render(true, { actorUuid: target.dataset.actorUuid, focus: true })
@@ -292,7 +292,7 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
    * Update all weapon masteries for an actor based on its selected proficiencies
    * @param {*} actor 
    */
-  async _updateMasteries(actor) {
+  async _updateActorMasteries(actor) {
     const weaponProficiencies = foundry.utils.deepClone(actor.system.weaponProficiencies);
     for (const wp of weaponProficiencies) {
       if (wp.weapon !== "*Any" && !wp.exception) {
@@ -303,27 +303,40 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
       }
     }
 
-    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateMasteries", `${actor.name} weapon masteries updated:`, weaponProficiencies);
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateActorMasteries", `${actor.name} weapon masteries updated:`, weaponProficiencies);
     await actor.update({ "system.weaponProficiencies": weaponProficiencies });
   }
 
-  async _removeMastery(actor, removedWeapon) {
+  /**
+   * Remove mastery from an actor's owned weapons if they match the proficiency that was removed
+   * @param {*} actor 
+   * @param {*} removedWeapon 
+   */
+  async _removeWeaponMastery(actor, removedWeapon) {
     const ownedWeapons = actor.items.filter(i => i.type === "weapon");
     for (const weapon of ownedWeapons) {
-      if (this._isMatch(weapon.name, removedWeapon.weapon) || this._isMatch(weapon.system.friendlyName, removedWeapon.weapon)) {
-        Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _removeMastery", `Removing ${weapon.name} mastery...`);
+      if (this._isMatch(weapon.system?.baseWeapon, removedWeapon.weapon) || 
+          this._isMatch(weapon.name, removedWeapon.weapon) || 
+          this._isMatch(weapon.system.friendlyName, removedWeapon.weapon)) {
+        Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _removeWeaponMastery", `Removing ${weapon.name} mastery...`);
         await weapon.update({ "system.wpnMaster": false, "system.wpnGrandmaster": false });
       }
     }
   }
 
-  // Update mastery flags on an actor's owned weapons, based on the actor's masteries
+  /**
+   * Update mastery flags on an actor's owned weapons, based on the actor's masteries
+   * @param {*} actor 
+   * @param {*} weaponProficiency 
+   */
   async _updateActorWeapons(actor, weaponProficiency) {
     const ownedWeapons = actor.items.filter(i => i.type === "weapon");
     let wpnMaster = false;
     let wpnGrandmaster = false;
     for (const weapon of ownedWeapons) {
-      if (this._isMatch(weapon.name, weaponProficiency.weapon) || this._isMatch(weapon.system.friendlyName, weaponProficiency.weapon)) {
+      if (this._isMatch(weapon.system?.baseWeapon, weaponProficiency.weapon) || 
+          this._isMatch(weapon.name, weaponProficiency.weapon) || 
+          this._isMatch(weapon.system.friendlyName, weaponProficiency.weapon)) {
         Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateActorWeapons", `Setting ${weapon.name} mastery to ${weaponProficiency.mastery}...`);
         switch (weaponProficiency.mastery) {
           case 0:
