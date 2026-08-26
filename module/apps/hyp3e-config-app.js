@@ -47,6 +47,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             autoCalcThiefTn: game.settings.get(game.system.id, "autoCalcThiefTn"),
             autoCalcAc: game.settings.get(game.system.id, "autoCalcAc"),
             enforceWeaponEquipRules: game.settings.get(game.system.id, "enforceWeaponEquipRules"),
+            enforceWeaponProficiencyRule: game.settings.get(game.system.id, "enforceWeaponProficiencyRule"),
             requireLightSourceFuel: game.settings.get(game.system.id, "requireLightSourceFuel"),
             flipRollUnderMods: game.settings.get(game.system.id, "flipRollUnderMods"),
             enableEncumbrance: game.settings.get(game.system.id, "enableEncumbrance"),

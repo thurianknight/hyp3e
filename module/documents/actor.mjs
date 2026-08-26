@@ -2043,7 +2043,7 @@ export class Hyp3eActor extends Actor {
 
     dataset.sitMod = 0;
     dataset.sitModList = "";
-    const sitModObj = this._getCombatantSitMods(attacker, target, !!itemData?.missile);
+    const sitModObj = this._getCombatantSitMods(attacker, target, itemData);
     dataset.sitMod = parseInt(sitModObj?.sitModSum || 0);
     dataset.sitModList = sitModObj?.sitModList || "";
 
@@ -2785,23 +2785,42 @@ export class Hyp3eActor extends Actor {
    *  attack roll.
    * @param {*} attacker - attacking token, if it exists (not theater of the mind)
    * @param {*} target - targeted token, if it exists (not theater of the mind)
-   * @param {boolean} isMissile - whether this is a missile attack, vs. melee/spell
+   * @param {*} weapon - system data of weapon being used to attack
    * @returns {Object} sitModObj { sitModSum: number, sitModsArr: Array }
    */
-  _getCombatantSitMods(attacker, target, isMissile=false) {
-    Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Getting situational modifiers for attacker ${this.name}...`);
+  _getCombatantSitMods(attacker, target, weapon) {
+    Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Getting situational modifiers for attacker ${this.name}...`, { attacker, weapon });
+
+    const isMissile = !!weapon?.missile;
 
     // Our return object & properties
     let sitModObj = {};
     let sitModSum = 0;
     let sitModsArr = [];
 
+    // Get the equipped weapon or weapons
+
+    // Apply the weapon non-proficiency penalty rule to characters?
+    if (CONFIG.HYP3E.enforceWeaponProficiencyRule 
+        && this.type === "character" 
+        && !this.system?.weaponProficiencies.some(w => w.weapon === "*Any")) {
+      // Ignore if baseWeapon is not set (natural attacks, grenade-like attacks, etc.)
+      if (weapon?.baseWeapon) {
+        if (!this.system?.weaponProficiencies.some(w => w.weapon === weapon.baseWeapon)) {
+          const nonProficientPenalty = this.system.unskilled;
+          sitModSum += nonProficientPenalty;
+          sitModsArr.push(`Non-proficient (${nonProficientPenalty})`);
+          Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Non-proficient penalty applied: ${nonProficientPenalty}`);
+        }
+      }
+    }
+
     // Is the attacker dual wielding? If so, penalties apply based on weapon class.
     if (!isMissile) {
-      const weapons = this.items.filter(i => i.type === "weapon" && i.system.equipped);
-      if (weapons.length >= 2) {
-        const mainHand = weapons[0];
-        const offHand = weapons[1];
+      const equippedWeapons = this.items.filter(i => i.type === "weapon" && i.system.equipped);
+      if (equippedWeapons.length >= 2) {
+        const mainHand = equippedWeapons[0];
+        const offHand = equippedWeapons[1];
         const mainHandWC = mainHand.system.wc ?? 1;
         const offHandWC = offHand.system.wc ?? 1;
         const dualWieldPenalty = -1 * (mainHandWC + offHandWC);

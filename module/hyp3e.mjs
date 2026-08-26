@@ -348,6 +348,11 @@ Hooks.once("ready", async function() {
   CONFIG.HYP3E.enforceWeaponEquipRules = enforceWeaponEquipRules;
   Hyp3eLogger.info("Init", "CONFIG Enforce weapon equippage rules:", CONFIG.HYP3E.enforceWeaponEquipRules);
 
+  // Enforce weapon proficiency rule
+  const enforceWeaponProficiencyRule = game.settings.get(game.system.id, "enforceWeaponProficiencyRule");
+  CONFIG.HYP3E.enforceWeaponProficiencyRule = enforceWeaponProficiencyRule;
+  Hyp3eLogger.info("Init", "CONFIG Enforce weapon proficiency rule:", CONFIG.HYP3E.enforceWeaponProficiencyRule);
+
   // Show weapon/shield overlay
   const showWeaponOverlay = game.settings.get(game.system.id, "showWeaponOverlay");
   CONFIG.HYP3E.showWeaponOverlay = showWeaponOverlay;

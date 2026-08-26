@@ -229,6 +229,20 @@ export function registerHyp3eConfigurations() {
         }
     });
 
+    // Enforce weapon proficiency rule
+    game.settings.register(game.system.id, "enforceWeaponProficiencyRule", {
+        name: game.i18n.localize("HYP3E.settings.enforceWeaponProficiencyRule"),
+        hint: game.i18n.localize("HYP3E.settings.enforceWeaponProficiencyRuleHint"),
+        default: false,
+        scope: "world",
+        type: Boolean,
+        config: showConfigOptions,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.enforceWeaponProficiencyRule = value;
+        }
+    });
+
     // Require fuel for light sources
     game.settings.register(game.system.id, "requireLightSourceFuel", {
       name: game.i18n.localize("HYP3E.settings.requireLightSourceFuel"),

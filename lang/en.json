@@ -77,6 +77,8 @@
             "autoCalcAcHint": "Use 'equipped' status of armour and shields to calculate Armour Class & Movement. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
             "enforceWeaponEquipRules": "Enforce weapon equip rules",
             "enforceWeaponEquipRulesHint": "When enabled, only one weapon may be equipped at a time, except dual-wielding melee weapons if Dex ≥ 13 and WC ≤ 2.",
+            "enforceWeaponProficiencyRule": "Enforce weapon proficiency penalty",
+            "enforceWeaponProficiencyRuleHint": "When enabled, apply the weapon non-proficiency penalty on weapons that a character does not have in its Favoured Weapons / Proficiencies list. This only applies to weapons with the Base Weapon (proficiency) field populated. If the field is blank, the weapon proficiency will be ignored.",
             "requireLightSourceFuel": "Require light-source fuel or consumable",
             "requireLightSourceFuelHint": "Only provide light if the light source has fuel or is itself consumable. Applies to these light sources: candle, lamp, lantern, torch.",
             "showWeaponOverlay": "Show weapon/shield overlays",
