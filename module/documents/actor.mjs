@@ -2358,7 +2358,7 @@ export class Hyp3eActor extends Actor {
 
       if (item) {
           if (item.type === "weapon") {
-              // Potentially add master/grandmaster text later if needed
+            // Potentially add master/grandmaster text later if needed
           } else if (item.type === "spell") {
               attackTextBase = "Cast spell";
           }
