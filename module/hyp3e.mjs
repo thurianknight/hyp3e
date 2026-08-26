@@ -570,9 +570,6 @@ Hooks.once("ready", async function() {
   const weaponMissileNames = await getJournalPageList("Equipment Lists", "Weapons", "Missile");
   Hyp3eLogger.info("Init", `Retrieved missile weapons from Core Journal:`, weaponMissileNames);
   const compendiumWeapons = await findItemsByFolderOrCompendiumName("weapons, melee, missile, ammunition", "weapon", "magic, magical");
-  // const allWeapons = [];
-  // allWeapons.push(...weaponMeleeNames, ...weaponMissileNames, ...compendiumWeapons);
-  // allWeapons.sort();
   const allWeapons = [...new Set([...weaponMeleeNames, ...weaponMissileNames, ...compendiumWeapons])].sort();
   Hyp3eLogger.info("Init", `Core Journal and compendia weapons list compiled:`, allWeapons);
   CONFIG.HYP3E.weaponsList = allWeapons;
@@ -584,9 +581,6 @@ Hooks.once("ready", async function() {
   const gearNames = await getJournalPageList("Equipment Lists", "Equipment", "General");
   Hyp3eLogger.info("Init", `Retrieved equipment/gear from Core Journal:`, gearNames);
   const compendiumGear = await findItemsByFolderOrCompendiumName("equipment, gear, general, clothing, weapons, ammunition", "item", "religious, religion, provisions, provision, food, supplies, magic, magical");
-  // const allGear = [];
-  // allGear.push(...clothingNames, ...ammunitionNames, ...gearNames, ...compendiumGear);
-  // allGear.sort();
   const allGear = [...new Set([...clothingNames, ...ammunitionNames, ...gearNames, ...compendiumGear])].sort();
   Hyp3eLogger.info("Init", `Core Journal and compendia equipment list compiled:`, allGear);
   CONFIG.HYP3E.gearList = allGear;
@@ -594,9 +588,6 @@ Hooks.once("ready", async function() {
   const provisionNames = await getJournalPageList("Equipment Lists", "Equipment", "Provisions");
   Hyp3eLogger.info("Init", `Retrieved provisions from Core Journal:`, provisionNames);
   const compendiumProvisions = await findItemsByFolderOrCompendiumName("equipment, provision, provisions, food, supplies", "item", "clothing, gear, general, religious, religion, magic, magical");
-  // const allProvisions = [];
-  // allProvisions.push(...provisionNames, ...compendiumProvisions);
-  // allProvisions.sort();
   const allProvisions = [...new Set([...provisionNames, ...compendiumProvisions])].sort();
   Hyp3eLogger.info("Init", `Core Journal and compendia provisions list compiled:`, allProvisions);
   CONFIG.HYP3E.provisionsList = allProvisions;
@@ -604,9 +595,6 @@ Hooks.once("ready", async function() {
   const religiousNames = await getJournalPageList("Equipment Lists", "Equipment", "Religious");
   Hyp3eLogger.info("Init", `Retrieved religious items from Journal:`, religiousNames);
   const compendiumReligious = await findItemsByFolderOrCompendiumName("equipment, religious, religion", "item", "clothing, gear, general, provisions, provision, food, supplies, magic, magical");
-  // const allReligious = [];
-  // allReligious.push(...religiousNames, ...compendiumReligious);
-  // allReligious.sort();
   const allReligious = [...new Set([...religiousNames, ...compendiumReligious])].sort();
   Hyp3eLogger.info("Init", `Core Journal and compendia religious items list compiled:`, allReligious);
   CONFIG.HYP3E.religiousList = allReligious;
