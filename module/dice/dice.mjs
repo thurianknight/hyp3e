@@ -33,7 +33,7 @@ export class Hyp3eDice {
     const itemAtkMod = parseInt(itemData.atkMod) > 0 ? `+${parseInt(itemData.atkMod)}` : `${parseInt(itemData.atkMod)}`;
 
     // Check if the weapon attack has Master or Grandmaster flags set
-    const actorMastery = actorData?.weaponProficiencies.find(w => w.weapon == itemData.baseWeapon).mastery ?? 0;
+    const actorMastery = actorData?.weaponProficiencies.find(w => w.weapon == itemData.baseWeapon)?.mastery ?? 0;
     if (itemData.wpnGrandmaster) {
         masteryMod = 2;
     } else if (itemData.wpnMaster) {
