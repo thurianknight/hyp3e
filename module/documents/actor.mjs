@@ -2002,9 +2002,14 @@ export class Hyp3eActor extends Actor {
     }
     dataset.itemName = itemName || "";
 
+    // Is this scene indoors or outdoors?
+    const isOutdoor = canvas.scene?.getFlag("hyp3e", "isOutdoor") ?? false;
+
     // Gather Target Information & Calculate Distance/Range
     const { target, targetData, gridDistance } = this._getTargetDetails(attacker);
+
     dataset.rangeUoM = canvas.scene?.grid.units || "ft";
+    dataset.isOutdoor = isOutdoor;
     dataset.gridDistance = gridDistance;
     dataset.targetName = targetData.name;
     dataset.targetAc = targetData.ac;
@@ -2016,7 +2021,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Prepare Data for Dialog (Range, Ammo, Initial Mods)
-    const { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance);
+    const { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance, isOutdoor);
     rangeMessages.forEach(msg => ui.notifications.warn(msg)); // Show range warnings immediately
     if (isOutOfRange && CONFIG.HYP3E.forceRangeLimit) {
       Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Target out of range, or too close, and forceRangeLimit enabled. Aborting.`);
@@ -2485,79 +2490,87 @@ export class Hyp3eActor extends Actor {
    * Prepares range data, checks limits, and determines the default range category.
    * @param {object|null} itemData - The system data of the item.
    * @param {number} gridDistance - Calculated distance to the target.
+   * @param {boolean} isOutdoor - true if the canvas scene is outdoors, false if indoors
    * @returns {{ranges: object, rangeGroup: string, chosenRange: string, rangeMessages: string[], isOutOfRange: boolean}}
    */
-  _prepareRangeData(itemData, gridDistance) {
-      let ranges = {};
-      let rangeText = "";
-      let rangeGroup = "";
-      let chosenRange = "";
-      let rangeMessages = [];
-      let isOutOfRange = false;
+  _prepareRangeData(itemData, gridDistance, isOutdoor) {
+    const multiplier = isOutdoor ? 3 : 1;
+    let ranges = {};
+    let rangeText = "";
+    let rangeGroup = "";
+    let chosenRange = "";
+    let rangeMessages = [];
+    let isOutOfRange = false;
+    const effectiveShort = itemData.range.short * multiplier;
+    const effectiveMed = itemData.range.medium * multiplier;
+    const effectiveLong = itemData.range.long * multiplier;
+  
+    if (!itemData) return { ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange };
 
-      if (!itemData) return { ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange };
-
-      // Melee Check
-      if (itemData.melee) {
-          const meleeRange = this._getMeleeRange(itemData.wc);
-          if (gridDistance > meleeRange) {
-              const msg = `Target is beyond melee range! (${gridDistance} ${canvas.scene.grid.units} > ${meleeRange} ${canvas.scene.grid.units})`;
-              Hyp3eLogger.info("Hyp3eActor _prepareRangeData", msg);
-              rangeMessages.push(msg);
-              isOutOfRange = true;
-          }
+    // Melee Check
+    if (itemData.melee) {
+      const meleeRange = this._getMeleeRange(itemData.wc);
+      if (gridDistance > meleeRange) {
+        const msg = `Target is beyond melee range! (${gridDistance} ${canvas.scene.grid.units} > ${meleeRange} ${canvas.scene.grid.units})`;
+        Hyp3eLogger.info("Hyp3eActor _prepareRangeData", msg);
+        rangeMessages.push(msg);
+        isOutOfRange = true;
       }
+    }
 
-      // Missile Check
-      if (itemData.missile && itemData.range) {
-          const meleeRange = this._getMeleeRange(0);
-          rangeGroup = "rangeGroup"; // Identifier for the dialog field
-          ranges = {
-              short: `Short (${itemData.range.short})`,
-              medium: `Med (${itemData.range.medium})`,
-              long: `Long (${itemData.range.long})`
-          };
-          if (gridDistance > 0 && gridDistance <= meleeRange) {
-              // If gridDistance == 0, then we assume no target and allow the attack to go through
-              chosenRange = "short"; // Set to Short even if too close
-              // For certain missile attacks, prevent attacks to an adjacent square:
-              //  Physical weapons only, not spells (filtered by the itemData.missile check above)
-              //  - Not grenades, not area effect attacks
-              //  - Not weapons conjured by spells (e.g. Exploding Skull, Magic Ice Dart)
-              if (!itemData.isGrenade && !itemData.isAreaEffect && (!itemData?.duration || !Number.isFinite(Number(itemData.duration)))) {
-                  const msg = `Target is in melee range, cannot use this missile weapon so close! (${gridDistance} ${canvas.scene.grid.units})`;
-                  Hyp3eLogger.info("Hyp3eActor _prepareRangeData", msg);
-                  rangeMessages.push(msg);
-                  isOutOfRange = true;
-              }
-          } else if (gridDistance <= itemData.range.short) {
-              chosenRange = "short";
-          } else if (gridDistance <= itemData.range.medium) {
-              chosenRange = "medium";
-          } else if (gridDistance <= itemData.range.long) {
-              chosenRange = "long";
-          } else {
-              chosenRange = "long"; // Set to Long even if out of range
-              const msg = `Target is out of missile range! (${gridDistance} ${canvas.scene.grid.units} > ${itemData.range.long} ${canvas.scene.grid.units})`;
-              Hyp3eLogger.info("Hyp3eActor _prepareRangeData", msg);
-              rangeMessages.push(msg);
-              isOutOfRange = true;
-          }
+    // Missile Check
+    if (itemData.missile && itemData.range) {
+      const meleeRange = this._getMeleeRange(0);
+      rangeGroup = "rangeGroup"; // Identifier for the dialog field
+      ranges = {
+        // short: `Short (${itemData.range.short})`,
+        short: `Short (${effectiveShort})`,
+        // medium: `Med (${itemData.range.medium})`,
+        medium: `Med (${effectiveMed})`,
+        // long: `Long (${itemData.range.long})`
+        long: `Long (${effectiveLong})`
+      };
+      if (gridDistance > 0 && gridDistance <= meleeRange) {
+        // If gridDistance == 0, then we assume no target and allow the attack to go through
+        chosenRange = "short"; // Set to Short even if too close
+        // For certain missile attacks, prevent attacks to an adjacent square:
+        //  Physical weapons only, not spells (filtered by the itemData.missile check above)
+        //  - Not grenades, not area effect attacks
+        //  - Not weapons conjured by spells (e.g. Exploding Skull, Magic Ice Dart)
+        if (!itemData.isGrenade && !itemData.isAreaEffect && (!itemData?.duration || !Number.isFinite(Number(itemData.duration)))) {
+          const msg = `Target is in melee range, cannot use this missile weapon so close! (${gridDistance} ${canvas.scene.grid.units})`;
+          Hyp3eLogger.info("Hyp3eActor _prepareRangeData", msg);
+          rangeMessages.push(msg);
+          isOutOfRange = true;
+        }
+      } else if (gridDistance <= effectiveShort) {
+        chosenRange = "short";
+      } else if (gridDistance <= effectiveMed) {
+        chosenRange = "medium";
+      } else if (gridDistance <= effectiveLong) {
+        chosenRange = "long";
+      } else {
+        chosenRange = "long"; // Set to Long even if out of range
+        const msg = `Target is out of missile range! (${gridDistance} ${canvas.scene.grid.units} > ${itemData.range.long} ${canvas.scene.grid.units})`;
+        Hyp3eLogger.info("Hyp3eActor _prepareRangeData", msg);
+        rangeMessages.push(msg);
+        isOutOfRange = true;
       }
+    }
 
-      // Spell Attack Roll Check
-      if (itemData.itemType === "spell" && itemData.range) {
-          const spellRange = this._parseSpellRange(itemData.range);
-          if (gridDistance > spellRange) {
-              const msg = `Target is out of spell range! (${gridDistance} ${canvas.scene.grid.units} > ${spellRange} ${canvas.scene.grid.units})`;
-              Hyp3eLogger.info("Hyp3eActor _prepareRangeData", msg);
-              rangeMessages.push(msg);
-              isOutOfRange = true;
-          }
+    // Spell Attack Roll Check
+    if (itemData.itemType === "spell" && itemData.range) {
+      const spellRange = this._parseSpellRange(itemData.range);
+      if (gridDistance > spellRange) {
+        const msg = `Target is out of spell range! (${gridDistance} ${canvas.scene.grid.units} > ${spellRange} ${canvas.scene.grid.units})`;
+        Hyp3eLogger.info("Hyp3eActor _prepareRangeData", msg);
+        rangeMessages.push(msg);
+        isOutOfRange = true;
       }
-      rangeText = `${gridDistance} ${canvas.scene.grid.units}`;
+    }
+    rangeText = `${gridDistance} ${canvas.scene.grid.units}`;
 
-      return { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange };
+    return { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange };
   }
 
   /**

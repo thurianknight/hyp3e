@@ -776,6 +776,62 @@ Hooks.on("renderSettingsConfig", (app, htmlElement, data) => {
   }
 });
 
+/**
+ * Insert a new Indoor/Outdoor slider switch into the scene config dialog
+ */
+Hooks.on("renderSceneConfig", (app, html, context) => {
+  const scene = app.document;
+  const isOutdoor = scene.getFlag("hyp3e", "isOutdoor") ?? false;
+
+  // Create the fieldset
+  const fieldset = document.createElement("fieldset");
+  fieldset.classList.add("hyp3e-environment");
+
+  // FieldSet legend
+  const legend = document.createElement("legend");
+  legend.textContent = game.i18n.localize("HYP3E.SceneConfig.Environment");
+  fieldset.append(legend);
+
+  // Form group with the toggle
+  const group = document.createElement("div");
+  group.classList.add("form-group", "hyp3e-environment-toggle");
+
+  group.innerHTML = `
+    <label>${game.i18n.localize("HYP3E.SceneConfig.IsOutdoor")}</label>
+    <div class="form-fields">
+      <input type="checkbox" name="flags.hyp3e.isOutdoor" ${isOutdoor ? "checked" : ""}>
+      <label class="checkbox"></label>
+    </div>
+    <p class="hint">${game.i18n.localize("HYP3E.SceneConfig.IsOutdoorHint")}</p>
+  `;
+
+  // Make the visual switch clickable
+  const checkbox = group.querySelector('input[type="checkbox"]');
+  const visual = group.querySelector("label.checkbox");
+  visual.addEventListener("click", ev => {
+    ev.preventDefault();
+    checkbox.checked = !checkbox.checked;
+    checkbox.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+
+  fieldset.append(group);
+
+  // Find a good insertion point – Grid tab is usually clean
+  // (you can also put it on the Basic tab or create your own section)
+  const target = html.querySelector('.tab[data-tab="grid"]') 
+              || html.querySelector('.tab[data-tab="basic"]')
+              || html.querySelector("form");
+
+  if (target) {
+    target.append(fieldset);
+    // Force the app to recalculate height after we added content
+    app.setPosition({ height: "auto" });
+  }
+});
+
+/**
+ * Insert a custom Quick-Equip button into the token HUD
+ */
 Hooks.on("renderTokenHUD", (hud, html, data) => {
   Hyp3eLogger.info("renderTokenHUD", `Incoming parameters for token HUD:`, {hud, html, data})
   const token = hud.object; // Token object

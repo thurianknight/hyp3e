@@ -1,30 +1,13 @@
 {
-    "TYPES": {
-      "actor": {
-        "character": "Character",
-        "npc": "NPC",
-        "merchant": "Merchant",
-        "treasure": "Treasure",
-        "itemToken": "Item Token"
-      },
-      "item": {
-          "armor": "Armour", 
-          "feature": "Feature", 
-          "item": "Item", 
-          "shield": "Shield", 
-          "spell": "Spell", 
-          "weapon": "Weapon",
-          "classTemplate": "Class Template",
-          "effectTemplate": "Effect Template"
-      },
-      "Actor": {
-        "character": "Character",
-        "npc": "NPC",
-        "merchant": "Merchant",
-        "treasure": "Treasure",
-        "itemToken": "Item Token"
-      },
-      "Item": {
+  "TYPES": {
+    "actor": {
+      "character": "Character",
+      "npc": "NPC",
+      "merchant": "Merchant",
+      "treasure": "Treasure",
+      "itemToken": "Item Token"
+    },
+    "item": {
         "armor": "Armour", 
         "feature": "Feature", 
         "item": "Item", 
@@ -33,791 +16,813 @@
         "weapon": "Weapon",
         "classTemplate": "Class Template",
         "effectTemplate": "Effect Template"
+    },
+    "Actor": {
+      "character": "Character",
+      "npc": "NPC",
+      "merchant": "Merchant",
+      "treasure": "Treasure",
+      "itemToken": "Item Token"
+    },
+    "Item": {
+      "armor": "Armour", 
+      "feature": "Feature", 
+      "item": "Item", 
+      "shield": "Shield", 
+      "spell": "Spell", 
+      "weapon": "Weapon",
+      "classTemplate": "Class Template",
+      "effectTemplate": "Effect Template"
+    }
+  },
+
+  "HYP3E": {
+    "settings": {
+      "reRunSetup": "Re-run world setup",
+      "reRunSetupHint": "When this world is loaded again, re-run world setup to create folders and core compendia. Does not include compendia migration (below).",
+      "reRunMigration": "Re-run world migration",
+      "reRunMigrationHint": "When this world is loaded again, re-run world data migrations included with the most recent release. Does not include compendia.",
+      "migrateCompendia": "Migrate compendia",
+      "migrateCompendiaHint": "Migrates compendium data to the latest version. Meant for developers only. If you don't know what this does, you really shouldn't click it. Seriously. Don't.",
+      "debugMessages": "Debug Messages",
+      "debugMessagesHint": "Enable additional debug logging and messages.",
+      "logLevel": "Logging Level",
+      "logLevelHint": "Controls the verbosity of system logs.",
+      "races": "Races",
+      "racesHint": "Human races in Hyperborea.",
+      "phenotypes": "Phenotypes",
+      "phenotypesHint": "In Hyperborean scholarship, the primary zoological or morphological descriptor of a creature. Occasionally used to determine whether a magic weapon, spell, or armour does special damage to the creature, or provides protection from attacks by the creature, etc.",
+      "languages": "Languages",
+      "languagesHint": "Known/available languages in Hyperborea.",
+      "characterClasses": "Character classes",
+      "characterClassesHint": "Character classes available to PCs and some NPCs.",
+      "spellLists": "Spell lists",
+      "spellListsHint": "Spell lists available to spellcasters of all classes.",
+      "weapons": "Favoured Weapons (proficiencies & exceptions)",
+      "weaponsHint": "The full weapons list for favoured weapons, proficiencies, and exceptions. This is a subset of the complete weapons list, as some weapons share the same proficiency (e.g. a weapon that has missile & melee usage) and some do not require proficiency (e.g. incendiary oil and other grenade-like thrown items). N.B.: Weapon names may include commas, but weapons MUST be separated by a semicolon (;).",
+      "openClassEditor": "Manage Custom Classes",
+      "openClassEditorHint": "Open the class editor interface to create or modify custom classes.",
+      "chatFontSize": "Chat Relative Font Size",
+      "chatFontSizeHint": "Chat font size, relative to the Foundry default system configuration size. Default is zero.",
+      "calendarVerbose": "Verbose Date Format",
+      "calendarVerboseHint": "When enabled, display the date as 'Sun, the 1 of Aries, Year of the Tempest'. Otherwise just display as '576/1/1'.",
+      "enableTurnTracker": "Enable Turn Tracker",
+      "enableTurnTrackerHint": "Enable the Turn Tracker app, which allows you to track exploration turns. Enabled by default.",
+      "showDateInTurnTracker": "Show Date in Turn Tracker",
+      "showDateInTurnTrackerHint": "Display the current date in the Turn Tracker app. Turn Tracker must be enabled (see above).",
+      "explorationTurn": "Exploration Turn",
+      "autoCalcThiefTn": "Auto-calculate Thief Ability Chances",
+      "autoCalcThiefTnHint": "Ignore Target number in thief abilities, and calculate automatically based on class level. Thief ability names must match spelling (upper/lower case is ignored): 'climb', 'decipher script', 'discern noise', 'hide', 'manipulate traps', 'move silently', 'open locks', 'pick pockets', and 'read scrolls'. Enabled by default.",
+      "autoCalcAc": "Auto-calculate AC & encounter MV",
+      "autoCalcAcHint": "Use 'equipped' status of armour and shields to calculate Armour Class & Movement. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
+      "enforceWeaponEquipRules": "Enforce weapon equip rules",
+      "enforceWeaponEquipRulesHint": "When enabled, only one weapon may be equipped at a time, except dual-wielding melee weapons if Dex ≥ 13 and WC ≤ 2.",
+      "enforceWeaponProficiencyRule": "Enforce weapon proficiency penalty",
+      "enforceWeaponProficiencyRuleHint": "When enabled, apply the weapon non-proficiency penalty on weapons that a character does not have in its Favoured Weapons / Proficiencies list. This only applies to weapons with the Base Weapon (proficiency) field populated. If the field is blank, the weapon proficiency will be ignored.",
+      "requireLightSourceFuel": "Require light-source fuel or consumable",
+      "requireLightSourceFuelHint": "Only provide light if the light source has fuel or is itself consumable. Applies to these light sources: candle, lamp, lantern, torch.",
+      "showWeaponOverlay": "Show weapon/shield overlays",
+      "showWeaponOverlayHint": "If enabled, small icons of equipped weapons and shields will appear on tokens. For the best look, icons should have background transparency. Since the generic weapon icon is of swords crossed behind a shield, the overlay feature is disabled by default.",
+      "quickCreateChars": "Enable quick-create characters",
+      "quickCreateCharsHint": "Enable the Quick Create Characters button on the Character sheet by selecting a Method. All stats are rolled down-the-line, and the system will re-roll until it gets a set that meets class requirements.",
+      "autoCalcAttrMods": "Auto-calculate character attribute modifiers",
+      "autoCalcAttrModsHint": "Automatically update attribute modifiers when the current atttribute score changes.",
+      "customCompendia": "Search compendia",
+      "customCompendiaHint": "Comma-separated list of your compendia for armor, equipment, and weapons. This allows you to use your own compendia with the character quick-create feature.",
+      "enableAttrChecks": "Enable IN & WS concentration checks",
+      "enableAttrChecksHint": "This option allows players to click an attribute name to do a 3d6 concentration (roll-under) check. N.B.: This is an optional rule, and is disabled by default.",
+      "flipRollUnderMods": "Reverse situational modifiers on checks",
+      "flipRollUnderModsHint": "For roll-under checks, reverse the sign on situational modifiers so that a positive number is treated as a bonus (subtracted from the roll) and a negative number is treated as a penalty (added to the roll). Other modifiers applied from attributes or items are automatically handled this way.",
+      "resizeTokens": "Resize Small and Large NPC tokens",
+      "resizeTokensHint": "When loading the game world, scan the actors directory and update prototypeToken information for Small and Large NPCs. Disabled by default.",
+      "isGroupInitiative": "Use group-based initiative",
+      "isGroupInitiativeHint": "Hyperborea 3rd Edition (as written) uses group-based initiative. Disabling this item reverts the system to Foundry's default behavior of individual initiative.",
+      "initiativeType": "Initiative type",
+      "initiativeTypeHint": "Choose between 'Group', 'Phased', or 'Individual'. Group-based initiative is the standard for Hyperborea 3rd Edition. Phased initiative uses group-based initiative but has each declared action type act in separate phases within the same round. Individual initiative is the default Foundry behavior.",
+      "resetInitiative": "Initiative persistence",
+      "resetInitiativeHint": "Keeps or resets initiative each round. Reset is the standard for Hyperborea 3rd Edition.",
+      "initiativeKeep": "Keep same for each round",
+      "initiativeReset": "Reset to blank each round",
+      "initiativeReroll": "Reroll each round",
+      "resolveDeathAtRoundEnd": "Resolve unconscious/dead at round's end",
+      "resolveDeathAtRoundEndHint": "Do not resolve unconscious or dead status of combatants until the end of the round, when they all fall at once. Disabled by default.",
+      "limitMovement": "Limit movement to MV speed",
+      "limitMovementHint": "Limit token movement to MV speed for all actors. Disabled by default.",
+      "forceRangeLimit": "Force range limit on attacks",
+      "forceRangeLimitHint": "For PCs, prevent a weapon or spell attack if it is out of range. Disabled by default.",
+      "forceWeaponEquip": "Force item equippage to use",
+      "forceWeaponEquipHint": "For PCs, prevent item use or weapon attack if it is not equipped. NPCs/monsters are not affected by this setting. Disabled by default.",
+      "forceSpellMemorize": "Force spell memorization to cast",
+      "forceSpellMemorizeHint": "For PCs, prevent a spell being cast if it is not memorized. NPCs/monsters are not affected by this setting. Disabled by default.",
+      "enableCombatSitModDetection": "Enable combat situation mod detection",
+      "enableCombatSitModDetectionHint": "The system will try to automatically detect and calculate situational attack modifiers based on a number of token effects, token elevation, etc. Disabled by default.",
+      "enableAdvancedCombatOptions": "Enable advanced combat options declaration",
+      "enableAdvancedCombatOptionsHint": "Adds optional advanced combat options to the Quick-Equip menu. This allows players to declare options that apply situational modifiers to attacks, damage, and/or defense. Disabled by default.",
+      "enableEncumbrance": "Enable custom encumbrance formulae",
+      "enableEncumbranceHint": "Enables the following GM-defined Strength multipliers as encumbrance formulae, to enforce MV and AC penalties. Disabled by default.",
+      "enableCoinWeight": "Enable coin weight",
+      "enableCoinWeightHint": "Include coin weight (100 coins = 1 lb.) in the encumbrance calculation. Disabled by default.",
+      "encumberedLabel": "Encumbered multiplier: ST x ",
+      "heavilyEncumberedLabel": "Heavily encumbered: ST x ",
+      "encumbranceLabelHint": "A whole number, e.g. 10, 15, etc. This is only used if Encumbrance is enabled, above.",
+      "critHits": "Critical Hits",
+      "critHitsHint": "Show buttons to roll critical hits on natural 20.",
+      "critMiss": "Critical Misses / Xathoqqua’s Woe",
+      "critMissHint": "Show buttons to roll critical miss on natural 1.",
+      "damageTypes": "Additional damage types",
+      "damageTypesHint": "These will be appended to the existing system list for weapons and spells. The current damage types include Basic, Bludgeoning, Piercing, Slashing, Acid, Cold, Electricity, Fire, Gas, Negative Energy, Pain, Poison, and Positive Energy.",
+      "clickToToggle": "Click to toggle"
+    },
+    "tabs": {
+      "abilities": "Abilities",
+      "combat": "Combat",
+      "spells": "Spells",
+      "effects": "Effects",
+      "items": "Items",
+      "description": "Description",
+      "details": "Details",
+      "attributes": "Attributes",
+      "equipment": "General Equipment & Provisions",
+      "fightingGear": "Fighting Gear",
+      "treasureAll": "Items in Treasure",
+      "itemTokenAbilities": "Item Details",
+      "itemTokenDescription": "Item Description",
+      "classAdvancement": "Advancement",
+      "classEquipment": "Equipment"
+    },
+    "headers": {
+      "name": "Name",
+      "attributes": "Attributes",
+      "exploration": "Exploration",
+      "taskResolution": "Task Resolution",
+      "movement": "Movement",
+      "classAbilities": "Class Abilities",
+      "fightingSkills": "Fighting Skills",
+      "combatStats": "Combat Stats",
+      "savingThrows": "Saving Throws",
+      "equipmentItems": "Equipment & Items",
+      "equipmentItemsEtc": "Equipment, Items, Etc.",
+      "containers": "Containers",
+      "abilitiesItems": "Abilities & Items",
+      "weapons": "Weapons",
+      "weaponsMelee": "Weapons - Melee",
+      "weaponsMissile": "Weapons - Missile",
+      "armor": "Armour",
+      "armorAndShields": "Armour & Shields",
+      "weaponsAndArmor": "Weapons & Armour",
+      "items": "Items",
+      "ability": "Ability",
+      "linkedWeapon": "Linked Weapon",
+      "linkedItem": "Linked Item",
+      "atkRate": "Atk Rate",
+      "rof": "RoF",
+      "classRange": "Class/Range",
+      "wpnClass": "Wpn Class",
+      "hands": "# Hands",
+      "atkMod": "Atk Mod",
+      "dmgMod": "Dmg Mod",
+      "damage": "Damage",
+      "damage2h": "2-Hand Dmg",
+      "damageType": "Damage Type",
+      "damageTypes": "Damage Types",
+      "altDmg": "Add'l Dmg",
+      "weaponMastery": "Weapon Mastery",
+      "type": "Type",
+      "biography": "Biography",
+      "descNotes": "Description & Notes",
+      "effectsCond": "Effects & Conditions",
+      "attacksItems": "Attacks & Items",
+      "attacksWeapons": "Attacks & Weapons",
+      "encumbrance": "Encumbrance",
+      "money": "Money",
+      "treasure": "Treasure"
+    },
+    "details": {
+      "class": "Class",
+      "alignment": "Alignment",
+      "level": "Level",
+      "hitDie": "Hit Die",
+      "hitDice": "Hit Dice",
+      "rollHD": "Roll HP on create",
+      "rollHDLong": "Roll the NPCs HP when a token is created based on the HD",
+      "hd": "HD",
+      "xp": "XP",
+      "toNextLvl": "Next Level",
+      "primeAttr": "Prime Attr",
+      "hitPoints": "Hit Points",
+      "hp": "HP",
+      "tempHp": "Temp HP",
+      "race": "Race",
+      "gender": "Gender",
+      "age": "Age",
+      "homeland": "Homeland",
+      "religion": "Cult",
+      "height": "Height",
+      "weight": "Weight",
+      "hair": "Hair",
+      "eyes": "Eyes",
+      "complexion": "Complexion",
+      "secSkills": "Secondary Skills",
+      "languages": "Languages",
+      "physFeatures": "Physical Features"
+    },
+    "attributes": {
+      "str": {
+        "name": "Strength",
+        "abbrev": "ST",
+        "atkMod": "Melee Mod",
+        "dmgMod": "Dmg Mod",
+        "test": "Test of ST",
+        "feat": "Feat of ST",
+        "check": "Basic ST check"
+      },
+      "dex": {
+        "name": "Dexterity",
+        "abbrev": "DX",
+        "atkMod": "Missile Mod",
+        "defMod": "Def Mod",
+        "test": "Test of DX",
+        "feat": "Feat of DX",
+        "check": "Basic DX check"
+      },
+      "con": {
+        "name": "Constitution",
+        "abbrev": "CN",
+        "hpMod": "HP Mod",
+        "poisRadMod": "Pois/Rad Mod",
+        "traumaSurvive": "Trauma",
+        "test": "Test of CN",
+        "feat": "Feat of CN",
+        "check": "Basic CN check"
+      },
+      "int": {
+        "name": "Intelligence",
+        "abbrev": "IN",
+        "languages": "Languages",
+        "bonusSpells": "Bonus Spells",
+        "learnSpell": "Learn Spell",
+        "check": "IN concentration check"
+      },
+      "wis": {
+        "name": "Wisdom",
+        "abbrev": "WS",
+        "willMod": "Will Mod",
+        "bonusSpells": "Bonus Spells",
+        "learnSpell": "Learn Spell",
+        "check": "WS concentration check"
+      },
+      "cha": {
+        "name": "Charisma",
+        "abbrev": "CH",
+        "reaction": "Reaction",
+        "maxHenchmen": "Max Henchmen",
+        "turnUndead": "Turn Mod",
+        "check": "Basic CH check"
       }
     },
-
-    "HYP3E": {
-        "settings": {
-            "reRunSetup": "Re-run world setup",
-            "reRunSetupHint": "When this world is loaded again, re-run world setup to create folders and core compendia. Does not include compendia migration (below).",
-            "reRunMigration": "Re-run world migration",
-            "reRunMigrationHint": "When this world is loaded again, re-run world data migrations included with the most recent release. Does not include compendia.",
-            "migrateCompendia": "Migrate compendia",
-            "migrateCompendiaHint": "Migrates compendium data to the latest version. Meant for developers only. If you don't know what this does, you really shouldn't click it. Seriously. Don't.",
-            "debugMessages": "Debug Messages",
-            "debugMessagesHint": "Enable additional debug logging and messages.",
-            "logLevel": "Logging Level",
-            "logLevelHint": "Controls the verbosity of system logs.",
-            "races": "Races",
-            "racesHint": "Human races in Hyperborea.",
-            "phenotypes": "Phenotypes",
-            "phenotypesHint": "In Hyperborean scholarship, the primary zoological or morphological descriptor of a creature. Occasionally used to determine whether a magic weapon, spell, or armour does special damage to the creature, or provides protection from attacks by the creature, etc.",
-            "languages": "Languages",
-            "languagesHint": "Known/available languages in Hyperborea.",
-            "characterClasses": "Character classes",
-            "characterClassesHint": "Character classes available to PCs and some NPCs.",
-            "spellLists": "Spell lists",
-            "spellListsHint": "Spell lists available to spellcasters of all classes.",
-            "weapons": "Favoured Weapons (proficiencies & exceptions)",
-            "weaponsHint": "The full weapons list for favoured weapons, proficiencies, and exceptions. This is a subset of the complete weapons list, as some weapons share the same proficiency (e.g. a weapon that has missile & melee usage) and some do not require proficiency (e.g. incendiary oil and other grenade-like thrown items). N.B.: Weapon names may include commas, but weapons MUST be separated by a semicolon (;).",
-            "openClassEditor": "Manage Custom Classes",
-            "openClassEditorHint": "Open the class editor interface to create or modify custom classes.",
-            "chatFontSize": "Chat Relative Font Size",
-            "chatFontSizeHint": "Chat font size, relative to the Foundry default system configuration size. Default is zero.",
-            "calendarVerbose": "Verbose Date Format",
-            "calendarVerboseHint": "When enabled, display the date as 'Sun, the 1 of Aries, Year of the Tempest'. Otherwise just display as '576/1/1'.",
-            "enableTurnTracker": "Enable Turn Tracker",
-            "enableTurnTrackerHint": "Enable the Turn Tracker app, which allows you to track exploration turns. Enabled by default.",
-            "showDateInTurnTracker": "Show Date in Turn Tracker",
-            "showDateInTurnTrackerHint": "Display the current date in the Turn Tracker app. Turn Tracker must be enabled (see above).",
-            "explorationTurn": "Exploration Turn",
-            "autoCalcThiefTn": "Auto-calculate Thief Ability Chances",
-            "autoCalcThiefTnHint": "Ignore Target number in thief abilities, and calculate automatically based on class level. Thief ability names must match spelling (upper/lower case is ignored): 'climb', 'decipher script', 'discern noise', 'hide', 'manipulate traps', 'move silently', 'open locks', 'pick pockets', and 'read scrolls'. Enabled by default.",
-            "autoCalcAc": "Auto-calculate AC & encounter MV",
-            "autoCalcAcHint": "Use 'equipped' status of armour and shields to calculate Armour Class & Movement. N.B.: This function may not work correctly with certain magic item combinations, depending on whether or not they should stack with other protective items. But the majority of cases should work correctly.",
-            "enforceWeaponEquipRules": "Enforce weapon equip rules",
-            "enforceWeaponEquipRulesHint": "When enabled, only one weapon may be equipped at a time, except dual-wielding melee weapons if Dex ≥ 13 and WC ≤ 2.",
-            "enforceWeaponProficiencyRule": "Enforce weapon proficiency penalty",
-            "enforceWeaponProficiencyRuleHint": "When enabled, apply the weapon non-proficiency penalty on weapons that a character does not have in its Favoured Weapons / Proficiencies list. This only applies to weapons with the Base Weapon (proficiency) field populated. If the field is blank, the weapon proficiency will be ignored.",
-            "requireLightSourceFuel": "Require light-source fuel or consumable",
-            "requireLightSourceFuelHint": "Only provide light if the light source has fuel or is itself consumable. Applies to these light sources: candle, lamp, lantern, torch.",
-            "showWeaponOverlay": "Show weapon/shield overlays",
-            "showWeaponOverlayHint": "If enabled, small icons of equipped weapons and shields will appear on tokens. For the best look, icons should have background transparency. Since the generic weapon icon is of swords crossed behind a shield, the overlay feature is disabled by default.",
-            "quickCreateChars": "Enable quick-create characters",
-            "quickCreateCharsHint": "Enable the Quick Create Characters button on the Character sheet by selecting a Method. All stats are rolled down-the-line, and the system will re-roll until it gets a set that meets class requirements.",
-            "autoCalcAttrMods": "Auto-calculate character attribute modifiers",
-            "autoCalcAttrModsHint": "Automatically update attribute modifiers when the current atttribute score changes.",
-            "customCompendia": "Search compendia",
-            "customCompendiaHint": "Comma-separated list of your compendia for armor, equipment, and weapons. This allows you to use your own compendia with the character quick-create feature.",
-            "enableAttrChecks": "Enable IN & WS concentration checks",
-            "enableAttrChecksHint": "This option allows players to click an attribute name to do a 3d6 concentration (roll-under) check. N.B.: This is an optional rule, and is disabled by default.",
-            "flipRollUnderMods": "Reverse situational modifiers on checks",
-            "flipRollUnderModsHint": "For roll-under checks, reverse the sign on situational modifiers so that a positive number is treated as a bonus (subtracted from the roll) and a negative number is treated as a penalty (added to the roll). Other modifiers applied from attributes or items are automatically handled this way.",
-            "resizeTokens": "Resize Small and Large NPC tokens",
-            "resizeTokensHint": "When loading the game world, scan the actors directory and update prototypeToken information for Small and Large NPCs. Disabled by default.",
-            "isGroupInitiative": "Use group-based initiative",
-            "isGroupInitiativeHint": "Hyperborea 3rd Edition (as written) uses group-based initiative. Disabling this item reverts the system to Foundry's default behavior of individual initiative.",
-            "initiativeType": "Initiative type",
-            "initiativeTypeHint": "Choose between 'Group', 'Phased', or 'Individual'. Group-based initiative is the standard for Hyperborea 3rd Edition. Phased initiative uses group-based initiative but has each declared action type act in separate phases within the same round. Individual initiative is the default Foundry behavior.",
-            "resetInitiative": "Initiative persistence",
-            "resetInitiativeHint": "Keeps or resets initiative each round. Reset is the standard for Hyperborea 3rd Edition.",
-            "initiativeKeep": "Keep same for each round",
-            "initiativeReset": "Reset to blank each round",
-            "initiativeReroll": "Reroll each round",
-            "resolveDeathAtRoundEnd": "Resolve unconscious/dead at round's end",
-            "resolveDeathAtRoundEndHint": "Do not resolve unconscious or dead status of combatants until the end of the round, when they all fall at once. Disabled by default.",
-            "limitMovement": "Limit movement to MV speed",
-            "limitMovementHint": "Limit token movement to MV speed for all actors. Disabled by default.",
-            "forceRangeLimit": "Force range limit on attacks",
-            "forceRangeLimitHint": "For PCs, prevent a weapon or spell attack if it is out of range. Disabled by default.",
-            "forceWeaponEquip": "Force item equippage to use",
-            "forceWeaponEquipHint": "For PCs, prevent item use or weapon attack if it is not equipped. NPCs/monsters are not affected by this setting. Disabled by default.",
-            "forceSpellMemorize": "Force spell memorization to cast",
-            "forceSpellMemorizeHint": "For PCs, prevent a spell being cast if it is not memorized. NPCs/monsters are not affected by this setting. Disabled by default.",
-            "enableCombatSitModDetection": "Enable combat situation mod detection",
-            "enableCombatSitModDetectionHint": "The system will try to automatically detect and calculate situational attack modifiers based on a number of token effects, token elevation, etc. Disabled by default.",
-            "enableAdvancedCombatOptions": "Enable advanced combat options declaration",
-            "enableAdvancedCombatOptionsHint": "Adds optional advanced combat options to the Quick-Equip menu. This allows players to declare options that apply situational modifiers to attacks, damage, and/or defense. Disabled by default.",
-            "enableEncumbrance": "Enable custom encumbrance formulae",
-            "enableEncumbranceHint": "Enables the following GM-defined Strength multipliers as encumbrance formulae, to enforce MV and AC penalties. Disabled by default.",
-            "enableCoinWeight": "Enable coin weight",
-            "enableCoinWeightHint": "Include coin weight (100 coins = 1 lb.) in the encumbrance calculation. Disabled by default.",
-            "encumberedLabel": "Encumbered multiplier: ST x ",
-            "heavilyEncumberedLabel": "Heavily encumbered: ST x ",
-            "encumbranceLabelHint": "A whole number, e.g. 10, 15, etc. This is only used if Encumbrance is enabled, above.",
-            "critHits": "Critical Hits",
-            "critHitsHint": "Show buttons to roll critical hits on natural 20.",
-            "critMiss": "Critical Misses / Xathoqqua’s Woe",
-            "critMissHint": "Show buttons to roll critical miss on natural 1.",
-            "damageTypes": "Additional damage types",
-            "damageTypesHint": "These will be appended to the existing system list for weapons and spells. The current damage types include Basic, Bludgeoning, Piercing, Slashing, Acid, Cold, Electricity, Fire, Gas, Negative Energy, Pain, Poison, and Positive Energy.",
-            "clickToToggle": "Click to toggle"
+    "saves": {
+      "base": {
+        "name": "Base Save",
+        "abbrev": "Base"
+      },
+      "death": {
+        "name": "Death, Poison, ...",
+        "abbrev": "Death"
+      },
+      "transformation": {
+        "name": "Transformation",
+        "abbrev": "Xform"
+      },
+      "device": {
+        "name": "Devices",
+        "abbrev": "Device"
+      },
+      "avoidance": {
+        "name": "Avoidance",
+        "abbrev": "Avoid"
+      },
+      "sorcery": {
+        "name": "Sorcery",
+        "abbrev": "Sorcery"
+      }
+    },
+    "resistancesAndVulnerabilities": "Resistances & Vulnerabilities",
+    "fightingAbility": "Fighting Ability",
+    "fa": "FA",
+    "unskilled": "Unskilled",
+    "wpnSkills": "Favoured Weapons",
+    "level4": "Level 4",
+    "level8": "Level 8",
+    "level12": "Level 12",
+    "castingAbility": "Casting Ability",
+    "ca": "CA",
+    "turningAbility": "Turning Ability",
+    "ta": "TA",
+    "taskResolution": {
+      "simple": {
+        "name": "Simple",
+        "abbrev": "Simpl.",
+        "hint": "Examples: Climbing natural/rough surface with light or no armour..."
+      },
+      "moderate": {
+        "name": "Moderate",
+        "abbrev": "Mod.",
+        "hint": "Examples: Climbing natural/rough surface with medium armour..."
+      },
+      "challenging": {
+        "name": "Challenging",
+        "abbrev": "Chall.",
+        "hint": "Examples: Climbing natural/rough surface with heavy armour; hear loud noise..."
+      },
+      "difficult": {
+        "name": "Difficult",
+        "abbrev": "Diff.",
+        "hint": "Examples: Non-thief hear quiet noise; find concealed or secret door..."
+      },
+      "veryDifficult": {
+        "name": "Very Difficult",
+        "abbrev": "V. Diff.",
+        "hint": "Examples: Non-thief pick lock; find trap..."
+      }
+    },
+    "movement": {
+      "base": {
+        "name": "Base Move",
+        "abbrev": "MV"
+      },
+      "exploration": {
+        "name": "Dungeon (ft/turn)",
+        "abbrev": "Explore"
+      },
+      "travel": {
+        "name": "Wilderness (mi/day)",
+        "abbrev": "Wilderness"
+      }
+    },
+    "otherMv": {
+      "name": "Other Movement",
+      "abbrev": "Other MV"
+    },
+    "alignment": "Alignment",
+    "size": "Size",
+    "sizes": {
+      "S": "Small",
+      "M": "Medium",
+      "L": "Large"
+    },
+    "encWild": "# Enc.",
+    "encLair": "# in Lair",
+    "phenotype": "Phenotype",
+    "morale": "Morale",
+    "loyalty": "Loyalty",
+    "cost": "Cost/Month",
+    "xp": "XP Value",
+    "treasure": "Treasure Class",
+    "tokenAlias": "Token Alias",
+    "itemAlias": "Alias",
+    "aliasDescription": "Description if not Identified",
+    "identified": "Identified",
+    "effect": {
+      "add": "Add Effect",
+      "create": "Create Effect",
+      "toggle": "Toggle Effect",
+      "source": "Source"
+    },
+    "feature": {
+      "add": "Add Feature"
+    },
+    "itemTypes": {
+      "armor": "Armour", 
+      "feature": "Feature", 
+      "item": "Item", 
+      "shield": "Shield", 
+      "spell": "Spell", 
+      "weapon": "Weapon", 
+      "classTemplate": "Class Template", 
+      "effectTemplate": "Effect Template"
+    },
+    "item": {
+      "add": "Add Item",
+      "edit": "Edit",
+      "delete": "Delete",
+      "splitStack": "Split Stack",
+      "splitStackPrompt": "Split off how many? (max {max})",
+      "equip": "Toggle Equip/Unequip",
+      "equipped": "Equipped",
+      "show": "Send to Chat",
+      "rollDamage": "Roll Damage",
+      "carry": "Toggle Carried/Dropped",
+      "carried": "Carried",
+      "consumable": "Consumable",
+      "ammunition": "Ammunition",
+      "bundleQty": "Bundle Qty",
+      "container": "Container",
+      "inStorage": "In Storage",
+      "lightSource": "Light Source",
+      "toggleLight": "Toggle Light",
+      "light": {
+        "lightRadius": "Light Radius",
+        "dim": "Dim",
+        "bright": "Bright",
+        "angle": "Emission Angle",
+        "color": "Light Color",
+        "alpha": "Color Intensity"
+      },
+      "addAmmo": "Ammunition",
+      "usesAmmo": "Uses ammo",
+      "grenade": "Grenade-like item",
+      "areaEffect": "Area effect attack",
+      "duration": "Duration",
+      "hasSpells": "Has Spells",
+      "hideCharges": "Hide Charges",
+      "castSpell": "Cast Spell",
+      "cost": "Cost",
+      "value": "GP Value",
+      "unitPrice": "GP Each",
+      "qty": "Qty",
+      "weight": "Weight",
+      "wt": "Wt",
+      "location": "Location",
+      "incr": "Add",
+      "decr": "Subtract",
+      "charges": "Charges",
+      "maxCharges": "Max Charges",
+      "spellsAbilities": "Spells/Abilities",
+      "attributes": {
+        "equipped": "The Equipped tag indicates whether this item is equipped or not.",
+        "carried": "The Carried tag allows this item to be carried or dropped.",
+        "baseWeapon": "The Weapon Proficiency required to wield this weapon without penalty.",
+        "isConsumable": "The Consumable tag gives this item the increment/decrement buttons.",
+        "isAmmunition": "The Ammunition tag causes this item to display on the Combat tab.",
+        "bundleQty": "If used, indicates how many individual items are sold in a bundle.",
+        "isLightSource": "The Light Source tag allows this item to be used as a light source.",
+        "lightRadius": "Distance of light emission. Bright must be included within the radius of dim light.",
+        "lightAngle": "Limit the angle of emission for this light source.",
+        "lightColor": "Coloration applied to this light source.",
+        "lightAlpha": "Intensity of the light color, from 0 (no color) to 1 (full color).",
+        "lightDuration": "Duration in rounds (roll formula allowed) for a light source. Leave blank if permanent.",
+        "isContainer": "The Container tag allows this item to contain other non-container items.",
+        "inStorage": "The In Storage tag indicates that this item is in storage, not carried (no encumbrance, but also not equippable).",
+        "duration": "Duration in rounds (numbers only) for a conjured or ephemeral item. Leave blank if permanent.",
+        "hasSpells": "The Has Spells tag allows this item to have one or more spells as usable powers.",
+        "hideCharges": "The Hide Charges tag prevents spell charges from being displayed to players."
+      }
+    },
+    "spell": {
+      "addLvl": "Add Lvl",
+      "addSpell": "Add Spell",
+      "classes": "Classes",
+      "numMem": "# Mem",
+      "spellRange": "Spell Range",
+      "duration": "Duration",
+      "dur": "Dur.",
+      "numAffected": "# Affected",
+      "save": "Save",
+      "attributes": {
+        "isConsumable": "Note: Leave this item checked unless the spell is being used as an at-will power."
+      }
+    },
+    "money": {
+      "cp": "CP",
+      "sp": "SP",
+      "ep": "EP",
+      "gp": "GP",
+      "pp": "PP"
+    },
+    "weapon": {
+      "add": "Add Weapon",
+      "type": {
+        "melee": "Melee",
+        "missile": "Missile"
+      },
+      "range": "Range",
+      "atkType": "Atk Type",
+      "hands": {
+        "one": "1 Hand",
+        "two": "2 Hands"
+      },
+      "master": "Master",
+      "grandMaster": "Grandmaster",
+      "damageTypes": {
+        "basic": "Basic",
+        "bludgeoning": "Bludgeoning",
+        "piercing": "Piercing",
+        "slashing": "Slashing",
+        "acid": "Acid",
+        "asphyxiation": "Asphyxiation",
+        "bleeding": "Bleeding",
+        "cold": "Cold",
+        "crushing": "Crushing",
+        "electricity": "Electricity",
+        "fire": "Fire",
+        "gas": "Gas",
+        "negative": "Negative Energy",
+        "pain": "Pain",
+        "poison": "Poison",
+        "positive": "Positive Energy",
+        "radiation": "Radiation",
+        "healing": "Healing"
+      },
+      "attributes": {
+        "usesAmmo": "The Uses Ammo tag allows this item to decrement ammunition on attacks.",
+        "isGrenade": "The Grenade tag causes this item to attack as a hurled item, from Table 143 of the Player's Manual.",
+        "isAreaEffect": "The Area Effect tag causes this item ignore making an attack roll, and simply roll damage. Note that this is different from the Grenade tag, above."
+      },
+      "annotations": {
+        "ignoreShieldAc": "Ignores AC bonus provided by opponent's shield (if any).",
+        "p1VsPlate": "+1 'to hit' opponents wearing plate mail, field plate, or full plate.",
+        "1hOr2h": "Melee weapon may be wielded one- or two-handed. If the weapon can also be hurled, use one-handed damage.",
+        "true2Hand": "A 'true' two-handed melee weapon; must be wielded with two hands.",
+        "hurled": "Melee weapon may be hurled one-handed; strength damage adjustment applies.",
+        "p1VsMelee": "+1 AC bonus versus melee attacks; quarterstaff must be wielded with two hands; tonfa and hand trident must be dual wielded (one in each hand).",
+        "dblDmgVsCharge": "Double damage dice (apply modifiers after) when set to receive a charge.",
+        "dismountRider": "Weapon has a 4-in-6 chance to dismount a rider on a natural 19 or 20 attack roll.",
+        "dblDmgFromCharge": "Double damage dice (apply modifiers after) when used from a charging mount.",
+        "d10FromWarhorse": "Base damage improves to 1d10 when mounted on a heavy warhorse.",
+        "strDmgAdj": "Strength damage adjustment applies [for certain missile weapons].",
+        "strDmgIfCustomized": "Strength damage adjustment applies only if draw weight is adjusted for the archer."
+      }
+    },
+    "armor": {
+      "add": "Add Armour",
+      "type": {
+        "unarmored": "Unarmoured",
+        "light": "Light",
+        "medium": "Medium",
+        "heavy": "Heavy",
+        "shield": "Shield"
+      },
+      "wtClass": "Wt Class",
+      "armorClass": "Armour Class",
+      "ac": "AC",
+      "dmgReduct": "Dmg Reduction",
+      "dr": "DR",
+      "unarmored": "Unarmoured",
+      "acMod": "AC Mod"
+    },
+    "shield": {
+      "add": "Add Shield",
+      "type": {
+        "small": "Small",
+        "large": "Large",
+        "passive": "Passive"
+      },
+      "shieldType": "Shield Type",
+      "acMod": "AC Mod"
+    },
+    "attack": {
+      "add": "Add Attack",
+      "critMiss": {
+        "name": "Critical Miss",
+        "badMiss": "Bad miss",
+        "dropWeapon" : "Drop weapon: {feet} feet away to {direction}.",
+        "stumble": "Awkward stumble. One adjacent gets one free attack. No further attacks for rest of round.",
+        "tripFall" : "Trip and fall. Prone: -4 AC, no DX bonus for remainder of round and until next action.",
+        "hitAlly": "Hit ally: closest for melee, closest adjacent for ranged. Regular hit.",
+        "hitAllyCrit": "Hit ally: closest for melee, closest adjacent for ranged. <b>Critical Hit</b>.",
+        "hitSelf": "Hit self: Regular hit.",
+        "hitSelfCrit": "Hit self: <b>Critical Hit</b>.",
+        "cleric": "Critical miss roll for cleric-class...",
+        "fighter": "Critical miss roll for fighter-class...",
+        "magician": "Critical miss roll for magician-class...",
+        "thief": "Critical miss roll for thief-class...",
+        "npc": "Critical miss roll for npc/monster...",
+        "other": "Critical miss roll for cleric/thief/monster..."
+      },
+      "critHit": {
+        "cleric": "Critical hit roll for cleric-class...",
+        "fighter": "Critical hit roll for fighter-class...",
+        "magician": "Critical hit roll for magician-class...",
+        "thief": "Critical hit roll for thief-class...",
+        "npc": "Critical hit roll for npc/monster...",
+        "other": "Critical hit roll for cleric/thief/monster..."
+      },
+      "overrideMiss": "Override miss & roll damage anyway..."
+    },
+    "roll": "Roll",
+    "reroll": "Reroll",
+    "rollAll": "Roll All",
+    "rollGroup": "Roll My Group",
+    "rollFormula": "Roll Formula",
+    "rollExample": "e.g. 1d6+1",
+    "attackRoll": "Attack Roll",
+    "checkRoll": "Check Roll",
+    "target": "Target",
+    "rollMode": "Roll Mode",
+    "blindRoll": "Blind Roll",
+    "sitMod": "Situational Modifier",
+    "bonus": "Bonus",
+    "true": "True",
+    "false": "False",
+    "classEditor": {
+      "title": "Class Editor",
+      "defaultName": "New Class",
+      "classInfo": "Class Info",
+      "className": "Class Name",
+      "hitDieNote": "Die used to roll hit points at each class level.",
+      "baseClass": "Base Class",
+      "baseClassNote": "Determines the critical hit & miss columns to use.",
+      "attrReqs": "Attribute Requirements / Minimums",
+      "xpBonusReqs": "XP Bonus Requirements",
+      "xpBonusReqsNote": "Minimum attribute scores required to earn a 10% bonus to XP.",
+      "extrFeatReqs": "Extraordinary Feat Bonus %",
+      "extrFeatReqsNote": "Some classes get a +8% bonus on one or two physical feats.",
+      "spellLists": "Spell Lists",
+      "spellListsNote": "If the class can cast spells, make one or two selections here.",
+      "spellList": "Spell List",
+      "saveThrows": "Saving Throws at 1st Level",
+      "saveThrowsNote": "Note: Most classes get a +2 bonus on two of their saving throws.",
+      "proficiencies": "Proficiencies",
+      "favoredWeapons": "Favoured Weapons",
+      "exceptions": "Exceptions",
+      "clearList": "Clear list and start over",
+      "clearLegacy": "Clear legacy data",
+      "levelAdvancement": "Level Advancement",
+      "hpRoll": "HP Roll",
+      "classFeatures": "Class Abilities & Features",
+      "classFeaturesNote": "Add the class abilities and features here.",
+      "featureNamePlaceholder": "Ability Name",
+      "startingPack": "Starting Pack",
+      "startingPackNote": "Define the starting equipment pack for this class.",
+      "add": "Add",
+      "delete": "Delete",
+      "saveClass": "Save Class"
+    },
+    "dataLabel": {
+      "levelUp": "Level Up!",
+      "quickCreate": "Quick Create Character",
+      "setAttributeMods": "Set Attribute Modifiers",
+      "spellcaster": "Spellcaster",
+      "noSpells": "No Spells",
+      "basicMeleeAtk": "Basic melee attack",
+      "attackWith": "Attack with",
+      "castSpell": "Cast spell",
+      "use": "Use",
+      "hitDieRoll": "Hit Die + CN mod",
+      "deathSave": "Save vs. Death/Poison/Radiation",
+      "deviceSave": "Save vs. Device",
+      "xformSave": "Save vs. Transformation",
+      "avoidanceSave": "Avoidance Save",
+      "sorcerySave": "Save vs. Sorcery",
+      "check": "check",
+      "caCheck": "Casting Ability check",
+      "taCheck": "Turn Undead check",
+      "spells": "Spells",
+      "spellsPerDay": "Spells/Day",
+      "friendlyName": "Friendly Name",
+      "baseWeapon": "Base Weapon Type",
+      "altDmg": "Alternative/Additional Damage",
+      "annotations": "Annotations",
+      "itemId": "Item ID",
+      "containerId": "Container ID",
+      "containedItemIds": "Contained Item IDs",
+      "bonusLvl1": "Level 1",
+      "bonusLvl2": "Level 2",
+      "bonusLvl3": "Level 3",
+      "bonusLvl4": "Level 4",
+      "lvl1": "L1",
+      "lvl2": "L2",
+      "lvl3": "L3",
+      "lvl4": "L4",
+      "lvl5": "L5",
+      "lvl6": "L6",
+      "leaveBlank": "Blank if not used",
+      "viewRemove": "View/Remove",
+      "create": "Create",
+      "edit": "Edit",
+      "delete": "Delete",
+      "createClass": "Create New Class",
+      "buyMultiplier": "Buy/Offer Fraction",
+      "sellMultiplier": "Sell/Cost Multiplier",
+      "combatOptions": "Combat Options"
+    },
+    "combat": {
+      "rollInitiative": "Group {initGroup} rolls for Initiative!",
+      "initiative": "Initiative",
+      "setCombatantGroups": "Set Combatant Groups",
+      "setCombatantAsActive": "Set Combatant as Active",
+      "meleeDeclared": "Melee",
+      "missileDeclared": "Missile",
+      "magicDeclared": "Magic",
+      "moveDeclared": "Movement",
+      "otherDeclared": "Other",
+      "delayedDeclared": "Delayed Action / Last Strike"
+    },
+    "actions": {
+      "melee": "Melee",
+      "missile": "Missile",
+      "magic": "Magic",
+      "movement": "Movement",
+      "other": "Other"
+    },
+    "colors": {
+      "green": "Green",
+      "red": "Red",
+      "yellow": "Yellow",
+      "purple": "Purple",
+      "blue": "Blue",
+      "orange": "Orange",
+      "white": "White"
+    },
+    "statusEffects": {
+      "hasted": "Hasted",
+      "slowed": "Slowed",
+      "shieldBound": "Shield Bound",
+      "coverPartial": "Partial Concealment",
+      "coverFull": "Full Concealment",
+      "flankAttack": "Flank Attack",
+      "rearAttack": "Rear Attack"
+    },
+    "calendar": {
+      "days": {
+        "sun": {
+          "abbreviation": "Sun",
+          "name": "Sun"
         },
-        "tabs": {
-            "abilities": "Abilities",
-            "combat": "Combat",
-            "spells": "Spells",
-            "effects": "Effects",
-            "items": "Items",
-            "description": "Description",
-            "details": "Details",
-            "attributes": "Attributes",
-            "equipment": "General Equipment & Provisions",
-            "fightingGear": "Fighting Gear",
-            "treasureAll": "Items in Treasure",
-            "itemTokenAbilities": "Item Details",
-            "itemTokenDescription": "Item Description",
-            "classAdvancement": "Advancement",
-            "classEquipment": "Equipment"
+        "earth": {
+          "abbreviation": "Earth",
+          "name": "Earth"
         },
-        "headers": {
-            "name": "Name",
-            "attributes": "Attributes",
-            "exploration": "Exploration",
-            "taskResolution": "Task Resolution",
-            "movement": "Movement",
-            "classAbilities": "Class Abilities",
-            "fightingSkills": "Fighting Skills",
-            "combatStats": "Combat Stats",
-            "savingThrows": "Saving Throws",
-            "equipmentItems": "Equipment & Items",
-            "equipmentItemsEtc": "Equipment, Items, Etc.",
-            "containers": "Containers",
-            "abilitiesItems": "Abilities & Items",
-            "weapons": "Weapons",
-            "weaponsMelee": "Weapons - Melee",
-            "weaponsMissile": "Weapons - Missile",
-            "armor": "Armour",
-            "armorAndShields": "Armour & Shields",
-            "weaponsAndArmor": "Weapons & Armour",
-            "items": "Items",
-            "ability": "Ability",
-            "linkedWeapon": "Linked Weapon",
-            "linkedItem": "Linked Item",
-            "atkRate": "Atk Rate",
-            "rof": "RoF",
-            "classRange": "Class/Range",
-            "wpnClass": "Wpn Class",
-            "hands": "# Hands",
-            "atkMod": "Atk Mod",
-            "dmgMod": "Dmg Mod",
-            "damage": "Damage",
-            "damage2h": "2-Hand Dmg",
-            "damageType": "Damage Type",
-            "damageTypes": "Damage Types",
-            "altDmg": "Add'l Dmg",
-            "weaponMastery": "Weapon Mastery",
-            "type": "Type",
-            "biography": "Biography",
-            "descNotes": "Description & Notes",
-            "effectsCond": "Effects & Conditions",
-            "attacksItems": "Attacks & Items",
-            "attacksWeapons": "Attacks & Weapons",
-            "encumbrance": "Encumbrance",
-            "money": "Money",
-            "treasure": "Treasure"
+        "sea": {
+          "abbreviation": "Sea",
+          "name": "Sea"
         },
-        "details": {
-            "class": "Class",
-            "alignment": "Alignment",
-            "level": "Level",
-            "hitDie": "Hit Die",
-            "hitDice": "Hit Dice",
-            "rollHD": "Roll HP on create",
-            "rollHDLong": "Roll the NPCs HP when a token is created based on the HD",
-            "hd": "HD",
-            "xp": "XP",
-            "toNextLvl": "Next Level",
-            "primeAttr": "Prime Attr",
-            "hitPoints": "Hit Points",
-            "hp": "HP",
-            "tempHp": "Temp HP",
-            "race": "Race",
-            "gender": "Gender",
-            "age": "Age",
-            "homeland": "Homeland",
-            "religion": "Cult",
-            "height": "Height",
-            "weight": "Weight",
-            "hair": "Hair",
-            "eyes": "Eyes",
-            "complexion": "Complexion",
-            "secSkills": "Secondary Skills",
-            "languages": "Languages",
-            "physFeatures": "Physical Features"
+        "moon": {
+          "abbreviation": "Moon",
+          "name": "Moon"
         },
-        "attributes": {
-            "str": {
-                "name": "Strength",
-                "abbrev": "ST",
-                "atkMod": "Melee Mod",
-                "dmgMod": "Dmg Mod",
-                "test": "Test of ST",
-                "feat": "Feat of ST",
-                "check": "Basic ST check"
-            },
-            "dex": {
-                "name": "Dexterity",
-                "abbrev": "DX",
-                "atkMod": "Missile Mod",
-                "defMod": "Def Mod",
-                "test": "Test of DX",
-                "feat": "Feat of DX",
-                "check": "Basic DX check"
-            },
-            "con": {
-                "name": "Constitution",
-                "abbrev": "CN",
-                "hpMod": "HP Mod",
-                "poisRadMod": "Pois/Rad Mod",
-                "traumaSurvive": "Trauma",
-                "test": "Test of CN",
-                "feat": "Feat of CN",
-                "check": "Basic CN check"
-            },
-            "int": {
-                "name": "Intelligence",
-                "abbrev": "IN",
-                "languages": "Languages",
-                "bonusSpells": "Bonus Spells",
-                "learnSpell": "Learn Spell",
-                "check": "IN concentration check"
-            },
-            "wis": {
-                "name": "Wisdom",
-                "abbrev": "WS",
-                "willMod": "Will Mod",
-                "bonusSpells": "Bonus Spells",
-                "learnSpell": "Learn Spell",
-                "check": "WS concentration check"
-            },
-            "cha": {
-                "name": "Charisma",
-                "abbrev": "CH",
-                "reaction": "Reaction",
-                "maxHenchmen": "Max Henchmen",
-                "turnUndead": "Turn Mod",
-                "check": "Basic CH check"
-            }
+        "star": {
+          "abbreviation": "Star",
+          "name": "Star"
         },
-        "saves": {
-            "base": {
-                "name": "Base Save",
-                "abbrev": "Base"
-            },
-            "death": {
-                "name": "Death, Poison, ...",
-                "abbrev": "Death"
-            },
-            "transformation": {
-                "name": "Transformation",
-                "abbrev": "Xform"
-            },
-            "device": {
-                "name": "Devices",
-                "abbrev": "Device"
-            },
-            "avoidance": {
-                "name": "Avoidance",
-                "abbrev": "Avoid"
-            },
-            "sorcery": {
-                "name": "Sorcery",
-                "abbrev": "Sorcery"
-            }
+        "sky": {
+          "abbreviation": "Sky",
+          "name": "Sky"
         },
-        "resistancesAndVulnerabilities": "Resistances & Vulnerabilities",
-        "fightingAbility": "Fighting Ability",
-        "fa": "FA",
-        "unskilled": "Unskilled",
-        "wpnSkills": "Favoured Weapons",
-        "level4": "Level 4",
-        "level8": "Level 8",
-        "level12": "Level 12",
-        "castingAbility": "Casting Ability",
-        "ca": "CA",
-        "turningAbility": "Turning Ability",
-        "ta": "TA",
-        "taskResolution": {
-            "simple": {
-                "name": "Simple",
-                "abbrev": "Simpl.",
-                "hint": "Examples: Climbing natural/rough surface with light or no armour..."
-            },
-            "moderate": {
-                "name": "Moderate",
-                "abbrev": "Mod.",
-                "hint": "Examples: Climbing natural/rough surface with medium armour..."
-            },
-            "challenging": {
-                "name": "Challenging",
-                "abbrev": "Chall.",
-                "hint": "Examples: Climbing natural/rough surface with heavy armour; hear loud noise..."
-            },
-            "difficult": {
-                "name": "Difficult",
-                "abbrev": "Diff.",
-                "hint": "Examples: Non-thief hear quiet noise; find concealed or secret door..."
-            },
-            "veryDifficult": {
-                "name": "Very Difficult",
-                "abbrev": "V. Diff.",
-                "hint": "Examples: Non-thief pick lock; find trap..."
-            }
-        },
-        "movement": {
-            "base": {
-                "name": "Base Move",
-                "abbrev": "MV"
-            },
-            "exploration": {
-                "name": "Dungeon (ft/turn)",
-                "abbrev": "Explore"
-            },
-            "travel": {
-                "name": "Wilderness (mi/day)",
-                "abbrev": "Wilderness"
-            }
-        },
-        "otherMv": {
-            "name": "Other Movement",
-            "abbrev": "Other MV"
-        },
-        "alignment": "Alignment",
-        "size": "Size",
-        "sizes": {
-            "S": "Small",
-            "M": "Medium",
-            "L": "Large"
-        },
-        "encWild": "# Enc.",
-        "encLair": "# in Lair",
-        "phenotype": "Phenotype",
-        "morale": "Morale",
-        "loyalty": "Loyalty",
-        "cost": "Cost/Month",
-        "xp": "XP Value",
-        "treasure": "Treasure Class",
-        "tokenAlias": "Token Alias",
-        "itemAlias": "Alias",
-        "aliasDescription": "Description if not Identified",
-        "identified": "Identified",
-        "effect": {
-            "add": "Add Effect",
-            "create": "Create Effect",
-            "toggle": "Toggle Effect",
-            "source": "Source"
-        },
-        "feature": {
-            "add": "Add Feature"
-        },
-        "itemTypes": {
-            "armor": "Armour", 
-            "feature": "Feature", 
-            "item": "Item", 
-            "shield": "Shield", 
-            "spell": "Spell", 
-            "weapon": "Weapon", 
-            "classTemplate": "Class Template", 
-            "effectTemplate": "Effect Template"
-        },
-        "item": {
-            "add": "Add Item",
-            "edit": "Edit",
-            "delete": "Delete",
-            "splitStack": "Split Stack",
-            "splitStackPrompt": "Split off how many? (max {max})",
-            "equip": "Toggle Equip/Unequip",
-            "equipped": "Equipped",
-            "show": "Send to Chat",
-            "rollDamage": "Roll Damage",
-            "carry": "Toggle Carried/Dropped",
-            "carried": "Carried",
-            "consumable": "Consumable",
-            "ammunition": "Ammunition",
-            "bundleQty": "Bundle Qty",
-            "container": "Container",
-            "inStorage": "In Storage",
-            "lightSource": "Light Source",
-            "toggleLight": "Toggle Light",
-            "light": {
-                "lightRadius": "Light Radius",
-                "dim": "Dim",
-                "bright": "Bright",
-                "angle": "Emission Angle",
-                "color": "Light Color",
-                "alpha": "Color Intensity"
-            },
-            "addAmmo": "Ammunition",
-            "usesAmmo": "Uses ammo",
-            "grenade": "Grenade-like item",
-            "areaEffect": "Area effect attack",
-            "duration": "Duration",
-            "hasSpells": "Has Spells",
-            "hideCharges": "Hide Charges",
-            "castSpell": "Cast Spell",
-            "cost": "Cost",
-            "value": "GP Value",
-            "unitPrice": "GP Each",
-            "qty": "Qty",
-            "weight": "Weight",
-            "wt": "Wt",
-            "location": "Location",
-            "incr": "Add",
-            "decr": "Subtract",
-            "charges": "Charges",
-            "maxCharges": "Max Charges",
-            "spellsAbilities": "Spells/Abilities",
-            "attributes": {
-                "equipped": "The Equipped tag indicates whether this item is equipped or not.",
-                "carried": "The Carried tag allows this item to be carried or dropped.",
-                "baseWeapon": "The Weapon Proficiency required to wield this weapon without penalty.",
-                "isConsumable": "The Consumable tag gives this item the increment/decrement buttons.",
-                "isAmmunition": "The Ammunition tag causes this item to display on the Combat tab.",
-                "bundleQty": "If used, indicates how many individual items are sold in a bundle.",
-                "isLightSource": "The Light Source tag allows this item to be used as a light source.",
-                "lightRadius": "Distance of light emission. Bright must be included within the radius of dim light.",
-                "lightAngle": "Limit the angle of emission for this light source.",
-                "lightColor": "Coloration applied to this light source.",
-                "lightAlpha": "Intensity of the light color, from 0 (no color) to 1 (full color).",
-                "lightDuration": "Duration in rounds (roll formula allowed) for a light source. Leave blank if permanent.",
-                "isContainer": "The Container tag allows this item to contain other non-container items.",
-                "inStorage": "The In Storage tag indicates that this item is in storage, not carried (no encumbrance, but also not equippable).",
-                "duration": "Duration in rounds (numbers only) for a conjured or ephemeral item. Leave blank if permanent.",
-                "hasSpells": "The Has Spells tag allows this item to have one or more spells as usable powers.",
-                "hideCharges": "The Hide Charges tag prevents spell charges from being displayed to players."
-            }
-        },
-        "spell": {
-            "addLvl": "Add Lvl",
-            "addSpell": "Add Spell",
-            "classes": "Classes",
-            "numMem": "# Mem",
-            "spellRange": "Spell Range",
-            "duration": "Duration",
-            "dur": "Dur.",
-            "numAffected": "# Affected",
-            "save": "Save",
-            "attributes": {
-                "isConsumable": "Note: Leave this item checked unless the spell is being used as an at-will power."
-            }
-        },
-        "money": {
-            "cp": "CP",
-            "sp": "SP",
-            "ep": "EP",
-            "gp": "GP",
-            "pp": "PP"
-        },
-        "weapon": {
-            "add": "Add Weapon",
-            "type": {
-                "melee": "Melee",
-                "missile": "Missile"
-            },
-            "range": "Range",
-            "atkType": "Atk Type",
-            "hands": {
-                "one": "1 Hand",
-                "two": "2 Hands"
-            },
-            "master": "Master",
-            "grandMaster": "Grandmaster",
-            "damageTypes": {
-                "basic": "Basic",
-                "bludgeoning": "Bludgeoning",
-                "piercing": "Piercing",
-                "slashing": "Slashing",
-                "acid": "Acid",
-                "asphyxiation": "Asphyxiation",
-                "bleeding": "Bleeding",
-                "cold": "Cold",
-                "crushing": "Crushing",
-                "electricity": "Electricity",
-                "fire": "Fire",
-                "gas": "Gas",
-                "negative": "Negative Energy",
-                "pain": "Pain",
-                "poison": "Poison",
-                "positive": "Positive Energy",
-                "radiation": "Radiation",
-                "healing": "Healing"
-            },
-            "attributes": {
-                "usesAmmo": "The Uses Ammo tag allows this item to decrement ammunition on attacks.",
-                "isGrenade": "The Grenade tag causes this item to attack as a hurled item, from Table 143 of the Player's Manual.",
-                "isAreaEffect": "The Area Effect tag causes this item ignore making an attack roll, and simply roll damage. Note that this is different from the Grenade tag, above."
-            },
-            "annotations": {
-                "ignoreShieldAc": "Ignores AC bonus provided by opponent's shield (if any).",
-                "p1VsPlate": "+1 'to hit' opponents wearing plate mail, field plate, or full plate.",
-                "1hOr2h": "Melee weapon may be wielded one- or two-handed. If the weapon can also be hurled, use one-handed damage.",
-                "true2Hand": "A 'true' two-handed melee weapon; must be wielded with two hands.",
-                "hurled": "Melee weapon may be hurled one-handed; strength damage adjustment applies.",
-                "p1VsMelee": "+1 AC bonus versus melee attacks; quarterstaff must be wielded with two hands; tonfa and hand trident must be dual wielded (one in each hand).",
-                "dblDmgVsCharge": "Double damage dice (apply modifiers after) when set to receive a charge.",
-                "dismountRider": "Weapon has a 4-in-6 chance to dismount a rider on a natural 19 or 20 attack roll.",
-                "dblDmgFromCharge": "Double damage dice (apply modifiers after) when used from a charging mount.",
-                "d10FromWarhorse": "Base damage improves to 1d10 when mounted on a heavy warhorse.",
-                "strDmgAdj": "Strength damage adjustment applies [for certain missile weapons].",
-                "strDmgIfCustomized": "Strength damage adjustment applies only if draw weight is adjusted for the archer."
-            }
-        },
-        "armor": {
-            "add": "Add Armour",
-            "type": {
-                "unarmored": "Unarmoured",
-                "light": "Light",
-                "medium": "Medium",
-                "heavy": "Heavy",
-                "shield": "Shield"
-            },
-            "wtClass": "Wt Class",
-            "armorClass": "Armour Class",
-            "ac": "AC",
-            "dmgReduct": "Dmg Reduction",
-            "dr": "DR",
-            "unarmored": "Unarmoured",
-            "acMod": "AC Mod"
-        },
-        "shield": {
-            "add": "Add Shield",
-            "type": {
-                "small": "Small",
-                "large": "Large",
-                "passive": "Passive"
-            },
-            "shieldType": "Shield Type",
-            "acMod": "AC Mod"
-        },
-        "attack": {
-            "add": "Add Attack",
-            "critMiss": {
-                "name": "Critical Miss",
-                "badMiss": "Bad miss",
-                "dropWeapon" : "Drop weapon: {feet} feet away to {direction}.",
-                "stumble": "Awkward stumble. One adjacent gets one free attack. No further attacks for rest of round.",
-                "tripFall" : "Trip and fall. Prone: -4 AC, no DX bonus for remainder of round and until next action.",
-                "hitAlly": "Hit ally: closest for melee, closest adjacent for ranged. Regular hit.",
-                "hitAllyCrit": "Hit ally: closest for melee, closest adjacent for ranged. <b>Critical Hit</b>.",
-                "hitSelf": "Hit self: Regular hit.",
-                "hitSelfCrit": "Hit self: <b>Critical Hit</b>.",
-                "cleric": "Critical miss roll for cleric-class...",
-                "fighter": "Critical miss roll for fighter-class...",
-                "magician": "Critical miss roll for magician-class...",
-                "thief": "Critical miss roll for thief-class...",
-                "npc": "Critical miss roll for npc/monster...",
-                "other": "Critical miss roll for cleric/thief/monster..."
-            },
-            "critHit": {
-                "cleric": "Critical hit roll for cleric-class...",
-                "fighter": "Critical hit roll for fighter-class...",
-                "magician": "Critical hit roll for magician-class...",
-                "thief": "Critical hit roll for thief-class...",
-                "npc": "Critical hit roll for npc/monster...",
-                "other": "Critical hit roll for cleric/thief/monster..."
-            },
-            "overrideMiss": "Override miss & roll damage anyway..."
-        },
-        "roll": "Roll",
-        "reroll": "Reroll",
-        "rollAll": "Roll All",
-        "rollGroup": "Roll My Group",
-        "rollFormula": "Roll Formula",
-        "rollExample": "e.g. 1d6+1",
-        "attackRoll": "Attack Roll",
-        "checkRoll": "Check Roll",
-        "target": "Target",
-        "rollMode": "Roll Mode",
-        "blindRoll": "Blind Roll",
-        "sitMod": "Situational Modifier",
-        "bonus": "Bonus",
-        "true": "True",
-        "false": "False",
-        "classEditor": {
-            "title": "Class Editor",
-            "defaultName": "New Class",
-            "classInfo": "Class Info",
-            "className": "Class Name",
-            "hitDieNote": "Die used to roll hit points at each class level.",
-            "baseClass": "Base Class",
-            "baseClassNote": "Determines the critical hit & miss columns to use.",
-            "attrReqs": "Attribute Requirements / Minimums",
-            "xpBonusReqs": "XP Bonus Requirements",
-            "xpBonusReqsNote": "Minimum attribute scores required to earn a 10% bonus to XP.",
-            "extrFeatReqs": "Extraordinary Feat Bonus %",
-            "extrFeatReqsNote": "Some classes get a +8% bonus on one or two physical feats.",
-            "spellLists": "Spell Lists",
-            "spellListsNote": "If the class can cast spells, make one or two selections here.",
-            "spellList": "Spell List",
-            "saveThrows": "Saving Throws at 1st Level",
-            "saveThrowsNote": "Note: Most classes get a +2 bonus on two of their saving throws.",
-            "proficiencies": "Proficiencies",
-            "favoredWeapons": "Favoured Weapons",
-            "exceptions": "Exceptions",
-            "clearList": "Clear list and start over",
-            "clearLegacy": "Clear legacy data",
-            "levelAdvancement": "Level Advancement",
-            "hpRoll": "HP Roll",
-            "classFeatures": "Class Abilities & Features",
-            "classFeaturesNote": "Add the class abilities and features here.",
-            "featureNamePlaceholder": "Ability Name",
-            "startingPack": "Starting Pack",
-            "startingPackNote": "Define the starting equipment pack for this class.",
-            "add": "Add",
-            "delete": "Delete",
-            "saveClass": "Save Class"
-        },
-        "dataLabel": {
-            "levelUp": "Level Up!",
-            "quickCreate": "Quick Create Character",
-            "setAttributeMods": "Set Attribute Modifiers",
-            "spellcaster": "Spellcaster",
-            "noSpells": "No Spells",
-            "basicMeleeAtk": "Basic melee attack",
-            "attackWith": "Attack with",
-            "castSpell": "Cast spell",
-            "use": "Use",
-            "hitDieRoll": "Hit Die + CN mod",
-            "deathSave": "Save vs. Death/Poison/Radiation",
-            "deviceSave": "Save vs. Device",
-            "xformSave": "Save vs. Transformation",
-            "avoidanceSave": "Avoidance Save",
-            "sorcerySave": "Save vs. Sorcery",
-            "check": "check",
-            "caCheck": "Casting Ability check",
-            "taCheck": "Turn Undead check",
-            "spells": "Spells",
-            "spellsPerDay": "Spells/Day",
-            "friendlyName": "Friendly Name",
-            "baseWeapon": "Base Weapon Type",
-            "altDmg": "Alternative/Additional Damage",
-            "annotations": "Annotations",
-            "itemId": "Item ID",
-            "containerId": "Container ID",
-            "containedItemIds": "Contained Item IDs",
-            "bonusLvl1": "Level 1",
-            "bonusLvl2": "Level 2",
-            "bonusLvl3": "Level 3",
-            "bonusLvl4": "Level 4",
-            "lvl1": "L1",
-            "lvl2": "L2",
-            "lvl3": "L3",
-            "lvl4": "L4",
-            "lvl5": "L5",
-            "lvl6": "L6",
-            "leaveBlank": "Blank if not used",
-            "viewRemove": "View/Remove",
-            "create": "Create",
-            "edit": "Edit",
-            "delete": "Delete",
-            "createClass": "Create New Class",
-            "buyMultiplier": "Buy/Offer Fraction",
-            "sellMultiplier": "Sell/Cost Multiplier",
-            "combatOptions": "Combat Options"
-        },
-        "combat": {
-            "rollInitiative": "Group {initGroup} rolls for Initiative!",
-            "initiative": "Initiative",
-            "setCombatantGroups": "Set Combatant Groups",
-            "setCombatantAsActive": "Set Combatant as Active",
-            "meleeDeclared": "Melee",
-            "missileDeclared": "Missile",
-            "magicDeclared": "Magic",
-            "moveDeclared": "Movement",
-            "otherDeclared": "Other",
-            "delayedDeclared": "Delayed Action / Last Strike"
-        },
-        "actions": {
-            "melee": "Melee",
-            "missile": "Missile",
-            "magic": "Magic",
-            "movement": "Movement",
-            "other": "Other"
-        },
-        "colors": {
-            "green": "Green",
-            "red": "Red",
-            "yellow": "Yellow",
-            "purple": "Purple",
-            "blue": "Blue",
-            "orange": "Orange",
-            "white": "White"
-        },
-        "statusEffects": {
-            "hasted": "Hasted",
-            "slowed": "Slowed",
-            "shieldBound": "Shield Bound",
-            "coverPartial": "Partial Concealment",
-            "coverFull": "Full Concealment",
-            "flankAttack": "Flank Attack",
-            "rearAttack": "Rear Attack"
-        },
-        "calendar": {
-            "days": {
-                "sun": {
-                  "abbreviation": "Sun",
-                  "name": "Sun"
-                },
-                "earth": {
-                  "abbreviation": "Earth",
-                  "name": "Earth"
-                },
-                "sea": {
-                  "abbreviation": "Sea",
-                  "name": "Sea"
-                },
-                "moon": {
-                  "abbreviation": "Moon",
-                  "name": "Moon"
-                },
-                "star": {
-                  "abbreviation": "Star",
-                  "name": "Star"
-                },
-                "sky": {
-                  "abbreviation": "Sky",
-                  "name": "Sky"
-                },
-                "saturn": {
-                  "abbreviation": "Saturn",
-                  "name": "Saturn"
-                }
-            },
-            "months": {
-                "I": {
-                    "name": "Aries",
-                    "abbreviation": "Aries"
-                },
-                "II": {
-                    "name": "Taurus",
-                    "abbreviation": "Taurus"
-                },
-                "III": {
-                    "name": "Gemini",
-                    "abbreviation": "Gemini"
-                },
-                "IV": {
-                    "name": "Cancer",
-                    "abbreviation": "Cancer"
-                },
-                "V": {
-                    "name": "Leo",
-                    "abbreviation": "Leo"
-                },
-                "VI": {
-                    "name": "Virgo",
-                    "abbreviation": "Virgo"
-                },
-                "VII": {
-                    "name": "Libra",
-                    "abbreviation": "Libra"
-                },
-                "VIII": {
-                    "name": "Scorpius",
-                    "abbreviation": "Scorpius"
-                },
-                "IX": {
-                    "name": "Ophiuchus",
-                    "abbreviation": "Ophiuchus"
-                },
-                "X": {
-                    "name": "Sagittarius",
-                    "abbreviation": "Sagittarius"
-                },
-                "XI": {
-                    "name": "Capricorn",
-                    "abbreviation": "Capricorn"
-                },
-                "XII": {
-                    "name": "Aquarius",
-                    "abbreviation": "Aquarius"
-                },
-                "XIII": {
-                    "name": "Pisces",
-                    "abbreviation": "Pisces"
-                }
-            }
+        "saturn": {
+          "abbreviation": "Saturn",
+          "name": "Saturn"
         }
+      },
+      "months": {
+        "I": {
+          "name": "Aries",
+          "abbreviation": "Aries"
+        },
+        "II": {
+          "name": "Taurus",
+          "abbreviation": "Taurus"
+        },
+        "III": {
+          "name": "Gemini",
+          "abbreviation": "Gemini"
+        },
+        "IV": {
+          "name": "Cancer",
+          "abbreviation": "Cancer"
+        },
+        "V": {
+          "name": "Leo",
+          "abbreviation": "Leo"
+        },
+        "VI": {
+          "name": "Virgo",
+          "abbreviation": "Virgo"
+        },
+        "VII": {
+          "name": "Libra",
+          "abbreviation": "Libra"
+        },
+        "VIII": {
+          "name": "Scorpius",
+          "abbreviation": "Scorpius"
+        },
+        "IX": {
+          "name": "Ophiuchus",
+          "abbreviation": "Ophiuchus"
+        },
+        "X": {
+          "name": "Sagittarius",
+          "abbreviation": "Sagittarius"
+        },
+        "XI": {
+          "name": "Capricorn",
+          "abbreviation": "Capricorn"
+        },
+        "XII": {
+          "name": "Aquarius",
+          "abbreviation": "Aquarius"
+        },
+        "XIII": {
+          "name": "Pisces",
+          "abbreviation": "Pisces"
+        }
+      }
+    },
+    "SceneConfig": {
+      "Environment": "Hyperborea Environment",
+      "IsOutdoor": "Outdoor Environment",
+      "IsOutdoorHint": "When enabled, missile weapon ranges are treated as yards instead of feet (×3)."
     }
+  }
 }
