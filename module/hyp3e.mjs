@@ -1084,13 +1084,6 @@ async function setupSystem() {
   // Create folder for core compendia, if it doesn't exist
   await createCompendiumFolders(folderDefs);
 
-  // Check for Class Templates folder in world Items directory, create if needed
-  // const classTemplatesFolder = game.folders.find(f => f.name === "Class Templates" && f.type === "Item");
-  // if (!classTemplatesFolder) {
-  //   Hyp3eLogger.info("setupSystem", "Creating Class Templates folder in world Items directory...");
-  //   await Folder.create({ name: "Class Templates", type: "Item", parent: null });
-  // }
-
 }
 
 /**
