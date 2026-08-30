@@ -277,8 +277,9 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
 
   _getEntryContextOptions() {
     const options = super._getEntryContextOptions();
+    const enableAdvancedCombatOptions = game.settings.get(game.system.id, "enableAdvancedCombatOptions");
 
-    return [
+    const menuOptions = [
       {
         name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
         icon: '<i class="fas fa-star-of-life"></i>',
@@ -287,8 +288,10 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
           const turnToActivate = this.viewed.turns.findIndex(t => t.id === combatantId);
           this.viewed.activateCombatant(turnToActivate);
         }
-      },
-      {
+      }
+    ];
+    if (enableAdvancedCombatOptions) {
+      const combatOptionsApp = {
         name: game.i18n.localize("HYP3E.combat.combatOptions"),
         icon: '<i class="fas fa-sword"></i>',
         callback: (li) => {
@@ -296,8 +299,11 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
           const actor = this.viewed?.combatants.get(combatantId)?.actor;
           HYP3EActorCombatOptions.openForActor(actor);
         }
-      },
-      ...options
-    ];
+      };
+      menuOptions.push(combatOptionsApp);
+    }
+    // Add all the default options and return
+    menuOptions.push(...options);
+    return menuOptions;
   }
 }
