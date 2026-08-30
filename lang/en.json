@@ -706,7 +706,8 @@
       "magicDeclared": "Magic",
       "moveDeclared": "Movement",
       "otherDeclared": "Other",
-      "delayedDeclared": "Delayed Action / Last Strike"
+      "delayedDeclared": "Delayed Action / Last Strike",
+      "combatOptions": "Combat Options"
     },
     "actions": {
       "melee": "Melee",

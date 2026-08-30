@@ -1,7 +1,8 @@
 import HYP3E from "../helpers/config.mjs";
-import { Hyp3eLogger } from "../helpers/logger.mjs";
+import { HYP3EActorCombatOptions } from "../apps/actor-combat-options.mjs";
 import { HYP3EGroupCombat } from "./combat-group.mjs";
 import HYP3ECombatGroupSelector from "./combat-set-groups.mjs";
+import { Hyp3eLogger } from "../helpers/logger.mjs";
 
 export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.CombatTracker {
   // ===========================================================================
@@ -285,6 +286,15 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
           const combatantId = li.dataset.combatantId
           const turnToActivate = this.viewed.turns.findIndex(t => t.id === combatantId);
           this.viewed.activateCombatant(turnToActivate);
+        }
+      },
+      {
+        name: game.i18n.localize("HYP3E.combat.combatOptions"),
+        icon: '<i class="fas fa-sword"></i>',
+        callback: (li) => {
+          const combatantId = li.dataset.combatantId
+          const actor = this.viewed?.combatants.get(combatantId)?.actor;
+          HYP3EActorCombatOptions.openForActor(actor);
         }
       },
       ...options
