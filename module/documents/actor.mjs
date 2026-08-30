@@ -2021,7 +2021,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Prepare Data for Dialog (Range, Ammo, Initial Mods)
-    Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Preparing rage data:`, { item: itemData, distance: gridDistance, outdoor: isOutdoor });
+    Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Preparing range data:`, { item: itemData, distance: gridDistance, outdoor: isOutdoor });
     const { rangeText, ranges, rangeGroup, chosenRange, rangeMessages, isOutOfRange } = this._prepareRangeData(itemData, gridDistance, isOutdoor);
     rangeMessages.forEach(msg => ui.notifications.warn(msg)); // Show range warnings immediately
     if (isOutOfRange && CONFIG.HYP3E.forceRangeLimit) {
