@@ -279,6 +279,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     const options = super._getEntryContextOptions();
     const enableAdvancedCombatOptions = game.settings.get(game.system.id, "enableAdvancedCombatOptions");
 
+    // Start with "Set Combatant as Active" menu item
     const menuOptions = [
       {
         name: game.i18n.localize("HYP3E.combat.setCombatantAsActive"),
@@ -290,6 +291,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
         }
       }
     ];
+    // If enabled, add "Combat Options" menu item
     if (enableAdvancedCombatOptions) {
       const combatOptionsApp = {
         name: game.i18n.localize("HYP3E.combat.combatOptions"),
@@ -302,7 +304,7 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
       };
       menuOptions.push(combatOptionsApp);
     }
-    // Add all the default options and return
+    // Finally add all the default options and return
     menuOptions.push(...options);
     return menuOptions;
   }
