@@ -117,7 +117,7 @@ export async function migrateActorData(actor, classTemplate = null) {
         for (let [k, v] of Object.entries(attributes)) {
           attributes[k].min = (classTemplate?.system?.attrReqs[k] ?? 3);
         };
-        Hyp3eLogger.info("migrateActorData", `${actor.name} attribute minumums updated:`, attributes);
+        Hyp3eLogger.info("migrateActorData", `${actor.name} attribute minimums updated:`, attributes);
         updates = { ...updates, "system.attributes": attributes };
 
         // Migrate, fix, or delete old data
