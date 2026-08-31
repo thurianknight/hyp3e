@@ -123,7 +123,7 @@ export async function migrateActorData(actor, classTemplate = null) {
         // Migrate, fix, or delete old data
 
         // Migrate legacy weapon proficiencies, if it hasn't already been done
-        if (actor.system.proficiencies.class !== "" && actor.system.weaponProficiencies.length == 0) {
+        if (actor.system?.proficiencies?.class && actor.system?.proficiencies?.class.trim() !== "" && actor.system?.weaponProficiencies.length == 0) {
           const newProficiencies = migrateProficiencies(actor, classTemplate);
           updates = { ...updates, "system.weaponProficiencies": newProficiencies };
           // Write a Proficiency Migration report for the actor
@@ -911,7 +911,7 @@ export function calcMastery(weaponName, weaponProficiencies) {
   let mastery = 0;
   for (const w of weaponProficiencies) {
     if (!w.exception && weaponName !== "*Any" && weaponName !== "") {
-      if (w.weapon == weaponName || w.weapon == "*Any") mastery ++;
+      if (w.weapon == weaponName || w.weapon == "*Any") mastery++;
     }
   }
   return Math.max(mastery - 1, 0);
