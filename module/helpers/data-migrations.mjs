@@ -123,11 +123,24 @@ export async function migrateActorData(actor, classTemplate = null) {
         // Migrate, fix, or delete old data
 
         // Migrate legacy weapon proficiencies, if it hasn't already been done
+        Hyp3eLogger.info("migrateActorData", `Checking ${actor.name} weapon proficiencies:`, { "legacy": actor.system?.proficiencies?.class, "new": actor.system?.weaponProficiencies });
         if (actor.system?.proficiencies?.class && actor.system?.proficiencies?.class.trim() !== "" && actor.system?.weaponProficiencies.length == 0) {
           const newProficiencies = migrateProficiencies(actor, classTemplate);
           updates = { ...updates, "system.weaponProficiencies": newProficiencies };
           // Write a Proficiency Migration report for the actor
           await createProficiencyMigrationReport(actor, newProficiencies)
+        }
+
+        // If new-schema proficiencies exist, wipe the legacy fields
+        if (actor.system?.weaponProficiencies.length > 0) {
+          const proficiencies = {
+            class: "",
+            lvl1: "",
+            lvl4: "",
+            lvl8: "",
+            lvl12: "",
+          }
+          updates = { ...updates, "system.proficiencies": proficiencies };
         }
 
         // Delete old explorationSkills

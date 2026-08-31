@@ -126,12 +126,14 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
 
     schema.unskilled = new fields.NumberField({ nullable: true, initial: null });
 
+    // Legacy fields, replaced by weaponProficiencies below
     schema.proficiencies = new fields.SchemaField({
       class: new fields.StringField({ blank: true }),
       lvl4: new fields.StringField({ blank: true }),
       lvl8: new fields.StringField({ blank: true }),
       lvl12: new fields.StringField({ blank: true })
     });
+    // New schema for weapon proficiencies
     schema.weaponProficiencies = new fields.ArrayField(new fields.SchemaField({
       weapon: new fields.StringField({ initial: "" }), // Name of the weapon
       level: new fields.NumberField({ initial: 1 }), // Character level at which this was gained
