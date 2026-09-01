@@ -1765,220 +1765,219 @@ export class Hyp3eActor extends Actor {
    * @param {*} dataset 
    */
   async rollCheck(dataset) {
-      Hyp3eLogger.info("Hyp3eActor rollCheck", `Rolling ${dataset.label}...`);
+    Hyp3eLogger.info("Hyp3eActor rollCheck", `Rolling ${dataset.label}...`);
 
-      // Declare vars
-      const itemId = dataset.itemId ?? null
-      const tokenId = dataset.tokenId ?? null
-      let itemName = ""
-      let label = ""
-      let checkHeader = dataset.label
-      let rollFormula = ""
-      const targetComparison = dataset.comparison ?? "le"
-      let rollResponse
+    // Declare vars
+    const itemId = dataset.itemId ?? null
+    const tokenId = dataset.tokenId ?? null
+    let itemName = ""
+    let label = ""
+    let checkHeader = dataset.label
+    let rollFormula = ""
+    const targetComparison = dataset.comparison ?? "le"
+    let rollResponse
 
-      // Did we get a token ID?
-      if (tokenId) {
-          // Get the token from the canvas
-          const token = canvas.tokens.get(tokenId)
-          Hyp3eLogger.info("Hyp3eActor rollCheck", `Token (ID ${tokenId}):`, token);
-          if (token) {
-              // Get the token's actor
-              const tokenActor = token.actor
-              Hyp3eLogger.info("Hyp3eActor rollCheck", `Token actor:`, tokenActor);
-          }
+    // Did we get a token ID?
+    if (tokenId) {
+      // Get the token from the canvas
+      const token = canvas.tokens.get(tokenId)
+      Hyp3eLogger.info("Hyp3eActor rollCheck", `Token (ID ${tokenId}):`, token);
+      if (token) {
+        // Get the token's actor
+        const tokenActor = token.actor
+        Hyp3eLogger.info("Hyp3eActor rollCheck", `Token actor:`, tokenActor);
+      }
+    }
+
+    // Retrieve roll data from the actor
+    const rollData = this.getRollData();
+
+    // Is this an item or ability check?
+    const item = this.items.get(itemId) ?? null
+    if (item) {
+      itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
+      label = this._createChatLabel(this.img, itemName)
+      // Set the roll button label based on item type
+      switch (item.type) {
+        case "item":
+          dataset.rollButtonLabel = "Use Item"
+          break
+        case "feature":
+          dataset.rollButtonLabel = "Use Ability"
+          break
+        case "spell":
+          dataset.rollButtonLabel = "Cast Spell"
+          break
+        default:
+          dataset.rollButtonLabel = "Use"
+          break
+      }
+    } else {
+      label = this._createChatLabel(this.img, `Rolling ${dataset.label}`)
+      dataset.rollButtonLabel = "Roll"
+    }
+
+    // Use itemNameLower for ability name comparisons below...
+    const itemNameLower = itemName.toLowerCase()
+    // Initialize these for later
+    dataset.sitMod = 0;
+    dataset.sitModList = "";
+
+    // Check the ability name to determine if this is a thief ability
+    const abilityList = ["climb", "decipher script", "discern noise", "hide", "manipulate traps", "move silently", "open locks", "pick pockets", "read scrolls"];
+    const thiefAbility = (abilityList.includes(itemNameLower))
+    if (thiefAbility) {
+      // Are we auto-calculating Thief ability target numbers (only for characters)?
+      if (CONFIG.HYP3E.autoCalcThiefTn && this.type === "character") {
+        // If wearing heavy armor, prevent certain thief skills
+        const skillsPreventedByHeavyArmor = ["climb", "hide", "move silently"];
+        const armorType = this.system.wornArmorType;
+        if (armorType === "heavy" && skillsPreventedByHeavyArmor.includes(itemNameLower)) {
+          const msg = `${this.displayName} cannot attempt to ${itemNameLower} while wearing heavy armor.`;
+          Hyp3eLogger.warn("Hyp3eActor rollCheck", msg);
+          ui.notifications.warn(msg);
+          return false;
+        }
+
+        // Calculate & override the roll target in the dataset
+        const target = this._resolveThiefAbilityTn(itemNameLower);
+        if (target === null) {
+          const msg = `At level ${this.system.details.level.value}, ${this.name} has no chance of success to ${itemNameLower}.`;
+          Hyp3eLogger.warn("Hyp3eActor rollCheck", msg);
+          ui.notifications.warn(msg);
+          return false;
+        }
+        dataset.rollTarget = target;
       }
 
-      // Retrieve roll data from the actor
-      const rollData = this.getRollData();
-
-      // Is this an item or ability check?
-      const item = this.items.get(itemId) ?? null
-      if (item) {
-          itemName = item.system.friendlyName != "" ? item.system.friendlyName : item.name
-          label = this._createChatLabel(this.img, itemName)
-          // Set the roll button label based on item type
-          switch (item.type) {
-              case "item":
-                  dataset.rollButtonLabel = "Use Item"
-                  break
-              case "feature":
-                  dataset.rollButtonLabel = "Use Ability"
-                  break
-              case "spell":
-                  dataset.rollButtonLabel = "Cast Spell"
-                  break
-              default:
-                  dataset.rollButtonLabel = "Use"
-                  break
-          }
-      } else {
-          label = this._createChatLabel(this.img, `Rolling ${dataset.label}`)
-          dataset.rollButtonLabel = "Roll"
-      }
-
-      // Use itemNameLower for ability name comparisons below...
-      const itemNameLower = itemName.toLowerCase()
-      // Initialize these for later
-      dataset.sitMod = 0;
-      dataset.sitModList = "";
-
-      // Check the ability name to determine if this is a thief ability
-      const abilityList = ["climb", "decipher script", "discern noise", "hide", "manipulate traps", "move silently", "open locks", "pick pockets", "read scrolls"];
-      const thiefAbility = (abilityList.includes(itemNameLower))
-      // Are we auto-calculating Thief ability target numbers?
-      if (CONFIG.HYP3E.autoCalcThiefTn) {
-          if (thiefAbility) {
-            // If wearing heavy armor, prevent certain thief skills
-            const skillsPreventedByHeavyArmor = ["climb", "hide", "move silently"];
-            const armorType = this.system.wornArmorType;
-            if (armorType === "heavy" && skillsPreventedByHeavyArmor.includes(itemNameLower)) {
-                const msg = `${this.displayName} cannot attempt to ${itemNameLower} while wearing heavy armor.`;
-                Hyp3eLogger.warn("Hyp3eActor rollCheck", msg);
-                ui.notifications.warn(msg);
-                return false;
-            }
-
-            // Calculate & override the roll target in the dataset
-              const target = this._resolveThiefAbilityTn(itemNameLower);
-              if (target === null) {
-                  const msg = `At level ${this.system.details.level.value}, ${this.name} has no chance of success to ${itemNameLower}.`;
-                  Hyp3eLogger.warn("Hyp3eActor rollCheck", msg);
-                  ui.notifications.warn(msg);
-                  return false;
-              }
-              dataset.rollTarget = target;
-          }
-      }
       // Even without automatic target calculation, we can still do the sit mods
-      if (thiefAbility) {
-          // Check to see if we need to add an attribute modifier for thief skills
-          const actorAttributes = { 
-              dx: this.system.attributes.dex.value, 
-              in: this.system.attributes.int.value, 
-              ws: this.system.attributes.wis.value
-          };
-          const sitModObj = this._getThiefSkillModifier(itemNameLower, actorAttributes)
-          for (const [sitModKey, sitModData] of Object.entries(sitModObj)) {
-            if (sitModData.modifier === 0) continue;
-            dataset.sitMod = Number(dataset.sitMod) + Number(sitModData.modifier);
-            // Separate multiple situational mods with commas
-            if (dataset.sitModList !== "") {
-                dataset.sitModList += ", "
-            }
-            // Customize how the modifier is displayed
-            let sitModText = ""
-            if (sitModData.modifier >= 0) {
-                sitModText = `(+${sitModData.modifier})`
-            } else if (sitModData.modifier === -99) {
-                sitModText = `makes this skill impossible to use!`
-            } else {
-                sitModText = `(${sitModData.modifier})`
-            }
-            dataset.sitModList += `${sitModData.attribute} ${sitModText}`
-          }
+      // Check to see if we need to add an attribute modifier for thief skills
+      const actorAttributes = { 
+        dx: this.system?.attributes?.dex?.value ?? null, 
+        in: this.system?.attributes?.int?.value ?? null, 
+        ws: this.system?.attributes?.wis?.value ?? null
+      };
+      const sitModObj = this._getThiefSkillModifier(itemNameLower, actorAttributes)
+      for (const [sitModKey, sitModData] of Object.entries(sitModObj)) {
+        if (sitModData.modifier === 0) continue;
+        dataset.sitMod = Number(dataset.sitMod) + Number(sitModData.modifier);
+        // Separate multiple situational mods with commas
+        if (dataset.sitModList !== "") {
+          dataset.sitModList += ", "
+        }
+        // Customize how the modifier is displayed
+        let sitModText = ""
+        if (sitModData.modifier >= 0) {
+            sitModText = `(+${sitModData.modifier})`
+        } else if (sitModData.modifier === -99) {
+            sitModText = `makes this skill impossible to use!`
+        } else {
+            sitModText = `(${sitModData.modifier})`
+        }
+        dataset.sitModList += `${sitModData.attribute} ${sitModText}`
       }
+    }
 
-      // This footer is used for Turn Undead & Assassinate results
-      let checkFooter = ""
-      // Use simple word parsing in the ability name to determine if this is a cleric turning undead
-      const turnUndead = itemNameLower.includes("turn") && itemNameLower.includes("undead");
-      // Same idea here, but for a necromancer commanding undead
-      const commandUndead = itemNameLower.includes("command") && itemNameLower.includes("undead");
-      if (turnUndead || commandUndead) {
-          // Ensure we have a valid Turning Ability
-          if (!this.system.ta || this.system.ta === 0) {
-              const msg = `${this.name} must have a Turning Ability of 1 or greater!`;
-              Hyp3eLogger.warn("rollCheck", msg);
-              ui.notifications.warn(msg);
-              return false;
-          }
-          // Special case: if the user forgot to include @cha.turnUndead in the formula,
-          //  we will add it here, so the roll will be correct
-          if (dataset.roll.indexOf("@cha.turnUndead") < 0) {
-              dataset.roll = `${dataset.roll} - @cha.turnUndead`;
-          }
-          // Clerics turn undead on a sliding scale from 10+ (lowest level) down to 1 (highest),
-          //  but there is no actual target number since it is a range of success.
-          dataset.rollTarget = this.system.ta == 1 ? 10 : 13;
+    // This footer is used for Turn Undead & Assassinate results
+    let checkFooter = ""
+    // Use simple word parsing in the ability name to determine if this is a cleric turning undead
+    const turnUndead = itemNameLower.includes("turn") && itemNameLower.includes("undead");
+    // Same idea here, but for a necromancer commanding undead
+    const commandUndead = itemNameLower.includes("command") && itemNameLower.includes("undead");
+    if (turnUndead || commandUndead) {
+      // Ensure we have a valid Turning Ability
+      if (!this.system.ta || this.system.ta === 0) {
+        const msg = `${this.name} must have a Turning Ability of 1 or greater!`;
+        Hyp3eLogger.warn("rollCheck", msg);
+        ui.notifications.warn(msg);
+        return false;
       }
-
-      // Use simple word parsing in the ability name to determine if this is an assassin plying her trade
-      const assassinate = itemNameLower.includes("assassinat"); // Allow "assassinate" or "assassination"
-      const userTargets = Array.from(game.user.targets);
-      let targetToken = null;
-      if (assassinate) {
-          // Ensure we have a targeted token
-          targetToken = userTargets.length > 0 ? userTargets[0] : null;
-          if (!targetToken) {
-              const msg = `${this.name} must have a target token selected to assassinate!`;
-              Hyp3eLogger.warn("rollCheck", msg);
-              ui.notifications.warn(msg);
-              return false;
-          }
-          // Calculate the target number, overriding its incoming value if any
-          dataset.rollTarget = this._resolveAssassinationTn(targetToken);
+      // Special case: if the user forgot to include @cha.turnUndead in the formula,
+      //  we will add it here, so the roll will be correct
+      if (dataset.roll.indexOf("@cha.turnUndead") < 0) {
+        dataset.roll = `${dataset.roll} - @cha.turnUndead`;
       }
+      // Clerics turn undead on a sliding scale from 10+ (lowest level) down to 1 (highest),
+      //  but there is no actual target number since it is a range of success.
+      dataset.rollTarget = this.system.ta == 1 ? 10 : 13;
+    }
 
-      // If the Target number has variables like a roll formula, resolve it to a number
-      if (isNaN(dataset.rollTarget)) {
-          const targetRoll = new Roll(dataset.rollTarget, rollData)
-          await targetRoll.roll()
-          Hyp3eLogger.info("Hyp3eActor rollCheck", `Check target formula: ${dataset.rollTarget} evaluates to ${targetRoll.formula} = ${targetRoll.total}`)
-          Hyp3eLogger.info("Hyp3eActor rollCheck", `Target formula eval:`, targetRoll)
-          // Override rollTarget, even if it has the same value
-          dataset.rollTarget = targetRoll.total
+    // Use simple word parsing in the ability name to determine if this is an assassin plying her trade
+    const assassinate = itemNameLower.includes("assassinat"); // Allow "assassinate" or "assassination"
+    const userTargets = Array.from(game.user.targets);
+    let targetToken = null;
+    if (assassinate) {
+      // Ensure we have a targeted token
+      targetToken = userTargets.length > 0 ? userTargets[0] : null;
+      if (!targetToken) {
+        const msg = `${this.name} must have a target token selected to assassinate!`;
+        Hyp3eLogger.warn("rollCheck", msg);
+        ui.notifications.warn(msg);
+        return false;
       }
+      // Calculate the target number, overriding its incoming value if any
+      dataset.rollTarget = this._resolveAssassinationTn(targetToken);
+    }
 
-      // Determine whether we have a valid target number or formula
-      if (dataset.rollTarget === '' || dataset.rollTarget == null) {
-          const msg = `Missing or invalid target number, cannot confirm success of check!`
-          Hyp3eLogger.warn("rollCheck", msg)
-          ui.notifications.warn(msg)
-          return false
-      }
+    // If the Target number has variables like a roll formula, resolve it to a number
+    if (isNaN(dataset.rollTarget)) {
+      const targetRoll = new Roll(dataset.rollTarget, rollData)
+      await targetRoll.roll()
+      Hyp3eLogger.info("Hyp3eActor rollCheck", `Check target formula: ${dataset.rollTarget} evaluates to ${targetRoll.formula} = ${targetRoll.total}`)
+      Hyp3eLogger.info("Hyp3eActor rollCheck", `Target formula eval:`, targetRoll)
+      // Override rollTarget, even if it has the same value
+      dataset.rollTarget = targetRoll.total
+    }
 
-      // We should now have a valid target number
-      checkHeader += ` (target ${dataset.rollTarget})... `
+    // Determine whether we have a valid target number or formula
+    if (dataset.rollTarget === '' || dataset.rollTarget == null) {
+      const msg = `Missing or invalid target number, cannot confirm success of check!`
+      Hyp3eLogger.warn("rollCheck", msg)
+      ui.notifications.warn(msg)
+      return false
+    }
 
-      // Log the dataset before the dialog renders
-      Hyp3eLogger.info("Hyp3eActor rollCheck", `${dataset.label} dataset:`, dataset);
-      try {
-          rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
-      } catch(err) {
-          return false
-      }
+    // We should now have a valid target number
+    checkHeader += ` (target ${dataset.rollTarget})... `
 
-      // Add/subtract situational modifier from the dice dialog
-      if (CONFIG.HYP3E.flipRollUnderMods) {
-          rollFormula = `${dataset.roll} - ${rollResponse.sitMod}`
-      } else {
-          rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
-      }
+    // Log the dataset before the dialog renders
+    Hyp3eLogger.info("Hyp3eActor rollCheck", `${dataset.label} dataset:`, dataset);
+    try {
+      rollResponse = await Hyp3eDialog.ShowBasicRollDialog(dataset)
+    } catch(err) {
+      return false
+    }
 
-      // Roll the dice!
-      const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, rollData, dataset.rollTarget, targetComparison);
+    // Add/subtract situational modifier from the dice dialog
+    if (CONFIG.HYP3E.flipRollUnderMods) {
+      rollFormula = `${dataset.roll} - ${rollResponse.sitMod}`
+    } else {
+      rollFormula = `${dataset.roll} + ${rollResponse.sitMod}`
+    }
 
-      // Depending on the type of roll, we add text to the final chat message
-      if (turnUndead || commandUndead) {
-          const turnOrCommand = turnUndead ? "turn" : "command"
-          // Use the "success" flag to describe the results of the attempted turning/commanding undead
-          checkFooter = this._resolveTurnUndead(roll.total, rollData.ta, turnOrCommand)
-      } else if (assassinate) {
-          // Use the "success" flag to describe the results of the attempted assassination
-          checkFooter = this._resolveAssassination(targetToken, success)
-      } else {
-          // Default option: simple Success/Fail message for a standard check
-          checkHeader += success ? "<b>Success!</b>" : "<b>Fail.</b>";
-      }
-      // Hit & showDmgButtons must be false so we don't display any damage buttons
-      roll.showDmgButtons = false;
-      roll.hit = false;
+    // Roll the dice!
+    const { roll, total, success } = await Hyp3eDice.rollFormulaAndEvaluateSuccess(rollFormula, rollData, dataset.rollTarget, targetComparison);
 
-      // Construct a custom chat card for the check
-      await renderCustomChat(roll, item, {}, this, tokenId, label, "", checkHeader, checkFooter, rollResponse.rollMode)
+    // Depending on the type of roll, we add text to the final chat message
+    if (turnUndead || commandUndead) {
+      const turnOrCommand = turnUndead ? "turn" : "command"
+      // Use the "success" flag to describe the results of the attempted turning/commanding undead
+      checkFooter = this._resolveTurnUndead(roll.total, rollData.ta, turnOrCommand)
+    } else if (assassinate) {
+      // Use the "success" flag to describe the results of the attempted assassination
+      checkFooter = this._resolveAssassination(targetToken, success)
+    } else {
+      // Default option: simple Success/Fail message for a standard check
+      checkHeader += success ? "<b>Success!</b>" : "<b>Fail.</b>";
+    }
+    // Hit & showDmgButtons must be false so we don't display any damage buttons
+    roll.showDmgButtons = false;
+    roll.hit = false;
 
-      return true
+    // Construct a custom chat card for the check
+    await renderCustomChat(roll, item, {}, this, tokenId, label, "", checkHeader, checkFooter, rollResponse.rollMode)
+
+    return true
   }
 
   /**

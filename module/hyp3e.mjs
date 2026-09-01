@@ -166,21 +166,21 @@ Hooks.once('init', async function() {
   // Set the Combat and Combatant document classes based on initiative mode
   // if (isGroupInitiative) {
   switch (initiativeType) {
-  case "group":
-    Hyp3eLogger.info("Init", "Group-based combat initiative:", CONFIG.Combat.initiative);
-    CONFIG.Combat.documentClass = HYP3EGroupCombat;
-    CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
-    break;
-  case "phased":
-    Hyp3eLogger.info("Init", "Phased combat initiative:", CONFIG.Combat.initiative);
-    CONFIG.Combat.documentClass = HYP3EGroupCombat;
-    CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
-    break;
-  case "individual":
-    Hyp3eLogger.info("Init", "Individual combat initiative:", CONFIG.Combat.initiative);
-    CONFIG.Combat.documentClass = HYP3ECombat;
-    CONFIG.Combatant.documentClass = HYP3ECombatant;
-    break;
+    case "group":
+      Hyp3eLogger.info("Init", "Group-based combat initiative:", CONFIG.Combat.initiative);
+      CONFIG.Combat.documentClass = HYP3EGroupCombat;
+      CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
+      break;
+    case "phased":
+      Hyp3eLogger.info("Init", "Phased combat initiative:", CONFIG.Combat.initiative);
+      CONFIG.Combat.documentClass = HYP3EGroupCombat;
+      CONFIG.Combatant.documentClass = HYP3EGroupCombatant;
+      break;
+    case "individual":
+      Hyp3eLogger.info("Init", "Individual combat initiative:", CONFIG.Combat.initiative);
+      CONFIG.Combat.documentClass = HYP3ECombat;
+      CONFIG.Combatant.documentClass = HYP3ECombatant;
+      break;
   }
 
   // Load v13+ compatible Combat Tracker class
