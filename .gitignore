@@ -10,5 +10,3 @@ foundry
 .venv/
 .vscode/
 packs/
-packs/classes/
-packs/equipment-lists/
