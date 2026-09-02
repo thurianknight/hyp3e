@@ -11,8 +11,9 @@
 Requires the _Hyperborea 3rd Edition_ role-playing game ruleset.<!-- END TEXT REQUIRED BY LICENSE --> Find the game at the [North Wind Adventures website](https://www.hyperborea.tv/).
 
 <!-- FOUNDRY-COMPATIBILITY-BADGE:START - Do not remove or modify this section -->
-![Foundry v13](https://img.shields.io/badge/foundry-v13-green)  
-![Foundry v12](https://img.shields.io/badge/foundry-v12-green)  
+![Foundry v14](https://img.shields.io/badge/foundry-v14-green) (starting with release 3.1.10) 
+![Foundry v13](https://img.shields.io/badge/foundry-v13-green) (starting with release 1.8)
+![Foundry v12](https://img.shields.io/badge/foundry-v12-green) (up to release 1.9.x)
 ![Foundry v11](https://img.shields.io/badge/foundry-v11-green) (up to release 1.0.5)
 <!-- FOUNDRY-COMPATIBILITY-BADGE:END -->
 
