@@ -9,3 +9,4 @@ foundry
 .nvmrc
 .venv/
 .vscode/
+packs/
