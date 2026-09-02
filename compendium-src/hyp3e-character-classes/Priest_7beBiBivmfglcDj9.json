@@ -1,0 +1,281 @@
+{
+  "folder": null,
+  "name": "Priest",
+  "type": "classTemplate",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "friendlyName": "Priest",
+    "description": "",
+    "identified": true,
+    "realName": "Priest",
+    "realDescription": "",
+    "itemAlias": "",
+    "aliasDescription": "",
+    "baseClass": "cleric",
+    "hitDie": "1d4",
+    "attrReqs": {
+      "wis": 9,
+      "cha": 9,
+      "str": null,
+      "dex": null,
+      "con": null,
+      "int": null
+    },
+    "xpBonusReq": {
+      "wis": 16,
+      "cha": 16,
+      "str": null,
+      "dex": null,
+      "con": null,
+      "int": null
+    },
+    "featBonus": {
+      "str": null,
+      "dex": null,
+      "con": null
+    },
+    "saves": {
+      "base": 16,
+      "death": 14,
+      "device": 16,
+      "transformation": 16,
+      "avoidance": 16,
+      "sorcery": 14
+    },
+    "unskilled": -4,
+    "weaponProficiencies": {
+      "favoredWeapons": [
+        "Dagger",
+        "Dart",
+        "Quarterstaff",
+        "Sling",
+        "Whip"
+      ],
+      "exceptions": []
+    },
+    "spellLists": [
+      "Cleric",
+      ""
+    ],
+    "levelAdvancement": {
+      "1": {
+        "xp": 0,
+        "hpRoll": "1d4",
+        "fa": 0,
+        "ca": 1,
+        "ta": 1
+      },
+      "2": {
+        "xp": 2000,
+        "hpRoll": "1d4",
+        "fa": 0,
+        "ca": 2,
+        "ta": 2
+      },
+      "3": {
+        "xp": 4000,
+        "hpRoll": "1d4",
+        "fa": 1,
+        "ca": 3,
+        "ta": 3
+      },
+      "4": {
+        "xp": 8000,
+        "hpRoll": "1d4",
+        "fa": 1,
+        "ca": 4,
+        "ta": 4
+      },
+      "5": {
+        "xp": 16000,
+        "hpRoll": "1d4",
+        "fa": 2,
+        "ca": 5,
+        "ta": 5
+      },
+      "6": {
+        "xp": 32000,
+        "hpRoll": "1d4",
+        "fa": 2,
+        "ca": 6,
+        "ta": 6
+      },
+      "7": {
+        "xp": 64000,
+        "hpRoll": "1d4",
+        "fa": 3,
+        "ca": 7,
+        "ta": 7
+      },
+      "8": {
+        "xp": 128000,
+        "hpRoll": "1d4",
+        "fa": 3,
+        "ca": 8,
+        "ta": 8
+      },
+      "9": {
+        "xp": 256000,
+        "hpRoll": "1d4",
+        "fa": 4,
+        "ca": 9,
+        "ta": 9
+      },
+      "10": {
+        "xp": 384000,
+        "hpRoll": "1",
+        "fa": 4,
+        "ca": 10,
+        "ta": 10
+      },
+      "11": {
+        "xp": 512000,
+        "hpRoll": "1",
+        "fa": 5,
+        "ca": 11,
+        "ta": 11
+      },
+      "12": {
+        "xp": 640000,
+        "hpRoll": "1",
+        "fa": 5,
+        "ca": 12,
+        "ta": 12
+      }
+    },
+    "abilities": [
+      {
+        "name": "Scroll Use"
+      },
+      {
+        "name": "Scroll Writing"
+      },
+      {
+        "name": "Sorcery"
+      },
+      {
+        "name": "Turn Undead"
+      },
+      {
+        "name": "Daemonwrack"
+      },
+      {
+        "name": "Specialized Faith (optional)"
+      },
+      {
+        "name": "New Weapon Skill"
+      },
+      {
+        "name": "Enlist Henchmen"
+      },
+      {
+        "name": "Lordship"
+      }
+    ],
+    "startingPack": {
+      "gold": "1d4+1",
+      "armour": [],
+      "weapons": [
+        {
+          "name": "Dagger, Silver",
+          "quantity": 1
+        },
+        {
+          "name": "Quarterstaff",
+          "quantity": 1
+        },
+        {
+          "name": "Whip",
+          "quantity": 1
+        },
+        {
+          "name": "Unarmed Attack",
+          "quantity": 1
+        }
+      ],
+      "equipment - general": [
+        {
+          "name": "Backpack",
+          "quantity": 1
+        },
+        {
+          "name": "Bandages, Gauze",
+          "quantity": 1
+        },
+        {
+          "name": "Blanket, Winter",
+          "quantity": 1
+        },
+        {
+          "name": "Clothing, Religious",
+          "quantity": 1
+        },
+        {
+          "name": "Pouch, Soft Leather (Small)",
+          "quantity": 1
+        },
+        {
+          "name": "Sack, Small",
+          "quantity": 1
+        },
+        {
+          "name": "Tinderbox",
+          "quantity": 1
+        },
+        {
+          "name": "Torch",
+          "quantity": 3
+        },
+        {
+          "name": "Water-/Wineskin",
+          "quantity": 1
+        },
+        {
+          "name": "Writing Stick",
+          "quantity": 1
+        }
+      ],
+      "equipment - provisions": [
+        {
+          "name": "Rations, Iron",
+          "quantity": 7
+        }
+      ],
+      "equipment - religious": [
+        {
+          "name": "Holy Symbol, Silver",
+          "quantity": 1
+        },
+        {
+          "name": "Holy Oil/Water",
+          "quantity": 1
+        },
+        {
+          "name": "Prayer Beads, Wooden",
+          "quantity": 1
+        }
+      ]
+    },
+    "spellcaster": true
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0,
+    "jcvmHxQbPb7I0o9y": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "hyp3e",
+    "systemVersion": "4.0.0",
+    "createdTime": 1785491559374,
+    "modifiedTime": 1785906760272,
+    "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+  },
+  "_id": "7beBiBivmfglcDj9",
+  "sort": 2000000,
+  "_key": "!items!7beBiBivmfglcDj9"
+}

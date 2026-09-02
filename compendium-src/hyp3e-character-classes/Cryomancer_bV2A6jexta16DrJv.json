@@ -1,0 +1,315 @@
+{
+  "folder": null,
+  "name": "Cryomancer",
+  "type": "classTemplate",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "friendlyName": "Cryomancer",
+    "description": "",
+    "identified": true,
+    "realName": "Cryomancer",
+    "realDescription": "",
+    "itemAlias": "",
+    "aliasDescription": "",
+    "baseClass": "magician",
+    "hitDie": "1d4",
+    "attrReqs": {
+      "int": 9,
+      "wis": 9,
+      "str": null,
+      "dex": null,
+      "con": null,
+      "cha": null
+    },
+    "xpBonusReq": {
+      "int": 16,
+      "wis": 16,
+      "str": null,
+      "dex": null,
+      "con": null,
+      "cha": null
+    },
+    "featBonus": {
+      "str": null,
+      "dex": null,
+      "con": null
+    },
+    "saves": {
+      "base": 16,
+      "death": 16,
+      "device": 14,
+      "transformation": 16,
+      "avoidance": 16,
+      "sorcery": 14
+    },
+    "unskilled": -4,
+    "weaponProficiencies": {
+      "favoredWeapons": [
+        "Axe, Hand",
+        "Dagger",
+        "Dart",
+        "Pick, Horseman's",
+        "Quarterstaff",
+        "Spear, Short"
+      ],
+      "exceptions": []
+    },
+    "spellLists": [
+      "Cryomancer",
+      ""
+    ],
+    "levelAdvancement": {
+      "1": {
+        "xp": 0,
+        "hpRoll": "1d4",
+        "fa": 0,
+        "ca": 1,
+        "ta": null
+      },
+      "2": {
+        "xp": 2500,
+        "hpRoll": "1d4",
+        "fa": 0,
+        "ca": 2,
+        "ta": null
+      },
+      "3": {
+        "xp": 5000,
+        "hpRoll": "1d4",
+        "fa": 1,
+        "ca": 3,
+        "ta": null
+      },
+      "4": {
+        "xp": 10000,
+        "hpRoll": "1d4",
+        "fa": 1,
+        "ca": 4,
+        "ta": null
+      },
+      "5": {
+        "xp": 20000,
+        "hpRoll": "1d4",
+        "fa": 2,
+        "ca": 5,
+        "ta": null
+      },
+      "6": {
+        "xp": 40000,
+        "hpRoll": "1d4",
+        "fa": 2,
+        "ca": 6,
+        "ta": null
+      },
+      "7": {
+        "xp": 80000,
+        "hpRoll": "1d4",
+        "fa": 3,
+        "ca": 7,
+        "ta": null
+      },
+      "8": {
+        "xp": 160000,
+        "hpRoll": "1d4",
+        "fa": 3,
+        "ca": 8,
+        "ta": null
+      },
+      "9": {
+        "xp": 320000,
+        "hpRoll": "1d4",
+        "fa": 4,
+        "ca": 9,
+        "ta": null
+      },
+      "10": {
+        "xp": 480000,
+        "hpRoll": "1",
+        "fa": 4,
+        "ca": 10,
+        "ta": null
+      },
+      "11": {
+        "xp": 640000,
+        "hpRoll": "1",
+        "fa": 5,
+        "ca": 11,
+        "ta": null
+      },
+      "12": {
+        "xp": 800000,
+        "hpRoll": "1",
+        "fa": 5,
+        "ca": 12,
+        "ta": null
+      }
+    },
+    "abilities": [
+      {
+        "name": "Alchemy"
+      },
+      {
+        "name": "Fire/Heat Vulnerability"
+      },
+      {
+        "name": "Ice/Cold Affinity"
+      },
+      {
+        "name": "Icicle"
+      },
+      {
+        "name": "Read Magic"
+      },
+      {
+        "name": "Scroll Use"
+      },
+      {
+        "name": "Scroll Writing"
+      },
+      {
+        "name": "Sorcery"
+      },
+      {
+        "name": "New Weapon Skill"
+      },
+      {
+        "name": "Enlist Henchmen"
+      },
+      {
+        "name": "Lordship"
+      }
+    ],
+    "startingPack": {
+      "gold": "1d4+1",
+      "armour": [],
+      "weapons": [
+        {
+          "name": "Axe, Hand",
+          "quantity": 2
+        },
+        {
+          "name": "Dagger, Silver",
+          "quantity": 1
+        },
+        {
+          "name": "Spear, Short",
+          "quantity": 1
+        },
+        {
+          "name": "Unarmed Attack",
+          "quantity": 1
+        }
+      ],
+      "equipment - general": [
+        {
+          "name": "Backpack",
+          "quantity": 1
+        },
+        {
+          "name": "Bandages, Gauze",
+          "quantity": 1
+        },
+        {
+          "name": "Blanket, Winter",
+          "quantity": 1
+        },
+        {
+          "name": "Candle, Beeswax",
+          "quantity": 3
+        },
+        {
+          "name": "Chalk",
+          "quantity": 1
+        },
+        {
+          "name": "Crampons",
+          "quantity": 1
+        },
+        {
+          "name": "Hammer, Small",
+          "quantity": 1
+        },
+        {
+          "name": "Ink and Quill",
+          "quantity": 1
+        },
+        {
+          "name": "Lantern, Bullseye",
+          "quantity": 1
+        },
+        {
+          "name": "Oil, Lamp",
+          "quantity": 2
+        },
+        {
+          "name": "Parchment",
+          "quantity": 3
+        },
+        {
+          "name": "Pouch, Hard Leather (Large)",
+          "quantity": 1
+        },
+        {
+          "name": "Pouch, Soft Leather (Small)",
+          "quantity": 1
+        },
+        {
+          "name": "Rope, Silk",
+          "quantity": 1
+        },
+        {
+          "name": "Sack, Large",
+          "quantity": 1
+        },
+        {
+          "name": "Spikes, Iron (x4)",
+          "quantity": 12
+        },
+        {
+          "name": "Tinderbox",
+          "quantity": 1
+        },
+        {
+          "name": "Water-/Wineskin",
+          "quantity": 1
+        },
+        {
+          "name": "Writing Stick",
+          "quantity": 1
+        },
+        {
+          "name": "Book, Spell",
+          "quantity": 1
+        }
+      ],
+      "equipment - provisions": [
+        {
+          "name": "Rations, Standard",
+          "quantity": 7
+        }
+      ],
+      "equipment - religious": []
+    },
+    "spellcaster": true
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0,
+    "jcvmHxQbPb7I0o9y": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "hyp3e",
+    "systemVersion": "4.0.0",
+    "createdTime": 1785491481749,
+    "modifiedTime": 1785906669666,
+    "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+  },
+  "_id": "bV2A6jexta16DrJv",
+  "sort": 1000000,
+  "_key": "!items!bV2A6jexta16DrJv"
+}

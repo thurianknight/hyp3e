@@ -2,7 +2,7 @@
   "id": "hyp3e",
   "title": "Hyperborea 3rd Edition",
   "description": "The Hyperborea 3rd Edition system for FoundryVTT!",
-  "version": "4.2.7",
+  "version": "4.2.8",
   "compatibility": {
     "minimum": "13",
     "verified": "14.365",
@@ -54,7 +54,7 @@
     {
       "name": "hyp3e-character-classes",
       "label": "Character Classes",
-      "path": "packs/classes",
+      "path": "packs/hyp3e-character-classes",
       "type": "Item",
       "system": "hyp3e",
       "ownership": {
@@ -67,7 +67,7 @@
     {
       "name": "hyp3e-equipment-lists",
       "label": "Equipment Lists",
-      "path": "packs/equipment-lists",
+      "path": "packs/hyp3e-equipment-lists",
       "type": "JournalEntry",
       "system": "hyp3e",
       "ownership": {

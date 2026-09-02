@@ -1,0 +1,320 @@
+{
+  "folder": null,
+  "name": "Druid",
+  "type": "classTemplate",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "friendlyName": "Druid",
+    "description": "",
+    "identified": true,
+    "realName": "Druid",
+    "realDescription": "",
+    "itemAlias": "",
+    "aliasDescription": "",
+    "baseClass": "cleric",
+    "hitDie": "1d8",
+    "attrReqs": {
+      "wis": 9,
+      "cha": 12,
+      "str": null,
+      "dex": null,
+      "con": null,
+      "int": null
+    },
+    "xpBonusReq": {
+      "wis": 16,
+      "cha": 16,
+      "str": null,
+      "dex": null,
+      "con": null,
+      "int": null
+    },
+    "featBonus": {
+      "str": null,
+      "dex": null,
+      "con": null
+    },
+    "saves": {
+      "base": 16,
+      "death": 14,
+      "device": 16,
+      "transformation": 16,
+      "avoidance": 16,
+      "sorcery": 14
+    },
+    "unskilled": -2,
+    "weaponProficiencies": {
+      "favoredWeapons": [
+        "Bow, Long",
+        "Bow, Short",
+        "Club, Light",
+        "Club, War",
+        "Dagger",
+        "Dart",
+        "Falcata",
+        "Lasso",
+        "Morning Star",
+        "Quarterstaff",
+        "Scimitar, Long",
+        "Scimitar, Short",
+        "Sickle",
+        "Sling",
+        "Spear, Long",
+        "Spear, Short",
+        "Staff, Spiked",
+        "Tonfa",
+        "Trident, Long",
+        "Whip"
+      ],
+      "exceptions": []
+    },
+    "spellLists": [
+      "Druid",
+      ""
+    ],
+    "levelAdvancement": {
+      "1": {
+        "xp": 0,
+        "hpRoll": "1d8",
+        "fa": 1,
+        "ca": 1,
+        "ta": null
+      },
+      "2": {
+        "xp": 2000,
+        "hpRoll": "1d8",
+        "fa": 1,
+        "ca": 2,
+        "ta": null
+      },
+      "3": {
+        "xp": 4000,
+        "hpRoll": "1d8",
+        "fa": 2,
+        "ca": 3,
+        "ta": null
+      },
+      "4": {
+        "xp": 8000,
+        "hpRoll": "1d8",
+        "fa": 3,
+        "ca": 4,
+        "ta": null
+      },
+      "5": {
+        "xp": 16000,
+        "hpRoll": "1d8",
+        "fa": 3,
+        "ca": 5,
+        "ta": null
+      },
+      "6": {
+        "xp": 32000,
+        "hpRoll": "1d8",
+        "fa": 4,
+        "ca": 6,
+        "ta": null
+      },
+      "7": {
+        "xp": 64000,
+        "hpRoll": "1d8",
+        "fa": 5,
+        "ca": 7,
+        "ta": null
+      },
+      "8": {
+        "xp": 128000,
+        "hpRoll": "1d8",
+        "fa": 5,
+        "ca": 8,
+        "ta": null
+      },
+      "9": {
+        "xp": 256000,
+        "hpRoll": "1d8",
+        "fa": 6,
+        "ca": 9,
+        "ta": null
+      },
+      "10": {
+        "xp": 384000,
+        "hpRoll": "2",
+        "fa": 7,
+        "ca": 10,
+        "ta": null
+      },
+      "11": {
+        "xp": 512000,
+        "hpRoll": "2",
+        "fa": 7,
+        "ca": 11,
+        "ta": null
+      },
+      "12": {
+        "xp": 640000,
+        "hpRoll": "2",
+        "fa": 8,
+        "ca": 12,
+        "ta": null
+      }
+    },
+    "abilities": [
+      {
+        "name": "Druidic Tongue"
+      },
+      {
+        "name": "Fire/Heat Affinity"
+      },
+      {
+        "name": "Natural Identifications"
+      },
+      {
+        "name": "Scroll Use"
+      },
+      {
+        "name": "Scroll Writing"
+      },
+      {
+        "name": "Sorcery"
+      },
+      {
+        "name": "Traverse Overgrowth"
+      },
+      {
+        "name": "Charm Immunity"
+      },
+      {
+        "name": "Shapechange"
+      },
+      {
+        "name": "Druidic Hierarchy"
+      },
+      {
+        "name": "Longevity"
+      },
+      {
+        "name": "New Weapon Skill"
+      },
+      {
+        "name": "Enlist Henchmen"
+      },
+      {
+        "name": "Lordship"
+      }
+    ],
+    "startingPack": {
+      "gold": "1d4+1",
+      "armour": [
+        {
+          "name": "Studded Armour",
+          "quantity": 1
+        }
+      ],
+      "weapons": [
+        {
+          "name": "Bow, Short",
+          "quantity": 1
+        },
+        {
+          "name": "Dagger",
+          "quantity": 1
+        },
+        {
+          "name": "Spear, Short",
+          "quantity": 1
+        },
+        {
+          "name": "Unarmed Attack",
+          "quantity": 1
+        }
+      ],
+      "equipment - general": [
+        {
+          "name": "Arrows (x12)",
+          "quantity": 12
+        },
+        {
+          "name": "Arrow Quiver",
+          "quantity": 1
+        },
+        {
+          "name": "Backpack",
+          "quantity": 1
+        },
+        {
+          "name": "Bandages, Gauze",
+          "quantity": 1
+        },
+        {
+          "name": "Parchment",
+          "quantity": 3
+        },
+        {
+          "name": "Pouch, Soft Leather (Small)",
+          "quantity": 1
+        },
+        {
+          "name": "Sack, Small",
+          "quantity": 1
+        },
+        {
+          "name": "Tinderbox",
+          "quantity": 1
+        },
+        {
+          "name": "Torch",
+          "quantity": 3
+        },
+        {
+          "name": "Water-/Wineskin",
+          "quantity": 1
+        },
+        {
+          "name": "Wolfsbane",
+          "quantity": 1
+        },
+        {
+          "name": "Writing Stick",
+          "quantity": 1
+        }
+      ],
+      "equipment - provisions": [
+        {
+          "name": "Rations, Iron",
+          "quantity": 7
+        }
+      ],
+      "equipment - religious": [
+        {
+          "name": "Holy Symbol, Wooden",
+          "quantity": 1
+        },
+        {
+          "name": "Paint, Body",
+          "quantity": 1
+        }
+      ]
+    },
+    "spellcaster": true
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0,
+    "jcvmHxQbPb7I0o9y": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "hyp3e",
+    "systemVersion": "4.0.0",
+    "createdTime": 1785491507494,
+    "modifiedTime": 1785906694143,
+    "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+  },
+  "_id": "0yxt2lB1j2RZqqOH",
+  "sort": 1100000,
+  "_key": "!items!0yxt2lB1j2RZqqOH"
+}

@@ -1,0 +1,306 @@
+{
+  "folder": null,
+  "name": "Necromancer",
+  "type": "classTemplate",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "friendlyName": "Necromancer",
+    "description": "",
+    "identified": true,
+    "realName": "Necromancer",
+    "realDescription": "",
+    "itemAlias": "",
+    "aliasDescription": "",
+    "baseClass": "magician",
+    "hitDie": "1d4",
+    "attrReqs": {
+      "int": 9,
+      "wis": 9,
+      "str": null,
+      "dex": null,
+      "con": null,
+      "cha": null
+    },
+    "xpBonusReq": {
+      "int": 16,
+      "wis": 16,
+      "str": null,
+      "dex": null,
+      "con": null,
+      "cha": null
+    },
+    "featBonus": {
+      "str": null,
+      "dex": null,
+      "con": null
+    },
+    "saves": {
+      "base": 16,
+      "death": 14,
+      "device": 16,
+      "transformation": 16,
+      "avoidance": 16,
+      "sorcery": 14
+    },
+    "unskilled": -4,
+    "weaponProficiencies": {
+      "favoredWeapons": [
+        "Dagger",
+        "Dart",
+        "Quarterstaff",
+        "Sickle",
+        "Sling",
+        "Whip"
+      ],
+      "exceptions": []
+    },
+    "spellLists": [
+      "Necromancer",
+      ""
+    ],
+    "levelAdvancement": {
+      "1": {
+        "xp": 0,
+        "hpRoll": "1d4",
+        "fa": 0,
+        "ca": 1,
+        "ta": null
+      },
+      "2": {
+        "xp": 2500,
+        "hpRoll": "1d4",
+        "fa": 0,
+        "ca": 2,
+        "ta": null
+      },
+      "3": {
+        "xp": 5000,
+        "hpRoll": "1d4",
+        "fa": 1,
+        "ca": 3,
+        "ta": 1
+      },
+      "4": {
+        "xp": 10000,
+        "hpRoll": "1d4",
+        "fa": 1,
+        "ca": 4,
+        "ta": 2
+      },
+      "5": {
+        "xp": 20000,
+        "hpRoll": "1d4",
+        "fa": 2,
+        "ca": 5,
+        "ta": 3
+      },
+      "6": {
+        "xp": 40000,
+        "hpRoll": "1d4",
+        "fa": 2,
+        "ca": 6,
+        "ta": 4
+      },
+      "7": {
+        "xp": 80000,
+        "hpRoll": "1d4",
+        "fa": 3,
+        "ca": 7,
+        "ta": 5
+      },
+      "8": {
+        "xp": 160000,
+        "hpRoll": "1d4",
+        "fa": 3,
+        "ca": 8,
+        "ta": 6
+      },
+      "9": {
+        "xp": 320000,
+        "hpRoll": "1d4",
+        "fa": 4,
+        "ca": 9,
+        "ta": 7
+      },
+      "10": {
+        "xp": 480000,
+        "hpRoll": "1",
+        "fa": 4,
+        "ca": 10,
+        "ta": 8
+      },
+      "11": {
+        "xp": 640000,
+        "hpRoll": "1",
+        "fa": 5,
+        "ca": 11,
+        "ta": 9
+      },
+      "12": {
+        "xp": 800000,
+        "hpRoll": "1",
+        "fa": 5,
+        "ca": 12,
+        "ta": 10
+      }
+    },
+    "abilities": [
+      {
+        "name": "Alchemy"
+      },
+      {
+        "name": "Read Magic"
+      },
+      {
+        "name": "Scroll Use"
+      },
+      {
+        "name": "Scroll Writing"
+      },
+      {
+        "name": "Sorcery"
+      },
+      {
+        "name": "Command Undead"
+      },
+      {
+        "name": "New Weapon Skill"
+      },
+      {
+        "name": "Enlist Henchmen"
+      },
+      {
+        "name": "Lordship"
+      }
+    ],
+    "startingPack": {
+      "gold": "1d4+1",
+      "armour": [],
+      "weapons": [
+        {
+          "name": "Sickle",
+          "quantity": 1
+        },
+        {
+          "name": "Sling",
+          "quantity": 1
+        },
+        {
+          "name": "Whip",
+          "quantity": 1
+        },
+        {
+          "name": "Oil, Incendiary (thrown)",
+          "quantity": 1
+        },
+        {
+          "name": "Unarmed Attack",
+          "quantity": 1
+        }
+      ],
+      "equipment - general": [
+        {
+          "name": "Backpack",
+          "quantity": 1
+        },
+        {
+          "name": "Blanket, Winter",
+          "quantity": 1
+        },
+        {
+          "name": "Bullets, Sling, Lead (x20)",
+          "quantity": 20
+        },
+        {
+          "name": "Chalk",
+          "quantity": 1
+        },
+        {
+          "name": "Ink and Quill",
+          "quantity": 1
+        },
+        {
+          "name": "Lantern, Hooded",
+          "quantity": 1
+        },
+        {
+          "name": "Mirror, Steel or Copper",
+          "quantity": 1
+        },
+        {
+          "name": "Oil, Lamp",
+          "quantity": 2
+        },
+        {
+          "name": "Parchment",
+          "quantity": 3
+        },
+        {
+          "name": "Pouch, Hard Leather (Large)",
+          "quantity": 1
+        },
+        {
+          "name": "Pouch, Soft Leather (Small)",
+          "quantity": 1
+        },
+        {
+          "name": "Rope, Silk",
+          "quantity": 1
+        },
+        {
+          "name": "Sack, Small",
+          "quantity": 1
+        },
+        {
+          "name": "Tinderbox",
+          "quantity": 1
+        },
+        {
+          "name": "Water-/Wineskin",
+          "quantity": 1
+        },
+        {
+          "name": "Writing Stick",
+          "quantity": 1
+        },
+        {
+          "name": "Book, Spell",
+          "quantity": 1
+        }
+      ],
+      "equipment - provisions": [
+        {
+          "name": "Rations, Iron",
+          "quantity": 7
+        }
+      ],
+      "equipment - religious": [
+        {
+          "name": "Holy Symbol, Wooden",
+          "quantity": 1
+        }
+      ]
+    },
+    "spellcaster": true
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0,
+    "jcvmHxQbPb7I0o9y": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "hyp3e",
+    "systemVersion": "4.0.0",
+    "createdTime": 1785491551161,
+    "modifiedTime": 1785906739004,
+    "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+  },
+  "_id": "Q2mCzuXf5dwbEzrB",
+  "sort": 1800000,
+  "_key": "!items!Q2mCzuXf5dwbEzrB"
+}

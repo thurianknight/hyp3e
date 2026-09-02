@@ -1,0 +1,143 @@
+{
+  "name": "Armour",
+  "_id": "kyhiYfYdTsOLOnzm",
+  "pages": [
+    {
+      "sort": 100000,
+      "name": "Armour",
+      "type": "text",
+      "_id": "QLXxEQONShK3Qii7",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Banded Mail</p><p>Chain Mail</p><p>Field Plate</p><p>Full Plate</p><p>Laminated Armour</p><p>Leather Armour</p><p>Padded (Quilted) Armour</p><p>Plate Mail</p><p>Scale Mail</p><p>Splint Mail</p><p>Studded Armour</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671246154,
+        "modifiedTime": 1785671752003,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!kyhiYfYdTsOLOnzm.QLXxEQONShK3Qii7"
+    },
+    {
+      "sort": 200000,
+      "name": "Shields",
+      "type": "text",
+      "_id": "rTgHPxzqxsMOuOAn",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Shield, Large</p><p>Shield, Small</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671251350,
+        "modifiedTime": 1785671331577,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!kyhiYfYdTsOLOnzm.rTgHPxzqxsMOuOAn"
+    },
+    {
+      "sort": 0,
+      "name": "READ ME",
+      "type": "text",
+      "_id": "ljy6mQfbSy1c8Gzy",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>These lists are used as simple data stores for the Hyperborea system. They are used to populate drop-down lists in the Class Template sheet and elsewhere. <em>Do not edit these lists.</em></p><p>If you want to add a custom item of any type and use it in a class template, all you need to do is create the Item document in your world Items directory (in an appropriate folder) so that the system can find it.</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671798789,
+        "modifiedTime": 1785735468461,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!kyhiYfYdTsOLOnzm.ljy6mQfbSy1c8Gzy"
+    }
+  ],
+  "folder": null,
+  "categories": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "jcvmHxQbPb7I0o9y": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "hyp3e",
+    "systemVersion": "4.0.0",
+    "createdTime": 1785671192285,
+    "modifiedTime": 1785671192285,
+    "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+  },
+  "_key": "!journal!kyhiYfYdTsOLOnzm"
+}

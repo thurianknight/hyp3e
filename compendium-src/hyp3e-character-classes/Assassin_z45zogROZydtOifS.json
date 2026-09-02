@@ -1,0 +1,324 @@
+{
+  "folder": null,
+  "name": "Assassin",
+  "type": "classTemplate",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "friendlyName": "Assassin",
+    "description": "",
+    "identified": true,
+    "realName": "Assassin",
+    "realDescription": "",
+    "itemAlias": "",
+    "aliasDescription": "",
+    "baseClass": "thief",
+    "hitDie": "1d6",
+    "attrReqs": {
+      "str": 9,
+      "dex": 9,
+      "int": 9,
+      "con": null,
+      "wis": null,
+      "cha": null
+    },
+    "xpBonusReq": {
+      "dex": 16,
+      "int": 16,
+      "str": null,
+      "con": null,
+      "wis": null,
+      "cha": null
+    },
+    "featBonus": {
+      "dex": 8,
+      "str": null,
+      "con": null
+    },
+    "saves": {
+      "base": 16,
+      "death": 16,
+      "device": 14,
+      "transformation": 16,
+      "avoidance": 14,
+      "sorcery": 16
+    },
+    "unskilled": -2,
+    "weaponProficiencies": {
+      "favoredWeapons": [
+        "Axe, Hand",
+        "Blowgun",
+        "Bow, Short",
+        "Chain Whip",
+        "Club, Light",
+        "Crossbow, Light",
+        "Dagger",
+        "Dart",
+        "Falcata",
+        "Flail, Horseman's",
+        "Hammer, Horseman's",
+        "Hooked Throwing Knife",
+        "Mace, Horseman's",
+        "Pick, Horseman's",
+        "Scimitar, Short",
+        "Sling",
+        "Sword, Broad",
+        "Sword, Long",
+        "Sword, Short",
+        "Tonfa",
+        "Trident, Hand"
+      ],
+      "exceptions": []
+    },
+    "spellLists": [
+      "",
+      ""
+    ],
+    "levelAdvancement": {
+      "1": {
+        "xp": 0,
+        "hpRoll": "1d6",
+        "fa": 1,
+        "ca": null,
+        "ta": null
+      },
+      "2": {
+        "xp": 1750,
+        "hpRoll": "1d6",
+        "fa": 1,
+        "ca": null,
+        "ta": null
+      },
+      "3": {
+        "xp": 3500,
+        "hpRoll": "1d6",
+        "fa": 2,
+        "ca": null,
+        "ta": null
+      },
+      "4": {
+        "xp": 7000,
+        "hpRoll": "1d6",
+        "fa": 3,
+        "ca": null,
+        "ta": null
+      },
+      "5": {
+        "xp": 14000,
+        "hpRoll": "1d6",
+        "fa": 3,
+        "ca": null,
+        "ta": null
+      },
+      "6": {
+        "xp": 28000,
+        "hpRoll": "1d6",
+        "fa": 4,
+        "ca": null,
+        "ta": null
+      },
+      "7": {
+        "xp": 56000,
+        "hpRoll": "1d6",
+        "fa": 5,
+        "ca": null,
+        "ta": null
+      },
+      "8": {
+        "xp": 112000,
+        "hpRoll": "1d6",
+        "fa": 5,
+        "ca": null,
+        "ta": null
+      },
+      "9": {
+        "xp": 224000,
+        "hpRoll": "1d6",
+        "fa": 6,
+        "ca": null,
+        "ta": null
+      },
+      "10": {
+        "xp": 336000,
+        "hpRoll": "2",
+        "fa": 7,
+        "ca": null,
+        "ta": null
+      },
+      "11": {
+        "xp": 448000,
+        "hpRoll": "2",
+        "fa": 7,
+        "ca": null,
+        "ta": null
+      },
+      "12": {
+        "xp": 560000,
+        "hpRoll": "2",
+        "fa": 8,
+        "ca": null,
+        "ta": null
+      }
+    },
+    "abilities": [
+      {
+        "name": "Agile"
+      },
+      {
+        "name": "Assassinate (Backstab)"
+      },
+      {
+        "name": "Detect Secret Doors"
+      },
+      {
+        "name": "Disguise"
+      },
+      {
+        "name": "Extraordinary Dexterity"
+      },
+      {
+        "name": "Harvest Venom"
+      },
+      {
+        "name": "Poison Resistance"
+      },
+      {
+        "name": "Poison Use"
+      },
+      {
+        "name": "Poison Manufacture"
+      },
+      {
+        "name": "Climb"
+      },
+      {
+        "name": "Discern Noise"
+      },
+      {
+        "name": "Hide"
+      },
+      {
+        "name": "Manipulate Traps"
+      },
+      {
+        "name": "Move Silently"
+      },
+      {
+        "name": "Open Locks"
+      },
+      {
+        "name": "New Weapon Skill"
+      },
+      {
+        "name": "Enlist Henchmen"
+      },
+      {
+        "name": "Lordship"
+      }
+    ],
+    "startingPack": {
+      "gold": "1d4+1",
+      "armour": [
+        {
+          "name": "Leather Armour",
+          "quantity": 1
+        }
+      ],
+      "weapons": [
+        {
+          "name": "Crossbow, Light",
+          "quantity": 1
+        },
+        {
+          "name": "Dagger",
+          "quantity": 1
+        },
+        {
+          "name": "Sword, Short",
+          "quantity": 1
+        },
+        {
+          "name": "Unarmed Attack",
+          "quantity": 1
+        }
+      ],
+      "equipment - general": [
+        {
+          "name": "Backpack",
+          "quantity": 1
+        },
+        {
+          "name": "Blanket, Winter",
+          "quantity": 1
+        },
+        {
+          "name": "Bolt Case",
+          "quantity": 1
+        },
+        {
+          "name": "Bolts, Light (x20)",
+          "quantity": 20
+        },
+        {
+          "name": "Clothing, Disguise",
+          "quantity": 1
+        },
+        {
+          "name": "Pouch, Soft Leather (Small)",
+          "quantity": 1
+        },
+        {
+          "name": "Rope, Hemp",
+          "quantity": 1
+        },
+        {
+          "name": "Sack, Small",
+          "quantity": 1
+        },
+        {
+          "name": "Thieves' Tools",
+          "quantity": 1
+        },
+        {
+          "name": "Tinderbox",
+          "quantity": 1
+        },
+        {
+          "name": "Torch",
+          "quantity": 3
+        },
+        {
+          "name": "Water-/Wineskin",
+          "quantity": 1
+        }
+      ],
+      "equipment - provisions": [
+        {
+          "name": "Rations, Iron",
+          "quantity": 7
+        }
+      ],
+      "equipment - religious": []
+    },
+    "spellcaster": false
+  },
+  "effects": [],
+  "ownership": {
+    "default": 0,
+    "jcvmHxQbPb7I0o9y": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "hyp3e",
+    "systemVersion": "4.0.0",
+    "createdTime": 1785491446639,
+    "modifiedTime": 1785906595021,
+    "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+  },
+  "_id": "z45zogROZydtOifS",
+  "sort": 500000,
+  "_key": "!items!z45zogROZydtOifS"
+}

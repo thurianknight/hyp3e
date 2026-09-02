@@ -1,0 +1,221 @@
+{
+  "name": "Equipment",
+  "_id": "bLUFhnLEe9E7kpjR",
+  "pages": [
+    {
+      "sort": 100000,
+      "name": "Clothing",
+      "type": "text",
+      "_id": "xFEmYSTnNZOXPRbf",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Belt</p><p>Boots, Normal</p><p>Boots, Riding</p><p>Cape, Fine</p><p>Cape, Wool</p><p>Cloak, Hooded, Fine</p><p>Cloak, Hooded, Wool</p><p>Clothing, Disguise</p><p>Clothing, Normal</p><p>Clothing, Religious</p><p>Clothing, Special</p><p>Coat, Hooded, Fur</p><p>Coat, Hooded, Wool</p><p>Gloves, Fur</p><p>Gloves, Leather</p><p>Hat or Cap, Fur</p><p>Hat or Cap, Wool</p><p>Leggings, Fur</p><p>Robe, Fine</p><p>Robe, Wool</p><p>Sandals, Leather</p><p>Shoes, Leather</p><p>Tabard</p><p>Toga, Wool</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671281408,
+        "modifiedTime": 1785674712086,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!bLUFhnLEe9E7kpjR.xFEmYSTnNZOXPRbf"
+    },
+    {
+      "sort": 200000,
+      "name": "General",
+      "type": "text",
+      "_id": "jAqiPA7GzZFXYclR",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Arrow Quiver</p><p>Backpack</p><p>Bandages, Gauze</p><p>Belladonna</p><p>Blanket, Winter</p><p>Block and Tackle</p><p>Bolt Case</p><p>Book, Blank</p><p>Book, Spell</p><p>Bottle</p><p>Bow Case</p><p>Candle, Beeswax</p><p>Candle, Tallow</p><p>Case, Map or Scroll (Brass)</p><p>Case, Map or Scroll (Leather)</p><p>Chain, Iron, Heavy</p><p>Chain, Iron, Light</p><p>Chalk</p><p>Chisel</p><p>Cord, Sinew</p><p>Crampons</p><p>Dice, Ivory</p><p>Fishing Hooks</p><p>Fishing Net</p><p>Fishing String</p><p>Glue</p><p>Grappling Hook</p><p>Grease</p><p>Hammer, Small</p><p>Helmet</p><p>Horn, Drinking</p><p>Horn, Hunting</p><p>Hourglass</p><p>Ink and Quill</p><p>Lantern, Bullseye</p><p>Lantern, Hooded</p><p>Marbles (x20)</p><p>Mirror, Silver</p><p>Mirror, Steel or Copper</p><p>Nails (x20)</p><p>Needle, Blowgun</p><p>Needle, Sewing</p><p>Oil, Lamp</p><p>Padlock and Key</p><p>Parchment</p><p>Pole</p><p>Pouch, Hard Leather (Large)</p><p>Pouch, Soft Leather (Small)</p><p>Pry Bar</p><p>Ring, Signet</p><p>Rope Ladder, Hemp</p><p>Rope Ladder, Silk</p><p>Rope, Hemp</p><p>Rope, Silk</p><p>Sack, Large</p><p>Sack, Small</p><p>Scabbard, Leather</p><p>Scabbard, Metal</p><p>Sheath, Dagger</p><p>Skis</p><p>Soap</p><p>Spikes, Iron (x4)</p><p>Spyglass</p><p>Stakes (x4) and Wooden Mallet</p><p>Tent, 1-person</p><p>Tent, 2-person</p><p>Tent, 4-person</p><p>Thieves' Tools</p><p>Tinderbox</p><p>Torch</p><p>Water-/Wineskin</p><p>Wax, Bees-</p><p>Wire, Spool</p><p>Wolfsbane</p><p>Writing Stick</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671288367,
+        "modifiedTime": 1785675212027,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!bLUFhnLEe9E7kpjR.jAqiPA7GzZFXYclR"
+    },
+    {
+      "sort": 300000,
+      "name": "Provisions",
+      "type": "text",
+      "_id": "T00ke9OefVPptv1P",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Biscuits, Hard, Bag</p><p>Cereal, Bag</p><p>Cheese, Brick</p><p>Eggs, Dozen, Box</p><p>Flour, Sack</p><p>Honey, Crock</p><p>Horse Meal/Grains, Sack</p><p>Nuts, Bag</p><p>Rations, Iron</p><p>Rations, Standard</p><p>Salt, Bag</p><p>Spices, Cooking, Pouch</p><p>Sugar, Coarse, Bag</p><p>Wine, Common, Quart</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671293545,
+        "modifiedTime": 1785674982265,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!bLUFhnLEe9E7kpjR.T00ke9OefVPptv1P"
+    },
+    {
+      "sort": 400000,
+      "name": "Religious",
+      "type": "text",
+      "_id": "JWrMMFF74JpbdIRu",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Bell, Small</p><p>Censer</p><p>Flute</p><p>Holy Oil/Water</p><p>Holy Symbol, Gold</p><p>Holy Symbol, Ivory</p><p>Holy Symbol, Silver</p><p>Holy Symbol, Wooden</p><p>Incense Sticks (x12)</p><p>Mask, Gold</p><p>Mask, Ivory</p><p>Mask, Leather</p><p>Mask, Silver</p><p>Mask, Wood w/ Inlay</p><p>Mask, Wooden</p><p>Paint, Body</p><p>Pan Pipes</p><p>Prayer Beads, Ivory</p><p>Prayer Beads, Wooden</p><p>Prayer Book</p><p>Rattle</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671299146,
+        "modifiedTime": 1785674861484,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!bLUFhnLEe9E7kpjR.JWrMMFF74JpbdIRu"
+    },
+    {
+      "sort": 0,
+      "name": "READ ME",
+      "type": "text",
+      "_id": "Z64Rb7UWnl05geFJ",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>These lists are used as simple data stores for the Hyperborea system. They are used to populate drop-down lists in the Class Template sheet and elsewhere. <em>Do not edit these lists.</em></p><p>If you want to add a custom item of any type and use it in a class template, all you need to do is create the Item document in your world Items directory (in an appropriate folder) so that the system can find it.</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671966750,
+        "modifiedTime": 1785735483451,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!bLUFhnLEe9E7kpjR.Z64Rb7UWnl05geFJ"
+    }
+  ],
+  "folder": null,
+  "categories": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "jcvmHxQbPb7I0o9y": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "hyp3e",
+    "systemVersion": "4.0.0",
+    "createdTime": 1785671271822,
+    "modifiedTime": 1785671271822,
+    "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+  },
+  "_key": "!journal!bLUFhnLEe9E7kpjR"
+}

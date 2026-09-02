@@ -1,0 +1,182 @@
+{
+  "name": "Weapons",
+  "_id": "lYYLOTNcxklXCRTj",
+  "pages": [
+    {
+      "sort": 100000,
+      "name": "Melee",
+      "type": "text",
+      "_id": "9RAMQLAbDhYZ60u4",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Axe, Battle</p><p>Axe, Great</p><p>Axe, Hand</p><p>Bardiche</p><p>Bill</p><p>Cæstuses</p><p>Chain Whip</p><p>Club, Light</p><p>Club, War</p><p>Dagger</p><p>Dagger, Silver</p><p>Falcata</p><p>Fauchard</p><p>Flail, Footman's</p><p>Flail, Horseman's</p><p>Garrotte</p><p>Glaive</p><p>Halberd</p><p>Hammer, Great</p><p>Hammer, Horseman's</p><p>Hammer, War</p><p>Javelin</p><p>Lance</p><p>Lasso</p><p>Mace, Footman's</p><p>Mace, Great</p><p>Mace, Horseman's</p><p>Monk's Empty Hand Attack</p><p>Morning Star</p><p>Pick, Horseman's</p><p>Pick, War</p><p>Pike</p><p>Poleaxe</p><p>Quarterstaff</p><p>Scimitar, Great</p><p>Scimitar, Long</p><p>Scimitar, Short</p><p>Scimitar, Two-handed</p><p>Sickle</p><p>Spear, Great</p><p>Spear, Long</p><p>Spear, Short</p><p>Staff, Spiked</p><p>Stone (held)</p><p>Sword, Bastard</p><p>Sword, Broad</p><p>Sword, Long</p><p>Sword, Short</p><p>Sword, Two-handed</p><p>Tonfa</p><p>Trident, Hand</p><p>Trident, Long</p><p>Unarmed Attack</p><p>Whip</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "14.365",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671226695,
+        "modifiedTime": 1786516397861,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!lYYLOTNcxklXCRTj.9RAMQLAbDhYZ60u4"
+    },
+    {
+      "sort": 200000,
+      "name": "Missile",
+      "type": "text",
+      "_id": "6nA2Y8JPto1f3vTa",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Blowgun</p><p>Bola</p><p>Boomerang</p><p>Bow, Long</p><p>Bow, Long, Composite</p><p>Bow, Short</p><p>Bow, Short, Composite</p><p>Crossbow, Heavy</p><p>Crossbow, Light</p><p>Crossbow, Repeating</p><p>Dart</p><p>Holy Water/Oil (thrown)</p><p>Hooked Throwing Knife</p><p>Needle, Blowgun</p><p>Net, Fighting</p><p>Oil, Incendiary (thrown)</p><p>Sling</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671231033,
+        "modifiedTime": 1785674151266,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!lYYLOTNcxklXCRTj.6nA2Y8JPto1f3vTa"
+    },
+    {
+      "sort": 50000,
+      "name": "Ammunition",
+      "type": "text",
+      "_id": "Y3loI9fqCQKfmska",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>Arrow, Silver-tipped (x1)</p><p>Arrows (x12)</p><p>Bolt, Heavy, Silver-tipped (x1)</p><p>Bolt, Light, Silver-tipped (x1)</p><p>Bolts, Heavy (x10)</p><p>Bolts, Light (x20)</p><p>Bullet, Sling, Silver (x1)</p><p>Bullets, Sling, Lead (x20)</p><p>Needle, Blowgun</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671237457,
+        "modifiedTime": 1785673826420,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!lYYLOTNcxklXCRTj.Y3loI9fqCQKfmska"
+    },
+    {
+      "sort": 0,
+      "name": "READ ME",
+      "type": "text",
+      "_id": "bwyVvxZpnAMIzXC8",
+      "system": {},
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "image": {},
+      "text": {
+        "format": 1,
+        "content": "<p>These lists are used as simple data stores for the Hyperborea system. They are used to populate drop-down lists in the Class Template sheet and elsewhere. <em>Do not edit these lists.</em></p><p>If you want to add a custom item of any type and use it in a class template, all you need to do is create the Item document in your world Items directory (in an appropriate folder) so that the system can find it.</p>"
+      },
+      "video": {
+        "controls": true,
+        "volume": 0.5
+      },
+      "src": null,
+      "category": null,
+      "ownership": {
+        "default": -1,
+        "jcvmHxQbPb7I0o9y": 3
+      },
+      "flags": {},
+      "_stats": {
+        "compendiumSource": null,
+        "duplicateSource": null,
+        "exportSource": null,
+        "coreVersion": "13.351",
+        "systemId": "hyp3e",
+        "systemVersion": "4.0.0",
+        "createdTime": 1785671982311,
+        "modifiedTime": 1785735506675,
+        "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+      },
+      "_key": "!journal.pages!lYYLOTNcxklXCRTj.bwyVvxZpnAMIzXC8"
+    }
+  ],
+  "folder": null,
+  "categories": [],
+  "sort": 0,
+  "ownership": {
+    "default": 0,
+    "jcvmHxQbPb7I0o9y": 3
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "hyp3e",
+    "systemVersion": "4.0.0",
+    "createdTime": 1785671221316,
+    "modifiedTime": 1785671221316,
+    "lastModifiedBy": "jcvmHxQbPb7I0o9y"
+  },
+  "_key": "!journal!lYYLOTNcxklXCRTj"
+}
