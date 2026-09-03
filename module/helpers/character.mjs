@@ -4837,18 +4837,18 @@ export class Hyp3eCharacterClass {
     const rolledValues = Object.values(attributes);
     Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `Rolled attribute values in order:`, rolledValues);
 
-    const classPrimes = Object.keys(classData.attrReqs);
     // Sort prime attributes by required minimum, descending
-    const primeReqsSorted = Object.keys(classData.attrReqs).sort((a, b) => {
-      return classData.attrReqs[b] - classData.attrReqs[a];
-    });
+    const primeReqsSorted = Object.entries(classData.attrReqs)
+      .filter(([, value]) => value !== null)
+      .sort(([, a], [, b]) => b - a)
+      .map(([key]) => key);
 
     Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${classData.realName} prime attributes:`, primeReqsSorted);
 
     // Take top N values for prime attributes
     const topValues = [...rolledValues]
       .sort((a, b) => b - a)
-      .slice(0, Object.keys(classData.attrReqs).length);
+      .slice(0, Object.keys(primeReqsSorted).length);
 
     // Assign top values to primes
     primeReqsSorted.forEach((attr, i) => {
@@ -4857,16 +4857,15 @@ export class Hyp3eCharacterClass {
 
     // Remove used values by value, not index
     let remainingValues = [...rolledValues];
-    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `Remaining attribute values before removing primes:`, remainingValues);
     topValues.forEach(val => {
       Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `Removing value ${val}...`);
       const idx = remainingValues.indexOf(val);
       if (idx !== -1) remainingValues.splice(idx, 1);
     });
-    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${classData.realName} remaining attribute values without primes:`, remainingValues);
+    Hyp3eLogger.info("Hyp3eCharacterClass _optimizeAttributesForClass", `${classData.realName} remaining attribute values after removing primes:`, remainingValues);
 
     // Assign remaining values to non-primes, in original roll order
-    const nonPrimes = attributeOrder.filter(a => !classPrimes.includes(a));
+    const nonPrimes = attributeOrder.filter(a => !primeReqsSorted.includes(a));
     nonPrimes.forEach((attr, i) => {
       optimizedAttributes[attr] = remainingValues[i];
     });
