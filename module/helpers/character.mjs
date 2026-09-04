@@ -4743,15 +4743,14 @@ export class Hyp3eCharacterClass {
   /**
    * Roll attributes for a character of the given class
    * @param {string} actor - The actor object to create the character for
-   * @param {object} dataset - The dataset containing character creation data
+   * @param {object} classTemplate - The class template object to use for rolling attributes
    * @returns {Object} - Returns an object with the rolled attributes
    */
-  // static async rollAttributesForClass(actor, dataset) {
   static async rollAttributesForClass(actor, classTemplate = null) {
     const charClass = actor.system.details.class;
     Hyp3eLogger.info("Hyp3eCharacterClass rollAttributesForClass", `Class to roll:`, charClass);
-    // If no template was provided, get the class attribute requirements
-    const classData = classTemplate.system; // || this.classData[charClass] || CONFIG.HYP3E.customClassData[charClass];
+    // Get the class template
+    const classData = classTemplate.system;
     if (!classData) {
       Hyp3eLogger.error("Hyp3eCharacterClass rollAttributesForClass", `Class data not found for class ${charClass}!`);
       return null;
@@ -4765,7 +4764,7 @@ export class Hyp3eCharacterClass {
     let attributes = {};
     while (!metReqs) {
       attributes = await this._rollAttributes(actor, classData);
-      if (rollFormula == "4d6dl") {   // Method III: Arrange/optimize rolls for class
+      if (rollFormula == "4d6dl") {   // Method III: Arrange/optimize rolls for class prime reqs
         attributes = this._optimizeAttributesForClass(classData, attributes);
       }
       metReqs = await this._checkAttrRequirements(classData, attributes);
@@ -4792,7 +4791,6 @@ export class Hyp3eCharacterClass {
     let attributes = {};
     if (rollFormula === "4d6dl,3d6") {
       // Special case: Roll 4d6 drop lowest for prime attributes; 3d6 for non-primes
-      // const classData = this.classData[actor.system.details.class] || CONFIG.HYP3E.customClassData[actor.system.details.class];
       const primeAttrs = Object.keys(classData.attrReqs).filter( key => classData.attrReqs[key] !== null && classData.attrReqs[key] !== undefined);
       for (const attr of Object.keys(actor.system.attributes)) {
         let roll;
@@ -4803,7 +4801,6 @@ export class Hyp3eCharacterClass {
         }
         await roll.roll();
         attributes[attr] = roll.total;
-        // attributes[attr].min = (classData.attrReqs[attr] ?? 3);
       }
       Hyp3eLogger.info("Hyp3eCharacterClass _rollAttributes", `Rolled attributes with Method VI:`, attributes);
       return attributes;
@@ -4814,7 +4811,6 @@ export class Hyp3eCharacterClass {
       let roll = new Roll(rollFormula);
       await roll.roll();
       attributes[attr] = roll.total;
-      // attributes[attr].min = (classData.attrReqs[attr] ?? 3);
     }
     Hyp3eLogger.info("Hyp3eCharacterClass _rollAttributes", `Rolled attributes:`, attributes);
     return attributes;
