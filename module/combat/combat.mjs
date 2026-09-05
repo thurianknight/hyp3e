@@ -212,10 +212,10 @@ export class HYP3ECombat extends Combat {
     // Clean all combatant-actors
     for (const c of this?.combatants || []) {
       if (c.actor) {
-        const combatOptions = c.actor.system?.combatOptions;
-        // Only update if there is something to remove
-        if (typeof combatOptions === "object" && Object.keys(combatOptions).length > 0) {
-          await c.actor.update( { system: { combatOptions: {} } } );
+        const combatOptions = c.actor.system?.combatOptions ?? [];
+        // Only update if there is something to clear out
+        if (Array.isArray(combatOptions) && combatOptions.length > 0) {
+          await c.actor.update({ "system.combatOptions": [] });
         }
       }
     }

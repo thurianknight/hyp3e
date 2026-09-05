@@ -140,32 +140,18 @@ export class HYP3EActorCombatOptions extends HandlebarsApplicationMixin(Applicat
       return;
     }
 
-    // Check to see if the option is already selected, return true or false
-    function checkOption(id) {
-      return id != target.dataset.optionId;
-    }
-
     // Toggle this option on/off for the actor
-    let newList = [];
-    let combatOptions;
-    if (actor.system?.combatOptions) {
-      combatOptions = actor.system.combatOptions;
-    } else {
-      combatOptions = [];
-    }
+    const combatOptions = actor.system?.combatOptions ?? [];
+    const optionId = target.dataset.optionId;
 
-    // The filter function will delete any entries that match the clicked item, thus toggling it off
-    newList = combatOptions.filter(checkOption)
-    if (newList.length == combatOptions.length) {
-      // Nothing was deleted, so we will add this to the list, thus toggling it on
-      combatOptions.push(target.dataset.optionId)
-    } else {
-      // If something was deleted before, replace combatOptions with newList
-      combatOptions = newList
-    }
+    // The filter function will remove any entries that match the clicked item, thus toggling it off
+    const newList = combatOptions.includes(optionId)
+      ? combatOptions.filter(id => id !== optionId)  // was present, so remove it
+      : [...combatOptions, optionId];                // was missing, so add it
+
     // Log the results and update the actor
-    Hyp3eLogger.info("HYP3EActorCombatOptions toggleOption", `Combat Options on ${actor.name}: `, combatOptions);
-    await actor.update({ system: { combatOptions: combatOptions } })
+    Hyp3eLogger.info("HYP3EActorCombatOptions toggleOption", `Combat Options on ${actor.name}: `, newList);
+    await actor.update({ "system.combatOptions": newList });
 
     this.render(true, { actor: this.actor, focus: true })
   }
