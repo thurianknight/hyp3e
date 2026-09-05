@@ -131,7 +131,6 @@ export class HYP3EActorCombatOptions extends HandlebarsApplicationMixin(Applicat
   static async toggleOption(event, target) {
     Hyp3eLogger.info("HYP3EActorCombatOptions toggleOption", `Combat Options Target:`, target);
 
-    // const id = target.dataset.optionId;
     const actor = this.actor;
     if (!actor) {
       const msg = `No actor found to apply combat option ${target.dataset.optionId}!`;
@@ -144,7 +143,7 @@ export class HYP3EActorCombatOptions extends HandlebarsApplicationMixin(Applicat
     const combatOptions = actor.system?.combatOptions ?? [];
     const optionId = target.dataset.optionId;
 
-    // The filter function will remove any entries that match the clicked item, thus toggling it off
+    // Either remove an existing option (toggle off) or add a new one (toggle on)
     const newList = combatOptions.includes(optionId)
       ? combatOptions.filter(id => id !== optionId)  // was present, so remove it
       : [...combatOptions, optionId];                // was missing, so add it
