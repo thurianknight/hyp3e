@@ -9,10 +9,6 @@ const {
 
 export class HYP3EActorCombatOptions extends HandlebarsApplicationMixin(ApplicationV2) {
 
-  // constructor(actorId, options={}) {
-  //   super(options);
-  //   this.actorId = actorId;
-  // }
   constructor(actor, options = {}) {
     super(options);
     this.actor = actor;
