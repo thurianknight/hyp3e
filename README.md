@@ -36,9 +36,9 @@ You may also copy the manifest link below and paste it into the manifest link in
 https://github.com/thurianknight/hyp3e/releases/latest/download/system.json
 ```
 
-<!-- ### Open Game Content Compendium
+<!-- ### Game Content Compendium
 
-The Hyperborea 3rd Edition Content Compendium is a Foundry VTT premium module separate from the system. Find it within Foundry VTT's _module_ browser with the search term `hyperborea`.
+The Hyperborea 3rd Edition Compendium is a Foundry VTT premium module separate from the system. Find it within Foundry VTT's _module_ browser with the search term `hyperborea`.
 
 -->
 
