@@ -900,13 +900,16 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
   const baseMove = actor.system.movement?.base.value ?? 40;
   // "isDelayed" is a declared action that allows a combatant to take their turn later in the round, 
   //  but it also doubles their allowed movement for a "charge".
-  const maxMove = combatant.isDelayed ? baseMove * 2 : baseMove;
+  // "charge" is a declared option that allows a combatant to double its move and attack at the very end of the round.
+  const combatOptions = actor.system?.combatOptions ?? [];
+  const isCharging = combatOptions.includes("charge");
+  const maxMove = (combatant.isDelayed || isCharging) ? baseMove * 2 : baseMove;
 
   // Calculate current move, including completed and pending waypoints
   const totalDistance = movement.history.distance + movement.passed.distance + movement.pending.distance;
   Hyp3eLogger.info("preMoveToken", `${actor.name} total distance: `, totalDistance);
   if (totalDistance > maxMove) {
-    const msg = `This move exceeds ${actor.displayName}'s speed of ${maxMove} feet per round!`;
+    const msg = `This move exceeds ${actor.displayName}'s speed of ${maxMove} feet!`;
     Hyp3eLogger.warn("preMoveToken", msg)
     ui.notifications.warn(msg);
     if (CONFIG.HYP3E.limitMovement) {
