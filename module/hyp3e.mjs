@@ -900,7 +900,7 @@ Hooks.on("preMoveToken", (token, movement, operation) => {
   const baseMove = actor.system.movement?.base.value ?? 40;
   // "isDelayed" is a declared action that allows a combatant to take their turn later in the round, 
   //  but it also doubles their allowed movement for a "charge".
-  // "charge" is a declared option that allows a combatant to double its move and attack at the very end of the round.
+  // "charge" is a combat option that allows a combatant to double its move and attack at the very end of the round.
   const combatOptions = actor.system?.combatOptions ?? [];
   const isCharging = combatOptions.includes("charge");
   const maxMove = (combatant.isDelayed || isCharging) ? baseMove * 2 : baseMove;
