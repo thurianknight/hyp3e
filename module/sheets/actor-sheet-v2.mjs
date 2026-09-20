@@ -803,7 +803,11 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           }
         }
 
-        // Right-click context menu on item entries
+        //---------------------------------------------------------------------
+        // Here we add a right-click context menu on item entries...
+        //---------------------------------------------------------------------
+
+        // Menu option to split item stacks, if the item has a quantity > 1
         const splitStackLabel = game.i18n.localize("HYP3E.item.splitStack");
         const canSplitStack = (target) => {
           const item = this.actor.items.get(target.dataset.itemId);
@@ -819,10 +823,26 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
             : { name: splitStackLabel, condition: canSplitStack, callback: splitStack })
         };
 
+        // Menu option to move a non-container item into or out of a container
+        const moveItemLabel = game.i18n.localize("HYP3E.item.moveItem");
+        const isNotContainer = (target) => {
+          const item = this.actor.items.get(target.dataset.itemId);
+          return !item?.system?.isContainer;
+        };
+        const moveItem = (target) => {
+          Hyp3eActorSheetV2._showMoveItemDialog.call(this, target.dataset.itemId);
+        };
+        const moveItemEntry = {
+          icon: '<i class="fas fa-box"></i>',
+          ...(Number(game.version.split(".")[0]) >= 14
+            ? { label: moveItemLabel, visible: isNotContainer, onClick: moveItem }
+            : { name: moveItemLabel, condition: isNotContainer, callback: moveItem })
+        };
+
         new foundry.applications.ux.ContextMenu.implementation(
           this.element,
           ".item-entry",
-          [splitStackEntry],
+          [splitStackEntry, moveItemEntry],
           { jQuery: false }
         );
 
@@ -1144,6 +1164,52 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     /**
+     * Display the move item dialog, allowing the user to select a container to move the item into (or out of).
+     * @param {*} itemId 
+     * @returns 
+     */
+    static async _showMoveItemDialog(itemId) {
+        const item = this.actor.items.get(itemId);
+        if (!item) return;
+
+        const containers = this.actor.items.filter(i => i.type === 'item' && i.system.isContainer);
+        const containerOptions = containers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+        const content = `
+            <form>
+                <div class="form-group">
+                    <label>${game.i18n.localize("HYP3E.item.moveItemPrompt")}</label>
+                    <select name="containerId">
+                        <option value="">${game.i18n.localize("HYP3E.item.moveItemNone")}</option>
+                        ${containerOptions}
+                    </select>
+                </div>
+            </form>`;
+
+        new Dialog({
+            title: `${game.i18n.localize("HYP3E.item.moveItem")}: ${item.name}`,
+            content: content,
+            buttons: {
+                move: {
+                    icon: '<i class="fas fa-box"></i>',
+                    label: game.i18n.localize("HYP3E.item.moveItem"),
+                    callback: (html) => {
+                        const containerId = html.find('[name="containerId"]').val();
+                        this.actor.updateEmbeddedDocuments("Item", [
+                            { _id: item.id, "system.containerId": containerId }
+                        ]);
+                    }
+                },
+                cancel: {
+                    icon: '<i class="fas fa-times"></i>',
+                    label: "Cancel"
+                }
+            },
+            default: "move"
+        }).render(true);
+    }
+
+    /**
      * Split an item stack into two separate stacks via a dialog.
      * Called from the right-click context menu on any item with quantity > 1.
      * @param {string} itemId - The ID of the item to split
@@ -1217,6 +1283,12 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         await this.actor.createEmbeddedDocuments("Item", [newItemData]);
     }
 
+    /**
+     * Sort items of a given type A-Z (or by level for features) and update their sort order in the actor's item list.
+     * @param {*} event 
+     * @param {*} target 
+     * @returns 
+     */
     static async _sortItemsAz(event, target) {
         event.preventDefault()
         const itemType = target.dataset.itemType;
