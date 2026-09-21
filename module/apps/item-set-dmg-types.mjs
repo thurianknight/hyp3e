@@ -140,9 +140,6 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     delete formDataObj[`dmgType`];
     delete formDataObj[`damage`];
 
-    // Delete the existing altDmg, then recreate it from the form data
-    // await this.item.update({ "system.altDmg": {} });
-
     const altDmg = {};
 
     for (let i = 1; i <= 3; i++) {
@@ -162,11 +159,18 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     const updateData = {
       "system.dmgType": dmgType
     };
-    
-    if (Object.keys(altDmg).length > 0) {
-      updateData["system.altDmg"] = altDmg;
-    } else {
-      updateData["system.altDmg"] = {};
+
+    // Set every key that should remain (or be added)
+    for (const [type, value] of Object.entries(altDmg)) {
+      updateData[`system.altDmg.${type}`] = value;
+    }
+
+    // Explicitly delete every key that is no longer present
+    const current = this.item.system.altDmg ?? {};
+    for (const type of Object.keys(current)) {
+      if (!(type in altDmg)) {
+        updateData[`system.altDmg.-=${type}`] = null;
+      }
     }
 
     // Log the update data and update the item
@@ -177,13 +181,5 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     } catch (err) {
       Hyp3eLogger.error("#onSubmit", `Item damage types update error!`, err);
     }
-
-    // Log the results and update the item
-    // Hyp3eLogger.info("#onSubmit", `Alternate Damage Types:`, altDmg);
-    // try {
-    //   await this.item.update({ "system.dmgType": dmgType, "system.altDmg": altDmg })
-    // } catch(err) {
-    //   Hyp3eLogger.error("#onSubmit", `Item damage types update error!`, err);
-    // }
   }
 }
