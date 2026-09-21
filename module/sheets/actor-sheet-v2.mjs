@@ -806,19 +806,25 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         //---------------------------------------------------------------------
         // Here we add a right-click context menu on item entries...
         //---------------------------------------------------------------------
-
+        const isV14Plus = Number(game.version.split(".")[0]) >= 14;
         // Menu option to split item stacks, if the item has a quantity > 1
         const splitStackLabel = game.i18n.localize("HYP3E.item.splitStack");
         const canSplitStack = (target) => {
           const item = this.actor.items.get(target.dataset.itemId);
           return item?.system?.quantity?.value > 1;
         };
-        const splitStack = (target) => {
-          Hyp3eActorSheetV2._splitItemStack.call(this, target.dataset.itemId);
-        };
+
+        const splitStack = isV14Plus
+          ? (event, target) => {
+              this._splitItemStack(target.dataset.itemId);
+            }
+          : (target) => {
+              this._splitItemStack(target.dataset.itemId);
+            };
+
         const splitStackEntry = {
           icon: '<i class="fas fa-scissors"></i>',
-          ...(Number(game.version.split(".")[0]) >= 14
+          ...(isV14Plus
             ? { label: splitStackLabel, visible: canSplitStack, onClick: splitStack }
             : { name: splitStackLabel, condition: canSplitStack, callback: splitStack })
         };
@@ -829,12 +835,18 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
           const item = this.actor.items.get(target.dataset.itemId);
           return !item?.system?.isContainer;
         };
-        const moveItem = (target) => {
-          Hyp3eActorSheetV2._showMoveItemDialog.call(this, target.dataset.itemId);
-        };
+
+        const moveItem = isV14Plus
+          ? (event, target) => {
+              this._showMoveItemDialog(target.dataset.itemId);
+            }
+          : (target) => {
+              this._showMoveItemDialog(target.dataset.itemId);
+            };
+
         const moveItemEntry = {
           icon: '<i class="fas fa-box"></i>',
-          ...(Number(game.version.split(".")[0]) >= 14
+          ...(isV14Plus
             ? { label: moveItemLabel, visible: isNotContainer, onClick: moveItem }
             : { name: moveItemLabel, condition: isNotContainer, callback: moveItem })
         };
@@ -1168,7 +1180,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @param {*} itemId 
      * @returns 
      */
-    static async _showMoveItemDialog(itemId) {
+    async _showMoveItemDialog(itemId) {
         const item = this.actor.items.get(itemId);
         if (!item) return;
 
@@ -1178,7 +1190,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         const content = `
             <form>
                 <div class="form-group">
-                    <label>${game.i18n.localize("HYP3E.item.moveItemPrompt")}</label>
+                    <label>${game.i18n.localize("HYP3E.item.moveItemPrompt", { item: item.name })}</label>
                     <select name="containerId">
                         <option value="">${game.i18n.localize("HYP3E.item.moveItemNone")}</option>
                         ${containerOptions}
@@ -1215,7 +1227,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
      * @param {string} itemId - The ID of the item to split
      * @private
      */
-    static async _splitItemStack(itemId) {
+    async _splitItemStack(itemId) {
         const item = this.actor.items.get(itemId);
         if (!item || item.system.quantity.value <= 1) return;
 
