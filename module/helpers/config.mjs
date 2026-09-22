@@ -430,7 +430,7 @@ HYP3E.combatOptions = {
     "attack": -4 
   },
   "dodge": { 
-    "nameLong": "Dodging (+2 AC, no attack)", 
+    "nameLong": "Dodging (+2 AC)", 
     "name": "Dodging", 
     "ac": 2 
   },
@@ -446,12 +446,12 @@ HYP3E.combatOptions = {
   },
   // "firingMarch": "Firing March",
   "indirect": { 
-    "nameLong": "Indirect Fire (-2 attack, ignore nearby allies)", 
+    "nameLong": "Indirect Fire (-2 attack)", 
     "name": "Indirect Fire", 
     "attack": -2 
   },
   "parry": { 
-    "nameLong": "Off-hand Weapon Parry (+1 AC, no off-hand attack)", 
+    "nameLong": "Off-hand Weapon Parry (+1 AC)", 
     "name": "Off-hand Weapon Parry", 
     "ac": 1 
   },
