@@ -429,7 +429,8 @@
         "bright": "Bright",
         "angle": "Emission Angle",
         "color": "Light Color",
-        "alpha": "Color Intensity"
+        "alpha": "Color Intensity",
+        "animation": "Animation"
       },
       "addAmmo": "Ammunition",
       "usesAmmo": "Uses ammo",
@@ -463,6 +464,7 @@
         "lightAngle": "Limit the angle of emission for this light source.",
         "lightColor": "Coloration applied to this light source.",
         "lightAlpha": "Intensity of the light color, from 0 (no color) to 1 (full color).",
+        "lightAnimation": "Animation applied to this light source.",
         "lightDuration": "Duration in rounds (roll formula allowed) for a light source. Leave blank if permanent.",
         "isContainer": "The Container tag allows this item to contain other non-container items.",
         "inStorage": "The In Storage tag indicates that this item is in storage, not carried (no encumbrance, but also not equippable).",

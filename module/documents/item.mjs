@@ -57,6 +57,7 @@ export class Hyp3eItem extends Item {
         updateData["system.light.angle"] = lightSourceProps.angle;
         updateData["system.light.color"] = lightSourceProps.color;
         updateData["system.light.alpha"] = lightSourceProps.alpha;
+        updateData["system.light.animation.type"] = lightSourceProps["animation.type"];
       }
     }
 
@@ -633,17 +634,17 @@ export class Hyp3eItem extends Item {
 
     // Light source lookup table
     const lightSources = {
-      "bonfire": { "radius": 60, "angle": 360, "color": null, "alpha": 0.5 },
-      "campfire": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
-      "candle": { "radius": 5, "angle": 360, "color": null, "alpha": 0.5 },
-      "continuous_light_spell": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-      "lamp": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-      "lantern": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-      "lantern_bullseye": { "radius": 60, "angle": 15, "color": null, "alpha": 0.5 },
-      "lantern_hooded": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 },
-      "light_spell": { "radius": 15, "angle": 360, "color": null, "alpha": 0.5 },
-      "produce_flame_spell": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5 },
-      "torch": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5 }
+      "bonfire": { "radius": 60, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "flame" },
+      "campfire": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "flame" },
+      "candle": { "radius": 5, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "flame" },
+      "continuous_light_spell": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "sunburst" },
+      "lamp": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "flame" },
+      "lantern": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "flame" },
+      "lantern_bullseye": { "radius": 60, "angle": 15, "color": null, "alpha": 0.5, "animation.type": "flame" },
+      "lantern_hooded": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "flame" },
+      "light_spell": { "radius": 15, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "sunburst" },
+      "produce_flame_spell": { "radius": 40, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "flame" },
+      "torch": { "radius": 30, "angle": 360, "color": null, "alpha": 0.5, "animation.type": "flame" }
     }
 
     // Convert the name to lowercase and replace spaces with underscores

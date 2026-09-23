@@ -54,11 +54,15 @@
             <div class="flexrow flexshrink flex-group-left bg-attributes">
               <label class="resource-label">{{localize 'HYP3E.item.light.lightRadius'}}</label>
               <div class="flex-xlarge">
-                {{localize 'HYP3E.item.light.dim'}}:
-                <input type="number" name="system.light.dim" value="{{system.light.dim}}" />
-                {{localize 'HYP3E.item.light.bright'}}:
-                <input type="number" name="system.light.bright" value="{{system.light.bright}}" />
-                {{localize 'HYP3E.item.attributes.lightRadius'}}
+                <span>
+                  {{localize 'HYP3E.item.light.dim'}}:
+                  <input type="number" name="system.light.dim" value="{{system.light.dim}}" />
+                </span>
+                <span>
+                  {{localize 'HYP3E.item.light.bright'}}:
+                  <input type="number" name="system.light.bright" value="{{system.light.bright}}" />
+                </span>
+                <span style="margin-left: 4px;">{{localize 'HYP3E.item.attributes.lightRadius'}}</span>
               </div>
             </div>
             <div class="flexrow flexshrink flex-group-left bg-attributes-wide">
@@ -78,13 +82,23 @@
                   <input type="text" placeholder="" style="" />
                   <input type="color" style="" />
                 </color-picker>
-                <span>{{localize 'HYP3E.item.attributes.lightColor'}}</span>
+                <span style="margin-left: 4px;">{{localize 'HYP3E.item.attributes.lightColor'}}</span>
               </div>
             </div>
             <div class="flexrow flexshrink flex-group-left bg-attributes-wide">
               <label class="resource-label">{{localize 'HYP3E.item.light.alpha'}}</label>
               <input type="number" name="system.light.alpha" value="{{system.light.alpha}}" min="0" max="1" step="0.05" />
               <div class="flex-xlarge">{{localize 'HYP3E.item.attributes.lightAlpha'}}</div>
+            </div>
+            <div class="flexrow flexshrink flex-group-left bg-attributes-wide">
+              <label class="resource-label">{{localize 'HYP3E.item.light.animation'}}</label>
+              <div class="flexrow flex-xlarge">
+                <select name="system.light.animation.type" value="{{system.light.animation.type}}">
+                  <option value="none">None</option>
+                  {{selectOptions lightAnimations selected=system.light.animation.type localize=true}}
+                </select>
+                <span style="margin-left: 4px;">{{localize 'HYP3E.item.attributes.lightAnimation'}}</span>
+              </div>
             </div>
           </fieldset>
         {{/if}}

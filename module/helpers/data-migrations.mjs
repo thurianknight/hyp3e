@@ -188,7 +188,8 @@ export function migrateItemData(item) {
         "system.light.bright": Math.floor(lightSourceProps.radius / 2),
         "system.light.angle": lightSourceProps.angle || 360,
         "system.light.color": lightSourceProps.color,
-        "system.light.alpha": lightSourceProps.alpha
+        "system.light.alpha": lightSourceProps.alpha,
+        "system.light.animation.type": lightSourceProps["animation.type"] || null
     });
 
     // Ensure quantities and weight are numbers
