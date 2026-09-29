@@ -343,6 +343,11 @@ Hooks.once("ready", async function() {
   CONFIG.HYP3E.autoCalcAc = autoCalcAc;
   Hyp3eLogger.info("Init", "CONFIG Auto-calculate AC:", CONFIG.HYP3E.autoCalcAc);
 
+  // Automatically calculate weapon attack rates
+  const autoCalcAttackRates = game.settings.get(game.system.id, "autoCalcAttackRates");
+  CONFIG.HYP3E.autoCalcAttackRates = autoCalcAttackRates;
+  Hyp3eLogger.info("Init", "CONFIG Auto-calculate weapon attack rates:", CONFIG.HYP3E.autoCalcAttackRates);
+
   // Enforce weapon equippage rules
   const enforceWeaponEquipRules = game.settings.get(game.system.id, "enforceWeaponEquipRules");
   CONFIG.HYP3E.enforceWeaponEquipRules = enforceWeaponEquipRules;

@@ -215,6 +215,20 @@ export function registerHyp3eConfigurations() {
         }
     });
 
+    // Automatic weapon attack rate calculation
+    game.settings.register(game.system.id, "autoCalcAttackRates", {
+        name: game.i18n.localize("HYP3E.settings.autoCalcAttackRates"),
+        hint: game.i18n.localize("HYP3E.settings.autoCalcAttackRatesHint"),
+        default: true,
+        scope: "world",
+        type: Boolean,
+        config: showConfigOptions,
+        requiresReload: false,
+        onChange: value => {
+            CONFIG.HYP3E.autoCalcAttackRates = value;
+        }
+    });
+
     // Enforce weapon equippage rules
     game.settings.register(game.system.id, "enforceWeaponEquipRules", {
         name: game.i18n.localize("HYP3E.settings.enforceWeaponEquipRules"),
@@ -327,17 +341,6 @@ export function registerHyp3eConfigurations() {
     /********************************************
      * Combat Rules Options
      ********************************************/
-
-    // Enable/disable group-based initiative
-    // game.settings.register(game.system.id, "isGroupInitiative", {
-    //     name: game.i18n.localize("HYP3E.settings.isGroupInitiative"),
-    //     hint: game.i18n.localize("HYP3E.settings.isGroupInitiativeHint"),
-    //     default: true,
-    //     scope: "world",
-    //     type: Boolean,
-    //     config: showConfigOptions,
-    //     requiresReload: true,
-    // });
 
     // Select initiative type: group, phased, or individual
     game.settings.register(game.system.id, "initiativeType", {

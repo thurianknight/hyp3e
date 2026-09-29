@@ -46,6 +46,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             // Rules Options - General
             autoCalcThiefTn: game.settings.get(game.system.id, "autoCalcThiefTn"),
             autoCalcAc: game.settings.get(game.system.id, "autoCalcAc"),
+            autoCalcAttackRates: game.settings.get(game.system.id, "autoCalcAttackRates"),
             enforceWeaponEquipRules: game.settings.get(game.system.id, "enforceWeaponEquipRules"),
             enforceWeaponProficiencyRule: game.settings.get(game.system.id, "enforceWeaponProficiencyRule"),
             requireLightSourceFuel: game.settings.get(game.system.id, "requireLightSourceFuel"),
