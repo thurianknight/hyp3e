@@ -381,14 +381,11 @@ export class Hyp3eItem extends Item {
     }
 
     // Check if the weapon attack has Master or Grandmaster flags set
-    let masteryMod = 0;
-    if (actor.system?.weaponProficiencies) {
-      const actorMastery = actor.system.weaponProficiencies?.find(w => w.weapon == this.system.baseWeapon)?.mastery ?? 0;
-      if (this.system.wpnMaster || this.system.wpnGrandmaster) {
-        rateKey += 1;
-      } else if (actorMastery > 0) {
-        rateKey += 1;
-      }
+    const actorMastery = actor.system?.weaponProficiencies?.find(w => w.weapon == this.system.baseWeapon)?.mastery ?? 0;
+    if (this.system.wpnMaster || this.system.wpnGrandmaster) {
+      rateKey += 1;
+    } else if (actorMastery > 0) {
+      rateKey += 1;
     }
     Hyp3eLogger.info("calcAndUpdateAttackRate", `Final rate key for ${this.name}: ${rateKey}`);
 
