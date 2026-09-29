@@ -558,11 +558,6 @@ Hooks.once("ready", async function() {
     Hyp3eLogger.info("Init", "CONFIG Armor Types:", CONFIG.HYP3E.armorTypes);
   }
 
-  // Load class templates from the Hyp3e Core Compendium and other compendia
-  // const classTemplates = await getClassTemplates(); // Returns an array of class template documents from world and compendia
-  // Hyp3eLogger.info("Init", `Retrieved class templates from Core Journal and compendia:`, classTemplates);
-  // CONFIG.HYP3E.classTemplates = classTemplates;
-
   // Load item lists from the Hyp3e Core compendium and other compendia
   const armorNames = await getJournalPageList("Equipment Lists", "Armour", "Armour");
   Hyp3eLogger.info("Init", `Retrieved armor names from Core Journal:`, armorNames);

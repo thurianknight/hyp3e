@@ -160,13 +160,6 @@ export async function getClassTemplateNames() {
 export async function getClassTemplate(className) {
   if (!className || className.trim().length === 0) return null;
 
-  // Check CONFIG.HYP3E.classTemplates first, as it may have been preloaded during initialization
-  // const preloadedTemplate = CONFIG.HYP3E.classTemplates?.find(t => t.name.toLowerCase() === className.toLowerCase());
-  // if (preloadedTemplate) {
-  //   Hyp3eLogger.info("getClassTemplate", `Found ${className} class template in preloaded CONFIG.HYP3E.classTemplates!`, preloadedTemplate);
-  //   return preloadedTemplate;
-  // }
-
   // Check world items next, though it should have been preloaded already
   Hyp3eLogger.info("getClassTemplate", `Checking world items for ${className} class template...`);
   const worldItem = game.items.find(i => 
