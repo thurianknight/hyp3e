@@ -434,14 +434,20 @@ export class Hyp3eDice {
     }
 
     // Check if the weapon attack has Master or Grandmaster flags set
-    let masteryMod = null
-    if (itemData.wpnGrandmaster) {
-      masteryMod = '2'
-    } else if (itemData.wpnMaster) {
-      masteryMod = '1'
+    let masteryMod = 0;
+    if (actorData?.weaponProficiencies) {
+      const actorMastery = actorData?.weaponProficiencies.find(w => w.weapon == itemData.baseWeapon)?.mastery ?? 0;
+      if (itemData.wpnGrandmaster) {
+        masteryMod = 2;
+      } else if (itemData.wpnMaster) {
+        masteryMod = 1;
+      } else {
+        masteryMod = actorMastery;
+      }
     }
+
     // Add Weapon Mastery mod, if applicable
-    if (masteryMod) {
+    if (masteryMod > 0) {
       dmgRollParts.push(masteryMod)
       debugDmgRollParts.push(`<tr><td>Mastery Mod</td><td>+${masteryMod}</td></tr>`)
       if (itemData.damage2h) {
