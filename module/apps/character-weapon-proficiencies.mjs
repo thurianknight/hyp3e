@@ -357,6 +357,10 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
             break;
         }
         await weapon.update({ "system.wpnMaster": wpnMaster, "system.wpnGrandmaster": wpnGrandmaster });
+        // After setting mastery, update the attack rate if autoCalcAttackRates is enabled
+        if (CONFIG.HYP3E.autoCalcAttackRates) {
+          await weapon.calcAndUpdateAttackRate();
+        }
       }
     }
   }

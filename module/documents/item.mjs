@@ -361,13 +361,16 @@ export class Hyp3eItem extends Item {
   }
 
   /**
-   * Get the actor's class, level, and mastery, and determine the attack rate for this weapon.
-   * @param {*} actor 
+   * Get the owner-actor's class, level, and mastery, and determine the attack rate for this weapon.
    */
   async calcAndUpdateAttackRate() {
     const actor = this.actor;
+
     // If not a character & fighter or sub-class, return without updating
-    if (!actor || actor.type !== "character" || actor.system?.baseClass !== "fighter") {
+    if (!actor || actor.type !== "character") return;
+    Hyp3eLogger.info("calcAndUpdateAttackRate", `Calculating attack rate for ${this.name} (owned by ${actor.name})...`, { actor: actor, item: this });
+    if (actor.system?.baseClass !== "fighter") {
+      Hyp3eLogger.info("calcAndUpdateAttackRate", `${actor.name} is not a fighter or sub-class, so attack rate will not be changed.`);
       return;
     }
 
@@ -376,9 +379,18 @@ export class Hyp3eItem extends Item {
     if (actor.system.details.level >= 7) {
       rateKey += 1;
     }
-    if (actor.system.weaponProficiency?.mastery) {
-      rateKey += 1;
+
+    // Check if the weapon attack has Master or Grandmaster flags set
+    let masteryMod = 0;
+    if (actor.system?.weaponProficiencies) {
+      const actorMastery = actor.system.weaponProficiencies?.find(w => w.weapon == this.system.baseWeapon)?.mastery ?? 0;
+      if (this.system.wpnMaster || this.system.wpnGrandmaster) {
+        rateKey += 1;
+      } else if (actorMastery > 0) {
+        rateKey += 1;
+      }
     }
+    Hyp3eLogger.info("calcAndUpdateAttackRate", `Final rate key for ${this.name}: ${rateKey}`);
 
     // Now lookup the weapon and determine the attack rate based on the type
     const weaponType = this.system.melee? "Melee" : (this.system.missile ? "Missile" : "Melee");
@@ -389,6 +401,7 @@ export class Hyp3eItem extends Item {
 
     const rateTier = weaponRates[rateKey];   // key is 0, 1, or 2; returns a tier value between 0 and 5
     const weaponRoF = this.ratesOfFire[rateTier] || "1/1"; // Default to 1/1 if not found
+    Hyp3eLogger.info("calcAndUpdateAttackRate", `Final attack rate for ${this.name}: ${weaponRoF} (tier ${rateTier})`);
 
     const updateData = { rof: weaponRoF };
     return await this.update({ system: updateData });
