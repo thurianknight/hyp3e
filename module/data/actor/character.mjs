@@ -264,7 +264,7 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
   }
 
   /**
-   * 
+   * Pre-update hook for handling changes to the character's data.
    * @param {*} changed 
    * @param {*} options 
    * @param {*} user 
