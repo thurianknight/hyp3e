@@ -159,7 +159,15 @@ export async function getClassTemplateNames() {
  */
 export async function getClassTemplate(className) {
   if (!className || className.trim().length === 0) return null;
-  // Check world items first, as they take precedence if the same name exists in both
+
+  // Check CONFIG.HYP3E.classTemplates first, as it may have been preloaded during initialization
+  // const preloadedTemplate = CONFIG.HYP3E.classTemplates?.find(t => t.name.toLowerCase() === className.toLowerCase());
+  // if (preloadedTemplate) {
+  //   Hyp3eLogger.info("getClassTemplate", `Found ${className} class template in preloaded CONFIG.HYP3E.classTemplates!`, preloadedTemplate);
+  //   return preloadedTemplate;
+  // }
+
+  // Check world items next, though it should have been preloaded already
   Hyp3eLogger.info("getClassTemplate", `Checking world items for ${className} class template...`);
   const worldItem = game.items.find(i => 
     i.type === "classTemplate" && i.name.toLowerCase() === className.toLowerCase()
@@ -169,7 +177,7 @@ export async function getClassTemplate(className) {
     return worldItem;
   }
 
-  // Not found? Search Item compendia
+  // Not found? Search Item compendia last, using the index so we only load the matching document
   Hyp3eLogger.info("getClassTemplate", `Checking item compendia for ${className} class template...`);
   for (const pack of game.packs) {
     if (pack.documentName !== "Item") continue;

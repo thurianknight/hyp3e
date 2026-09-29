@@ -34,7 +34,7 @@ import { HYP3EQuickEquipApp } from "./apps/quick-equip-app.mjs";
 import { Hyp3eLogger } from "./helpers/logger.mjs";
 import { registerHyp3eConfigurations } from "./helpers/register-config.mjs";
 import { applyChatFontSizeSetting } from "./chat/chat.mjs";
-import { getClassTemplate, getClassTemplateNames, findItemsByFolderOrCompendiumName, getJournalPageList } from "./helpers/folders-and-compendia.mjs"
+import { getClassTemplate, getClassTemplates, getClassTemplateNames, findItemsByFolderOrCompendiumName, getJournalPageList } from "./helpers/folders-and-compendia.mjs"
 
 // Set this now, to use later
 let trackerInitialized = false;
@@ -557,6 +557,11 @@ Hooks.once("ready", async function() {
     }
     Hyp3eLogger.info("Init", "CONFIG Armor Types:", CONFIG.HYP3E.armorTypes);
   }
+
+  // Load class templates from the Hyp3e Core Compendium and other compendia
+  // const classTemplates = await getClassTemplates(); // Returns an array of class template documents from world and compendia
+  // Hyp3eLogger.info("Init", `Retrieved class templates from Core Journal and compendia:`, classTemplates);
+  // CONFIG.HYP3E.classTemplates = classTemplates;
 
   // Load item lists from the Hyp3e Core compendium and other compendia
   const armorNames = await getJournalPageList("Equipment Lists", "Armour", "Armour");

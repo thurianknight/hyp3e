@@ -197,9 +197,9 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
     this.weightCarried = 0;
 
     // Get character base class, used for crit hit & crit miss tables
-    if (!this.baseClass || this.baseClass == "") {
-      this.baseClass = getClassTemplate(this.details.class)?.baseClass ?? "npc";
-    }
+    // if (!this.baseClass || this.baseClass == "" || this.baseClass == "npc") {
+    //   this.baseClass = getClassTemplate(this.details.class)?.baseClass ?? "npc";
+    // }
 
     Hyp3eLogger.info("Hyp3eCharacter prepareBaseData", `Base data prepared for character ${this.parent.name}:`, this);
   }

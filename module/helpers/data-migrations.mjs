@@ -122,6 +122,13 @@ export async function migrateActorData(actor, classTemplate = null) {
 
         // Migrate, fix, or delete old data
 
+        // Fix character base class
+        if (!actor.system.baseClass || actor.system.baseClass == "" || actor.system.baseClass == "npc") {
+          const baseClass = classTemplate?.system?.baseClass ?? "npc";
+          Hyp3eLogger.info("migrateActorData", `${actor.name} base class is missing or invalid. Setting to ${baseClass}...`);
+          updates = { ...updates, "system.baseClass": baseClass };
+        }
+
         // Migrate legacy weapon proficiencies, if it hasn't already been done
         Hyp3eLogger.info("migrateActorData", `Checking ${actor.name} weapon proficiencies:`, { "legacy": actor.system?.proficiencies?.class, "new": actor.system?.weaponProficiencies });
         if (actor.system?.proficiencies?.class && actor.system?.proficiencies?.class.trim() !== "" && actor.system?.weaponProficiencies.length == 0) {
