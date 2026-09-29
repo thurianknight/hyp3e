@@ -264,6 +264,37 @@ export default class Hyp3eCharacter extends Hyp3eActorBase {
   }
 
   /**
+   * 
+   * @param {*} changed 
+   * @param {*} options 
+   * @param {*} user 
+   * @returns 
+   */
+  async _preUpdate(changed, options, user) {
+    Hyp3eLogger.info("Hyp3eCharacter _preUpdate", `Pre-update event fired:`, { changed, options, user });
+    // If the class field is being changed, update base class too
+    const newClass = foundry.utils.getProperty(changed, "system.details.class");
+    if (newClass !== undefined) {
+      // Lookup the base class for the new class and set it in the changed data
+      Hyp3eLogger.info("Hyp3eCharacter _preUpdate", `Looking up base class for ${newClass}...`);
+      const baseClass = await this._lookupBaseClass(newClass);
+      foundry.utils.setProperty(changed, "system.baseClass", baseClass);
+    }
+    Hyp3eLogger.info("Hyp3eCharacter _preUpdate", `Final changed data after pre-update processing:`, changed);
+    return super._preUpdate(changed, options, user);
+  }
+
+  /**
+   * Lookup character base class from the class template compendium.
+   * @param {string} className - The class name to look up
+   * @returns {string}
+   */
+  async _lookupBaseClass(className) {
+    const classTemplate = await getClassTemplate(className);
+    return classTemplate?.system.baseClass ?? "";
+  }
+
+  /**
    * Automatically calculate and populate character attribute modifiers
    * @returns {object} - JSON object of attributes and modifiers
    */

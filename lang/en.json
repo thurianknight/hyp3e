@@ -658,6 +658,7 @@
     "dataLabel": {
       "levelUp": "Level Up!",
       "quickCreate": "Quick Create Character",
+      "classDisabled": "Class selection for this character is now locked.",
       "setAttributeMods": "Set Attribute Modifiers",
       "spellcaster": "Spellcaster",
       "noSpells": "No Spells",

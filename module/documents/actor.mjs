@@ -1,4 +1,5 @@
 import { Hyp3eCharacterClass } from "../helpers/character.mjs";
+import { getClassTemplate } from "../helpers/folders-and-compendia.mjs"
 import { Hyp3eDice, isPureNumber, isPureString, containsDice, containsMathOrVariables, convertToInt } from "../dice/dice.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
@@ -383,6 +384,16 @@ export class Hyp3eActor extends Actor {
     if (this.type !== 'npc') return data;
     // Anything to load?
     return data;
+  }
+
+  /**
+   * Sets starting/default values for a selected class.
+   * @param {String} className The name of the class for which to set defaults
+   */
+  async setClassDefaults(className) {
+    const classTemplate = await getClassTemplate(className);
+    const updates = { "system.baseClass": classTemplate?.baseClass ?? "" };
+    await this.update(updates);
   }
 
   /**
