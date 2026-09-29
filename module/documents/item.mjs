@@ -144,6 +144,8 @@ export class Hyp3eItem extends Item {
     return rollData;
   }
 
+  /** DATA UPDATE HELPERS -----------------------------------------*/
+
   /**
    * Toggle the identified state of the item.
    * If identified, set item.name to system.realName and item.system.description to item.system.realDescription.
@@ -359,6 +361,42 @@ export class Hyp3eItem extends Item {
   }
 
   /**
+   * Get the actor's class, level, and mastery, and determine the attack rate for this weapon.
+   * @param {*} actor 
+   */
+  async calcAndUpdateAttackRate() {
+    const actor = this.actor;
+    // If not a character & fighter or sub-class, return without updating
+    if (!actor || actor.type !== "character" || actor.system?.baseClass !== "fighter") {
+      return;
+    }
+
+    const baseWeapon = this.system.baseWeapon?.toLowerCase() || this.name?.toLowerCase();
+    let rateKey = 0; // Default attack rate key
+    if (actor.system.details.level >= 7) {
+      rateKey += 1;
+    }
+    if (actor.system.weaponProficiency?.mastery) {
+      rateKey += 1;
+    }
+
+    // Now lookup the weapon and determine the attack rate based on the type
+    const weaponType = this.system.melee? "Melee" : (this.system.missile ? "Missile" : "Melee");
+    const lookupTable = `fighter${weaponType}AttackRates`;
+
+    const weaponRates = this[lookupTable][baseWeapon] 
+           ?? this[lookupTable].default;
+
+    const rateTier = weaponRates[rateKey];   // key is 0, 1, or 2; returns a tier value between 0 and 5
+    const weaponRoF = this.ratesOfFire[rateTier] || "1/1"; // Default to 1/1 if not found
+
+    const updateData = { rof: weaponRoF };
+    return await this.update({ system: updateData });
+  }
+
+  /** ITEM SPELL HELPERS ------------------------------------------*/
+
+  /**
    * Add a spell reference to this item's spellcasting list.
    * Prevents duplicates and handles charges initialization.
    * @param {Item} droppedItem - The spell item being added.
@@ -414,6 +452,8 @@ export class Hyp3eItem extends Item {
   _getEffectNames() {
     return this.effects.map(e => e.name);
   }
+
+  /** CHAT DISPLAY HELPERS ----------------------------------------*/
 
   /**
    * Handle displaying an Item description in the chat.
@@ -582,6 +622,8 @@ export class Hyp3eItem extends Item {
     return parts.join("");
   }
 
+  /** TIME TRACKING HELPERS ---------------------------------------*/
+
   /**
    * Handle active effects that might expire, or events that occur, with a new turn.
    * @param {*} turn - The current game-world turn number.
@@ -614,7 +656,95 @@ export class Hyp3eItem extends Item {
    return dur;
   }
 
-  /** LOOKUP TABLES AND FUNCTIONS ---------------------*/
+  /** LOOKUP TABLES AND FUNCTIONS ---------------------------------*/
+  
+  /**
+   * Rates of fire table
+   */
+  ratesOfFire = {
+    0: "1/2",
+    1: "1/1",
+    2: "3/2",
+    3: "2/1",
+    4: "5/2",
+    5: "3/1"
+  }
+
+  fighterMeleeAttackRates = {
+    "default": {
+      0: 1,   // Basic proficiency, levels 1-6
+      1: 2,   // Basic proficiency, levels 7-12; OR Mastery, levels 1-6
+      2: 3    // Mastery, levels 7-12
+    }
+  }
+
+  fighterMissileAttackRates = {
+    "default": {
+      0: 1,
+      1: 2,
+      2: 3
+    },
+    "bow, long": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "bow, long, composite": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "bow, short": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "bow, short, composite": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "crossbow, heavy": {
+      0: 0,
+      1: 0,
+      2: 1
+    },
+    "crossbow, light": {
+      0: 1,
+      1: 1,
+      2: 2
+    },
+    "crossbow, repeating": {
+      0: 5,
+      1: 5,
+      2: 5
+    },
+    "dagger": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "dart": {
+      0: 3,
+      1: 4,
+      2: 5
+    },
+    "lasso": {
+      0: 0,
+      1: 0,
+      2: 1
+    },
+    "net, fighting": {
+      0: 0,
+      1: 0,
+      2: 1
+    },
+    "stone": {
+      0: 3,
+      1: 4,
+      2: 5
+    }
+  }
 
   /**
    * Determine whether the item is a container or not
