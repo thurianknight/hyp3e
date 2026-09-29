@@ -981,17 +981,6 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     }
 
     /**
-     * Sets a few default values when a class is selected. This happens before quickCreate can be run.
-     * @param {*} event 
-     * @param {*} target 
-     */
-    static async _setClassDefaults(event, target) {
-      const className = target.value;
-      Hyp3eLogger.info("HYP3EActorSheetV2 _setClassDefaults", `Set class defaults clicked:`, { Event: event, Target: target });
-      await this.actor.setClassDefaults(className);
-    }
-
-    /**
      * Toggles the spellcaster flag true/false, which controls whether the Spells tab is shown on the sheet
      * @param {*} event 
      * @param {*} target

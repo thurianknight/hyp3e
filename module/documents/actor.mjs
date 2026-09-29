@@ -387,16 +387,6 @@ export class Hyp3eActor extends Actor {
   }
 
   /**
-   * Sets starting/default values for a selected class.
-   * @param {String} className The name of the class for which to set defaults
-   */
-  async setClassDefaults(className) {
-    const classTemplate = await getClassTemplate(className);
-    const updates = { "system.baseClass": classTemplate?.baseClass ?? "" };
-    await this.update(updates);
-  }
-
-  /**
    * Handle adding and removing a bonus spell
    * @param {String} spellLvl The bonus spell level to be updated
    * @param {Bool} val The true or false value to be assigned
