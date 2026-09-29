@@ -1218,6 +1218,14 @@ export class Hyp3eCharacterClass {
         await actor.update(updateData)
         // Log the actor data after updating
         Hyp3eLogger.info("Hyp3eCharacterClass levelUp", `Actor after update:`, actor);
+        // Recalculate attack rates for a fighter's weapons if the setting is enabled
+        if (CONFIG.HYP3E.autoCalcAttackRates) {
+          if (actor.system?.baseClass === "fighter") {
+            for (const weapon of actor.items.filter(i => i.type === "weapon")) {
+              await weapon.calcAndUpdateAttackRate();
+            }
+          }
+        }
       }
     } catch(err) {
       Hyp3eLogger.error("Hyp3eCharacterClass levelUp", `Actor update error:`, err)

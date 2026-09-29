@@ -165,7 +165,7 @@ export async function getClassTemplate(className) {
     i.type === "classTemplate" && i.name.toLowerCase() === className.toLowerCase()
   );
   if (worldItem) {
-    Hyp3eLogger.info("getClassTemplate", `Found ${className} class template in world items!`);
+    Hyp3eLogger.info("getClassTemplate", `Found ${className} class template in world items!`, worldItem);
     return worldItem;
   }
 
@@ -179,9 +179,9 @@ export async function getClassTemplate(className) {
       i.type === "classTemplate" && i.name.toLowerCase() === className.toLowerCase()
     );
     if (!entry) continue;
-
-    Hyp3eLogger.info("getClassTemplate", `Found ${className} class template in ${pack.metadata.label} compendium!`);
-    return await pack.getDocument(entry._id);
+    const classTemplate = await pack.getDocument(entry._id);
+    Hyp3eLogger.info("getClassTemplate", `Found ${className} class template in ${pack.metadata.label} compendium!`, classTemplate);
+    return classTemplate;
   }
 
   Hyp3eLogger.info("getClassTemplate", `Template ${className} was not found anywhere!`);

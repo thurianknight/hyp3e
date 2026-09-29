@@ -376,7 +376,7 @@ export class Hyp3eItem extends Item {
 
     const baseWeapon = this.system.baseWeapon?.toLowerCase() || this.name?.toLowerCase();
     let rateKey = 0; // Default attack rate key
-    if (actor.system.details.level >= 7) {
+    if (actor.system.details.level.value >= 7) {
       rateKey += 1;
     }
 

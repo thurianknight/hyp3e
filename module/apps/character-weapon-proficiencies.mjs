@@ -289,10 +289,11 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
   }
 
   /**
-   * Update all weapon masteries for an actor based on its selected proficiencies
+   * Update all weapon masteries for a fighter based on its selected proficiencies
    * @param {*} actor 
    */
   async _updateActorMasteries(actor) {
+    if (actor.system?.baseClass !== "fighter") return;
     const weaponProficiencies = foundry.utils.deepClone(actor.system.weaponProficiencies);
     for (const wp of weaponProficiencies) {
       if (wp.weapon !== "*Any" && !wp.exception) {
@@ -325,11 +326,15 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
   }
 
   /**
-   * Update mastery flags on an actor's owned weapons, based on the actor's masteries
+   * Update mastery flags on a fighter's owned weapons, based on the fighters's masteries
    * @param {*} actor 
    * @param {*} weaponProficiency 
    */
   async _updateActorWeapons(actor, weaponProficiency) {
+    // Skip if this isn't a fighter or sub-class
+    if (actor.system?.baseClass !== "fighter") {
+      return;
+    }
     const ownedWeapons = actor.items.filter(i => i.type === "weapon");
     let wpnMaster = false;
     let wpnGrandmaster = false;
