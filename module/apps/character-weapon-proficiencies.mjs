@@ -177,9 +177,19 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
           if (actor.system.baseClass !== "fighter") {
             ui.notifications.warn(`${actor.name} is already proficient with this weapon.`);
             weaponName = "";
-          } else {
-            weaponName = event.target.value;
+            break;
           }
+          // Character is a fighter or sub-class
+          const isGrandmaster = this._isGrandmaster(actor);
+          const proficiency = this._getProficiencyLevel(actor, event.target.value);
+          // Use isGrandmaster and proficiency to determine whether this weapon 
+          //  is going to add a second grandmastery, which is not allowed.
+          if (isGrandmaster && proficiency >= 1) {
+            ui.notifications.warn(`${actor.name} already has one grandmastery, cannot add this one.`);
+            weaponName = "";
+            break;
+          }
+          weaponName = event.target.value;
         } else {
           weaponName = event.target.value;
         }
@@ -255,6 +265,26 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     this.render(true, { actorUuid: target.dataset.actorUuid, focus: true })
   }
 
+  /** DATA CHECKS AND CALCULATIONS --------------------------------*/
+
+  /**
+   * Is this actor already a grandmaster of a weapon?
+   * @param {*} actor 
+   * @returns 
+   */
+  _isGrandmaster(actor) {
+    return actor.system.weaponProficiencies.some(wp => wp.mastery === 2);
+  }
+
+  _getProficiencyLevel(actor, weaponName) {
+    // This is used with fighters who have *Any weapon proficiency, but we may 
+    //  need to know if they have mastery or grandmastery
+    const proficiency = actor.system.weaponProficiencies.find(wp => 
+      this._isMatch(weaponName, wp.weapon)
+    );
+    return proficiency?.level || 0;   // Default 0 is basic proficiency
+  }
+
   /**
    * Determine whether the actor's weaponProficiencies list has at least one exception
    * @param {*} weaponProficiencies - the actor's full weaponProficiencies object
@@ -309,7 +339,6 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     for (const wp of weaponProficiencies) {
       if (wp.weapon !== "*Any" && !wp.exception) {
         wp.mastery = this._calcMastery(wp.weapon, weaponProficiencies);
-        // await this._updateActorWeapons(actor, wp);
       } else {
         wp.mastery = 0;
       }
@@ -472,6 +501,8 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
 
     return weaponRoF;
   }
+
+  /** WEAPON NAME PARSING -----------------------------------------*/
 
   /**
    * Normalize a weapon name for fuzzy comparison.
