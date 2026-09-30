@@ -139,7 +139,7 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
   }
 
   /**
-   * Update the selected weapon proficiency.
+   * Update the selected weapon proficiency on any change to the app/form.
    * @param {*} event 
    * @param {*} target 
    * @returns 
@@ -149,10 +149,10 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     const index = event.target.dataset.index;
     const fieldName = event.target.dataset.fieldName;
     if (!actor) {
-      const msg = `No character found for Uuid ${target.dataset.actorUuid}!`
+      const msg = `No character found for Uuid ${target.dataset.actorUuid}!`;
       Hyp3eLogger.warn("HYP3ECharacterWeaponProficiencies _addWeapon", msg);
-      ui.notifications.warn(msg)
-      return
+      ui.notifications.warn(msg);
+      return;
     }
 
     // Get current proficiency values from the actor
@@ -172,6 +172,14 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
         } else if (this._isException(event.target.value, weaponProficiencies)) {
           ui.notifications.warn(`${event.target.value} is forbidden to this character/class.`)
           weaponName = "";
+        } else if (weaponProficiencies.some(wp => wp.weapon == event.target.value && wp.weapon !== "*Any" && wp.weapon !== "")) {
+          // Only allow multiple instances of a weapon if the actor's baseClass is "fighter"
+          if (actor.system.baseClass !== "fighter") {
+            ui.notifications.warn(`${actor.name} is already proficient with this weapon.`);
+            weaponName = "";
+          } else {
+            weaponName = event.target.value;
+          }
         } else {
           weaponName = event.target.value;
         }
@@ -202,13 +210,13 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
       exception: exception
     }
 
-    const sorted = [...weaponProficiencies].sort((a, b) => 
+    const sortedProfs = [...weaponProficiencies].sort((a, b) => 
       a.level - b.level || a.weapon.localeCompare(b.weapon)
     );
 
     // Log the results and update the character
-    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateWeapon", `${actor.name} favored weapons updated:`, sorted);
-    await actor.update({"system.weaponProficiencies": sorted});
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateWeapon", `${actor.name} favored weapons updated:`, sortedProfs);
+    await actor.update({"system.weaponProficiencies": sortedProfs});
 
     // Re-calc weapon masteries
     await this._updateActorMasteries(actor)
@@ -293,19 +301,47 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
    * @param {*} actor 
    */
   async _updateActorMasteries(actor) {
+    // Skip if this isn't a fighter or sub-class
     if (actor.system?.baseClass !== "fighter") return;
+
+    // Calculate weapon proficiencies/masteries at the actor level
     const weaponProficiencies = foundry.utils.deepClone(actor.system.weaponProficiencies);
     for (const wp of weaponProficiencies) {
       if (wp.weapon !== "*Any" && !wp.exception) {
         wp.mastery = this._calcMastery(wp.weapon, weaponProficiencies);
-        await this._updateActorWeapons(actor, wp);
+        // await this._updateActorWeapons(actor, wp);
       } else {
         wp.mastery = 0;
       }
     }
-
-    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateActorMasteries", `${actor.name} weapon masteries updated:`, weaponProficiencies);
+    // Batch the update to the actor's weaponProficiencies
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateActorMasteries", `${actor.name} weapon proficiencies updated:`, weaponProficiencies);
     await actor.update({ "system.weaponProficiencies": weaponProficiencies });
+
+    // Now we need to update the actor's owned weapons and update their mastery flags based on the new proficiencies
+    for (const weapon of actor.items.filter(i => i.type === "weapon")) {
+      const matchingProficiency = weaponProficiencies.find(wp => 
+        this._isMatch(weapon.system?.baseWeapon, wp.weapon) ||
+        this._isMatch(weapon.name, wp.weapon) ||
+        this._isMatch(weapon.system?.friendlyName, wp.weapon)
+      );
+      if (matchingProficiency) {
+        await this._updateActorWeapons(actor, matchingProficiency);
+      } else {
+        // If no matching proficiency is found, reset mastery flags
+        const updates = {
+          "system.wpnMaster": false,
+          "system.wpnGrandmaster": false
+        }
+        // Update the attack rate if autoCalcAttackRates is enabled
+        if (CONFIG.HYP3E.autoCalcAttackRates) {
+          const rof = this._calcAttackRate(actor, weapon, updates);
+          updates["system.rof"] = rof;
+        }
+        Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateActorMasteries", `Updates to ${weapon.name}:`, updates);
+        await weapon.update( updates );
+      }
+    }
   }
 
   /**
@@ -314,60 +350,127 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
    * @param {*} removedWeapon 
    */
   async _removeWeaponMastery(actor, removedWeapon) {
-    const ownedWeapons = actor.items.filter(i => i.type === "weapon");
-    for (const weapon of ownedWeapons) {
-      if (this._isMatch(weapon.system?.baseWeapon, removedWeapon.weapon) || 
-          this._isMatch(weapon.name, removedWeapon.weapon) || 
-          this._isMatch(weapon.system.friendlyName, removedWeapon.weapon)) {
-        Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _removeWeaponMastery", `Removing ${weapon.name} mastery...`);
-        await weapon.update({ "system.wpnMaster": false, "system.wpnGrandmaster": false });
+    // Skip if this isn't a fighter or sub-class
+    if (actor.system?.baseClass !== "fighter") return;
+
+    // Find all owned weapons that match the removed weapon proficiency
+    const matchingWeapons = actor.items.filter(i => 
+      i.type === "weapon" && (
+        this._isMatch(i.system?.baseWeapon, removedWeapon.weapon) ||
+        this._isMatch(i.name, removedWeapon.weapon) ||
+        this._isMatch(i.system?.friendlyName, removedWeapon.weapon)
+      )
+    );
+
+    for (const weapon of matchingWeapons) {
+      Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _removeWeaponMastery", `Removing ${weapon.name} mastery...`);
+      const updates = {
+        "system.wpnMaster": false,
+        "system.wpnGrandmaster": false
       }
+      // Update the attack rate if autoCalcAttackRates is enabled
+      if (CONFIG.HYP3E.autoCalcAttackRates) {
+        const rof = this._calcAttackRate(actor, weapon, updates);
+        updates["system.rof"] = rof;
+      }
+      Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _removeWeaponMastery", `Updates to ${weapon.name}:`, updates);
+      await weapon.update( updates );
     }
   }
 
   /**
-   * Update mastery flags on a fighter's owned weapons, based on the fighters's masteries
+   * Update mastery flags on a fighter's owned weapons, based on the fighters's proficiency
    * @param {*} actor 
    * @param {*} weaponProficiency 
    */
   async _updateActorWeapons(actor, weaponProficiency) {
     // Skip if this isn't a fighter or sub-class
-    if (actor.system?.baseClass !== "fighter") {
-      return;
-    }
-    const ownedWeapons = actor.items.filter(i => i.type === "weapon");
+    if (actor.system?.baseClass !== "fighter") return;
+
+    // Find all owned weapons that match the updated weapon proficiency
+    const matchingWeapons = actor.items.filter(i => 
+      i.type === "weapon" && (
+        this._isMatch(i.system?.baseWeapon, weaponProficiency.weapon) ||
+        this._isMatch(i.name, weaponProficiency.weapon) ||
+        this._isMatch(i.system?.friendlyName, weaponProficiency.weapon)
+      )
+    );
     let wpnMaster = false;
     let wpnGrandmaster = false;
-    for (const weapon of ownedWeapons) {
-      if (this._isMatch(weapon.system?.baseWeapon, weaponProficiency.weapon) || 
-          this._isMatch(weapon.name, weaponProficiency.weapon) || 
-          this._isMatch(weapon.system.friendlyName, weaponProficiency.weapon)) {
-        Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateActorWeapons", `Setting ${weapon.name} mastery to ${weaponProficiency.mastery}...`);
-        switch (weaponProficiency.mastery) {
-          case 0:
-            wpnMaster = false;
-            wpnGrandmaster = false;
-            break;
-          case 1:
-            wpnMaster = true;
-            wpnGrandmaster = false;
-            break;
-          case 2:
-            wpnMaster = false;
-            wpnGrandmaster = true;
-            break;
-          default:
-            wpnMaster = false;
-            wpnGrandmaster = false;
-            break;
-        }
-        await weapon.update({ "system.wpnMaster": wpnMaster, "system.wpnGrandmaster": wpnGrandmaster });
-        // After setting mastery, update the attack rate if autoCalcAttackRates is enabled
-        if (CONFIG.HYP3E.autoCalcAttackRates) {
-          await weapon.calcAndUpdateAttackRate();
-        }
+    for (const weapon of matchingWeapons) {
+      Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateActorWeapons", `Setting ${weapon.name} mastery to ${weaponProficiency.mastery}...`);
+      switch (weaponProficiency.mastery) {
+        case 0:
+          wpnMaster = false;
+          wpnGrandmaster = false;
+          break;
+        case 1:
+          wpnMaster = true;
+          wpnGrandmaster = false;
+          break;
+        case 2:
+          wpnMaster = false;
+          wpnGrandmaster = true;
+          break;
+        default:
+          wpnMaster = false;
+          wpnGrandmaster = false;
+          break;
       }
+      const updates = {
+        "system.wpnMaster": wpnMaster,
+        "system.wpnGrandmaster": wpnGrandmaster
+      }
+      // Update the attack rate if autoCalcAttackRates is enabled
+      if (CONFIG.HYP3E.autoCalcAttackRates) {
+        const rof = this._calcAttackRate(actor, weapon, updates);
+        updates["system.rof"] = rof;
+      }
+      Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _updateActorWeapons", `Updates to ${weapon.name}:`, updates);
+      await weapon.update( updates );
     }
+  }
+
+  /**
+   * Get the actor's class, level, and mastery, and determine the attack rate for this weapon.
+   * @param {*} actor 
+   * @param {*} weapon 
+   * @returns 
+   */
+  _calcAttackRate(actor, weapon, updates) {
+    // Skip if this isn't a fighter or sub-class
+    if (actor.system?.baseClass !== "fighter") return;
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _calcAttackRate", `Calculating attack rate for ${weapon.name} (owned by ${actor.name})...`, { actor: actor, item: weapon });
+
+    const baseWeapon = weapon.system.baseWeapon?.toLowerCase() || weapon.name?.toLowerCase();
+    let rateKey = 0; // Default attack rate key
+
+    // Is the fighter level 7 or higher?
+    if (actor.system.details.level.value >= 7) {
+      rateKey += 1;
+    }
+
+    // Do the weapon updates have Master or Grandmaster flags set?
+    const actorMastery = actor.system?.weaponProficiencies?.find(w => w.weapon == weapon.system.baseWeapon)?.mastery ?? 0;
+    if (updates["system.wpnMaster"] || updates["system.wpnGrandmaster"]) {
+      rateKey += 1;
+    // } else if (actorMastery > 0) {
+    //   rateKey += 1;
+    }
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _calcAttackRate", `Final rate key for ${weapon.name}: ${rateKey}`);
+
+    // Now lookup the weapon and determine the attack rate based on the type
+    const weaponType = weapon.system.melee? "Melee" : (weapon.system.missile ? "Missile" : "Melee");
+    const lookupTable = `fighter${weaponType}AttackRates`;
+
+    const weaponRates = this[lookupTable][baseWeapon] 
+           ?? this[lookupTable].default;
+
+    const rateTier = weaponRates[rateKey];   // key is 0, 1, or 2; returns a tier value between 0 and 5
+    const weaponRoF = this.ratesOfFire[rateTier] || "1/1"; // Default to 1/1 if not found
+    Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _calcAttackRate", `Final attack rate for ${weapon.name}: ${weaponRoF} (tier ${rateTier})`);
+
+    return weaponRoF;
   }
 
   /**
@@ -413,4 +516,96 @@ export default class HYP3ECharacterWeaponProficiencies extends HandlebarsApplica
     Hyp3eLogger.info("HYP3ECharacterWeaponProficiencies _isMatch", `Does ${input.sorted} match ${target.sorted}?`);
     return input.sorted === target.sorted;
   }
+
+
+  /** LOOKUP TABLES AND FUNCTIONS ---------------------------------*/
+  
+  /**
+   * Rates of fire table
+   */
+  ratesOfFire = {
+    0: "1/2",
+    1: "1/1",
+    2: "3/2",
+    3: "2/1",
+    4: "5/2",
+    5: "3/1"
+  }
+
+  fighterMeleeAttackRates = {
+    "default": {
+      0: 1,   // Basic proficiency, levels 1-6
+      1: 2,   // Basic proficiency, levels 7-12; OR Mastery, levels 1-6
+      2: 3    // Mastery, levels 7-12
+    }
+  }
+
+  fighterMissileAttackRates = {
+    "default": {
+      0: 1,
+      1: 2,
+      2: 3
+    },
+    "bow, long": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "bow, long, composite": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "bow, short": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "bow, short, composite": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "crossbow, heavy": {
+      0: 0,
+      1: 0,
+      2: 1
+    },
+    "crossbow, light": {
+      0: 1,
+      1: 1,
+      2: 2
+    },
+    "crossbow, repeating": {
+      0: 5,
+      1: 5,
+      2: 5
+    },
+    "dagger": {
+      0: 2,
+      1: 3,
+      2: 4
+    },
+    "dart": {
+      0: 3,
+      1: 4,
+      2: 5
+    },
+    "lasso": {
+      0: 0,
+      1: 0,
+      2: 1
+    },
+    "net, fighting": {
+      0: 0,
+      1: 0,
+      2: 1
+    },
+    "stone": {
+      0: 3,
+      1: 4,
+      2: 5
+    }
+  }
+
 }
