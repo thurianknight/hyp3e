@@ -499,7 +499,8 @@ function insertCritDamageDice(formula, formulaAppend, damageGroups) {
   }
 
   // Split the base formula on pluses or minuses, and retain the signs
-  const parts = formula.split(/([+-])/);
+  // const parts = formula.split(/([+-])/);
+  const parts = String(formula ?? "").split(/([+-])/);
 
   // Insert formulaAppend after the base damage dice (which is the first part)
   parts[0] = `${parts[0]} + ${formulaAppend}`;
