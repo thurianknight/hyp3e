@@ -489,27 +489,44 @@ async function rollCriticalDamage(total, extraRoll, damageType, applyDr) {
  * @returns {Boolean}
  */
 export function getApplyDr(dmgType, item=null) {
-  let applyDr = false;
   dmgType = dmgType?.toLowerCase() ?? "basic";
 
-  // Handle edge cases for damage type and item type
-  if (dmgType === "basic" || dmgType === "") {
-    // If the damage type is "basic" or blank, we determine DR by item/attack type if possible
-    if (item) {
-      applyDr = (item?.type === "weapon" && !item?.system?.isGrenade && !item?.system?.isAreaEffect) ? true : false
-    } else {
-      // If no item was provided (along with no real damage type), default to true
-      applyDr = true;
-    }
-  } else {
+  if (item) {
+    Hyp3eLogger.info("getApplyDr", `Item type: ${item.type}, Damage type: ${dmgType}`, item);
     // If the damage type has been properly specified, use that to determine DR
-    if (["bludgeoning", "piercing", "slashing"].includes(dmgType)) {
-      applyDr = true;
+    if (item?.type === "weapon" && ["bludgeoning", "piercing", "slashing"].includes(dmgType)) {
+      return true;
     } else {
-      applyDr = false;
+      // If the item is not a weapon or the damage type is not one of the three, do not apply DR
+      return false;
     }
   }
-  return applyDr;
+  // No item? Then we assume this is spell or other non-weapon damage, and no DR applies
+  return false;
+
+  // if (["bludgeoning", "piercing", "slashing"].includes(dmgType)) {
+  //   return true;
+  // } else {
+  //   return false;
+  // }
+  // Handle edge cases for damage type and item type
+  // if (dmgType === "basic" || dmgType === "") {
+  //   // If the damage type is "basic" or blank, we determine DR by item/attack type if possible
+  //   if (item) {
+  //     applyDr = (item?.type === "weapon" && !item?.system?.isGrenade && !item?.system?.isAreaEffect) ? true : false
+  //   } else {
+  //     // If no item was provided (along with no real damage type), default to true
+  //     applyDr = true;
+  //   }
+  // } else {
+  //   // If the damage type has been properly specified, use that to determine DR
+  //   if (["bludgeoning", "piercing", "slashing"].includes(dmgType)) {
+  //     applyDr = true;
+  //   } else {
+  //     applyDr = false;
+  //   }
+  // }
+  // return applyDr;
 }
 
 /**

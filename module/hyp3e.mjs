@@ -1210,7 +1210,7 @@ async function migrateWorld() {
   }
 
   // Migrate custom classes, if any exist
-  await migrateCustomClasses();
+  // await migrateCustomClasses();
 
   // We only migrate the Hyperborea compendium if the GM requests it.
   // We don't want to migrate compendia every time the game is loaded, as it may take a long time.
