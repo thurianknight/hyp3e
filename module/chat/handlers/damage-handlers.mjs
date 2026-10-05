@@ -6,6 +6,7 @@
  */
 import { HYP3E } from "../../helpers/config.mjs"
 import { Hyp3eLogger } from "../../helpers/logger.mjs";
+import { chatFlavorHasDamageType, getDamageTypeFromChatFlavor } from "../chat.mjs";
 
 /**
  * Resolve the actor that originated a damage roll.
@@ -229,6 +230,10 @@ export async function handleGenericDamageHealButtons(_msg, html) {
   const total = _msg.rolls?.[0]?.total ?? _msg.roll?.total;
   if (total === undefined) return; // not a dice roll
 
+  const damageType = getDamageTypeFromChatFlavor(_msg) ?? "basic";
+  const applyDr = getApplyDr(damageType);
+  Hyp3eLogger.info("handleGenericDamageHealButtons", `Damage type ${damageType} and DR ${applyDr}`, _msg.flavor);
+
   const btnContainer = $(`<div class="roll-chat-buttons flexrow"></div>`);
   const dmgBtn = $(
     `<button class="dice-total-fullDamage-btn chat-button-small" title="Apply ${total} damage to selected token(s)"><i class="fas fa-user-minus"></i></button>`
@@ -240,8 +245,8 @@ export async function handleGenericDamageHealButtons(_msg, html) {
   btnContainer.append(dmgBtn, healBtn);
   html$.append(btnContainer);
 
-  dmgBtn.on("click", () => applyHealthChange(total, "basic", true));
-  healBtn.on("click", () => applyHealthChange(total * -1, "", false)); // Healing is negative, and ignores DR
+  dmgBtn.on("click", () => applyHealthChange(total, damageType, applyDr));
+  healBtn.on("click", () => applyHealthChange(total * -1, "healing", false)); // Healing is negative, and ignores DR
 }
 
 /**********************************************************
@@ -296,7 +301,7 @@ export async function rollDmgButton(formula, debugDmgRollFormula, baseDmgFormula
   }
 
   // Determine whether to apply DR based on item & damage type
-  let applyDr = getApplyDr(item)
+  let applyDr = getApplyDr(item.system.dmgType, item)
 
   Hyp3eLogger.info("rollDmgButton", `Damage roll formula: ${formula}`);
   // Invoke the damage roll
@@ -483,15 +488,22 @@ async function rollCriticalDamage(total, extraRoll, damageType, applyDr) {
  * @param {*} item - An item object with properties including type, dmgType, etc.
  * @returns {Boolean}
  */
-export function getApplyDr(item) {
+export function getApplyDr(dmgType, item=null) {
   let applyDr = false;
+  dmgType = dmgType?.toLowerCase() ?? "basic";
 
-  if (item.system.dmgType === "basic" || item.system.dmgType === "") {
-    // If the damage type is "basic" or blank, we determine DR by item/attack type
-    applyDr = (item.type === "weapon" && !item.system?.isGrenade && !item.system?.isAreaEffect) ? true : false
+  // Handle edge cases for damage type and item type
+  if (dmgType === "basic" || dmgType === "") {
+    // If the damage type is "basic" or blank, we determine DR by item/attack type if possible
+    if (item) {
+      applyDr = (item?.type === "weapon" && !item?.system?.isGrenade && !item?.system?.isAreaEffect) ? true : false
+    } else {
+      // If no item was provided (along with no real damage type), default to true
+      applyDr = true;
+    }
   } else {
-    // If the damage type has been specified, then we use that to determine DR
-    if (["bludgeoning", "piercing", "slashing"].includes(item.system.dmgType)) {
+    // If the damage type has been properly specified, use that to determine DR
+    if (["bludgeoning", "piercing", "slashing"].includes(dmgType)) {
       applyDr = true;
     } else {
       applyDr = false;

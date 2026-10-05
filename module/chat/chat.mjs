@@ -202,3 +202,25 @@ export const chatFlavorHasDamageType = function(chatMessage) {
   const damageTypeRegex = new RegExp(`\\b(${damageTypes})\\b`, "i");
   return damageTypeRegex.test(flavor);
 }
+
+/**
+ * Extract a damage type from a chat message's flavor text if one is present.
+ * Looks for a value from CONFIG.HYP3E.damageTypes (case-insensitive, whole-word).
+ * Explicitly ignores "Save vs. ..." flavors to avoid false positives.
+ *
+ * @param {*} chatMessage
+ * @returns {string|null} the matched damage type, or null if none found
+ */
+export const getDamageTypeFromChatFlavor = function(chatMessage) {
+  if (!chatMessage || !chatMessage.flavor) return null;
+  const flavor = chatMessage.flavor;
+
+  // Ignore "Save vs. Death/Poison/Radiation" etc.
+  if (flavor.toLowerCase().includes("save vs.")) return null;
+
+  const damageTypes = Object.values(CONFIG.HYP3E.damageTypes).join("|");
+  const damageTypeRegex = new RegExp(`\\b(${damageTypes})\\b`, "i");
+  const match = flavor.match(damageTypeRegex);
+
+  return match ? match[1] : null;
+};
