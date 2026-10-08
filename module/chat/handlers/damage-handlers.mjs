@@ -501,7 +501,7 @@ export function getApplyDr(dmgType, item=null) {
       return false;
     }
   }
-  // No item? Then we assume this is spell or other non-weapon damage, and no DR applies
+  // No item? Then we assume this is a spell or other non-weapon damage, and no DR applies
   return false;
 
   // if (["bludgeoning", "piercing", "slashing"].includes(dmgType)) {
