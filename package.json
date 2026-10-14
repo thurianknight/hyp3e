@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "CSS compiler for the Hyp3e system",
   "scripts": {
+    "test:migrations": "node --test tests/effect-migrations.test.mjs",
     "build": "gulp build",
     "compile": "gulp css",
     "watch": "gulp",

@@ -1,3 +1,5 @@
+import { runMigrations } from "./helpers/effect-migrations.mjs";
+
 // Import datamodels
 import * as HYP3E_DATA_MODELS from "./data/_module.mjs";
 // Import document classes
@@ -21,8 +23,6 @@ import { migrateActorData,
       updateWeaponMasteries,
       migrateItemData, 
       fixTokenSize,
-      migrateActorEffects,
-      migrateItemEffects,
       migrateCustomClasses } from "./helpers/data-migrations.mjs"
 import { HYP3ETurnTracker, 
       setupTurnTrackerHooks } from "./helpers/turn-tracker.mjs";
@@ -624,22 +624,13 @@ Hooks.once("ready", async function() {
       Hyp3eLogger.info("Init", "System setup has been run before, no need to do it again.");
     }
 
-    // Data migration for version updates and patches
-    const reRunMigration = game.settings.get(game.system.id, `reRunMigration`);
-    const migrationHasRun = game.settings.get(game.system.id, `migration-${currentVersion}-ran`);
-    // const migrationHasRun = false  // FOR DEBUGGING, TO FORCE A RE-RUN
-    if (!migrationHasRun || reRunMigration) {
-      Hyp3eLogger.info("Init", "Running one-time migration...");
-
-      // Do the world migration
-      await migrateWorld();
-
-      // Set the flags so it doesn't run again
-      await game.settings.set(game.system.id, `migration-${currentVersion}-ran`, true);
-      await game.settings.set(game.system.id, `reRunMigration`, false);
-      Hyp3eLogger.info("Init", "Migration complete.");
-    } else {
-      Hyp3eLogger.info("Init", "Migration has been run before, no need to do it again.");
+    // Only the active GM performs shared migrations. Failures remain retryable.
+    try {
+      const migration = await runMigrations(game, migrateWorld);
+      if (migration.status === "complete") Hyp3eLogger.info("Init", `Migration complete for ${currentVersion}.`, migration);
+    } catch (error) {
+      console.error("[HYP3E] Migration failed; completion was not recorded.", error);
+      ui.notifications.error(game.i18n.localize("HYP3E.migration.failed"));
     }
   }
 
@@ -1149,7 +1140,7 @@ async function createCompendiumFolders(folderDefs, parentId = null) {
 /* -------------------------------------------- */
 /*  Migrate system/world functions              */
 /* -------------------------------------------- */
-async function migrateWorld() {
+export async function migrateWorld() {
   Hyp3eLogger.info("migrateWorld", `Migrating world ${game.system.version}...`);
 
   // Migrate Actor directory
@@ -1180,14 +1171,9 @@ async function migrateWorld() {
             await item.update(itemUpdates);
           }
         }
-        // Migrate item effects required for v14 data changes
-        migrateItemEffects(item);
       }
     }
   }
-
-  // Migrate all actor effects required for v14 data changes
-  await migrateActorEffects();
 
   // Skip out early
   // return true;
@@ -1205,8 +1191,6 @@ async function migrateWorld() {
         await item.update(itemUpdates);
       }
     }
-    // Migrate item effects required for v14 data changes
-    migrateItemEffects(item);
   }
 
   // Migrate custom classes, if any exist
@@ -1230,75 +1214,73 @@ async function migrateWorld() {
 
     // Get the compendium's locked property, then unlock it
     const wasLocked = pack.locked
-    await pack.configure({ locked: false })
-
-    // Begin by requesting server-side data model migration, and get the pack docs
-    Hyp3eLogger.info("migrateWorld", `Migrating compendium pack ${pack.metadata.label}...`);
-    await pack.migrate()
-    const documents = await pack.getDocuments()
-
-    // Iterate over compendium entries and apply migration functions
-    for (const doc of documents) {
     try {
-      switch(packType) {
-      case "Actor":
-        // Migrate actor data
-        const origActor = foundry.utils.deepClone(doc);
-        const actorUpdates = await migrateActorData(origActor);
-        if (actorUpdates && Object.keys(actorUpdates).length > 0) {
-          await doc.update(actorUpdates);
-        }
-        // For PCs only, re-calc weapon masteries after the primary update
-        if (doc.type === "character") {
-          const weaponProficiencies = updateWeaponMasteries(doc);
-          await doc.update({ "system.weaponProficiencies": weaponProficiencies });
-        }
-        // Migrate the actor's items
-        if (doc.items) {
-        for (const item of doc.items) {
-          const origItem = foundry.utils.deepClone(item);
-          const itemUpdates = migrateItemData(origItem);
+      await pack.configure({ locked: false })
+
+      // Begin by requesting server-side data model migration, and get the pack docs
+      Hyp3eLogger.info("migrateWorld", `Migrating compendium pack ${pack.metadata.label}...`);
+      await pack.migrate()
+      const documents = await pack.getDocuments()
+
+      // Iterate over compendium entries and apply migration functions
+      for (const doc of documents) {
+        try {
+          switch(packType) {
+            case "Actor": {
+              // Migrate actor data
+              const origActor = foundry.utils.deepClone(doc);
+              const actorUpdates = await migrateActorData(origActor);
+              if (actorUpdates && Object.keys(actorUpdates).length > 0) {
+                await doc.update(actorUpdates);
+              }
+              // For PCs only, re-calc weapon masteries after the primary update
+              if (doc.type === "character") {
+                const weaponProficiencies = updateWeaponMasteries(doc);
+                await doc.update({ "system.weaponProficiencies": weaponProficiencies });
+              }
+              // Migrate the actor's items
+              if (doc.items) {
+                for (const item of doc.items) {
+                  const origItem = foundry.utils.deepClone(item);
+                  const itemUpdates = migrateItemData(origItem);
+                  if (itemUpdates && Object.keys(itemUpdates).length > 0) {
+                    if (origItem.type === "armor" && origItem.system.type === "shield") {
+                      // Legacy shields need non-recursive update to force item type change
+                      await item.update(itemUpdates, { recursive: false });
+                    } else {
+                      await item.update(itemUpdates);
+                    }
+                  }
+                }
+              }
+              break;
+            }
+            case "Item": {
+              // Do for all items regardless of type
+              const origItem = foundry.utils.deepClone(doc);
+              const itemUpdates = migrateItemData(origItem);
               if (itemUpdates && Object.keys(itemUpdates).length > 0) {
                 if (origItem.type === "armor" && origItem.system.type === "shield") {
                   // Legacy shields need non-recursive update to force item type change
-                  await item.update(itemUpdates, { recursive: false });
+                  await doc.update(itemUpdates, { recursive: false });
                 } else {
-                  await item.update(itemUpdates);
+                  await doc.update(itemUpdates);
                 }
               }
-              // Migrate item effects required for v14 data changes
-              migrateItemEffects(item);
+              break;
             }
+            default:
+              break;
           }
-          break
-
-        case "Item":
-          // Do for all items regardless of type
-          const origItem = foundry.utils.deepClone(doc);
-          const itemUpdates = migrateItemData(origItem);
-          if (itemUpdates && Object.keys(itemUpdates).length > 0) {
-            if (origItem.type === "armor" && origItem.system.type === "shield") {
-              // Legacy shields need non-recursive update to force item type change
-              await doc.update(itemUpdates, { recursive: false });
-            } else {
-              await doc.update(itemUpdates);
-            }
-          }
-          // Migrate item effects required for v14 data changes
-          migrateItemEffects(doc);      
-          break;
-
-        default:
-          break;
+        } catch (err) {
+          const errMsg = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}.`;
+          throw new Error(errMsg, { cause: err });
         }
-      } catch (err) {
-        const errMsg = `Failed Hyp3e system migration for document ${doc.name} in pack ${pack.collection}.`;
-        Hyp3eLogger.error("migrateWorld", errMsg, err);
       }
+    } finally {
+      // Re-lock the compendium if it was locked before
+      await pack.configure({ locked: wasLocked });
     }
-
-    // Re-lock the compendium if it was locked before
-    await pack.configure({ locked: wasLocked })
     Hyp3eLogger.info("migrateWorld", `Migrated all ${documentName} documents from Compendium ${pack.collection}`);
 
   }
