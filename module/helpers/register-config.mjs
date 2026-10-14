@@ -36,6 +36,14 @@ export function registerHyp3eConfigurations() {
         default: false,
     });
 
+    // A v13 run must not prevent this effect pass when the world upgrades to v14.
+    game.settings.register(game.system.id, "effectMigrationVersion", {
+        scope: "world",
+        config: false,
+        type: Number,
+        default: 0
+    });
+
     // Store the current Hyperborean date
     game.settings.register(game.system.id, "calendarDate", {
         name: "Calendar Date",

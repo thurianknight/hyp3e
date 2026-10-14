@@ -42,7 +42,9 @@ Create a branch for your contribution:
 - Ensure your commits are atomic and focused.
 
 ### 6. Test Your Changes
-Make sure to test and confirm that your changes do not break existing functionality. Test in _all_ supported versions of Foundry (currently v11 & v12).
+Make sure to test and confirm that your changes do not break existing functionality. Test in all supported versions declared in `system.json`.
+
+Run the effect-migration regression suite with `npm run test:migrations`. It uses Node's built-in test runner and does not require a running Foundry server. The real-Document checks and isolated v13/v14 validation procedure are described in [tests/effect-migration-validation.md](tests/effect-migration-validation.md).
 
 ### 7. Push Your Changes
 Once your changes are ready, push them to your fork:
