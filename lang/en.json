@@ -740,7 +740,8 @@
       "coverPartial": "Partial Concealment",
       "coverFull": "Full Concealment",
       "flankAttack": "Flank Attack",
-      "rearAttack": "Rear Attack"
+      "rearAttack": "Rear Attack",
+      "combatOptionApplied": "Combat Option Applied"
     },
     "calendar": {
       "days": {
