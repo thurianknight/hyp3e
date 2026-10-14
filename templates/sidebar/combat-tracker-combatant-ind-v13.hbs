@@ -28,7 +28,7 @@
                 <button type="button" class="inline-control combatant-control icon fa-solid fa-hourglass-end {{#if isDelayed}}active{{/if}}"
                         data-action="delayed" data-tooltip="{{localize 'HYP3E.combat.delayedDeclared'}}"
                         aria-label="{{localize 'HYP3E.combat.delayedDeclared'}}"></button>
-                <span class="tooltip-initiative">Initiative: {{ initiative }}</span>
+                {{!-- <span class="tooltip-initiative">Initiative: {{ initiative }}</span> --}}
                 {{/if}}
             </div>
             <div class="combatant-controls">
@@ -62,6 +62,7 @@
                     <img class="token-effect" src="{{ img }}" alt="{{ name }}">
                     {{/each}}
                 </div>
+                <span class="tooltip-initiative">Initiative: {{ initiative }}</span>
             </div>
         </div>
 
