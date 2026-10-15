@@ -108,6 +108,19 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
   // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has equipped gear:`, equippedWeapons);
   // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has token:`, token);
 
+  // Get selected combat options, if any
+  const combatOptions = actor._getCombatOptions() ?? {};
+  // Select options that have an 'attack' or 'damage' property
+  const attackOptions = Object.fromEntries(
+    Object.entries(combatOptions)
+      .filter(([, value]) => 'attack' in value || 'damage' in value)
+  );
+  // Selection options that have an 'ac' property
+  const defenseOptions = Object.fromEntries(
+    Object.entries(combatOptions)
+      .filter(([, value]) => 'ac' in value)
+  );
+
   // Create overlay container
   const container = new PIXI.Container();
   token.weaponOverlay = container;
@@ -148,6 +161,20 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
           sprite.x = (-tokenRenderWidth / meshScaleX) / 2 + offset;
           sprite.y = (tokenRenderHeight / meshScaleY) / 2 - spriteSize - offset;
           // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #1 (lower left):`, sprite);
+
+          // If we have attack options, add a small red dot to the top-right corner of the sprite
+          if (Object.keys(attackOptions).length > 0) {
+            // const attackDot = new PIXI.Graphics();
+            // attackDot.beginFill(0xFF0000); // Red color
+            // attackDot.drawCircle(0, 0, spriteSize / 6); // Circle with radius 1/6 of sprite size
+            // attackDot.endFill();
+            // attackDot.x = sprite.x + spriteSize - (spriteSize / 6) - offset; // Position at top-right corner of sprite
+            // attackDot.y = sprite.y + (spriteSize / 6) + offset; // Position at top-right corner of sprite
+            // container.addChild(attackDot);
+            // Tint the entire sprite blue to indicate that it has attack options
+            sprite.tint = 0x2196f3;
+          }
+    
         } else {
           // Secondary weapon: bottom-right corner
           sprite.anchor.set(0, 0); // Anchor to dead center of token
@@ -161,6 +188,19 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
         sprite.x = (tokenRenderWidth / meshScaleX) / 2 - spriteSize - offset;
         sprite.y = (tokenRenderHeight / meshScaleY) / 2 - spriteSize - offset;
         // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #2 (lower right):`, sprite);
+
+        // If we have defense options, add a small red dot to the top-right corner of the sprite
+        if (Object.keys(defenseOptions).length > 0) {
+          // const defenseDot = new PIXI.Graphics();
+          // defenseDot.beginFill(0xFF0000); // Red color
+          // defenseDot.drawCircle(0, 0, spriteSize / 6); // Circle with radius 1/6 of sprite size
+          // defenseDot.endFill();
+          // defenseDot.x = sprite.x + spriteSize - (spriteSize / 6) - offset; // Position at top-right corner of sprite
+          // defenseDot.y = sprite.y + (spriteSize / 6) + offset; // Position at top-right corner of sprite
+          // container.addChild(defenseDot);
+          // Tint the entire sprite blue to indicate that it has defense options
+          sprite.tint = 0x2196f3;
+        }
       }
 
       sprite.alpha = 1.0;

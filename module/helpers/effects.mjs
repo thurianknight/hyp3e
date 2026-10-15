@@ -222,17 +222,6 @@ export function pushCustomStatusEffects() {
   }
   CONFIG.statusEffects.push(coverFull)
 
-  // Only include combat option if advanced options are enabled
-  if (game.settings.get(game.system.id, "enableAdvancedCombatOptions")) {
-    const combatOptionApplied = {
-      id: "combatOptionApplied",
-      name: "HYP3E.statusEffects.combatOptionApplied",
-      img: `icons/svg/sword.svg`,
-      isActive: false
-    }
-    CONFIG.statusEffects.push(combatOptionApplied)
-  }
-
   // Only include flank and rear attack if advanced options are disabled
   if (!game.settings.get(game.system.id, "enableAdvancedCombatOptions")) {
     const flankAttack = {
