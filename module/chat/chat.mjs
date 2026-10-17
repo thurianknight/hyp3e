@@ -138,7 +138,7 @@ export const addChatMessageButtons = async function(_msg, html, _data) {
   //    or messages with a flavor that contains a valid damage type
   if (_msg.flavor !== "") {
     Hyp3eLogger.info("addChatMessageButtons", "Flavored chat message:", _msg.flavor);
-    if (!chatFlavorHasDamageType(_msg)) {
+    if (!chatFlavorHasDamageType(_msg) && !_msg.flavor.toLowerCase().includes("rolling hit die")) {
       addGenericDmgHealBtns = false;
     }
   }
