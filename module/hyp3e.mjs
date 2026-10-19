@@ -294,7 +294,12 @@ Hooks.once('init', async function() {
   });
 
   // Preload Handlebars templates
-  return await preloadHandlebarsTemplates();
+  try {
+    await preloadHandlebarsTemplates();
+  } catch (error) {
+    // Hooks do not await init callbacks. Applications retry their partials on render.
+    console.error("hyp3e | Failed to preload templates; rendering will retry.", error);
+  }
 
 });
 

@@ -5,7 +5,7 @@
  */
 import HYP3E from "./config.mjs"
 
-export const preloadHandlebarsTemplates = async function() {
+export const loadHandlebarsPartials = function(type) {
     // Register Handlebars partials
     const partialPaths = [
         // Actor V2 partials - main sheets
@@ -52,12 +52,17 @@ export const preloadHandlebarsTemplates = async function() {
         `${HYP3E.templatePath}/sidebar/combat-tracker-combatant-group-v13.hbs`,
     ];
 
-    // Load and register partials
-    await Promise.all(partialPaths.map(async (path) => {
+    // Foundry caches compiled partials and retries failed loads. Keep the short
+    // aliases used by our templates, and only block renders on their own family.
+    const paths = type ? partialPaths.filter(path => path.startsWith(`${HYP3E.templatePath}/${type}/`)) : partialPaths;
+    return foundry.applications.handlebars.loadTemplates(Object.fromEntries(paths.map(path => {
         const name = path.split("/").pop().replace(".hbs", "");
-        const source = await fetch(path).then(r => r.text());
-        Handlebars.registerPartial(name, source);
-    }));
+        return [name, path];
+    })));
+};
+
+export const preloadHandlebarsTemplates = async function() {
+    await loadHandlebarsPartials();
 
     // Preload Handlebars templates
     return foundry.applications.handlebars.loadTemplates([

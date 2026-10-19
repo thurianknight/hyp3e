@@ -1,4 +1,5 @@
 import HYP3E from "../helpers/config.mjs";
+import { loadHandlebarsPartials } from "../helpers/templates.mjs";
 import { HYP3EActorCombatOptions } from "../apps/actor-combat-options.mjs";
 import { HYP3EGroupCombat } from "./combat-group.mjs";
 import HYP3ECombatGroupSelector from "./combat-set-groups.mjs";
@@ -40,6 +41,12 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
   // ===========================================================================
   // RENDERING
   // ===========================================================================
+
+  /** Await named partials even when the asynchronous init preload is unfinished. @override */
+  async _preRender(context, options) {
+    await loadHandlebarsPartials("sidebar");
+    await super._preRender(context, options);
+  }
 
   async _prepareCombatContext(context, options) {
     // Log incoming parameters
