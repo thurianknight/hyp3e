@@ -1,3 +1,4 @@
+import { HYP3E } from "./config.mjs";
 import { Hyp3eLogger } from "./logger.mjs";
 
 /**
@@ -74,6 +75,28 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
   // Only do the overlay if the token is in combat
   if (!isTokenInCombat(token)) return;
 
+  // Create two empty hands in case no weapon or shield is equipped
+  const emptyRightHand = {
+    name: "Empty Right Hand",
+    // img: `${HYP3E.assetsPath}/overlays/hand_right_token.png`,
+    img: `${HYP3E.assetsPath}/transparent.png`,
+    type: "weapon",
+    system: {
+      equipped: true,
+      type: "unarmed"
+    }
+  };
+  const emptyLeftHand = {
+    name: "Empty Left Hand",
+    // img: `${HYP3E.assetsPath}/overlays/hand_left_token.png`,
+    img: `${HYP3E.assetsPath}/transparent.png`,
+    type: "weapon",
+    system: {
+      equipped: true,
+      type: "unarmed"
+    }
+  };
+
   // Get equipped weapons/shields
   const equippedWeapons = actor.items.filter(i =>
     i.type === "weapon" && i.system.equipped
@@ -83,20 +106,31 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
   ).slice(0, 2); // up to two shields... crazy, but allowable if no weapons are equipped
 
   // Neither weapons nor shield equipped, exit early...
-  if (!equippedWeapons.length && !equippedShields.length) return;
+  // if (!equippedWeapons.length && !equippedShields.length) return;
+
+  // No primary weapon equipped, add an empty right hand
+  if (equippedWeapons.length === 0) {
+    equippedWeapons.push(emptyRightHand);
+  }
 
   // If we have a shield, it takes precedence over a second weapon
   //  This should never happen, but just in case
   if (equippedShields.length) {
-    if (equippedWeapons.length === 0) {
-      // No weapons, so show the shield
-      equippedWeapons.push(equippedShields[0]);
-    } else if (equippedWeapons.length === 1) {
+    // if (equippedWeapons.length === 0) {
+    //   // No weapons, so show the shield
+    //   equippedWeapons.push(equippedShields[0]);
+    // } else 
+    if (equippedWeapons.length === 1) {
       // One weapon, so add the shield as second item
       equippedWeapons.push(equippedShields[0]);
     } else {
       // Two weapons, so replace the second weapon with the shield
       equippedWeapons[1] = equippedShields[0];
+    }
+  } else {
+    // No shield equipped, so if we have only one weapon, add an empty left hand
+    if (equippedWeapons.length === 1) {
+      equippedWeapons.push(emptyLeftHand);
     }
   }
 
@@ -104,9 +138,23 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
   if (equippedWeapons.length > 2) {
     equippedWeapons.splice(2);
   }
+
   // Log the equipped weapon/shield, and token
   // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has equipped gear:`, equippedWeapons);
   // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `Actor ${actor.name} has token:`, token);
+
+  // Get selected combat options, if any
+  const combatOptions = actor._getCombatOptions() ?? {};
+  // Select options that have an 'attack' or 'damage' property
+  const attackOptions = Object.fromEntries(
+    Object.entries(combatOptions)
+      .filter(([, value]) => 'attack' in value || 'damage' in value)
+  );
+  // Selection options that have an 'ac' property
+  const defenseOptions = Object.fromEntries(
+    Object.entries(combatOptions)
+      .filter(([, value]) => 'ac' in value)
+  );
 
   // Create overlay container
   const container = new PIXI.Container();
@@ -148,12 +196,23 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
           sprite.x = (-tokenRenderWidth / meshScaleX) / 2 + offset;
           sprite.y = (tokenRenderHeight / meshScaleY) / 2 - spriteSize - offset;
           // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #1 (lower left):`, sprite);
+
+          // If we have attack/defense options, tint the sprite blue
+          if (Object.keys(attackOptions).length > 0 || Object.keys(defenseOptions).length > 0) {
+            sprite.tint = 0x2196f3;
+          }
+
         } else {
           // Secondary weapon: bottom-right corner
           sprite.anchor.set(0, 0); // Anchor to dead center of token
           sprite.x = (tokenRenderWidth / meshScaleX) / 2 - spriteSize - offset;
           sprite.y = (tokenRenderHeight / meshScaleY) / 2 - spriteSize - offset;
           // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #2 (lower right):`, sprite);
+
+          // If we have defense options, tint the sprite blue
+          // if (Object.keys(defenseOptions).length > 0) {
+          //   sprite.tint = 0x2196f3;
+          // }
         }
       } else if (item.type === "shield" || (item.type === "armor" && item.system.type === "shield")) {
         // Shield: bottom-right corner
@@ -161,6 +220,11 @@ export async function overlayEquippedWeaponAndShield(token, tokenState) {
         sprite.x = (tokenRenderWidth / meshScaleX) / 2 - spriteSize - offset;
         sprite.y = (tokenRenderHeight / meshScaleY) / 2 - spriteSize - offset;
         // Hyp3eLogger.info("overlayEquippedWeaponAndShield", `${item.name} sprite #2 (lower right):`, sprite);
+
+        // If we have defense options, tint the sprite blue
+        // if (Object.keys(defenseOptions).length > 0) {
+        //   sprite.tint = 0x2196f3;
+        // }
       }
 
       sprite.alpha = 1.0;

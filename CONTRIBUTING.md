@@ -52,6 +52,33 @@ Once your changes are ready, push them to your fork:
   git push origin my-new-feature
   ```
 
+### Release packaging checks
+
+With Python 3.9+ available as `python`, run `npm run test:packaging`. These
+standard-library tests do not require publishing credentials or Python packages.
+
+Run `npm run release:build` to build `../hyp3e_release/hyp3e.zip` from the current
+source and compiled `packs/`. The archive has `system.json` at its root. Every
+build uses fresh temporary staging and validates the allowlisted file set and
+bytes before replacing the ZIP; the old `hyp3e_release/hyp3e/` directory is no
+longer a build input or refreshed output. Do not install that historical folder.
+
+For a custom output directory, use
+`python create-release.py --build-only --output /path/to/release-output`.
+The output directory must be outside the source tree. `--source` optionally
+selects another prepared source directory.
+
+Running `python create-release.py` **without `--build-only`** retains the existing
+tag-and-publish behavior and requires `python-dotenv`, `PyGithub`, and an
+authorized `GITHUB_TOKEN`. Publishing is a separate maintainer action. Local
+packaging tests never load those dependencies, create tags, or contact GitHub.
+
+Test the exact ZIP in disposable Foundry v13/v14 worlds before publication.
+Verify package discovery, absence of the `template.json` warning, and Actor/Item
+creation, saving, reloading, permissions, and compendium loading. The manifest's
+current compatibility range takes precedence over historical version examples
+elsewhere in this guide.
+
 ### 8. Open a Pull Request
 Submit a pull request (PR) to the ThurianKnight hyp3e dev repository:
 - Clearly explain the changes made and reference the issue number if applicable.
