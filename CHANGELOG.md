@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Preserve permanent effects, modern durations, expiry events, and remaining-round flags during effect migration. Await writes and leave failed migrations eligible for retry.
+- Run shared migrations only on the active GM, restore compendium locks after failures, and check effects when a previously migrated v13 world upgrades to v14.
 - Build release ZIPs from fresh staging so obsolete files such as `template.json`
   cannot survive from a previous release. hyp3e already defines its Actor and
   Item types in `system.json` and registers their data models for Foundry v13/v14.

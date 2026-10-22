@@ -37,6 +37,9 @@
   },
 
   "HYP3E": {
+    "migration": {
+      "failed": "Hyperborea migration could not finish. The active GM can reload to retry; see the console for the affected document."
+    },
     "settings": {
       "reRunSetup": "Re-run world setup",
       "reRunSetupHint": "When this world is loaded again, re-run world setup to create folders and core compendia. Does not include compendia migration (below).",
