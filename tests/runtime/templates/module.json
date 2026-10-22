@@ -1,0 +1,7 @@
+{
+  "id": "hyp3e-template-probe",
+  "title": "hyp3e Template Regression Probe (Disposable Worlds Only)",
+  "version": "0.0.1",
+  "compatibility": { "minimum": "13", "verified": "14.369", "maximum": "14" },
+  "esmodules": ["probe.mjs"]
+}

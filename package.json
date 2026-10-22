@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "CSS compiler for the Hyp3e system",
   "scripts": {
+    "test:templates": "node --test tests/templates.test.mjs",
     "test:migrations": "node --test tests/effect-migrations.test.mjs",
     "test:packaging": "python -B -m unittest discover -s tests -p test_release_packaging.py -v",
     "release:build": "python -B create-release.py --build-only",

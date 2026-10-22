@@ -1,4 +1,5 @@
 import { HYP3E } from "../helpers/config.mjs"
+import { loadHandlebarsPartials } from "../helpers/templates.mjs";
 import {
   getMergeObjectDeletionOptions,
   getRollModeChoices
@@ -19,6 +20,12 @@ const { ItemSheetV2 } = foundry.applications.sheets
  * @extends {ItemSheetV2}
  */
 export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
+
+  /** Await named partials even when the asynchronous init preload is unfinished. @override */
+  async _preRender(context, options) {
+    await loadHandlebarsPartials("item");
+    await super._preRender(context, options);
+  }
 
   static ITEM_ANNOTATIONS_APP = new HYP3EItemSetAnnotations();
   static ITEM_SET_DMG_TYPES_APP = new HYP3EItemSetDmgTypes();

@@ -1,4 +1,5 @@
 import { HYP3E } from "../helpers/config.mjs"
+import { loadHandlebarsPartials } from "../helpers/templates.mjs";
 import { getRollModeChoices } from "../helpers/foundry-compat.mjs";
 import { Hyp3eCharacterClass } from "../helpers/character.mjs";
 import { parseGpValue, 
@@ -24,6 +25,12 @@ const { ActorSheetV2 } = foundry.applications.sheets
  * @extends {ActorSheetV2}
  */
 export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) {
+
+  /** Await named partials even when the asynchronous init preload is unfinished. @override */
+  async _preRender(context, options) {
+    await loadHandlebarsPartials("actor");
+    await super._preRender(context, options);
+  }
 
   static LANGUAGES_APP = new HYP3EActorSetLanguages();
   static FAVORED_WEAPONS_APP = new HYP3ECharacterWeaponProficiencies();
