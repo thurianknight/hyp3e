@@ -71,7 +71,7 @@ export class Hyp3eConfigApp extends HandlebarsApplicationMixin(ApplicationV2) {
             critMiss: game.settings.get(game.system.id, "critMiss"),
             addlDamageTypes: game.settings.get(game.system.id, "addlDamageTypes"),
             // Character & NPC Options
-            quickCreateChars: game.settings.get(game.system.id, "quickCreateChars"),
+            quickCreateRollMethod: game.settings.get(game.system.id, "quickCreateRollMethod"),
             autoCalcAttrMods: game.settings.get(game.system.id, "autoCalcAttrMods"),
             customCompendia: game.settings.get(game.system.id, "customCompendia"),
             openClassEditor: game.settings.get(game.system.id, "openClassEditor"),

@@ -542,10 +542,30 @@ export function registerHyp3eConfigurations() {
      * Character & NPC Options
      ********************************************/
 
-    // Enable quick-create characters by selecting a roll method
+    // Legacy setting for roll method, replaced by quickCreateRollMethod. This legacy 
+    //  setting will eventually be removed.
     game.settings.register(game.system.id, "quickCreateChars", {
-        name: game.i18n.localize("HYP3E.settings.quickCreateChars"),
-        hint: game.i18n.localize("HYP3E.settings.quickCreateCharsHint"),
+      name: game.i18n.localize("HYP3E.settings.quickCreateChars"),
+      hint: game.i18n.localize("HYP3E.settings.quickCreateCharsHint"),
+      default: "",
+      scope: "world",
+      type: String,
+      choices: {
+          "": "Disabled",
+          "3d6": "Method I: 3d6 in order",
+          "4d6dl": "Method III: 4d6 drop lowest, optimize for prime attributes",
+          "{3d6,3d6,3d6}kh": "Method IV: 3d6 three times and pick best",
+          "2d6+6": "Method V: 2d6+6 in order",
+          "4d6dl,3d6": "Method VI: 4d6 drop low for prime attributes, 3d6 for others"
+      },
+      config: false,
+      requiresReload: true,
+    });
+
+    // Enable quick-create characters by selecting a roll method
+    game.settings.register(game.system.id, "quickCreateRollMethod", {
+        name: game.i18n.localize("HYP3E.settings.quickCreateRollMethod"),
+        hint: game.i18n.localize("HYP3E.settings.quickCreateRollMethodHint"),
         default: "3d6",
         scope: "world",
         type: String,

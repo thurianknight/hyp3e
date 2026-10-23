@@ -286,7 +286,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     context.rollData = this.actor.getRollData();
 
     // Enable/disable character quick-create button
-    if (game.settings.get(game.system.id, "quickCreateChars") != "" && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
+    if (game.settings.get(game.system.id, "quickCreateRollMethod") != "" && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
       context.enableQuickCreate = true;
     } else {
       context.enableQuickCreate = false;
@@ -505,10 +505,10 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
         }
       }
       // If the attribute is NOT at its default 10, set disableQuickCreate to true
-      if (v.value != 10 && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
-        this.actor.setFlag(game.system.id, "disableQuickCreate", true)
-        // Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
-      }
+      // if (v.value != 10 && !this.actor.getFlag(game.system.id, "disableQuickCreate")) {
+      //   this.actor.setFlag(game.system.id, "disableQuickCreate", true)
+      //   // Hyp3eLogger.info("HYP3EActorSheetV2 _prepareCharacterData", `Attribute ${k} is not at default 10, disabling quick-create!`);
+      // }
     }
 
     // Format favoured weapons and exceptions into one set
@@ -599,172 +599,172 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
     context.creatureSizes = CONFIG.HYP3E.creatureSizes
   }
 
-    /**
-     * Organize and classify Items for Character sheets.
-     * @param {Object} context The actor sheet context to prepare.
-     * @return {undefined}
-     */
-    async _prepareItems(context) {
-        // Initialize item types.
-        const containers = [];
-        const gear = [];
-        const features = [];
-        const weapons = [];
-        const armor = [];
-        const spells = {
-            1: [],
-            2: [],
-            3: [],
-            4: [],
-            5: [],
-            6: []
-        };
+  /**
+   * Organize and classify Items for Character sheets.
+   * @param {Object} context The actor sheet context to prepare.
+   * @return {undefined}
+   */
+  async _prepareItems(context) {
+    // Initialize item types.
+    const containers = [];
+    const gear = [];
+    const features = [];
+    const weapons = [];
+    const armor = [];
+    const spells = {
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+      6: []
+    };
 
-        // Encumbrance is a running sum of all weight carried
-        let encumbrance = 0
-        // allTheGold is a running sum of all item gp values
-        let allTheGold = 0.0
+    // Encumbrance is a running sum of all weight carried
+    let encumbrance = 0
+    // allTheGold is a running sum of all item gp values
+    let allTheGold = 0.0
 
-        // Iterate through items, adding encumbrance and allocating to tab-groups
-        for (let i of this.actor.items) {
-            i.img = i.img || DEFAULT_TOKEN;
+    // Iterate through items, adding encumbrance and allocating to tab-groups
+    for (let i of this.actor.items) {
+      i.img = i.img || DEFAULT_TOKEN;
 
-            // Enrich all item Description fields
-            if (i.system?.description) {
-                i.system.enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(i.system.description, {
-                    async: true,
-                    rollData: this.actor.getRollData(),
-                    rolls: true,          // enable [[roll]] links
-                    documents: true,
-                });
-            }
+      // Enrich all item Description fields
+      if (i.system?.description) {
+        i.system.enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(i.system.description, {
+          async: true,
+          rollData: this.actor.getRollData(),
+          rolls: true,          // enable [[roll]] links
+          documents: true,
+        });
+      }
 
-            // Calculate total weight carried by character. For weapons & armor, the equipped
-            //  status is ignored and the item weight is always added to encumbrance.
-            //  For non-weapon items, the equipped status is used to determine if the item
-            //  is carried or not.
-            if (i.system.weight) {
-                if (i.system.quantity.value) {
-                    // Is this a normal item, and is it carried?
-                    if ((i.type === 'item' || i.type === 'container') && i.system.equipped) {
-                        if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
-                            // For bundled items, we calculate weight based on number of bundles
-                            i.system.carriedWt = (i.system.weight * (i.system.quantity.value / i.system.quantity.bundle))
-                        } else {
-                            // Normal unbundled item
-                            i.system.carriedWt = (i.system.weight * i.system.quantity.value)
-                        }
-                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
-                    } else if (i.type === 'weapon' || i.type === 'armor' || i.type === 'shield') {
-                        if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
-                            // For bundled items, we calculate weight based on number of bundles
-                            i.system.carriedWt = (i.system.weight * (i.system.quantity.value / i.system.quantity.bundle))
-                        } else {
-                            i.system.carriedWt = (i.system.weight * i.system.quantity.value)
-                        }
-                        i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
-                    } else {
-                        i.system.carriedWt = 0
-                    }
-                }
-            }
-            // Calculate the gp value of the item, taking qty x cost. If qty is empty, assume 1.
-            //  If cost is empty, assume 0.
-            if (i.system.cost) {
-                const baseGpVal = parseGpValue(i.system.cost)
-                if (baseGpVal) {
-                    // For merchants, show item selling price (unit or bundle)
-                    i.system.unitPrice = Math.round(baseGpVal * (this.actor.system.sellMultiplier ?? 1) * 100) / 100;
-                    // Normal characters show total value of item qty
-                    if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
-                        // Calculate value based on number of bundles
-                        i.system.value = Math.round((baseGpVal * (i.system.quantity.value ? (i.system.quantity.value / i.system.quantity.bundle) : 1))*100)/100    
-                    } else {
-                        // Calculate value based on total qty
-                        i.system.value = Math.round((baseGpVal * (i.system.quantity.value ? i.system.quantity.value : 1))*100)/100    
-                    }
-                    allTheGold += i.system.value
-                } else {
-                    i.system.unitPrice = null
-                    i.system.value = null
-                }
+      // Calculate total weight carried by character. For weapons & armor, the equipped
+      //  status is ignored and the item weight is always added to encumbrance.
+      //  For non-weapon items, the equipped status is used to determine if the item
+      //  is carried or not.
+      if (i.system.weight) {
+        if (i.system.quantity.value) {
+          // Is this a normal item, and is it carried?
+          if ((i.type === 'item' || i.type === 'container') && i.system.equipped) {
+            if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
+              // For bundled items, we calculate weight based on number of bundles
+              i.system.carriedWt = (i.system.weight * (i.system.quantity.value / i.system.quantity.bundle))
             } else {
-                i.system.unitPrice = 0
-                i.system.value = 0
+              // Normal unbundled item
+              i.system.carriedWt = (i.system.weight * i.system.quantity.value)
             }
-
-            // Append to containers
-            if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
-                // Get contained items and add to their container
-                i.contents = this.getContents(i.id)
-                Hyp3eLogger.info("HYP3EActorSheetV2 _prepareItems", `${i.name} contents:`, i.contents)
-                i.contents.sort((a,b) => (a.sort||0) - (b.sort||0));
-                containers.push(i);
-                // Migrate 'container' type to 'item' & set isContainer flag
-                if (i.type === 'container') {
-                    i.type = 'item'
-                    i.system.isContainer = true
-                    // Update the embedded item document
-                    this.actor.updateEmbeddedDocuments("Item", [
-                        { _id: i._id, "type": 'item', "system.isContainer": true },
-                    ])
-                }
+            i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
+          } else if (i.type === 'weapon' || i.type === 'armor' || i.type === 'shield') {
+            if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
+              // For bundled items, we calculate weight based on number of bundles
+              i.system.carriedWt = (i.system.weight * (i.system.quantity.value / i.system.quantity.bundle))
+            } else {
+              i.system.carriedWt = (i.system.weight * i.system.quantity.value)
             }
-            // Append to gear that isn't in a container.
-            if (i.type === 'item' && i.system.containerId == '' && !i.system.isContainer) {
-                gear.push(i);
-            }
-            // Append to features.
-            else if (i.type === 'feature') {
-                features.push(i);
-            }
-            // Append to weapons.
-            if (i.type === 'weapon') {
-                weapons.push(i);
-            }
-            // Append to armor.
-            if (i.type === 'armor' || i.type === 'shield') {
-                armor.push(i);
-            }
-            // Append to spells.
-            else if (i.type === 'spell') {
-                if (i.system.spellLevel != undefined && i.system.spellLevel >= 1 && i.system.spellLevel <= 6) {
-                    spells[i.system.spellLevel].push(i);
-                } else if (i.system.spellLevel != undefined && i.system.spellLevel < 1) {
-                    spells[1].push(i);
-                } else if (i.system.spellLevel != undefined && i.system.spellLevel > 6) {
-                    spells[6].push(i);
-                }
-            }
+            i.system.carriedWt = Math.round(i.system.carriedWt * 10)/10
+          } else {
+            i.system.carriedWt = 0
+          }
         }
-        encumbrance = this.actor.system.weightCarried
-        allTheGold = Math.round(allTheGold * 100)/100
-        // Now convert allTheGold to a string and add " gp" to the end
-        allTheGold = allTheGold.toLocaleString("en-US", {
-                                                    minimumFractionDigits: 0,
-                                                    maximumFractionDigits: 2,
-                                                }) + " gp";
-
-        // Sort our arrays in item sort order
-        gear.sort((a,b) => (a.sort||0) - (b.sort||0));
-        containers.sort((a,b) => (a.sort||0) - (b.sort||0));
-        features.sort((a,b) => (a.sort||0) - (b.sort||0));
-        weapons.sort((a,b) => (a.sort||0) - (b.sort||0));
-        armor.sort((a,b) => (a.sort||0) - (b.sort||0));
-        for (let i=1; i<=6; i++) {
-            spells[i].sort((a,b) => (a.sort||0) - (b.sort||0));
+      }
+      // Calculate the gp value of the item, taking qty x cost. If qty is empty, assume 1.
+      //  If cost is empty, assume 0.
+      if (i.system.cost) {
+        const baseGpVal = parseGpValue(i.system.cost)
+        if (baseGpVal) {
+          // For merchants, show item selling price (unit or bundle)
+          i.system.unitPrice = Math.round(baseGpVal * (this.actor.system.sellMultiplier ?? 1) * 100) / 100;
+          // Normal characters show total value of item qty
+          if (i.system.quantity.bundle && i.system.quantity.bundle > 1) {
+            // Calculate value based on number of bundles
+            i.system.value = Math.round((baseGpVal * (i.system.quantity.value ? (i.system.quantity.value / i.system.quantity.bundle) : 1))*100)/100    
+          } else {
+            // Calculate value based on total qty
+            i.system.value = Math.round((baseGpVal * (i.system.quantity.value ? i.system.quantity.value : 1))*100)/100    
+          }
+          allTheGold += i.system.value
+        } else {
+          i.system.unitPrice = null
+          i.system.value = null
         }
+      } else {
+        i.system.unitPrice = 0
+        i.system.value = 0
+      }
 
-        // Assign and return
-        context.encumbrance = encumbrance;
-        context.allTheGold = allTheGold;
-        context.gear = gear;
-        context.containers = containers;
-        context.features = features;
-        context.weapons = weapons;
-        context.armor = armor;
-        context.spells = spells;
+      // Append to containers
+      if (i.type === 'container' || (i.type === 'item' && i.system.isContainer)) {
+        // Get contained items and add to their container
+        i.contents = this.getContents(i.id)
+        Hyp3eLogger.info("HYP3EActorSheetV2 _prepareItems", `${i.name} contents:`, i.contents)
+        i.contents.sort((a,b) => (a.sort||0) - (b.sort||0));
+        containers.push(i);
+        // Migrate 'container' type to 'item' & set isContainer flag
+        if (i.type === 'container') {
+          i.type = 'item'
+          i.system.isContainer = true
+          // Update the embedded item document
+          this.actor.updateEmbeddedDocuments("Item", [
+            { _id: i._id, "type": 'item', "system.isContainer": true },
+          ])
+        }
+      }
+      // Append to gear that isn't in a container.
+      if (i.type === 'item' && i.system.containerId == '' && !i.system.isContainer) {
+        gear.push(i);
+      }
+      // Append to features.
+      else if (i.type === 'feature') {
+        features.push(i);
+      }
+      // Append to weapons.
+      if (i.type === 'weapon') {
+        weapons.push(i);
+      }
+      // Append to armor.
+      if (i.type === 'armor' || i.type === 'shield') {
+        armor.push(i);
+      }
+      // Append to spells.
+      else if (i.type === 'spell') {
+        if (i.system.spellLevel != undefined && i.system.spellLevel >= 1 && i.system.spellLevel <= 6) {
+          spells[i.system.spellLevel].push(i);
+        } else if (i.system.spellLevel != undefined && i.system.spellLevel < 1) {
+          spells[1].push(i);
+        } else if (i.system.spellLevel != undefined && i.system.spellLevel > 6) {
+          spells[6].push(i);
+        }
+      }
     }
+    encumbrance = this.actor.system.weightCarried
+    allTheGold = Math.round(allTheGold * 100)/100
+    // Now convert allTheGold to a string and add " gp" to the end
+    allTheGold = allTheGold.toLocaleString("en-US", {
+                                                minimumFractionDigits: 0,
+                                                maximumFractionDigits: 2,
+                                            }) + " gp";
+
+    // Sort our arrays in item sort order
+    gear.sort((a,b) => (a.sort||0) - (b.sort||0));
+    containers.sort((a,b) => (a.sort||0) - (b.sort||0));
+    features.sort((a,b) => (a.sort||0) - (b.sort||0));
+    weapons.sort((a,b) => (a.sort||0) - (b.sort||0));
+    armor.sort((a,b) => (a.sort||0) - (b.sort||0));
+    for (let i=1; i<=6; i++) {
+      spells[i].sort((a,b) => (a.sort||0) - (b.sort||0));
+    }
+
+    // Assign and return
+    context.encumbrance = encumbrance;
+    context.allTheGold = allTheGold;
+    context.gear = gear;
+    context.containers = containers;
+    context.features = features;
+    context.weapons = weapons;
+    context.armor = armor;
+    context.spells = spells;
+  }
 
     /**
      * Get the items within a container item

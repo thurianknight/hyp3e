@@ -1148,6 +1148,13 @@ async function createCompendiumFolders(folderDefs, parentId = null) {
 export async function migrateWorld() {
   Hyp3eLogger.info("migrateWorld", `Migrating world ${game.system.version}...`);
 
+  // Migrate quickCreateChars setting to quickCreateRollMethod
+  const rollMethod = game.settings.get(game.system.id, "quickCreateChars");
+  if (rollMethod && rollMethod !== "") {
+    await game.settings.set(game.system.id, "quickCreateRollMethod", rollMethod);
+    await game.settings.set(game.system.id, "quickCreateChars", "");
+  }
+
   // Migrate Actor directory
   Hyp3eLogger.info("migrateWorld", `Migrating data for ${game.actors.contents.length} actors in the directory...`);
   for (const actor of game.actors.contents) {

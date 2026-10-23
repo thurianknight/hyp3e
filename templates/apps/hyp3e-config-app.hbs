@@ -297,17 +297,17 @@
             <!-- Character & NPC Options -->
             <div class="tab" data-tab="chars">
                 <div class="form-group config-item">
-                    <label class="option-label">{{localize "HYP3E.settings.quickCreateChars"}}</label>
-                    <select name="quickCreateChars">
+                    <label class="option-label">{{localize "HYP3E.settings.quickCreateRollMethod"}}</label>
+                    <select name="quickCreateRollMethod">
                     {{#each quickCreateCharMethods}}
-                        <option value="{{this.value}}" {{#if (eq ../settings.quickCreateChars this.value)}}selected{{/if}}>
+                        <option value="{{this.value}}" {{#if (eq ../settings.quickCreateRollMethod this.value)}}selected{{/if}}>
                         {{this.label}}
                         </option>
                     {{/each}}
                     </select>
                 </div>
                 <div class="form-group">
-                    <p class="option-hint">{{localize "HYP3E.settings.quickCreateCharsHint"}}</p>
+                    <p class="option-hint">{{localize "HYP3E.settings.quickCreateRollMethodHint"}}</p>
                 </div>
 
                 <div class="form-group config-item">

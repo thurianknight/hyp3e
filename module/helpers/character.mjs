@@ -712,7 +712,7 @@ export class Hyp3eCharacterClass {
 
     // Roll attributes down the line, retry until we get a set that meets the class requirements
     Hyp3eLogger.info("Hyp3eCharacterClass rollAttributesForClass", `Rolling attributes for class ${charClass}`);
-    const rollFormula = game.settings.get(game.system.id, "quickCreateChars")
+    const rollFormula = game.settings.get(game.system.id, "quickCreateRollMethod")
     let metReqs = false;
     let attributes = {};
     while (!metReqs) {
@@ -738,7 +738,7 @@ export class Hyp3eCharacterClass {
    * @returns {Object} - Returns an object with the rolled attributes
    */
   static async _rollAttributes(actor, classData) {
-    const rollFormula = game.settings.get(game.system.id, "quickCreateChars")
+    const rollFormula = game.settings.get(game.system.id, "quickCreateRollMethod")
     Hyp3eLogger.info("Hyp3eCharacterClass _rollAttributes", `Rolling attributes using formula ${rollFormula}...`);
     // Just roll and return the attributes
     let attributes = {};
