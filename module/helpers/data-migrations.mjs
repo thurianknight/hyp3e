@@ -8,174 +8,185 @@ import { Hyp3eLogger } from "./logger.mjs";
  * @returns {Object} - JSON of update data
  */
 export async function migrateActorData(actor, classTemplate = null) {
-    // Hyp3eLogger.info("migrateActorData", `Migrating data for ${actor.name}...:`, actor)
-    // let newActor = {...actor};
-    let updates = {};
-    // Add new default values
-    if (!("identified" in actor.system)) {
-        Hyp3eLogger.info("migrateActorData", `Fixing "identified" flag for ${actor.name}...`);
-        updates = { ...updates, "system.identified": true };
-    }
-    if (!("tokenAlias" in actor.system)) {
-        Hyp3eLogger.info("migrateActorData", `Fixing token alias for ${actor.name}...`);
-        updates = { ...updates, "system.tokenAlias": "" };
-    }
+  // Hyp3eLogger.info("migrateActorData", `Migrating data for ${actor.name}...:`, actor)
+  // let newActor = {...actor};
+  let updates = {};
+  // Add new default values
+  if (!("identified" in actor.system)) {
+    Hyp3eLogger.info("migrateActorData", `Fixing "identified" flag for ${actor.name}...`);
+    updates = { ...updates, "system.identified": true };
+  }
+  if (!("tokenAlias" in actor.system)) {
+    Hyp3eLogger.info("migrateActorData", `Fixing token alias for ${actor.name}...`);
+    updates = { ...updates, "system.tokenAlias": "" };
+  }
 
-    // Migrate, fix, or delete old data
+  // Migrate, fix, or delete old data
 
-    // Ensure that physical-attribute class feat bonuses are valid
-    if (classTemplate) {
-      for (const [key, value] of Object.entries(classTemplate.system.featBonus || {})) {
-        if (value !== null && value !== undefined && !isNaN(value)) {
+  // Ensure that physical-attribute class feat bonuses are valid
+  if (classTemplate) {
+    for (const [key, value] of Object.entries(classTemplate.system.featBonus || {})) {
+      if (value !== null && value !== undefined && !isNaN(value)) {
+        if (!actor.system.attributes[key] || actor.system.attributes[key].classFeatBonus !== value) {
           updates = { ...updates, [`system.attributes.${key}.classFeatBonus`]: value };
         }
       }
     }
+  }
 
-    // If fightingAbility is missing, assume same issue for casting and turning, 
-    //  and migrate all three from old properties
-    if (actor.system.fightingAbility === undefined) {
-      const stats = ["fa", "ca", "ta"];
-      for (const stat of stats) {
-        const current = foundry.utils.getProperty(actor, `system.${stat}`);
-        let newStat = "";
-        if (stat === "fa") newStat = "fightingAbility";
-        if (stat === "ca") newStat = "castingAbility";
-        if (stat === "ta") newStat = "turningAbility";
-        // Transform old number/null to new object
-        Hyp3eLogger.info("migrateActorData", `Setting system.${newStat} for ${actor.name}...`);
-        let newValue;
-        if (typeof current === "object" && current !== null && "value" in current) {
-          newValue = current.value || null;
-        } else if (typeof current === "number") {
-          newValue = current;
-        } else if (typeof current === "string") {
-          const parsed = parseInt(current);
-          newValue = isNaN(parsed) ? null : parsed;
-        } else {
-          newValue = null;
-        }
-        updates = { ...updates, [`system.${stat}`]: newValue, [`system.${newStat}`]: { value: newValue } };
+  // If fightingAbility is missing, assume same issue for casting and turning, 
+  //  and migrate all three from old properties
+  if (actor.system.fightingAbility === undefined) {
+    const stats = ["fa", "ca", "ta"];
+    for (const stat of stats) {
+      const current = foundry.utils.getProperty(actor, `system.${stat}`);
+      let newStat = "";
+      if (stat === "fa") newStat = "fightingAbility";
+      if (stat === "ca") newStat = "castingAbility";
+      if (stat === "ta") newStat = "turningAbility";
+      // Transform old number/null to new object
+      Hyp3eLogger.info("migrateActorData", `Setting system.${newStat} for ${actor.name}...`);
+      let newValue;
+      if (typeof current === "object" && current !== null && "value" in current) {
+        newValue = current.value || null;
+      } else if (typeof current === "number") {
+        newValue = current;
+      } else if (typeof current === "string") {
+        const parsed = parseInt(current);
+        newValue = isNaN(parsed) ? null : parsed;
+      } else {
+        newValue = null;
       }
+      updates = { ...updates, [`system.${stat}`]: newValue, [`system.${newStat}`]: { value: newValue } };
+    }
+  }
+
+  // If tempHp is an object, convert it to zero
+  if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp === "object") {
+    Hyp3eLogger.info("migrateActorData", `Fixing temp HP for ${actor.name}...`);
+    updates = { ...updates, "system.hp.tempHp": 0 };
+  }
+  // If tempAtkMod is an object, convert it to zero
+  if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod === "object") {
+    Hyp3eLogger.info("migrateActorData", `Fixing temp attack mod for ${actor.name}...`);
+    updates = { ...updates, "system.tempAtkMod": 0 };
+  }
+  // If tempDmgMod is an object, convert it to zero
+  if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod === "object") {
+    Hyp3eLogger.info("migrateActorData", `Fixing temp damage mod for ${actor.name}...`);
+    updates = { ...updates, "system.tempDmgMod": 0 };
+  }
+  // If tempAcMod is an object, convert it to zero
+  if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod === "object") {
+    Hyp3eLogger.info("migrateActorData", `Fixing temp AC mod for ${actor.name}...`);
+    updates = { ...updates, "system.ac.tempAcMod": 0 };
+  }
+  // If tempDrMod is an object, convert it to zero
+  if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod === "object") {
+    Hyp3eLogger.info("migrateActorData", `Fixing temp DR mod for ${actor.name}...`);
+    updates = { ...updates, "system.ac.tempDrMod": 0 };
+  }
+  // Only migrate tempMvMod if we haven't already fixed this
+  if (!("tempMvMod" in actor.system.movement) && "tempMvMod" in actor.system) {
+    Hyp3eLogger.info("migrateActorData", `Fixing temp MV mod for ${actor.name}...`);
+    // Migrate tempMvMod from system.* to system.movement.* in the actor template
+    let tempMvUpdate = {}
+    if (actor.system?.tempMvMod && !("tempMvMod" in actor.system.movement)) {
+      // Reassign tempMvMod to the new property and delete the original
+      tempMvUpdate = {
+        "system.movement.tempMvMod": actor.system.tempMvMod,
+        "system.-=tempMvMod": null
+      };
+    } else if (actor.system?.tempMvMod && actor.system.movement?.tempMvMod) {
+      // Both exist? Only delete the original
+      tempMvUpdate = { "system.-=tempMvMod": null };
+    } else {
+      // Only assign the new property
+      tempMvUpdate = { "system.movement.tempMvMod": 0 };
+    }
+    updates = { ...updates, tempMvUpdate };
+  }
+
+  // PCs only
+  if (actor.type === "character") {
+    // Get the base class template info
+    const classTemplate = await getClassTemplate(actor.system.details.class);
+
+    // Add new default values
+
+    // Set the attribute minimums in the actor
+    const attributes = foundry.utils.deepClone(actor.system.attributes);
+    const compareAttributes = foundry.utils.deepClone(attributes);
+    for (let [k, v] of Object.entries(attributes)) {
+      attributes[k].min = (classTemplate?.system?.attrReqs[k] ?? 3);
+    };
+    if (!foundry.utils.isEmpty(foundry.utils.diffObject(compareAttributes, attributes))) {
+      Hyp3eLogger.info("migrateActorData", `${actor.name} attribute minimums updated:`, attributes);
+      updates = { ...updates, "system.attributes": attributes };
     }
 
-    // If tempHp is an object, convert it to zero
-    if (!("tempHp" in actor.system.hp) || typeof actor.system.hp.tempHp === "object") {
-        Hyp3eLogger.info("migrateActorData", `Fixing temp HP for ${actor.name}...`);
-        updates = { ...updates, "system.hp.tempHp": 0 };
-    }
-    // If tempAtkMod is an object, convert it to zero
-    if (!("tempAtkMod" in actor.system) || typeof actor.system?.tempAtkMod === "object") {
-        Hyp3eLogger.info("migrateActorData", `Fixing temp attack mod for ${actor.name}...`);
-        updates = { ...updates, "system.tempAtkMod": 0 };
-    }
-    // If tempDmgMod is an object, convert it to zero
-    if (!("tempDmgMod" in actor.system) || typeof actor.system?.tempDmgMod === "object") {
-        Hyp3eLogger.info("migrateActorData", `Fixing temp damage mod for ${actor.name}...`);
-        updates = { ...updates, "system.tempDmgMod": 0 };
-    }
-    // If tempAcMod is an object, convert it to zero
-    if (!("tempAcMod" in actor.system.ac) || typeof actor.system.ac?.tempAcMod === "object") {
-        Hyp3eLogger.info("migrateActorData", `Fixing temp AC mod for ${actor.name}...`);
-        updates = { ...updates, "system.ac.tempAcMod": 0 };
-    }
-    // If tempDrMod is an object, convert it to zero
-    if (!("tempDrMod" in actor.system.ac) || typeof actor.system.ac?.tempDrMod === "object") {
-        Hyp3eLogger.info("migrateActorData", `Fixing temp DR mod for ${actor.name}...`);
-        updates = { ...updates, "system.ac.tempDrMod": 0 };
-    }
-    // Only migrate tempMvMod if we haven't already fixed this
-    if (!("tempMvMod" in actor.system.movement) && "tempMvMod" in actor.system) {
-        Hyp3eLogger.info("migrateActorData", `Fixing temp MV mod for ${actor.name}...`);
-        // Migrate tempMvMod from system.* to system.movement.* in the actor template
-        let tempMvUpdate = {}
-        if (actor.system?.tempMvMod && !("tempMvMod" in actor.system.movement)) {
-            // Reassign tempMvMod to the new property and delete the original
-            tempMvUpdate = {
-                "system.movement.tempMvMod": actor.system.tempMvMod,
-                "system.-=tempMvMod": null
-            };
-        } else if (actor.system?.tempMvMod && actor.system.movement?.tempMvMod) {
-            // Both exist? Only delete the original
-            tempMvUpdate = { "system.-=tempMvMod": null };
-        } else {
-            // Only assign the new property
-            tempMvUpdate = { "system.movement.tempMvMod": 0 };
-        }
-        updates = { ...updates, tempMvUpdate };
+    // Migrate, fix, or delete old data
+
+    // Fix character base class
+    if (!actor.system.baseClass || actor.system.baseClass == "" || actor.system.baseClass == "npc") {
+      const baseClass = classTemplate?.system?.baseClass ?? "npc";
+      Hyp3eLogger.info("migrateActorData", `${actor.name} base class is missing or invalid. Setting to ${baseClass}...`);
+      updates = { ...updates, "system.baseClass": baseClass };
     }
 
-    // PCs only
-    if (actor.type === "character") {
-        // Get the base class template info
-        const classTemplate = await getClassTemplate(actor.system.details.class);
+    // Migrate legacy weapon proficiencies, if it hasn't already been done
+    const legacyProficiencies = actor.system?.proficiencies?.class ?? "";
+    const weaponProficiencies = actor.system?.weaponProficiencies ?? {};
+    if (legacyProficiencies && legacyProficiencies.trim() !== "" && Object.keys(weaponProficiencies).length == 0) {
+      Hyp3eLogger.info("migrateActorData", `Migrating ${actor.name} weapon proficiencies:`, { "legacy": legacyProficiencies, "new": weaponProficiencies });
 
-        // Add new default values
+      const newProficiencies = migrateProficiencies(actor, classTemplate);
+      // updates = { ...updates, "system.weaponProficiencies": newProficiencies };
 
-        // Set the attribute minimums in the actor
-        const attributes = foundry.utils.deepClone(actor.system.attributes);
-        for (let [k, v] of Object.entries(attributes)) {
-          attributes[k].min = (classTemplate?.system?.attrReqs[k] ?? 3);
-        };
-        Hyp3eLogger.info("migrateActorData", `${actor.name} attribute minimums updated:`, attributes);
-        updates = { ...updates, "system.attributes": attributes };
+      // Write a Proficiency Migration report for the actor
+      await createProficiencyMigrationReport(actor, newProficiencies)
 
-        // Migrate, fix, or delete old data
+      // Clear the legacy proficiency properties
+      const proficiencies = {
+        class: "",
+        lvl1: "",
+        lvl4: "",
+        lvl8: "",
+        lvl12: ""
+      }
 
-        // Fix character base class
-        if (!actor.system.baseClass || actor.system.baseClass == "" || actor.system.baseClass == "npc") {
-          const baseClass = classTemplate?.system?.baseClass ?? "npc";
-          Hyp3eLogger.info("migrateActorData", `${actor.name} base class is missing or invalid. Setting to ${baseClass}...`);
-          updates = { ...updates, "system.baseClass": baseClass };
-        }
-
-        // Migrate legacy weapon proficiencies, if it hasn't already been done
-        Hyp3eLogger.info("migrateActorData", `Checking ${actor.name} weapon proficiencies:`, { "legacy": actor.system?.proficiencies?.class, "new": actor.system?.weaponProficiencies });
-        if (actor.system?.proficiencies?.class && actor.system?.proficiencies?.class.trim() !== "" && actor.system?.weaponProficiencies.length == 0) {
-          const newProficiencies = migrateProficiencies(actor, classTemplate);
-          updates = { ...updates, "system.weaponProficiencies": newProficiencies };
-          // Write a Proficiency Migration report for the actor
-          await createProficiencyMigrationReport(actor, newProficiencies)
-        }
-
-        // If new-schema proficiencies exist, wipe the legacy fields
-        if (actor.system?.weaponProficiencies.length > 0) {
-          const proficiencies = {
-            class: "",
-            lvl1: "",
-            lvl4: "",
-            lvl8: "",
-            lvl12: "",
-          }
-          updates = { ...updates, "system.proficiencies": proficiencies };
-        }
-
-        // Delete old explorationSkills
-        if ("explorationSkills" in actor.system) {
-            Hyp3eLogger.info("migrateActorData", `Removing old explorationSkills from ${actor.name}...`);
-            updates = { ...updates, "system.-=explorationSkills": null };
-        }
-        // Alignment is under system instead of system.details
-        //    (Only characters have a details property, but monsters also need alignment)
-        if (!actor.system.alignment && actor.system.details.alignment) {
-            Hyp3eLogger.info("migrateActorData", `Fixing alignment for ${actor.name}...`);
-            const fixAlignment = { "system.alignment": actor.system.details.alignment }
-            updates = { ...updates, fixAlignment };
-        }
+      updates = { ...updates, 
+        "system.proficiencies": proficiencies, 
+        "system.weaponProficiencies": newProficiencies 
+      };
     }
 
-    // NPCs only
-    if (actor.type === "npc") {
-        // Add new default values
-
-        // Migrate, fix, or delete old data
-
+    // Delete old explorationSkills
+    if ("explorationSkills" in actor.system) {
+      Hyp3eLogger.info("migrateActorData", `Removing old explorationSkills from ${actor.name}...`);
+      updates = { ...updates, "system.-=explorationSkills": null };
     }
-
-    if (Object.keys(updates).length > 0) { 
-        Hyp3eLogger.info("migrateActorData", `Updated data for ${actor.name}:`, updates);
+    // Alignment is under system instead of system.details
+    //    (Only characters have a details property, but monsters also need alignment)
+    if (!actor.system.alignment && actor.system.details.alignment) {
+      Hyp3eLogger.info("migrateActorData", `Fixing alignment for ${actor.name}...`);
+      const fixAlignment = { "system.alignment": actor.system.details.alignment }
+      updates = { ...updates, fixAlignment };
     }
-    return updates;
+  }
+
+  // NPCs only
+  if (actor.type === "npc") {
+    // Add new default values
+
+    // Migrate, fix, or delete old data
+
+  }
+
+  if (Object.keys(updates).length > 0) { 
+    Hyp3eLogger.info("migrateActorData", `Updated data for ${actor.name}:`, updates);
+  }
+  return updates;
 }
 
 /**
@@ -184,140 +195,144 @@ export async function migrateActorData(actor, classTemplate = null) {
  * @returns {Object} - JSON of update data
  */
 export function migrateItemData(item) {
-    // Hyp3eLogger.info("migrateItemData", `Original ${item.name} to migrate:`, item)
-    // let newItem = {...item};
-    let updates = {};
+  // Hyp3eLogger.info("migrateItemData", `Original ${item.name} to migrate:`, item)
+  // let newItem = {...item};
+  let updates = {};
 
-    // Is the item a known light source?
-    const lightSourceUpdates = (lightSourceProps) => ({
-        "system.isLightSource": true,
-        "system.light.dim": lightSourceProps.radius,
-        "system.light.bright": Math.floor(lightSourceProps.radius / 2),
-        "system.light.angle": lightSourceProps.angle || 360,
-        "system.light.color": lightSourceProps.color,
-        "system.light.alpha": lightSourceProps.alpha,
-        "system.light.animation.type": lightSourceProps["animation.type"] || null
-    });
+  // Is the item a known light source?
+  const lightSourceUpdates = (lightSourceProps) => ({
+    "system.isLightSource": true,
+    "system.light.dim": lightSourceProps.radius,
+    "system.light.bright": Math.floor(lightSourceProps.radius / 2),
+    "system.light.angle": lightSourceProps.angle || 360,
+    "system.light.color": lightSourceProps.color,
+    "system.light.alpha": lightSourceProps.alpha,
+    "system.light.animation.type": lightSourceProps["animation.type"] || null
+  });
 
+  // Ensure quantities and weight are numbers
+  const qtyAndWeightUpdates = (item) => ({
+    "system.quantity.value": toNumber(item.system.quantity.value) || 1,
+    "system.quantity.max": toNumber(item.system.quantity.max) || 1,
+    "system.quantity.bundle": Number(item.system.quantity.bundle) || null,
+    "system.weight": toNumber(item.system.weight) || 0
+  });
+
+  // All items, regardless of type
+  if (item.system.identified === undefined) {
+    Hyp3eLogger.info("migrateItemData", `Fixing "identified" flag for ${item.name}...`);
+    updates = { ...updates, "system.identified": true };
+  }
+  if (item.system.itemAlias === undefined) {
+    Hyp3eLogger.info("migrateItemData", `Fixing item alias for ${item.name}...`);
+    updates = { ...updates, "system.itemAlias": "" };
+  }
+  if (item.system.realName === undefined || item.system.realName == "") {
+    Hyp3eLogger.info("migrateItemData", `Fixing real name for ${item.name}...`);
+    updates = { ...updates, "system.realName": item.name };
+  }
+  if (item.system.realDescription === undefined) {
+    Hyp3eLogger.info("migrateItemData", `Fixing real description for ${item.name}...`);
+    updates = { ...updates, "system.realDescription": item.system.description };
+  }
+
+  // Armor only
+  if (item.type === "armor") {
     // Ensure quantities and weight are numbers
-    const qtyAndWeightUpdates = (item) => ({
-      "system.quantity.value": toNumber(item.system.quantity.value) || 1,
-      "system.quantity.max": toNumber(item.system.quantity.max) || 1,
-      "system.quantity.bundle": Number(item.system.quantity.bundle) || null,
-      "system.weight": toNumber(item.system.weight) || 0
-    });
+    if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
+      updates = { ...updates, ...qtyAndWeightUpdates(item) };
+    }
+    // Convert legacy shield to new type
+    const shieldUpdate = migrateShield(item);
+    if (shieldUpdate) {
+      Hyp3eLogger.info("migrateItemData", `Migrating ${item.name} from armor to shield...`);
+      updates = { ...updates, ...shieldUpdate };
+    }
+    // On actual armor, replace default shield icon with new breastplate icon
+    if (item.system.type !== "shield") {
+      const defaultIcon = "icons/svg/shield.svg"
+      const newIcon = "systems/hyp3e/assets/breastplate_wht.svg"
+      if (item.img === defaultIcon) {
+        Hyp3eLogger.info("migrateItemData", `Fixing armor icon for ${item.name}...`);
+        updates = { ...updates, "img": newIcon };
+      }
+    }
+  }
 
-    // All items, regardless of type
-    if (item.system.identified === undefined) {
-        Hyp3eLogger.info("migrateItemData", `Fixing "identified" flag for ${item.name}...`);
-        updates = { ...updates, "system.identified": true };
+  // Shield only
+  if (item.type === "shield") {
+    // Ensure quantities and weight are numbers
+    if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
+      updates = { ...updates, ...qtyAndWeightUpdates(item) };
     }
-    if (item.system.itemAlias === undefined) {
-        Hyp3eLogger.info("migrateItemData", `Fixing item alias for ${item.name}...`);
-        updates = { ...updates, "system.itemAlias": "" };
-    }
-    if (item.system.realName === undefined || item.system.realName == "") {
-        Hyp3eLogger.info("migrateItemData", `Fixing real name for ${item.name}...`);
-        updates = { ...updates, "system.realName": item.name };
-    }
-    if (item.system.realDescription === undefined) {
-        Hyp3eLogger.info("migrateItemData", `Fixing real description for ${item.name}...`);
-        updates = { ...updates, "system.realDescription": item.system.description };
-    }
+  }
 
-    // Armor only
-    if (item.type === "armor") {
-        // Ensure quantities and weight are numbers
-        if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
-            updates = { ...updates, ...qtyAndWeightUpdates(item) };
-        }
-        // Convert legacy shield to new type
-        const shieldUpdate = migrateShield(item);
-        if (shieldUpdate) {
-            Hyp3eLogger.info("migrateItemData", `Migrating ${item.name} from armor to shield...`);
-            updates = { ...updates, ...shieldUpdate };
-        }
-        // On actual armor, replace default shield icon with new breastplate icon
-        if (item.system.type !== "shield") {
-            const defaultIcon = "icons/svg/shield.svg"
-            const newIcon = "systems/hyp3e/assets/breastplate_wht.svg"
-            if (item.img === defaultIcon) {
-                Hyp3eLogger.info("migrateItemData", `Fixing armor icon for ${item.name}...`);
-                updates = { ...updates, "img": newIcon };
-            }
-        }
+  // Features only
+  if (item.type === "feature") {
+
+  }
+
+  // General/equipment items only
+  if (item.type === "item") {
+    // Ensure quantities and weight are numbers
+    if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
+      updates = { ...updates, ...qtyAndWeightUpdates(item) };
     }
-
-    // Shield only
-    if (item.type === "shield") {
-        // Ensure quantities and weight are numbers
-        if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
-            updates = { ...updates, ...qtyAndWeightUpdates(item) };
-        }
+    // Add the new light source properties if they do not exist yet
+    if (item.system.isLightSource === undefined || item.system.isLightSource === null) {
+      Hyp3eLogger.info("migrateItemData", `Fixing light source properties for ${item.name}...`);
+      const lightSourceProps = Hyp3eItem.getLightSourceProperties(item.name);
+      if (lightSourceProps) {
+        const lightProps = lightSourceUpdates(lightSourceProps);
+        updates = { ...updates, ...lightProps };
+      } else {
+        // If the item not a known light source, set it to false
+        updates = { ...updates, "system.isLightSource": false };
+      }
     }
+  }
 
-    // Features only
-    if (item.type === "feature") {
+  // Spells only
+  if (item.type === "spell") {
 
+  }
+
+  // Weapons only
+  if (item.type === "weapon") {
+    // Ensure baseWeapon is populated
+    if (!item.system?.baseWeapon) {
+      const match = findCanonicalWeapon(item.name);
+      if (match) {
+        updates = { ...updates, "system.baseWeapon": match };
+      } else {
+        // Only update if baseWeapon is null or undefined
+        if (item.system?.baseWeapon !== "") {
+          Hyp3eLogger.info("migrateItemData", `No baseWeapon match found for ${item.name}`);
+          updates = { ...updates, "system.baseWeapon": "" };
+        }
+      }
     }
-
-    // General/equipment items only
-    if (item.type === "item") {
-        // Ensure quantities and weight are numbers
-        if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
-            updates = { ...updates, ...qtyAndWeightUpdates(item) };
-        }
-        // Add the new light source properties if they do not exist yet
-        if (item.system.isLightSource === undefined || item.system.isLightSource === null) {
-            Hyp3eLogger.info("migrateItemData", `Fixing light source properties for ${item.name}...`);
-            const lightSourceProps = Hyp3eItem.getLightSourceProperties(item.name);
-            if (lightSourceProps) {
-                const lightProps = lightSourceUpdates(lightSourceProps);
-                updates = { ...updates, ...lightProps };
-            } else {
-                // If the item not a known light source, set it to false
-                updates = { ...updates, "system.isLightSource": false };
-            }
-        }
+    // Ensure quantities and weight are numbers
+    if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
+      updates = { ...updates, ...qtyAndWeightUpdates(item) };
     }
-
-    // Spells only
-    if (item.type === "spell") {
-
+    // Set weapon hands property based on name or annotations
+    const handsUpdate = migrateWeaponHands(item);
+    if (handsUpdate) {
+      Hyp3eLogger.info("migrateItemData", `Updated weapon hands for ${item.name}:`, handsUpdate)
+      updates = { ...updates, ...handsUpdate };
     }
-
-    // Weapons only
-    if (item.type === "weapon") {
-        // Ensure baseWeapon is populated
-        if (!item.system.baseWeapon) {
-          const match = findCanonicalWeapon(item.name);
-          if (match) {
-            updates = { ...updates, "system.baseWeapon": match };
-          } else {
-            Hyp3eLogger.info("migrateItemData", `No canonical match found for ${item.name}`);
-          }
-        }
-        // Ensure quantities and weight are numbers
-        if (isNaN(item.system.quantity.value) || isNaN(item.system.weight)) {
-            updates = { ...updates, ...qtyAndWeightUpdates(item) };
-        }
-        // Set weapon hands property based on name or annotations
-        const handsUpdate = migrateWeaponHands(item);
-        if (handsUpdate) {
-            Hyp3eLogger.info("migrateItemData", `Updated weapon hands for ${item.name}:`, handsUpdate)
-            updates = { ...updates, ...handsUpdate };
-        }
-        // Fix weapon & spell missing or invalid damage type
-        if (!item.system.dmgType || item.system.dmgType.trim() === "") {
-            Hyp3eLogger.warn("migrateItemData", `No damage type set on ${item.name}. Setting to Basic...`)
-            updates = { ...updates, "system.dmgType": "basic" };
-        }
+    // Fix weapon & spell missing or invalid damage type
+    if (!item.system.dmgType || item.system.dmgType.trim() === "") {
+      Hyp3eLogger.warn("migrateItemData", `No damage type set on ${item.name}. Setting to Basic...`)
+      updates = { ...updates, "system.dmgType": "basic" };
     }
+  }
 
-    if (Object.keys(updates).length > 0) { 
-        Hyp3eLogger.info("migrateItemData", `Updated data for ${item.name}:`, updates);
-    }
-    return updates;
+  if (Object.keys(updates).length > 0) { 
+    Hyp3eLogger.info("migrateItemData", `Updated data for ${item.name}:`, updates);
+  }
+  return updates;
 }
 
 /**
@@ -326,23 +341,23 @@ export function migrateItemData(item) {
  * @returns {Object|null} - JSON of update data
  */
 export function migrateShield(item) {
-    if (!(item.type === "armor" && item.system.type === "shield")) return null;
+  if (!(item.type === "armor" && item.system.type === "shield")) return null;
 
-    let shieldType = "small"; // default
-    const name = item.name.toLowerCase();
+  let shieldType = "small"; // default
+  const name = item.name.toLowerCase();
 
-    if (["tower", "door", "large"].some(s => name.includes(s))) 
-        shieldType = "large";
+  if (["tower", "door", "large"].some(s => name.includes(s))) 
+    shieldType = "large";
 
-    if (["ring", "cloak", "boots", "helm", "scarab", "amulet"].some(s => name.includes(s))) 
-        shieldType = "passive";
+  if (["ring", "cloak", "boots", "helm", "scarab", "amulet"].some(s => name.includes(s))) 
+    shieldType = "passive";
 
-    const systemData = foundry.utils.duplicate(item.system);
-    const update = {
-        type: "shield",
-        system: { ...systemData, type: shieldType }
-    }
-    return update;
+  const systemData = foundry.utils.duplicate(item.system);
+  const update = {
+    type: "shield",
+    system: { ...systemData, type: shieldType }
+  }
+  return update;
 }
 
 /**
@@ -352,22 +367,22 @@ export function migrateShield(item) {
  * @returns {Object|null} - JSON of update data or null if no change needed
  */
 export function migrateWeaponHands(item) {
-    if (item.type !== "weapon") return null;
+  if (item.type !== "weapon") return null;
 
-    let hands = 1; // default
-    const name = item.name.toLowerCase();
+  let hands = 1; // default
+  const name = item.name.toLowerCase();
 
-    if (["two-handed", "2h", "great", "halberd", "pike", "staff", "bow", "sling", "gun"].some(w => name.includes(w)) ||
-        (Array.isArray(item.system.annotations) &&
-            item.system.annotations.some(a => a.toLowerCase().includes("true2hand")))
-    ) { hands = 2; }
+  if (["two-handed", "2h", "great", "halberd", "pike", "staff", "bow", "sling", "gun"].some(w => name.includes(w)) ||
+    (Array.isArray(item.system.annotations) &&
+      item.system.annotations.some(a => a.toLowerCase().includes("true2hand")))
+  ) { hands = 2; }
 
-    // Only return an update if the hands property differs
-    if (item.system.hands !== hands) {
-        return { "system.hands": hands };
-    }
+  // Only return an update if the hands property differs
+  if (item.system.hands !== hands) {
+    return { "system.hands": hands };
+  }
 
-    return null;
+  return null;
 }
 
 /**
@@ -376,31 +391,31 @@ export function migrateWeaponHands(item) {
  * @returns {Object} - JSON of update data
  */
 export function fixTokenSize(actor) {
-    // If actor size is Medium, convert prototype token size to 1
-    if (actor.system.size == "M") {
-        Hyp3eLogger.info("fixTokenSize", `Fixing token size for ${actor.name}...`)
-        const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 1, scaleY: 1}}}
-        return update
-    }
-    // If actor size is Large, convert prototype token size to 2
-    if (actor.system.size == "L") {
-        Hyp3eLogger.info("fixTokenSize", `Fixing token size for ${actor.name}...`)
-        const update = {prototypeToken: {width: 2, height: 2, texture: {scaleX: 1, scaleY: 1}}}
-        return update
-    }
-    // If actor size is Huge, convert prototype token size to 3
-    if (actor.system.size == "H") {
-        Hyp3eLogger.info("fixTokenSize", `Fixing token size for ${actor.name}...`)
-        const update = {prototypeToken: {width: 3, height: 3, texture: {scaleX: 1, scaleY: 1}}}
-        return update
-    }
-    // If actor size is Small, convert prototype token scale to 0.5
-    if (actor.system.size == "S") {
-        Hyp3eLogger.info("fixTokenSize", `Fixing token size for ${actor.name}...`)
-        const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 0.5, scaleY: 0.5}}}
-        return update
-    }
-    return null
+  // If actor size is Medium, convert prototype token size to 1
+  if (actor.system.size == "M") {
+    Hyp3eLogger.info("fixTokenSize", `Fixing token size for ${actor.name}...`)
+    const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 1, scaleY: 1}}}
+    return update
+  }
+  // If actor size is Large, convert prototype token size to 2
+  if (actor.system.size == "L") {
+    Hyp3eLogger.info("fixTokenSize", `Fixing token size for ${actor.name}...`)
+    const update = {prototypeToken: {width: 2, height: 2, texture: {scaleX: 1, scaleY: 1}}}
+    return update
+  }
+  // If actor size is Huge, convert prototype token size to 3
+  if (actor.system.size == "H") {
+    Hyp3eLogger.info("fixTokenSize", `Fixing token size for ${actor.name}...`)
+    const update = {prototypeToken: {width: 3, height: 3, texture: {scaleX: 1, scaleY: 1}}}
+    return update
+  }
+  // If actor size is Small, convert prototype token scale to 0.5
+  if (actor.system.size == "S") {
+    Hyp3eLogger.info("fixTokenSize", `Fixing token size for ${actor.name}...`)
+    const update = {prototypeToken: {width: 1, height: 1, texture: {scaleX: 0.5, scaleY: 0.5}}}
+    return update
+  }
+  return null
 }
 
 /**
@@ -409,10 +424,10 @@ export function fixTokenSize(actor) {
  * @returns {Object} - JSON of update data
  */
 export function fixFriendlyName(item) {
-    const friendlyName = item.system.friendlyName;
-    // Use a regex to replace (1h) or (2h) with null
-    const output = friendlyName.replace(/\s?\((1h|2h)\)/g, "");
-    return output;
+  const friendlyName = item.system.friendlyName;
+  // Use a regex to replace (1h) or (2h) with null
+  const output = friendlyName.replace(/\s?\((1h|2h)\)/g, "");
+  return output;
 }
 
 // Retain the existing import paths for macros and integrations.
