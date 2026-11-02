@@ -19,6 +19,8 @@ export async function handleCritDamageButton(html) {
   let critDmgElement = html$.find(".crit-damage-button");
   if (critDmgElement.length === 0) return false;
 
+  Hyp3eLogger.info("handleCritDamageButton", `Found ${critDmgElement.length} critical damage button(s) in chat message.`);
+
   critDmgElement.each((_i, b) => {
     const total = Number($(b).data('total'));
     const damageType = $(b).data('damageType');
@@ -51,6 +53,7 @@ export async function handleCritMissOrHitButtons(html) {
   // Crit misses & hits are mutually exclusive so we can handle them both here
   let critMissElement = html$.find(".critical-miss");
   let critHitElement = html$.find(".critical-hit");
+  Hyp3eLogger.info("handleCritMissOrHitButtons", `Found ${critMissElement.length} critical miss element(s) and ${critHitElement.length} critical hit element(s) in chat message.`);
   if (critMissElement.length === 0 && critHitElement.length === 0) return false;
 
   let baseClass = "";
@@ -58,6 +61,7 @@ export async function handleCritMissOrHitButtons(html) {
 
   if (critMissElement.length > 0) {
     critMissElement.each((_i, b) => {
+      Hyp3eLogger.info("handleCritMissOrHitButtons", `Critical miss element data:`, $(b).data());
       baseClass = $(b).data('baseClass');
       if (baseClass != "npc") {
         baseClassLabel = baseClass.charAt(0).toUpperCase()+baseClass.substring(1)
@@ -68,10 +72,14 @@ export async function handleCritMissOrHitButtons(html) {
 
       // Read weapon damage data embedded by actor.mjs (present when item has a valid damage formula)
       const formula = $(b).data('formula');
+      const formula2h = $(b).data('formula2h') ?? null;
       const dmgData = formula ? {
         formula:    formula,
+        formula2h:    formula2h,
         debugFormula: $(b).data('debugFormula'),
+        debugFormula2h: $(b).data('debugFormula2h') ?? null,
         baseDamage:   $(b).data('baseDamage'),
+        baseDamage2h: $(b).data('baseDamage2h') ?? null,
         damageType:   $(b).data('damageType'),
         itemId:       $(b).data('itemId'),
         itemUuid:     $(b).data('itemUuid'),
@@ -79,6 +87,7 @@ export async function handleCritMissOrHitButtons(html) {
         tokenId:      $(b).data('tokenId'),
         sourceType:   $(b).data('sourceType'),
         damageGroups: $(b).data('damageGroups'),
+        damageGroups2h: $(b).data('damageGroups2h') ?? null,
       } : null;
 
       const icon = "fa-user-slash";
@@ -180,6 +189,7 @@ export async function handleCritMissOrHitButtons(html) {
 
 async function rollCritHit(charType, actorId) {
   let content = "";
+  Hyp3eLogger.info("rollCritHit", `Rolling critical hit for actor ${actorId} with character type ${charType}`);
   const dmg = game.i18n.localize("HYP3E.headers.damage");
   let roll = await new Roll("1d6").roll();
   if (charType === "fighter") {
@@ -243,6 +253,7 @@ async function rollCritHit(charType, actorId) {
 
 async function rollCritMiss(charType, actorId, dmgData = null) {
   let content = "";
+  Hyp3eLogger.info("rollCritMiss", `Rolling critical miss for actor ${actorId} with character type ${charType}`, dmgData);
   let hitCrit = false;
   let hitAllyOrSelf = false;
   let roll = await new Roll("1d12").roll();
@@ -363,6 +374,20 @@ async function rollCritMiss(charType, actorId, dmgData = null) {
       ` data-debug-formula='${dmgData.debugFormula}'` +
       ` data-damage-groups='${JSON.stringify(dmgData.damageGroups)}'` +
       ` data-source-type='${dmgData.sourceType}'></div>`;
+    // If needed, inject a second damage roll button for 2H damage (if present)
+    if (dmgData.formula2h) {
+      content += `<div class='dmg-roll-button2h' style='padding-top: 5px'` +
+        ` data-item-id='${dmgData.itemId}'` +
+        ` data-item-uuid='${dmgData.itemUuid}'` +
+        ` data-actor-id='${dmgData.actorId}'` +
+        ` data-token-id='${dmgData.tokenId}'` +
+        ` data-base-damage='${dmgData.baseDamage2h}'` +
+        ` data-damage-type='${dmgData.damageType}'` +
+        ` data-formula='${dmgData.formula2h}'` +
+        ` data-debug-formula='${dmgData.debugFormula2h}'` +
+        ` data-damage-groups='${JSON.stringify(dmgData.damageGroups)}'` +
+        ` data-source-type='${dmgData.sourceType}'></div>`;
+    }
   }
   if (hitCrit) {
     content += `<div class='critical-hit' data-base-class='${charType}' data-actor-id='${actorId}'></div>`;
@@ -441,7 +466,7 @@ async function rollCritHitWithDamage(charType, actorId, formula, debugDmgRollFor
       formulaAppend = `${baseDmgFormula} + ${baseDmgFormula}`;
     }
   }
-  // Hyp3eLogger.info("rollCritHitWithDamage", `Rolling critical hit damage. Base formula: ${formula}, formula to append: ${formulaAppend}, damageGroups: ${JSON.stringify(damageGroups)}`);
+  Hyp3eLogger.info("rollCritHitWithDamage", `Rolling critical hit damage. Base formula: ${formula}, formula to append: ${formulaAppend}, damageGroups: ${JSON.stringify(damageGroups)}`);
 
   const baseClassLabel = charType === "npc" ? "NPC" : charType.charAt(0).toUpperCase() + charType.substring(1);
   const title = `${baseClassLabel} Critical Hit: ${critLabel}`;
@@ -476,7 +501,7 @@ async function rollCritHitWithDamage(charType, actorId, formula, debugDmgRollFor
 function insertCritDamageDice(formula, formulaAppend, damageGroups) {
   if (!formula || !formulaAppend) return formula || "";
 
-  // Hyp3eLogger.info("insertCritDamageDice", `Inserting crit damage dice into formula. Base formula: ${formula}, formula to append: ${formulaAppend}, damageGroups: ${JSON.stringify(damageGroups)}`);
+  Hyp3eLogger.info("insertCritDamageDice", `Inserting crit damage dice into formula. Base formula: ${formula}, formula to append: ${formulaAppend}, damageGroups: ${JSON.stringify(damageGroups)}`);
 
   // Get the number of dice in the formulaAppend string, split on "+"
   const numDice = formulaAppend.split("+").length;

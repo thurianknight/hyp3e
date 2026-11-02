@@ -2185,24 +2185,30 @@ export class Hyp3eActor extends Actor {
     // if ((hit || isCritMiss) && item && Roll.validate(itemData.damage)) {
     if (item && Roll.validate(itemData.damage)) {
       damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);
+      Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Damage formulas:`, damageFormulas);
     }
 
     // Embed damage data in the crit-miss footer so the crit miss handler can offer damage rolls
     let resolvedCritFooter = critFooter;
     if (isCritMiss && damageFormulas.primary) {
       const df = damageFormulas.primary;
+      const df2h = damageFormulas.secondary ?? {};
       resolvedCritFooter = `<div class='critical-miss'` +
                             ` data-base-class='${this.system.baseClass}'` +
                             ` data-actor-id='${this.id}'` +
                             ` data-formula='${df.formula}'` +
+                            ` data-formula2h='${df2h.formula}'` +
                             ` data-debug-formula='${df.debugFormula}'` +
+                            ` data-debug-formula2h='${df2h.debugFormula}'` +
                             ` data-base-damage='${itemData.damage}'` +
+                            ` data-base-damage2h='${itemData.damage2h}'` +
                             ` data-damage-type='${itemData.dmgType}'` +
                             ` data-item-id='${item.id}'` +
                             ` data-item-uuid='${item.uuid}'` +
                             ` data-token-id='${attacker?.id ?? ""}'` +
                             ` data-source-type='${item.type}'` +
-                            ` data-damage-groups='${JSON.stringify(df.damageGroups)}'></div>`;
+                            ` data-damage-groups='${JSON.stringify(df.damageGroups)}'` +
+                            ` data-damage-groups2h='${JSON.stringify(df2h.damageGroups)}'></div>`;
     }
 
     // Render chat message
