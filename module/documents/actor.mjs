@@ -2197,18 +2197,18 @@ export class Hyp3eActor extends Actor {
                             ` data-base-class='${this.system.baseClass}'` +
                             ` data-actor-id='${this.id}'` +
                             ` data-formula='${df.formula}'` +
-                            ` data-formula2h='${df2h.formula}'` +
+                            ` data-formula2h='${df2h.formula ? df2h.formula : ""}'` +
                             ` data-debug-formula='${df.debugFormula}'` +
-                            ` data-debug-formula2h='${df2h.debugFormula}'` +
+                            ` data-debug-formula2h='${df2h.debugFormula ? df2h.debugFormula : ""}'` +
                             ` data-base-damage='${itemData.damage}'` +
-                            ` data-base-damage2h='${itemData.damage2h}'` +
+                            ` data-base-damage2h='${itemData.damage2h ? itemData.damage2h : ""}'` +
                             ` data-damage-type='${itemData.dmgType}'` +
                             ` data-item-id='${item.id}'` +
                             ` data-item-uuid='${item.uuid}'` +
                             ` data-token-id='${attacker?.id ?? ""}'` +
                             ` data-source-type='${item.type}'` +
                             ` data-damage-groups='${JSON.stringify(df.damageGroups)}'` +
-                            ` data-damage-groups2h='${JSON.stringify(df2h.damageGroups)}'></div>`;
+                            ` data-damage-groups2h='${df2h.damageGroups ? JSON.stringify(df2h.damageGroups) : ""}'"></div>`;
     }
 
     // Render chat message

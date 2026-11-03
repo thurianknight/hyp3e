@@ -357,6 +357,7 @@ async function rollCritMiss(charType, actorId, dmgData = null) {
       content = "Critical Miss -- Error in getting result";
     }
   }
+  Hyp3eLogger.info("rollCritMiss", `Critical Miss result ${roll.total}: ${content}`);
 
   content = `<div class="dice-damage">` + content + `</div>`
   if (hitAllyOrSelf && dmgData) {
@@ -375,7 +376,7 @@ async function rollCritMiss(charType, actorId, dmgData = null) {
       ` data-damage-groups='${JSON.stringify(dmgData.damageGroups)}'` +
       ` data-source-type='${dmgData.sourceType}'></div>`;
     // If needed, inject a second damage roll button for 2H damage (if present)
-    if (dmgData.formula2h) {
+    if (dmgData.formula2h && dmgData.formula2h !== "" && dmgData.formula2h !== null && dmgData.formula2h !== undefined) {
       content += `<div class='dmg-roll-button2h' style='padding-top: 5px'` +
         ` data-item-id='${dmgData.itemId}'` +
         ` data-item-uuid='${dmgData.itemUuid}'` +
@@ -557,6 +558,7 @@ async function getFeetAndDirectionCritMiss() {
 
 async function getCritMissHitCrit(charType) {
   let roll = await new Roll("1d8").roll();
+  Hyp3eLogger.info("getCritMissHitCrit", `Critical Miss crit-check roll for ${charType}: ${roll.total}`);
   if (charType === "fighter" && roll.total == 1) {
     return true;
   } else if (charType === "magician" && roll.total <= 3) {
