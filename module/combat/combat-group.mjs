@@ -47,12 +47,12 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     } = options;
 
     // If one or more combatant IDs was provided, get any applicable groups, otherwise get all
-    let groupsToRollFor
+    let groupsToRollFor;
     if (combatantIds !== null && combatantIds.length > 0) {
       Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Combatant IDs for group initiative:`, combatantIds);
       groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
     } else if (group !== undefined) {
-      groupsToRollFor = [group];
+      groupsToRollFor = new Set([group]);
     } else {
       groupsToRollFor = this.availableGroups;
     }
@@ -69,23 +69,23 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Initiative results per group:`, results);
 
     // For each combatant, add its combat action & status modifiers to initiative
-    const combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.initGroup))
-    combatantsAffected.forEach(c => {
-      c.initRoll = results[c.initGroup].initiative
-      // Movement partially overrides the other combat actions for initiative order
-      c.getActionModifiers();
-      const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit} + ${c.delayedInit}`
-      Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other + delayed): ${rollTerms}`);
+    // const combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.initGroup))
+    // combatantsAffected.forEach(c => {
+    //   c.initRoll = results[c.initGroup].initiative
+    //   // Movement partially overrides the other combat actions for initiative order
+    //   const actionMods = c.getActionModifiers();
+    //   const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit} + ${c.delayedInit}`
+    //   Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other + delayed): ${rollTerms}`);
 
-      // Add the actor's temporary initiative modifier, if one exists
-      c.getTempInitMod();
+    //   // Add the actor's temporary initiative modifier, if one exists
+    //   c.getTempInitMod();
 
-      // Get initiative penalties based on status effects like blind or deaf
-      c.getSlowingModifiers();
+    //   // Get initiative penalties based on status effects like blind or deaf
+    //   c.getSlowingModifiers();
 
-      // If defeated, add this initiative penalty to force actor to the end of the round
-      c.getDefeatedModifier();
-    })
+    //   // If defeated, add this initiative penalty to force actor to the end of the round
+    //   c.getDefeatedModifier();
+    // })
 
     // Update each group's initiative score
     for (const initGroup of groupsToRollFor) {
@@ -187,45 +187,70 @@ export class HYP3EGroupCombat extends HYP3ECombat {
     const initScore = Number(newInitScore);
     Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `Setting initiative score for group ${initGroup} to ${initScore}...`);
 
+    // Create a mutable array of combatants in the group to update
     const combatantsToUpdate = this.combatants.filter(c => c.initGroup === initGroup);
     for (const c of combatantsToUpdate) {
-      c.initRoll = initScore;
+      // c.initRoll = initScore;
       // Movement partially overrides the other combat actions for initiative order
-      c.getActionModifiers();
-      const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit} + ${c.delayedInit}`
+      const actionMods = c.getActionModifiers();
+      c.meleeInit = actionMods.meleeInit;
+      c.missileInit = actionMods.missileInit;
+      c.magicInit = actionMods.magicInit;
+      c.moveInit = actionMods.moveInit;
+      c.otherInit = actionMods.otherInit;
+      c.delayedInit = actionMods.delayedInit;
+
+      const rollTerms = `${initScore} + ${actionMods.meleeInit} + ${actionMods.missileInit} + ${actionMods.magicInit} + ${actionMods.moveInit} + ${actionMods.otherInit} + ${actionMods.delayedInit}`
       Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other + delayed): ${rollTerms}`);
 
       // Add the actor's temporary initiative modifier, if one exists
-      c.getTempInitMod();
+      const tempInitMod = c.getTempInitMod();
+      c.tempInitMod = tempInitMod;
 
       // Get initiative penalties based on status effects like blind or deaf
-      c.getSlowingModifiers();
+      const slowingMods = c.getSlowingModifiers();
+      c.statusInit = slowingMods.slowingMod;
+      c.isSlowed = slowingMods.isSlowed;
 
       // If defeated, add this initiative penalty to force actor to the end of the round
-      c.getDefeatedModifier();
+      const defeatedMod = c.getDefeatedModifier();
+      c.defeatedInit = defeatedMod;
 
       // const initiative = Math.round((initScore 
       c.initiative = Math.round((initScore 
                                 + (c.actor?.system?.attributes?.dex?.value/1000)
-                                + c.tempInitMod
-                                + c.meleeInit
-                                + c.missileInit
-                                + c.magicInit
-                                + c.moveInit
-                                + c.otherInit
-                                + c.delayedInit
-                                + c.statusInit
-                                + c.defeatedInit) * 1000) / 1000;
+                                  + tempInitMod
+                                  + actionMods.meleeInit
+                                  + actionMods.missileInit
+                                  + actionMods.magicInit
+                                  + actionMods.moveInit
+                                  + actionMods.otherInit
+                                  + actionMods.delayedInit
+                                  + slowingMods.slowingMod
+                                  + defeatedMod)
+                                * 1000) / 1000;
       Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `Updating combatant ${c.name} (${c.id}) to initiative ${c.initiative}...`, c);
     }
+
+    // Update the combatant documents in the group with the new initiative values
     const updates = combatantsToUpdate.map(
       (c) => ({ _id: c.id, 
         initRoll: initScore,
         "flags.hyp3e.initRoll": initScore,
         initiative: c.initiative,
+        meleeInit: c.meleeInit,
+        missileInit: c.missileInit,
+        magicInit: c.magicInit,
+        moveInit: c.moveInit,
+        otherInit: c.otherInit,
+        delayedInit: c.delayedInit,
+        tempInitMod: c.tempInitMod,
+        statusInit: c.statusInit,
+        isSlowed: c.isSlowed,
+        defeatedInit: c.defeatedInit,
       })
     )
-    return this.updateEmbeddedDocuments("Combatant", updates);
+    return await this.updateEmbeddedDocuments("Combatant", updates);
   }
 
   // ===========================================================================
@@ -252,14 +277,7 @@ export class HYP3EGroupCombat extends HYP3ECombat {
 
   get groupInitiativeScores() {
     const initiativeMap = new Map()
-    // for (const initGroup in this.combatantsByGroup) {
-    //   this.combatantsByGroup[initGroup].forEach(c => {
-    //     // Set the combatant's initiative roll as the group's initiative score
-    //     if (c.initRoll > (initiativeMap.get(initGroup) || 0)) {
-    //       initiativeMap.set(initGroup, c.initRoll)
-    //     }
-    //   });
-    // }
+
     for (const [initGroup, combatants] of Object.entries(this.combatantsByGroup)) {
       for (const c of combatants) {
         const initRoll = c.getFlag("hyp3e", "initRoll") ?? null;

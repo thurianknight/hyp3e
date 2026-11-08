@@ -225,7 +225,7 @@ export class HYP3ECombatant extends Combatant {
     // Get the actor's roll data now, so we can use the DX value
     const rollData = this.actor?.getRollData() || {};
     const name = this.actor?.displayName || ""
-    Hyp3eLogger.info("HYP3ECombatant getInitiativeRoll", `Actor roll data for individual initiative:`, rollData);
+    Hyp3eLogger.info("HYP3ECombatant getInitiativeRoll", `${name} roll data for individual initiative:`, rollData);
 
     // Movement partially overrides the other combat actions for initiative order
     this.getActionModifiers();
@@ -284,44 +284,53 @@ export class HYP3ECombatant extends Combatant {
       }
     }
     // Log all initiative modifiers for this combatant
-    const initMods = {};
-    initMods['meleeInit'] = this.meleeInit;
-    initMods['missileInit'] = this.missileInit;
-    initMods['magicInit'] = this.magicInit;
-    initMods['moveInit'] = this.moveInit;
-    initMods['otherInit'] = this.otherInit;
-    initMods['delayedInit'] = this.delayedInit;
+    const initMods = {
+      meleeInit: this.meleeInit,
+      missileInit: this.missileInit,
+      magicInit: this.magicInit,
+      moveInit: this.moveInit,
+      otherInit: this.otherInit,
+      delayedInit: this.delayedInit
+    }
     Hyp3eLogger.info("HYP3ECombatant getActionModifiers", `${this.name} declared-action Initiative mods:`, initMods);
+    return initMods;
   }
 
   getTempInitMod() {
     // If the actor has a temporary init mod set, apply it here
-    this.tempInitMod = this.actor?.system?.tempInitiativeMod ? this.actor?.system?.tempInitiativeMod : 0
+    const tempInitMod = this.actor?.system?.tempInitiativeMod ? this.actor?.system?.tempInitiativeMod : 0
+    this.tempInitMod = tempInitMod;
+    return tempInitMod;
   }
 
   getDefeatedModifier() {
     // If defeated or unconscious, add this initiative penalty to force actor to the end of the round
-    this.defeatedInit = this.isDefeated || this?.isDying || this?.isUnconscious ? HYP3ECombatant.INITIATIVE_MOD_DEFEATED : 0;
+    const defeatedMod = this.isDefeated || this?.isDying || this?.isUnconscious ? HYP3ECombatant.INITIATIVE_MOD_DEFEATED : 0;
+    this.defeatedInit = defeatedMod;
+    return defeatedMod;
   }
 
   getSlowingModifiers() {
     // If deaf or blind, add these initiative penalties
-    this.statusInit = 0;
-    this.isSlowed = false;
+    let slowingMod = 0;
+    let isSlowed = false;
     for ( let e of this.actor.effects) {
       if (e.name == "Slowed" && !e.disabled) {
-        this.statusInit += HYP3ECombatant.INITIATIVE_MOD_SLOWED;
-        this.isSlowed = true;
+        slowingMod += HYP3ECombatant.INITIATIVE_MOD_SLOWED;
+        isSlowed = true;
       }
       if (e.name == "Deaf" && !e.disabled) {
-        this.statusInit += HYP3ECombatant.INITIATIVE_MOD_DEAF;
-        this.isSlowed = true;
+        slowingMod += HYP3ECombatant.INITIATIVE_MOD_DEAF;
+        isSlowed = true;
       }
       if (e.name == "Blind" && !e.disabled) {
-        this.statusInit += HYP3ECombatant.INITIATIVE_MOD_BLIND;
-        this.isSlowed = true;
+        slowingMod += HYP3ECombatant.INITIATIVE_MOD_BLIND;
+        isSlowed = true;
       }
     }
+    this.statusInit = slowingMod;
+    this.isSlowed = isSlowed;
+    return { slowingMod, isSlowed };
   }
 
   async updateStatus() {

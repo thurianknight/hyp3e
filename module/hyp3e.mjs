@@ -35,9 +35,10 @@ import { Hyp3eLogger } from "./helpers/logger.mjs";
 import { registerHyp3eConfigurations } from "./helpers/register-config.mjs";
 import { applyChatFontSizeSetting } from "./chat/chat.mjs";
 import { getClassTemplate, getClassTemplates, getClassTemplateNames, findItemsByFolderOrCompendiumName, getJournalPageList } from "./helpers/folders-and-compendia.mjs"
+import { SOCKET_NAME, SOCKET_EVENTS } from "./helpers/constants.mjs";
 
 // Set this now, to use later
-let trackerInitialized = false;
+// let trackerInitialized = false;
 
 /* -------------------------------------------- */
 /*  Init Hook                   */
@@ -725,6 +726,9 @@ Hooks.once("ready", async function() {
   // Log world time & date
   Hyp3eLogger.info("Init", `Current world time is ${game.time.worldTime} seconds since epoch.`, game.time);
 
+  // Register combat socket listeners
+  registerCombatSockets()
+
   // Pre-load processing
   if (game.user.isGM) {
     // If the token resize option is set, do that now, while the game is loading
@@ -1140,6 +1144,36 @@ async function createCompendiumFolders(folderDefs, parentId = null) {
       await ensureCompendiumFolders(def.folders, folder.id);
     }
   }
+}
+
+/* -------------------------------------------- */
+/*  Group Initiative socket functions           */
+/* -------------------------------------------- */
+
+export function registerCombatSockets() {
+  game.socket.on(SOCKET_NAME, async (data) => {
+    // Only the active GM applies privileged updates
+    if (game.user !== game.users.activeGM) return;
+
+    switch (data?.type) {
+      case SOCKET_EVENTS.APPLY_GROUP_INITIATIVE:
+        await _applyGroupInitiativeAsGM(data);
+        break;
+      default:
+        break;
+    }
+  });
+}
+
+async function _applyGroupInitiativeAsGM({ combatId, updates }) {
+  const combat = game.combats.get(combatId);
+  if (!combat || !updates?.length) return;
+
+  // Core path that GMs are allowed to use
+  await combat.updateEmbeddedDocuments("Combatant", updates, {
+    // keep current turn stable if you need that behavior
+    // turn: combat.turn
+  });
 }
 
 /* -------------------------------------------- */
