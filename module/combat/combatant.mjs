@@ -228,25 +228,43 @@ export class HYP3ECombatant extends Combatant {
     Hyp3eLogger.info("HYP3ECombatant getInitiativeRoll", `${name} roll data for individual initiative:`, rollData);
 
     // Movement partially overrides the other combat actions for initiative order
-    this.getActionModifiers();
+    const actionMods = this.getActionModifiers();
     // Add the action values to rollTerms
-    rollTerms += `+ ${this.meleeInit + this.missileInit + this.magicInit + this.moveInit + this.otherInit} + ${this.delayedInit}`;
+    rollTerms += `+ ${actionMods.meleeInit + actionMods.missileInit + actionMods.magicInit + actionMods.moveInit + actionMods.otherInit} + ${actionMods.delayedInit}`;
     Hyp3eLogger.info("HYP3ECombatant getInitiativeRoll", `${this.name} initiative roll terms (roll + melee + missile + magic + move + other + delayed): ${rollTerms}`);
     // Add the actor's DX value
     rollTerms += `+ ${(rollData.attributes?.dex?.value/1000)}`
 
     // Add the actor's temporary initiative modifier, if one exists
-    this.getTempInitMod();
-    rollTerms += `+ ${this.tempInitMod}`;
+    const tempInitMod = this.getTempInitMod();
+    rollTerms += `+ ${tempInitMod}`;
 
     // If deaf or blind, add these initiative penalties
-    this.getSlowingModifiers();
-    rollTerms += `+ ${this.statusInit}`;
+    const slowingMods = this.getSlowingModifiers();
+    // rollTerms += `+ ${this.statusInit}`;
+    rollTerms += `+ ${slowingMods.slowingMod}`;
+    // this.statusInit = slowingMods.slowingMod;
+    // this.isSlowed = slowingMods.isSlowed;
 
     // If defeated, add this initiative penalty to force actor to the bottom of the list
-    this.getDefeatedModifier();
-    rollTerms += `+ ${this.defeatedInit}`;
+    const defeatedMod = this.getDefeatedModifier();
+    rollTerms += `+ ${defeatedMod}`;
 
+    // Update this combatant with all values
+    this.update({
+      // meleeInit: actionMods.meleeInit,
+      // missileInit: actionMods.missileInit,
+      // magicInit: actionMods.magicInit,
+      // moveInit: actionMods.moveInit,
+      // otherInit: actionMods.otherInit,
+      // delayedInit: actionMods.delayedInit,
+      // tempInitMod: tempInitMod,
+      // statusInit: slowingMods.slowingMod,
+      isSlowed: slowingMods.isSlowed,
+      // defeatedInit: defeatedMod
+    });
+
+    Hyp3eLogger.info("HYP3ECombatant getInitiativeRoll", `${this.name} final initiative roll terms (roll + melee + missile + magic + move + other + delayed + temp mod + status mod + defeated mod): ${rollTerms}`);
     // Create a roll object and return to rollInitiative() where the roll happens
     return foundry.dice.Roll.create(rollTerms, rollData);
     // const result = new Roll(rollTerms, rollData);
@@ -258,39 +276,43 @@ export class HYP3ECombatant extends Combatant {
     Hyp3eLogger.info("HYP3ECombatant getActionModifiers", `Initiative type:`, initiativeType);
     const PREFIX = (initiativeType === "group") ? "GROUP" : "PHASED";
     // Movement partially overrides the other combat actions for initiative order
-    // this.moveInit = this.getFlag(game.system.id, "isMovement") ? HYP3ECombatant.GROUP_INIT_MOD_MOVEMENT : 0;
     const isMovement = this.getFlag(game.system.id, "isMovement") || false;
     Hyp3eLogger.info("HYP3ECombatant getActionModifiers", `${this.name} Movement declared?:`, isMovement);
-    this.moveInit = isMovement ? Number(HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVEMENT`]) : 0;
+    let moveInit = isMovement ? Number(HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVEMENT`]) : 0;
+    let meleeInit = 0;
+    let missileInit = 0;
+    let magicInit = 0;
+    let otherInit = 0;
+    let delayedInit = 0;
     // Action without movement
-    if (this.moveInit == 0) {
-      this.meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MELEE`] : 0;
-      this.missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MISSILE`] : 0;
-      this.magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MAGIC`] : 0;
-      this.otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_OTHER`] : 0;
-      this.delayedInit = this.getFlag(game.system.id, "isDelayed") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_DELAYED`] : 0;
+    if (moveInit == 0) {
+      meleeInit = this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MELEE`] : 0;
+      missileInit = this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MISSILE`] : 0;
+      magicInit = this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MAGIC`] : 0;
+      otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_OTHER`] : 0;
+      delayedInit = this.getFlag(game.system.id, "isDelayed") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_DELAYED`] : 0;
     } else {
       // Movement declared, possibly with another action
-      this.meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MELEE`] : 0)/10;
-      this.missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MISSILE`] : 0)/10;
-      this.magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MAGIC`] : 0)/10;
+      meleeInit = (this.getFlag(game.system.id, "isMelee") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MELEE`] : 0)/10;
+      missileInit = (this.getFlag(game.system.id, "isMissile") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MISSILE`] : 0)/10;
+      magicInit = (this.getFlag(game.system.id, "isMagic") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MAGIC`] : 0)/10;
       // We treat Move + Other specially to ensure it falls in the correct order
-      this.otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVE_OTHER`] : 0;
+      otherInit = this.getFlag(game.system.id, "isOther") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_MOVE_OTHER`] : 0;
       // Delayed actions are handled to ensure they fall at the end of the initiative order
-      this.delayedInit = this.getFlag(game.system.id, "isDelayed") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_DELAYED`] : 0;
+      delayedInit = this.getFlag(game.system.id, "isDelayed") ? HYP3ECombatant[`${PREFIX}_INIT_MOD_DELAYED`] : 0;
       // If move is combined with another action, reduce its modifier value to 1/10
-      if (this.meleeInit > 0 || this.missileInit > 0 || this.magicInit > 0 || this.otherInit > 0) {
-        this.moveInit = this.moveInit/10;
+      if (meleeInit > 0 || missileInit > 0 || magicInit > 0 || otherInit > 0) {
+        moveInit = moveInit/10;
       }
     }
     // Log all initiative modifiers for this combatant
     const initMods = {
-      meleeInit: this.meleeInit,
-      missileInit: this.missileInit,
-      magicInit: this.magicInit,
-      moveInit: this.moveInit,
-      otherInit: this.otherInit,
-      delayedInit: this.delayedInit
+      meleeInit: meleeInit,
+      missileInit: missileInit,
+      magicInit: magicInit,
+      moveInit: moveInit,
+      otherInit: otherInit,
+      delayedInit: delayedInit
     }
     Hyp3eLogger.info("HYP3ECombatant getActionModifiers", `${this.name} declared-action Initiative mods:`, initMods);
     return initMods;
@@ -299,14 +321,14 @@ export class HYP3ECombatant extends Combatant {
   getTempInitMod() {
     // If the actor has a temporary init mod set, apply it here
     const tempInitMod = this.actor?.system?.tempInitiativeMod ? this.actor?.system?.tempInitiativeMod : 0
-    this.tempInitMod = tempInitMod;
+    // this.tempInitMod = tempInitMod;
     return tempInitMod;
   }
 
   getDefeatedModifier() {
     // If defeated or unconscious, add this initiative penalty to force actor to the end of the round
     const defeatedMod = this.isDefeated || this?.isDying || this?.isUnconscious ? HYP3ECombatant.INITIATIVE_MOD_DEFEATED : 0;
-    this.defeatedInit = defeatedMod;
+    // this.defeatedInit = defeatedMod;
     return defeatedMod;
   }
 
@@ -328,8 +350,8 @@ export class HYP3ECombatant extends Combatant {
         isSlowed = true;
       }
     }
-    this.statusInit = slowingMod;
-    this.isSlowed = isSlowed;
+    // this.statusInit = slowingMod;
+    // this.isSlowed = isSlowed;
     return { slowingMod, isSlowed };
   }
 

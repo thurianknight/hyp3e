@@ -39,55 +39,37 @@ export class HYP3EGroupCombat extends HYP3ECombat {
   async rollInitiative(options = {}) {
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Arguments passed to method:`, { options });
     const {
-      combatantIds = null,
-      group,
+      combatantIds = null,    // An array of combatant ID strings
+      group,                  // A string representing a single group name
       formula,
       updateTurn = false,
       messageOptions = {}
     } = options;
 
-    // If one or more combatant IDs was provided, get any applicable groups, otherwise get all
-    let groupsToRollFor;
+    // If one or more combatant IDs was provided, get the applicable groups, otherwise get all groups
+    let groupsToRollFor = [];
     if (combatantIds !== null && combatantIds.length > 0) {
       Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Combatant IDs for group initiative:`, combatantIds);
       groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
     } else if (group !== undefined) {
-      groupsToRollFor = new Set([group]);
+      groupsToRollFor = [group];
     } else {
       groupsToRollFor = this.availableGroups;
     }
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Groups to roll for:`, groupsToRollFor);
 
-    // Take the groups array and append a roll object to each group
+    // Take the groupsToRollFor array and append a roll object to each group
     const rollPerGroup = groupsToRollFor.reduce((prev, curr) => ({
       ...prev,
       [curr]: new Roll(HYP3ECombat.FORMULA)
     }), {});
+
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Initiative roll per group:`, rollPerGroup);
 
     const results = await this.#prepareGroupInitiativeDice(rollPerGroup);
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Initiative results per group:`, results);
 
-    // For each combatant, add its combat action & status modifiers to initiative
-    // const combatantsAffected = this.combatants.filter(c => groupsToRollFor.some(group => group === c.initGroup))
-    // combatantsAffected.forEach(c => {
-    //   c.initRoll = results[c.initGroup].initiative
-    //   // Movement partially overrides the other combat actions for initiative order
-    //   const actionMods = c.getActionModifiers();
-    //   const rollTerms = `${c.initRoll} + ${c.meleeInit} + ${c.missileInit} + ${c.magicInit} + ${c.moveInit} + ${c.otherInit} + ${c.delayedInit}`
-    //   Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other + delayed): ${rollTerms}`);
-
-    //   // Add the actor's temporary initiative modifier, if one exists
-    //   c.getTempInitMod();
-
-    //   // Get initiative penalties based on status effects like blind or deaf
-    //   c.getSlowingModifiers();
-
-    //   // If defeated, add this initiative penalty to force actor to the end of the round
-    //   c.getDefeatedModifier();
-    // })
-
-    // Update each group's initiative score
+    // Update each group's initiative scores
     for (const initGroup of groupsToRollFor) {
       const newInitScore = results[initGroup].initiative;
       Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Setting ${initGroup} group initiative to ${newInitScore}...`);
@@ -193,28 +175,28 @@ export class HYP3EGroupCombat extends HYP3ECombat {
       // c.initRoll = initScore;
       // Movement partially overrides the other combat actions for initiative order
       const actionMods = c.getActionModifiers();
-      c.meleeInit = actionMods.meleeInit;
-      c.missileInit = actionMods.missileInit;
-      c.magicInit = actionMods.magicInit;
-      c.moveInit = actionMods.moveInit;
-      c.otherInit = actionMods.otherInit;
-      c.delayedInit = actionMods.delayedInit;
+      // c.meleeInit = actionMods.meleeInit;
+      // c.missileInit = actionMods.missileInit;
+      // c.magicInit = actionMods.magicInit;
+      // c.moveInit = actionMods.moveInit;
+      // c.otherInit = actionMods.otherInit;
+      // c.delayedInit = actionMods.delayedInit;
 
       const rollTerms = `${initScore} + ${actionMods.meleeInit} + ${actionMods.missileInit} + ${actionMods.magicInit} + ${actionMods.moveInit} + ${actionMods.otherInit} + ${actionMods.delayedInit}`
       Hyp3eLogger.info("HYP3EGroupCombat setGroupInitiativeScore", `${c.name} initiative roll terms (roll + melee + missile + magic + move + other + delayed): ${rollTerms}`);
 
       // Add the actor's temporary initiative modifier, if one exists
       const tempInitMod = c.getTempInitMod();
-      c.tempInitMod = tempInitMod;
+      // c.tempInitMod = tempInitMod;
 
       // Get initiative penalties based on status effects like blind or deaf
       const slowingMods = c.getSlowingModifiers();
-      c.statusInit = slowingMods.slowingMod;
+      // c.statusInit = slowingMods.slowingMod;
       c.isSlowed = slowingMods.isSlowed;
 
       // If defeated, add this initiative penalty to force actor to the end of the round
       const defeatedMod = c.getDefeatedModifier();
-      c.defeatedInit = defeatedMod;
+      // c.defeatedInit = defeatedMod;
 
       // const initiative = Math.round((initScore 
       c.initiative = Math.round((initScore 
@@ -238,16 +220,16 @@ export class HYP3EGroupCombat extends HYP3ECombat {
         initRoll: initScore,
         "flags.hyp3e.initRoll": initScore,
         initiative: c.initiative,
-        meleeInit: c.meleeInit,
-        missileInit: c.missileInit,
-        magicInit: c.magicInit,
-        moveInit: c.moveInit,
-        otherInit: c.otherInit,
-        delayedInit: c.delayedInit,
-        tempInitMod: c.tempInitMod,
-        statusInit: c.statusInit,
+        // meleeInit: c.meleeInit,
+        // missileInit: c.missileInit,
+        // magicInit: c.magicInit,
+        // moveInit: c.moveInit,
+        // otherInit: c.otherInit,
+        // delayedInit: c.delayedInit,
+        // tempInitMod: c.tempInitMod,
+        // statusInit: c.statusInit,
         isSlowed: c.isSlowed,
-        defeatedInit: c.defeatedInit,
+        // defeatedInit: c.defeatedInit,
       })
     )
     return await this.updateEmbeddedDocuments("Combatant", updates);

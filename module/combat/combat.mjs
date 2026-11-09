@@ -172,14 +172,14 @@ export class HYP3ECombat extends Combat {
         "flags.hyp3e.initRoll": null,
         initRoll: null,
         initiative: null,
-        meleeInit: null,
-        missileInit: null,
-        magicInit: null,
-        moveInit: null,
-        otherInit: null,
-        delayedInit: null,
-        statusInit: null,
-        defeatedInit: null
+        // meleeInit: null,
+        // missileInit: null,
+        // magicInit: null,
+        // moveInit: null,
+        // otherInit: null,
+        // delayedInit: null,
+        // statusInit: null,
+        // defeatedInit: null
       })
     )
     await this.updateEmbeddedDocuments("Combatant", updates);
