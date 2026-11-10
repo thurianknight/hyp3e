@@ -1,5 +1,6 @@
 import { logEffectRegistry } from "../helpers/effects.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
+import { SOCKET_NAME, SOCKET_EVENTS } from "../helpers/constants.mjs";
 
 /**
  * @file System-level modifications to the way combat works

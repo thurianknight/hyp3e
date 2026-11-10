@@ -2,6 +2,7 @@ import HYP3E from "../helpers/config.mjs";
 import { Hyp3eLogger } from "../helpers/logger.mjs";
 import { HYP3ECombat } from "./combat.mjs";
 import { Hyp3eDialog } from "../helpers/dialog.mjs";
+import { SOCKET_NAME, SOCKET_EVENTS } from "../helpers/constants.mjs";
 
 export const colorGroups = HYP3E.colors;
 export const actionGroups = {
@@ -52,8 +53,10 @@ export class HYP3EGroupCombat extends HYP3ECombat {
       Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Combatant IDs for group initiative:`, combatantIds);
       groupsToRollFor = this.getCombatantGroupsFromList(combatantIds);
     } else if (group !== undefined) {
+      // This is used when anyone clicks the roll button for a color-group in the combat tracker
       groupsToRollFor = [group];
     } else {
+      // This is used when the GM clicks "Roll All" at the very top of the combat tracker
       groupsToRollFor = this.availableGroups;
     }
     Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Groups to roll for:`, groupsToRollFor);
@@ -71,9 +74,38 @@ export class HYP3EGroupCombat extends HYP3ECombat {
 
     // Update each group's initiative scores
     for (const initGroup of groupsToRollFor) {
+      const groupCombatants = this.combatants.filter(c => c.initGroup === initGroup);
+      if (!groupCombatants.length) return;
+
+      // Authorization: player must own at least one combatant in the group
+      const ownsAny = groupCombatants.some(c => c.isOwner);
+      if (!game.user.isGM && !ownsAny) {
+        ui.notifications.warn(`You do not control any combatant in ${initGroup} group.`);
+        return;
+      }
+
       const newInitScore = results[initGroup].initiative;
       Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Setting ${initGroup} group initiative to ${newInitScore}...`);
-      await this.setGroupInitiativeScore(initGroup, newInitScore);
+      if (game.user.isGM) {
+        Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `User is GM, setting initiative directly...`);
+        // GM can write directly
+        await this.setGroupInitiativeScore(initGroup, newInitScore);
+      } else {
+        if (!game.users.activeGM) {
+          Hyp3eLogger.warn("HYP3EGroupCombat rollInitiative", `No active GM available to apply group initiative.`);
+          ui.notifications.error("No active GM available to apply group initiative.");
+          return;
+        }
+        // Players must send a socket request to the GM to update the initiative
+        Hyp3eLogger.info("HYP3EGroupCombat rollInitiative", `Sending socket request to GM to set ${initGroup} group initiative to ${newInitScore}...`, { Socket: SOCKET_NAME, Event: SOCKET_EVENTS.APPLY_GROUP_INITIATIVE });
+        game.socket.emit(SOCKET_NAME, {
+          type: SOCKET_EVENTS.APPLY_GROUP_INITIATIVE,
+          combatId: this.id,
+          updates: { groupId: initGroup, initiative: newInitScore },
+          rollerUserId: game.user.id,
+          flavor: game.i18n.format("HYP3E.combat.rollInitiative", { initGroup })
+        });
+      }
     }
 
     await this.#rollInitiativeUIFeedback(results);

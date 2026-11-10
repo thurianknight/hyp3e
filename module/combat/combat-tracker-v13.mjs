@@ -177,19 +177,6 @@ export class HYP3ECombatTracker extends foundry.applications.sidebar.tabs.Combat
     super._onRender(context, options);
     // super.activateListeners(html);
 
-    // Roll group initiative for all groups (GMs only)
-    html.find('.combat-control[data-action="reroll"]').click((ev) => {      
-      game.combat.rollInitiative();
-    });
-
-    // Roll for group that the player's combatant is in
-    html.find('.combat-control[data-action="rollGroup"]').click((ev) => {
-      const combatant = game.combat.combatants.find(c => c.actor.isOwner);
-      if (combatant) {
-        game.combat.rollInitiative({ combatantIds: [combatant.id] });
-      }
-    });
-
     // Roll for specific group
     html.find('a[data-action="roll-group-initiative"]').click((ev) => {      
       const groupName = ev.currentTarget.dataset.initGroup;

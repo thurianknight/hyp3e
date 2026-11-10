@@ -737,7 +737,7 @@ Hooks.once("ready", async function() {
     }
   }
 
-});
+}); // End of Hooks.once("ready")
 
 /* -------------------------------------------- */
 /*  Additional Hooks                            */
@@ -1151,29 +1151,38 @@ async function createCompendiumFolders(folderDefs, parentId = null) {
 /* -------------------------------------------- */
 
 export function registerCombatSockets() {
+  Hyp3eLogger.info("registerCombatSockets", `Registering combat socket events for socket ${SOCKET_NAME}...`);
   game.socket.on(SOCKET_NAME, async (data) => {
+    Hyp3eLogger.info("Socket Event", `Socket received:`, data);
     // Only the active GM applies privileged updates
     if (game.user !== game.users.activeGM) return;
 
     switch (data?.type) {
       case SOCKET_EVENTS.APPLY_GROUP_INITIATIVE:
+        Hyp3eLogger.info("Socket Event", `Applying group initiative updates for combat ${data.combatId}:`, data.updates);
         await _applyGroupInitiativeAsGM(data);
         break;
       default:
+        Hyp3eLogger.warn("Socket Event", `Unhandled socket event type: ${data?.type}`);
         break;
     }
   });
 }
 
 async function _applyGroupInitiativeAsGM({ combatId, updates }) {
+  Hyp3eLogger.info("_applyGroupInitiativeAsGM", `Applying group initiative updates for combat ${combatId}:`, updates);
   const combat = game.combats.get(combatId);
-  if (!combat || !updates?.length) return;
+  if (!combat) {
+    Hyp3eLogger.warn("_applyGroupInitiativeAsGM", `Combat not found for combat ${combatId}`);
+    return;
+  }
 
   // Core path that GMs are allowed to use
-  await combat.updateEmbeddedDocuments("Combatant", updates, {
-    // keep current turn stable if you need that behavior
-    // turn: combat.turn
-  });
+  // await combat.updateEmbeddedDocuments("Combatant", updates, {
+  //   // keep current turn stable if you need that behavior
+  //   // turn: combat.turn
+  // });
+  await combat.setGroupInitiativeScore(updates.groupId, updates.initiative);
 }
 
 /* -------------------------------------------- */
