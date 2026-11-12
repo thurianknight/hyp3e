@@ -303,8 +303,8 @@
                             data-item-id="{{item.id}}" 
                             data-roll-type="item" 
                             {{!-- data-roll-mode="publicroll"  --}}
-                            data-label="{{localize 'HYP3E.dataLabel.attackWith'}} {{item.name}}">
-                          <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                            data-label="{{localize 'HYP3E.dataLabel.attackWith'}} {{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}">
+                          <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
                         </a>
                     </div>
                     {{#if item.system.identified}}
@@ -330,7 +330,9 @@
                         </div>
                         {{/if}}
                     {{/if}}
-                    <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+                    <a data-action="dropItemDescription"><span class="item-drop">
+                        {{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}
+                    </span></a>
                 </div>
                 <div class="item-prop">
                     {{#if item.system.isConsumable}}
@@ -410,9 +412,11 @@
                 <div class="flexrow">
                     <div class="item-name">
                         <div class="item-image">
-                            <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                            <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
                         </div>
-                        <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+                        <a data-action="dropItemDescription"><span class="item-drop">
+                            {{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}
+                        </span></a>
                     </div>
                     <div class="item-prop">
                         {{#if item.system.isConsumable}}
@@ -449,7 +453,7 @@
                 </div>
                 <div class="item-summary">
                     <div class="item-description">
-                        <div class="contained-items">{{{item.system.description}}}</div>
+                        <div>{{{item.system.enrichedDescription}}}</div>
                     </div>
                 </div>
             </li>
@@ -475,7 +479,7 @@
                 <div class="flexrow">
                     <div class="item-name">
                         <div class="item-image">
-                            <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                            <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
                         </div>
                         {{#if item.system.identified}}
                         <!-- Cast spell button (only shown if item has spells) -->
@@ -500,7 +504,9 @@
                         </div>
                         {{/if}}
                         {{/if}}
-                        <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+                        <a data-action="dropItemDescription"><span class="item-drop">
+                            {{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}
+                        </span></a>
                     </div>
                     <div class="item-prop">
                         {{#if item.system.identified}}

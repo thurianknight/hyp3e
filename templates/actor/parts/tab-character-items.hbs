@@ -40,11 +40,11 @@
                       data-action="rollThis" 
                       data-item-id="{{container.id}}" 
                       data-roll-type="item" 
-                      data-label="{{localize 'HYP3E.dataLabel.use'}} {{container.name}}">
-                    <img src="{{container.img}}" title="{{container.name}}" width="24" height="24"/>
+                      data-label="{{localize 'HYP3E.dataLabel.use'}} {{#if container.system.identified}}{{container.name}}{{else}}{{container.system.itemAlias}}{{/if}}">
+                    <img src="{{container.img}}" title="{{#if container.system.identified}}{{container.name}}{{else}}{{container.system.itemAlias}}{{/if}}" width="24" height="24"/>
                   </a>
                   {{else}}
-                  <img src="{{container.img}}" title="{{container.name}}" width="24" height="24"/>
+                  <img src="{{container.img}}" title="{{#if container.system.identified}}{{container.name}}{{else}}{{container.system.itemAlias}}{{/if}}" width="24" height="24"/>
                   {{/if}}
                 </div>
                 {{#if container.system.identified}}
@@ -70,7 +70,7 @@
                 </div>
                 {{/if}}
                 {{/if}}
-                <span class="item-drop"><a data-action="dropItemDescription">{{container.name}}</a></span>
+                <span class="item-drop"><a data-action="dropItemDescription">{{#if container.system.identified}}{{container.name}}{{else}}{{container.system.itemAlias}}{{/if}}</a></span>
                 <a class="item-arrow collapse-toggle" aria-expanded="true">
                   ▼
                 </a>
@@ -79,7 +79,7 @@
                 {{container.system.quantity.value}}
               </div>
               <div class="item-prop">{{container.system.carriedWt}}</div>
-              <div class="item-prop">{{container.system.value}}</div>
+              <div class="item-prop">{{#if container.system.identified}}{{container.system.value}}{{else}}??{{/if}}</div>
               <div class="item-prop">{{container.system.location}}</div>
               <div class="item-controls">
                 <a {{#unless container.system.equipped}}class="item-unequipped"{{/unless}}
@@ -118,11 +118,11 @@
                           data-action="rollThis" 
                           data-item-id="{{item.id}}" 
                           data-roll-type="item" 
-                          data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
-                        <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                          data-label="{{localize 'HYP3E.dataLabel.use'}} {{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}">
+                        <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
                       </a>
                       {{else}}
-                      <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                      <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
                       {{/if}}
                     </div>
                     {{#if item.system.identified}}
@@ -148,7 +148,7 @@
                     </div>
                     {{/if}}
                     {{/if}}
-                    <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+                    <a data-action="dropItemDescription"><span class="item-drop">{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}</span></a>
                   </div>
                   <div class="item-prop">
                     {{#if item.system.isConsumable}}
@@ -165,7 +165,7 @@
                     {{/if}}
                   </div>
                   <div class="item-prop">{{item.system.carriedWt}}</div>
-                  <div class="item-prop">{{item.system.value}}</div>
+                  <div class="item-prop">{{#if item.system.identified}}{{item.system.value}}{{else}}??{{/if}}</div>
                   <div class="item-prop">{{item.system.location}}</div>
                   <div class="item-controls">
                     <a {{#unless item.system.equipped}}class="item-unequipped"{{/unless}}
@@ -205,11 +205,11 @@
                       data-action="rollThis" 
                       data-item-id="{{item.id}}" 
                       data-roll-type="item" 
-                      data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
-                    <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                      data-label="{{localize 'HYP3E.dataLabel.use'}} {{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}">
+                    <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
                   </a>
                   {{else}}
-                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                  <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
                   {{/if}}
                 </div>
                 {{#if item.system.identified}}
@@ -235,7 +235,7 @@
                 </div>
                 {{/if}}
                 {{/if}}
-                <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+                <a data-action="dropItemDescription"><span class="item-drop">{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}</span></a>
               </div>
               <div class="item-prop">
                 {{#if item.system.isConsumable}}
@@ -252,7 +252,7 @@
                 {{/if}}
               </div>
               <div class="item-prop">{{item.system.carriedWt}}</div>
-              <div class="item-prop">{{item.system.value}}</div>
+              <div class="item-prop">{{#if item.system.identified}}{{item.system.value}}{{else}}??{{/if}}</div>
               <div class="item-prop">{{item.system.location}}</div>
               <div class="item-controls">
                 <a {{#unless item.system.equipped}}class="item-unequipped"{{/unless}}
