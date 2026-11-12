@@ -93,11 +93,11 @@
             <a class="rollable" 
                 data-action="rollThis" 
                 data-roll-type="item" 
-                data-label="Attack with {{item.name}}">
-              <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                data-label="Attack with {{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}">
+              <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
             </a>
           </div>
-          <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+          <a data-action="dropItemDescription"><span class="item-drop">{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}</span></a>
         </div>
         <div class="item-prop">{{item.system.rof}}</div>
         <div class="item-prop">{{item.system.damage}}</div>
@@ -108,15 +108,9 @@
             <i class="fas fa-hand-fist"></i>
           </a>
           <a data-action="displayItem" 
-              {{!-- title='{{localize "HYP3E.item.show"}}'>
-            <i class="fas fa-eye"></i> --}}
               title='{{localize "HYP3E.item.rollDamage"}}'>
             <i class="fas fa-droplet"></i>
           </a>
-          {{!-- <a data-action="rollDamage" 
-              title='{{localize "HYP3E.item.rollDamage"}}'>
-            <i class="fas fa-sword"></i>
-          </a> --}}
           <a data-action="editItem" 
               title="{{localize 'HYP3E.item.edit'}}">
             <i class="fas fa-edit"></i>
@@ -154,9 +148,9 @@
       <div class="flexrow">
         <div class="item-name">
           <div class="item-image">
-            <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+            <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
           </div>
-          <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+          <a data-action="dropItemDescription"><span class="item-drop">{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}</span></a>
         </div>
         <div class="item-prop">{{item.system.quantity.value}}
         </div>
@@ -202,11 +196,11 @@
                 data-action="rollThis" 
                 data-item-id="{{container.id}}" 
                 data-roll-type="item" 
-                data-label="{{localize 'HYP3E.dataLabel.use'}} {{container.name}}">
-              <img src="{{container.img}}" title="{{container.name}}" width="24" height="24"/>
+                data-label="{{localize 'HYP3E.dataLabel.use'}} {{#if container.system.identified}}{{container.name}}{{else}}{{container.system.itemAlias}}{{/if}}">
+              <img src="{{container.img}}" title="{{#if container.system.identified}}{{container.name}}{{else}}{{container.system.itemAlias}}{{/if}}" width="24" height="24"/>
             </a>
             {{else}}
-            <img src="{{container.img}}" title="{{container.name}}" width="24" height="24"/>
+            <img src="{{container.img}}" title="{{#if container.system.identified}}{{container.name}}{{else}}{{container.system.itemAlias}}{{/if}}" width="24" height="24"/>
             {{/if}}
           </div>
           {{#if container.system.identified}}
@@ -232,7 +226,7 @@
           </div>
           {{/if}}
           {{/if}}
-          <span class="item-drop"><a data-action="dropItemDescription">{{container.name}}</a></span>
+          <span class="item-drop"><a data-action="dropItemDescription">{{#if container.system.identified}}{{container.name}}{{else}}{{container.system.itemAlias}}{{/if}}</a></span>
           <a class="item-arrow collapse-toggle" aria-expanded="true">
             ▼
           </a>
@@ -278,11 +272,11 @@
                     data-action="rollThis" 
                     data-item-id="{{item.id}}" 
                     data-roll-type="item" 
-                    data-label="{{localize 'HYP3E.dataLabel.use'}} {{item.name}}">
-                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                    data-label="{{localize 'HYP3E.dataLabel.use'}} {{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}">
+                  <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
                 </a>
                 {{else}}
-                <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                <img src="{{item.img}}" title="{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}" width="24" height="24"/>
                 {{/if}}
               </div>
               {{#if item.system.identified}}
@@ -308,7 +302,7 @@
               </div>
               {{/if}}
               {{/if}}
-              <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+              <a data-action="dropItemDescription"><span class="item-drop">{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}</span></a>
             </div>
             <div class="item-prop">
               {{#if item.system.isConsumable}}
@@ -368,6 +362,7 @@
             <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
             {{/if}}
           </div>
+          {{#if item.system.identified}}
           <!-- Cast spell button (only shown if item has spells) -->
           {{#if item.system.spellcasting.spellRefs.length}}
           <div class="item-prop" style="margin-right: 4px;">
@@ -389,7 +384,8 @@
             </a>
           </div>
           {{/if}}
-          <a data-action="dropItemDescription"><span class="item-drop">{{item.name}}</span></a>
+          {{/if}}
+          <a data-action="dropItemDescription"><span class="item-drop">{{#if item.system.identified}}{{item.name}}{{else}}{{item.system.itemAlias}}{{/if}}</span></a>
         </div>
         <div class="item-prop">
           {{#if item.system.isConsumable}}
