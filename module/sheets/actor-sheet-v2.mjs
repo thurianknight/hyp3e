@@ -670,7 +670,7 @@ export class Hyp3eActorSheetV2 extends HandlebarsApplicationMixin(ActorSheetV2) 
       }
       // Calculate the gp value of the item, taking qty x cost. If qty is empty, assume 1.
       //  If cost is empty, assume 0.
-      if (i.system.cost) {
+      if (i.system.cost && i.system.identified) {
         const baseGpVal = parseGpValue(i.system.cost)
         if (baseGpVal) {
           // For merchants, show item selling price (unit or bundle)
