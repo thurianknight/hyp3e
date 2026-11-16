@@ -416,128 +416,158 @@ export class Hyp3eActor extends Actor {
   /**
    * Enforce weapon equip rules:
    * - Only one weapon and shield equipped by default.
+   * - Small shield + missile weapon allowed.
    * - Dual wielding (but no shield) allowed if dex >= 13 and both melee weapons are wc <= 2.
    * @param {Item} newlyEquipped - the weapon being equipped
    */
   async enforceWeaponEquipRules(newlyEquipped) {
-      // Note: these arrow functions return a value to the caller
-      const _isShield = i => 
-          (i.type === "shield" && i.system.type !== "passive") || (i.type === "armor" && i.system.type === "shield");
-      const isMelee = w => w.system.melee;
-      const isMissile = w => w.system.missile;
-      const isLight = w => (w.system.wc ?? 99) <= 2;
-      const isTwoHanded = w =>
-          (w.system.hands ?? 1) === 2 ||
-          (Array.isArray(w.system.annotations) &&
-              w.system.annotations.some(a => a.toLowerCase().includes("true2hand")));
+    // Note: these arrow functions return a value to the caller
+    const _isShield = i => 
+      (i.type === "shield" && i.system.type !== "passive") || (i.type === "armor" && i.system.type === "shield");
+    const isMelee = w => w.system.melee;
+    const isMissile = w => w.system.missile;
+    const isLight = w => (w.system.wc ?? 99) <= 2;
+    const isTwoHanded = w =>
+      (w.system.hands ?? 1) === 2 ||
+      (Array.isArray(w.system.annotations) &&
+        w.system.annotations.some(a => a.toLowerCase().includes("true2hand")));
 
-      if (newlyEquipped.type !== "weapon" && !_isShield(newlyEquipped)) return;
-      Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Newly equipped:`, newlyEquipped);
+    // Not equipping a weapon or shield? Exit early
+    if (newlyEquipped.type !== "weapon" && !_isShield(newlyEquipped)) return;
 
-      // All other currently equipped weapons
-      const equippedWeapons = this._getEquippedWeapons(newlyEquipped.id);
-      Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Currently equipped weapons:`, equippedWeapons);
+    Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Newly equipped:`, newlyEquipped);
 
-      // All other currently equipped shields
-      const equippedShields = this._getEquippedShields(newlyEquipped.id);
-      Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Currently equipped shield:`, equippedShields);
+    // Currently equipped weapon(s), not including the item being equipped
+    const equippedWeapons = this._getEquippedWeapons(newlyEquipped.id);
+    Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Currently equipped weapons:`, equippedWeapons);
 
-      // Handle weapons first
-      if (newlyEquipped.type === "weapon") {
-          let dualWielding = false;
-          const dex = this.system.attributes?.dex?.value ?? 0;
-          // Check dual-wield condition (exactly one other weapon equipped)
-          if (equippedWeapons.length === 1 && isMelee(newlyEquipped) && isLight(newlyEquipped)) {
-              const other = equippedWeapons[0];
-              Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Other equipped weapon:`, other);
-              dualWielding =
-                  dex >= 13 &&
-                  isMelee(newlyEquipped) && isMelee(other) &&
-                  isLight(newlyEquipped) && isLight(other);
+    // Currently equipped shield(s), not including the item being equipped
+    const equippedShields = this._getEquippedShields(newlyEquipped.id);
+    Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Currently equipped shield:`, equippedShields);
 
-              Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Dual wielding?`, dualWielding);
-              if (dualWielding) {
-                  // If dual wielding, we must unequip any shields
-                  if (equippedShields.length > 0) {
-                      const unequipUpdates = equippedShields.map(s => ({
-                          _id: s.id,
-                          "system.equipped": false
-                      }));
-                      Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
-                      await this.updateEmbeddedDocuments("Item", unequipUpdates);
-                  }
-              }
-          }
-          // Default case, unequip all other weapons
-          if (!dualWielding && equippedWeapons.length > 0) {
-              const unequipUpdates = equippedWeapons.map(w => ({
-                  _id: w.id,
-                  "system.equipped": false
-              }));
-              Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping other weapons:`, unequipUpdates);
-              await this.updateEmbeddedDocuments("Item", unequipUpdates);
-          }
-          // If a 2-handed weapon is being equipped, unequip all hand-shields
-          if (isTwoHanded(newlyEquipped)) {
-              // Unequip all hand-shields
-              if (equippedShields.length > 0) {
-                  const unequipUpdates = equippedShields.map(s => ({
-                      _id: s.id,
-                      "system.equipped": false
-                  }));
-                  Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
-                  await this.updateEmbeddedDocuments("Item", unequipUpdates);
-              }
-          }
+    // Handle weapons first
+    if (newlyEquipped.type === "weapon") {
+      let dualWielding = false;
+      const dex = this.system.attributes?.dex?.value ?? 0;
+      // Check dual-wield condition (only one weapon and no shield equipped)
+      if (equippedWeapons.length === 1 && equippedShields.length === 0 && isMelee(newlyEquipped) && isLight(newlyEquipped)) {
+        const other = equippedWeapons[0];
+        Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Other equipped weapon:`, other);
+        dualWielding =
+          dex >= 13 &&
+          isMelee(newlyEquipped) && isMelee(other) &&
+          isLight(newlyEquipped) && isLight(other);
+
+        Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Dual wielding?`, dualWielding);
+        // if (dualWielding) {
+          // If dual wielding, we must unequip any shields
+          // if (equippedShields.length > 0) {
+          //   const unequipUpdates = equippedShields.map(s => ({
+          //     _id: s.id,
+          //     "system.equipped": false
+          //   }));
+          //   Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
+          //   await this.updateEmbeddedDocuments("Item", unequipUpdates);
+          // }
+        // }
       }
-
-      // Now handle shields
-      if (_isShield(newlyEquipped)) {
-          // Only one hand-shield allowed
+      // Default case, unequip all other weapons
+      if (!dualWielding && equippedWeapons.length > 0) {
+        const unequipUpdates = equippedWeapons.map(w => ({
+          _id: w.id,
+          "system.equipped": false
+        }));
+        Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping other weapons:`, unequipUpdates);
+        await this.updateEmbeddedDocuments("Item", unequipUpdates);
+      }
+      // If a 2-handed weapon is being equipped, unequip shields by default
+      if (isTwoHanded(newlyEquipped)) {
+        if (isMelee(newlyEquipped)) {
+          // Unequip all shields
           if (equippedShields.length > 0) {
-              const unequipUpdates = equippedShields.map(s => ({
-                  _id: s.id,
-                  "system.equipped": false
-              }));
-              Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
-              await this.updateEmbeddedDocuments("Item", unequipUpdates);
+            const unequipUpdates = equippedShields.map(s => ({
+              _id: s.id,
+              "system.equipped": false
+            }));
+            Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
+            await this.updateEmbeddedDocuments("Item", unequipUpdates);
           }
-          // Unequip any two-handed weapons
-          const twoHanders = this.items.filter(i =>
-              i.type === "weapon" &&
-              i.system.equipped &&
-              i.system.hands === 2
-          );
-          // If dual wielding, must unequip both weapons since we don't know which one to keep
-          if (equippedWeapons.length === 2) {
-              twoHanders.push(...equippedWeapons);
+        } else if (isMissile(newlyEquipped)) {
+          // Special case: missile weapon + small shield is allowed, but not with large shield
+          if (equippedShields.length > 0) {
+            const unequipUpdates = equippedShields.map(s => ({
+              _id: s.id,
+              "system.equipped": s.system.type === "large" ? false : true
+            }));
+            Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
+            await this.updateEmbeddedDocuments("Item", unequipUpdates);
           }
-          if (twoHanders.length > 0) {
-              const unequipUpdates = twoHanders.map(s => ({
-                  _id: s.id,
-                  "system.equipped": false
-              }));
-              Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping two-handers:`, unequipUpdates);
-              await this.updateEmbeddedDocuments("Item", unequipUpdates);
-          }
+        }
       }
+    }
+
+    // Now handle shields
+    if (_isShield(newlyEquipped)) {
+      // Only one shield allowed
+      if (equippedShields.length > 0) {
+        const unequipUpdates = equippedShields.map(s => ({
+          _id: s.id,
+          "system.equipped": false
+        }));
+        Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping shields:`, unequipUpdates);
+        await this.updateEmbeddedDocuments("Item", unequipUpdates);
+      }
+      // Start by unequipping two-handed melee weapons
+      const weaponsToUnequip = this.items.filter(i =>
+        i.type === "weapon" &&
+        i.system.equipped &&
+        i.system.melee &&
+        i.system.hands === 2
+      );
+      // If dual wielding, unequip both weapons since we wouldn't know which to keep
+      if (equippedWeapons.length === 2) {
+        weaponsToUnequip.push(...equippedWeapons);
+      }
+      // If the shield is large, must unequip any two-handed missile weapons.
+      // The Hyperborea rules state that a small shield + bow is allowed, but 
+      //  here we only disallow large shields with two-handed missile weapons.
+      //  Basically we are allowing blowguns, crossbows, and slings to also be 
+      //  used with a small shield.
+      if (newlyEquipped.system.type === "large") {
+        const missileWeaponsToUnequip = this.items.filter(i =>
+          i.type === "weapon" &&
+          i.system.equipped &&
+          i.system.missile &&
+          i.system.hands === 2
+        );
+        weaponsToUnequip.push(...missileWeaponsToUnequip);
+      }
+      if (weaponsToUnequip.length > 0) {
+        const unequipUpdates = weaponsToUnequip.map(s => ({
+          _id: s.id,
+          "system.equipped": false
+        }));
+        Hyp3eLogger.info("Hyp3eActor enforceWeaponEquipRules", `Unequipping two-handers:`, unequipUpdates);
+        await this.updateEmbeddedDocuments("Item", unequipUpdates);
+      }
+    }
   }
 
   _getEquippedWeapons(excludeId) {
-      return this.items.filter(i =>
-          i.id !== excludeId &&
-          i.type === "weapon" &&
-          i.system.equipped
-      );
+    return this.items.filter(i =>
+      i.id !== excludeId &&
+      i.type === "weapon" &&
+      i.system.equipped
+    );
   }
 
   _getEquippedShields(excludeId) {
-      return this.items.filter(i =>
-          i.id !== excludeId &&
-          (i.type === "shield" || (i.type === "armor" && i.system.type === "shield")) &&
-          i.system.equipped &&
-          i.system.type !== "passive"
-      );
+    return this.items.filter(i =>
+      i.id !== excludeId &&
+      (i.type === "shield" || (i.type === "armor" && i.system.type === "shield")) &&
+      i.system.equipped &&
+      i.system.type !== "passive"
+    );
   }
 
   /**
@@ -545,23 +575,23 @@ export class Hyp3eActor extends Actor {
    * @param {Item} newArmor - The armor item being equipped.
    */
   async enforceSingleArmor(newArmor) {
-      if (newArmor.type !== "armor") return;
-      if (newArmor.system.type === "shield") return; // Legacy shields are handled with weapons
-      Hyp3eLogger.info("Hyp3eActor enforceSingleArmor", `Newly equipped armor:`, newArmor);
+    if (newArmor.type !== "armor") return;
+    if (newArmor.system.type === "shield") return; // Legacy shields are handled with weapons
+    Hyp3eLogger.info("Hyp3eActor enforceSingleArmor", `Newly equipped armor:`, newArmor);
 
-      // Find other equipped armor items
-      const equippedArmors = this.items.filter(i =>
-          i.id !== newArmor.id &&
-          i.type === "armor" &&
-          i.system.equipped &&
-          i.system.type !== "shield"
-      );
+    // Find other equipped armor items
+    const equippedArmors = this.items.filter(i =>
+      i.id !== newArmor.id &&
+      i.type === "armor" &&
+      i.system.equipped &&
+      i.system.type !== "shield"
+    );
 
-      // Unequip them
-      for (const armor of equippedArmors) {
-          await armor.update({ "system.equipped": false });
-          Hyp3eLogger.info("Hyp3eActor enforceSingleArmor", `Unequipping armor:`, armor);
-      }
+    // Unequip them
+    for (const armor of equippedArmors) {
+      await armor.update({ "system.equipped": false });
+      Hyp3eLogger.info("Hyp3eActor enforceSingleArmor", `Unequipping armor:`, armor);
+    }
   }
 
   /** CUSTOM TEMPORARY MODIFIERS (NOT USED YET) -------*/
