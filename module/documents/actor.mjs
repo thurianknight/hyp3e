@@ -1162,18 +1162,18 @@ export class Hyp3eActor extends Actor {
       let deadHp = this.system.hp?.min || 0;
       let unconsciousHp = null;
       let dyingHp = null;
-      // Characters and classed NPCs (including henchmen) should all be rolled as characters
+      // Characters and classed NPCs (including henchmen) should be the *character* Actor type
       if (this.type === "character") {
         unconsciousHp = 0;
         dyingHp = -4;
         // deadHp = -10; We already know this is set
       } else {
-        // 0-level NPCs can drop to -3 hp, monsters die at 0 hp
-        if (this.system?.npcType === "monster") {
-          // deadHp = 0; We already know this is set
-        } else if (this.system?.npcType === "npc") {
+        // NPCs and humanoid monsters can drop to -3 hp, most monsters die at 0 hp
+        if (this.system?.npcType === "npc" || (this.system?.npcType === "monster" && this.system.phenotype.toLowerCase() === "humanoid")) {
           unconsciousHp = 0;
-          // deadHp = -3; We already know this is set
+          // deadHp = -3;  // Should be set in system.hp.min, but default to -3 if not set
+        } else {
+          // deadHp = 0;   // Should be set in system.hp.min, but default to 0 if not set
         }
       }
 

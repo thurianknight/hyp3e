@@ -49,10 +49,12 @@ export default class Hyp3eNpc extends Hyp3eActorBase {
       this.npcType = "monster";
     }
     // NPCs and monsters don't get the -10 hp benefit that PCs do
-    if (this.npcType === "monster") {
-      this.hp.min = 0
-    } else if (this.npcType === "npc") {
+    if (this.npcType === "npc") {
       this.hp.min = -3
+    } else if (this.npcType === "monster" && this.phenotype.toLowerCase() === "humanoid") {
+      this.hp.min = -3
+    } else {
+      this.hp.min = 0
     }
 
     this.baseClass = "npc";
