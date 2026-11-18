@@ -2166,6 +2166,7 @@ export class Hyp3eActor extends Actor {
       item._displayItemInChat(actorData);
       return null;
     }
+
     // Use ammo or consumable item, and return ammo atk/dmg mods if applicable
     const { ammoMods, ammoUpdated } = await this._consumeAmmoOrItem(rollResponse, item, itemData);
     if (ammoUpdated) {
@@ -2173,6 +2174,21 @@ export class Hyp3eActor extends Actor {
       const ammo = this.items.get(rollResponse.ammunition);
       await item.setFlag("hyp3e", "usedAmmoId", ammo.id);
       // this.sheet.render(false);
+    }
+
+    // Does the attacker's weapon ignore the target's shield?
+    let ignoreShieldAc = false;
+    if (Array.isArray(itemData.annotations) && itemData.annotations?.includes("ignoreShieldAc")) {
+      ignoreShieldAc = true;
+    }
+
+    // Is the target using a shield? If so, the ignoreShieldAc flag may override its AC bonus
+    if (target && ignoreShieldAc) {
+      const targetShield = target.actor?.items.find(i => i.type === "shield" && i.system.equipped && (i.system.type === "small" || i.system.type === "large"));
+      if (targetShield) {
+        dataset.targetAc = Number(dataset.targetAc) + Number(targetShield.system.ac);
+        Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Target ${target.name} has a shield equipped, adjusting its AC to ignore the shield. New target AC: ${dataset.targetAc}`);
+      }
     }
 
     // Update dataset with final situational mods and roll mode from dialog
@@ -2698,58 +2714,60 @@ export class Hyp3eActor extends Actor {
    * @returns {{hit: boolean, attackTextResult: string, critFooter: string}}
    */
   _determineHitResult(atkRoll, naturalRoll, itemData, targetAc, targetSize) {
-      let hit = false;
-      let attackTextResult = "";
-      let critFooter = "";
-      const total = atkRoll.total;
-      const isGrenade = itemData?.isGrenade ?? false;
+    let hit = false;
+    let attackTextResult = "";
+    let critFooter = "";
+    const total = atkRoll.total;
+    const isGrenade = itemData?.isGrenade ?? false;
 
-      if (isGrenade) {
-          // Grenade-like attack TN based on size
-          let tn = 7;
-          let sizeFromTable = "Stationary";
-          switch (targetSize) {
-              case "S": sizeFromTable = "Small"; tn = 13; break;
-              case "M": sizeFromTable = "Medium"; tn = 11; break;
-              case "L": sizeFromTable = "Large"; tn = 9; break;
-          }
-          if (total >= tn) {
-              hit = true;
-              attackTextResult = `<b>Hits a ${sizeFromTable} target!</b>`;
-              Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Grenade Hit! ${total} >= ${tn}`);
-          } else {
-              attackTextResult = `<b>Misses a ${sizeFromTable} target.</b>`;
-              Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Grenade Miss! ${total} < ${tn}`);
-          }
-      } else {
-          // Normal attack TN based on AC
-          const tn = 20 - targetAc;
-          const hitAC = 20 - total; // AC the roll would hit
-
-          if (naturalRoll === 20) {
-              hit = true;
-              attackTextResult = `<span style='color:#00b34c'><b>Critical Hit!</b></span>`;
-              Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Natural 20 Crit Hit!`);
-              if (CONFIG.HYP3E.critHit) {
-                  critFooter = `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
-              }
-          } else if (naturalRoll === 1) {
-              attackTextResult = `<span style='color:#e90000'><b>Critical Miss!</b></span>`;
-              Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Natural 1 Crit Miss!`);
-              if (CONFIG.HYP3E.critMiss) {
-                  critFooter = `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
-              }
-          } else if (total >= tn) {
-              hit = true;
-              attackTextResult = `<b>Hits AC ${hitAC}!</b>`;
-              Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Hit! ${total} >= ${tn}`);
-          } else {
-              attackTextResult = `<b>Miss${hitAC <= 9 ? `, would have hit AC ${hitAC}` : 'es AC 9'}.</b>`;
-              Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Miss! ${total} < ${tn}`);
-          }
+    // Grenade-like attacks have a different TN based on target size, not AC
+    if (isGrenade) {
+      // Grenade-like attack TN based on size
+      let tn = 7;
+      let sizeFromTable = "Stationary";
+      switch (targetSize) {
+        case "S": sizeFromTable = "Small"; tn = 13; break;
+        case "M": sizeFromTable = "Medium"; tn = 11; break;
+        case "L": sizeFromTable = "Large"; tn = 9; break;
       }
-
+      if (total >= tn) {
+        hit = true;
+        attackTextResult = `<b>Hits a ${sizeFromTable} target!</b>`;
+        Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Grenade Hit! ${total} >= ${tn}`);
+      } else {
+        attackTextResult = `<b>Misses a ${sizeFromTable} target.</b>`;
+        Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Grenade Miss! ${total} < ${tn}`);
+      }
       return { hit, attackTextResult, critFooter };
+    }
+
+    // Normal attack TN based on AC
+    const tn = 20 - targetAc;
+    const hitAC = 20 - total; // AC the roll would hit
+
+    if (naturalRoll === 20) {
+      hit = true;
+      attackTextResult = `<span style='color:#00b34c'><b>Critical Hit!</b></span>`;
+      Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Natural 20 Crit Hit!`);
+      if (CONFIG.HYP3E.critHit) {
+        critFooter = `<div class='critical-hit' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
+      }
+    } else if (naturalRoll === 1) {
+      attackTextResult = `<span style='color:#e90000'><b>Critical Miss!</b></span>`;
+      Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Natural 1 Crit Miss!`);
+      if (CONFIG.HYP3E.critMiss) {
+        critFooter = `<div class='critical-miss' data-base-class='${this.system.baseClass}' data-actor-id='${this.id}'></div>`;
+      }
+    } else if (total >= tn) {
+      hit = true;
+      attackTextResult = `<b>Hits AC ${hitAC}!</b>`;
+      Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Hit! ${total} >= ${tn}`);
+    } else {
+      attackTextResult = `<b>Miss${hitAC <= 9 ? `, would have hit AC ${hitAC}` : 'es AC 9'}.</b>`;
+      Hyp3eLogger.info("Hyp3eActor _determineHitResult", `Miss! ${total} < ${tn}`);
+    }
+
+    return { hit, attackTextResult, critFooter };
   }
 
   /**
