@@ -2176,21 +2176,6 @@ export class Hyp3eActor extends Actor {
       // this.sheet.render(false);
     }
 
-    // Does the attacker's weapon ignore the target's shield?
-    let ignoreShieldAc = false;
-    if (Array.isArray(itemData.annotations) && itemData.annotations?.includes("ignoreShieldAc")) {
-      ignoreShieldAc = true;
-    }
-
-    // Is the target using a shield? If so, the ignoreShieldAc flag may override its AC bonus
-    if (target && ignoreShieldAc) {
-      const targetShield = target.actor?.items.find(i => i.type === "shield" && i.system.equipped && (i.system.type === "small" || i.system.type === "large"));
-      if (targetShield) {
-        dataset.targetAc = Number(dataset.targetAc) + Number(targetShield.system.ac);
-        Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Target ${target.name} has a shield equipped, adjusting its AC to ignore the shield. New target AC: ${dataset.targetAc}`);
-      }
-    }
-
     // Update dataset with final situational mods and roll mode from dialog
     dataset.sitMod = rollResponse.sitMod;
     dataset.rollMode = rollResponse.rollMode;
@@ -2880,6 +2865,19 @@ export class Hyp3eActor extends Actor {
           sitModsArr.push(`Non-proficient (${nonProficientPenalty})`);
           Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Non-proficient penalty applied: ${nonProficientPenalty}`);
         }
+      }
+    }
+
+    // Does the attacker's weapon ignore the target's shield?
+    const ignoreShieldAc = Array.isArray(weapon.annotations) && weapon.annotations?.includes("ignoreShieldAc") ? true : false;
+
+    // Is the target using a shield? If so, the ignoreShieldAc flag may override its AC bonus
+    if (target && ignoreShieldAc) {
+      const targetShield = target.actor?.items.find(i => i.type === "shield" && i.system.equipped && (i.system.type === "small" || i.system.type === "large"));
+      if (targetShield) {
+        sitModSum += Number(targetShield.system.ac);
+        sitModsArr.push(`Shield Ignored (+${targetShield.system.ac})`);
+        Hyp3eLogger.info("Hyp3eActor _getCombatantSitMods", `Target ${target.name} has a shield equipped, sit mod will cancel its AC bonus of ${targetShield.system.ac}.`);
       }
     }
 
