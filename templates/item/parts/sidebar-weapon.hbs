@@ -54,6 +54,15 @@
           {{/each}}
           </ol>
           <hr class="plain-hr"/>
+          <a class="item-button item-control" 
+              aria-label="{{localize 'Conditional Modifiers'}}" 
+              role="button" 
+              data-tooltip="Conditional Modifiers" 
+              data-action="configureConditionalMods">
+            <i class="fas fa-cogs" style="font-size: small"></i>
+          </a>
+          <label class="resource-label">Special</label>
+          <hr class="plain-hr"/>
           {{else}}
             {{#if system.identified}}
             <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
@@ -64,6 +73,15 @@
               </li>
             {{/each}}
             </ol>
+            <hr class="plain-hr"/>
+            <a class="item-button item-control" 
+                aria-label="{{localize 'Conditional Modifiers'}}" 
+                role="button" 
+                data-tooltip="Conditional Modifiers" 
+                data-action="configureConditionalMods">
+              <i class="fas fa-cogs" style="font-size: small"></i>
+            </a>
+            <label class="resource-label">Special</label>
             <hr class="plain-hr"/>
             {{/if}}
           {{/if}}

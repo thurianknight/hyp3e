@@ -322,10 +322,15 @@ export function migrateItemData(item) {
       Hyp3eLogger.info("migrateItemData", `Updated weapon hands for ${item.name}:`, handsUpdate)
       updates = { ...updates, ...handsUpdate };
     }
-    // Fix weapon & spell missing or invalid damage type
+    // Fix missing or invalid damage type
     if (!item.system.dmgType || item.system.dmgType.trim() === "") {
       Hyp3eLogger.warn("migrateItemData", `No damage type set on ${item.name}. Setting to Basic...`)
       updates = { ...updates, "system.dmgType": "basic" };
+    }
+    // Migrate altDmg to addlDmg if it exists
+    if (item.system.altDmg && Object.keys(item.system.altDmg).length > 0) {
+      const addlDmg = Object.entries(item.system.altDmg).map(([type, formula]) => ({ type, formula }));
+      updates = { ...updates, "system.addlDmg": addlDmg };
     }
   }
 

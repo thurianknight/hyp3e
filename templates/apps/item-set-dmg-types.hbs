@@ -1,42 +1,71 @@
 <div class="item-set-dmg-types">
-    <h3>{{item.name}}</h3>
-    <input type="hidden" name="itemUuid" value="{{itemUuid}}" />
+  <h3>{{item.name}}</h3>
+  {{!-- <input type="hidden" name="itemUuid" value="{{itemUuid}}" /> --}}
+  <hr class="plain-hr"/>
+  <div class="flexrow">
+    <span style="font-weight: bold;">Select a Base Type</span>
+    <span style="font-weight: bold;">Damage Roll</span>
+  </div>
+  <div class="form-fields flexrow">
+    <select name="dmgType">
+      {{selectOptions damageTypes selected=@root.dmgType localize=false}}
+    </select>
+    <input type="text" name="damage" value="{{@root.damage}}" disabled />
+  </div>
+  <hr class="plain-hr"/>
+  <div class="flexrow">
+    <span style="font-weight: bold;">Additional Types</span>
+    <span style="font-weight: bold;">Damage Roll</span>
+  </div>
+  <div class="form-fields flexrow">
+    <select name="damageType1">
+      <option value=""></option>
+      {{selectOptions damageTypes selected=@root.damageType1 localize=false}}
+    </select>
+    <input type="text" name="altDmg1" value="{{@root.altDmg1}}" placeholder="Ex.: 1d4" />
+  </div>
+  <div class="form-fields flexrow">
+    <select name="damageType2">
+      <option value=""></option>
+      {{selectOptions damageTypes selected=@root.damageType2 localize=false}}
+    </select>
+    <input type="text" name="altDmg2" value="{{@root.altDmg2}}" placeholder="Ex.: 1d4" />
+  </div>
+  <div class="form-fields flexrow">
+    <select name="damageType3">
+      <option value=""></option>
+      {{selectOptions damageTypes selected=@root.damageType3 localize=false}}
+    </select>
+    <input type="text" name="altDmg3" value="{{@root.altDmg3}}" placeholder="Ex.: 1d4" />
+  </div>
+
+  <div class="flexrow">
+    <div><span style="font-weight: bold;">Additional Types</span></div>
+    <div><span style="font-weight: bold;">Damage Roll</span></div>
+    {{!-- <div></div> --}}
+  </div>
+  <div class="flexcol">
+    {{#each item.system.addlDmg as |dmg i|}}
+    <div class="form-fields flexrow">
+      <select name="addlDmg.{{i}}.type">
+        {{selectOptions @root.damageTypes selected=dmg.type localize=false}}
+      </select>
+      <input type="text" name="addlDmg.{{i}}.formula" value="{{dmg.formula}}" />
+      <button class="button-narrow" type="button" data-action="deleteType" data-index="{{i}}" data-tooltip="Delete">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+    {{/each}}
+  </div>
+
+  <div class="form-footer">
     <hr class="plain-hr"/>
-    <div class="item-set-dmg-types flexrow">
-        <span style="font-weight: bold;">Select a Base Type</span>
-        <span style="font-weight: bold;">Damage Roll</span>
-    </div>
-    <div class="form-fields item-set-dmg-types flexrow">
-        <select name="dmgType">
-            {{selectOptions damageTypes selected=@root.dmgType localize=false}}
-        </select>
-        <input type="text" name="damage" value="{{@root.damage}}" disabled />
-    </div>
-    <hr class="plain-hr"/>
-    <div class="item-set-dmg-types flexrow">
-        <span style="font-weight: bold;">Additional/Alternative Types</span>
-        <span style="font-weight: bold;">Damage Roll</span>
-    </div>
-    <div class="form-fields item-set-dmg-types flexrow">
-        <select name="damageType1">
-            <option value=""></option>
-            {{selectOptions damageTypes selected=@root.damageType1 localize=false}}
-        </select>
-        <input type="text" name="altDmg1" value="{{@root.altDmg1}}" placeholder="Ex.: 1d4" />
-    </div>
-    <div class="form-fields item-set-dmg-types flexrow">
-        <select name="damageType2">
-            <option value=""></option>
-            {{selectOptions damageTypes selected=@root.damageType2 localize=false}}
-        </select>
-        <input type="text" name="altDmg2" value="{{@root.altDmg2}}" placeholder="Ex.: 1d4" />
-    </div>
-    <div class="form-fields item-set-dmg-types flexrow">
-        <select name="damageType3">
-            <option value=""></option>
-            {{selectOptions damageTypes selected=@root.damageType3 localize=false}}
-        </select>
-        <input type="text" name="altDmg3" value="{{@root.altDmg3}}" placeholder="Ex.: 1d4" />
-    </div>
+    <button type="button" data-action="addType">
+      <i class="fas fa-plus"></i> Add Damage Type
+    </button>
+    <button type="submit">
+      <i class="fas fa-save"></i> Save Changes
+    </button>
+  </div>
 
 </div>

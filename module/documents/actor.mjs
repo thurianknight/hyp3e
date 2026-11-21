@@ -2492,9 +2492,9 @@ export class Hyp3eActor extends Actor {
    * @returns {number} Melee reach distance in grid units.
    */
   _getMeleeRange(wc) {
-      if (wc <= 3) return 7; // Adjust for diagonal? Base 5ft -> 7 allows diagonal
+      if (wc <= 3) return 7;  // Adjust for diagonal. Base 5ft -> 7 allows diagonal
       if (wc <= 5) return 12; // Base 10ft -> 12 allows diagonal
-      return 20; // Base 15ft -> 20 allows diagonal
+      return 20;              // Base 15ft -> 20 allows diagonal
   }
 
   /**

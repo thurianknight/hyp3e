@@ -8,6 +8,7 @@ import { Hyp3eLogger } from "../helpers/logger.mjs";
 import {onManageActiveEffectV2, prepareActiveEffectCategories} from "../helpers/effects.mjs";
 import HYP3EItemSetAnnotations from "../apps/item-set-annotations.mjs";
 import HYP3EItemSetDmgTypes from "../apps/item-set-dmg-types.mjs";
+import HYP3EItemSetConditionalMods from "../apps/item-set-conditional-mods.mjs";
 import { findItemsByFolderOrCompendiumName, getJournalPageList } from "../helpers/folders-and-compendia.mjs"
 import HYP3EClassWeaponProficiencies from "../apps/class-weapon-proficiencies.mjs";
 import HYP3EClassWeaponExceptions from "../apps/class-weapon-exceptions.mjs";
@@ -29,6 +30,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
   static ITEM_ANNOTATIONS_APP = new HYP3EItemSetAnnotations();
   static ITEM_SET_DMG_TYPES_APP = new HYP3EItemSetDmgTypes();
+  static ITEM_SET_CONDITIONAL_MODS_APP = new HYP3EItemSetConditionalMods();
   static WEAPONS_APP = new HYP3EClassWeaponProficiencies();
   static EXCEPTIONS_APP = new HYP3EClassWeaponExceptions();
 
@@ -66,6 +68,7 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
       deleteSpell: Hyp3eItemSheetV2._handleSpellDelete,
       setGrenadeOrAreaEffect: Hyp3eItemSheetV2._onSetGrenadeOrAreaEffect,
       setDmgTypes: Hyp3eItemSheetV2._openDmgTypesApp,
+      configureConditionalMods: Hyp3eItemSheetV2._openConditionalModsApp,
       setAnnotations: Hyp3eItemSheetV2._openAnnotationsApp,
       dropItemDescription: Hyp3eItemSheetV2._toggleItemSummary,
       // ActiveEffect actions
@@ -585,7 +588,13 @@ export class Hyp3eItemSheetV2 extends HandlebarsApplicationMixin(ItemSheetV2) {
 
   // Open the Damage Types app
   static _openDmgTypesApp() {
-    Hyp3eItemSheetV2.ITEM_SET_DMG_TYPES_APP.render(true, { itemUuid: this.item.uuid, focus: true })
+    // Hyp3eItemSheetV2.ITEM_SET_DMG_TYPES_APP.render(true, { itemUuid: this.item.uuid, focus: true })
+    Hyp3eItemSheetV2.ITEM_SET_DMG_TYPES_APP.render(true, { item: this.item, focus: true })
+  }
+
+  // Open the Conditional Mods app
+  static _openConditionalModsApp() {
+    Hyp3eItemSheetV2.ITEM_SET_CONDITIONAL_MODS_APP.render(true, { item: this.item, focus: true })
   }
 
   /**

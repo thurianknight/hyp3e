@@ -7,15 +7,11 @@ const {
 } = foundry.applications.api;
 
 export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(ApplicationV2) {
-  // _highlighted;
-  constructor(itemUuid, options={}) {
-    super(options);
-    this.itemUuid = itemUuid;
-  }
 
   // ===========================================================================
   // APPLICATION SETUP
   // ===========================================================================
+
   static DEFAULT_OPTIONS = {
     ...super.DEFAULT_OPTIONS,
     id: "item-set-dmg-types",
@@ -26,17 +22,19 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
       icon: "fas fa-book",
       contentClasses: ["standard-form"]
     },
-    actions: {
-      saveChanges: HYP3EItemSetDmgTypes.saveChanges
+    position: {
+      width: 500,
+      height: "auto"
     },
     form: {
       handler: HYP3EItemSetDmgTypes.#onSubmit,
       submitOnChange: false,
       closeOnSubmit: true
     },
-    position: {
-      width: 400,
-      height: "auto"
+    actions: {
+      // saveChanges: HYP3EItemSetDmgTypes.saveChanges
+      addType: HYP3EItemSetDmgTypes.#onAddType,
+      deleteType: HYP3EItemSetDmgTypes.#onDeleteType
     }
   }
 
@@ -48,9 +46,14 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     main: {
       template: `${HYP3E.templatePath}/apps/item-set-dmg-types.hbs`
     },
-    footer: {
-      template: "templates/generic/form-footer.hbs",
-    },
+    // footer: {
+    //   template: "templates/generic/form-footer.hbs",
+    // },
+  }
+
+  constructor(item, options={}) {
+    super(options);
+    this.item = item;
   }
 
 
@@ -59,12 +62,13 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
   // ===========================================================================
 
   async _prepareContext(_options) {
-    Hyp3eLogger.info("_prepareContext", `Context options: `, _options);
+    Hyp3eLogger.info("HYP3EItemSetDmgTypes _prepareContext", `Context options: `, _options);
 
-    const item = await fromUuid(_options.itemUuid)
+    // const item = await fromUuid(_options.itemUuid)
+    const item = _options.item ?? this.item;
     if (!item) {
-      const msg = `No item found for itemUuid ${target.dataset.itemUuid}!`;
-      Hyp3eLogger.warn("_prepareContext", msg)
+      const msg = `No item found in context!`;
+      Hyp3eLogger.warn("HYP3EItemSetDmgTypes _prepareContext", msg)
       ui.notifications.warn(msg)
       return
     }
@@ -74,7 +78,7 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
 
     // Setup our return context
     const context = {
-      itemUuid: _options.itemUuid,
+      // itemUuid: _options.itemUuid,
       item: item,
       damageTypes: damageTypes,
       buttons: [
@@ -104,14 +108,8 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
       }
     }
 
-    Hyp3eLogger.info("_prepareContext", `Return context: `, context);
+    Hyp3eLogger.info("HYP3EItemSetDmgTypes _prepareContext", `Return context: `, context);
     return context;
-  }
-
-  _onRender(context, options) {
-    // Hyp3eLogger.info("_onRender", `Render context: `, context);
-    // Hyp3eLogger.info("_onRender", `Render options: `, options);
-    super._onRender(context, options);
   }
 
 
@@ -120,19 +118,19 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
   // ===========================================================================
 
   static async #onSubmit(event, form, formData) {
-    Hyp3eLogger.info("#onSubmit", `Submit event:`, event);
-    Hyp3eLogger.info("#onSubmit", `Submit form data:`, formData);
+    Hyp3eLogger.info("HYP3EItemSetDmgTypes #onSubmit", `Submit event:`, event);
+    Hyp3eLogger.info("HYP3EItemSetDmgTypes #onSubmit", `Submit form data:`, formData);
 
     const formDataObj = foundry.utils.expandObject(formData.object);
-    const itemUuid = this.itemUuid
+    // const itemUuid = this.itemUuid
 
     if (!this.item) {
-      const msg = `No item found for itemUuid ${itemUuid}!`;
-      Hyp3eLogger.warn("#onSubmit", msg)
+      const msg = `No item found on submit!`;
+      Hyp3eLogger.warn("HYP3EItemSetDmgTypes #onSubmit", msg)
       ui.notifications.warn(msg);
       return
     }
-    Hyp3eLogger.info("#onSubmit", `Item:`, this.item);
+    Hyp3eLogger.info("HYP3EItemSetDmgTypes #onSubmit", `Item:`, this.item);
 
     const dmgType = formDataObj[`dmgType`]?.trim();
 
@@ -174,12 +172,37 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     }
 
     // Log the update data and update the item
-    Hyp3eLogger.info("#onSubmit", `Item damage update:`, updateData);
+    Hyp3eLogger.info("HYP3EItemSetDmgTypes #onSubmit", `Item damage update:`, updateData);
 
     try {
       await this.item.update(updateData);
     } catch (err) {
-      Hyp3eLogger.error("#onSubmit", `Item damage types update error!`, err);
+      Hyp3eLogger.error("HYP3EItemSetDmgTypes #onSubmit", `Item damage types update error!`, err);
     }
   }
+
+  static async #onAddType(event, target) {
+    Hyp3eLogger.info("HYP3EItemSetDmgTypes #onAddType", `Adding a new damage type...`, target);
+
+    const app = this;
+    const addlDmg = foundry.utils.deepClone(app.item.system.addlDmg ?? []);
+    addlDmg.push({
+      type: "",
+      formula: ""
+    });
+    await app.item.update({ "system.addlDmg": addlDmg });
+    app.render(true);
+  }
+
+  static async #onDeleteType(event, target) {
+    Hyp3eLogger.info("HYP3EItemSetDmgTypes #onDeleteType", `Deleting a damage type...`, target);
+
+    const app = this;
+    const index = parseInt(target.dataset.index);
+    const addlDmg = foundry.utils.deepClone(app.item.system.addlDmg ?? []);
+    addlDmg.splice(index, 1);
+    await app.item.update({ "system.addlDmg": addlDmg });
+    app.render(true);
+  }
+
 }
