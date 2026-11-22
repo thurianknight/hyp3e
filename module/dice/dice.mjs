@@ -881,13 +881,15 @@ export class Hyp3eDice {
             break;
 
           case "incl":
+            // Check if the actor's value includes the condition value (case-insensitive)
             if (dataValue.toLowerCase().includes(condition.value.toLowerCase())) {
               applicableMods.push(mod);
             }
             break;
 
           case "in":
-            if (dataValue.toLowerCase() in condition.value.toLowerCase()) {
+            // Check if the actor's value is in the list of condition values (comma-separated, case-insensitive)
+            if (condition.value.toLowerCase().split(",").includes(dataValue.toLowerCase())) {
               applicableMods.push(mod);
             }
             break;
@@ -918,13 +920,15 @@ export class Hyp3eDice {
             break;
 
           case "incl":
+            // Check if the target's value includes the condition value (case-insensitive)
             if (dataValue.toLowerCase().includes(condition.value.toLowerCase())) {
               applicableMods.push(mod);
             }
             break;
 
           case "in":
-            if (dataValue.toLowerCase() in condition.value.toLowerCase()) {
+            // Check if the target's value is in the list of condition values (comma-separated, case-insensitive)
+            if (condition.value.toLowerCase().split(",").includes(dataValue.toLowerCase())) {
               applicableMods.push(mod);
             }
             break;
