@@ -587,7 +587,7 @@ export class Hyp3eItem extends Item {
     if (!itemData.damage) return "";
     if (!Roll.validate(itemData.damage)) return `<p>Damage: ${itemData.damage || ""}</p>`;
 
-    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData);
+    const dmgObj = Hyp3eDice.buildDamageFormula(itemData, null, actorData, null);
     Hyp3eLogger.info("Hyp3eItem _renderDamageRoll", `Damage formula object for ${item.name}:`, dmgObj);
     const roll = new Roll(dmgObj.formula, actorData);
     let html = `

@@ -49,19 +49,10 @@
           <ol class="items-list">
             {{#each system.addlDmg as |dmg i|}}
             <li class="item-entry item" data-item-id="{{i}}">
-              <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes dmg.type}} {{dmg.formula}}" disabled />
+              <input class="align-center" type="text" name="system.addlDmgList" value="{{lookup @root.damageTypes dmg.type}} {{dmg.formula}}" disabled />
             </li>
             {{/each}}
           </ol>
-          <hr class="plain-hr"/>
-          <a class="item-button item-control" 
-              aria-label="{{localize 'Conditional Modifiers'}}" 
-              role="button" 
-              data-tooltip="Conditional Modifiers" 
-              data-action="configureConditionalMods">
-            <i class="fas fa-cogs" style="font-size: small"></i>
-          </a>
-          <label class="resource-label">Special</label>
           <hr class="plain-hr"/>
           {{else}} {{!-- not isGM --}}
             {{#if system.identified}}
@@ -98,6 +89,15 @@
               {{selectOptions saveThrows selected=system.save localize=true}}
             </select>
           </div>
+          <hr class="plain-hr"/>
+          <a class="item-button item-control" 
+              aria-label="{{localize 'Conditional Modifiers'}}" 
+              role="button" 
+              data-tooltip="Conditional Modifiers" 
+              data-action="configureConditionalMods">
+            <i class="fas fa-cogs" style="font-size: small"></i>
+          </a>
+          <label class="resource-label">Special</label>
           {{else}} {{!-- not isGM --}}
             {{#if system.identified}}
             <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>

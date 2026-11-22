@@ -4,15 +4,17 @@ export class Hyp3eDice {
   /**
    * Construct attack roll from relevant parts, return roll formula
    * @param {Object} rollData 
-   * @param {Object} itemData
-   * @param {Object} actorData
+   * @param {Object} itemData - Item/weapon/spell system data object
+   * @param {Object} ammoData - Ammo system data object, if any
+   * @param {Object} actorData - Owner/actor system data object, if any
+   * @param {Object} targetData - Target/actor system data object, if any
    */
-  static buildAttackFormula(rollData, itemData, ammoData = null, actorData = null) {
+  static buildAttackFormula(rollData, itemData, ammoData = null, actorData = null, targetData = null) {
     // Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Roll data:`, rollData);
     // Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Item data:`, itemData);
     // Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Ammo data:`, ammoData);
     // Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Actor data:`, actorData);
-
+    // Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Target data:`, targetData);
     let atkRollParts = [];
     let masteryMod = 0;
     let debugAtkRollParts = [];
@@ -30,7 +32,17 @@ export class Hyp3eDice {
     }
     const faAtkMod = parseInt(actorData.fa) > 0 ? `+${parseInt(actorData.fa)}` : `${parseInt(actorData.fa)}`;
     const caAtkMod = parseInt(actorData.ca) > 0 ? `+${parseInt(actorData.ca)}` : `${parseInt(actorData.ca)}`;
-    const itemAtkMod = parseInt(itemData.atkMod) > 0 ? `+${parseInt(itemData.atkMod)}` : `${parseInt(itemData.atkMod)}`;
+    // let itemAtkMod = parseInt(itemData.atkMod) > 0 ? `+${parseInt(itemData.atkMod)}` : `${parseInt(itemData.atkMod)}`;
+    let itemAtkMod = parseInt(itemData.atkMod);
+    const conditionalMods = (itemData?.conditionalMods && Array.isArray(itemData?.conditionalMods)) ? this._getApplicableConditionalMods(itemData, actorData, targetData) : [];
+    Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Applicable conditional mods:`, conditionalMods);
+    // Replace itemAtkMod with the sum of all applicable conditional mods
+    const sumConditionalMods = conditionalMods.reduce((sum, mod) => sum + parseInt(mod.attack), 0);
+    if (sumConditionalMods !== 0) {
+      // const replacementAtkMod = sumConditionalMods > 0 ? `+${sumConditionalMods}` : `${sumConditionalMods}`;
+      // itemAtkMod = replacementAtkMod;
+      itemAtkMod = sumConditionalMods;
+    }
 
     // Check if the weapon attack has Master or Grandmaster flags set
     if (actorData?.weaponProficiencies) {
@@ -93,13 +105,17 @@ export class Hyp3eDice {
     }
 
     // Apply the item attack mod if needed
-    if (itemData.atkMod && parseInt(itemData.atkMod) != 0) {
+    // if (itemData.atkMod && parseInt(itemData.atkMod) != 0) {
+    if (itemAtkMod !== 0) {
+      const itemAtkModStr = itemAtkMod > 0 ? `+${itemAtkMod}` : `${itemAtkMod}`;
       if (atkRollParts.length > 1) {
-        atkRollParts.splice(1, 0, itemData.atkMod);
-        debugAtkRollParts.splice(1, 0, `<tr><td>Item Atk Mod</td><td>${itemAtkMod}</td></tr>`);
+        // atkRollParts.splice(1, 0, itemData.atkMod);
+        atkRollParts.splice(1, 0, itemAtkMod);
+        // debugAtkRollParts.splice(1, 0, `<tr><td>Item Atk Mod</td><td>${itemAtkMod}</td></tr>`);
+        debugAtkRollParts.splice(1, 0, `<tr><td>Item Atk Mod</td><td>${itemAtkModStr}</td></tr>`);
       } else {
-        atkRollParts.push(itemData.atkMod);
-        debugAtkRollParts.push(`<tr><td>Item Atk Mod</td><td>${itemAtkMod}</td></tr>`);
+        atkRollParts.push(itemAtkMod);
+        debugAtkRollParts.push(`<tr><td>Item Atk Mod</td><td>${itemAtkModStr}</td></tr>`);
       }
     }
 
@@ -259,11 +275,12 @@ export class Hyp3eDice {
 
   /**
    * Construct damage roll from relevant parts, return roll formula
-   * @param {Object} itemData
-   * @param {Object} ammoData
-   * @param {Object} actorData
+   * @param {Object} itemData - Item/weapon/spell system data object
+   * @param {Object} ammoData - Ammo system data object, if any
+   * @param {Object} actorData - Owner/actor system data object, if any
+   * @param {Object} targetData - Target/actor system data object, if any
    */
-  static buildDamageFormula(itemData, ammoData = null, actorData = null) {
+  static buildDamageFormula(itemData, ammoData = null, actorData = null, targetData = null) {
     let dmgRollParts = [];
     let debugDmgRollParts = [];
     let dmgIcons = [];
@@ -278,7 +295,17 @@ export class Hyp3eDice {
     }
     const faDmgMod = parseInt(actorData.fa) > 0 ? `+${parseInt(actorData.fa)}` : `${parseInt(actorData.fa)}`;
     const caDmgMod = parseInt(actorData.ca) > 0 ? `+${parseInt(actorData.ca)}` : `${parseInt(actorData.ca)}`;
-    const itemDmgMod = parseInt(itemData.dmgMod) > 0 ? `+${parseInt(itemData.dmgMod)}` : `${parseInt(itemData.dmgMod)}`;
+    // const itemDmgMod = parseInt(itemData.dmgMod) > 0 ? `+${parseInt(itemData.dmgMod)}` : `${parseInt(itemData.dmgMod)}`;
+    let itemDmgMod = parseInt(itemData.dmgMod);
+    const conditionalMods = (itemData?.conditionalMods && Array.isArray(itemData?.conditionalMods)) ? this._getApplicableConditionalMods(itemData, actorData, targetData) : [];
+    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Applicable conditional mods:`, conditionalMods);
+    // Replace itemDmgMod with the sum of all applicable conditional mods
+    const sumConditionalMods = conditionalMods.reduce((sum, mod) => sum + parseInt(mod.damage), 0);
+    if (sumConditionalMods !== 0) {
+      // const replacementDmgMod = sumConditionalMods > 0 ? `+${sumConditionalMods}` : `${sumConditionalMods}`;
+      // itemDmgMod = replacementDmgMod;
+      itemDmgMod = sumConditionalMods;
+    }
 
     const baseDmgType = itemData?.dmgType ? CONFIG.HYP3E.damageTypes[itemData.dmgType] : "Basic";
     const baseIcon = itemData?.dmgType 
@@ -287,8 +314,8 @@ export class Hyp3eDice {
     dmgIcons.push(`<span>${baseIcon}</span>`);
 
     const altDmgTypes = Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
-    const addlDmgTypes = (itemData?.addlDmg && Array.isArray(itemData?.addlDmg)) ? itemData?.addlDmg : [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Alternate damage types:`, altDmgTypes);
+    const addlDmgTypes = (itemData?.addlDmg && Array.isArray(itemData?.addlDmg)) ? itemData?.addlDmg : [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Additional damage types:`, addlDmgTypes);
 
     // I may regret this, but I'm going to assume we will never have more than 2 damage fields 
@@ -383,12 +410,21 @@ export class Hyp3eDice {
     }
 
     // Apply the item damage mod if needed
-    if (itemData?.dmgMod && parseInt(itemData.dmgMod) != 0) {
-      dmgRollParts.push(itemDmgMod.replace("+", ""));
-      debugDmgRollParts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgMod}</td></tr>`);
+    // if (itemData?.dmgMod && parseInt(itemData.dmgMod) != 0) {
+    //   dmgRollParts.push(itemDmgMod.replace("+", ""));
+    //   debugDmgRollParts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgMod}</td></tr>`);
+    //   if (itemData.damage2h) {
+    //     dmgRoll2Parts.push(itemDmgMod.replace("+", ""));
+    //     debugDmgRoll2Parts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgMod}</td></tr>`);
+    //   }
+    // }
+    if (itemDmgMod !== 0) {
+      const itemDmgModStr = itemDmgMod > 0 ? `+${itemDmgMod}` : `${itemDmgMod}`;
+      dmgRollParts.push(itemDmgMod);
+      debugDmgRollParts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgModStr}</td></tr>`);
       if (itemData.damage2h) {
-        dmgRoll2Parts.push(itemDmgMod.replace("+", ""));
-        debugDmgRoll2Parts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgMod}</td></tr>`);
+        dmgRoll2Parts.push(itemDmgMod);
+        debugDmgRoll2Parts.push(`<tr><td>Item Dmg Mod</td><td>${itemDmgModStr}</td></tr>`);
       }
     }
 
@@ -603,7 +639,7 @@ export class Hyp3eDice {
       });
     }
 
-    // New: Repeat for 2H groups (parallel logic)
+    // Repeat for 2H groups
     currentTermStart = 0;
     const baseTermCount2h = termCounts2h.slice(0, numBaseParts2h).reduce((a, b) => a + b, 0);
     if (itemData.damage2h) {
@@ -804,6 +840,102 @@ export class Hyp3eDice {
       console.warn("Hyp3eDice resolveFormulaWithMathAsync: evaluation error", err);
       return null;
     }
+  }
+
+  /**
+   * Check item conditional mods and return an array of those that apply to the current actor/target.
+   * @param {*} itemData - item system data (from item.system)
+   * @param {*} actorData - actor/owner system data (from actor.system)
+   * @param {*} targetData - actor/target system data (from target.system)
+   * @returns 
+   */
+  static _getApplicableConditionalMods(itemData, actorData = null, targetData = null) {
+    const conditionalMods = itemData?.conditionalMods || [];
+    const applicableMods = [];
+
+    for (const mod of conditionalMods) {
+      Hyp3eLogger.info("Hyp3eDice _getApplicableConditionalMods", `Testing conditional mod:`, mod);
+      const condition = mod.condition;
+      if (!condition) continue; // This should never happen!
+
+      // Wielder or target?
+      if (condition.source === "wielder") {
+        if (!actorData) continue; // If no actor data, skip this mod
+        // If systemPath starts with "system.", remove it for getProperty
+        if (condition.systemPath.startsWith("system.")) {
+          condition.systemPath = condition.systemPath.substring(7);
+        }
+        const dataValue = foundry.utils.getProperty(actorData, condition.systemPath);
+        Hyp3eLogger.info("Hyp3eDice _getApplicableConditionalMods", `System path: ${condition.systemPath}, Actor value: ${dataValue}, Condition value: ${condition.value}, Operator: ${condition.operator}`);
+        switch (condition.operator) {
+          case "==":
+            if (dataValue.toLowerCase() == condition.value.toLowerCase()) {
+              applicableMods.push(mod);
+            }
+            break;
+
+          case "!=":
+            if (dataValue.toLowerCase() != condition.value.toLowerCase()) {
+              applicableMods.push(mod);
+            }
+            break;
+
+          case "incl":
+            if (dataValue.toLowerCase().includes(condition.value.toLowerCase())) {
+              applicableMods.push(mod);
+            }
+            break;
+
+          case "in":
+            if (dataValue.toLowerCase() in condition.value.toLowerCase()) {
+              applicableMods.push(mod);
+            }
+            break;
+
+          default:
+            break;
+        }
+
+      } else {  // source === "target"
+        if (!targetData) continue; // If no target data, skip this mod
+        // If systemPath starts with "system.", remove it for getProperty
+        if (condition.systemPath.startsWith("system.")) {
+          condition.systemPath = condition.systemPath.substring(7);
+        }
+        const dataValue = foundry.utils.getProperty(targetData, condition.systemPath);
+        Hyp3eLogger.info("Hyp3eDice _getApplicableConditionalMods", `System path: ${condition.systemPath}, Target value: ${dataValue}, Condition value: ${condition.value}, Operator: ${condition.operator}`);
+        switch (condition.operator) {
+          case "==":
+            if (dataValue.toLowerCase() == condition.value.toLowerCase()) {
+              applicableMods.push(mod);
+            }
+            break;
+
+          case "!=":
+            if (dataValue.toLowerCase() != condition.value.toLowerCase()) {
+              applicableMods.push(mod);
+            }
+            break;
+
+          case "incl":
+            if (dataValue.toLowerCase().includes(condition.value.toLowerCase())) {
+              applicableMods.push(mod);
+            }
+            break;
+
+          case "in":
+            if (dataValue.toLowerCase() in condition.value.toLowerCase()) {
+              applicableMods.push(mod);
+            }
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+
+    return applicableMods;
   }
 
 }

@@ -2186,7 +2186,7 @@ export class Hyp3eActor extends Actor {
     }
 
     // Build Roll Formula
-    const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData);
+    const { formula: rollFormula, debugFormula: debugAtkRollFormula } = Hyp3eDice.buildAttackFormula(dataset, itemData, ammoMods, actorData, target?.actor?.system);
     Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Final attack formula:`, rollFormula);
 
     // Execute the Roll
@@ -2215,7 +2215,7 @@ export class Hyp3eActor extends Actor {
     }
     // if ((hit || isCritMiss) && item && Roll.validate(itemData.damage)) {
     if (item && Roll.validate(itemData.damage)) {
-      damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData);
+      damageFormulas = this._prepareDamageFormulas(itemData, ammoMods, actorData, target?.actor?.system);
       Hyp3eLogger.info("Hyp3eActor rollAttackOrSpell", `Damage formulas:`, damageFormulas);
     }
 
@@ -2760,12 +2760,13 @@ export class Hyp3eActor extends Actor {
    * @param {object} itemData - System data of the item.
    * @param {object} ammoMods - Modifiers from ammunition.
    * @param {object} actorData - Roll data context.
+   * @param {object} targetData - Data of the target actor, if any.
    * @returns {object} Object containing primary and secondary damage formulas {primary: {formula, debugFormula}, secondary: {formula, debugFormula}}.
    */
-  _prepareDamageFormulas(itemData, ammoMods, actorData) {
+  _prepareDamageFormulas(itemData, ammoMods, actorData, targetData) {
       const dmgFormulas = {};
       // Build primary damage formula
-      const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData);
+      const dmgObj = Hyp3eDice.buildDamageFormula(itemData, ammoMods, actorData, targetData);
       dmgFormulas.primary = {
           formula: dmgObj.formula,
           debugFormula: dmgObj.debugFormula,

@@ -5,47 +5,55 @@
     <fieldset class="mod-entry" data-index="{{i}}">
       <legend>Modifier {{add i 1}}</legend>
 
-      <div class="form-group">
-        <label>Attack Mod</label>
-        <input type="number" name="mods.{{i}}.attack" value="{{mod.attack}}" />
-      </div>
-      <div class="form-group">
-        <label>Damage Mod</label>
-        <input type="number" name="mods.{{i}}.damage" value="{{mod.damage}}" />
-      </div>
-
-      <div class="form-group">
-        <label>Source</label>
-        <select name="mods.{{i}}.condition.source">
-          {{selectOptions @root.sources selected=mod.condition.source}}
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>System Path</label>
-        <input type="text" name="mods.{{i}}.condition.systemPath" value="{{mod.condition.systemPath}}" placeholder="example: system.phenotype" />
+      <div class="form-fields flexrow">
+        <div class="form-group flexlarge">
+          <label>Attack Mod:</label>
+          <input class="input-med60" style="margin-right: 40px;" type="text" name="mods.{{i}}.attack" value="{{numberFormat mod.attack decimals=0 sign=true}}" />
+        </div>
+        <div class="form-group flexlarge">
+          <label>Damage Mod:</label>
+          <input class="input-med60" style="margin-right: 40px;" type="text" name="mods.{{i}}.damage" value="{{numberFormat mod.damage decimals=0 sign=true}}" />
+        </div>
+        <div class="form-group">
+          <button type="button" class="button-narrow" data-action="deleteMod" data-index="{{i}}">
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Operator</label>
-        <select name="mods.{{i}}.condition.operator">
-          {{selectOptions @root.operators selected=mod.condition.operator}}
-        </select>
+      <div class="form-fields flexrow">
+        <div class="form-group">
+          <label>Source:</label>
+          <select name="mods.{{i}}.condition.source">
+            {{selectOptions @root.sources selected=mod.condition.source}}
+          </select>
+        </div>
+        <div class="form-group" style="padding-left: 10px;">
+          <label>Data Path:</label>
+          <input type="text" name="mods.{{i}}.condition.systemPath" value="{{mod.condition.systemPath}}" placeholder="system.phenotype" />
+        </div>
+      </div>
+      <div class="form-fields flexrow">
+        <div class="form-group">
+          <label>Operator:</label>
+          <select name="mods.{{i}}.condition.operator">
+            {{selectOptions @root.operators selected=mod.condition.operator}}
+          </select>
+        </div>
+        <div class="form-group" style="padding-left: 10px;">
+          <label>Value:</label>
+          <input type="text" name="mods.{{i}}.condition.value" value="{{mod.condition.value}}" />
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Value</label>
-        <input type="text" name="mods.{{i}}.condition.value" value="{{mod.condition.value}}" />
-      </div>
-
-      <button type="button" data-action="deleteMod" data-index="{{i}}">
+      {{!-- <button type="button" data-action="deleteMod" data-index="{{i}}">
         <i class="fas fa-trash"></i> Delete
-      </button>
+      </button> --}}
     </fieldset>
     {{/each}}
   </div>
 
-  <div class="form-footer">
+  <div class="form-footer" style="margin-top: 10px; display: flex; justify-content: space-between;">
     <button type="button" data-action="addMod">
       <i class="fas fa-plus"></i> Add Conditional Modifier
     </button>

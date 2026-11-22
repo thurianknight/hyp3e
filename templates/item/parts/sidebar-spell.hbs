@@ -33,8 +33,19 @@
             {{/each}} --}}
             {{#each system.addlDmg as |dmg i|}}
             <li class="item-entry item" data-item-id="{{i}}">
-              <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes dmg.type}} {{dmg.formula}}" disabled />
+              <input class="align-center" type="text" name="system.addlDmgList" value="{{lookup @root.damageTypes dmg.type}} {{dmg.formula}}" disabled />
             </li>
             {{/each}}
           </ol>
+          {{#if isGM}}
+          <hr class="plain-hr"/>
+          <a class="item-button item-control" 
+              aria-label="{{localize 'Conditional Modifiers'}}" 
+              role="button" 
+              data-tooltip="Conditional Modifiers" 
+              data-action="configureConditionalMods">
+            <i class="fas fa-cogs" style="font-size: small"></i>
+          </a>
+          <label class="resource-label">Special</label>
+          {{/if}} {{!-- /if isGM --}}
         </div>
