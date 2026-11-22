@@ -62,7 +62,7 @@ export async function handleCritMissOrHitButtons(html) {
   if (critMissElement.length > 0) {
     critMissElement.each((_i, b) => {
       Hyp3eLogger.info("handleCritMissOrHitButtons", `Critical miss element data:`, $(b).data());
-      baseClass = $(b).data('baseClass');
+      baseClass = $(b).data('baseClass') != "" ? $(b).data('baseClass') : "npc";
       if (baseClass != "npc") {
         baseClassLabel = baseClass.charAt(0).toUpperCase()+baseClass.substring(1)
       } else {
@@ -104,7 +104,7 @@ export async function handleCritMissOrHitButtons(html) {
 
   if (critHitElement.length > 0) {
     critHitElement.each((_i, b) => {
-      baseClass = $(b).data('baseClass');
+      baseClass = $(b).data('baseClass') != "" ? $(b).data('baseClass') : "npc";
       if (baseClass != "npc") {
         baseClassLabel = baseClass.charAt(0).toUpperCase()+baseClass.substring(1)
       } else {
@@ -408,7 +408,8 @@ async function rollCritMiss(charType, actorId, dmgData = null) {
   }
 
   // const flavor = `<div class="dice-damage">` + game.i18n.localize(`HYP3E.attack.critMiss.${charType}`) + `</div>`
-  const flavor = game.i18n.localize(`HYP3E.attack.critMiss.${charType}`)
+  const msgVar = `HYP3E.attack.critMiss.${charType}`;
+  const flavor = game.i18n.localize(msgVar);
   // Send to chat
   roll.toMessage({
     author: game.user_id,
