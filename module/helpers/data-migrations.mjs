@@ -327,7 +327,7 @@ export function migrateItemData(item) {
       Hyp3eLogger.warn("migrateItemData", `No damage type set on ${item.name}. Setting to Basic...`)
       updates = { ...updates, "system.dmgType": "basic" };
     }
-    // Migrate altDmg to addlDmg if it exists
+    // Migrate altDmg, if it exists, to addlDmg
     if (item.system.altDmg && Object.keys(item.system.altDmg).length > 0) {
       const addlDmg = Object.entries(item.system.altDmg).map(([type, formula]) => ({ type, formula }));
       updates = { ...updates, "system.addlDmg": addlDmg };

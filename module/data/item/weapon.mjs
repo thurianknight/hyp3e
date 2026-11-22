@@ -32,26 +32,19 @@ export default class Hyp3eWeapon extends Hyp3eItemBase {
     schema.rof = new fields.StringField({ initial: "1/1" });
     schema.atkMod = new fields.NumberField({ initial: 0 });
     schema.dmgMod = new fields.NumberField({ initial: 0 });
-    // schema.altDmg = new fields.ObjectField({ initial: {}, nullable: true });
-    // addlDmg replaces altDmg (in the rollable template)
-    schema.addlDmg = new fields.ArrayField(
-      new fields.SchemaField({
-        type: new fields.StringField({ required: true, initial: "" }),
-        formula: new fields.StringField({ required: true, initial: "" })
-      })
-    );
-    schema.conditionalMods = new fields.ArrayField(
-      new fields.SchemaField({
-        attack: new fields.NumberField({ required: true, integer: true, initial: 0 }),
-        damage: new fields.NumberField({ required: true, integer: true, initial: 0 }),
-        condition: new fields.SchemaField({
-          source: new fields.StringField({ required: true, initial: "target" }),  // "target" or "wielder"
-          systemPath: new fields.StringField({ required: true, initial: "" }),
-          operator: new fields.StringField({ required: true, initial: "==", choices: { "==": "equal to", "!=": "not equal to", "incl": "includes", "in": "is one of" } }),
-          value: new fields.StringField({ required: true, initial: "" })
-        })
-      })
-    );
+    // This may need to move into the rollable template...
+    // schema.conditionalMods = new fields.ArrayField(
+    //   new fields.SchemaField({
+    //     attack: new fields.NumberField({ required: true, integer: true, initial: 0 }),
+    //     damage: new fields.NumberField({ required: true, integer: true, initial: 0 }),
+    //     condition: new fields.SchemaField({
+    //       source: new fields.StringField({ required: true, initial: "target" }),  // "target" or "wielder"
+    //       systemPath: new fields.StringField({ required: true, initial: "" }),
+    //       operator: new fields.StringField({ required: true, initial: "==", choices: { "==": "equal to", "!=": "not equal to", "incl": "includes", "in": "is one of" } }),
+    //       value: new fields.StringField({ required: true, initial: "" })
+    //     })
+    //   })
+    // );
     schema.wpnMaster = new fields.BooleanField({ initial: false });
     schema.wpnGrandmaster = new fields.BooleanField({ initial: false });
     schema.isGrenade = new fields.BooleanField({ initial: false });

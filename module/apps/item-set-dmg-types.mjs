@@ -29,7 +29,7 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
     form: {
       handler: HYP3EItemSetDmgTypes.#onSubmit,
       submitOnChange: false,
-      closeOnSubmit: true
+      closeOnSubmit: false
     },
     actions: {
       // saveChanges: HYP3EItemSetDmgTypes.saveChanges
@@ -170,6 +170,9 @@ export default class HYP3EItemSetDmgTypes extends HandlebarsApplicationMixin(App
         updateData[`system.altDmg.-=${type}`] = null;
       }
     }
+
+    const addlDmg = Object.values(formDataObj.addlDmg ?? {});
+    updateData[`system.addlDmg`] = addlDmg;
 
     // Log the update data and update the item
     Hyp3eLogger.info("HYP3EItemSetDmgTypes #onSubmit", `Item damage update:`, updateData);

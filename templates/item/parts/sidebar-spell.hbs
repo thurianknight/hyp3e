@@ -26,10 +26,15 @@
           <hr class="plain-hr"/>
           <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
           <ol class="items-list">
-          {{#each system.altDmg as |val key|}}
+            {{!-- {{#each system.altDmg as |val key|}}
             <li class="item-entry item" data-item-id="{{key}}">
               <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes key}} {{val}}" disabled />
             </li>
-          {{/each}}
+            {{/each}} --}}
+            {{#each system.addlDmg as |dmg i|}}
+            <li class="item-entry item" data-item-id="{{i}}">
+              <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes dmg.type}} {{dmg.formula}}" disabled />
+            </li>
+            {{/each}}
           </ol>
         </div>

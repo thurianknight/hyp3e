@@ -286,8 +286,10 @@ export class Hyp3eDice {
       : CONFIG.HYP3E.damageTypeIcons["basic"];
     dmgIcons.push(`<span>${baseIcon}</span>`);
 
-    const altDmgTypes =  Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
+    const altDmgTypes = Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
+    const addlDmgTypes = (itemData?.addlDmg && Array.isArray(itemData?.addlDmg)) ? itemData?.addlDmg : [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Alternate damage types:`, altDmgTypes);
+    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Additional damage types:`, addlDmgTypes);
 
     // I may regret this, but I'm going to assume we will never have more than 2 damage fields 
     //  (1-hand and 2-hand) and hard-code it into this function.
@@ -508,19 +510,34 @@ export class Hyp3eDice {
     const numBaseParts2h = dmgRoll2Parts.length;
 
     // Do we have any alternate damage types?
-    if (Object.keys(altDmgTypes).length > 0) {
-      for (let [k, v] of Object.entries(altDmgTypes)) {
-        dmgRollParts.push(v)
-        const dmgType = CONFIG.HYP3E.damageTypes[k];
-        const altIcon = CONFIG.HYP3E.damageTypeIcons[k.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
-        debugDmgRollParts.push(`<tr><td>${dmgType} Dmg</td><td>+${v}</td></tr>`)
-        dmgIcons.push(`<span>${altIcon}</span>`);
+    // if (Object.keys(altDmgTypes).length > 0) {
+    //   for (let [k, v] of Object.entries(altDmgTypes)) {
+    //     dmgRollParts.push(v)
+    //     const dmgType = CONFIG.HYP3E.damageTypes[k];
+    //     const altIcon = CONFIG.HYP3E.damageTypeIcons[k.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
+    //     debugDmgRollParts.push(`<tr><td>${dmgType} Dmg</td><td>+${v}</td></tr>`)
+    //     dmgIcons.push(`<span>${altIcon}</span>`);
+
+    //     if (itemData.damage2h) {
+    //       dmgRoll2Parts.push(v)
+    //       debugDmgRoll2Parts.push(`<tr><td>${dmgType} Dmg</td><td>+${v}</td></tr>`)
+    //     }
+    //   }
+    // }
+    // Do we have any additional damage types?
+    if (addlDmgTypes.length > 0) {
+      addlDmgTypes.forEach(addl => {
+        dmgRollParts.push(addl.formula)
+        const dmgType = CONFIG.HYP3E.damageTypes[addl.type] || addl.type;
+        const addlIcon = CONFIG.HYP3E.damageTypeIcons[addl.type.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
+        debugDmgRollParts.push(`<tr><td>${dmgType} Dmg</td><td>+${addl.formula}</td></tr>`)
+        dmgIcons.push(`<span>${addlIcon}</span>`);
 
         if (itemData.damage2h) {
-          dmgRoll2Parts.push(v)
-          debugDmgRoll2Parts.push(`<tr><td>${dmgType} Dmg</td><td>+${v}</td></tr>`)
+          dmgRoll2Parts.push(addl.formula)
+          debugDmgRoll2Parts.push(`<tr><td>${dmgType} Dmg</td><td>+${addl.formula}</td></tr>`)
         }
-      }
+      });
     }
 
     // Finish the debug damage roll table
@@ -554,19 +571,35 @@ export class Hyp3eDice {
     currentTermStart += baseTermCount;
 
     // Alt groups
-    if (Object.keys(altDmgTypes).length > 0) {
-      Object.keys(altDmgTypes).forEach((k, idx) => {
-        const altIdx = numBaseParts + idx;
-        const altTermCount = termCounts[altIdx];
-        const altIcon = CONFIG.HYP3E.damageTypeIcons[k.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
+    // if (Object.keys(altDmgTypes).length > 0) {
+    //   Object.keys(altDmgTypes).forEach((k, idx) => {
+    //     const altIdx = numBaseParts + idx;
+    //     const altTermCount = termCounts[altIdx];
+    //     const altIcon = CONFIG.HYP3E.damageTypeIcons[k.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
+    //     damageGroups.push({
+    //       dmgType: k,
+    //       termStart: currentTermStart,
+    //       termCount: altTermCount,
+    //       icon: altIcon,
+    //       label: CONFIG.HYP3E.damageTypes[k] || k.charAt(0).toUpperCase() + k.slice(1)  // fallback to capitalized key
+    //     });
+    //     currentTermStart += altTermCount;
+    //   });
+    // }
+    // Addl groups
+    if (addlDmgTypes.length > 0) {
+      addlDmgTypes.forEach((addl, idx) => {
+        const addlIdx = numBaseParts + idx;
+        const addlTermCount = termCounts[addlIdx];
+        const addlIcon = CONFIG.HYP3E.damageTypeIcons[addl.type.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
         damageGroups.push({
-          dmgType: k,
+          dmgType: addl.type,
           termStart: currentTermStart,
-          termCount: altTermCount,
-          icon: altIcon,
-          label: CONFIG.HYP3E.damageTypes[k] || k.charAt(0).toUpperCase() + k.slice(1)  // fallback to capitalized key
+          termCount: addlTermCount,
+          icon: addlIcon,
+          label: CONFIG.HYP3E.damageTypes[addl.type] || addl.type.charAt(0).toUpperCase() + addl.type.slice(1)  // fallback to capitalized key
         });
-        currentTermStart += altTermCount;
+        currentTermStart += addlTermCount;
       });
     }
 
@@ -583,19 +616,35 @@ export class Hyp3eDice {
       });
       currentTermStart += baseTermCount2h;
 
-      if (Object.keys(altDmgTypes).length > 0) {
-        Object.keys(altDmgTypes).forEach((k, idx) => {
-          const altIdx = numBaseParts2h + idx;
-          const altTermCount = termCounts2h[altIdx];
-          const altIcon = CONFIG.HYP3E.damageTypeIcons[k.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
+      // if (Object.keys(altDmgTypes).length > 0) {
+      //   Object.keys(altDmgTypes).forEach((k, idx) => {
+      //     const altIdx = numBaseParts2h + idx;
+      //     const altTermCount = termCounts2h[altIdx];
+      //     const altIcon = CONFIG.HYP3E.damageTypeIcons[k.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
+      //     damageGroups2h.push({
+      //       dmgType: k,
+      //       termStart: currentTermStart,
+      //       termCount: altTermCount,
+      //       icon: altIcon,
+      //       label: CONFIG.HYP3E.damageTypes[k] || k.charAt(0).toUpperCase() + k.slice(1)  // fallback to capitalized key
+      //     });
+      //     currentTermStart += altTermCount;
+      //   });
+      // }
+      // Addl groups for 2H
+      if (addlDmgTypes.length > 0) {
+        addlDmgTypes.forEach((addl, idx) => {
+          const addlIdx = numBaseParts2h + idx;
+          const addlTermCount = termCounts2h[addlIdx];
+          const addlIcon = CONFIG.HYP3E.damageTypeIcons[addl.type.toLowerCase()] ?? CONFIG.HYP3E.damageTypeIcons["basic"];
           damageGroups2h.push({
-            dmgType: k,
+            dmgType: addl.type,
             termStart: currentTermStart,
-            termCount: altTermCount,
-            icon: altIcon,
-            label: CONFIG.HYP3E.damageTypes[k] || k.charAt(0).toUpperCase() + k.slice(1)  // fallback to capitalized key
+            termCount: addlTermCount,
+            icon: addlIcon,
+            label: CONFIG.HYP3E.damageTypes[addl.type] || addl.type.charAt(0).toUpperCase() + addl.type.slice(1)  // fallback to capitalized key
           });
-          currentTermStart += altTermCount;
+          currentTermStart += addlTermCount;
         });
       }
     }

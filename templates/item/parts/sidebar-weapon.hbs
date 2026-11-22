@@ -25,7 +25,7 @@
             <label class="resource-label">{{localize 'HYP3E.headers.dmgMod'}}</label>
             <input class="align-center" type="text" value="??" readonly />
             {{/if}}
-          {{/if}}
+          {{/if}} {{!-- /if isGM --}}
           <label class="resource-label">{{localize 'HYP3E.headers.damage'}}</label>
           <a class="item-button item-control" 
               aria-label="{{localize 'HYP3E.headers.damageTypes'}}" 
@@ -47,11 +47,11 @@
           {{#if isGM}}
           <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
           <ol class="items-list">
-          {{#each system.altDmg as |val key|}}
-            <li class="item-entry item" data-item-id="{{key}}">
-              <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes key}} {{val}}" disabled />
+            {{#each system.addlDmg as |dmg i|}}
+            <li class="item-entry item" data-item-id="{{i}}">
+              <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes dmg.type}} {{dmg.formula}}" disabled />
             </li>
-          {{/each}}
+            {{/each}}
           </ol>
           <hr class="plain-hr"/>
           <a class="item-button item-control" 
@@ -63,15 +63,15 @@
           </a>
           <label class="resource-label">Special</label>
           <hr class="plain-hr"/>
-          {{else}}
+          {{else}} {{!-- not isGM --}}
             {{#if system.identified}}
             <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
             <ol class="items-list">
-            {{#each system.altDmg as |val key|}}
-              <li class="item-entry item" data-item-id="{{key}}">
-                <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes key}} {{val}}" disabled />
+              {{#each system.addlDmg as |dmg i|}}
+              <li class="item-entry item" data-item-id="{{i}}">
+                <input class="align-center" type="text" name="system.altDmgList" value="{{lookup @root.damageTypes dmg.type}} {{dmg.formula}}" disabled />
               </li>
-            {{/each}}
+              {{/each}}
             </ol>
             <hr class="plain-hr"/>
             <a class="item-button item-control" 
@@ -84,7 +84,7 @@
             <label class="resource-label">Special</label>
             <hr class="plain-hr"/>
             {{/if}}
-          {{/if}}
+          {{/if}} {{!-- /if isGM --}}
           <label class="resource-label">{{localize 'HYP3E.headers.weaponMastery'}}</label>
           <div class="flexrow">
             <a class="{{#unless system.wpnMaster}}not-selected{{/unless}}" data-action="handleWeaponMastery" data-mastery="master" title='{{localize "HYP3E.weapon.master"}}'><i class="fas fa-sword"></i></a>
@@ -98,7 +98,7 @@
               {{selectOptions saveThrows selected=system.save localize=true}}
             </select>
           </div>
-          {{else}}
+          {{else}} {{!-- not isGM --}}
             {{#if system.identified}}
             <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
             <div class="form-fields">
@@ -108,5 +108,5 @@
               </select>
             </div>
             {{/if}}
-          {{/if}}
+          {{/if}} {{!-- /if isGM --}}
         </div>
