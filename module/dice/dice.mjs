@@ -332,11 +332,27 @@ export class Hyp3eDice {
     debugDmgRollParts.push(`<b>Damage formula elements:</b><table class="chat-table">`);
     debugDmgRollParts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage}</td></tr>`);
 
+    // Concatenate conditional damage dice, if any exist, to the base damage formulas
+    conditionalMods.forEach((mod) => {
+      if (mod.dmgFormula && mod.dmgFormula !== "") {
+        dmgRollParts.push(mod.dmgFormula);
+        debugDmgRollParts.push(`<tr><td>${baseDmgType} Dmg</td><td>${mod.dmgFormula}</td></tr>`);
+      }
+    });
+
     // Do we have 2-handed damage?
     if (itemData.damage2h) {
       dmgRoll2Parts.push(itemData.damage2h);
       debugDmgRoll2Parts.push(`<b>Damage formula elements:</b><table class="chat-table">`);
       debugDmgRoll2Parts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage2h}</td></tr>`);
+
+      // Concatenate conditional damage dice, if any exist, to the base damage formulas
+      conditionalMods.forEach((mod) => {
+        if (mod.dmgFormula2h && mod.dmgFormula2h !== "") {
+          dmgRoll2Parts.push(mod.dmgFormula2h);
+          debugDmgRoll2Parts.push(`<tr><td>${baseDmgType} Dmg</td><td>${mod.dmgFormula2h}</td></tr>`);
+        }
+      });  
     }
 
     // Reformat the item damage string for commonly-used variables

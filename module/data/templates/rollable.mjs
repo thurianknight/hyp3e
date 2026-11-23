@@ -26,6 +26,8 @@ export function rollableTemplate() {
       new fields.SchemaField({
         attack: new fields.NumberField({ required: true, integer: true, initial: 0 }),
         damage: new fields.NumberField({ required: true, integer: true, initial: 0 }),
+        dmgFormula: new fields.StringField({ required: true, initial: "" }),
+        dmgFormula2h: new fields.StringField({ required: true, initial: "" }),
         condition: new fields.SchemaField({
           source: new fields.StringField({ required: true, initial: "target" }),  // "target" or "wielder"
           systemPath: new fields.StringField({ required: true, initial: "" }),

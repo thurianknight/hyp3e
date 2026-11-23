@@ -107,6 +107,8 @@ export default class HYP3EItemSetConditionalMods extends HandlebarsApplicationMi
     mods.push({
       attack: 0,
       damage: 0,
+      dmgFormula: "",
+      dmgFormula2h: "",
       condition: {
         source: "target",
         systemPath: "",

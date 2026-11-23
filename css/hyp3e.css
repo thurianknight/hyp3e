@@ -369,6 +369,10 @@
   text-align: center;
   max-width: 60px;
 }
+.hyp3e input.input-med75 {
+  text-align: center;
+  max-width: 75px;
+}
 .hyp3e input.input-wide {
   text-align: center;
   width: 90%;

@@ -6,6 +6,10 @@
       <legend>Modifier {{add i 1}}</legend>
 
       <div class="form-fields flexrow">
+        <span style="font-style: italic;">Note: Attack and Damage Mods replace any existing on the weapon, but 1-Hand and 2-Hand Damage formulas are added to the existing formula.</span>
+      </div>
+
+      <div class="form-fields flexrow">
         <div class="form-group flexlarge">
           <label>Attack Mod:</label>
           <input class="input-med60" style="margin-right: 40px;" type="text" name="mods.{{i}}.attack" value="{{numberFormat mod.attack decimals=0 sign=true}}" />
@@ -18,6 +22,17 @@
           <button type="button" class="button-narrow" data-action="deleteMod" data-index="{{i}}">
             <i class="fas fa-trash"></i> Delete
           </button>
+        </div>
+      </div>
+
+      <div class="form-fields flexrow">
+        <div class="form-group flexlarge">
+          <label>1-Hand Damage:</label>
+          <input class="input-med75" style="margin-right: 60px;" type="text" name="mods.{{i}}.dmgFormula" value="{{mod.dmgFormula}}" />
+        </div>
+        <div class="form-group flexlarge">
+          <label>2-Hand Damage:</label>
+          <input class="input-med75" style="margin-right: 60px;" type="text" name="mods.{{i}}.dmgFormula2h" value="{{mod.dmgFormula2h}}" />
         </div>
       </div>
 
