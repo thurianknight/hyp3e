@@ -3257,16 +3257,18 @@ export class Hyp3eActor extends Actor {
 
   /**
    * Toggle the light source on the actor's token.
-   * Light sources are either all on or all off, we don't try to track multiple sources.
    * @param {*} itemId - The ID of the item to toggle light source for.
+   * @param {TokenDocument} [token] - The token using the light, if supplied by the caller.
    * @returns - null
    */
-  async toggleLightSource(itemId) {
-    // Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Actor ${this.name}:`, this);
-    // const token = this?.token ?? this?.sheet?.token;
-    const token = this.getAssociatedToken();
+  async toggleLightSource(itemId, token = this.token) {
     if (!token) {
-      Hyp3eLogger.warn("toggleLightSource", `No token found for actor ${this.name}.`);
+      const selected = canvas.tokens?.controlled.filter(t => t.actor === this) ?? [];
+      const candidates = selected.length ? selected.map(t => t.document) : this.getActiveTokens(true, true);
+      if (candidates.length === 1) token = candidates[0];
+    }
+    if (!token || token.actor !== this) {
+      ui.notifications.warn(game.i18n.localize("HYP3E.item.selectLightToken"));
       return;
     }
     const item = this.items.get(itemId);
@@ -3275,14 +3277,20 @@ export class Hyp3eActor extends Actor {
       return;
     }
 
-    // If the token already has a light source, toggle it off and exit
+    // Linked tokens share this effects collection, but each carries its own light.
+    const lights = this.effects.filter(e => e.getFlag("hyp3e", "lightProps"));
+    const ownLight = lights.find(e => e.getFlag("hyp3e", "lightTokenUuid") === token.uuid);
+    if (ownLight?.disabled) {
+      await ownLight.update({ disabled: false });
+      return;
+    }
     const hasLight = token.light?.dim || token.light?.bright;
-    if (hasLight) {
-      // Remove any current light source active effect from actor
-      // const activeEffects = this.effects.filter(e => e.origin === item.uuid && e.name.startsWith("Light Source:"));
-      const activeEffects = this.effects.filter(e => e.name.startsWith("Light Source:"));
-      if (activeEffects.length > 0) {
-        await activeEffects[0].delete();
+    if (ownLight || hasLight) {
+      const existing = ownLight ?? lights.find(e =>
+        !e.disabled && !e.getFlag("hyp3e", "lightTokenUuid") && token.getFlag("hyp3e", "originalLight")
+      );
+      if (existing) {
+        await existing.delete();
         Hyp3eLogger.info("Hyp3eActor toggleLightSource", `Light source active effect removed from actor ${this.name}.`);
       } else {
         Hyp3eLogger.info("Hyp3eActor toggleLightSource", `No active effect found for light source on actor ${this.name}.`);
@@ -3372,7 +3380,8 @@ export class Hyp3eActor extends Actor {
         duration: duration,
         flags: {
           hyp3e: {
-            lightProps: lightProps
+            lightProps: lightProps,
+            lightTokenUuid: token.uuid
           }
         }
       });
