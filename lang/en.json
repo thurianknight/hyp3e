@@ -624,6 +624,30 @@
     "bonus": "Bonus",
     "true": "True",
     "false": "False",
+    "damageTypes": {
+      "title": "Damage Types",
+      "selectType": "Select a Base Type",
+      "damageRoll": "Damage Roll",
+      "additionalTypes": "Additional Types",
+      "addDamageType": "Add Damage Type",
+      "saveChanges": "Save Changes"
+    },
+    "conditionalMods": {
+      "title": "Conditional Attack/Damage Modifiers",
+      "modifier": "Modifier",
+      "note": "Note: Attack and Damage Mods replace any existing on the weapon, but 1-Hand and 2-Hand Damage formulas are added to the existing formula.",
+      "atkMod": "Attack Mod",
+      "dmgMod": "Damage Mod",
+      "dmgFormula1h": "1-Hand Damage",
+      "dmgFormula2h": "2-Hand Damage",
+      "source": "Source",
+      "path": "Data Path",
+      "operator": "Operator",
+      "value": "Value",
+      "deleteCondMod": "Delete",
+      "addCondMod": "Add Conditional Modifier",
+      "saveChanges": "Save Changes"
+    },
     "classEditor": {
       "title": "Class Editor",
       "defaultName": "New Class",
@@ -683,6 +707,7 @@
       "friendlyName": "Friendly Name",
       "baseWeapon": "Base Weapon Type",
       "altDmg": "Alternative/Additional Damage",
+      "addlDmg": "Additional Damage",
       "annotations": "Annotations",
       "itemId": "Item ID",
       "containerId": "Container ID",

@@ -18,7 +18,7 @@ export default class HYP3EItemSetConditionalMods extends HandlebarsApplicationMi
     classes: ["hyp3e", "item-set-conditional-mods"],
     tag: "form",
     window: {
-      title: "Conditional Attack/Damage Bonuses",
+      title: "HYP3E.conditionalMods.title",
       icon: "fas fa-cogs",
       contentClasses: ["standard-form"]
     },

@@ -28,9 +28,9 @@ export default class Hyp3eTreasure extends Hyp3eActorBase {
   prepareDerivedData() {
     super.prepareDerivedData?.();
 
-    // Calculate weight carried & encumbrance
+    // Calculate weight carried & encumbrance, in case a treasure-actor is being 
+    //  used for a mule or other beast of burden.
     this.weightCarried = this._calcWeightCarried();
-
     // Get encumbered status
     this.encumberedState = this._getEncumberedStatus();
   }

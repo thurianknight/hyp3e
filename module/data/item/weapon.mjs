@@ -32,19 +32,6 @@ export default class Hyp3eWeapon extends Hyp3eItemBase {
     schema.rof = new fields.StringField({ initial: "1/1" });
     schema.atkMod = new fields.NumberField({ initial: 0 });
     schema.dmgMod = new fields.NumberField({ initial: 0 });
-    // This may need to move into the rollable template...
-    // schema.conditionalMods = new fields.ArrayField(
-    //   new fields.SchemaField({
-    //     attack: new fields.NumberField({ required: true, integer: true, initial: 0 }),
-    //     damage: new fields.NumberField({ required: true, integer: true, initial: 0 }),
-    //     condition: new fields.SchemaField({
-    //       source: new fields.StringField({ required: true, initial: "target" }),  // "target" or "wielder"
-    //       systemPath: new fields.StringField({ required: true, initial: "" }),
-    //       operator: new fields.StringField({ required: true, initial: "==", choices: { "==": "equal to", "!=": "not equal to", "incl": "includes", "in": "is one of" } }),
-    //       value: new fields.StringField({ required: true, initial: "" })
-    //     })
-    //   })
-    // );
     schema.wpnMaster = new fields.BooleanField({ initial: false });
     schema.wpnGrandmaster = new fields.BooleanField({ initial: false });
     schema.isGrenade = new fields.BooleanField({ initial: false });
@@ -64,5 +51,23 @@ export default class Hyp3eWeapon extends Hyp3eItemBase {
     // Skip processing if this item is in a compendium
     if (this.parent.pack) return;
 
+  }
+
+  static migrateData(source) {
+    source = super.migrateData(source);
+  
+    // Only act if the old altDmg data is present and has content
+    if (source.altDmg && !foundry.utils.isEmpty(source.altDmg)) {
+      Hyp3eLogger.info("Hyp3eWeapon migrateData", `Migrating altDmg to addlDmg...`, { altDmg: source.altDmg, addlDmg: source.addlDmg });
+      source.addlDmg = Object.entries(source.altDmg).map(([type, formula]) => ({
+        type: type ?? "",
+        formula: formula ?? ""
+      }));
+  
+      // Clean up so the old key doesn’t linger in the new document
+      delete source.altDmg;
+    }
+  
+    return source;
   }
 }

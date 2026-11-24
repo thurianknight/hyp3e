@@ -3,60 +3,60 @@
   <div class="mods-list">
     {{#each mods as |mod i|}}
     <fieldset class="mod-entry" data-index="{{i}}">
-      <legend>Modifier {{add i 1}}</legend>
+      <legend>{{localize "HYP3E.conditionalMods.modifier"}} {{add i 1}}</legend>
 
       <div class="form-fields flexrow">
-        <span style="font-style: italic;">Note: Attack and Damage Mods replace any existing on the weapon, but 1-Hand and 2-Hand Damage formulas are added to the existing formula.</span>
+        <span style="font-style: italic;">{{localize "HYP3E.conditionalMods.note"}}</span>
       </div>
 
       <div class="form-fields flexrow">
         <div class="form-group flexlarge">
-          <label>Attack Mod:</label>
+          <label>{{localize "HYP3E.conditionalMods.atkMod"}}:</label>
           <input class="input-med60" style="margin-right: 40px;" type="text" name="mods.{{i}}.attack" value="{{numberFormat mod.attack decimals=0 sign=true}}" />
         </div>
         <div class="form-group flexlarge">
-          <label>Damage Mod:</label>
+          <label>{{localize "HYP3E.conditionalMods.dmgMod"}}:</label>
           <input class="input-med60" style="margin-right: 40px;" type="text" name="mods.{{i}}.damage" value="{{numberFormat mod.damage decimals=0 sign=true}}" />
         </div>
         <div class="form-group">
           <button type="button" class="button-narrow" data-action="deleteMod" data-index="{{i}}">
-            <i class="fas fa-trash"></i> Delete
+            <i class="fas fa-trash"></i> {{localize "HYP3E.conditionalMods.deleteCondMod"}}
           </button>
         </div>
       </div>
 
       <div class="form-fields flexrow">
         <div class="form-group flexlarge">
-          <label>1-Hand Damage:</label>
+          <label>{{localize "HYP3E.conditionalMods.dmgFormula1h"}}:</label>
           <input class="input-med75" style="margin-right: 60px;" type="text" name="mods.{{i}}.dmgFormula" value="{{mod.dmgFormula}}" />
         </div>
         <div class="form-group flexlarge">
-          <label>2-Hand Damage:</label>
+          <label>{{localize "HYP3E.conditionalMods.dmgFormula2h"}}:</label>
           <input class="input-med75" style="margin-right: 60px;" type="text" name="mods.{{i}}.dmgFormula2h" value="{{mod.dmgFormula2h}}" />
         </div>
       </div>
 
       <div class="form-fields flexrow">
         <div class="form-group">
-          <label>Source:</label>
+          <label>{{localize "HYP3E.conditionalMods.source"}}:</label>
           <select name="mods.{{i}}.condition.source">
             {{selectOptions @root.sources selected=mod.condition.source}}
           </select>
         </div>
         <div class="form-group" style="padding-left: 10px;">
-          <label>Data Path:</label>
+          <label>{{localize "HYP3E.conditionalMods.path"}}:</label>
           <input type="text" name="mods.{{i}}.condition.systemPath" value="{{mod.condition.systemPath}}" placeholder="system.phenotype" />
         </div>
       </div>
       <div class="form-fields flexrow">
         <div class="form-group">
-          <label>Operator:</label>
+          <label>{{localize "HYP3E.conditionalMods.operator"}}:</label>
           <select name="mods.{{i}}.condition.operator">
             {{selectOptions @root.operators selected=mod.condition.operator}}
           </select>
         </div>
         <div class="form-group" style="padding-left: 10px;">
-          <label>Value:</label>
+          <label>{{localize "HYP3E.conditionalMods.value"}}:</label>
           <input type="text" name="mods.{{i}}.condition.value" value="{{mod.condition.value}}" />
         </div>
       </div>
@@ -70,10 +70,10 @@
 
   <div class="form-footer" style="margin-top: 10px; display: flex; justify-content: space-between;">
     <button type="button" data-action="addMod">
-      <i class="fas fa-plus"></i> Add Conditional Modifier
+      <i class="fas fa-plus"></i> {{localize "HYP3E.conditionalMods.addCondMod"}}
     </button>
     <button type="submit">
-      <i class="fas fa-save"></i> Save Changes
+      <i class="fas fa-save"></i> {{localize "HYP3E.conditionalMods.saveChanges"}}
     </button>
   </div>
 

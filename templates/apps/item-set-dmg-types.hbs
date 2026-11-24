@@ -3,8 +3,8 @@
   {{!-- <input type="hidden" name="itemUuid" value="{{itemUuid}}" /> --}}
   <hr class="plain-hr"/>
   <div class="flexrow">
-    <span style="font-weight: bold;">Select a Base Type</span>
-    <span style="font-weight: bold;">Damage Roll</span>
+    <span style="font-weight: bold;">{{localize "HYP3E.damageTypes.selectType"}}</span>
+    <span style="font-weight: bold;">{{localize "HYP3E.damageTypes.damageRoll"}}</span>
   </div>
   <div class="form-fields flexrow">
     <select name="dmgType">
@@ -14,8 +14,8 @@
   </div>
   <hr class="plain-hr"/>
   <div class="flexrow">
-    <span style="font-weight: bold;">Additional Types</span>
-    <span style="font-weight: bold;">Damage Roll</span>
+    <span style="font-weight: bold;">{{localize "HYP3E.damageTypes.additionalTypes"}}</span>
+    <span style="font-weight: bold;">{{localize "HYP3E.damageTypes.damageRoll"}}</span>
   </div>
   <div class="form-fields flexrow">
     <select name="damageType1">
@@ -40,8 +40,8 @@
   </div>
 
   <div class="flexrow">
-    <div><span style="font-weight: bold;">Additional Types</span></div>
-    <div><span style="font-weight: bold;">Damage Roll</span></div>
+    <div><span style="font-weight: bold;">{{localize "HYP3E.damageTypes.additionalTypes"}}</span></div>
+    <div><span style="font-weight: bold;">{{localize "HYP3E.damageTypes.damageRoll"}}</span></div>
     {{!-- <div></div> --}}
   </div>
   <div class="flexcol">
@@ -61,10 +61,10 @@
   <div class="form-footer">
     <hr class="plain-hr"/>
     <button type="button" data-action="addType">
-      <i class="fas fa-plus"></i> Add Damage Type
+      <i class="fas fa-plus"></i> {{localize "HYP3E.damageTypes.addDamageType"}}
     </button>
     <button type="submit">
-      <i class="fas fa-save"></i> Save Changes
+      <i class="fas fa-save"></i> {{localize "HYP3E.damageTypes.saveChanges"}}
     </button>
   </div>
 

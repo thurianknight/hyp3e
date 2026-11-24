@@ -36,4 +36,22 @@ export default class Hyp3eSpell extends Hyp3eItemBase {
     if (this.parent.pack) return;
 
   }
+  
+  static migrateData(source) {
+    source = super.migrateData(source);
+  
+    // Only act if the old altDmg data is present and has content
+    if (source.altDmg && !foundry.utils.isEmpty(source.altDmg)) {
+      Hyp3eLogger.info("Hyp3eSpell migrateData", `Migrating altDmg to addlDmg...`, { altDmg: source.altDmg, addlDmg: source.addlDmg });
+      source.addlDmg = Object.entries(source.altDmg).map(([type, formula]) => ({
+        type: type ?? "",
+        formula: formula ?? ""
+      }));
+  
+      // Clean up so the old key doesn’t linger in the new document
+      delete source.altDmg;
+    }
+  
+    return source;
+  }
 }

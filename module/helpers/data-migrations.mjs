@@ -294,7 +294,11 @@ export function migrateItemData(item) {
 
   // Spells only
   if (item.type === "spell") {
-
+    // Migrate altDmg, if it exists, to addlDmg
+    if (item.system.altDmg && Object.keys(item.system.altDmg).length > 0) {
+      const addlDmg = Object.entries(item.system.altDmg).map(([type, formula]) => ({ type, formula }));
+      updates = { ...updates, "system.addlDmg": addlDmg, "system.altDmg": null };
+    }
   }
 
   // Weapons only
@@ -330,7 +334,7 @@ export function migrateItemData(item) {
     // Migrate altDmg, if it exists, to addlDmg
     if (item.system.altDmg && Object.keys(item.system.altDmg).length > 0) {
       const addlDmg = Object.entries(item.system.altDmg).map(([type, formula]) => ({ type, formula }));
-      updates = { ...updates, "system.addlDmg": addlDmg };
+      updates = { ...updates, "system.addlDmg": addlDmg, "system.altDmg": null };
     }
   }
 
