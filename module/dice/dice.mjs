@@ -325,34 +325,50 @@ export class Hyp3eDice {
     let damageGroups = [];  // Damage array for 1H groups
     let damageGroups2h = [];  // Damage array for 2H groups
 
-    // All items start with the base damage formula
-    dmgRollParts.push(itemData.damage);
-
-    // Add the debug message header and first table row
-    debugDmgRollParts.push(`<b>Damage formula elements:</b><table class="chat-table">`);
-    debugDmgRollParts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage}</td></tr>`);
-
-    // Concatenate conditional damage dice, if any exist, to the base damage formulas
+    let damageFormula1h = itemData.damage;
+    // If a conditional damage formula exists, replace the base formula with that
     conditionalMods.forEach((mod) => {
       if (mod.dmgFormula && mod.dmgFormula !== "") {
-        dmgRollParts.push(mod.dmgFormula);
-        debugDmgRollParts.push(`<tr><td>${baseDmgType} Dmg</td><td>${mod.dmgFormula}</td></tr>`);
+        damageFormula1h = mod.dmgFormula;
       }
     });
 
+    // All items start with the base damage formula
+    dmgRollParts.push(damageFormula1h);
+
+    // Add the debug message header and first table row
+    debugDmgRollParts.push(`<b>Damage formula elements:</b><table class="chat-table">`);
+    debugDmgRollParts.push(`<tr><td>${baseDmgType} Dmg</td><td>${damageFormula1h}</td></tr>`);
+
+    // Concatenate conditional damage dice, if any exist, to the base damage formulas
+    // conditionalMods.forEach((mod) => {
+    //   if (mod.dmgFormula && mod.dmgFormula !== "") {
+    //     dmgRollParts.push(mod.dmgFormula);
+    //     debugDmgRollParts.push(`<tr><td>${baseDmgType} Dmg</td><td>${mod.dmgFormula}</td></tr>`);
+    //   }
+    // });
+
     // Do we have 2-handed damage?
     if (itemData.damage2h) {
-      dmgRoll2Parts.push(itemData.damage2h);
-      debugDmgRoll2Parts.push(`<b>Damage formula elements:</b><table class="chat-table">`);
-      debugDmgRoll2Parts.push(`<tr><td>${baseDmgType} Dmg</td><td>${itemData.damage2h}</td></tr>`);
-
-      // Concatenate conditional damage dice, if any exist, to the base damage formulas
+      let damageFormula2h = itemData.damage2h;
+      // If a conditional damage formula exists, replace the base formula with that
       conditionalMods.forEach((mod) => {
         if (mod.dmgFormula2h && mod.dmgFormula2h !== "") {
-          dmgRoll2Parts.push(mod.dmgFormula2h);
-          debugDmgRoll2Parts.push(`<tr><td>${baseDmgType} Dmg</td><td>${mod.dmgFormula2h}</td></tr>`);
+          damageFormula2h = mod.dmgFormula2h;
         }
-      });  
+      });
+  
+      dmgRoll2Parts.push(damageFormula2h);
+      debugDmgRoll2Parts.push(`<b>Damage formula elements:</b><table class="chat-table">`);
+      debugDmgRoll2Parts.push(`<tr><td>${baseDmgType} Dmg</td><td>${damageFormula2h}</td></tr>`);
+
+      // Concatenate conditional damage dice, if any exist, to the base damage formulas
+      // conditionalMods.forEach((mod) => {
+      //   if (mod.dmgFormula2h && mod.dmgFormula2h !== "") {
+      //     dmgRoll2Parts.push(mod.dmgFormula2h);
+      //     debugDmgRoll2Parts.push(`<tr><td>${baseDmgType} Dmg</td><td>${mod.dmgFormula2h}</td></tr>`);
+      //   }
+      // });
     }
 
     // Reformat the item damage string for commonly-used variables
@@ -471,7 +487,7 @@ export class Hyp3eDice {
     if (itemData.missile && Array.isArray(itemData.annotations) && 
                       (itemData.annotations?.includes("hurled") || 
                         itemData.annotations?.includes("strDmgAdj"))) {
-      const baseFormula = itemData.damage || "";
+      const baseFormula = damageFormula1h || "";
       const hasStrVar = baseFormula.includes("@str.dmgMod");
 
       if (!hasStrVar) {
@@ -545,17 +561,6 @@ export class Hyp3eDice {
         }
       }
     }
-    // if (damageOptions) {
-    //   damageOptions.forEach(opt => {
-    //     dmgRollParts.push(opt.damage);
-    //     const optionMod = parseInt(opt.damage) > 0 ? `+${parseInt(opt.damage)}` : `${parseInt(opt.damage)}`;
-    //     debugDmgRollParts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
-    //     if (itemData.damage2h) {
-    //       dmgRoll2Parts.push(opt.damage)
-    //       debugDmgRoll2Parts.push(`<tr><td>${opt.name}</td><td>${optionMod}</td></tr>`)
-    //     }
-    //   });
-    // }
 
     // Before alts, record how many parts are for base (for both 1H and 2H)
     const numBaseParts = dmgRollParts.length;
@@ -596,7 +601,7 @@ export class Hyp3eDice {
     debugDmgRollParts.push(`</table>`)
     if (itemData.damage2h) { debugDmgRoll2Parts.push(`</table>`) }
 
-    // New: Compute term counts per part (handles if any part like itemData.damage has multiple terms, e.g., '1d6 + 1d4')
+    // New: Compute term counts per part (handles if any part like damageFormula1h has multiple terms, e.g., '1d6 + 1d4')
     const termCounts = dmgRollParts.map(part => {
       if (!part) return 0;
       const tempRoll = new Roll(`${part}`);  // No actorData needed, since vars are replaced
@@ -622,7 +627,7 @@ export class Hyp3eDice {
     });
     currentTermStart += baseTermCount;
 
-    // Alt groups
+    // Alt damage groups
     // if (Object.keys(altDmgTypes).length > 0) {
     //   Object.keys(altDmgTypes).forEach((k, idx) => {
     //     const altIdx = numBaseParts + idx;
@@ -638,7 +643,7 @@ export class Hyp3eDice {
     //     currentTermStart += altTermCount;
     //   });
     // }
-    // Addl groups
+    // Addl damage groups
     if (addlDmgTypes.length > 0) {
       addlDmgTypes.forEach((addl, idx) => {
         const addlIdx = numBaseParts + idx;
@@ -668,6 +673,7 @@ export class Hyp3eDice {
       });
       currentTermStart += baseTermCount2h;
 
+      // Alt damage groups for 2H
       // if (Object.keys(altDmgTypes).length > 0) {
       //   Object.keys(altDmgTypes).forEach((k, idx) => {
       //     const altIdx = numBaseParts2h + idx;
@@ -683,7 +689,7 @@ export class Hyp3eDice {
       //     currentTermStart += altTermCount;
       //   });
       // }
-      // Addl groups for 2H
+      // Addl damage groups for 2H
       if (addlDmgTypes.length > 0) {
         addlDmgTypes.forEach((addl, idx) => {
           const addlIdx = numBaseParts2h + idx;

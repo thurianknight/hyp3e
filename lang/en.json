@@ -627,7 +627,7 @@
     "false": "False",
     "damageTypes": {
       "title": "Damage Types",
-      "selectType": "Select a Base Type",
+      "selectType": "Base Damage",
       "damageRoll": "Damage Roll",
       "additionalTypes": "Additional Types",
       "addDamageType": "Add Damage Type",
@@ -636,7 +636,7 @@
     "conditionalMods": {
       "title": "Conditional Attack/Damage Modifiers",
       "modifier": "Modifier",
-      "note": "Note: Attack and Damage Mods replace any existing on the weapon, but 1-Hand and 2-Hand Damage formulas are added to the existing formula.",
+      "note": "Note: All mods and formulas _replace_ any existing on the weapon.",
       "atkMod": "Attack Mod",
       "dmgMod": "Damage Mod",
       "dmgFormula1h": "1-Hand Damage",

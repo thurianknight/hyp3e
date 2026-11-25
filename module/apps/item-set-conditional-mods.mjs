@@ -29,7 +29,7 @@ export default class HYP3EItemSetConditionalMods extends HandlebarsApplicationMi
     form: {
       handler: HYP3EItemSetConditionalMods.#onSubmit,
       submitOnChange: false,
-      closeOnSubmit: true
+      closeOnSubmit: false
     },
     actions: {
       addMod: HYP3EItemSetConditionalMods.#onAddMod,

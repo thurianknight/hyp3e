@@ -1,7 +1,7 @@
 <div class="item-set-dmg-types">
   <h3>{{item.name}}</h3>
   {{!-- <input type="hidden" name="itemUuid" value="{{itemUuid}}" /> --}}
-  <hr class="plain-hr"/>
+  <hr class="plain-hr" style="margin: 10px 0;"/>
   <div class="flexrow">
     <span style="font-weight: bold;">{{localize "HYP3E.damageTypes.selectType"}}</span>
     <span style="font-weight: bold;">{{localize "HYP3E.damageTypes.damageRoll"}}</span>
@@ -12,8 +12,10 @@
     </select>
     <input type="text" name="damage" value="{{@root.damage}}" disabled />
   </div>
-  <hr class="plain-hr"/>
-  <div class="flexrow">
+
+  <hr class="plain-hr" style="margin: 10px 0;"/>
+
+  {{!-- <div class="flexrow">
     <span style="font-weight: bold;">{{localize "HYP3E.damageTypes.additionalTypes"}}</span>
     <span style="font-weight: bold;">{{localize "HYP3E.damageTypes.damageRoll"}}</span>
   </div>
@@ -37,7 +39,7 @@
       {{selectOptions damageTypes selected=@root.damageType3 localize=false}}
     </select>
     <input type="text" name="altDmg3" value="{{@root.altDmg3}}" placeholder="Ex.: 1d4" />
-  </div>
+  </div> --}}
 
   <div class="flexrow">
     <div><span style="font-weight: bold;">{{localize "HYP3E.damageTypes.additionalTypes"}}</span></div>
@@ -58,8 +60,7 @@
     {{/each}}
   </div>
 
-  <div class="form-footer">
-    <hr class="plain-hr"/>
+  <div class="form-footer" style="margin-top: 20px;">
     <button type="button" data-action="addType">
       <i class="fas fa-plus"></i> {{localize "HYP3E.damageTypes.addDamageType"}}
     </button>
