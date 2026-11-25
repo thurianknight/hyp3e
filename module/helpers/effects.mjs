@@ -436,16 +436,7 @@ export async function setupEffectHandlers() {
       Hyp3eLogger.info("ActiveEffect createActiveEffect", `Setting remainingRounds to ${durationRounds} for ${effect.name}`);
     }
 
-    // Does the effect include light source properties?
-    const lightProps = effect.getFlag("hyp3e", "lightProps");
-    if (lightProps) {
-      // Find all placed tokens for this actor (usually just one) in the current scene
-      for (const token of canvas.tokens.placeables) {
-        if (token.actor?.id !== actor.id) continue;
-        // Apply the light source to the token
-        applyTokenLight(token, lightProps);
-      }
-    }
+    if (!effect.disabled) await syncTokenLight(effect, true, userId);
     Hyp3eLogger.info("ActiveEffect createActiveEffect", `Effect ${effect.name} created on ${actor.name}:`, effect);
 
     // Send a chat message that the effect was applied
@@ -477,44 +468,7 @@ export async function setupEffectHandlers() {
       await effect.setFlag("hyp3e", "remainingRounds", 0);
     }
 
-    // Check if "disabled" is in the light source effect updates, and toggle light accordingly
-    Hyp3eLogger.info("ActiveEffect updateActiveEffect", `ActiveEffect ${effect.name} and changes:`, { Effect: effect, Change: change });
-    if ("disabled" in change) {
-      const wasDisabled = change.disabled;
-      if (wasDisabled === true) {
-        Hyp3eLogger.info("ActiveEffect updateActiveEffect", `Disabling ${effect.name} on ${effect.parent?.name}:`, effect);
-        // Does the effect include light source properties?
-        const lightProps = effect.getFlag("hyp3e", "lightProps");
-        if (lightProps) {
-          // Find all placed tokens for this actor (usually just one) in the current scene
-          for (const token of canvas.tokens.placeables) {
-            if (token.actor?.id !== effect.parent.id) continue;
-
-            // Restore original light properties from the flag
-            const originalLight = token.document.getFlag("hyp3e", "originalLight");
-            if (originalLight) {
-              await token.document.update({ light: originalLight });
-              await token.document.unsetFlag("hyp3e", "originalLight");
-              Hyp3eLogger.info("ActiveEffect updateActiveEffect", `Restored original light for token ${token.name}`);
-            } else {
-              await token.document.update({ light: null });
-            }
-          }
-        }
-      } else if (wasDisabled === false) {
-        Hyp3eLogger.info("ActiveEffect updateActiveEffect", `Enabling ${effect.name} on ${effect.parent?.name}:`, effect);
-        // Does the effect include light source properties?
-        const lightProps = effect.getFlag("hyp3e", "lightProps");
-        if (lightProps) {
-          // Find all placed tokens for this actor (usually just one) in the current scene
-          for (const token of canvas.tokens.placeables) {
-            if (token.actor?.id !== effect.parent.id) continue;
-            // Apply the light source to the token
-            await applyTokenLight(token, lightProps);
-          }
-        }
-      }
-    }
+    if ("disabled" in change) await syncTokenLight(effect, !change.disabled, userId);
   });
 
   /**
@@ -543,22 +497,7 @@ export async function setupEffectHandlers() {
       Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `${effect.name} removed from ${actor.name}.`, effect);
     }
 
-    // When an active effect is deleted, check whether it had modified the token's light.
-    //  If so, restore the original light settings from the flag.
-    const lightProps = effect.getFlag("hyp3e", "lightProps");
-    if (lightProps) {
-      for (const token of canvas.tokens.placeables) {
-        if (token.actor?.id !== actor.id) continue;
-
-        const originalLight = token.document.getFlag("hyp3e", "originalLight");
-        if (!originalLight) continue;
-
-        await token.document.update({ light: originalLight });
-        await token.document.unsetFlag("hyp3e", "originalLight");
-
-        Hyp3eLogger.info("ActiveEffect deleteActiveEffect", `Restored original light for token ${token.name}`);
-      }
-    }
+    await syncTokenLight(effect, false, userId);
   });
 }
 
@@ -614,12 +553,48 @@ export async function checkAndResolveDuration(effect, actorData) {
   return { updatedDuration, updated };
 }
 
+// One client updates token documents, including tokens on scenes nobody is viewing.
+async function syncTokenLight(effect, enabled, userId) {
+  const props = effect.getFlag("hyp3e", "lightProps");
+  if (!props || game.user.id !== (game.users.activeGM?.id ?? userId)) return;
+  const actor = effect.parent;
+  const uuid = effect.getFlag("hyp3e", "lightTokenUuid");
+  let targets;
+  if (uuid) {
+    const token = await fromUuid(uuid);
+    if (token?.documentName !== "Token" || token.actor?.uuid !== actor.uuid) return;
+    targets = [token];
+  } else if (actor.token) {
+    targets = [actor.token];
+  } else {
+    // Older lights have no token UUID. Only restore tokens with a saved light;
+    // enable an old light only when the actor has one possible linked token.
+    targets = actor.getDependentTokens?.({ linked: enabled }) ?? [];
+    if (enabled && targets.length !== 1) return;
+  }
+  for (const token of targets) {
+    const previous = token.getFlag("hyp3e", "originalLight");
+    const appliedBy = token.getFlag("hyp3e", "lightEffectId");
+    if (enabled) {
+      await applyTokenLight(token, props, effect.id);
+    } else if (previous && (!appliedBy || appliedBy === effect.id)) {
+      const ForcedDeletion = foundry.data?.operators?.ForcedDeletion;
+      const clearedFlags = ForcedDeletion
+        ? { originalLight: new ForcedDeletion(), lightEffectId: new ForcedDeletion() }
+        : { "-=originalLight": null, "-=lightEffectId": null };
+      await token.update({ light: previous, "flags.hyp3e": clearedFlags });
+    }
+  }
+}
+
 /**
  * Handle applying a light source to a token document.
  * @param {*} token - The token document to receive the light source
  * @param {*} lightProps - An object containing the light properties to apply
+ * @param {string} [effectId] - The effect that owns the saved light settings.
  */
-export async function applyTokenLight(token, lightProps) {
+export async function applyTokenLight(token, lightProps, effectId) {
+  token = token.document ?? token;
   Hyp3eLogger.info("ActiveEffect applyTokenLight", `Applying light source properties to ${token.name}:`, lightProps);
   // Prepare the light data
   const lightSource = {
@@ -631,15 +606,12 @@ export async function applyTokenLight(token, lightProps) {
     animation: lightProps.animation || { type: "none" } // Default animation if none provided
   };
 
-  // Store original light properties as a flag, in case you want to restore later
-  const currentLight = token.document.light;
-  await token.document.setFlag("hyp3e", "originalLight", currentLight);
-
-  // Update light on the placed token
-  await token.document.update({
-    "light": lightSource,
-    "vision": true // Ensure the token can see
-  });
+  const updates = { light: lightSource, vision: true };
+  if (!token.getFlag("hyp3e", "originalLight")) {
+    updates["flags.hyp3e.originalLight"] = token.light.toObject?.() ?? token.light;
+  }
+  if (effectId) updates["flags.hyp3e.lightEffectId"] = effectId;
+  await token.update(updates);
 
   // Hyp3eLogger.info("ActiveEffect applyTokenLight", `Applied light source to token ${token.name}`);
 }

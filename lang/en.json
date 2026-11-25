@@ -428,6 +428,7 @@
       "inStorage": "In Storage",
       "lightSource": "Light Source",
       "toggleLight": "Toggle Light",
+      "selectLightToken": "Select one token for this actor to use its light.",
       "light": {
         "lightRadius": "Light Radius",
         "dim": "Dim",
