@@ -284,7 +284,7 @@ export class Hyp3eDice {
     let dmgRollParts = [];
     let debugDmgRollParts = [];
     let dmgIcons = [];
-    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Item damage type: ${itemData?.dmgType}`);
+    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Item damage type: ${itemData?.dmgType}`, itemData);
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Actor data:`, actorData);
 
     // Format these output strings for later
@@ -317,12 +317,13 @@ export class Hyp3eDice {
     const addlDmgTypes = (itemData?.addlDmg && Array.isArray(itemData?.addlDmg)) ? itemData?.addlDmg : [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Additional damage types:`, addlDmgTypes);
 
-    // Check for legacy alternate damage types, log but ignore
+    // Check for legacy alternate damage types, log but ignore. 
+    //  These should have been migrated but there must have been an error.
     let altDmgTypes = {};
     if (!addlDmgTypes) {
       if (itemData.altDmg) {
         altDmgTypes = Object.keys(itemData?.altDmg).length ? itemData.altDmg : {};
-        Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Alternate damage types:`, altDmgTypes);  
+        Hyp3eLogger.warn("Hyp3eDice buildDamageFormula", `Alternate damage types on ${itemData.realName} failed to migrate:`, altDmgTypes);  
       }
     }
 
