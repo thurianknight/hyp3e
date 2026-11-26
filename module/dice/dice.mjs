@@ -284,7 +284,7 @@ export class Hyp3eDice {
     let dmgRollParts = [];
     let debugDmgRollParts = [];
     let dmgIcons = [];
-    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Item damage type: ${itemData?.dmgType}`, itemData);
+    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Item damage type: ${itemData?.dmgType}, item data:`, itemData);
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Actor data:`, actorData);
 
     // Format these output strings for later
