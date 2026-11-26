@@ -45,7 +45,7 @@
           {{/if}}
           <hr class="plain-hr"/>
           {{#if isGM}}
-          <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
+          <label class="resource-label">{{localize 'HYP3E.headers.addlDmg'}}</label>
           <ol class="items-list">
             {{#each system.addlDmg as |dmg i|}}
             <li class="item-entry item" data-item-id="{{i}}">
@@ -56,7 +56,7 @@
           <hr class="plain-hr"/>
           {{else}} {{!-- not isGM --}}
             {{#if system.identified}}
-            <label class="resource-label">{{localize 'HYP3E.headers.altDmg'}}</label>
+            <label class="resource-label">{{localize 'HYP3E.headers.addlDmg'}}</label>
             <ol class="items-list">
               {{#each system.addlDmg as |dmg i|}}
               <li class="item-entry item" data-item-id="{{i}}">
@@ -64,15 +64,6 @@
               </li>
               {{/each}}
             </ol>
-            <hr class="plain-hr"/>
-            <a class="item-button item-control" 
-                aria-label="{{localize 'Conditional Modifiers'}}" 
-                role="button" 
-                data-tooltip="Conditional Modifiers" 
-                data-action="configureConditionalMods">
-              <i class="fas fa-cogs" style="font-size: small"></i>
-            </a>
-            <label class="resource-label">Special</label>
             <hr class="plain-hr"/>
             {{/if}}
           {{/if}} {{!-- /if isGM --}}
@@ -95,9 +86,9 @@
               role="button" 
               data-tooltip="Conditional Modifiers" 
               data-action="configureConditionalMods">
-            <i class="fas fa-cogs" style="font-size: small"></i>
+            <i class="fas fa-cogs" style="font-size: small"></i> 
+            <label class="resource-label">{{localize "HYP3E.dataLabel.advanced"}}</label>
           </a>
-          <label class="resource-label">Special</label>
           {{else}} {{!-- not isGM --}}
             {{#if system.identified}}
             <label class="resource-label">{{localize 'HYP3E.spell.save'}}</label>
@@ -107,6 +98,15 @@
                 {{selectOptions saveThrows selected=system.save localize=true}}
               </select>
             </div>
+            <hr class="plain-hr"/>
+            <a class="item-button item-control" 
+                aria-label="{{localize 'Conditional Modifiers'}}" 
+                role="button" 
+                data-tooltip="Conditional Modifiers" 
+                data-action="configureConditionalMods">
+              <i class="fas fa-cogs" style="font-size: small"></i> 
+              <label class="resource-label">{{localize "HYP3E.dataLabel.advanced"}}</label>
+            </a>
             {{/if}}
           {{/if}} {{!-- /if isGM --}}
         </div>

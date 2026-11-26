@@ -313,10 +313,18 @@ export class Hyp3eDice {
       : CONFIG.HYP3E.damageTypeIcons["basic"];
     dmgIcons.push(`<span>${baseIcon}</span>`);
 
-    const altDmgTypes = Object.keys(itemData?.altDmg).length ? itemData?.altDmg : {};
-    Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Alternate damage types:`, altDmgTypes);
+    // Check for additional damage types, to be used later
     const addlDmgTypes = (itemData?.addlDmg && Array.isArray(itemData?.addlDmg)) ? itemData?.addlDmg : [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Additional damage types:`, addlDmgTypes);
+
+    // Check for legacy alternate damage types, log but ignore
+    let altDmgTypes = {};
+    if (!addlDmgTypes) {
+      if (itemData.altDmg) {
+        altDmgTypes = Object.keys(itemData?.altDmg).length ? itemData.altDmg : {};
+        Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Alternate damage types:`, altDmgTypes);  
+      }
+    }
 
     // I may regret this, but I'm going to assume we will never have more than 2 damage fields 
     //  (1-hand and 2-hand) and hard-code it into this function.

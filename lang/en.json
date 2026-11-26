@@ -190,7 +190,7 @@
       "damage2h": "2-Hand Dmg",
       "damageType": "Damage Type",
       "damageTypes": "Damage Types",
-      "altDmg": "Add'l Dmg",
+      "addlDmg": "Add'l Dmg",
       "weaponMastery": "Weapon Mastery",
       "type": "Type",
       "biography": "Biography",
@@ -731,7 +731,8 @@
       "createClass": "Create New Class",
       "buyMultiplier": "Buy/Offer Fraction",
       "sellMultiplier": "Sell/Cost Multiplier",
-      "combatOptions": "Combat Options"
+      "combatOptions": "Combat Options",
+      "advanced": "Advanced"
     },
     "combat": {
       "rollInitiative": "Group {initGroup} rolls for Initiative!",
