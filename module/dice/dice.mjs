@@ -33,7 +33,7 @@ export class Hyp3eDice {
     const faAtkMod = parseInt(actorData.fa) > 0 ? `+${parseInt(actorData.fa)}` : `${parseInt(actorData.fa)}`;
     const caAtkMod = parseInt(actorData.ca) > 0 ? `+${parseInt(actorData.ca)}` : `${parseInt(actorData.ca)}`;
     // let itemAtkMod = parseInt(itemData.atkMod) > 0 ? `+${parseInt(itemData.atkMod)}` : `${parseInt(itemData.atkMod)}`;
-    let itemAtkMod = parseInt(itemData.atkMod);
+    let itemAtkMod = itemData?.atkMod ? parseInt(itemData?.atkMod) : 0;
     const conditionalMods = (itemData?.conditionalMods && Array.isArray(itemData?.conditionalMods)) ? this._getApplicableConditionalMods(itemData, actorData, targetData) : [];
     Hyp3eLogger.info("Hyp3eDice buildAttackFormula", `Applicable conditional mods:`, conditionalMods);
     // Replace itemAtkMod with the sum of all applicable conditional mods
@@ -296,7 +296,7 @@ export class Hyp3eDice {
     const faDmgMod = parseInt(actorData.fa) > 0 ? `+${parseInt(actorData.fa)}` : `${parseInt(actorData.fa)}`;
     const caDmgMod = parseInt(actorData.ca) > 0 ? `+${parseInt(actorData.ca)}` : `${parseInt(actorData.ca)}`;
     // const itemDmgMod = parseInt(itemData.dmgMod) > 0 ? `+${parseInt(itemData.dmgMod)}` : `${parseInt(itemData.dmgMod)}`;
-    let itemDmgMod = parseInt(itemData.dmgMod);
+    let itemDmgMod = itemData?.dmgMod ? parseInt(itemData.dmgMod) : 0;
     const conditionalMods = (itemData?.conditionalMods && Array.isArray(itemData?.conditionalMods)) ? this._getApplicableConditionalMods(itemData, actorData, targetData) : [];
     Hyp3eLogger.info("Hyp3eDice buildDamageFormula", `Applicable conditional mods:`, conditionalMods);
     // Replace itemDmgMod with the sum of all applicable conditional mods
